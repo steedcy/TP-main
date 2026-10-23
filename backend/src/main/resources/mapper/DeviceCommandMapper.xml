@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.airport.ai.device.DeviceCommandMapper">
+    <resultMap id="DeviceCommandResult" type="com.airport.ai.device.DeviceCommandRecord">
+        <id column="id" property="id"/>
+        <result column="command_id" property="commandId"/>
+        <result column="agent_code" property="agentCode"/>
+        <result column="command_type" property="commandType"/>
+        <result column="attempt_no" property="attemptNo"/>
+        <result column="task_id" property="taskId"/>
+        <result column="step_seq" property="stepSeq"/>
+        <result column="capability_type" property="capabilityType"/>
+        <result column="command_payload" property="commandPayload"/>
+        <result column="command_status" property="commandStatus"/>
+        <result column="response_payload" property="responsePayload"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+    <insert id="insertIfAbsent" parameterType="com.airport.ai.device.DeviceCommandRecord">
+        INSERT INTO device_commands (command_id, agent_code, command_type, attempt_no, task_id, step_seq,
+                                     capability_type, command_payload, command_status, created_at, updated_at)
+        VALUES (#{commandId}, #{agentCode}, #{commandType}, #{attemptNo}, #{taskId}, #{stepSeq},
+                #{capabilityType}, #{commandPayload}, #{commandStatus}, #{createdAt}, #{updatedAt})
+        ON CONFLICT (agent_code, command_id, command_type, attempt_no) DO NOTHING
+    </insert>
+    <select id="findByKey" resultMap="DeviceCommandResult">
+        SELECT * FROM device_commands
+        WHERE agent_code = #{agentCode} AND command_id = #{commandId}
+          AND command_type = #{commandType} AND attempt_no = #{attemptNo}
+    </select>
+    <select id="findRecentByAgentCode" resultMap="DeviceCommandResult">
+        SELECT * FROM device_commands
+        WHERE agent_code = #{agentCode}
+        ORDER BY created_at DESC
+        LIMIT #{limit}
+    </select>
+    <update id="updateStatus">
+        UPDATE device_commands
+        SET command_status = #{status}, response_payload = COALESCE(#{responsePayload}, response_payload),
+            updated_at = CURRENT_TIMESTAMP
+        WHERE agent_code = #{agentCode} AND command_id = #{commandId}
+          AND command_type = #{commandType} AND attempt_no = #{attemptNo}
+          AND (#{status} NOT IN ('SENT', 'DELIVERY_FAILED') OR command_status IN ('PENDING', 'DELIVERY_FAILED'))
+    </update>
+</mapper>

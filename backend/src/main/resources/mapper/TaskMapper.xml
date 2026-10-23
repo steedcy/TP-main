@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.airport.ai.task.TaskMapper">
+
+    <resultMap id="TaskResult" type="com.airport.ai.task.Task">
+        <id column="id" property="id"/>
+        <result column="task_code" property="taskCode"/>
+        <result column="task_goal" property="taskGoal"/>
+        <result column="task_family" property="taskFamily"/>
+        <result column="scene_params" property="sceneParams"/>
+        <result column="goal_parsing_result" property="goalParsingResult"/>
+        <result column="status" property="status"/>
+        <result column="current_plan_version_id" property="currentPlanVersionId"/>
+        <result column="replan_used" property="replanUsed"/>
+        <result column="replanning_reason" property="replanningReason"/>
+        <result column="manual_terminate_reason" property="manualTerminateReason"/>
+        <result column="failure_reason" property="failureReason"/>
+        <result column="missing_info_questions" property="missingInfoQuestions"/>
+        <result column="downgrade_reason" property="downgradeReason"/>
+        <result column="is_dry_run" property="isDryRun"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="created_by" property="createdBy"/>
+    </resultMap>
+
+    <sql id="Columns">
+        id, task_code, task_goal, task_family, scene_params, goal_parsing_result, status,
+        current_plan_version_id, replan_used, replanning_reason, manual_terminate_reason,
+        failure_reason, missing_info_questions, downgrade_reason, is_dry_run, created_at, updated_at, created_by
+    </sql>
+
+    <select id="findById" resultMap="TaskResult">
+        SELECT <include refid="Columns"/> FROM tasks WHERE id = #{id}
+    </select>
+
+    <select id="findByTaskCode" resultMap="TaskResult">
+        SELECT <include refid="Columns"/> FROM tasks WHERE task_code = #{taskCode}
+    </select>
+
+    <select id="searchPaged" resultMap="TaskResult">
+        SELECT <include refid="Columns"/> FROM tasks
+        <where>
+            <if test="taskCode != null">AND task_code = #{taskCode}</if>
+            <if test="status != null">AND status = #{status}</if>
+            <if test="taskFamily != null">AND task_family = #{taskFamily}</if>
+            <if test="createdFrom != null">AND created_at &gt;= #{createdFrom}</if>
+            <if test="createdTo != null">AND created_at &lt;= #{createdTo}</if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="countByStatus" resultType="long">
+        SELECT COUNT(*) FROM tasks WHERE status = #{status}
+    </select>
+
+    <select id="count" resultType="long">
+        SELECT COUNT(*) FROM tasks
+    </select>
+
+    <insert id="insert" parameterType="com.airport.ai.task.Task" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tasks (task_code, task_goal, task_family, scene_params, goal_parsing_result, status,
+                            current_plan_version_id, replan_used, replanning_reason, manual_terminate_reason,
+                            failure_reason, missing_info_questions, downgrade_reason, is_dry_run,
+                            created_at, updated_at, created_by)
+        VALUES (#{taskCode}, #{taskGoal}, #{taskFamily}, #{sceneParams}::json, #{goalParsingResult}::json, #{status},
+                #{currentPlanVersionId}, #{replanUsed}, #{replanningReason}, #{manualTerminateReason},
+                #{failureReason}, #{missingInfoQuestions}::json, #{downgradeReason}, #{isDryRun},
+                #{createdAt}, #{updatedAt}, #{createdBy})
+    </insert>
+
+    <update id="update" parameterType="com.airport.ai.task.Task">
+        UPDATE tasks SET
+            task_goal = #{taskGoal},
+            task_family = #{taskFamily},
+            scene_params = #{sceneParams}::json,
+            goal_parsing_result = #{goalParsingResult}::json,
+            status = #{status},
+            current_plan_version_id = #{currentPlanVersionId},
+            replan_used = #{replanUsed},
+            replanning_reason = #{replanningReason},
+            manual_terminate_reason = #{manualTerminateReason},
+            failure_reason = #{failureReason},
+            missing_info_questions = #{missingInfoQuestions}::json,
+            downgrade_reason = #{downgradeReason},
+            is_dry_run = #{isDryRun},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+
+    <update id="claimReplan">
+        UPDATE tasks SET replan_used = TRUE, replanning_reason = #{reason}, updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{taskId} AND replan_used = FALSE
+    </update>
+</mapper>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.airport.ai.task.PlanVersionMapper">
+
+    <resultMap id="PlanVersionResult" type="com.airport.ai.task.PlanVersion">
+        <id column="id" property="id"/>
+        <result column="task_id" property="taskId"/>
+        <result column="version_no" property="versionNo"/>
+        <result column="source" property="source"/>
+        <result column="baseline_template_id" property="baselineTemplateId"/>
+        <result column="snapshot_id" property="snapshotId"/>
+        <result column="plan_steps" property="planSteps"/>
+        <result column="structure_check_result" property="structureCheckResult"/>
+        <result column="capability_check_result" property="capabilityCheckResult"/>
+        <result column="constraint_check_result" property="constraintCheckResult"/>
+        <result column="validation_errors" property="validationErrors"/>
+        <result column="risk_level" property="riskLevel"/>
+        <result column="risk_reason_code" property="riskReasonCode"/>
+        <result column="judgment_basis" property="judgmentBasis"/>
+        <result column="confidence" property="confidence"/>
+        <result column="rule_set_version" property="ruleSetVersion"/>
+        <result column="frozen_at" property="frozenAt"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <sql id="Columns">
+        id, task_id, version_no, source, baseline_template_id, snapshot_id, plan_steps,
+        structure_check_result, capability_check_result, constraint_check_result, validation_errors, risk_level,
+        risk_reason_code, judgment_basis, confidence, rule_set_version, frozen_at, created_at
+    </sql>
+
+    <select id="findById" resultMap="PlanVersionResult">
+        SELECT <include refid="Columns"/> FROM plan_versions WHERE id = #{id}
+    </select>
+
+    <select id="findByTaskIdOrderByVersionNoAsc" resultMap="PlanVersionResult">
+        SELECT <include refid="Columns"/> FROM plan_versions WHERE task_id = #{taskId} ORDER BY version_no ASC
+    </select>
+
+    <select id="findByTaskIdAndVersionNo" resultMap="PlanVersionResult">
+        SELECT <include refid="Columns"/> FROM plan_versions WHERE task_id = #{taskId} AND version_no = #{versionNo}
+    </select>
+
+    <select id="countByTaskId" resultType="long">
+        SELECT COUNT(*) FROM plan_versions WHERE task_id = #{taskId}
+    </select>
+
+    <insert id="insert" parameterType="com.airport.ai.task.PlanVersion" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO plan_versions (task_id, version_no, source, baseline_template_id, snapshot_id, plan_steps,
+                                    structure_check_result, capability_check_result, constraint_check_result,
+                                    validation_errors, risk_level, risk_reason_code, judgment_basis, confidence,
+                                    rule_set_version, frozen_at, created_at)
+        VALUES (#{taskId}, #{versionNo}, #{source}, #{baselineTemplateId}, #{snapshotId}, #{planSteps}::json,
+                #{structureCheckResult}, #{capabilityCheckResult}, #{constraintCheckResult}, #{validationErrors}::json,
+                #{riskLevel}, #{riskReasonCode}, #{judgmentBasis}, #{confidence}, #{ruleSetVersion},
+                #{frozenAt}, #{createdAt})
+    </insert>
+
+    <update id="update" parameterType="com.airport.ai.task.PlanVersion">
+        UPDATE plan_versions SET
+            structure_check_result = #{structureCheckResult},
+            capability_check_result = #{capabilityCheckResult},
+            constraint_check_result = #{constraintCheckResult},
+            validation_errors = #{validationErrors}::json,
+            risk_level = #{riskLevel},
+            risk_reason_code = #{riskReasonCode},
+            judgment_basis = #{judgmentBasis},
+            confidence = #{confidence},
+            rule_set_version = #{ruleSetVersion},
+            frozen_at = #{frozenAt}
+        WHERE id = #{id}
+    </update>
+
+</mapper>

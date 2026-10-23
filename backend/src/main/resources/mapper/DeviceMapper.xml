@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.airport.ai.device.DeviceMapper">
+
+    <resultMap id="DeviceResult" type="com.airport.ai.device.Device">
+        <id column="id" property="id"/>
+        <result column="device_code" property="deviceCode"/>
+        <result column="device_name" property="deviceName"/>
+        <result column="device_type_code" property="deviceTypeCode"/>
+        <result column="is_simulator" property="isSimulator"/>
+        <result column="simulated_device_type" property="simulatedDeviceType"/>
+        <result column="area_code" property="areaCode"/>
+        <result column="position_x" property="positionX"/>
+        <result column="position_y" property="positionY"/>
+        <result column="access_endpoint" property="accessEndpoint"/>
+        <result column="access_credential_ref" property="accessCredentialRef"/>
+        <result column="device_token_hash" property="deviceTokenHash"/>
+        <result column="device_token_ciphertext" property="deviceTokenCiphertext"/>
+        <result column="device_token_issued_at" property="deviceTokenIssuedAt"/>
+        <result column="status_report_interval" property="statusReportInterval"/>
+        <result column="connection_test_status" property="connectionTestStatus"/>
+        <result column="connection_test_result" property="connectionTestResult"/>
+        <result column="remark" property="remark"/>
+        <result column="device_status" property="deviceStatus"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="updated_by" property="updatedBy"/>
+    </resultMap>
+
+    <sql id="Columns">
+        id, device_code, device_name, device_type_code, is_simulator, simulated_device_type, area_code,
+        position_x, position_y, access_endpoint, access_credential_ref, device_token_hash,
+        device_token_ciphertext, device_token_issued_at, status_report_interval,
+        connection_test_status, connection_test_result, remark, device_status, created_at, updated_at,
+        created_by, updated_by
+    </sql>
+
+    <select id="findById" resultMap="DeviceResult">
+        SELECT <include refid="Columns"/> FROM devices WHERE id = #{id}
+    </select>
+
+    <select id="findByDeviceCode" resultMap="DeviceResult">
+        SELECT <include refid="Columns"/> FROM devices WHERE device_code = #{deviceCode}
+    </select>
+
+    <select id="existsByDeviceCode" resultType="boolean">
+        SELECT EXISTS(SELECT 1 FROM devices WHERE device_code = #{deviceCode})
+    </select>
+
+    <select id="countByDeviceStatusNot" resultType="long">
+        SELECT COUNT(*) FROM devices WHERE device_status &lt;&gt; #{deviceStatus}
+    </select>
+
+    <select id="countByDeviceTypeCodeAndDeviceStatusNot" resultType="long">
+        SELECT COUNT(*) FROM devices
+        WHERE device_type_code = #{deviceTypeCode} AND device_status &lt;&gt; #{deviceStatus}
+    </select>
+
+    <update id="updateDeviceToken">
+        UPDATE devices
+        SET device_token_hash = #{tokenHash},
+            device_token_ciphertext = #{tokenCiphertext},
+            device_token_issued_at = #{issuedAt},
+            connection_test_status = 'UNTESTED',
+            connection_test_result = NULL,
+            updated_at = #{issuedAt}
+        WHERE id = #{deviceId}
+    </update>
+
+    <select id="findByIds" resultMap="DeviceResult">
+        SELECT <include refid="Columns"/> FROM devices
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>
+    </select>
+
+    <select id="searchPaged" resultMap="DeviceResult">
+        SELECT <include refid="Columns"/> FROM devices
+        <where>
+            device_status &lt;&gt; 'DELETED'
+            <if test="deviceTypeCode != null">
+                AND device_type_code = #{deviceTypeCode}
+            </if>
+            <if test="keyword != null">
+                AND (device_name LIKE CONCAT('%', #{keyword}, '%') OR device_code LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY id
+    </select>
+
+    <insert id="insert" parameterType="com.airport.ai.device.Device" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO devices (device_code, device_name, device_type_code, is_simulator, simulated_device_type,
+                              area_code, position_x, position_y, access_endpoint, access_credential_ref,
+                              status_report_interval, connection_test_status, connection_test_result, remark,
+                              device_status, created_at, updated_at, created_by, updated_by)
+        VALUES (#{deviceCode}, #{deviceName}, #{deviceTypeCode}, #{isSimulator}, #{simulatedDeviceType},
+                #{areaCode}, #{positionX}, #{positionY}, #{accessEndpoint}, #{accessCredentialRef},
+                #{statusReportInterval}, #{connectionTestStatus}, #{connectionTestResult}, #{remark},
+                #{deviceStatus}, #{createdAt}, #{updatedAt}, #{createdBy}, #{updatedBy})
+    </insert>
+
+    <update id="update" parameterType="com.airport.ai.device.Device">
+        UPDATE devices SET
+            device_name = #{deviceName},
+            area_code = #{areaCode},
+            position_x = #{positionX},
+            position_y = #{positionY},
+            access_endpoint = #{accessEndpoint},
+            access_credential_ref = #{accessCredentialRef},
+            status_report_interval = #{statusReportInterval},
+            connection_test_status = #{connectionTestStatus},
+            connection_test_result = #{connectionTestResult},
+            remark = #{remark},
+            device_status = #{deviceStatus},
+            updated_at = #{updatedAt},
+            updated_by = #{updatedBy}
+        WHERE id = #{id}
+    </update>
+
+</mapper>

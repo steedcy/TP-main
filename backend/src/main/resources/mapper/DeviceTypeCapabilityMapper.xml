@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.airport.ai.devicetype.DeviceTypeCapabilityMapper">
+
+    <resultMap id="DeviceTypeCapabilityResult" type="com.airport.ai.devicetype.DeviceTypeCapability">
+        <id column="id" property="id"/>
+        <result column="device_type_code" property="deviceTypeCode"/>
+        <result column="device_type_name" property="deviceTypeName"/>
+        <result column="supported_capability_types" property="supportedCapabilityTypes"/>
+        <result column="type_description" property="typeDescription"/>
+        <result column="constraint_rules" property="constraintRules"/>
+        <result column="typical_scenarios" property="typicalScenarios"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="updated_by" property="updatedBy"/>
+    </resultMap>
+
+    <sql id="Columns">
+        id, device_type_code, device_type_name, supported_capability_types, type_description,
+        constraint_rules, typical_scenarios, created_at, updated_at, updated_by
+    </sql>
+
+    <select id="findAll" resultMap="DeviceTypeCapabilityResult">
+        SELECT <include refid="Columns"/> FROM device_type_capability ORDER BY id
+    </select>
+
+    <select id="findByDeviceTypeCode" resultMap="DeviceTypeCapabilityResult">
+        SELECT <include refid="Columns"/> FROM device_type_capability WHERE device_type_code = #{deviceTypeCode}
+    </select>
+
+    <insert id="insert" parameterType="com.airport.ai.devicetype.DeviceTypeCapability" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO device_type_capability (device_type_code, device_type_name, supported_capability_types,
+                                             type_description, constraint_rules, typical_scenarios,
+                                             created_at, updated_at, updated_by)
+        VALUES (#{deviceTypeCode}, #{deviceTypeName}, #{supportedCapabilityTypes}::json,
+                #{typeDescription}, #{constraintRules}, #{typicalScenarios},
+                #{createdAt}, #{updatedAt}, #{updatedBy})
+    </insert>
+
+    <update id="update" parameterType="com.airport.ai.devicetype.DeviceTypeCapability">
+        UPDATE device_type_capability SET
+            device_type_name = #{deviceTypeName},
+            supported_capability_types = #{supportedCapabilityTypes}::json,
+            type_description = #{typeDescription},
+            constraint_rules = #{constraintRules},
+            typical_scenarios = #{typicalScenarios},
+            updated_at = #{updatedAt},
+            updated_by = #{updatedBy}
+        WHERE id = #{id}
+    </update>
+
+</mapper>

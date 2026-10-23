@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.airport.ai.risk.RiskRuleMapper">
+
+    <resultMap id="RiskRuleResult" type="com.airport.ai.risk.RiskRule">
+        <id column="id" property="id"/>
+        <result column="rule_code" property="ruleCode"/>
+        <result column="rule_content" property="ruleContent"/>
+        <result column="rule_version" property="ruleVersion"/>
+        <result column="enabled" property="enabled"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="updated_by" property="updatedBy"/>
+    </resultMap>
+
+    <sql id="Columns">id, rule_code, rule_content, rule_version, enabled, created_at, updated_at, updated_by</sql>
+
+    <select id="findAll" resultMap="RiskRuleResult">
+        SELECT <include refid="Columns"/> FROM risk_rules ORDER BY id
+    </select>
+
+    <select id="findByEnabled" resultMap="RiskRuleResult">
+        SELECT <include refid="Columns"/> FROM risk_rules WHERE enabled = #{enabled} ORDER BY id
+    </select>
+
+    <select id="findByRuleCode" resultMap="RiskRuleResult">
+        SELECT <include refid="Columns"/> FROM risk_rules WHERE rule_code = #{ruleCode}
+    </select>
+
+    <select id="existsByRuleCode" resultType="boolean">
+        SELECT EXISTS(SELECT 1 FROM risk_rules WHERE rule_code = #{ruleCode})
+    </select>
+
+    <insert id="insert" parameterType="com.airport.ai.risk.RiskRule" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO risk_rules (rule_code, rule_content, rule_version, enabled, created_at, updated_at, updated_by)
+        VALUES (#{ruleCode}, #{ruleContent}, #{ruleVersion}, #{enabled}, #{createdAt}, #{updatedAt}, #{updatedBy})
+    </insert>
+
+    <update id="update" parameterType="com.airport.ai.risk.RiskRule">
+        UPDATE risk_rules SET
+            rule_content = #{ruleContent},
+            rule_version = #{ruleVersion},
+            enabled = #{enabled},
+            updated_at = #{updatedAt},
+            updated_by = #{updatedBy}
+        WHERE id = #{id}
+    </update>
+
+</mapper>

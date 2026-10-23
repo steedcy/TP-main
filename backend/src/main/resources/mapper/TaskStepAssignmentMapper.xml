@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.airport.ai.task.TaskStepAssignmentMapper">
+
+    <resultMap id="AssignmentResult" type="com.airport.ai.task.TaskStepAssignment">
+        <id column="id" property="id"/>
+        <result column="task_id" property="taskId"/>
+        <result column="plan_version_id" property="planVersionId"/>
+        <result column="step_seq" property="stepSeq"/>
+        <result column="device_agent_id" property="deviceAgentId"/>
+        <result column="command_id" property="commandId"/>
+        <result column="step_status" property="stepStatus"/>
+        <result column="retry_count" property="retryCount"/>
+        <result column="execution_result" property="executionResult"/>
+        <result column="reason_code" property="reasonCode"/>
+        <result column="output_params" property="outputParams"/>
+        <result column="dispatched_at" property="dispatchedAt"/>
+        <result column="feedback_at" property="feedbackAt"/>
+        <result column="rejected_agent_ids" property="rejectedAgentIds"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="Columns">
+        id, task_id, plan_version_id, step_seq, device_agent_id, command_id, step_status,
+        retry_count, execution_result, reason_code, output_params, dispatched_at, feedback_at,
+        rejected_agent_ids, created_at, updated_at
+    </sql>
+
+    <select id="findById" resultMap="AssignmentResult">
+        SELECT <include refid="Columns"/> FROM task_step_assignments WHERE id = #{id}
+    </select>
+
+    <select id="findByPlanVersionIdOrderByStepSeqAsc" resultMap="AssignmentResult">
+        SELECT <include refid="Columns"/> FROM task_step_assignments
+        WHERE plan_version_id = #{planVersionId} ORDER BY step_seq ASC
+    </select>
+
+    <select id="findByPlanVersionIdAndStepSeq" resultMap="AssignmentResult">
+        SELECT <include refid="Columns"/> FROM task_step_assignments
+        WHERE plan_version_id = #{planVersionId} AND step_seq = #{stepSeq}
+    </select>
+
+    <select id="findByCommandId" resultMap="AssignmentResult">
+        SELECT <include refid="Columns"/> FROM task_step_assignments WHERE command_id = #{commandId}
+    </select>
+
+    <select id="findByStepStatusAndDispatchedAtBefore" resultMap="AssignmentResult">
+        SELECT <include refid="Columns"/> FROM task_step_assignments
+        WHERE step_status = #{stepStatus} AND dispatched_at &lt; #{threshold}
+    </select>
+
+    <insert id="insert" parameterType="com.airport.ai.task.TaskStepAssignment" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO task_step_assignments (task_id, plan_version_id, step_seq, device_agent_id, command_id,
+                                            step_status, retry_count, execution_result, reason_code, output_params,
+                                            dispatched_at, feedback_at, rejected_agent_ids, created_at, updated_at)
+        VALUES (#{taskId}, #{planVersionId}, #{stepSeq}, #{deviceAgentId}, #{commandId},
+                #{stepStatus}, #{retryCount}, #{executionResult}, #{reasonCode}, #{outputParams}::json,
+                #{dispatchedAt}, #{feedbackAt}, #{rejectedAgentIds}::json, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <update id="update" parameterType="com.airport.ai.task.TaskStepAssignment">
+        UPDATE task_step_assignments SET
+            device_agent_id = #{deviceAgentId},
+            command_id = #{commandId},
+            step_status = #{stepStatus},
+            retry_count = #{retryCount},
+            execution_result = #{executionResult},
+            reason_code = #{reasonCode},
+            output_params = #{outputParams}::json,
+            dispatched_at = #{dispatchedAt},
+            feedback_at = #{feedbackAt},
+            rejected_agent_ids = #{rejectedAgentIds}::json,
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+
+</mapper>

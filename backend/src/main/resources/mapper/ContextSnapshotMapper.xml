@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.airport.ai.task.ContextSnapshotMapper">
+
+    <resultMap id="ContextSnapshotResult" type="com.airport.ai.task.ContextSnapshot">
+        <id column="id" property="id"/>
+        <result column="snapshot_code" property="snapshotCode"/>
+        <result column="task_id" property="taskId"/>
+        <result column="agents" property="agents"/>
+        <result column="capability_coverage" property="capabilityCoverage"/>
+        <result column="failed_agent_codes" property="failedAgentCodes"/>
+        <result column="generated_at" property="generatedAt"/>
+    </resultMap>
+
+    <sql id="Columns">
+        id, snapshot_code, task_id, agents, capability_coverage, failed_agent_codes, generated_at
+    </sql>
+
+    <select id="findById" resultMap="ContextSnapshotResult">
+        SELECT <include refid="Columns"/> FROM context_snapshots WHERE id = #{id}
+    </select>
+
+    <select id="findBySnapshotCode" resultMap="ContextSnapshotResult">
+        SELECT <include refid="Columns"/> FROM context_snapshots WHERE snapshot_code = #{snapshotCode}
+    </select>
+
+    <select id="findByTaskIdOrderByGeneratedAtDesc" resultMap="ContextSnapshotResult">
+        SELECT <include refid="Columns"/> FROM context_snapshots WHERE task_id = #{taskId} ORDER BY generated_at DESC
+    </select>
+
+    <select id="count" resultType="long">
+        SELECT COUNT(*) FROM context_snapshots
+    </select>
+
+    <insert id="insert" parameterType="com.airport.ai.task.ContextSnapshot" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO context_snapshots (snapshot_code, task_id, agents, capability_coverage, failed_agent_codes, generated_at)
+        VALUES (#{snapshotCode}, #{taskId}, #{agents}::json, #{capabilityCoverage}::json, #{failedAgentCodes}::json, #{generatedAt})
+    </insert>
+
+</mapper>

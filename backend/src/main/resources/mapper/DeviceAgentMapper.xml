@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.airport.ai.device.DeviceAgentMapper">
+
+    <resultMap id="DeviceAgentResult" type="com.airport.ai.device.DeviceAgent">
+        <id column="id" property="id"/>
+        <result column="agent_code" property="agentCode"/>
+        <result column="device_id" property="deviceId"/>
+        <result column="agent_status" property="agentStatus"/>
+        <result column="online_status" property="onlineStatus"/>
+        <result column="work_status" property="workStatus"/>
+        <result column="business_status" property="businessStatus"/>
+        <result column="current_task_id" property="currentTaskId"/>
+        <result column="current_step_seq" property="currentStepSeq"/>
+        <result column="last_reported_at" property="lastReportedAt"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="Columns">
+        id, agent_code, device_id, agent_status, online_status, work_status, current_task_id,
+        current_step_seq, business_status, last_reported_at, created_at, updated_at
+    </sql>
+
+    <select id="findById" resultMap="DeviceAgentResult">
+        SELECT <include refid="Columns"/> FROM device_agents WHERE id = #{id}
+    </select>
+
+    <select id="findByDeviceId" resultMap="DeviceAgentResult">
+        SELECT <include refid="Columns"/> FROM device_agents WHERE device_id = #{deviceId}
+    </select>
+
+    <select id="findByAgentCode" resultMap="DeviceAgentResult">
+        SELECT <include refid="Columns"/> FROM device_agents WHERE agent_code = #{agentCode}
+    </select>
+
+    <select id="existsByDeviceId" resultType="boolean">
+        SELECT EXISTS(SELECT 1 FROM device_agents WHERE device_id = #{deviceId})
+    </select>
+
+    <select id="findByOnlineStatusAndLastReportedAtBefore" resultMap="DeviceAgentResult">
+        SELECT <include refid="Columns"/> FROM device_agents
+        WHERE online_status = #{onlineStatus} AND last_reported_at &lt; #{threshold}
+    </select>
+
+    <select id="findByCurrentTaskId" resultMap="DeviceAgentResult">
+        SELECT <include refid="Columns"/> FROM device_agents WHERE current_task_id = #{currentTaskId}
+    </select>
+
+    <select id="findByAgentStatusAndOnlineStatus" resultMap="DeviceAgentResult">
+        SELECT <include refid="Columns"/> FROM device_agents
+        WHERE agent_status = #{agentStatus} AND online_status = #{onlineStatus}
+    </select>
+
+    <select id="searchPaged" resultMap="DeviceAgentResult">
+        SELECT <include refid="Columns"/> FROM device_agents
+        <where>
+            <if test="agentStatus != null">
+                AND agent_status = #{agentStatus}
+            </if>
+            <if test="onlineStatus != null">
+                AND online_status = #{onlineStatus}
+            </if>
+        </where>
+        ORDER BY id
+    </select>
+
+    <insert id="insert" parameterType="com.airport.ai.device.DeviceAgent" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO device_agents (agent_code, device_id, agent_status, online_status, work_status,
+                                    current_task_id, current_step_seq, last_reported_at, created_at, updated_at)
+        VALUES (#{agentCode}, #{deviceId}, #{agentStatus}, #{onlineStatus}, #{workStatus},
+                #{currentTaskId}, #{currentStepSeq}, #{lastReportedAt}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <update id="update" parameterType="com.airport.ai.device.DeviceAgent">
+        UPDATE device_agents SET
+            agent_status = #{agentStatus},
+            online_status = #{onlineStatus},
+            work_status = #{workStatus},
+            business_status = CAST(#{businessStatus} AS jsonb),
+            current_task_id = #{currentTaskId},
+            current_step_seq = #{currentStepSeq},
+            last_reported_at = #{lastReportedAt},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+
+</mapper>

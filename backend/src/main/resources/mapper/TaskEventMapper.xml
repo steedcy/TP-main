@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.airport.ai.event.TaskEventMapper">
+
+    <resultMap id="TaskEventResult" type="com.airport.ai.event.TaskEvent">
+        <id column="id" property="id"/>
+        <result column="task_id" property="taskId"/>
+        <result column="event_type" property="eventType"/>
+        <result column="occurred_at" property="occurredAt"/>
+        <result column="trigger" property="trigger"/>
+        <result column="reason_code" property="reasonCode"/>
+        <result column="detail_summary" property="detailSummary"/>
+    </resultMap>
+
+    <sql id="Columns">
+        id, task_id, event_type, occurred_at, trigger, reason_code, detail_summary
+    </sql>
+
+    <select id="findByTaskIdOrderByOccurredAtAsc" resultMap="TaskEventResult">
+        SELECT <include refid="Columns"/> FROM task_events
+        WHERE task_id = #{taskId}
+        ORDER BY occurred_at ASC
+    </select>
+
+    <insert id="insert" parameterType="com.airport.ai.event.TaskEvent" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO task_events (task_id, event_type, occurred_at, trigger, reason_code, detail_summary)
+        VALUES (#{taskId}, #{eventType}, #{occurredAt}, #{trigger}, #{reasonCode}, #{detailSummary})
+    </insert>
+
+</mapper>

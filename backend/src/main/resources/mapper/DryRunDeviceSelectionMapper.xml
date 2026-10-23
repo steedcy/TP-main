@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.airport.ai.baseline.DryRunDeviceSelectionMapper">
+
+    <resultMap id="DryRunDeviceSelectionResult" type="com.airport.ai.baseline.DryRunDeviceSelection">
+        <id column="id" property="id"/>
+        <result column="task_id" property="taskId"/>
+        <result column="step_seq" property="stepSeq"/>
+        <result column="device_agent_id" property="deviceAgentId"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <sql id="Columns">id, task_id, step_seq, device_agent_id, created_at</sql>
+
+    <select id="findByTaskId" resultMap="DryRunDeviceSelectionResult">
+        SELECT <include refid="Columns"/> FROM dry_run_device_selections WHERE task_id = #{taskId} ORDER BY step_seq
+    </select>
+
+    <insert id="insert" parameterType="com.airport.ai.baseline.DryRunDeviceSelection" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO dry_run_device_selections (task_id, step_seq, device_agent_id, created_at)
+        VALUES (#{taskId}, #{stepSeq}, #{deviceAgentId}, #{createdAt})
+    </insert>
+
+</mapper>

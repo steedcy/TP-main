@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.airport.ai.device.DeviceCapabilityMapper">
+
+    <resultMap id="DeviceCapabilityResult" type="com.airport.ai.device.DeviceCapability">
+        <id column="id" property="id"/>
+        <result column="device_id" property="deviceId"/>
+        <result column="template_id" property="templateId"/>
+        <result column="capability_code" property="capabilityCode"/>
+        <result column="capability_name" property="capabilityName"/>
+        <result column="capability_type" property="capabilityType"/>
+        <result column="input_params" property="inputParams"/>
+        <result column="output_params" property="outputParams"/>
+        <result column="applicable_conditions" property="applicableConditions"/>
+        <result column="capability_status" property="capabilityStatus"/>
+        <result column="test_result" property="testResult"/>
+        <result column="last_test_at" property="lastTestAt"/>
+        <result column="capability_description" property="capabilityDescription"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="Columns">
+        id, device_id, template_id, capability_code, capability_name, capability_type, input_params,
+        output_params, applicable_conditions, capability_status, test_result, last_test_at,
+        capability_description, created_at, updated_at
+    </sql>
+
+    <select id="findById" resultMap="DeviceCapabilityResult">
+        SELECT <include refid="Columns"/> FROM device_capabilities WHERE id = #{id}
+    </select>
+
+    <select id="findByDeviceId" resultMap="DeviceCapabilityResult">
+        SELECT <include refid="Columns"/> FROM device_capabilities WHERE device_id = #{deviceId}
+    </select>
+
+    <select id="findByDeviceIdAndCapabilityCode" resultMap="DeviceCapabilityResult">
+        SELECT <include refid="Columns"/> FROM device_capabilities
+        WHERE device_id = #{deviceId} AND capability_code = #{capabilityCode}
+    </select>
+
+    <select id="existsByDeviceIdAndCapabilityCode" resultType="boolean">
+        SELECT EXISTS(SELECT 1 FROM device_capabilities WHERE device_id = #{deviceId} AND capability_code = #{capabilityCode})
+    </select>
+
+    <select id="findByDeviceIdAndCapabilityStatus" resultMap="DeviceCapabilityResult">
+        SELECT <include refid="Columns"/> FROM device_capabilities
+        WHERE device_id = #{deviceId} AND capability_status = #{capabilityStatus}
+    </select>
+
+    <select id="countByTemplateId" resultType="long">
+        SELECT COUNT(*) FROM device_capabilities WHERE template_id = #{templateId}
+    </select>
+
+    <select id="existsByCapabilityTypeAndCapabilityStatus" resultType="boolean">
+        SELECT EXISTS(SELECT 1 FROM device_capabilities WHERE capability_type = #{capabilityType} AND capability_status = #{capabilityStatus})
+    </select>
+
+    <select id="existsByDeviceIdAndCapabilityTypeAndCapabilityStatus" resultType="boolean">
+        SELECT EXISTS(SELECT 1 FROM device_capabilities
+        WHERE device_id = #{deviceId} AND capability_type = #{capabilityType} AND capability_status = #{capabilityStatus})
+    </select>
+
+    <insert id="insert" parameterType="com.airport.ai.device.DeviceCapability" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO device_capabilities (device_id, template_id, capability_code, capability_name, capability_type,
+                                          input_params, output_params, applicable_conditions, capability_status,
+                                          test_result, last_test_at, capability_description, created_at, updated_at)
+        VALUES (#{deviceId}, #{templateId}, #{capabilityCode}, #{capabilityName}, #{capabilityType},
+                #{inputParams}::json, #{outputParams}::json, #{applicableConditions}, #{capabilityStatus},
+                #{testResult}, #{lastTestAt}, #{capabilityDescription}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <update id="update" parameterType="com.airport.ai.device.DeviceCapability">
+        UPDATE device_capabilities SET
+            template_id = #{templateId},
+            capability_name = #{capabilityName},
+            input_params = #{inputParams}::json,
+            output_params = #{outputParams}::json,
+            applicable_conditions = #{applicableConditions},
+            capability_status = #{capabilityStatus},
+            test_result = #{testResult},
+            last_test_at = #{lastTestAt},
+            capability_description = #{capabilityDescription},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+
+</mapper>

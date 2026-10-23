@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.airport.ai.auth.UserMapper">
+
+    <resultMap id="UserResult" type="com.airport.ai.auth.User">
+        <id column="id" property="id"/>
+        <result column="username" property="username"/>
+        <result column="password_hash" property="passwordHash"/>
+        <result column="real_name" property="realName"/>
+        <result column="role" property="role"/>
+        <result column="contact" property="contact"/>
+        <result column="status" property="status"/>
+        <result column="failed_login_attempts" property="failedLoginAttempts"/>
+        <result column="locked_at" property="lockedAt"/>
+        <result column="locked_reason" property="lockedReason"/>
+        <result column="last_login_at" property="lastLoginAt"/>
+        <result column="last_failed_login_at" property="lastFailedLoginAt"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="created_by" property="createdBy"/>
+    </resultMap>
+
+    <sql id="Columns">
+        id, username, password_hash, real_name, role, contact, status, failed_login_attempts,
+        locked_at, locked_reason, last_login_at, last_failed_login_at, created_at, updated_at, created_by
+    </sql>
+
+    <select id="findById" resultMap="UserResult">
+        SELECT <include refid="Columns"/> FROM users WHERE id = #{id}
+    </select>
+
+    <select id="findByUsername" resultMap="UserResult">
+        SELECT <include refid="Columns"/> FROM users WHERE username = #{username}
+    </select>
+
+    <select id="existsByUsername" resultType="boolean">
+        SELECT EXISTS(SELECT 1 FROM users WHERE username = #{username})
+    </select>
+
+    <select id="findByStatusPaged" resultMap="UserResult">
+        SELECT <include refid="Columns"/> FROM users WHERE status = #{status} ORDER BY id
+    </select>
+
+    <select id="findAllPaged" resultMap="UserResult">
+        SELECT <include refid="Columns"/> FROM users ORDER BY id
+    </select>
+
+    <insert id="insert" parameterType="com.airport.ai.auth.User" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO users (username, password_hash, real_name, role, contact, status, failed_login_attempts,
+                            locked_at, locked_reason, last_login_at, last_failed_login_at, created_at, updated_at, created_by)
+        VALUES (#{username}, #{passwordHash}, #{realName}, #{role}, #{contact}, #{status}, #{failedLoginAttempts},
+                #{lockedAt}, #{lockedReason}, #{lastLoginAt}, #{lastFailedLoginAt}, #{createdAt}, #{updatedAt}, #{createdBy})
+    </insert>
+
+    <update id="update" parameterType="com.airport.ai.auth.User">
+        UPDATE users SET
+            password_hash = #{passwordHash},
+            real_name = #{realName},
+            role = #{role},
+            contact = #{contact},
+            status = #{status},
+            failed_login_attempts = #{failedLoginAttempts},
+            locked_at = #{lockedAt},
+            locked_reason = #{lockedReason},
+            last_login_at = #{lastLoginAt},
+            last_failed_login_at = #{lastFailedLoginAt},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+
+</mapper>

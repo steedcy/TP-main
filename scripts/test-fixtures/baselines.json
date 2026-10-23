@@ -1,0 +1,263 @@
+[
+  {
+    "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+    "inputParams": [
+      {
+        "name": "baggageLocation",
+        "type": "String",
+        "required": true,
+        "defaultValue": "F2_BAGGAGE_POINT"
+      },
+      {
+        "name": "routePreference",
+        "type": "String",
+        "required": true,
+        "defaultValue": "BARRIER_FREE"
+      },
+      {
+        "name": "measureMode",
+        "type": "String",
+        "required": true,
+        "defaultValue": "AUTO"
+      },
+      {
+        "name": "timeout",
+        "type": "Integer",
+        "required": true,
+        "defaultValue": "30",
+        "range": "10~60"
+      },
+      {
+        "name": "alertLevel",
+        "type": "String",
+        "required": true,
+        "defaultValue": "WARNING"
+      }
+    ],
+    "steps": [
+      {
+        "capabilityType": "CAP_NAVIGATION",
+        "paramMapping": [
+          {
+            "target": "targetLocation",
+            "source": "TEMPLATE_INPUT.baggageLocation"
+          },
+          {
+            "target": "routePreference",
+            "source": "TEMPLATE_INPUT.routePreference"
+          }
+        ],
+        "stepTimeout": 60,
+        "completionCondition": "routeGenerated=true"
+      },
+      {
+        "capabilityType": "CAP_BAGGAGE_MEASURE",
+        "paramMapping": [
+          {
+            "target": "measureMode",
+            "source": "TEMPLATE_INPUT.measureMode"
+          },
+          {
+            "target": "timeout",
+            "source": "TEMPLATE_INPUT.timeout"
+          }
+        ],
+        "stepTimeout": 60,
+        "completionCondition": "measureStatus=SUCCESS"
+      },
+      {
+        "capabilityType": "CAP_OVERSIZE_ALERT",
+        "paramMapping": [
+          {
+            "target": "baggageInfo",
+            "source": "STEP2_OUTPUT.baggageInfo"
+          },
+          {
+            "target": "alertLevel",
+            "source": "TEMPLATE_INPUT.alertLevel"
+          }
+        ],
+        "stepTimeout": 60,
+        "completionCondition": "reportStatus=SUCCESS"
+      }
+    ],
+    "devices": [
+      "SIM_F2_ROBOT",
+      "SIM_F2_BAGGAGE",
+      "SIM_F2_BAGGAGE"
+    ]
+  },
+  {
+    "taskFamily": "SPECIAL_PASSENGER_SERVICE",
+    "inputParams": [
+      {
+        "name": "assistanceType",
+        "type": "String",
+        "required": true,
+        "defaultValue": "测试轮椅旅客需要陪同，请现场服务人员协助"
+      },
+      {
+        "name": "notificationType",
+        "type": "String",
+        "required": true,
+        "defaultValue": "BOTH"
+      },
+      {
+        "name": "repeatCount",
+        "type": "Integer",
+        "required": true,
+        "defaultValue": "1",
+        "range": "1~5"
+      },
+      {
+        "name": "targetLocation",
+        "type": "String",
+        "required": true,
+        "defaultValue": "F2_TEST_GATE"
+      },
+      {
+        "name": "escortMode",
+        "type": "String",
+        "required": true,
+        "defaultValue": "LEAD"
+      },
+      {
+        "name": "maxDuration",
+        "type": "Integer",
+        "required": true,
+        "defaultValue": "600",
+        "range": "60~1800"
+      }
+    ],
+    "steps": [
+      {
+        "capabilityType": "CAP_NOTIFICATION",
+        "paramMapping": [
+          {
+            "target": "notificationContent",
+            "source": "TEMPLATE_INPUT.assistanceType"
+          },
+          {
+            "target": "notificationType",
+            "source": "TEMPLATE_INPUT.notificationType"
+          },
+          {
+            "target": "repeatCount",
+            "source": "TEMPLATE_INPUT.repeatCount"
+          }
+        ],
+        "stepTimeout": 60,
+        "completionCondition": "notificationStatus=SUCCESS"
+      },
+      {
+        "capabilityType": "CAP_ESCORT",
+        "paramMapping": [
+          {
+            "target": "targetLocation",
+            "source": "TEMPLATE_INPUT.targetLocation"
+          },
+          {
+            "target": "escortMode",
+            "source": "TEMPLATE_INPUT.escortMode"
+          },
+          {
+            "target": "maxDuration",
+            "source": "TEMPLATE_INPUT.maxDuration"
+          }
+        ],
+        "stepTimeout": 60,
+        "completionCondition": "arrivalStatus=ARRIVED"
+      }
+    ],
+    "devices": [
+      "SIM_F2_ROBOT",
+      "SIM_F2_ROBOT"
+    ]
+  },
+  {
+    "taskFamily": "FLIGHT_CHANGE_RESPONSE",
+    "inputParams": [
+      {
+        "name": "flightNumber",
+        "type": "String",
+        "required": true,
+        "defaultValue": "TEST1022"
+      },
+      {
+        "name": "updateType",
+        "type": "String",
+        "required": true,
+        "defaultValue": "GATE_CHANGE"
+      },
+      {
+        "name": "updateContent",
+        "type": "String",
+        "required": true,
+        "defaultValue": "测试航班登机口变更至F2_TEST_GATE"
+      },
+      {
+        "name": "displayDuration",
+        "type": "Integer",
+        "required": true,
+        "defaultValue": "60",
+        "range": "10~600"
+      },
+      {
+        "name": "targetLocation",
+        "type": "String",
+        "required": true,
+        "defaultValue": "F2_TEST_GATE"
+      },
+      {
+        "name": "routePreference",
+        "type": "String",
+        "required": true,
+        "defaultValue": "BARRIER_FREE"
+      }
+    ],
+    "steps": [
+      {
+        "capabilityType": "CAP_FLIGHT_UPDATE",
+        "paramMapping": [
+          {
+            "target": "flightNumber",
+            "source": "TEMPLATE_INPUT.flightNumber"
+          },
+          {
+            "target": "updateType",
+            "source": "TEMPLATE_INPUT.updateType"
+          },
+          {
+            "target": "updateContent",
+            "source": "TEMPLATE_INPUT.updateContent"
+          },
+          {
+            "target": "displayDuration",
+            "source": "TEMPLATE_INPUT.displayDuration"
+          }
+        ],
+        "stepTimeout": 60,
+        "completionCondition": "publishStatus=SUCCESS"
+      },
+      {
+        "capabilityType": "CAP_NAVIGATION",
+        "paramMapping": [
+          {
+            "target": "targetLocation",
+            "source": "TEMPLATE_INPUT.targetLocation"
+          },
+          {
+            "target": "routePreference",
+            "source": "TEMPLATE_INPUT.routePreference"
+          }
+        ],
+        "stepTimeout": 60,
+        "completionCondition": "routeGenerated=true"
+      }
+    ],
+    "devices": [
+      "SIM_F2_FLIGHT",
+      "SIM_F2_DISPLAY"
+    ]
+  }
+]

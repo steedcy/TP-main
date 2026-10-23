@@ -1,0 +1,88 @@
+spring:
+  application:
+    name: airport-ai-app
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:airport_ai}
+    username: ${DB_USERNAME:admin}
+    password: ${DB_PASSWORD:123456}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 30
+      connection-timeout: 30000
+      idle-timeout: 600000
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: 0
+
+server:
+  port: 8080
+
+# 会话空闲30分钟失效，对应SRS_NF002
+app:
+  session:
+    idle-timeout-minutes: 30
+  auth:
+    max-failed-attempts: 3
+  device:
+    heartbeat-timeout-seconds: 30
+    command-timeout-seconds: 60
+    adapter-connect-timeout-ms: 2000
+    adapter-read-timeout-ms: 3000
+    adapter-public-base-url: ${DEVICE_PLATFORM_BASE_URL:http://localhost:8080}
+    max-access-objects-demo: 10
+    max-access-objects-system: 20
+    credential-encryption-key: ${DEVICE_CREDENTIAL_ENCRYPTION_KEY:}
+  situation:
+    refresh-interval-seconds: 5
+    refresh-interval-max-seconds: 15
+  task:
+    max-steps: 5
+    max-replan-count: 1
+    step-timeout-default-seconds: 60
+  risk:
+    low-confidence-threshold: 0.8
+    context-stale-seconds: 60
+    resource-critical-candidate-threshold: 1
+  planning-model:
+    provider: ${PLANNING_MODEL_PROVIDER:external}
+    endpoint: ${PLANNING_MODEL_ENDPOINT:}
+    api-key: ${PLANNING_MODEL_API_KEY:}
+    timeout-ms: 60000
+    moonshot:
+      base-url: ${MOONSHOT_BASE_URL:https://api.moonshot.cn/v1}
+      api-key: ${MOONSHOT_API_KEY:}
+      model: ${MOONSHOT_MODEL:kimi-k2.6}
+      max-tokens: ${MOONSHOT_MAX_TOKENS:4096}
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+pagehelper:
+  helper-dialect: postgresql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  level:
+    root: INFO
+    com.airport.ai: INFO

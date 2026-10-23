@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.airport.ai.devicetype.CapabilityTemplateMapper">
+
+    <resultMap id="CapabilityTemplateResult" type="com.airport.ai.devicetype.CapabilityTemplate">
+        <id column="id" property="id"/>
+        <result column="device_type_code" property="deviceTypeCode"/>
+        <result column="template_code" property="templateCode"/>
+        <result column="template_name" property="templateName"/>
+        <result column="capability_type" property="capabilityType"/>
+        <result column="input_params" property="inputParams"/>
+        <result column="output_params" property="outputParams"/>
+        <result column="template_version" property="templateVersion"/>
+        <result column="template_status" property="templateStatus"/>
+        <result column="template_description" property="templateDescription"/>
+        <result column="usage_count" property="usageCount"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="Columns">
+        id, device_type_code, template_code, template_name, capability_type, input_params, output_params,
+        template_version, template_status, template_description, usage_count, created_at, updated_at
+    </sql>
+
+    <select id="findById" resultMap="CapabilityTemplateResult">
+        SELECT <include refid="Columns"/> FROM capability_template WHERE id = #{id}
+    </select>
+
+    <select id="findByDeviceTypeCode" resultMap="CapabilityTemplateResult">
+        SELECT <include refid="Columns"/> FROM capability_template WHERE device_type_code = #{deviceTypeCode}
+    </select>
+
+    <select id="findByDeviceTypeCodeAndTemplateCode" resultMap="CapabilityTemplateResult">
+        SELECT <include refid="Columns"/> FROM capability_template
+        WHERE device_type_code = #{deviceTypeCode} AND template_code = #{templateCode}
+    </select>
+
+    <select id="existsByDeviceTypeCodeAndTemplateCode" resultType="boolean">
+        SELECT EXISTS(SELECT 1 FROM capability_template
+                      WHERE device_type_code = #{deviceTypeCode} AND template_code = #{templateCode})
+    </select>
+
+    <select id="countByDeviceTypeCode" resultType="long">
+        SELECT COUNT(*) FROM capability_template WHERE device_type_code = #{deviceTypeCode}
+    </select>
+
+    <insert id="insert" parameterType="com.airport.ai.devicetype.CapabilityTemplate" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO capability_template (device_type_code, template_code, template_name, capability_type,
+                                          input_params, output_params, template_version, template_status,
+                                          template_description, usage_count, created_at, updated_at)
+        VALUES (#{deviceTypeCode}, #{templateCode}, #{templateName}, #{capabilityType},
+                #{inputParams}::json, #{outputParams}::json, #{templateVersion}, #{templateStatus},
+                #{templateDescription}, #{usageCount}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <update id="update" parameterType="com.airport.ai.devicetype.CapabilityTemplate">
+        UPDATE capability_template SET
+            template_name = #{templateName},
+            capability_type = #{capabilityType},
+            input_params = #{inputParams}::json,
+            output_params = #{outputParams}::json,
+            template_version = #{templateVersion},
+            template_status = #{templateStatus},
+            template_description = #{templateDescription},
+            usage_count = #{usageCount},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM capability_template WHERE id = #{id}
+    </delete>
+
+</mapper>

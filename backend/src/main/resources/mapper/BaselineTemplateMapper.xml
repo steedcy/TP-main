@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.airport.ai.baseline.BaselineTemplateMapper">
+
+    <resultMap id="BaselineTemplateResult" type="com.airport.ai.baseline.BaselineTemplate">
+        <id column="id" property="id"/>
+        <result column="template_name" property="templateName"/>
+        <result column="task_family" property="taskFamily"/>
+        <result column="is_preset" property="isPreset"/>
+        <result column="input_params" property="inputParams"/>
+        <result column="steps" property="steps"/>
+        <result column="template_version" property="templateVersion"/>
+        <result column="template_status" property="templateStatus"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="updated_by" property="updatedBy"/>
+    </resultMap>
+
+    <sql id="Columns">
+        id, template_name, task_family, is_preset, input_params, steps, template_version,
+        template_status, created_at, updated_at, updated_by
+    </sql>
+
+    <select id="findById" resultMap="BaselineTemplateResult">
+        SELECT <include refid="Columns"/> FROM baseline_templates WHERE id = #{id}
+    </select>
+
+    <select id="findAll" resultMap="BaselineTemplateResult">
+        SELECT <include refid="Columns"/> FROM baseline_templates ORDER BY id
+    </select>
+
+    <select id="existsByTemplateName" resultType="boolean">
+        SELECT EXISTS(SELECT 1 FROM baseline_templates WHERE template_name = #{templateName})
+    </select>
+
+    <select id="findByTaskFamilyAndTemplateStatus" resultMap="BaselineTemplateResult">
+        SELECT <include refid="Columns"/> FROM baseline_templates
+        WHERE task_family = #{taskFamily} AND template_status = #{templateStatus}
+    </select>
+
+    <insert id="insert" parameterType="com.airport.ai.baseline.BaselineTemplate" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO baseline_templates (template_name, task_family, is_preset, input_params, steps,
+                                          template_version, template_status, created_at, updated_at, updated_by)
+        VALUES (#{templateName}, #{taskFamily}, #{isPreset}, #{inputParams}::json, #{steps}::json,
+                #{templateVersion}, #{templateStatus}, #{createdAt}, #{updatedAt}, #{updatedBy})
+    </insert>
+
+    <update id="update" parameterType="com.airport.ai.baseline.BaselineTemplate">
+        UPDATE baseline_templates SET
+            task_family = #{taskFamily},
+            is_preset = #{isPreset},
+            input_params = #{inputParams}::json,
+            steps = #{steps}::json,
+            template_version = #{templateVersion},
+            template_status = #{templateStatus},
+            updated_at = #{updatedAt},
+            updated_by = #{updatedBy}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM baseline_templates WHERE id = #{id}
+    </delete>
+
+</mapper>

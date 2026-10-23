@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.airport.ai.task.TaskExceptionMapper">
+
+    <resultMap id="ExceptionResult" type="com.airport.ai.task.TaskException">
+        <id column="id" property="id"/>
+        <result column="task_id" property="taskId"/>
+        <result column="step_seq" property="stepSeq"/>
+        <result column="exception_type" property="exceptionType"/>
+        <result column="occurred_at" property="occurredAt"/>
+        <result column="recovery_action" property="recoveryAction"/>
+        <result column="recovery_result" property="recoveryResult"/>
+        <result column="impact_conclusion" property="impactConclusion"/>
+        <result column="reason_code" property="reasonCode"/>
+        <result column="exception_status" property="exceptionStatus"/>
+        <result column="resolved_at" property="resolvedAt"/>
+        <result column="resolved_by" property="resolvedBy"/>
+    </resultMap>
+
+    <sql id="Columns">
+        id, task_id, step_seq, exception_type, occurred_at, recovery_action, recovery_result,
+        impact_conclusion, reason_code, exception_status, resolved_at, resolved_by
+    </sql>
+
+    <select id="findById" resultMap="ExceptionResult">
+        SELECT <include refid="Columns"/> FROM task_exceptions WHERE id = #{id}
+    </select>
+
+    <select id="findByTaskIdOrderByOccurredAtDesc" resultMap="ExceptionResult">
+        SELECT <include refid="Columns"/> FROM task_exceptions WHERE task_id = #{taskId} ORDER BY occurred_at DESC
+    </select>
+
+    <select id="searchPaged" resultMap="ExceptionResult">
+        SELECT <include refid="Columns"/> FROM task_exceptions
+        <where>
+            <if test="exceptionType != null">AND exception_type = #{exceptionType}</if>
+            <if test="exceptionStatus != null">AND exception_status = #{exceptionStatus}</if>
+        </where>
+        ORDER BY occurred_at DESC
+    </select>
+
+    <select id="countByExceptionStatus" resultType="long">
+        SELECT COUNT(*) FROM task_exceptions WHERE exception_status = #{exceptionStatus}
+    </select>
+
+    <insert id="insert" parameterType="com.airport.ai.task.TaskException" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO task_exceptions (task_id, step_seq, exception_type, occurred_at, recovery_action,
+                                      recovery_result, impact_conclusion, reason_code, exception_status,
+                                      resolved_at, resolved_by)
+        VALUES (#{taskId}, #{stepSeq}, #{exceptionType}, #{occurredAt}, #{recoveryAction},
+                #{recoveryResult}, #{impactConclusion}, #{reasonCode}, #{exceptionStatus},
+                #{resolvedAt}, #{resolvedBy})
+    </insert>
+
+    <update id="update" parameterType="com.airport.ai.task.TaskException">
+        UPDATE task_exceptions SET
+            recovery_action = #{recoveryAction},
+            recovery_result = #{recoveryResult},
+            impact_conclusion = #{impactConclusion},
+            reason_code = #{reasonCode},
+            exception_status = #{exceptionStatus},
+            resolved_at = #{resolvedAt},
+            resolved_by = #{resolvedBy}
+        WHERE id = #{id}
+    </update>
+
+</mapper>

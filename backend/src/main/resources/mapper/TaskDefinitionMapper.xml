@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.airport.ai.taskdef.TaskDefinitionMapper">
+
+    <resultMap id="TaskDefinitionResult" type="com.airport.ai.taskdef.TaskDefinition">
+        <id column="id" property="id"/>
+        <result column="definition_code" property="definitionCode"/>
+        <result column="task_name" property="taskName"/>
+        <result column="goal_template" property="goalTemplate"/>
+        <result column="scene_params" property="sceneParams"/>
+        <result column="available_capability_types" property="availableCapabilityTypes"/>
+        <result column="constraint_description" property="constraintDescription"/>
+        <result column="completion_condition" property="completionCondition"/>
+        <result column="is_preset" property="isPreset"/>
+        <result column="definition_status" property="definitionStatus"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="updated_by" property="updatedBy"/>
+    </resultMap>
+
+    <sql id="Columns">
+        id, definition_code, task_name, goal_template, scene_params, available_capability_types,
+        constraint_description, completion_condition, is_preset, definition_status,
+        created_at, updated_at, updated_by
+    </sql>
+
+    <select id="findById" resultMap="TaskDefinitionResult">
+        SELECT <include refid="Columns"/> FROM task_definitions WHERE id = #{id}
+    </select>
+
+    <select id="findByDefinitionCode" resultMap="TaskDefinitionResult">
+        SELECT <include refid="Columns"/> FROM task_definitions WHERE definition_code = #{definitionCode}
+    </select>
+
+    <select id="findAll" resultMap="TaskDefinitionResult">
+        SELECT <include refid="Columns"/> FROM task_definitions ORDER BY is_preset DESC, id
+    </select>
+
+    <select id="findByDefinitionStatus" resultMap="TaskDefinitionResult">
+        SELECT <include refid="Columns"/> FROM task_definitions WHERE definition_status = #{definitionStatus}
+        ORDER BY is_preset DESC, id
+    </select>
+
+    <select id="existsByTaskName" resultType="boolean">
+        SELECT EXISTS(SELECT 1 FROM task_definitions WHERE task_name = #{taskName})
+    </select>
+
+    <select id="existsByDefinitionCode" resultType="boolean">
+        SELECT EXISTS(SELECT 1 FROM task_definitions WHERE definition_code = #{definitionCode})
+    </select>
+
+    <insert id="insert" parameterType="com.airport.ai.taskdef.TaskDefinition" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO task_definitions (definition_code, task_name, goal_template, scene_params,
+                                        available_capability_types, constraint_description, completion_condition,
+                                        is_preset, definition_status, created_at, updated_at, updated_by)
+        VALUES (#{definitionCode}, #{taskName}, #{goalTemplate}, #{sceneParams}::json,
+                #{availableCapabilityTypes}::json, #{constraintDescription}, #{completionCondition},
+                #{isPreset}, #{definitionStatus}, #{createdAt}, #{updatedAt}, #{updatedBy})
+    </insert>
+
+    <update id="update" parameterType="com.airport.ai.taskdef.TaskDefinition">
+        UPDATE task_definitions SET
+            task_name = #{taskName},
+            goal_template = #{goalTemplate},
+            scene_params = #{sceneParams}::json,
+            available_capability_types = #{availableCapabilityTypes}::json,
+            constraint_description = #{constraintDescription},
+            completion_condition = #{completionCondition},
+            definition_status = #{definitionStatus},
+            updated_at = #{updatedAt},
+            updated_by = #{updatedBy}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM task_definitions WHERE id = #{id}
+    </delete>
+
+</mapper>
