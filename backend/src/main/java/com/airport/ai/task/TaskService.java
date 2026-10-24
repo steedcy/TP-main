@@ -199,9 +199,11 @@ public class TaskService {
                 task.setStatus(TaskStatus.PLANNING);
                 task.setUpdatedAt(LocalDateTime.now());
                 taskMapper.update(task);
-                taskEventService.append(taskId, "REPLANNING_TRIGGERED", "OPERATOR", null,
-                        "运行操作员" + operator.getUsername() + "发起" + action + "，重新执行规划链路");
-                taskPlanningOrchestrator.advance(taskId);
+                taskEventService.append(taskId, "SWITCH_TO_BASELINE".equals(action)
+                                ? "BASELINE_SWITCH_REQUESTED" : "REPLANNING_TRIGGERED", "OPERATOR", null,
+                        "运行操作员" + operator.getUsername() + "选择" + action);
+                if ("SWITCH_TO_BASELINE".equals(action)) taskPlanningOrchestrator.switchToBaseline(taskId);
+                else taskPlanningOrchestrator.advance(taskId);
             }
             case "MARK_FAILED" -> {
                 task.setStatus(TaskStatus.FAILED);
@@ -213,9 +215,13 @@ public class TaskService {
             default -> throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, "未知的人工处理动作: " + action);
         }
 
+        Task result = get(taskId);
+        boolean failed = result.getStatus() == TaskStatus.PENDING_MANUAL;
+        if (failed) taskEventService.append(taskId, "TASK_MANUAL_ACTION_FAILED", "SYSTEM",
+                "ERR_MANUAL_ACTION_FAILED", result.getFailureReason());
         operationLogService.record(operator.getId(), operator.getUsername(), operator.getRole(),
-                "TASK_MANUAL_ACTION", task.getTaskCode() + " -> " + action, "SUCCESS", null);
-        return get(taskId);
+                "TASK_MANUAL_ACTION", task.getTaskCode() + " -> " + action, failed ? "FAILED" : "SUCCESS", null);
+        return result;
     }
 
     /**
@@ -290,17 +296,18 @@ public class TaskService {
             try {
                 deviceAgentMessagingService.cancelTask(agentCode, cancelCommandId, taskId,
                         assignment == null ? agent.getCurrentStepSeq() : assignment.getStepSeq());
-                taskEventService.append(taskId, "TASK_CANCEL_SENT", "OPERATOR", null,
+                taskEventService.append(taskId, "TASK_CANCEL_REQUESTED", "OPERATOR", null,
                         "已向设备代理" + agentCode + "发送业务任务取消请求");
-                deviceResults.add(Map.of("agentId", agentCode, "result", "CANCEL_SENT"));
+                deviceResults.add(Map.of("agentId", agentCode, "result", "CANCEL_QUEUED"));
             } catch (RuntimeException ex) {
                 taskEventService.append(taskId, "TASK_CANCEL_DELIVERY_FAILED", "OPERATOR", "DEVICE_API_ERROR",
                         "向设备代理" + agentCode + "发送业务任务取消请求失败: " + ex.getMessage());
                 deviceResults.add(Map.of("agentId", agentCode, "result", "CANCEL_FAILED"));
             }
-            agent.setWorkStatus("IDLE");
-            agent.setCurrentTaskId(null);
-            agent.setCurrentStepSeq(null);
+            // A queued cancellation does not prove the device stopped. Keep it unavailable
+            // until an IDLE status report confirms release (or an operator resolves it).
+            agent.setWorkStatus("BUSY");
+            agent.setCurrentTaskId(taskId);
             deviceAgentMapper.update(agent);
         }
 

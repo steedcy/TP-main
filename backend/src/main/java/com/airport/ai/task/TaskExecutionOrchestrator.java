@@ -447,7 +447,7 @@ public class TaskExecutionOrchestrator {
         List<CandidateScore> scored = new ArrayList<>();
         for (DeviceAgent agent : onlineIdle) {
             Device device = deviceById.get(agent.getDeviceId());
-            if (device == null) continue;
+            if (device == null || !"ACTIVE".equals(device.getDeviceStatus())) continue;
             boolean hasCapability = deviceHasCapability(device.getId(), capabilityType);
             if (!hasCapability) continue;
 

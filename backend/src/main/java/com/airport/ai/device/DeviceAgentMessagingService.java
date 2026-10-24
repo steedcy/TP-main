@@ -67,7 +67,8 @@ public class DeviceAgentMessagingService {
     public java.util.Map<String, Object> testCapability(Device device, DeviceAgent agent, DeviceCapability capability,
                                                        java.util.Map<String, Object> params) {
         if (!"ENABLED".equals(agent.getAgentStatus()) || !"ONLINE".equals(agent.getOnlineStatus())
-                || !"IDLE".equals(agent.getWorkStatus())) throw new BusinessException(ErrorCode.DEVICE_OFFLINE);
+                || !"IDLE".equals(agent.getWorkStatus()) || !"ACTIVE".equals(device.getDeviceStatus()))
+            throw new BusinessException(ErrorCode.DEVICE_OFFLINE);
         if (!deviceTypeCapabilityService.isCapabilityTypeSupported(device.getDeviceTypeCode(),
                 device.getSimulatedDeviceType(), capability.getCapabilityType()))
             throw new BusinessException(ErrorCode.CAPABILITY_OUT_OF_BOUNDARY);
@@ -106,6 +107,7 @@ public class DeviceAgentMessagingService {
         }
         Device device = deviceMapper.findById(agent.getDeviceId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.DEVICE_NOT_FOUND));
+        if (!"ACTIVE".equals(device.getDeviceStatus())) throw new BusinessException(ErrorCode.DEVICE_OFFLINE);
         Task task = taskId == null ? null : taskMapper.findById(taskId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.TASK_NOT_FOUND));
         inputParams = inputParams == null ? Map.of() : inputParams;

@@ -63,14 +63,15 @@ public class OperationLogService {
         operationLogMapper.insert(log);
     }
 
-    public void recordUnlock(Long targetUserId, String targetUsername, String operatorUsername, String operatorRole) {
+    public void recordUnlock(String targetUsername, User operator) {
         OperationLog log = new OperationLog();
-        log.setUserId(targetUserId);
-        log.setUsername(operatorUsername);
-        log.setRole(operatorRole);
+        log.setUserId(operator.getId());
+        log.setUsername(operator.getUsername());
+        log.setRole(operator.getRole());
         log.setOperationType("MANUAL_HANDLING");
         log.setOperationTarget(targetUsername);
         log.setOperationResult("SUCCESS");
+        log.setSourceIp(currentRequestIp());
         operationLogMapper.insert(log);
     }
 

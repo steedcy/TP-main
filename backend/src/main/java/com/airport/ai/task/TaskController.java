@@ -12,16 +12,18 @@ import com.airport.ai.task.dto.PlanVersionView;
 import com.airport.ai.task.dto.SubmitTaskRequest;
 import com.airport.ai.task.dto.TaskView;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 /**
  * 对应5.4.1开放式任务目标提交与理解、附录B 6.7节任务规划与执行模块。
- * 任务提交/补充/取消由运行操作员发起，不限角色（登录即可，与前端TaskListView约定一致）。
+ * 正式任务的写操作仅运行操作员可发起；系统管理员可查看历史追溯。
  */
 @RestController
 @RequestMapping("/api/v1/tasks")
+@PreAuthorize("hasAnyRole('OPERATOR', 'SYSTEM_ADMIN')")
 public class TaskController {
 
     private final TaskService taskService;
@@ -35,6 +37,7 @@ public class TaskController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('OPERATOR')")
     public ApiResponse<TaskView> submit(@Valid @RequestBody SubmitTaskRequest request) {
         return ApiResponse.ok(TaskView.from(taskService.submit(request, currentUser.get())));
     }
@@ -56,17 +59,20 @@ public class TaskController {
     }
 
     @PostMapping("/{taskId}/clarify")
+    @PreAuthorize("hasRole('OPERATOR')")
     public ApiResponse<TaskView> clarify(@PathVariable Long taskId, @Valid @RequestBody ClarifyTaskRequest request) {
         return ApiResponse.ok(TaskView.from(taskService.clarify(taskId, request, currentUser.get())));
     }
 
     @PostMapping("/{taskId}/cancel")
+    @PreAuthorize("hasRole('OPERATOR')")
     public ApiResponse<TaskView> cancel(@PathVariable Long taskId, @Valid @RequestBody CancelTaskRequest request) {
         return ApiResponse.ok(TaskView.from(taskService.cancel(taskId, request.getReason(), currentUser.get())));
     }
 
     /** 对应5.5.6人工终止，与cancel区分：cancel仅限计划生成前，terminate覆盖6种运行期可终止状态 */
     @PostMapping("/{taskId}/terminate")
+    @PreAuthorize("hasRole('OPERATOR')")
     public ApiResponse<TaskView> terminate(@PathVariable Long taskId,
                                             @Valid @RequestBody com.airport.ai.task.dto.TerminateTaskRequest request) {
         if (!Boolean.TRUE.equals(request.getConfirmed())) {
@@ -81,6 +87,7 @@ public class TaskController {
     }
 
     @PostMapping("/{taskId}/manual-actions")
+    @PreAuthorize("hasRole('OPERATOR')")
     public ApiResponse<TaskView> manualAction(@PathVariable Long taskId, @Valid @RequestBody ManualActionRequest request) {
         return ApiResponse.ok(TaskView.from(taskService.manualAction(taskId, request.getAction(), currentUser.get())));
     }

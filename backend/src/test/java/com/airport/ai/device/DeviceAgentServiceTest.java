@@ -53,4 +53,47 @@ class DeviceAgentServiceTest {
         verify(taskExceptions).handleAgentOffline(agent);
         verify(agents, times(2)).update(agent);
     }
+    @Test
+    void terminatedTaskReleasesAgentOnlyAfterIdleReport() {
+        DeviceAgentMapper agents = mock(DeviceAgentMapper.class);
+        DeviceMapper devices = mock(DeviceMapper.class);
+        DeviceCommandMapper commands = mock(DeviceCommandMapper.class);
+        com.airport.ai.task.TaskMapper tasks = mock(com.airport.ai.task.TaskMapper.class);
+        TaskEventService taskEvents = mock(TaskEventService.class);
+        DeviceAgent agent = new DeviceAgent();
+        agent.setId(5L);
+        agent.setAgentCode("AGT-5");
+        agent.setDeviceId(5L);
+        agent.setAgentStatus("ENABLED");
+        agent.setOnlineStatus("ONLINE");
+        agent.setWorkStatus("BUSY");
+        agent.setCurrentTaskId(7L);
+        agent.setCurrentStepSeq(1);
+        Device device = new Device();
+        device.setId(5L);
+        when(agents.findByAgentCode("AGT-5")).thenReturn(Optional.of(agent));
+        when(devices.findById(5L)).thenReturn(Optional.of(device));
+        com.airport.ai.task.Task terminated = new com.airport.ai.task.Task();
+        terminated.setStatus(com.airport.ai.task.TaskStatus.MANUAL_TERMINATED);
+        when(tasks.findById(7L)).thenReturn(Optional.of(terminated));
+        DeviceCommandRecord cancel = new DeviceCommandRecord();
+        cancel.setCommandType("TASK_CANCEL");
+        cancel.setCommandId("CMD-7");
+        cancel.setTaskId(7L);
+        cancel.setCommandStatus("SENT");
+        when(commands.findRecentByAgentCode("AGT-5", 20)).thenReturn(java.util.List.of(cancel));
+        DeviceAgentService service = new DeviceAgentService(agents, devices, mock(OperationLogService.class),
+                taskEvents, mock(DeviceEventService.class), mock(TaskExceptionService.class));
+        org.springframework.test.util.ReflectionTestUtils.setField(service, "taskMapper", tasks);
+        org.springframework.test.util.ReflectionTestUtils.setField(service, "commandMapper", commands);
+
+        service.reportStatus("AGT-5", "ONLINE", "IDLE", null, null);
+
+        assertEquals("IDLE", agent.getWorkStatus());
+        assertNull(agent.getCurrentTaskId());
+        assertNull(agent.getCurrentStepSeq());
+        verify(commands).updateStatus("AGT-5", "CMD-7", "TASK_CANCEL", 0, "CONFIRMED_IDLE", null);
+        verify(taskEvents).append(eq(7L), eq("TASK_CANCEL_CONFIRMED_IDLE"), eq("DEVICE"),
+                isNull(), contains("AGT-5"));
+    }
 }

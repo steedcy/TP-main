@@ -28,6 +28,11 @@
         WHERE agent_code = #{agentCode} AND command_id = #{commandId}
           AND command_type = #{commandType} AND attempt_no = #{attemptNo}
     </select>
+    <select id="findUnconfirmedCancelBefore" resultMap="DeviceCommandResult">
+        SELECT * FROM device_commands
+        WHERE command_type = 'TASK_CANCEL' AND command_status IN ('PENDING', 'SENT')
+          AND created_at &lt; #{threshold}
+    </select>
     <select id="findRecentByAgentCode" resultMap="DeviceCommandResult">
         SELECT * FROM device_commands
         WHERE agent_code = #{agentCode}

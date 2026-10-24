@@ -66,6 +66,7 @@ public class ContextSnapshotService {
                 failedAgentCodes.add(agent.getAgentCode());
                 continue;
             }
+            if (!"ACTIVE".equals(device.getDeviceStatus())) continue;
             List<DeviceCapability> enabledCapabilities =
                     deviceCapabilityMapper.findByDeviceIdAndCapabilityStatus(device.getId(), "ENABLED");
             List<String> capabilityTypes = enabledCapabilities.stream()
@@ -87,8 +88,11 @@ public class ContextSnapshotService {
                 return schema;
             }).toList());
             agentView.put("onlineStatus", agent.getOnlineStatus());
-            agentView.put("location", Map.of("x", device.getPositionX(), "y", device.getPositionY(),
-                    "zone", device.getAreaCode()));
+            Map<String, Object> location = new LinkedHashMap<>();
+            location.put("x", device.getPositionX());
+            location.put("y", device.getPositionY());
+            location.put("zone", device.getAreaCode());
+            agentView.put("location", location);
             agentView.put("workload", agent.getWorkStatus());
             agentView.put("availableUntil", null);
             agentViews.add(agentView);

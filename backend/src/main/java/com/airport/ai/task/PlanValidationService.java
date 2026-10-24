@@ -44,6 +44,10 @@ public class PlanValidationService {
     public PlanValidationResult validate(List<Map<String, Object>> steps, List<Map<String, Object>> snapshotAgents,
                                           List<String> allowedCapabilityTypes) {
         PlanValidationResult result = new PlanValidationResult();
+        if (steps == null || steps.isEmpty()) {
+            result.failStructure("计划必须包含至少一个步骤", null, "ERR_STEP_FIELD_MISSING");
+            return result;
+        }
 
         // 1. 结构校验：步骤数≤5、字段完整、顺序与依赖合法、无循环、无无限轮次协商
         if (steps.size() > MAX_STEPS) {

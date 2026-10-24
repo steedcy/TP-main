@@ -42,7 +42,7 @@ public class UserController {
     @PostMapping("/{userId}/unlock")
     public ApiResponse<Void> unlock(@PathVariable Long userId) {
         User operator = currentUser.get();
-        authService.unlock(userId, operator.getUsername(), operator.getRole());
+        authService.unlock(userId, operator);
         return ApiResponse.ok(null);
     }
 

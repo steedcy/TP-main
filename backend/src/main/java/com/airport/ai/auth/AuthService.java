@@ -106,7 +106,7 @@ public class AuthService {
     }
 
     @Transactional
-    public void unlock(Long targetUserId, String operatorUsername, String operatorRole) {
+    public void unlock(Long targetUserId, User operator) {
         User user = userMapper.findById(targetUserId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         if (!"LOCKED".equals(user.getStatus())) {
@@ -115,6 +115,6 @@ public class AuthService {
         user.setStatus("ACTIVE");
         user.setFailedLoginAttempts(0);
         userMapper.update(user);
-        operationLogService.recordUnlock(targetUserId, user.getUsername(), operatorUsername, operatorRole);
+        operationLogService.recordUnlock(user.getUsername(), operator);
     }
 }

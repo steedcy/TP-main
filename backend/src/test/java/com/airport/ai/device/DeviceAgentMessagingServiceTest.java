@@ -127,4 +127,13 @@ class DeviceAgentMessagingServiceTest {
         return agent + "/" + command + "/" + type + "/" + attempt;
     }
 
+    @Test
+    void disabledDeviceCannotReceiveCommandEvenWhenAgentIsOnline() {
+        Device device = devices.findById(41L).orElseThrow();
+        device.setDeviceStatus("INACTIVE");
+        assertThrows(BusinessException.class, () -> service.requestTaskAcceptance("AGT-41", "CMD-STOP",
+                900L, 1, "CAP_INFO_DISPLAY", Map.of("contentType", "TEXT", "contentData", "Gate A05")));
+        verifyNoInteractions(adapter);
+        assertTrue(records.isEmpty());
+    }
 }

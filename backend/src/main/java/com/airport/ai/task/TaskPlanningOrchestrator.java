@@ -88,6 +88,19 @@ public class TaskPlanningOrchestrator {
         }
     }
 
+    /** Explicit manual choice skips the autonomous model and uses the same validated downgrade gate. */
+    @Transactional
+    public void switchToBaseline(Long taskId) {
+        Task task = taskMapper.findById(taskId).orElseThrow();
+        if (task.getStatus() != TaskStatus.PLANNING) return;
+        try {
+            downgradeOrManual(task, "运行操作员选择基线模板");
+        } catch (RuntimeException ex) {
+            taskEventService.append(taskId, "BASELINE_DOWNGRADED", "SYSTEM", "ERR_TEMPLATE_VALIDATION_FAILED",
+                    "人工切换基线失败: " + ex.getMessage());
+            toPendingManual(task, "人工切换基线失败: " + ex.getMessage());
+        }
+    }
     private void doAdvance(Task task) {
         Long taskId = task.getId();
         List<String> requiredCapabilities = extractRequiredCapabilities(task);

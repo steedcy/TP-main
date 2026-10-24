@@ -97,4 +97,21 @@ class MoonshotModelServiceTest {
         json.put("confidence", 2);
         assertFalse(service.generatePlan(request).isSuccess());
     }
+    @Test
+    void planningPromptOnlyOffersCapabilitiesAllowedByTaskFamilyAndOnlineCandidates() {
+        PlanningRequest request = new PlanningRequest();
+        request.setTaskFamily("FLIGHT_CHANGE_RESPONSE");
+        request.setCapabilityContext(List.of(
+                Map.of("capabilityType", "CAP_FLIGHT_UPDATE", "candidateCount", 1),
+                Map.of("capabilityType", "CAP_ESCORT", "candidateCount", 1),
+                Map.of("capabilityType", "CAP_NOTIFICATION", "candidateCount", 0)));
+        when(client.complete(anyString(), any(), any())).thenAnswer(invocation -> {
+            String prompt = invocation.getArgument(0);
+            Map<?, ?> payload = invocation.getArgument(1);
+            assertTrue(prompt.contains("eligibleCapabilityTypes"));
+            assertEquals(List.of("CAP_FLIGHT_UPDATE"), payload.get("eligibleCapabilityTypes"));
+            throw new MoonshotChatClient.CallFailure("1002", "fixture response");
+        });
+        assertFalse(service.generatePlan(request).isSuccess());
+    }
 }

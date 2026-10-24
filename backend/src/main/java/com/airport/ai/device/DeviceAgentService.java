@@ -27,6 +27,8 @@ public class DeviceAgentService {
     private final TaskEventService taskEventService;
     private final DeviceEventService deviceEventService;
     private final TaskExceptionService taskExceptionService;
+    @org.springframework.beans.factory.annotation.Autowired private com.airport.ai.task.TaskMapper taskMapper;
+    @org.springframework.beans.factory.annotation.Autowired private DeviceCommandMapper commandMapper;
 
     public DeviceAgentService(DeviceAgentMapper deviceAgentMapper,
                                DeviceMapper deviceMapper,
@@ -147,6 +149,26 @@ public class DeviceAgentService {
             throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, "workStatus取值非法");
         }
 
+        if ("IDLE".equals(workStatus) && agent.getCurrentTaskId() != null && taskMapper != null
+                && taskMapper.findById(agent.getCurrentTaskId())
+                        .map(t -> t.getStatus() == com.airport.ai.task.TaskStatus.MANUAL_TERMINATED)
+                        .orElse(false)) {
+            Long terminatedTaskId = agent.getCurrentTaskId();
+            if (commandMapper != null) {
+                for (DeviceCommandRecord command : commandMapper.findRecentByAgentCode(agent.getAgentCode(), 20)) {
+                    if ("TASK_CANCEL".equals(command.getCommandType())
+                            && terminatedTaskId.equals(command.getTaskId())
+                            && ("SENT".equals(command.getCommandStatus()) || "PENDING".equals(command.getCommandStatus()))) {
+                        commandMapper.updateStatus(agent.getAgentCode(), command.getCommandId(), "TASK_CANCEL", 0,
+                                "CONFIRMED_IDLE", null);
+                    }
+                }
+            }
+            agent.setCurrentTaskId(null);
+            agent.setCurrentStepSeq(null);
+            taskEventService.append(terminatedTaskId, "TASK_CANCEL_CONFIRMED_IDLE", "DEVICE", null,
+                    "设备代理" + agent.getAgentCode() + "上报空闲，解除人工终止任务的设备占用");
+        }
         boolean wasOffline = "OFFLINE".equals(agent.getOnlineStatus());
         agent.setOnlineStatus(onlineStatus);
         agent.setWorkStatus(workStatus);
