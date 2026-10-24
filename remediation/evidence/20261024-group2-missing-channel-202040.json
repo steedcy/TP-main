@@ -1,0 +1,318 @@
+{
+  "recordedAt": "2026-10-24T20:20:40.879407+08:00",
+  "case": "GROUP2_SMART_DISPLAY_OFFLINE",
+  "task": {
+    "id": 226,
+    "taskCode": "TASK-20261024-0225",
+    "taskGoal": "为虚构航班R08OFF处理登机口变更：从已标定仿真位置GATE_A05改至F2_TEST_GATE，2026-10-25 20:00生效，原因设备维护。请更新航延屏，在智慧航显展示新登机口与路线，并由机器人通知现场旅客改道。",
+    "taskFamily": "FLIGHT_CHANGE_RESPONSE",
+    "sceneParams": {
+      "eventSource": "MANUAL_FORM",
+      "flightNumber": "R08OFF",
+      "changeType": "GATE_CHANGE",
+      "originalTime": "2026-10-25T20:00:00",
+      "originalGate": "GATE_A05",
+      "newGate": "F2_TEST_GATE",
+      "changeDescription": "虚构航班R08OFF由GATE_A05变更至F2_TEST_GATE，原因设备维护",
+      "updateType": "GATE_CHANGE",
+      "updateContent": "虚构航班R08OFF改至F2_TEST_GATE",
+      "displayDuration": 60,
+      "originLocation": "GATE_A05",
+      "targetLocation": "F2_TEST_GATE",
+      "routePreference": "BARRIER_FREE",
+      "contentType": "TEXT",
+      "contentData": "R08OFF改至F2_TEST_GATE",
+      "notificationType": "BOTH",
+      "notificationContent": "R08OFF新登机口F2_TEST_GATE",
+      "repeatCount": 1,
+      "displayContent": "虚构航班登机口及无障碍路径提示，请前往F2_TEST_GATE。"
+    },
+    "goalParsingResult": {
+      "completionCondition": "航班变更信息已送达且旅客后续引导（如需）已完成",
+      "origin": "GATE_A05",
+      "destination": "F2_TEST_GATE",
+      "originalGoal": "为虚构航班R08OFF处理登机口变更：从已标定仿真位置GATE_A05改至F2_TEST_GATE，2026-10-25 20:00生效，原因设备维护。请更新航延屏，在智慧航显展示新登机口与路线，并由机器人通知现场旅客改道。",
+      "constraints": [
+        "航班变更信息发布须在旅客到达登机口前完成",
+        "涉及登机口变更时须同步空间引导"
+      ]
+    },
+    "status": "PENDING_MANUAL",
+    "currentPlanVersionId": 298,
+    "replanUsed": false,
+    "replanningReason": null,
+    "manualTerminateReason": null,
+    "failureReason": "候选计划三类校验未通过，转基线模板降级；所选基线模板校验失败",
+    "missingInfoQuestions": null,
+    "downgradeReason": null,
+    "isDryRun": false,
+    "createdAt": "2026-10-24T20:20:28.40049",
+    "updatedAt": "2026-10-24T20:20:38.825691",
+    "createdBy": "oprator"
+  },
+  "planVersions": [
+    {
+      "id": 298,
+      "versionNo": 1,
+      "source": "AUTONOMOUS",
+      "baselineTemplateId": null,
+      "snapshotId": "CTX-20261024-0280",
+      "planSteps": [
+        {
+          "stepSeq": 1,
+          "stepGoal": "更新航延屏，发布航班R08OFF登机口变更信息",
+          "capabilityType": "CAP_FLIGHT_UPDATE",
+          "inputParams": {
+            "flightNumber": "R08OFF",
+            "updateType": "GATE_CHANGE",
+            "updateContent": "虚构航班R08OFF改至F2_TEST_GATE",
+            "displayDuration": 60
+          },
+          "precondition": "航班变更事件已确认，航延屏设备在线可用",
+          "completionCondition": "航延屏成功发布航班变更信息，返回publishStatus为成功",
+          "failureHandling": "若发布失败，记录错误日志并尝试备用航延屏设备AGT-B0D7BDAD的CAP_INFO_DISPLAY能力进行文本展示",
+          "stepTimeout": 30
+        },
+        {
+          "stepSeq": 2,
+          "stepGoal": "在智慧航显展示新登机口与路线信息",
+          "capabilityType": "CAP_INFO_DISPLAY",
+          "inputParams": {
+            "contentType": "TEXT",
+            "contentData": "R08OFF改至F2_TEST_GATE",
+            "displayDuration": 60
+          },
+          "precondition": "航延屏变更信息已发布，智慧航显设备在线可用",
+          "completionCondition": "智慧航显成功展示新登机口信息，返回displayStatus为成功",
+          "failureHandling": "若展示失败，切换至另一台智慧航显设备重试",
+          "stepTimeout": 30
+        },
+        {
+          "stepSeq": 3,
+          "stepGoal": "机器人导航至原登机口区域准备通知旅客",
+          "capabilityType": "CAP_NAVIGATION",
+          "inputParams": {
+            "targetLocation": "GATE_A05",
+            "routePreference": "BARRIER_FREE"
+          },
+          "precondition": "智慧航显信息已展示，机器人设备在线且空闲",
+          "completionCondition": "机器人成功生成导航路线并抵达GATE_A05区域，返回routeGenerated为true",
+          "failureHandling": "若导航路线生成失败，切换至另一台机器人重试",
+          "stepTimeout": 120
+        },
+        {
+          "stepSeq": 4,
+          "stepGoal": "机器人通知现场旅客登机口变更及改道信息",
+          "capabilityType": "CAP_NOTIFICATION",
+          "inputParams": {
+            "notificationType": "BOTH",
+            "notificationContent": "R08OFF新登机口F2_TEST_GATE",
+            "repeatCount": 1
+          },
+          "precondition": "机器人已导航至GATE_A05区域",
+          "completionCondition": "旅客通知成功送达，返回notificationStatus为成功",
+          "failureHandling": "若通知失败，切换至另一台机器人重试或提升重复次数",
+          "stepTimeout": 60
+        }
+      ],
+      "structureCheckResult": "PASS",
+      "capabilityCheckResult": "FAIL",
+      "constraintCheckResult": "PASS",
+      "validationErrors": [
+        {
+          "errorType": "CAPABILITY",
+          "description": "能力类型CAP_INFO_DISPLAY无在线候选代理（要求渠道SMART_DISPLAY）",
+          "stepSeq": 2,
+          "reasonCode": "ERR_NO_ONLINE_CANDIDATE"
+        }
+      ],
+      "riskLevel": null,
+      "riskReasonCode": null,
+      "judgmentBasis": null,
+      "confidence": 0.85,
+      "ruleSetVersion": null,
+      "frozenAt": null,
+      "createdAt": "2026-10-24T20:20:38.802438"
+    },
+    {
+      "id": 299,
+      "versionNo": 2,
+      "source": "BASELINE_TEMPLATE",
+      "baselineTemplateId": 3,
+      "snapshotId": "CTX-20261024-0281",
+      "planSteps": [
+        {
+          "stepSeq": 1,
+          "capabilityType": "CAP_FLIGHT_UPDATE",
+          "paramMapping": [
+            {
+              "target": "flightNumber",
+              "source": "TEMPLATE_INPUT.flightNumber"
+            },
+            {
+              "target": "updateType",
+              "source": "TEMPLATE_INPUT.updateType"
+            },
+            {
+              "target": "updateContent",
+              "source": "TEMPLATE_INPUT.updateContent"
+            },
+            {
+              "target": "displayDuration",
+              "source": "TEMPLATE_INPUT.displayDuration"
+            }
+          ],
+          "stepTimeout": 60,
+          "completionCondition": "publishStatus=SUCCESS",
+          "stepGoal": "执行CAP_FLIGHT_UPDATE能力（基线模板步骤）",
+          "precondition": "候选设备在线且空闲",
+          "failureHandling": "重试一次或转人工处理",
+          "inputParams": {}
+        },
+        {
+          "stepSeq": 2,
+          "capabilityType": "CAP_INFO_DISPLAY",
+          "paramMapping": [
+            {
+              "target": "contentType",
+              "source": "TEMPLATE_INPUT.contentType"
+            },
+            {
+              "target": "contentData",
+              "source": "TEMPLATE_INPUT.displayContent"
+            },
+            {
+              "target": "displayDuration",
+              "source": "TEMPLATE_INPUT.displayDuration"
+            }
+          ],
+          "stepTimeout": 60,
+          "completionCondition": "displayStatus=SUCCESS",
+          "stepGoal": "执行CAP_INFO_DISPLAY能力（基线模板步骤）",
+          "precondition": "候选设备在线且空闲",
+          "failureHandling": "重试一次或转人工处理",
+          "inputParams": {}
+        },
+        {
+          "stepSeq": 3,
+          "capabilityType": "CAP_NOTIFICATION",
+          "paramMapping": [
+            {
+              "target": "notificationType",
+              "source": "TEMPLATE_INPUT.notificationType"
+            },
+            {
+              "target": "notificationContent",
+              "source": "TEMPLATE_INPUT.notificationContent"
+            },
+            {
+              "target": "repeatCount",
+              "source": "TEMPLATE_INPUT.repeatCount"
+            }
+          ],
+          "stepTimeout": 60,
+          "completionCondition": "notificationStatus=SUCCESS",
+          "stepGoal": "执行CAP_NOTIFICATION能力（基线模板步骤）",
+          "precondition": "候选设备在线且空闲",
+          "failureHandling": "重试一次或转人工处理",
+          "inputParams": {}
+        },
+        {
+          "stepSeq": 4,
+          "capabilityType": "CAP_NAVIGATION",
+          "paramMapping": [
+            {
+              "target": "targetLocation",
+              "source": "TEMPLATE_INPUT.targetLocation"
+            },
+            {
+              "target": "routePreference",
+              "source": "TEMPLATE_INPUT.routePreference"
+            }
+          ],
+          "stepTimeout": 60,
+          "completionCondition": "routeGenerated=true",
+          "stepGoal": "执行CAP_NAVIGATION能力（基线模板步骤）",
+          "precondition": "候选设备在线且空闲",
+          "failureHandling": "重试一次或转人工处理",
+          "inputParams": {}
+        }
+      ],
+      "structureCheckResult": "PASS",
+      "capabilityCheckResult": "FAIL",
+      "constraintCheckResult": "PASS",
+      "validationErrors": [
+        {
+          "errorType": "CAPABILITY",
+          "description": "能力类型CAP_INFO_DISPLAY无在线候选代理（要求渠道SMART_DISPLAY）",
+          "stepSeq": 2,
+          "reasonCode": "ERR_NO_ONLINE_CANDIDATE"
+        }
+      ],
+      "riskLevel": null,
+      "riskReasonCode": null,
+      "judgmentBasis": null,
+      "confidence": null,
+      "ruleSetVersion": null,
+      "frozenAt": null,
+      "createdAt": "2026-10-24T20:20:38.823127"
+    }
+  ],
+  "assignments": [],
+  "events": [
+    {
+      "id": 5055,
+      "taskId": 226,
+      "eventType": "GOAL_SUBMITTED",
+      "occurredAt": "2026-10-24T20:20:28.403133",
+      "trigger": "OPERATOR",
+      "reasonCode": null,
+      "detailSummary": "运行操作员oprator提交任务目标: 为虚构航班R08OFF处理登机口变更：从已标定仿真位置GATE_A05改至F2_TEST_GATE，2026-10-25 20:00生效，原因设备维护。请更新航延屏，在智慧航显展示新登机口与路线，并由机器人通知现场旅客改道。"
+    },
+    {
+      "id": 5056,
+      "taskId": 226,
+      "eventType": "GOAL_CLARIFIED",
+      "occurredAt": "2026-10-24T20:20:30.108123",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+    },
+    {
+      "id": 5057,
+      "taskId": 226,
+      "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+      "occurredAt": "2026-10-24T20:20:30.117153",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "生成规划上下文快照CTX-20261024-0280"
+    },
+    {
+      "id": 5058,
+      "taskId": 226,
+      "eventType": "PLAN_GENERATED",
+      "occurredAt": "2026-10-24T20:20:38.802438",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+    },
+    {
+      "id": 5059,
+      "taskId": 226,
+      "eventType": "PLAN_VALIDATED",
+      "occurredAt": "2026-10-24T20:20:38.810295",
+      "trigger": "SYSTEM",
+      "reasonCode": "ERR_VALIDATION_FAILED",
+      "detailSummary": "候选计划三类校验未通过: 1项错误"
+    },
+    {
+      "id": 5060,
+      "taskId": 226,
+      "eventType": "BASELINE_DOWNGRADED",
+      "occurredAt": "2026-10-24T20:20:38.825691",
+      "trigger": "SYSTEM",
+      "reasonCode": "ERR_TEMPLATE_VALIDATION_FAILED",
+      "detailSummary": "所选基线模板航班变更应对标准模板三类校验未通过"
+    }
+  ]
+}

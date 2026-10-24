@@ -10,7 +10,7 @@ import java.util.Set;
 @Component
 public class SmartDisplayDriver implements CapabilityDriver {
     private static final Set<String> CONTENT_TYPES = Set.of("TEXT", "IMAGE", "VIDEO", "HTML");
-    private static final Set<String> UPDATE_TYPES = Set.of("DELAY", "GATE_CHANGE", "CANCEL");
+    private static final Set<String> UPDATE_TYPES = Set.of("DELAY", "EARLY", "GATE_CHANGE", "CANCEL");
     private static final Set<String> ROUTE_PREFERENCES = Set.of("SHORTEST", "BARRIER_FREE");
 
     @Override public String deviceType() { return "SMART_DISPLAY"; }
@@ -39,7 +39,7 @@ public class SmartDisplayDriver implements CapabilityDriver {
     private Map<String, Object> flightUpdate(Map<String, Object> input) {
         requiredText(input, "flightNumber");
         String updateType = requiredText(input, "updateType");
-        if (!UPDATE_TYPES.contains(updateType)) throw invalid("updateType必须为DELAY/GATE_CHANGE/CANCEL");
+        if (!UPDATE_TYPES.contains(updateType)) throw invalid("updateType必须为DELAY/EARLY/GATE_CHANGE/CANCEL");
         requiredText(input, "updateContent");
         integer(input, "displayDuration", 10, 600);
         return Map.of("publishStatus", "SUCCESS", "publishTime", OffsetDateTime.now().toString());

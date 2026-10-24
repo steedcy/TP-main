@@ -59,6 +59,22 @@ public class SimulatorRuntime {
         }
     }
 
+    /** Named fictional fixtures for the two baggage decision branches. */
+    public synchronized Map<String, Object> setBaggageSample(String sample) {
+        if (!"BAGGAGE_SCANNER".equals(properties.getSimulatedDeviceType()))
+            throw new IllegalArgumentException("仅行李测量仿真体可切换样本");
+        if ("OVERSIZE".equals(sample)) {
+            properties.setBaggageLengthCm(80); properties.setBaggageWidthCm(55);
+            properties.setBaggageHeightCm(35); properties.setBaggageWeightKg(35);
+        } else if ("NORMAL".equals(sample)) {
+            properties.setBaggageLengthCm(55); properties.setBaggageWidthCm(40);
+            properties.setBaggageHeightCm(20); properties.setBaggageWeightKg(10);
+        } else throw new IllegalArgumentException("sample须为OVERSIZE或NORMAL");
+        return Map.of("sample", sample, "length", properties.getBaggageLengthCm(),
+                "width", properties.getBaggageWidthCm(), "height", properties.getBaggageHeightCm(),
+                "weight", properties.getBaggageWeightKg());
+    }
+
     @PostConstruct
     void restoreConfiguredBinding() {
         if (properties.getAgentCode() != null && !properties.getAgentCode().isBlank()

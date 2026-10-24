@@ -153,7 +153,8 @@ public class TaskPlanningOrchestrator {
         // 5.4.4 计划三类校验，约束校验维度接入5.6.1任务定义声明的可用能力类型范围
         List<Map<String, Object>> snapshotAgents = contextSnapshotService.parseAgents(snapshot.getAgents());
         List<String> allowedCapabilityTypes = allowedCapabilityTypes(task.getTaskFamily());
-        PlanValidationResult validation = planValidationService.validate(steps, snapshotAgents, allowedCapabilityTypes);
+        PlanValidationResult validation = planValidationService.validate(steps, snapshotAgents, allowedCapabilityTypes, task.getTaskFamily());
+        planValidationService.requireCoreScenarioCoverage(steps, task.getTaskFamily(), validation);
         applyValidationResult(planVersion, validation);
 
         if (!validation.isAllPassed()) {
@@ -266,7 +267,8 @@ public class TaskPlanningOrchestrator {
         ContextSnapshot snapshot = contextSnapshotService.buildSnapshot(taskId, requiredCapabilities);
         List<Map<String, Object>> snapshotAgents = contextSnapshotService.parseAgents(snapshot.getAgents());
 
-        PlanValidationResult validation = planValidationService.validate(templateSteps, snapshotAgents);
+        PlanValidationResult validation = planValidationService.validate(templateSteps, snapshotAgents, null, task.getTaskFamily());
+        planValidationService.requireCoreScenarioCoverage(templateSteps, task.getTaskFamily(), validation);
 
         PlanVersion downgradedVersion = new PlanVersion();
         downgradedVersion.setTaskId(taskId);

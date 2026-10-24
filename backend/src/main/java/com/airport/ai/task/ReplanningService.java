@@ -186,7 +186,8 @@ public class ReplanningService {
 
         List<Map<String, Object>> snapshotAgents = contextSnapshotService.parseAgents(snapshot.getAgents());
         // Completed frozen actions retain their actual results and do not require currently online devices.
-        PlanValidationResult validation = planValidationService.validate(renumberedTail, snapshotAgents, allowedTypes);
+        PlanValidationResult validation = planValidationService.validate(renumberedTail, snapshotAgents, allowedTypes, task.getTaskFamily());
+        planValidationService.requireCoreScenarioCoverage(mergedSteps, task.getTaskFamily(), validation);
         if (mergedSteps.size() > MAX_STEPS) validation.failStructure("最终路径超过五步", null, "ERR_STEP_LIMIT_EXCEEDED");
 
         PlanVersion newVersion = new PlanVersion();

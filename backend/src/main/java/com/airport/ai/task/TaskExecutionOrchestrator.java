@@ -127,7 +127,9 @@ public class TaskExecutionOrchestrator {
     public boolean hasAvailableCandidate(Long planVersionId, Integer stepSeq, List<String> excludeAgentCodes) {
         Map<String, Object> step = findStep(planVersionId, stepSeq);
         String capabilityType = String.valueOf(step.get("capabilityType"));
-        return !findRankedCandidates(capabilityType, step, excludeAgentCodes).isEmpty();
+        String family = taskMapper.findById(planVersionMapper.findById(planVersionId).orElseThrow().getTaskId())
+                .orElseThrow().getTaskFamily();
+        return !findRankedCandidates(capabilityType, step, excludeAgentCodes, family).isEmpty();
     }
 
     /**
@@ -143,8 +145,8 @@ public class TaskExecutionOrchestrator {
         String capabilityType = String.valueOf(step.get("capabilityType"));
 
         List<String> rejected = parseRejectedIds(assignment.getRejectedAgentIds());
-        List<CandidateScore> candidates = findRankedCandidates(capabilityType, step, rejected);
         Task currentTask = taskMapper.findById(taskId).orElseThrow();
+        List<CandidateScore> candidates = findRankedCandidates(capabilityType, step, rejected, currentTask.getTaskFamily());
         if (Boolean.TRUE.equals(currentTask.getIsDryRun())) {
             Long selected = selections.findByTaskId(taskId).stream().filter(s -> stepSeq.equals(s.getStepSeq()))
                     .map(com.airport.ai.baseline.DryRunDeviceSelection::getDeviceAgentId).findFirst().orElseThrow();
@@ -336,6 +338,14 @@ public class TaskExecutionOrchestrator {
             releaseAgent(assignment.getDeviceAgentId());
             taskEventService.append(assignment.getTaskId(), "STEP_COMPLETED", "SYSTEM", null,
                     "步骤" + assignment.getStepSeq() + "完成条件已满足: " + step.get("completionCondition"));
+            Task currentTask = taskMapper.findById(assignment.getTaskId()).orElseThrow();
+            if (!Boolean.TRUE.equals(currentTask.getIsDryRun())
+                    && "OVERSIZE_BAGGAGE_HANDLING".equals(currentTask.getTaskFamily())
+                    && "CAP_BAGGAGE_MEASURE".equals(step.get("capabilityType"))
+                    && Boolean.FALSE.equals(outputParams.get("isOversize"))) {
+                completeNormalBaggageBranch(currentTask, assignment.getPlanVersionId(), assignment.getStepSeq(), outputParams);
+                return;
+            }
             advanceAfterStepCompleted(assignment.getTaskId(), assignment.getPlanVersionId(), assignment.getStepSeq());
             return;
         }
@@ -378,6 +388,25 @@ public class TaskExecutionOrchestrator {
         taskEventService.append(assignment.getTaskId(), "STEP_FAILED", "SYSTEM", reasonCode,
                 "步骤" + assignment.getStepSeq() + "重试后仍失败: " + failureDetail);
         taskExceptionService.handleException(assignment.getTaskId(), assignment.getStepSeq(), "STEP_FAILED", failureDetail);
+    }
+
+    private void completeNormalBaggageBranch(Task task, Long planVersionId, Integer measuredStepSeq,
+                                             Map<String, Object> outputParams) {
+        for (TaskStepAssignment later : assignmentMapper.findByPlanVersionIdOrderByStepSeqAsc(planVersionId)) {
+            if (later.getStepSeq() <= measuredStepSeq) continue;
+            later.setStepStatus("SKIPPED");
+            later.setReasonCode("BAGGAGE_WITHIN_LIMIT");
+            later.setUpdatedAt(LocalDateTime.now());
+            assignmentMapper.update(later);
+        }
+        task.setStatus(TaskStatus.COMPLETED);
+        task.setUpdatedAt(LocalDateTime.now());
+        taskMapper.update(task);
+        taskEventService.append(task.getId(), "TASK_COMPLETED", "SYSTEM", "BAGGAGE_WITHIN_LIMIT",
+                "行李未超规，结束处置；三边和" + outputParams.get("totalDimensionCm") + "cm（阈值"
+                        + outputParams.get("dimensionThresholdCm") + "cm），重量" + outputParams.get("weight")
+                        + "kg（阈值" + outputParams.get("weightThresholdKg") + "kg）；来源："
+                        + outputParams.get("thresholdSource"));
     }
 
     /** 对应5.5.2业务规则8/9：全部步骤完成条件满足后置任务完成，否则按顺序取下一步骤分配设备 */
@@ -427,7 +456,7 @@ public class TaskExecutionOrchestrator {
      */
     @SuppressWarnings("unchecked")
     private List<CandidateScore> findRankedCandidates(String capabilityType, Map<String, Object> step,
-                                                        List<String> excludeAgentCodes) {
+                                                        List<String> excludeAgentCodes, String taskFamily) {
         List<DeviceAgent> onlineIdle = deviceAgentMapper.findByAgentStatusAndOnlineStatus("ENABLED", "ONLINE")
                 .stream()
                 .filter(a -> "IDLE".equals(a.getWorkStatus()))
@@ -447,7 +476,8 @@ public class TaskExecutionOrchestrator {
         List<CandidateScore> scored = new ArrayList<>();
         for (DeviceAgent agent : onlineIdle) {
             Device device = deviceById.get(agent.getDeviceId());
-            if (device == null || !"ACTIVE".equals(device.getDeviceStatus())) continue;
+            if (device == null || !"ACTIVE".equals(device.getDeviceStatus())
+                    || !CoreScenarioChannelPolicy.matches(taskFamily, capabilityType, device)) continue;
             boolean hasCapability = deviceHasCapability(device.getId(), capabilityType);
             if (!hasCapability) continue;
 

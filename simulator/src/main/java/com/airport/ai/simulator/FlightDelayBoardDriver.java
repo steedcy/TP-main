@@ -16,7 +16,7 @@ public class FlightDelayBoardDriver implements CapabilityDriver {
         if ("CAP_FLIGHT_UPDATE".equals(capabilityType)) {
             required(input, "flightNumber");
             String updateType = required(input, "updateType");
-            if (!Set.of("DELAY", "GATE_CHANGE", "CANCEL").contains(updateType)) throw new IllegalArgumentException("updateType取值非法");
+            if (!Set.of("DELAY", "EARLY", "GATE_CHANGE", "CANCEL").contains(updateType)) throw new IllegalArgumentException("updateType取值非法");
             required(input, "updateContent");
             range(input, "displayDuration", 10, 600);
             return Map.of("publishStatus", "SUCCESS", "publishTime", OffsetDateTime.now().toString());

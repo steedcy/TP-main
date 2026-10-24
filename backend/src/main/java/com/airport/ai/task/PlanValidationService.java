@@ -43,6 +43,12 @@ public class PlanValidationService {
     @SuppressWarnings("unchecked")
     public PlanValidationResult validate(List<Map<String, Object>> steps, List<Map<String, Object>> snapshotAgents,
                                           List<String> allowedCapabilityTypes) {
+        return validate(steps, snapshotAgents, allowedCapabilityTypes, null);
+    }
+
+    @SuppressWarnings("unchecked")
+    public PlanValidationResult validate(List<Map<String, Object>> steps, List<Map<String, Object>> snapshotAgents,
+                                          List<String> allowedCapabilityTypes, String taskFamily) {
         PlanValidationResult result = new PlanValidationResult();
         if (steps == null || steps.isEmpty()) {
             result.failStructure("计划必须包含至少一个步骤", null, "ERR_STEP_FIELD_MISSING");
@@ -87,9 +93,11 @@ public class PlanValidationService {
                 result.failCapability("能力类型" + capabilityType + "不存在已启用实例", stepSeq, "ERR_CAPABILITY_GAP");
                 continue;
             }
-            long onlineCandidates = countOnlineCandidates(snapshotAgents, capabilityType);
+            long onlineCandidates = countOnlineCandidates(snapshotAgents, capabilityType, taskFamily);
             if (onlineCandidates == 0) {
-                result.failCapability("能力类型" + capabilityType + "无在线候选代理", stepSeq, "ERR_NO_ONLINE_CANDIDATE");
+                String required = CoreScenarioChannelPolicy.requiredType(taskFamily, capabilityType);
+                result.failCapability("能力类型" + capabilityType + "无在线候选代理"
+                        + (required == null ? "" : "（要求渠道" + required + "）"), stepSeq, "ERR_NO_ONLINE_CANDIDATE");
             }
         }
 
@@ -107,6 +115,8 @@ public class PlanValidationService {
             if (!(step.get("paramMapping") instanceof List<?>) && step.get("inputParams") instanceof Map<?,?> inputs) {
                 List<Map<String,Object>> schemas=new ArrayList<>();
                 for (var agent:snapshotAgents) {
+                    if (!CoreScenarioChannelPolicy.matches(taskFamily, String.valueOf(step.get("capabilityType")),
+                            String.valueOf(agent.get("deviceTypeCode")), String.valueOf(agent.get("simulatedDeviceType")))) continue;
                     if (!(agent.get("capabilitySchemas") instanceof List<?> declared)) continue;
                     for (Object item:declared) if (item instanceof Map<?,?> schema && java.util.Objects.equals(schema.get("capabilityType"),step.get("capabilityType")))
                         schemas.add((Map<String,Object>)schema);
@@ -135,14 +145,56 @@ public class PlanValidationService {
         return result;
     }
 
-    private long countOnlineCandidates(List<Map<String, Object>> snapshotAgents, String capabilityType) {
+    /** Every preset scenario must plan its required actions on the correct physical channels. */
+    public void requireCoreScenarioCoverage(List<Map<String, Object>> fullSteps, String taskFamily,
+                                            PlanValidationResult result) {
+        if (taskFamily == null || !Set.of("FLIGHT_CHANGE_RESPONSE", "OVERSIZE_BAGGAGE_HANDLING", "SPECIAL_PASSENGER_SERVICE")
+                .contains(taskFamily)) return;
+        Set<String> capabilities = new HashSet<>();
+        if (fullSteps != null) for (Map<String, Object> step : fullSteps) {
+            capabilities.add(String.valueOf(step.get("capabilityType")));
+        }
+        List<String> requiredCapabilities = switch (taskFamily) {
+            case "FLIGHT_CHANGE_RESPONSE" -> List.of("CAP_FLIGHT_UPDATE", "CAP_INFO_DISPLAY");
+            case "OVERSIZE_BAGGAGE_HANDLING" -> List.of("CAP_BAGGAGE_MEASURE", "CAP_OVERSIZE_ALERT", "CAP_INFO_DISPLAY", "CAP_NAVIGATION");
+            case "SPECIAL_PASSENGER_SERVICE" -> List.of("CAP_INFO_DISPLAY", "CAP_NOTIFICATION", "CAP_ESCORT");
+            default -> List.of();
+        };
+        for (String required : requiredCapabilities) {
+            if (!capabilities.contains(required)) {
+                result.failCapability("核心场景计划缺少必需渠道" + CoreScenarioChannelPolicy.requiredType(taskFamily, required)
+                                + "的能力" + required,
+                        null, "ERR_REQUIRED_CHANNEL_MISSING");
+            }
+        }
+        if ("FLIGHT_CHANGE_RESPONSE".equals(taskFamily)
+                && !capabilities.contains("CAP_NOTIFICATION") && !capabilities.contains("CAP_NAVIGATION")) {
+            result.failCapability("航班变更计划缺少机器人现场通知或引导渠道", null, "ERR_REQUIRED_CHANNEL_MISSING");
+        }
+        if ("OVERSIZE_BAGGAGE_HANDLING".equals(taskFamily) && fullSteps != null) {
+            int measureSeq = fullSteps.stream().filter(s -> "CAP_BAGGAGE_MEASURE".equals(s.get("capabilityType")))
+                    .mapToInt(s -> asInteger(s.get("stepSeq")) == null ? 0 : asInteger(s.get("stepSeq"))).min().orElse(0);
+            for (Map<String, Object> step : fullSteps) {
+                String capability = String.valueOf(step.get("capabilityType"));
+                Integer seq = asInteger(step.get("stepSeq"));
+                if (measureSeq > 0 && seq != null && seq < measureSeq
+                        && Set.of("CAP_OVERSIZE_ALERT", "CAP_INFO_DISPLAY").contains(capability)) {
+                    result.failStructure("超规处置步骤不得早于测量判定", seq, "ERR_BAGGAGE_BRANCH_ORDER");
+                }
+            }
+        }
+    }
+
+    private long countOnlineCandidates(List<Map<String, Object>> snapshotAgents, String capabilityType, String taskFamily) {
         if (snapshotAgents == null) {
             return 0;
         }
         return snapshotAgents.stream()
                 .filter(agent -> {
                     Object caps = agent.get("capabilities");
-                    return caps instanceof List<?> list && list.contains(capabilityType);
+                    return caps instanceof List<?> list && list.contains(capabilityType)
+                            && CoreScenarioChannelPolicy.matches(taskFamily, capabilityType,
+                            String.valueOf(agent.get("deviceTypeCode")), String.valueOf(agent.get("simulatedDeviceType")));
                 })
                 .count();
     }

@@ -32,9 +32,14 @@ public class BaggageScannerDriver implements CapabilityDriver {
         double width = properties.getBaggageWidthCm();
         double height = properties.getBaggageHeightCm();
         double weight = properties.getBaggageWeightKg();
-        boolean oversize = length + width + height > 158 || weight > 32;
+        double totalDimension = length + width + height;
+        boolean oversize = totalDimension > 158 || weight > 32;
         Map<String, Object> result = new java.util.LinkedHashMap<>(Map.of("length", length, "width", width, "height", height, "weight", weight,
                 "isOversize", oversize, "measureStatus", "SUCCESS"));
+        result.put("totalDimensionCm", totalDimension);
+        result.put("dimensionThresholdCm", 158);
+        result.put("weightThresholdKg", 32);
+        result.put("thresholdSource", "附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束");
         try { result.put("baggageInfo", new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(result)); }
         catch (Exception ex) { throw new IllegalStateException("行李测量结果编码失败", ex); }
         return result;

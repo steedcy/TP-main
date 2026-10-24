@@ -80,6 +80,24 @@
       </a-table>
     </a-card>
 
+    <a-card v-if="task.taskFamily === 'FLIGHT_CHANGE_RESPONSE'" title="航班变更渠道响应" style="margin-top: 16px">
+      <a-descriptions bordered :column="1">
+        <a-descriptions-item v-for="channel in flightChannelResults" :key="channel.name" :label="channel.name">
+          {{ channel.summary }}
+        </a-descriptions-item>
+      </a-descriptions>
+    </a-card>
+
+    <a-card v-if="task.taskFamily === 'OVERSIZE_BAGGAGE_HANDLING' && baggageResult" title="行李测量与超规判定" style="margin-top: 16px">
+      <a-descriptions bordered :column="2">
+        <a-descriptions-item label="长×宽×高">{{ baggageResult.length }}×{{ baggageResult.width }}×{{ baggageResult.height }} cm</a-descriptions-item>
+        <a-descriptions-item label="重量">{{ baggageResult.weight }} kg</a-descriptions-item>
+        <a-descriptions-item label="超规判定">{{ baggageResult.isOversize ? '超规' : '非超规' }}</a-descriptions-item>
+        <a-descriptions-item label="阈值">三边和 ＞ {{ baggageResult.dimensionThresholdCm }} cm 或重量 ＞ {{ baggageResult.weightThresholdKg }} kg</a-descriptions-item>
+        <a-descriptions-item label="阈值来源" :span="2">{{ baggageResult.thresholdSource || '未记录' }}</a-descriptions-item>
+      </a-descriptions>
+    </a-card>
+
     <a-card title="事件时间线（只读，事件仅可追加不可修改删除，对应5.7.1）" style="margin-top: 16px">
       <a-timeline>
         <a-timeline-item v-for="e in events" :key="e.id">
@@ -139,6 +157,20 @@ const events = ref([])
 const planVersions = ref([])
 const contextSnapshots = ref([])
 const stepAssignments = ref([])
+const currentSteps = computed(() => planVersions.value.find(p => p.id === task.value?.currentPlanVersionId)?.planSteps || [])
+const baggageResult = computed(() => stepAssignments.value
+  .find(a => currentSteps.value.find(s => s.stepSeq === a.stepSeq)?.capabilityType === 'CAP_BAGGAGE_MEASURE')?.outputParams || null)
+const flightChannelResults = computed(() => [
+  { name: '航延屏', capabilities: ['CAP_FLIGHT_UPDATE'] },
+  { name: '智慧航显', capabilities: ['CAP_INFO_DISPLAY'] },
+  { name: '机器人', capabilities: ['CAP_NOTIFICATION', 'CAP_NAVIGATION'] }
+].map(channel => {
+  const assignments = stepAssignments.value.filter(a => channel.capabilities.includes(
+    currentSteps.value.find(s => s.stepSeq === a.stepSeq)?.capabilityType))
+  return { name: channel.name, summary: assignments.length
+    ? assignments.map(a => `${a.deviceAgentCode || '未分配'}：${stepStatusLabel(a.stepStatus)}${a.feedbackAt ? `，反馈时间 ${a.feedbackAt}` : ''}`).join('；')
+    : '未覆盖（计划缺少该渠道）' }
+}))
 const terminateVisible = ref(false)
 const terminateReason = ref('')
 const confirmed = ref(false)
@@ -185,7 +217,7 @@ function checkLabel(result) {
   return result === 'PASS' ? '通过' : '不通过'
 }
 function stepStatusLabel(status) {
-  const map = { PENDING_ASSIGNMENT: '待分配', EXECUTING: '执行中', COMPLETED: '已完成', FAILED: '失败', FROZEN: '已冻结' }
+  const map = { PENDING_ASSIGNMENT: '待分配', EXECUTING: '执行中', COMPLETED: '已完成', FAILED: '失败', FROZEN: '已冻结', SKIPPED: '条件分支跳过' }
   return map[status] || status
 }
 

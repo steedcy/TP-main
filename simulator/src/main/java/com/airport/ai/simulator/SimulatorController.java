@@ -75,6 +75,12 @@ public class SimulatorController {
     public Map<String,Integer> delay(@RequestParam int milliseconds, HttpServletRequest request) {
         authenticate(request); runtime.setExecutionDelay(milliseconds); return Map.of("milliseconds",milliseconds);
     }
+    @PostMapping("/control/baggage-sample")
+    public Map<String, Object> baggageSample(@RequestBody Map<String, String> body, HttpServletRequest request) {
+        authenticate(request);
+        try { return runtime.setBaggageSample(body.get("sample")); }
+        catch (IllegalArgumentException ex) { throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage()); }
+    }
 
     private void authenticate(HttpServletRequest request) {
         String expected = runtime.token();

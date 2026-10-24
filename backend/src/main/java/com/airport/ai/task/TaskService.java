@@ -135,6 +135,7 @@ public class TaskService {
             throw new BusinessException(ErrorCode.TASK_FAMILY_INVALID,
                     "任务族不存在或已停用，当前可选: " + taskDefinitionService.listEnabledTaskNames());
         }
+        FlightChangeSceneValidator.validate(request.getTaskFamily(), request.getSceneParams());
 
         Task task = new Task();
         task.setTaskCode(taskCodeGenerator.next());
