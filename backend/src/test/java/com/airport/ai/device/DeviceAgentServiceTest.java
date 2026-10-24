@@ -79,6 +79,7 @@ class DeviceAgentServiceTest {
         DeviceCommandRecord cancel = new DeviceCommandRecord();
         cancel.setCommandType("TASK_CANCEL");
         cancel.setCommandId("CMD-7");
+        cancel.setAttemptNo(0);
         cancel.setTaskId(7L);
         cancel.setCommandStatus("SENT");
         when(commands.findRecentByAgentCode("AGT-5", 20)).thenReturn(java.util.List.of(cancel));
