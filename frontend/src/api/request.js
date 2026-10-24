@@ -24,7 +24,9 @@ request.interceptors.response.use(
     if (status === 401) {
       // code=2001会话已过期(空闲30分钟失效，对应SRS_NF002)、2000未提供有效Token，两者统一跳转登录页。
       // 已经在登录页时不重复提示/跳转，避免退出登录后残留的轮询定时器持续弹窗刷屏
-      if (router.currentRoute.value.path !== '/login') {
+      if (error.config?.url === '/auth/login') {
+        message.error(error.response?.data?.message || '账号或密码错误')
+      } else if (router.currentRoute.value.path !== '/login') {
         const authStore = useAuthStore()
         authStore.clear()
         message.warning(code === 2001 ? '登录已过期，请重新登录' : '请先登录')

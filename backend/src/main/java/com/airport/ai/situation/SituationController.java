@@ -5,6 +5,7 @@ import com.airport.ai.common.PageResult;
 import com.airport.ai.device.Device;
 import com.airport.ai.device.DeviceAgent;
 import com.airport.ai.device.DeviceAgentService;
+import com.airport.ai.device.DeviceCapabilityMapper;
 import com.airport.ai.device.dto.DeviceAgentView;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,8 +20,10 @@ import java.util.List;
 @PreAuthorize("hasAnyRole('CONFIG_ADMIN', 'SYSTEM_ADMIN', 'OPERATOR')")
 public class SituationController {
     private final DeviceAgentService agentService;
-    public SituationController(DeviceAgentService agentService) {
+    private final DeviceCapabilityMapper capabilityMapper;
+    public SituationController(DeviceAgentService agentService, DeviceCapabilityMapper capabilityMapper) {
         this.agentService = agentService;
+        this.capabilityMapper = capabilityMapper;
     }
 
     @GetMapping("/snapshot")
@@ -31,7 +34,9 @@ public class SituationController {
             return new Marker(agent.getAgentCode(), device.getDeviceCode(), device.getDeviceName(),
                     device.getDeviceTypeCode(), Boolean.TRUE.equals(device.getIsSimulator()) ? device.getSimulatedDeviceType() : null,
                     agent.getAgentStatus(), new Location(device.getPositionX(), device.getPositionY(), device.getAreaCode()),
-                    agent.getOnlineStatus(), agent.getWorkStatus(), agent.getCurrentTaskId(), agent.getCurrentStepSeq(), agent.getLastReportedAt());
+                    agent.getOnlineStatus(), agent.getWorkStatus(), agent.getCurrentTaskId(), agent.getCurrentStepSeq(), agent.getLastReportedAt(),
+                    capabilityMapper.findByDeviceIdAndCapabilityStatus(device.getId(), "ENABLED").stream()
+                            .map(com.airport.ai.device.DeviceCapability::getCapabilityType).distinct().toList());
         }).toList();
         return ApiResponse.ok(new Snapshot(devices, OffsetDateTime.now().toString(), 5));
     }
@@ -41,5 +46,5 @@ public class SituationController {
     public record Marker(String agentId, String deviceCode, String deviceName, String deviceTypeCode,
                          String simulatedDeviceType, String agentStatus, Location location,
                          String onlineStatus, String workStatus, Long currentTaskId, Integer currentStepSeq,
-                         java.time.LocalDateTime lastReportedAt) {}
+                         java.time.LocalDateTime lastReportedAt, List<String> capabilityTypes) {}
 }

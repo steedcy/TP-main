@@ -283,7 +283,7 @@ async function handleTerminate() {
 onMounted(() => {
   fetchAll()
   pollTimer = setInterval(() => {
-    if (task.value && ['EXECUTING', 'DOWNGRADING', 'SUPERVISING'].includes(task.value.status)) {
+    if (task.value && TERMINABLE_STATUSES.includes(task.value.status)) {
       fetchAll()
     }
   }, 10000)

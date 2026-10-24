@@ -3,7 +3,7 @@
     <header class="page-header">
       <div>
         <h1>二维态势</h1>
-        <p>F2 候机楼平面图 · 坐标原点位于左下角，单位为像素</p>
+        <p>F2 候机楼平面图 · 坐标原点位于左上角，单位为像素</p>
       </div>
       <a-space wrap>
         <a-tag color="blue">自动刷新 {{ refreshInterval }} 秒</a-tag>
@@ -13,6 +13,8 @@
     </header>
 
     <a-alert v-if="snapshotError" type="warning" show-icon style="margin-bottom: 12px" :message="snapshotError" description="保留上次成功获取的数据；连接恢复后自动更新。" />
+    <a-alert v-if="unpositionedDevices.length" type="info" show-icon style="margin-bottom: 12px"
+             :message="`${unpositionedDevices.length} 个设备缺少有效坐标或超出底图范围，仅在下方列表展示`" />
     <a-card class="map-card" :body-style="{ padding: '12px' }">
       <div class="map-toolbar">
         <a-space wrap>
@@ -22,6 +24,9 @@
           <a-button @click="fitAll">查看全图</a-button>
           <span class="zoom-label">{{ Math.round(zoom * 100) }}%</span>
         </a-space>
+        <a-checkbox-group v-model:value="selectedTypes" class="type-filter">
+          <a-checkbox v-for="type in DEVICE_TYPES" :key="type.value" :value="type.value">{{ type.label }}</a-checkbox>
+        </a-checkbox-group>
         <a-space wrap class="map-legend">
           <span><i class="legend-dot online"></i>在线空闲</span>
           <span><i class="legend-dot busy"></i>在线忙碌</span>
@@ -46,7 +51,7 @@
         >
           <img class="floorplan" src="/F2.jpg" alt="F2 候机楼平面图" draggable="false" @load="mapLoaded = true" @error="mapError = true" />
           <button
-            v-for="device in devices"
+            v-for="device in positionedDevices"
             :key="device.deviceCode"
             class="device-marker"
             :class="markerClass(device)"
@@ -63,11 +68,11 @@
         <a-alert v-if="mapError" class="map-error" type="error" show-icon message="F2.jpg 底图加载失败" description="请确认前端静态资源目录中存在 F2.jpg。" />
         <div v-if="!devices.length && !loading && !snapshotError" class="empty-overlay">当前没有已登记的设备代理</div>
       </div>
-      <div class="map-hint">按住鼠标左键拖动平移；滚动鼠标滚轮缩放；也可使用上方按钮。设备坐标按图片左下角原点转换为图像位置。</div>
+      <div class="map-hint">按住鼠标左键拖动平移；滚动鼠标滚轮缩放；也可使用上方按钮。设备坐标按图片左上角原点同比例定位；更换底图尺寸或裁剪范围须重新标定坐标。</div>
     </a-card>
 
     <a-card title="仿真体及设备代理状态" class="device-card">
-      <a-table :data-source="devices" :columns="columns" row-key="deviceCode" :pagination="{ pageSize: 10, showSizeChanger: false }" size="small" :scroll="{ x: 900 }">
+      <a-table :data-source="filteredDevices" :columns="columns" row-key="deviceCode" :pagination="{ pageSize: 10, showSizeChanger: false }" size="small" :scroll="{ x: 900 }">
         <template #bodyCell="{ column, record }">
           <template v-if="column.key === 'type'">
             {{ deviceTypeLabel(record.simulatedDeviceType || record.deviceTypeCode) }}
@@ -77,7 +82,7 @@
             <a-tag :color="statusColor(record)">{{ statusLabel(record) }}</a-tag>
           </template>
           <template v-else-if="column.key === 'position'">
-            {{ coordinate(record.location?.x) }}, {{ coordinate(record.location?.y) }}
+            {{ markerPosition(record) ? `${coordinate(record.location?.x)}, ${coordinate(record.location?.y)}` : '无有效坐标' }}
           </template>
           <template v-else-if="column.key === 'lastReportedAt'">
             {{ record.lastReportedAt || '—' }}
@@ -93,8 +98,12 @@
         <a-descriptions-item label="设备类型">{{ deviceTypeLabel(selectedDevice.simulatedDeviceType || selectedDevice.deviceTypeCode) }}</a-descriptions-item>
         <a-descriptions-item label="在线/工作状态">{{ statusLabel(selectedDevice) }}</a-descriptions-item>
         <a-descriptions-item label="所属区域">{{ selectedDevice.location?.zone || '—' }}</a-descriptions-item>
-        <a-descriptions-item label="坐标（左下角原点）">X {{ coordinate(selectedDevice.location?.x) }}, Y {{ coordinate(selectedDevice.location?.y) }}</a-descriptions-item>
-        <a-descriptions-item label="当前任务">{{ selectedDevice.currentTaskId ?? '—' }}</a-descriptions-item>
+        <a-descriptions-item label="坐标（左上角原点）">{{ markerPosition(selectedDevice) ? `X ${coordinate(selectedDevice.location?.x)}, Y ${coordinate(selectedDevice.location?.y)}` : '无有效坐标' }}</a-descriptions-item>
+        <a-descriptions-item label="已启用能力摘要">{{ (selectedDevice.capabilityTypes || []).map(capabilityLabel).join('、') || '无已启用能力' }}</a-descriptions-item>
+        <a-descriptions-item label="当前任务">
+          <router-link v-if="canViewTasks && selectedDevice.currentTaskId" :to="`/tasks/${selectedDevice.currentTaskId}`">任务 {{ selectedDevice.currentTaskId }}</router-link>
+          <span v-else>{{ selectedDevice.currentTaskId ?? '—' }}</span>
+        </a-descriptions-item>
         <a-descriptions-item label="最后上报">{{ selectedDevice.lastReportedAt || '—' }}</a-descriptions-item>
       </a-descriptions>
     </a-modal>
@@ -104,13 +113,20 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import request from '../../api/request'
-import { deviceTypeLabel } from '../../constants/capability'
+import { DEVICE_TYPES, deviceTypeLabel, capabilityLabel } from '../../constants/capability'
+import { useAuthStore } from '../../store/auth'
 
 const MAP_WIDTH = 1260
 const MAP_HEIGHT = 6895
 const viewportRef = ref(null)
 const viewportSize = ref({ width: 0, height: 0 })
 const devices = ref([])
+const selectedTypes = ref(DEVICE_TYPES.map(type => type.value))
+const canViewTasks = computed(() => ['OPERATOR', 'SYSTEM_ADMIN'].includes(useAuthStore().role))
+const filteredDevices = computed(() => devices.value.filter(device => selectedTypes.value.includes(device.deviceTypeCode)
+  || (device.simulatedDeviceType && selectedTypes.value.includes(device.simulatedDeviceType))))
+const positionedDevices = computed(() => filteredDevices.value.filter(device => markerPosition(device)))
+const unpositionedDevices = computed(() => filteredDevices.value.filter(device => !markerPosition(device)))
 const loading = ref(false)
 const snapshotError = ref('')
 const generatedAt = ref('')
@@ -160,12 +176,12 @@ function markerPosition(device) {
   const x = Number(rawX)
   const y = Number(rawY)
   if (!Number.isFinite(x) || !Number.isFinite(y) || x < 0 || x > MAP_WIDTH || y < 0 || y > MAP_HEIGHT) return null
-  return { left: x / MAP_WIDTH * 100, top: (MAP_HEIGHT - y) / MAP_HEIGHT * 100 }
+  return { left: x / MAP_WIDTH * 100, top: y / MAP_HEIGHT * 100 }
 }
 
 function markerStyle(device) {
   const point = markerPosition(device)
-  return point ? { left: `${point.left}%`, top: `${point.top}%` } : { display: 'none' }
+  return { left: `${point.left}%`, top: `${point.top}%` }
 }
 
 function markerClass(device) {
@@ -194,11 +210,15 @@ async function loadSnapshot() {
   try {
     const response = await request.get('/situation/snapshot', { silent: true, timeout: 10000 })
     devices.value = response.data?.agents || []
+    if (selectedDevice.value) {
+      selectedDevice.value = devices.value.find(device => device.deviceCode === selectedDevice.value.deviceCode) || null
+    }
     generatedAt.value = response.data?.generatedAt || ''
     refreshInterval.value = Number(response.data?.refreshIntervalSeconds) || 5
     snapshotError.value = ''
   } catch (error) {
-    snapshotError.value = error.response?.status === 401 ? '登录已过期，请重新登录' : '态势服务暂时无法连接，正在自动重试'
+    snapshotError.value = error.response?.status === 401 ? '登录已过期，请重新登录'
+      : `态势刷新失败（${new Date().toLocaleString()}），正在自动重试`
   } finally {
     loading.value = false
   }

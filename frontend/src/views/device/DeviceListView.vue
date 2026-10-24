@@ -58,6 +58,8 @@
       @ok="handleSubmit"
       :confirmLoading="submitLoading"
       width="600px"
+      :style="{ top: '24px', maxWidth: 'calc(100vw - 32px)' }"
+      :bodyStyle="{ maxHeight: 'calc(100vh - 180px)', overflowY: 'auto' }"
     >
       <a-form ref="formRef" :model="form" :rules="formRules" layout="vertical">
         <a-form-item label="设备编码" name="deviceCode">

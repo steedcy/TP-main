@@ -2,16 +2,16 @@
   <div class="login-container">
     <a-card title="智慧机场人工智能集群协同服务平台" style="width: 400px">
       <a-form :model="form" @finish="handleLogin">
-        <a-form-item name="username" :rules="[{ required: true, message: '请输入账号' }]">
+        <a-form-item name="username" :rules="[{ required: true, whitespace: true, message: '请输入账号' }]">
           <a-input v-model:value="form.username" placeholder="账号" size="large" maxlength="32" />
         </a-form-item>
-        <a-form-item name="password" :rules="[{ required: true, message: '请输入密码' }]">
+        <a-form-item name="password" :rules="[{ required: true, whitespace: true, message: '请输入密码' }]">
           <a-input-password v-model:value="form.password" placeholder="密码" size="large" maxlength="32" />
         </a-form-item>
         <a-form-item>
           <a-button
             type="primary" html-type="submit" block size="large" :loading="loading"
-            :disabled="!form.username || !form.password"
+            :disabled="!form.username.trim() || !form.password.trim()"
           >
             登录
           </a-button>
@@ -34,6 +34,7 @@ const loading = ref(false)
 const form = reactive({ username: '', password: '' })
 
 async function handleLogin() {
+  form.username = form.username.trim()
   loading.value = true
   try {
     const resp = await login(form)
