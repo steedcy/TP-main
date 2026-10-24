@@ -28,7 +28,9 @@ public class SituationController {
 
     @GetMapping("/snapshot")
     public ApiResponse<Snapshot> snapshot() {
-        PageResult<DeviceAgent> agents = agentService.list(null, null, 1, 100);
+        // SRS 5.6.2 displays enabled agents only; archived test agents must not
+        // inflate the live situation snapshot even when their history is retained.
+        PageResult<DeviceAgent> agents = agentService.list("ENABLED", null, 1, 100);
         List<Marker> devices = agents.getContent().stream().map(agent -> {
             Device device = agentService.getDeviceOf(agent);
             return new Marker(agent.getAgentCode(), device.getDeviceCode(), device.getDeviceName(),

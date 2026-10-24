@@ -181,19 +181,22 @@
         "name": "flightNumber",
         "type": "String",
         "required": true,
-        "defaultValue": "TEST1022"
+        "defaultValue": "TEST1022",
+        "range": null
       },
       {
         "name": "updateType",
         "type": "String",
         "required": true,
-        "defaultValue": "GATE_CHANGE"
+        "defaultValue": "GATE_CHANGE",
+        "range": null
       },
       {
         "name": "updateContent",
         "type": "String",
         "required": true,
-        "defaultValue": "测试航班登机口变更至F2_TEST_GATE"
+        "defaultValue": "测试航班登机口变更至F2_TEST_GATE",
+        "range": null
       },
       {
         "name": "displayDuration",
@@ -206,17 +209,55 @@
         "name": "targetLocation",
         "type": "String",
         "required": true,
-        "defaultValue": "F2_TEST_GATE"
+        "defaultValue": "F2_TEST_GATE",
+        "range": null
       },
       {
         "name": "routePreference",
         "type": "String",
         "required": true,
-        "defaultValue": "BARRIER_FREE"
+        "defaultValue": "BARRIER_FREE",
+        "range": null
+      },
+      {
+        "name": "displayContent",
+        "type": "String",
+        "required": true,
+        "defaultValue": "虚构航班登机口及无障碍路径提示，请前往F2_TEST_GATE。",
+        "range": null
+      },
+      {
+        "name": "contentType",
+        "type": "String",
+        "required": true,
+        "defaultValue": "TEXT",
+        "range": null
+      },
+      {
+        "name": "notificationType",
+        "type": "String",
+        "required": true,
+        "defaultValue": "BOTH",
+        "range": null
+      },
+      {
+        "name": "notificationContent",
+        "type": "String",
+        "required": true,
+        "defaultValue": "虚构航班登机口已变更，请改道至新登机口。",
+        "range": null
+      },
+      {
+        "name": "repeatCount",
+        "type": "Integer",
+        "required": true,
+        "defaultValue": "1",
+        "range": "1~5"
       }
     ],
     "steps": [
       {
+        "stepSeq": 1,
         "capabilityType": "CAP_FLIGHT_UPDATE",
         "paramMapping": [
           {
@@ -240,6 +281,47 @@
         "completionCondition": "publishStatus=SUCCESS"
       },
       {
+        "stepSeq": 2,
+        "capabilityType": "CAP_INFO_DISPLAY",
+        "paramMapping": [
+          {
+            "target": "contentType",
+            "source": "TEMPLATE_INPUT.contentType"
+          },
+          {
+            "target": "contentData",
+            "source": "TEMPLATE_INPUT.displayContent"
+          },
+          {
+            "target": "displayDuration",
+            "source": "TEMPLATE_INPUT.displayDuration"
+          }
+        ],
+        "stepTimeout": 60,
+        "completionCondition": "displayStatus=SUCCESS"
+      },
+      {
+        "stepSeq": 3,
+        "capabilityType": "CAP_NOTIFICATION",
+        "paramMapping": [
+          {
+            "target": "notificationType",
+            "source": "TEMPLATE_INPUT.notificationType"
+          },
+          {
+            "target": "notificationContent",
+            "source": "TEMPLATE_INPUT.notificationContent"
+          },
+          {
+            "target": "repeatCount",
+            "source": "TEMPLATE_INPUT.repeatCount"
+          }
+        ],
+        "stepTimeout": 60,
+        "completionCondition": "notificationStatus=SUCCESS"
+      },
+      {
+        "stepSeq": 4,
         "capabilityType": "CAP_NAVIGATION",
         "paramMapping": [
           {
@@ -257,7 +339,9 @@
     ],
     "devices": [
       "SIM_F2_FLIGHT",
-      "SIM_F2_DISPLAY"
+      "SIM_F2_DISPLAY",
+      "SIM_F2_ROBOT",
+      "SIM_F2_ROBOT"
     ]
   }
 ]

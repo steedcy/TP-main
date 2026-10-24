@@ -34,7 +34,7 @@ class SituationControllerTest {
         device.setPositionX(new BigDecimal("120.5"));
         device.setPositionY(new BigDecimal("88.2"));
         device.setAreaCode("T2-B");
-        when(service.list(null, null, 1, 100)).thenReturn(new PageResult<>(List.of(agent), 1, 1, 100));
+        when(service.list("ENABLED", null, 1, 100)).thenReturn(new PageResult<>(List.of(agent), 1, 1, 100));
         when(service.getDeviceOf(agent)).thenReturn(device);
         DeviceCapabilityMapper capabilities = mock(DeviceCapabilityMapper.class);
         DeviceCapability display = new DeviceCapability();
@@ -49,5 +49,6 @@ class SituationControllerTest {
         assertEquals(new BigDecimal("120.5"), marker.location().x());
         assertEquals(22L, marker.currentTaskId());
         assertEquals(List.of("CAP_INFO_DISPLAY"), marker.capabilityTypes());
+        verify(service).list("ENABLED", null, 1, 100);
     }
 }
