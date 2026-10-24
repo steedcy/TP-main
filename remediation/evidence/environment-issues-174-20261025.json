@@ -1,0 +1,3876 @@
+{
+  "recordedAt": "2026-10-25",
+  "source": "测试用例-环境可实现性问题清单.xlsx",
+  "method": "M1-M11问题标签的初步分类；多标签保留；书面裁决待测试负责人",
+  "categoryRules": {
+    "M1": [
+      "需夹具"
+    ],
+    "M2": [
+      "需夹具"
+    ],
+    "M3": [
+      "口径冲突"
+    ],
+    "M4": [
+      "需外部接口或真机"
+    ],
+    "M5": [
+      "可补前置"
+    ],
+    "M6": [
+      "可补前置"
+    ],
+    "M7": [
+      "可补前置"
+    ],
+    "M8": [
+      "可补前置"
+    ],
+    "M9": [
+      "可补前置"
+    ],
+    "M10": [
+      "口径冲突"
+    ],
+    "M11": [
+      "重复交叉",
+      "口径冲突"
+    ]
+  },
+  "items": [
+    {
+      "caseId": "TC-F001-06",
+      "sourceSeverity": "A",
+      "sourceModule": "5.1 基础系统管理",
+      "sourceTags": [
+        "M3"
+      ],
+      "preliminaryCategories": [
+        "口径冲突"
+      ],
+      "responsibleRoles": [
+        "开发负责人/公司测试负责人"
+      ],
+      "preparationFromSource": "拆两层：UI层保留黑盒（无入口+接口拒绝）；架构层移入评审检查单，由开发走查签字",
+      "evidenceLimitFromSource": "属架构/代码评审范畴，黑盒测试无法证明「不存在」",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F001-18",
+      "sourceSeverity": "A",
+      "sourceModule": "5.1 基础系统管理",
+      "sourceTags": [
+        "M2",
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "可补前置",
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人",
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认；给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现；只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F002-03",
+      "sourceSeverity": "A",
+      "sourceModule": "5.1 基础系统管理",
+      "sourceTags": [
+        "M8"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "交付《测试数据准备手册》+各模块前置数据快照，用例「存在XX」改为「复位至快照S-xx」",
+      "evidenceLimitFromSource": "前置状态未给出构造路径，执行时造不出数据",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F002-06",
+      "sourceSeverity": "A",
+      "sourceModule": "5.1 基础系统管理",
+      "sourceTags": [
+        "M8",
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "可补前置",
+        "重复交叉"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人",
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "交付《测试数据准备手册》+各模块前置数据快照，用例「存在XX」改为「复位至快照S-xx」；见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "前置状态未给出构造路径，执行时造不出数据；与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F002-07",
+      "sourceSeverity": "A",
+      "sourceModule": "5.1 基础系统管理",
+      "sourceTags": [
+        "M4"
+      ],
+      "preliminaryCategories": [
+        "需外部接口或真机"
+      ],
+      "responsibleRoles": [
+        "项目负责人/设备方"
+      ],
+      "preparationFromSource": "明确以仿真体为验收基线，预期改为「代理收到指令且返回成功+事件时间线有记录」；确需真机则单列专项",
+      "evidenceLimitFromSource": "验收环境仅有仿真体；且现场行为平台侧不可观测",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F002-08",
+      "sourceSeverity": "A",
+      "sourceModule": "5.1 基础系统管理",
+      "sourceTags": [
+        "M1",
+        "M8"
+      ],
+      "preliminaryCategories": [
+        "可补前置",
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人",
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "要求开发交付规划模型Mock（合法/延迟/异常三档）与监督判定注入口（风险等级+置信度可指定），用例改写为「选择Mock模板X后提交」；交付《测试数据准备手册》+各模块前置数据快照，用例「存在XX」改为「复位至快照S-xx」",
+      "evidenceLimitFromSource": "测试环境无规划模型Mock与监督判定注入口，模型输出不可控、不可复现；前置状态未给出构造路径，执行时造不出数据",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F002-12",
+      "sourceSeverity": "A",
+      "sourceModule": "5.1 基础系统管理",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F002A-01",
+      "sourceSeverity": "A",
+      "sourceModule": "5.1 基础系统管理",
+      "sourceTags": [
+        "M7"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "交付标准数据集v1.0+安装复位脚本+底图与坐标文件；TC-F023-09删除或改为纯检查项",
+      "evidenceLimitFromSource": "标准数据集与预置底图未提供；TC-F023-05与TC-F023-09关于坐标标定自相矛盾",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F002A-02",
+      "sourceSeverity": "A",
+      "sourceModule": "5.1 基础系统管理",
+      "sourceTags": [
+        "M7"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "交付标准数据集v1.0+安装复位脚本+底图与坐标文件；TC-F023-09删除或改为纯检查项",
+      "evidenceLimitFromSource": "标准数据集与预置底图未提供；TC-F023-05与TC-F023-09关于坐标标定自相矛盾",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F002A-03",
+      "sourceSeverity": "A",
+      "sourceModule": "5.1 基础系统管理",
+      "sourceTags": [
+        "M2",
+        "M7"
+      ],
+      "preliminaryCategories": [
+        "可补前置",
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人",
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认；交付标准数据集v1.0+安装复位脚本+底图与坐标文件；TC-F023-09删除或改为纯检查项",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现；标准数据集与预置底图未提供；TC-F023-05与TC-F023-09关于坐标标定自相矛盾",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F002A-04",
+      "sourceSeverity": "A",
+      "sourceModule": "5.1 基础系统管理",
+      "sourceTags": [
+        "M7"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "交付标准数据集v1.0+安装复位脚本+底图与坐标文件；TC-F023-09删除或改为纯检查项",
+      "evidenceLimitFromSource": "标准数据集与预置底图未提供；TC-F023-05与TC-F023-09关于坐标标定自相矛盾",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F002A-05",
+      "sourceSeverity": "A",
+      "sourceModule": "5.1 基础系统管理",
+      "sourceTags": [
+        "M7"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "交付标准数据集v1.0+安装复位脚本+底图与坐标文件；TC-F023-09删除或改为纯检查项",
+      "evidenceLimitFromSource": "标准数据集与预置底图未提供；TC-F023-05与TC-F023-09关于坐标标定自相矛盾",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F002A-06",
+      "sourceSeverity": "A",
+      "sourceModule": "5.1 基础系统管理",
+      "sourceTags": [
+        "M7"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "交付标准数据集v1.0+安装复位脚本+底图与坐标文件；TC-F023-09删除或改为纯检查项",
+      "evidenceLimitFromSource": "标准数据集与预置底图未提供；TC-F023-05与TC-F023-09关于坐标标定自相矛盾",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F003-01",
+      "sourceSeverity": "A",
+      "sourceModule": "5.2 设备接入与代理",
+      "sourceTags": [
+        "M4"
+      ],
+      "preliminaryCategories": [
+        "需外部接口或真机"
+      ],
+      "responsibleRoles": [
+        "项目负责人/设备方"
+      ],
+      "preparationFromSource": "明确以仿真体为验收基线，预期改为「代理收到指令且返回成功+事件时间线有记录」；确需真机则单列专项",
+      "evidenceLimitFromSource": "验收环境仅有仿真体；且现场行为平台侧不可观测",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F003-06",
+      "sourceSeverity": "A",
+      "sourceModule": "5.2 设备接入与代理",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F003-08",
+      "sourceSeverity": "A",
+      "sourceModule": "5.2 设备接入与代理",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F003-14",
+      "sourceSeverity": "A",
+      "sourceModule": "5.2 设备接入与代理",
+      "sourceTags": [
+        "M3",
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "开发负责人/公司测试负责人",
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "拆两层：UI层保留黑盒（无入口+接口拒绝）；架构层移入评审检查单，由开发走查签字；给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "属架构/代码评审范畴，黑盒测试无法证明「不存在」；只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F004-07",
+      "sourceSeverity": "A",
+      "sourceModule": "5.2 设备接入与代理",
+      "sourceTags": [
+        "M3"
+      ],
+      "preliminaryCategories": [
+        "口径冲突"
+      ],
+      "responsibleRoles": [
+        "开发负责人/公司测试负责人"
+      ],
+      "preparationFromSource": "拆两层：UI层保留黑盒（无入口+接口拒绝）；架构层移入评审检查单，由开发走查签字",
+      "evidenceLimitFromSource": "属架构/代码评审范畴，黑盒测试无法证明「不存在」",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F004-10",
+      "sourceSeverity": "A",
+      "sourceModule": "5.2 设备接入与代理",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F005-05",
+      "sourceSeverity": "A",
+      "sourceModule": "5.2 设备接入与代理",
+      "sourceTags": [
+        "M2",
+        "M8"
+      ],
+      "preliminaryCategories": [
+        "可补前置",
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人",
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认；交付《测试数据准备手册》+各模块前置数据快照，用例「存在XX」改为「复位至快照S-xx」",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现；前置状态未给出构造路径，执行时造不出数据",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F005-06",
+      "sourceSeverity": "A",
+      "sourceModule": "5.2 设备接入与代理",
+      "sourceTags": [
+        "M2",
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "重复交叉",
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人",
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认；见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现；与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F005-08",
+      "sourceSeverity": "A",
+      "sourceModule": "5.2 设备接入与代理",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F006-04",
+      "sourceSeverity": "A",
+      "sourceModule": "5.2 设备接入与代理",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F006-05",
+      "sourceSeverity": "A",
+      "sourceModule": "5.2 设备接入与代理",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F006-06",
+      "sourceSeverity": "A",
+      "sourceModule": "5.2 设备接入与代理",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F006-11",
+      "sourceSeverity": "A",
+      "sourceModule": "5.2 设备接入与代理",
+      "sourceTags": [
+        "M3"
+      ],
+      "preliminaryCategories": [
+        "口径冲突"
+      ],
+      "responsibleRoles": [
+        "开发负责人/公司测试负责人"
+      ],
+      "preparationFromSource": "拆两层：UI层保留黑盒（无入口+接口拒绝）；架构层移入评审检查单，由开发走查签字",
+      "evidenceLimitFromSource": "属架构/代码评审范畴，黑盒测试无法证明「不存在」",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F006A-02",
+      "sourceSeverity": "A",
+      "sourceModule": "5.2 设备接入与代理",
+      "sourceTags": [
+        "M4"
+      ],
+      "preliminaryCategories": [
+        "需外部接口或真机"
+      ],
+      "responsibleRoles": [
+        "项目负责人/设备方"
+      ],
+      "preparationFromSource": "明确以仿真体为验收基线，预期改为「代理收到指令且返回成功+事件时间线有记录」；确需真机则单列专项",
+      "evidenceLimitFromSource": "验收环境仅有仿真体；且现场行为平台侧不可观测",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F006A-04",
+      "sourceSeverity": "A",
+      "sourceModule": "5.2 设备接入与代理",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F007-05",
+      "sourceSeverity": "A",
+      "sourceModule": "5.2 设备接入与代理",
+      "sourceTags": [
+        "M3"
+      ],
+      "preliminaryCategories": [
+        "口径冲突"
+      ],
+      "responsibleRoles": [
+        "开发负责人/公司测试负责人"
+      ],
+      "preparationFromSource": "拆两层：UI层保留黑盒（无入口+接口拒绝）；架构层移入评审检查单，由开发走查签字",
+      "evidenceLimitFromSource": "属架构/代码评审范畴，黑盒测试无法证明「不存在」",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F007-06",
+      "sourceSeverity": "A",
+      "sourceModule": "5.2 设备接入与代理",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F007-08",
+      "sourceSeverity": "A",
+      "sourceModule": "5.2 设备接入与代理",
+      "sourceTags": [
+        "M5",
+        "M8"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "测试负责人",
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "阈值参数化（会话/模型/心跳/刷新），用例改为「临时改参数为X后执行并还原」；8小时稳定性单列专项不进回归；交付《测试数据准备手册》+各模块前置数据快照，用例「存在XX」改为「复位至快照S-xx」",
+      "evidenceLimitFromSource": "真等待耗时长，多条叠加占用大量工时；前置状态未给出构造路径，执行时造不出数据",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F007-09",
+      "sourceSeverity": "A",
+      "sourceModule": "5.2 设备接入与代理",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F009-01",
+      "sourceSeverity": "A",
+      "sourceModule": "5.3 基线模板管理",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F009-03",
+      "sourceSeverity": "A",
+      "sourceModule": "5.3 基线模板管理",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F009-06",
+      "sourceSeverity": "A",
+      "sourceModule": "5.3 基线模板管理",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F010-07",
+      "sourceSeverity": "A",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M1",
+        "M2",
+        "M5"
+      ],
+      "preliminaryCategories": [
+        "可补前置",
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人",
+        "测试负责人"
+      ],
+      "preparationFromSource": "要求开发交付规划模型Mock（合法/延迟/异常三档）与监督判定注入口（风险等级+置信度可指定），用例改写为「选择Mock模板X后提交」；设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认；阈值参数化（会话/模型/心跳/刷新），用例改为「临时改参数为X后执行并还原」；8小时稳定性单列专项不进回归",
+      "evidenceLimitFromSource": "测试环境无规划模型Mock与监督判定注入口，模型输出不可控、不可复现；只写「模拟/构造」未给注入手段，黑盒环境无法复现；真等待耗时长，多条叠加占用大量工时",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F010-08",
+      "sourceSeverity": "A",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M1",
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "要求开发交付规划模型Mock（合法/延迟/异常三档）与监督判定注入口（风险等级+置信度可指定），用例改写为「选择Mock模板X后提交」；设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "测试环境无规划模型Mock与监督判定注入口，模型输出不可控、不可复现；只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F011-01",
+      "sourceSeverity": "A",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M8"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "交付《测试数据准备手册》+各模块前置数据快照，用例「存在XX」改为「复位至快照S-xx」",
+      "evidenceLimitFromSource": "前置状态未给出构造路径，执行时造不出数据",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F011-02",
+      "sourceSeverity": "A",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M8"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "交付《测试数据准备手册》+各模块前置数据快照，用例「存在XX」改为「复位至快照S-xx」",
+      "evidenceLimitFromSource": "前置状态未给出构造路径，执行时造不出数据",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F011-09",
+      "sourceSeverity": "A",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F012-01",
+      "sourceSeverity": "A",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M1"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "要求开发交付规划模型Mock（合法/延迟/异常三档）与监督判定注入口（风险等级+置信度可指定），用例改写为「选择Mock模板X后提交」",
+      "evidenceLimitFromSource": "测试环境无规划模型Mock与监督判定注入口，模型输出不可控、不可复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F012-02",
+      "sourceSeverity": "A",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M1",
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "要求开发交付规划模型Mock（合法/延迟/异常三档）与监督判定注入口（风险等级+置信度可指定），用例改写为「选择Mock模板X后提交」；设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "测试环境无规划模型Mock与监督判定注入口，模型输出不可控、不可复现；只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F012-04",
+      "sourceSeverity": "A",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M1",
+        "M2",
+        "M3"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/公司测试负责人",
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "要求开发交付规划模型Mock（合法/延迟/异常三档）与监督判定注入口（风险等级+置信度可指定），用例改写为「选择Mock模板X后提交」；设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认；拆两层：UI层保留黑盒（无入口+接口拒绝）；架构层移入评审检查单，由开发走查签字",
+      "evidenceLimitFromSource": "测试环境无规划模型Mock与监督判定注入口，模型输出不可控、不可复现；只写「模拟/构造」未给注入手段，黑盒环境无法复现；属架构/代码评审范畴，黑盒测试无法证明「不存在」",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F012-06",
+      "sourceSeverity": "A",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M1",
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "要求开发交付规划模型Mock（合法/延迟/异常三档）与监督判定注入口（风险等级+置信度可指定），用例改写为「选择Mock模板X后提交」；设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "测试环境无规划模型Mock与监督判定注入口，模型输出不可控、不可复现；只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F012-07",
+      "sourceSeverity": "A",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M1",
+        "M2",
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "可补前置",
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人",
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "要求开发交付规划模型Mock（合法/延迟/异常三档）与监督判定注入口（风险等级+置信度可指定），用例改写为「选择Mock模板X后提交」；设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认；给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "测试环境无规划模型Mock与监督判定注入口，模型输出不可控、不可复现；只写「模拟/构造」未给注入手段，黑盒环境无法复现；只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F012-08",
+      "sourceSeverity": "A",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M2",
+        "M5"
+      ],
+      "preliminaryCategories": [
+        "可补前置",
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人",
+        "测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认；阈值参数化（会话/模型/心跳/刷新），用例改为「临时改参数为X后执行并还原」；8小时稳定性单列专项不进回归",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现；真等待耗时长，多条叠加占用大量工时",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F012-09",
+      "sourceSeverity": "A",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M1",
+        "M2",
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "可补前置",
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人",
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "要求开发交付规划模型Mock（合法/延迟/异常三档）与监督判定注入口（风险等级+置信度可指定），用例改写为「选择Mock模板X后提交」；设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认；给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "测试环境无规划模型Mock与监督判定注入口，模型输出不可控、不可复现；只写「模拟/构造」未给注入手段，黑盒环境无法复现；只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F012-10",
+      "sourceSeverity": "A",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M1",
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "要求开发交付规划模型Mock（合法/延迟/异常三档）与监督判定注入口（风险等级+置信度可指定），用例改写为「选择Mock模板X后提交」；设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "测试环境无规划模型Mock与监督判定注入口，模型输出不可控、不可复现；只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F013-01",
+      "sourceSeverity": "A",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M3",
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "开发负责人/公司测试负责人",
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "拆两层：UI层保留黑盒（无入口+接口拒绝）；架构层移入评审检查单，由开发走查签字；给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "属架构/代码评审范畴，黑盒测试无法证明「不存在」；只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F013-06",
+      "sourceSeverity": "A",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M8"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "交付《测试数据准备手册》+各模块前置数据快照，用例「存在XX」改为「复位至快照S-xx」",
+      "evidenceLimitFromSource": "前置状态未给出构造路径，执行时造不出数据",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F013-08",
+      "sourceSeverity": "A",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F013-13",
+      "sourceSeverity": "A",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F014-03",
+      "sourceSeverity": "A",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M1"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "要求开发交付规划模型Mock（合法/延迟/异常三档）与监督判定注入口（风险等级+置信度可指定），用例改写为「选择Mock模板X后提交」",
+      "evidenceLimitFromSource": "测试环境无规划模型Mock与监督判定注入口，模型输出不可控、不可复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F014-04",
+      "sourceSeverity": "A",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M1",
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "要求开发交付规划模型Mock（合法/延迟/异常三档）与监督判定注入口（风险等级+置信度可指定），用例改写为「选择Mock模板X后提交」；设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "测试环境无规划模型Mock与监督判定注入口，模型输出不可控、不可复现；只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F014-05",
+      "sourceSeverity": "A",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M4"
+      ],
+      "preliminaryCategories": [
+        "需外部接口或真机"
+      ],
+      "responsibleRoles": [
+        "项目负责人/设备方"
+      ],
+      "preparationFromSource": "明确以仿真体为验收基线，预期改为「代理收到指令且返回成功+事件时间线有记录」；确需真机则单列专项",
+      "evidenceLimitFromSource": "验收环境仅有仿真体；且现场行为平台侧不可观测",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F014-07",
+      "sourceSeverity": "A",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M2",
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "重复交叉",
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人",
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认；见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现；与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F014-09",
+      "sourceSeverity": "A",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M1"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "要求开发交付规划模型Mock（合法/延迟/异常三档）与监督判定注入口（风险等级+置信度可指定），用例改写为「选择Mock模板X后提交」",
+      "evidenceLimitFromSource": "测试环境无规划模型Mock与监督判定注入口，模型输出不可控、不可复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F014-10",
+      "sourceSeverity": "A",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M1",
+        "M5"
+      ],
+      "preliminaryCategories": [
+        "可补前置",
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人",
+        "测试负责人"
+      ],
+      "preparationFromSource": "要求开发交付规划模型Mock（合法/延迟/异常三档）与监督判定注入口（风险等级+置信度可指定），用例改写为「选择Mock模板X后提交」；阈值参数化（会话/模型/心跳/刷新），用例改为「临时改参数为X后执行并还原」；8小时稳定性单列专项不进回归",
+      "evidenceLimitFromSource": "测试环境无规划模型Mock与监督判定注入口，模型输出不可控、不可复现；真等待耗时长，多条叠加占用大量工时",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F014-12",
+      "sourceSeverity": "A",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M1"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "要求开发交付规划模型Mock（合法/延迟/异常三档）与监督判定注入口（风险等级+置信度可指定），用例改写为「选择Mock模板X后提交」",
+      "evidenceLimitFromSource": "测试环境无规划模型Mock与监督判定注入口，模型输出不可控、不可复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F014-15",
+      "sourceSeverity": "A",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M1"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "要求开发交付规划模型Mock（合法/延迟/异常三档）与监督判定注入口（风险等级+置信度可指定），用例改写为「选择Mock模板X后提交」",
+      "evidenceLimitFromSource": "测试环境无规划模型Mock与监督判定注入口，模型输出不可控、不可复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F014-17",
+      "sourceSeverity": "A",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M1"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "要求开发交付规划模型Mock（合法/延迟/异常三档）与监督判定注入口（风险等级+置信度可指定），用例改写为「选择Mock模板X后提交」",
+      "evidenceLimitFromSource": "测试环境无规划模型Mock与监督判定注入口，模型输出不可控、不可复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F015-02",
+      "sourceSeverity": "A",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M8"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "交付《测试数据准备手册》+各模块前置数据快照，用例「存在XX」改为「复位至快照S-xx」",
+      "evidenceLimitFromSource": "前置状态未给出构造路径，执行时造不出数据",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F015-05",
+      "sourceSeverity": "A",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F015-06",
+      "sourceSeverity": "A",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M8"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "交付《测试数据准备手册》+各模块前置数据快照，用例「存在XX」改为「复位至快照S-xx」",
+      "evidenceLimitFromSource": "前置状态未给出构造路径，执行时造不出数据",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F016-02",
+      "sourceSeverity": "A",
+      "sourceModule": "5.5 协同执行与监督",
+      "sourceTags": [
+        "M8"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "交付《测试数据准备手册》+各模块前置数据快照，用例「存在XX」改为「复位至快照S-xx」",
+      "evidenceLimitFromSource": "前置状态未给出构造路径，执行时造不出数据",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F016-06",
+      "sourceSeverity": "A",
+      "sourceModule": "5.5 协同执行与监督",
+      "sourceTags": [
+        "M8"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "交付《测试数据准备手册》+各模块前置数据快照，用例「存在XX」改为「复位至快照S-xx」",
+      "evidenceLimitFromSource": "前置状态未给出构造路径，执行时造不出数据",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F017-03",
+      "sourceSeverity": "A",
+      "sourceModule": "5.5 协同执行与监督",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F017-05",
+      "sourceSeverity": "A",
+      "sourceModule": "5.5 协同执行与监督",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F017-06",
+      "sourceSeverity": "A",
+      "sourceModule": "5.5 协同执行与监督",
+      "sourceTags": [
+        "M4"
+      ],
+      "preliminaryCategories": [
+        "需外部接口或真机"
+      ],
+      "responsibleRoles": [
+        "项目负责人/设备方"
+      ],
+      "preparationFromSource": "明确以仿真体为验收基线，预期改为「代理收到指令且返回成功+事件时间线有记录」；确需真机则单列专项",
+      "evidenceLimitFromSource": "验收环境仅有仿真体；且现场行为平台侧不可观测",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F018-05",
+      "sourceSeverity": "A",
+      "sourceModule": "5.5 协同执行与监督",
+      "sourceTags": [
+        "M2",
+        "M8"
+      ],
+      "preliminaryCategories": [
+        "可补前置",
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人",
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认；交付《测试数据准备手册》+各模块前置数据快照，用例「存在XX」改为「复位至快照S-xx」",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现；前置状态未给出构造路径，执行时造不出数据",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F018-06",
+      "sourceSeverity": "A",
+      "sourceModule": "5.5 协同执行与监督",
+      "sourceTags": [
+        "M2",
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "重复交叉",
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人",
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认；见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现；与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F019-08",
+      "sourceSeverity": "A",
+      "sourceModule": "5.5 协同执行与监督",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F020-05",
+      "sourceSeverity": "A",
+      "sourceModule": "5.5 协同执行与监督",
+      "sourceTags": [
+        "M2",
+        "M3"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/公司测试负责人",
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认；拆两层：UI层保留黑盒（无入口+接口拒绝）；架构层移入评审检查单，由开发走查签字",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现；属架构/代码评审范畴，黑盒测试无法证明「不存在」",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F020-06",
+      "sourceSeverity": "A",
+      "sourceModule": "5.5 协同执行与监督",
+      "sourceTags": [
+        "M8"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "交付《测试数据准备手册》+各模块前置数据快照，用例「存在XX」改为「复位至快照S-xx」",
+      "evidenceLimitFromSource": "前置状态未给出构造路径，执行时造不出数据",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F021-10",
+      "sourceSeverity": "A",
+      "sourceModule": "5.5 协同执行与监督",
+      "sourceTags": [
+        "M4"
+      ],
+      "preliminaryCategories": [
+        "需外部接口或真机"
+      ],
+      "responsibleRoles": [
+        "项目负责人/设备方"
+      ],
+      "preparationFromSource": "明确以仿真体为验收基线，预期改为「代理收到指令且返回成功+事件时间线有记录」；确需真机则单列专项",
+      "evidenceLimitFromSource": "验收环境仅有仿真体；且现场行为平台侧不可观测",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F022-04",
+      "sourceSeverity": "A",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M3"
+      ],
+      "preliminaryCategories": [
+        "口径冲突"
+      ],
+      "responsibleRoles": [
+        "开发负责人/公司测试负责人"
+      ],
+      "preparationFromSource": "拆两层：UI层保留黑盒（无入口+接口拒绝）；架构层移入评审检查单，由开发走查签字",
+      "evidenceLimitFromSource": "属架构/代码评审范畴，黑盒测试无法证明「不存在」",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F023-01",
+      "sourceSeverity": "A",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M7",
+        "M8"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "交付标准数据集v1.0+安装复位脚本+底图与坐标文件；TC-F023-09删除或改为纯检查项；交付《测试数据准备手册》+各模块前置数据快照，用例「存在XX」改为「复位至快照S-xx」",
+      "evidenceLimitFromSource": "标准数据集与预置底图未提供；TC-F023-05与TC-F023-09关于坐标标定自相矛盾；前置状态未给出构造路径，执行时造不出数据",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F023-05",
+      "sourceSeverity": "A",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M3",
+        "M7",
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "可补前置",
+        "重复交叉"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人",
+        "开发负责人/公司测试负责人",
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "拆两层：UI层保留黑盒（无入口+接口拒绝）；架构层移入评审检查单，由开发走查签字；交付标准数据集v1.0+安装复位脚本+底图与坐标文件；TC-F023-09删除或改为纯检查项；见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "属架构/代码评审范畴，黑盒测试无法证明「不存在」；标准数据集与预置底图未提供；TC-F023-05与TC-F023-09关于坐标标定自相矛盾；与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F023-06",
+      "sourceSeverity": "A",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F023-10",
+      "sourceSeverity": "A",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M3"
+      ],
+      "preliminaryCategories": [
+        "口径冲突"
+      ],
+      "responsibleRoles": [
+        "开发负责人/公司测试负责人"
+      ],
+      "preparationFromSource": "拆两层：UI层保留黑盒（无入口+接口拒绝）；架构层移入评审检查单，由开发走查签字",
+      "evidenceLimitFromSource": "属架构/代码评审范畴，黑盒测试无法证明「不存在」",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F023-11",
+      "sourceSeverity": "A",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M2",
+        "M7",
+        "M8"
+      ],
+      "preliminaryCategories": [
+        "可补前置",
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人",
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认；交付标准数据集v1.0+安装复位脚本+底图与坐标文件；TC-F023-09删除或改为纯检查项；交付《测试数据准备手册》+各模块前置数据快照，用例「存在XX」改为「复位至快照S-xx」",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现；标准数据集与预置底图未提供；TC-F023-05与TC-F023-09关于坐标标定自相矛盾；前置状态未给出构造路径，执行时造不出数据",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F023-13",
+      "sourceSeverity": "A",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F024-02",
+      "sourceSeverity": "A",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F024-06",
+      "sourceSeverity": "A",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M4",
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "重复交叉",
+        "需外部接口或真机"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人",
+        "项目负责人/设备方"
+      ],
+      "preparationFromSource": "明确以仿真体为验收基线，预期改为「代理收到指令且返回成功+事件时间线有记录」；确需真机则单列专项；见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "验收环境仅有仿真体；且现场行为平台侧不可观测；与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F024-07",
+      "sourceSeverity": "A",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M8",
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "可补前置",
+        "重复交叉"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人",
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "交付《测试数据准备手册》+各模块前置数据快照，用例「存在XX」改为「复位至快照S-xx」；见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "前置状态未给出构造路径，执行时造不出数据；与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F024-09",
+      "sourceSeverity": "A",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F024-14",
+      "sourceSeverity": "A",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M8"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "交付《测试数据准备手册》+各模块前置数据快照，用例「存在XX」改为「复位至快照S-xx」",
+      "evidenceLimitFromSource": "前置状态未给出构造路径，执行时造不出数据",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F025-05",
+      "sourceSeverity": "A",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F025-07",
+      "sourceSeverity": "A",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M4"
+      ],
+      "preliminaryCategories": [
+        "需外部接口或真机"
+      ],
+      "responsibleRoles": [
+        "项目负责人/设备方"
+      ],
+      "preparationFromSource": "明确以仿真体为验收基线，预期改为「代理收到指令且返回成功+事件时间线有记录」；确需真机则单列专项",
+      "evidenceLimitFromSource": "验收环境仅有仿真体；且现场行为平台侧不可观测",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F025-08",
+      "sourceSeverity": "A",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M8",
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "可补前置",
+        "重复交叉"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人",
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "交付《测试数据准备手册》+各模块前置数据快照，用例「存在XX」改为「复位至快照S-xx」；见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "前置状态未给出构造路径，执行时造不出数据；与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F025-09",
+      "sourceSeverity": "A",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M2",
+        "M8"
+      ],
+      "preliminaryCategories": [
+        "可补前置",
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人",
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认；交付《测试数据准备手册》+各模块前置数据快照，用例「存在XX」改为「复位至快照S-xx」",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现；前置状态未给出构造路径，执行时造不出数据",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F025-10",
+      "sourceSeverity": "A",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F026-01",
+      "sourceSeverity": "A",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M4"
+      ],
+      "preliminaryCategories": [
+        "需外部接口或真机"
+      ],
+      "responsibleRoles": [
+        "项目负责人/设备方"
+      ],
+      "preparationFromSource": "明确以仿真体为验收基线，预期改为「代理收到指令且返回成功+事件时间线有记录」；确需真机则单列专项",
+      "evidenceLimitFromSource": "验收环境仅有仿真体；且现场行为平台侧不可观测",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F026-02",
+      "sourceSeverity": "A",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F026-07",
+      "sourceSeverity": "A",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M8",
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "可补前置",
+        "重复交叉"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人",
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "交付《测试数据准备手册》+各模块前置数据快照，用例「存在XX」改为「复位至快照S-xx」；见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "前置状态未给出构造路径，执行时造不出数据；与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F026-08",
+      "sourceSeverity": "A",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M4"
+      ],
+      "preliminaryCategories": [
+        "需外部接口或真机"
+      ],
+      "responsibleRoles": [
+        "项目负责人/设备方"
+      ],
+      "preparationFromSource": "明确以仿真体为验收基线，预期改为「代理收到指令且返回成功+事件时间线有记录」；确需真机则单列专项",
+      "evidenceLimitFromSource": "验收环境仅有仿真体；且现场行为平台侧不可观测",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F026-09",
+      "sourceSeverity": "A",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F026-12",
+      "sourceSeverity": "A",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F026-13",
+      "sourceSeverity": "A",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F027-07",
+      "sourceSeverity": "A",
+      "sourceModule": "5.7 过程追溯与记录",
+      "sourceTags": [
+        "M3"
+      ],
+      "preliminaryCategories": [
+        "口径冲突"
+      ],
+      "responsibleRoles": [
+        "开发负责人/公司测试负责人"
+      ],
+      "preparationFromSource": "拆两层：UI层保留黑盒（无入口+接口拒绝）；架构层移入评审检查单，由开发走查签字",
+      "evidenceLimitFromSource": "属架构/代码评审范畴，黑盒测试无法证明「不存在」",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F028-06",
+      "sourceSeverity": "A",
+      "sourceModule": "5.7 过程追溯与记录",
+      "sourceTags": [
+        "M3",
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "开发负责人/公司测试负责人",
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "拆两层：UI层保留黑盒（无入口+接口拒绝）；架构层移入评审检查单，由开发走查签字；给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "属架构/代码评审范畴，黑盒测试无法证明「不存在」；只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-E2E-01",
+      "sourceSeverity": "A",
+      "sourceModule": "端到端场景",
+      "sourceTags": [
+        "M2",
+        "M4",
+        "M7"
+      ],
+      "preliminaryCategories": [
+        "可补前置",
+        "需外部接口或真机",
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人",
+        "配置管理员/测试负责人",
+        "项目负责人/设备方"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认；明确以仿真体为验收基线，预期改为「代理收到指令且返回成功+事件时间线有记录」；确需真机则单列专项；交付标准数据集v1.0+安装复位脚本+底图与坐标文件；TC-F023-09删除或改为纯检查项",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现；验收环境仅有仿真体；且现场行为平台侧不可观测；标准数据集与预置底图未提供；TC-F023-05与TC-F023-09关于坐标标定自相矛盾",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-E2E-02",
+      "sourceSeverity": "A",
+      "sourceModule": "端到端场景",
+      "sourceTags": [
+        "M4",
+        "M7"
+      ],
+      "preliminaryCategories": [
+        "可补前置",
+        "需外部接口或真机"
+      ],
+      "responsibleRoles": [
+        "配置管理员/测试负责人",
+        "项目负责人/设备方"
+      ],
+      "preparationFromSource": "明确以仿真体为验收基线，预期改为「代理收到指令且返回成功+事件时间线有记录」；确需真机则单列专项；交付标准数据集v1.0+安装复位脚本+底图与坐标文件；TC-F023-09删除或改为纯检查项",
+      "evidenceLimitFromSource": "验收环境仅有仿真体；且现场行为平台侧不可观测；标准数据集与预置底图未提供；TC-F023-05与TC-F023-09关于坐标标定自相矛盾",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-E2E-03",
+      "sourceSeverity": "A",
+      "sourceModule": "端到端场景",
+      "sourceTags": [
+        "M4",
+        "M7"
+      ],
+      "preliminaryCategories": [
+        "可补前置",
+        "需外部接口或真机"
+      ],
+      "responsibleRoles": [
+        "配置管理员/测试负责人",
+        "项目负责人/设备方"
+      ],
+      "preparationFromSource": "明确以仿真体为验收基线，预期改为「代理收到指令且返回成功+事件时间线有记录」；确需真机则单列专项；交付标准数据集v1.0+安装复位脚本+底图与坐标文件；TC-F023-09删除或改为纯检查项",
+      "evidenceLimitFromSource": "验收环境仅有仿真体；且现场行为平台侧不可观测；标准数据集与预置底图未提供；TC-F023-05与TC-F023-09关于坐标标定自相矛盾",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-E2E-04",
+      "sourceSeverity": "A",
+      "sourceModule": "端到端场景",
+      "sourceTags": [
+        "M2",
+        "M8"
+      ],
+      "preliminaryCategories": [
+        "可补前置",
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人",
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认；交付《测试数据准备手册》+各模块前置数据快照，用例「存在XX」改为「复位至快照S-xx」",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现；前置状态未给出构造路径，执行时造不出数据",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-E2E-05",
+      "sourceSeverity": "A",
+      "sourceModule": "端到端场景",
+      "sourceTags": [
+        "M7"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "交付标准数据集v1.0+安装复位脚本+底图与坐标文件；TC-F023-09删除或改为纯检查项",
+      "evidenceLimitFromSource": "标准数据集与预置底图未提供；TC-F023-05与TC-F023-09关于坐标标定自相矛盾",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-E2E-09",
+      "sourceSeverity": "A",
+      "sourceModule": "端到端场景",
+      "sourceTags": [
+        "M7"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "交付标准数据集v1.0+安装复位脚本+底图与坐标文件；TC-F023-09删除或改为纯检查项",
+      "evidenceLimitFromSource": "标准数据集与预置底图未提供；TC-F023-05与TC-F023-09关于坐标标定自相矛盾",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-E2E-10",
+      "sourceSeverity": "A",
+      "sourceModule": "端到端场景",
+      "sourceTags": [
+        "M1",
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "要求开发交付规划模型Mock（合法/延迟/异常三档）与监督判定注入口（风险等级+置信度可指定），用例改写为「选择Mock模板X后提交」；设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "测试环境无规划模型Mock与监督判定注入口，模型输出不可控、不可复现；只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-NF008-01",
+      "sourceSeverity": "A",
+      "sourceModule": "非功能需求",
+      "sourceTags": [
+        "M1",
+        "M2",
+        "M5"
+      ],
+      "preliminaryCategories": [
+        "可补前置",
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人",
+        "测试负责人"
+      ],
+      "preparationFromSource": "要求开发交付规划模型Mock（合法/延迟/异常三档）与监督判定注入口（风险等级+置信度可指定），用例改写为「选择Mock模板X后提交」；设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认；阈值参数化（会话/模型/心跳/刷新），用例改为「临时改参数为X后执行并还原」；8小时稳定性单列专项不进回归",
+      "evidenceLimitFromSource": "测试环境无规划模型Mock与监督判定注入口，模型输出不可控、不可复现；只写「模拟/构造」未给注入手段，黑盒环境无法复现；真等待耗时长，多条叠加占用大量工时",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-NF011-01",
+      "sourceSeverity": "A",
+      "sourceModule": "非功能需求",
+      "sourceTags": [
+        "M5",
+        "M7",
+        "M8",
+        "M10"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人",
+        "测试负责人",
+        "配置管理员/测试负责人"
+      ],
+      "preparationFromSource": "阈值参数化（会话/模型/心跳/刷新），用例改为「临时改参数为X后执行并还原」；8小时稳定性单列专项不进回归；交付标准数据集v1.0+安装复位脚本+底图与坐标文件；TC-F023-09删除或改为纯检查项；交付《测试数据准备手册》+各模块前置数据快照，用例「存在XX」改为「复位至快照S-xx」；把模糊表述换成可比对的具体值/清单；文档评审类（职责清晰、代码变更）移出用例集",
+      "evidenceLimitFromSource": "真等待耗时长，多条叠加占用大量工时；标准数据集与预置底图未提供；TC-F023-05与TC-F023-09关于坐标标定自相矛盾；前置状态未给出构造路径，执行时造不出数据；预期结果无明确阈值或清单，判不出通过/不通过",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-NF014-01",
+      "sourceSeverity": "A",
+      "sourceModule": "非功能需求",
+      "sourceTags": [
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-NF015-01",
+      "sourceSeverity": "A",
+      "sourceModule": "非功能需求",
+      "sourceTags": [
+        "M1",
+        "M2"
+      ],
+      "preliminaryCategories": [
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "要求开发交付规划模型Mock（合法/延迟/异常三档）与监督判定注入口（风险等级+置信度可指定），用例改写为「选择Mock模板X后提交」；设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认",
+      "evidenceLimitFromSource": "测试环境无规划模型Mock与监督判定注入口，模型输出不可控、不可复现；只写「模拟/构造」未给注入手段，黑盒环境无法复现",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-NF017-01",
+      "sourceSeverity": "A",
+      "sourceModule": "非功能需求",
+      "sourceTags": [
+        "M2",
+        "M5",
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "可补前置",
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "开发负责人/测试负责人",
+        "测试负责人",
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "设备侧由仿真体控制台承担（停止上报/拒绝/超时/非法报文）；服务侧需测试环境管理端一键停用；需改代码的项降级为评审确认；阈值参数化（会话/模型/心跳/刷新），用例改为「临时改参数为X后执行并还原」；8小时稳定性单列专项不进回归；给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "只写「模拟/构造」未给注入手段，黑盒环境无法复现；真等待耗时长，多条叠加占用大量工时；只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-NF018-01",
+      "sourceSeverity": "A",
+      "sourceModule": "非功能需求",
+      "sourceTags": [
+        "M1",
+        "M10"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "需夹具"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人",
+        "开发负责人/测试负责人"
+      ],
+      "preparationFromSource": "要求开发交付规划模型Mock（合法/延迟/异常三档）与监督判定注入口（风险等级+置信度可指定），用例改写为「选择Mock模板X后提交」；把模糊表述换成可比对的具体值/清单；文档评审类（职责清晰、代码变更）移出用例集",
+      "evidenceLimitFromSource": "测试环境无规划模型Mock与监督判定注入口，模型输出不可控、不可复现；预期结果无明确阈值或清单，判不出通过/不通过",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F001-15",
+      "sourceSeverity": "B",
+      "sourceModule": "5.1 基础系统管理",
+      "sourceTags": [
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F004-08",
+      "sourceSeverity": "B",
+      "sourceModule": "5.2 设备接入与代理",
+      "sourceTags": [
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F005-03",
+      "sourceSeverity": "B",
+      "sourceModule": "5.2 设备接入与代理",
+      "sourceTags": [
+        "M5",
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "测试负责人",
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "阈值参数化（会话/模型/心跳/刷新），用例改为「临时改参数为X后执行并还原」；8小时稳定性单列专项不进回归；给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "真等待耗时长，多条叠加占用大量工时；只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F007-02",
+      "sourceSeverity": "B",
+      "sourceModule": "5.2 设备接入与代理",
+      "sourceTags": [
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F007-03",
+      "sourceSeverity": "B",
+      "sourceModule": "5.2 设备接入与代理",
+      "sourceTags": [
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F008-07",
+      "sourceSeverity": "B",
+      "sourceModule": "5.3 基线模板管理",
+      "sourceTags": [
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F009-10",
+      "sourceSeverity": "B",
+      "sourceModule": "5.3 基线模板管理",
+      "sourceTags": [
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F010-05",
+      "sourceSeverity": "B",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F010-06",
+      "sourceSeverity": "B",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F010-09",
+      "sourceSeverity": "B",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F011-05",
+      "sourceSeverity": "B",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M5",
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "测试负责人",
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "阈值参数化（会话/模型/心跳/刷新），用例改为「临时改参数为X后执行并还原」；8小时稳定性单列专项不进回归；给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "真等待耗时长，多条叠加占用大量工时；只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F011-06",
+      "sourceSeverity": "B",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F012-05",
+      "sourceSeverity": "B",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F012-11",
+      "sourceSeverity": "B",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F012-13",
+      "sourceSeverity": "B",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F013-03",
+      "sourceSeverity": "B",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F013-11",
+      "sourceSeverity": "B",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F015-11",
+      "sourceSeverity": "B",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F017-07",
+      "sourceSeverity": "B",
+      "sourceModule": "5.5 协同执行与监督",
+      "sourceTags": [
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F024-11",
+      "sourceSeverity": "B",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F025-02",
+      "sourceSeverity": "B",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F027-06",
+      "sourceSeverity": "B",
+      "sourceModule": "5.7 过程追溯与记录",
+      "sourceTags": [
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F028-11",
+      "sourceSeverity": "B",
+      "sourceModule": "5.7 过程追溯与记录",
+      "sourceTags": [
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-NF001-01",
+      "sourceSeverity": "B",
+      "sourceModule": "非功能需求",
+      "sourceTags": [
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-NF003-01",
+      "sourceSeverity": "B",
+      "sourceModule": "非功能需求",
+      "sourceTags": [
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-NF005-01",
+      "sourceSeverity": "B",
+      "sourceModule": "非功能需求",
+      "sourceTags": [
+        "M9"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "给只读DB账号+表清单+日志路径+检索命令；请求体核验改为网关脱敏落盘开关",
+      "evidenceLimitFromSource": "只读账号、表清单、日志路径、检索范围、抓包手段均未约定，判定主观",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-NF006-01",
+      "sourceSeverity": "B",
+      "sourceModule": "非功能需求",
+      "sourceTags": [
+        "M6",
+        "M10",
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "可补前置",
+        "重复交叉"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人",
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "补《性能测试执行说明》：工具脚本+数据量+页面清单+采样时长+统计口径；先确认接入上限是10还是20；把模糊表述换成可比对的具体值/清单；文档评审类（职责清晰、代码变更）移出用例集；见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "缺压测工具脚本、铺底数据量基线、采样时长与统计口径；预期结果无明确阈值或清单，判不出通过/不通过；与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-NF007-01",
+      "sourceSeverity": "B",
+      "sourceModule": "非功能需求",
+      "sourceTags": [
+        "M6"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "补《性能测试执行说明》：工具脚本+数据量+页面清单+采样时长+统计口径；先确认接入上限是10还是20",
+      "evidenceLimitFromSource": "缺压测工具脚本、铺底数据量基线、采样时长与统计口径",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-NF009-01",
+      "sourceSeverity": "B",
+      "sourceModule": "非功能需求",
+      "sourceTags": [
+        "M5",
+        "M6",
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "可补前置",
+        "重复交叉"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人",
+        "测试负责人",
+        "系统管理员/测试负责人"
+      ],
+      "preparationFromSource": "阈值参数化（会话/模型/心跳/刷新），用例改为「临时改参数为X后执行并还原」；8小时稳定性单列专项不进回归；补《性能测试执行说明》：工具脚本+数据量+页面清单+采样时长+统计口径；先确认接入上限是10还是20；见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "真等待耗时长，多条叠加占用大量工时；缺压测工具脚本、铺底数据量基线、采样时长与统计口径；与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F002-02",
+      "sourceSeverity": "C",
+      "sourceModule": "5.1 基础系统管理",
+      "sourceTags": [
+        "M10"
+      ],
+      "preliminaryCategories": [
+        "口径冲突"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人"
+      ],
+      "preparationFromSource": "把模糊表述换成可比对的具体值/清单；文档评审类（职责清晰、代码变更）移出用例集",
+      "evidenceLimitFromSource": "预期结果无明确阈值或清单，判不出通过/不通过",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F010-03",
+      "sourceSeverity": "C",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M10"
+      ],
+      "preliminaryCategories": [
+        "口径冲突"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人"
+      ],
+      "preparationFromSource": "把模糊表述换成可比对的具体值/清单；文档评审类（职责清晰、代码变更）移出用例集",
+      "evidenceLimitFromSource": "预期结果无明确阈值或清单，判不出通过/不通过",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F014-08",
+      "sourceSeverity": "C",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M10"
+      ],
+      "preliminaryCategories": [
+        "口径冲突"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人"
+      ],
+      "preparationFromSource": "把模糊表述换成可比对的具体值/清单；文档评审类（职责清晰、代码变更）移出用例集",
+      "evidenceLimitFromSource": "预期结果无明确阈值或清单，判不出通过/不通过",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F020-09",
+      "sourceSeverity": "C",
+      "sourceModule": "5.5 协同执行与监督",
+      "sourceTags": [
+        "M10"
+      ],
+      "preliminaryCategories": [
+        "口径冲突"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人"
+      ],
+      "preparationFromSource": "把模糊表述换成可比对的具体值/清单；文档评审类（职责清晰、代码变更）移出用例集",
+      "evidenceLimitFromSource": "预期结果无明确阈值或清单，判不出通过/不通过",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F026-06",
+      "sourceSeverity": "C",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M10"
+      ],
+      "preliminaryCategories": [
+        "口径冲突"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人"
+      ],
+      "preparationFromSource": "把模糊表述换成可比对的具体值/清单；文档评审类（职责清晰、代码变更）移出用例集",
+      "evidenceLimitFromSource": "预期结果无明确阈值或清单，判不出通过/不通过",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-NF010-01",
+      "sourceSeverity": "C",
+      "sourceModule": "非功能需求",
+      "sourceTags": [
+        "M10"
+      ],
+      "preliminaryCategories": [
+        "口径冲突"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人"
+      ],
+      "preparationFromSource": "把模糊表述换成可比对的具体值/清单；文档评审类（职责清晰、代码变更）移出用例集",
+      "evidenceLimitFromSource": "预期结果无明确阈值或清单，判不出通过/不通过",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F001-13",
+      "sourceSeverity": "D",
+      "sourceModule": "5.1 基础系统管理",
+      "sourceTags": [
+        "M5",
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "可补前置",
+        "重复交叉"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人",
+        "测试负责人"
+      ],
+      "preparationFromSource": "阈值参数化（会话/模型/心跳/刷新），用例改为「临时改参数为X后执行并还原」；8小时稳定性单列专项不进回归；见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "真等待耗时长，多条叠加占用大量工时；与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F003-10",
+      "sourceSeverity": "D",
+      "sourceModule": "5.2 设备接入与代理",
+      "sourceTags": [
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "重复交叉"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人"
+      ],
+      "preparationFromSource": "见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F003-15",
+      "sourceSeverity": "D",
+      "sourceModule": "5.2 设备接入与代理",
+      "sourceTags": [
+        "M5"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "测试负责人"
+      ],
+      "preparationFromSource": "阈值参数化（会话/模型/心跳/刷新），用例改为「临时改参数为X后执行并还原」；8小时稳定性单列专项不进回归",
+      "evidenceLimitFromSource": "真等待耗时长，多条叠加占用大量工时",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F005-02",
+      "sourceSeverity": "D",
+      "sourceModule": "5.2 设备接入与代理",
+      "sourceTags": [
+        "M5"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "测试负责人"
+      ],
+      "preparationFromSource": "阈值参数化（会话/模型/心跳/刷新），用例改为「临时改参数为X后执行并还原」；8小时稳定性单列专项不进回归",
+      "evidenceLimitFromSource": "真等待耗时长，多条叠加占用大量工时",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F006-13",
+      "sourceSeverity": "D",
+      "sourceModule": "5.2 设备接入与代理",
+      "sourceTags": [
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "重复交叉"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人"
+      ],
+      "preparationFromSource": "见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F008-09",
+      "sourceSeverity": "D",
+      "sourceModule": "5.3 基线模板管理",
+      "sourceTags": [
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "重复交叉"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人"
+      ],
+      "preparationFromSource": "见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F013-04",
+      "sourceSeverity": "D",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "重复交叉"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人"
+      ],
+      "preparationFromSource": "见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F013-12",
+      "sourceSeverity": "D",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "重复交叉"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人"
+      ],
+      "preparationFromSource": "见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F014-01",
+      "sourceSeverity": "D",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "重复交叉"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人"
+      ],
+      "preparationFromSource": "见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F014-06",
+      "sourceSeverity": "D",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "重复交叉"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人"
+      ],
+      "preparationFromSource": "见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F014-11",
+      "sourceSeverity": "D",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M5"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "测试负责人"
+      ],
+      "preparationFromSource": "阈值参数化（会话/模型/心跳/刷新），用例改为「临时改参数为X后执行并还原」；8小时稳定性单列专项不进回归",
+      "evidenceLimitFromSource": "真等待耗时长，多条叠加占用大量工时",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F015-08",
+      "sourceSeverity": "D",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "重复交叉"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人"
+      ],
+      "preparationFromSource": "见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F015-09",
+      "sourceSeverity": "D",
+      "sourceModule": "5.4 自主任务规划",
+      "sourceTags": [
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "重复交叉"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人"
+      ],
+      "preparationFromSource": "见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F018-12",
+      "sourceSeverity": "D",
+      "sourceModule": "5.5 协同执行与监督",
+      "sourceTags": [
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "重复交叉"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人"
+      ],
+      "preparationFromSource": "见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F019-02",
+      "sourceSeverity": "D",
+      "sourceModule": "5.5 协同执行与监督",
+      "sourceTags": [
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "重复交叉"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人"
+      ],
+      "preparationFromSource": "见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F019-11",
+      "sourceSeverity": "D",
+      "sourceModule": "5.5 协同执行与监督",
+      "sourceTags": [
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "重复交叉"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人"
+      ],
+      "preparationFromSource": "见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F022-08",
+      "sourceSeverity": "D",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "重复交叉"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人"
+      ],
+      "preparationFromSource": "见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F022-11",
+      "sourceSeverity": "D",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "重复交叉"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人"
+      ],
+      "preparationFromSource": "见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F023-04",
+      "sourceSeverity": "D",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M5"
+      ],
+      "preliminaryCategories": [
+        "可补前置"
+      ],
+      "responsibleRoles": [
+        "测试负责人"
+      ],
+      "preparationFromSource": "阈值参数化（会话/模型/心跳/刷新），用例改为「临时改参数为X后执行并还原」；8小时稳定性单列专项不进回归",
+      "evidenceLimitFromSource": "真等待耗时长，多条叠加占用大量工时",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F023-09",
+      "sourceSeverity": "D",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "重复交叉"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人"
+      ],
+      "preparationFromSource": "见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F026-11",
+      "sourceSeverity": "D",
+      "sourceModule": "5.6 旅客引导与态势",
+      "sourceTags": [
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "重复交叉"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人"
+      ],
+      "preparationFromSource": "见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F027-03",
+      "sourceSeverity": "D",
+      "sourceModule": "5.7 过程追溯与记录",
+      "sourceTags": [
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "重复交叉"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人"
+      ],
+      "preparationFromSource": "见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F028-02",
+      "sourceSeverity": "D",
+      "sourceModule": "5.7 过程追溯与记录",
+      "sourceTags": [
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "重复交叉"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人"
+      ],
+      "preparationFromSource": "见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-F028-05",
+      "sourceSeverity": "D",
+      "sourceModule": "5.7 过程追溯与记录",
+      "sourceTags": [
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "重复交叉"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人"
+      ],
+      "preparationFromSource": "见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    },
+    {
+      "caseId": "TC-NF002-01",
+      "sourceSeverity": "D",
+      "sourceModule": "非功能需求",
+      "sourceTags": [
+        "M5",
+        "M11"
+      ],
+      "preliminaryCategories": [
+        "口径冲突",
+        "可补前置",
+        "重复交叉"
+      ],
+      "responsibleRoles": [
+        "公司测试负责人/项目负责人",
+        "测试负责人"
+      ],
+      "preparationFromSource": "阈值参数化（会话/模型/心跳/刷新），用例改为「临时改参数为X后执行并还原」；8小时稳定性单列专项不进回归；见「重复与矛盾」页签，合并或修订",
+      "evidenceLimitFromSource": "真等待耗时长，多条叠加占用大量工时；与其他用例重复或存在口径冲突",
+      "executionDate": null,
+      "writtenDecision": null,
+      "status": "NT",
+      "reason": "环境条件或裁决尚未完成，未执行",
+      "classificationIsFinal": false
+    }
+  ]
+}
