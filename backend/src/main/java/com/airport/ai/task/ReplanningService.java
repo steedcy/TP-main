@@ -1,5 +1,8 @@
 package com.airport.ai.task;
 
+import com.airport.ai.baseline.BaselineTemplate;
+import com.airport.ai.baseline.BaselineTemplateService;
+import com.airport.ai.device.ParameterValues;
 import com.airport.ai.event.TaskEventService;
 import com.airport.ai.planning.PlanningModelService;
 import com.airport.ai.planning.PlanningRequest;
@@ -14,6 +17,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -39,6 +44,7 @@ public class ReplanningService {
     private final RiskAssessmentService riskAssessmentService;
     private final TaskExecutionOrchestrator taskExecutionOrchestrator;
     private final TaskEventService taskEventService;
+    private final BaselineTemplateService baselineTemplateService;
 
     public ReplanningService(TaskMapper taskMapper,
                               PlanVersionMapper planVersionMapper,
@@ -48,7 +54,8 @@ public class ReplanningService {
                               PlanningModelService planningModelService,
                               RiskAssessmentService riskAssessmentService,
                               TaskExecutionOrchestrator taskExecutionOrchestrator,
-                              TaskEventService taskEventService) {
+                              TaskEventService taskEventService,
+                              BaselineTemplateService baselineTemplateService) {
         this.taskMapper = taskMapper;
         this.planVersionMapper = planVersionMapper;
         this.assignmentMapper = assignmentMapper;
@@ -58,6 +65,7 @@ public class ReplanningService {
         this.riskAssessmentService = riskAssessmentService;
         this.taskExecutionOrchestrator = taskExecutionOrchestrator;
         this.taskEventService = taskEventService;
+        this.baselineTemplateService = baselineTemplateService;
     }
 
     /**
@@ -243,12 +251,14 @@ public class ReplanningService {
         taskEventService.append(taskId, "SUPERVISION_JUDGED", "SYSTEM", riskResult.getRiskReasonCode(),
                 "重新规划后监督判定: " + riskResult.getRiskLevel() + "，" + riskResult.getJudgmentBasis());
 
+        if ("HIGH".equals(riskResult.getRiskLevel())) {
+            downgradeReplanned(task, completedSteps, failedStepSeq, remainingQuota, riskResult);
+            return;
+        }
         if (!"LOW".equals(riskResult.getRiskLevel())) {
-            // 高风险或无法判定：局部重规划不做二次基线降级尝试，直接转人工（保持与5.5.3
-            // "降级任务不再二次自动降级"一致的谨慎口径——重规划本身已是一次异常恢复的兜底）
-            taskEventService.append(taskId, "REPLAN_FAILED", "SYSTEM", "ERR_REPLAN_HIGH_RISK",
-                    "重新规划后新计划版本判定为" + riskResult.getRiskLevel() + "，转人工处理");
-            toPendingManual(task, "局部重新规划后新计划风险判定为" + riskResult.getRiskLevel());
+            taskEventService.append(taskId, "REPLAN_FAILED", "SYSTEM", "ERR_REPLAN_RISK_UNDETERMINED",
+                    "重新规划后新计划版本风险无法确定，转人工处理");
+            toPendingManual(task, "局部重新规划后监督风险无法确定");
             return;
         }
 
@@ -261,6 +271,123 @@ public class ReplanningService {
                 "局部重新规划成功，新计划版本" + newVersion.getVersionNo() + "已冻结，任务重新进入待分配");
 
         taskExecutionOrchestrator.startExecution(taskId, newVersion.getId(), failedStepSeq);
+    }
+
+    /** High-risk replanning follows 5.4.6 while retaining actually completed actions. */
+    private void downgradeReplanned(Task task, List<Map<String, Object>> completedSteps,
+                                    int failedStepSeq, int remainingQuota, RiskAssessmentResult risk) {
+        Long taskId = task.getId();
+        Optional<BaselineTemplate> matched = task.getTaskFamily() == null ? Optional.empty()
+                : baselineTemplateService.matchForDowngrade(task.getTaskFamily());
+        if (matched.isEmpty()) {
+            baselineUnavailable(task, "无匹配的已启用基线模板");
+            return;
+        }
+        BaselineTemplate template = matched.get();
+        List<Map<String, Object>> templateSteps;
+        Map<String, Object> scene = new java.util.LinkedHashMap<>(parseObject(task.getSceneParams()));
+        try {
+            templateSteps = normalizeTemplateSteps(parseSteps(template.getSteps()));
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> fields = MAPPER.readValue(template.getInputParams(), List.class);
+            Map<String, Object> supplied = new java.util.LinkedHashMap<>();
+            for (Map<String, Object> field : fields) {
+                String name = String.valueOf(field.get("name"));
+                if (scene.containsKey(name)) supplied.put(name, scene.get(name));
+            }
+            scene.putAll(ParameterValues.materialize(template.getInputParams(), supplied));
+        } catch (Exception ex) {
+            baselineUnavailable(task, "基线模板步骤或输入无法绑定: " + ex.getMessage());
+            return;
+        }
+
+        // A completed action may only be skipped when the template has the same
+        // capability and completion condition at that position. Otherwise an
+        // automatic switch could silently repeat or omit a physical action.
+        if (templateSteps.size() <= completedSteps.size()) {
+            baselineUnavailable(task, "基线模板没有可替换的剩余步骤");
+            return;
+        }
+        for (int index = 0; index < completedSteps.size(); index++) {
+            Map<String, Object> completed = completedSteps.get(index);
+            Map<String, Object> baseline = templateSteps.get(index);
+            Object completedCondition = completed.get("completionCondition");
+            Object baselineCondition = baseline.get("completionCondition");
+            if (!Objects.equals(completed.get("capabilityType"), baseline.get("capabilityType"))
+                    || completedCondition == null || String.valueOf(completedCondition).isBlank()
+                    || !Objects.equals(completedCondition, baselineCondition)) {
+                baselineUnavailable(task, "基线模板前缀与已完成步骤不一致，禁止重复或跳过动作");
+                return;
+            }
+        }
+        List<Map<String, Object>> tail = new ArrayList<>();
+        int sequence = failedStepSeq;
+        for (Map<String, Object> step : templateSteps.subList(completedSteps.size(), templateSteps.size())) {
+            Map<String, Object> copy = new java.util.LinkedHashMap<>(step);
+            copy.put("stepSeq", sequence++);
+            tail.add(copy);
+        }
+        if (tail.size() > remainingQuota) {
+            baselineUnavailable(task, "基线模板剩余步骤超过五步路径额度" + remainingQuota);
+            return;
+        }
+        List<Map<String, Object>> merged = new ArrayList<>(completedSteps);
+        merged.addAll(tail);
+        List<String> capabilities = tail.stream().map(s -> String.valueOf(s.get("capabilityType"))).distinct().toList();
+        ContextSnapshot snapshot = contextSnapshotService.buildSnapshot(taskId, capabilities);
+        taskEventService.append(taskId, "CONTEXT_SNAPSHOT_GENERATED", "SYSTEM", null,
+                "重规划高风险基线降级快照" + snapshot.getSnapshotCode());
+        PlanValidationResult validation = planValidationService.validate(tail,
+                contextSnapshotService.parseAgents(snapshot.getAgents()), null, task.getTaskFamily());
+        planValidationService.requireCoreScenarioCoverage(merged, task.getTaskFamily(), validation);
+        if (merged.size() > MAX_STEPS) validation.failStructure("最终路径超过五步", null, "ERR_STEP_LIMIT_EXCEEDED");
+
+        PlanVersion baselineVersion = new PlanVersion();
+        baselineVersion.setTaskId(taskId);
+        baselineVersion.setVersionNo((int) (planVersionMapper.countByTaskId(taskId) + 1));
+        baselineVersion.setSource("BASELINE_TEMPLATE");
+        baselineVersion.setBaselineTemplateId(template.getId());
+        baselineVersion.setSnapshotId(snapshot.getSnapshotCode());
+        baselineVersion.setPlanSteps(toJson(merged));
+        baselineVersion.setStructureCheckResult(validation.getStructureCheckResult());
+        baselineVersion.setCapabilityCheckResult(validation.getCapabilityCheckResult());
+        baselineVersion.setConstraintCheckResult(validation.getConstraintCheckResult());
+        baselineVersion.setValidationErrors(toJson(validation.getErrors()));
+        if (!validation.isAllPassed()) {
+            planVersionMapper.insert(baselineVersion);
+            baselineUnavailable(task, "基线模板三类校验未通过");
+            return;
+        }
+        baselineVersion.setFrozenAt(LocalDateTime.now());
+        planVersionMapper.insert(baselineVersion);
+
+        task.setSceneParams(toJson(scene));
+        task.setCurrentPlanVersionId(baselineVersion.getId());
+        task.setDowngradeReason("局部重新规划后监督判定高风险: " + risk.getRiskReasonCode());
+        task.setFailureReason(null);
+        task.setStatus(TaskStatus.DOWNGRADING);
+        task.setUpdatedAt(LocalDateTime.now());
+        taskMapper.update(task);
+        taskEventService.append(taskId, "BASELINE_DOWNGRADED", "SYSTEM", risk.getRiskReasonCode(),
+                "局部重规划后切换至基线模板" + template.getTemplateName() + "(" + template.getTemplateVersion()
+                        + ")，保留" + completedSteps.size() + "个已完成步骤，剩余额度" + remainingQuota);
+        taskExecutionOrchestrator.startExecution(taskId, baselineVersion.getId(), failedStepSeq);
+    }
+
+    private void baselineUnavailable(Task task, String detail) {
+        taskEventService.append(task.getId(), "REPLAN_FAILED", "SYSTEM", "ERR_REPLAN_BASELINE_UNAVAILABLE", detail);
+        toPendingManual(task, "局部重规划高风险降级失败：" + detail);
+    }
+
+    private List<Map<String, Object>> normalizeTemplateSteps(List<Map<String, Object>> steps) {
+        return steps.stream().map(step -> {
+            Map<String, Object> normalized = new java.util.LinkedHashMap<>(step);
+            normalized.putIfAbsent("stepGoal", "执行" + normalized.get("capabilityType") + "能力（基线模板步骤）");
+            normalized.putIfAbsent("precondition", "候选设备在线且空闲");
+            normalized.putIfAbsent("failureHandling", "重试一次或转人工处理");
+            normalized.putIfAbsent("inputParams", Map.of());
+            return normalized;
+        }).toList();
     }
 
     private void toPendingManual(Task task, String reason) {

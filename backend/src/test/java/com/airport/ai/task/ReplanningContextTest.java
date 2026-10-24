@@ -32,7 +32,8 @@ class ReplanningContextTest {
         when(context.capabilityContext(eq(snapshot),anyList())).thenReturn(capabilities);
         when(model.generatePlan(any())).thenThrow(new RuntimeException("controlled timeout"));
         var service=new ReplanningService(tasks,plans,assignments,context,mock(PlanValidationService.class),model,
-                mock(RiskAssessmentService.class),mock(TaskExecutionOrchestrator.class),mock(TaskEventService.class));
+                mock(RiskAssessmentService.class),mock(TaskExecutionOrchestrator.class),mock(TaskEventService.class),
+                mock(com.airport.ai.baseline.BaselineTemplateService.class));
         var definitions=mock(com.airport.ai.taskdef.TaskDefinitionMapper.class);
         var definition=new com.airport.ai.taskdef.TaskDefinition();
         definition.setAvailableCapabilityTypes("[\"CAP_FLIGHT_UPDATE\",\"CAP_NOTIFICATION\"]");
