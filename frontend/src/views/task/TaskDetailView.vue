@@ -89,7 +89,7 @@
       </a-timeline>
     </a-card>
 
-    <a-card title="待人工处理" v-if="task.status === 'PENDING_MANUAL'" style="margin-top: 16px">
+    <a-card title="待人工处理" v-if="isOperator && task.status === 'PENDING_MANUAL'" style="margin-top: 16px">
       <a-space>
         <a-button @click="handleManualAction('SWITCH_TO_BASELINE')">转基线执行</a-button>
         <a-button @click="handleManualAction('RETRY_PLANNING')">重试规划</a-button>
@@ -100,7 +100,7 @@
 
     <!-- 对应5.5.6前置条件：PLANNING/SUPERVISING/PENDING_ASSIGNMENT/DOWNGRADING/EXECUTING均可终止，
          PENDING_MANUAL已在上方处置区提供终止入口，此处不重复展示 -->
-    <a-card title="终止任务" v-else-if="TERMINABLE_STATUSES.includes(task.status)" style="margin-top: 16px">
+    <a-card title="终止任务" v-else-if="isOperator && TERMINABLE_STATUSES.includes(task.status)" style="margin-top: 16px">
       <a-button danger @click="terminateVisible = true">终止任务</a-button>
     </a-card>
 
@@ -124,7 +124,7 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { message } from 'ant-design-vue'
 import { getTask, getTaskEvents, getPlanVersions, getContextSnapshots, getStepAssignments, manualAction, terminateTask } from '../../api/task'

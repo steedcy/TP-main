@@ -154,20 +154,27 @@ public class DeviceAgentService {
                         .map(t -> t.getStatus() == com.airport.ai.task.TaskStatus.MANUAL_TERMINATED)
                         .orElse(false)) {
             Long terminatedTaskId = agent.getCurrentTaskId();
-            if (commandMapper != null) {
+            boolean confirmed = false;
+            if ("ONLINE".equals(onlineStatus) && commandMapper != null) {
                 for (DeviceCommandRecord command : commandMapper.findRecentByAgentCode(agent.getAgentCode(), 20)) {
                     if ("TASK_CANCEL".equals(command.getCommandType())
                             && terminatedTaskId.equals(command.getTaskId())
-                            && ("SENT".equals(command.getCommandStatus()) || "PENDING".equals(command.getCommandStatus()))) {
-                        commandMapper.updateStatus(agent.getAgentCode(), command.getCommandId(), "TASK_CANCEL", 0,
-                                "CONFIRMED_IDLE", null);
+                            && ("SENT".equals(command.getCommandStatus()) || "TIMED_OUT".equals(command.getCommandStatus()))) {
+                        confirmed = commandMapper.updateStatus(agent.getAgentCode(), command.getCommandId(),
+                                "TASK_CANCEL", command.getAttemptNo(), "CONFIRMED_IDLE", null) == 1;
+                        if (confirmed) break;
                     }
                 }
             }
-            agent.setCurrentTaskId(null);
-            agent.setCurrentStepSeq(null);
-            taskEventService.append(terminatedTaskId, "TASK_CANCEL_CONFIRMED_IDLE", "DEVICE", null,
-                    "设备代理" + agent.getAgentCode() + "上报空闲，解除人工终止任务的设备占用");
+            if (confirmed) {
+                agent.setCurrentTaskId(null);
+                agent.setCurrentStepSeq(null);
+                taskEventService.append(terminatedTaskId, "TASK_CANCEL_CONFIRMED_IDLE", "DEVICE", null,
+                        "设备代理" + agent.getAgentCode() + "上报空闲，解除人工终止任务的设备占用");
+            } else {
+                // An offline or uncorrelated idle report cannot prove that cancellation was delivered.
+                workStatus = "BUSY";
+            }
         }
         boolean wasOffline = "OFFLINE".equals(agent.getOnlineStatus());
         agent.setOnlineStatus(onlineStatus);

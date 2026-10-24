@@ -45,6 +45,12 @@
             updated_at = CURRENT_TIMESTAMP
         WHERE agent_code = #{agentCode} AND command_id = #{commandId}
           AND command_type = #{commandType} AND attempt_no = #{attemptNo}
-          AND (#{status} NOT IN ('SENT', 'DELIVERY_FAILED') OR command_status IN ('PENDING', 'DELIVERY_FAILED'))
+          AND (CASE WHEN #{status} IN ('SENT', 'DELIVERY_FAILED')
+                    THEN command_status IN ('PENDING', 'DELIVERY_FAILED')
+                    WHEN #{status} = 'TIMED_OUT' AND command_type = 'TASK_CANCEL'
+                    THEN command_status IN ('PENDING', 'SENT')
+                    WHEN #{status} = 'CONFIRMED_IDLE' AND command_type = 'TASK_CANCEL'
+                    THEN command_status IN ('PENDING', 'SENT', 'TIMED_OUT', 'DELIVERY_FAILED')
+                    ELSE TRUE END)
     </update>
 </mapper>
