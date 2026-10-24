@@ -140,4 +140,3 @@ class ReplanningHighRiskDowngradeTest {
         verifyNoInteractions(execution);
     }
 }
-

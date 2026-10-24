@@ -55,4 +55,3 @@ class ReplanningContextTest {
         service.replan(1L,2,"SECOND"); verify(model,times(1)).generatePlan(any());
     }
 }
-
