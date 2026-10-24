@@ -149,6 +149,19 @@ public class DeviceAgentService {
             throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, "workStatus取值非法");
         }
 
+        if ("ONLINE".equals(onlineStatus) && "IDLE".equals(workStatus)
+                && agent.getCurrentTaskId() != null && taskMapper != null) {
+            Long taskId = agent.getCurrentTaskId();
+            taskMapper.findById(taskId).ifPresent(task -> {
+                if (task.getStatus() == com.airport.ai.task.TaskStatus.COMPLETED
+                        || task.getStatus() == com.airport.ai.task.TaskStatus.FAILED) {
+                    agent.setCurrentTaskId(null);
+                    agent.setCurrentStepSeq(null);
+                    taskEventService.append(taskId, "AGENT_STALE_TASK_REFERENCE_CLEARED", "SYSTEM", null,
+                            "设备代理" + agent.getAgentCode() + "上报空闲，清理已结束任务的残留占用");
+                }
+            });
+        }
         if ("IDLE".equals(workStatus) && agent.getCurrentTaskId() != null && taskMapper != null
                 && taskMapper.findById(agent.getCurrentTaskId())
                         .map(t -> t.getStatus() == com.airport.ai.task.TaskStatus.MANUAL_TERMINATED)
@@ -169,7 +182,7 @@ public class DeviceAgentService {
             if (confirmed) {
                 agent.setCurrentTaskId(null);
                 agent.setCurrentStepSeq(null);
-                taskEventService.append(terminatedTaskId, "TASK_CANCEL_CONFIRMED_IDLE", "DEVICE", null,
+                taskEventService.append(terminatedTaskId, "TASK_CANCEL_CONFIRMED_IDLE", "SYSTEM", null,
                         "设备代理" + agent.getAgentCode() + "上报空闲，解除人工终止任务的设备占用");
             } else {
                 // An offline or uncorrelated idle report cannot prove that cancellation was delivered.

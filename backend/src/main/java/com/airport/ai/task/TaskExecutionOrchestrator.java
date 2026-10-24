@@ -203,7 +203,7 @@ public class TaskExecutionOrchestrator {
             // Device-side retries may replay an already accepted response. A matching replay is a no-op.
             if ("EXECUTING".equals(assignment.getStepStatus()) || "COMPLETED".equals(assignment.getStepStatus())) return;
             if ("FROZEN".equals(assignment.getStepStatus())) {
-                taskEventService.append(assignment.getTaskId(), "LATE_TASK_RESPONSE_IGNORED", "DEVICE", null,
+                taskEventService.append(assignment.getTaskId(), "LATE_TASK_RESPONSE_IGNORED", "SYSTEM", null,
                         "任务已终止，忽略设备代理" + agentCode + "对承接请求的迟到响应");
                 return;
             }
@@ -302,14 +302,14 @@ public class TaskExecutionOrchestrator {
             throw new BusinessException(ErrorCode.STEP_STATUS_NOT_ALLOWED, "反馈代理与当前步骤分配不匹配");
         }
         if (attemptNo != assignment.getRetryCount()) {
-            taskEventService.append(assignment.getTaskId(), "STALE_EXECUTION_FEEDBACK_IGNORED", "DEVICE",
+            taskEventService.append(assignment.getTaskId(), "STALE_EXECUTION_FEEDBACK_IGNORED", "SYSTEM",
                     "STALE_ATTEMPT", "忽略指令" + commandId + "第" + attemptNo + "次尝试的迟到反馈");
             return;
         }
         if (!"EXECUTING".equals(assignment.getStepStatus())) {
             if ("COMPLETED".equals(assignment.getStepStatus()) || "FAILED".equals(assignment.getStepStatus())) return;
             if ("FROZEN".equals(assignment.getStepStatus())) {
-                taskEventService.append(assignment.getTaskId(), "LATE_EXECUTION_FEEDBACK_IGNORED", "DEVICE",
+                taskEventService.append(assignment.getTaskId(), "LATE_EXECUTION_FEEDBACK_IGNORED", "SYSTEM",
                         "TASK_TERMINATED", "任务已终止，忽略指令" + commandId + "的迟到执行反馈");
                 return;
             }

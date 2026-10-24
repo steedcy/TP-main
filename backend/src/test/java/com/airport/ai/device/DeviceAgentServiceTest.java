@@ -95,7 +95,7 @@ class DeviceAgentServiceTest {
         assertNull(agent.getCurrentTaskId());
         assertNull(agent.getCurrentStepSeq());
         verify(commands).updateStatus("AGT-5", "CMD-7", "TASK_CANCEL", 0, "CONFIRMED_IDLE", null);
-        verify(taskEvents).append(eq(7L), eq("TASK_CANCEL_CONFIRMED_IDLE"), eq("DEVICE"),
+        verify(taskEvents).append(eq(7L), eq("TASK_CANCEL_CONFIRMED_IDLE"), eq("SYSTEM"),
                 isNull(), contains("AGT-5"));
     }
     @Test
@@ -129,4 +129,36 @@ class DeviceAgentServiceTest {
 
         assertEquals("BUSY", agent.getWorkStatus());
         assertEquals(7L, agent.getCurrentTaskId());
-    }}
+    }
+
+    @Test
+    void idleReportClearsCompletedTaskPointerWithoutTouchingManualTerminationGate() {
+        DeviceAgentMapper agents = mock(DeviceAgentMapper.class);
+        DeviceMapper devices = mock(DeviceMapper.class);
+        com.airport.ai.task.TaskMapper tasks = mock(com.airport.ai.task.TaskMapper.class);
+        TaskEventService events = mock(TaskEventService.class);
+        DeviceAgent agent = new DeviceAgent();
+        agent.setId(5L);
+        agent.setAgentCode("AGT-5");
+        agent.setDeviceId(5L);
+        agent.setAgentStatus("ENABLED");
+        agent.setCurrentTaskId(7L);
+        agent.setCurrentStepSeq(2);
+        when(agents.findByAgentCode("AGT-5")).thenReturn(Optional.of(agent));
+        when(devices.findById(5L)).thenReturn(Optional.of(new Device()));
+        com.airport.ai.task.Task completed = new com.airport.ai.task.Task();
+        completed.setStatus(com.airport.ai.task.TaskStatus.COMPLETED);
+        when(tasks.findById(7L)).thenReturn(Optional.of(completed));
+        DeviceAgentService service = new DeviceAgentService(agents, devices, mock(OperationLogService.class),
+                events, mock(DeviceEventService.class), mock(TaskExceptionService.class));
+        org.springframework.test.util.ReflectionTestUtils.setField(service, "taskMapper", tasks);
+
+        service.reportStatus("AGT-5", "ONLINE", "IDLE", null, null);
+
+        assertEquals("IDLE", agent.getWorkStatus());
+        assertNull(agent.getCurrentTaskId());
+        assertNull(agent.getCurrentStepSeq());
+        verify(events).append(eq(7L), eq("AGENT_STALE_TASK_REFERENCE_CLEARED"), eq("SYSTEM"),
+                isNull(), contains("AGT-5"));
+    }
+}

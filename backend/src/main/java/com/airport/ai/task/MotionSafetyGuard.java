@@ -29,7 +29,11 @@ public final class MotionSafetyGuard {
         checkText(hits, asString(step.get("capabilityType")));
         checkText(hits, asString(step.get("stepGoal")));
         checkText(hits, asString(step.get("precondition")));
-        checkText(hits, asString(step.get("completionCondition")));
+        // A device may report waypointCount as an output metric. This does not
+        // authorize supplying path points to the device, which remain blocked
+        // in inputParams and the other instruction fields.
+        String completion = asString(step.get("completionCondition"));
+        checkText(hits, completion == null ? null : completion.replaceAll("(?i)(?<![A-Za-z])waypointCount(?![A-Za-z])", ""));
         checkText(hits, asString(step.get("failureHandling")));
 
         Object inputParams = step.get("inputParams");

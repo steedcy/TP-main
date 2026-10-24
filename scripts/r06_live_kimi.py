@@ -84,7 +84,8 @@ result["summary"] = {"status": final["task"].get("status"),
                      "snapshotCount": len(final["contextSnapshots"]),
                      "planVersionCount": len(final["planVersions"]),
                      "eventTypes": [e.get("eventType") for e in final["events"]]}
-out = ROOT / "document/formal-test-evidence/R06-TC037-live-kimi.json"
+out = ROOT / ("document/formal-test-evidence/R06-TC037-live-kimi-"
+              + time.strftime("%Y%m%d-%H%M%S") + ".json")
 env.save(out, result)
 print(json.dumps({"taskId": task_id, "status": result["summary"]["status"],
                   "reasonCode": result["summary"]["reasonCode"],
