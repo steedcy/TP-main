@@ -27,7 +27,9 @@ public class MoonshotModelService implements GoalUnderstandingService, PlanningM
             只能引用已提供的任务定义编码，不得发明任务族、地点、航班号、旅客身份或已完成结果。
             结合 goalTemplate、sceneParams 的 required 标记、constraints 和完成条件判断信息是否完整。
             对于完成任务必需而未提供的信息提出明确问题；不要因有任务定义就推断用户已经提供场景值。
-            结合 clarificationAnswers 和 sceneParams 中的补充回答重新判断。
+            clarificationAnswers 按时间列出已提出的问题及操作员回答。重新判断时必须逐轮读取全部回答，
+            已有明确回答的问题不得原样重复提出；只有回答仍含糊或与其他事实冲突时，才可提出具体追问。
+            不得仅因存在回答就判定信息完整，仍须核对任务必需条件。
             如果目标与所有已启用任务定义完全无关，unrelatedToAnyFamily=true、infoComplete=false。
             正常解析的 resultCode="0"，即使需要补充信息也是正常解析；无法解析时 resultCode="1002"。
             必须仅返回一个 JSON 对象，包含以下全部字段：

@@ -32,11 +32,12 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import { listTaskExceptions } from '../../api/task'
 
 const exceptions = ref([])
 const filterType = ref(undefined)
-const filterStatus = ref(undefined)
+const filterStatus = ref(useRoute().query.exceptionStatus || undefined)
 
 const columns = [
   { title: '任务', dataIndex: 'taskId' },

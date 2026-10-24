@@ -167,8 +167,29 @@ public class TaskService {
             throw new BusinessException(ErrorCode.TASK_STATUS_NOT_ALLOWED, "任务已离开待规划状态，不可补充信息");
         }
 
+        List<String> pendingQuestions = fromJsonQuestions(task.getMissingInfoQuestions());
+        if (pendingQuestions.isEmpty() || request.getAnswers() == null
+                || pendingQuestions.stream().anyMatch(q -> request.getAnswers().get(q) == null
+                        || request.getAnswers().get(q).isBlank())) {
+            throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, "请逐条回答当前待补充问题");
+        }
+
         Map<String, Object> mergedSceneParams = new HashMap<>(fromJsonMap(task.getSceneParams()));
-        mergedSceneParams.put("clarificationAnswers", request.getAnswers());
+        List<Map<String, Object>> rounds = new ArrayList<>();
+        Object saved = mergedSceneParams.get("clarificationAnswers");
+        if (saved instanceof List<?> savedRounds) {
+            for (Object round : savedRounds) {
+                if (round instanceof Map<?, ?> values) {
+                    Map<String, Object> copy = new HashMap<>();
+                    values.forEach((key, value) -> copy.put(String.valueOf(key), value));
+                    rounds.add(copy);
+                }
+            }
+        } else if (saved instanceof Map<?, ?> previousAnswers) {
+            rounds.add(Map.of("answers", previousAnswers));
+        }
+        rounds.add(Map.of("questions", pendingQuestions, "answers", new HashMap<>(request.getAnswers())));
+        mergedSceneParams.put("clarificationAnswers", rounds);
 
         task.setSceneParams(toJson(mergedSceneParams));
         taskMapper.update(task);
@@ -176,7 +197,7 @@ public class TaskService {
         taskEventService.append(task.getId(), "GOAL_CLARIFIED", "OPERATOR", null,
                 "运行操作员" + operator.getUsername() + "补充信息: " + request.getAnswers());
 
-        runGoalUnderstanding(task, mergedSceneParams, request.getAnswers());
+        runGoalUnderstanding(task, mergedSceneParams, rounds);
         return task;
     }
 
@@ -337,14 +358,15 @@ public class TaskService {
      * （协助类型等），本方法不做额外脱敏处理——业务规则6要求提交入口本身不采集
      * 真实身份字段，前端与SubmitTaskRequest均未开放姓名/证件号等字段。
      */
-    private void runGoalUnderstanding(Task task, Map<String, Object> sceneParams, Map<String, String> clarificationAnswers) {
+    private void runGoalUnderstanding(Task task, Map<String, Object> sceneParams,
+                                      List<Map<String, Object>> clarificationAnswers) {
         GoalUnderstandingRequest request = new GoalUnderstandingRequest();
         request.setRequestId(UUID.randomUUID().toString());
         request.setTaskGoal(task.getTaskGoal());
         request.setTaskFamily(task.getTaskFamily());
         request.setSceneParams(sceneParams);
         if (clarificationAnswers != null) {
-            request.setClarificationAnswers(List.of(Map.of("answers", clarificationAnswers)));
+            request.setClarificationAnswers(clarificationAnswers);
         }
 
         GoalUnderstandingResponse response = goalUnderstandingService.understand(request);
@@ -390,9 +412,18 @@ public class TaskService {
         } else {
             // 业务规则4：信息补充完成前不得进入计划生成，任务停留在PLANNING
             task.setMissingInfoQuestions(toJson(response.getMissingInfoQuestions()));
+            if (clarificationAnswers != null && clarificationAnswers.size() >= 3) {
+                task.setStatus(TaskStatus.PENDING_MANUAL);
+                task.setFailureReason("三轮信息补充后仍缺少关键信息，需人工处理");
+            }
             taskMapper.update(task);
             taskEventService.append(task.getId(), "GOAL_CLARIFIED", "SYSTEM", "INFO_INCOMPLETE",
-                    "目标理解发现信息缺失，待补充问题: " + response.getMissingInfoQuestions());
+                    "目标理解发现信息缺失，已补充" + (clarificationAnswers == null ? 0 : clarificationAnswers.size())
+                            + "轮，待补充问题: " + response.getMissingInfoQuestions());
+            if (task.getStatus() == TaskStatus.PENDING_MANUAL) {
+                taskEventService.append(task.getId(), "TASK_MANUAL_REQUIRED", "SYSTEM", "INFO_INCOMPLETE",
+                        task.getFailureReason());
+            }
         }
     }
 
@@ -412,6 +443,15 @@ public class TaskService {
             return MAPPER.readValue(json, Map.class);
         } catch (Exception e) {
             throw new RuntimeException("反序列化失败", e);
+        }
+    }
+
+    private List<String> fromJsonQuestions(String json) {
+        if (json == null || json.isBlank()) return List.of();
+        try {
+            return MAPPER.readValue(json, new com.fasterxml.jackson.core.type.TypeReference<List<String>>() {});
+        } catch (Exception e) {
+            throw new RuntimeException("待补充问题反序列化失败", e);
         }
     }
 }

@@ -214,18 +214,24 @@ function closeSubmitModalAndRefresh() {
 function openClarify(task) {
   clarifyTaskId.value = task.id
   clarifyQuestions.value = task.missingInfoQuestions || []
-  clarifyQuestions.value.forEach((q) => { clarifyAnswers[q] = clarifyAnswers[q] || '' })
+  Object.keys(clarifyAnswers).forEach((key) => { delete clarifyAnswers[key] })
+  clarifyQuestions.value.forEach((q) => { clarifyAnswers[q] = '' })
   clarifyVisible.value = true
 }
 
 async function handleClarifySubmit() {
   clarifying.value = true
   try {
-    const resp = await clarifyTask(clarifyTaskId.value, { ...clarifyAnswers })
-    if (resp.data.missingInfoQuestions?.length) {
+    const resp = await clarifyTask(clarifyTaskId.value,
+      Object.fromEntries(clarifyQuestions.value.map(q => [q, clarifyAnswers[q].trim()])))
+    if (resp.data.status === 'PLANNING' && resp.data.missingInfoQuestions?.length) {
       // 补充后目标理解仍发现缺失，展示最新的待补充问题，直至信息完整（对应5.4.1业务规则）
       message.warning('信息仍不完整，请继续补充')
       openClarify(resp.data)
+    } else if (resp.data.status === 'PENDING_MANUAL') {
+      message.warning('三轮补充后信息仍不完整，任务已转待人工处理')
+      clarifyVisible.value = false
+      clarifyTaskId.value = null
     } else {
       message.success('信息已补充，任务进入规划流程')
       clarifyVisible.value = false

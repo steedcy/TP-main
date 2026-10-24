@@ -20,6 +20,13 @@
       </a-descriptions>
       <a-alert v-if="task.missingInfoQuestions?.length" type="warning" show-icon style="margin-top: 8px"
                message="待补充问题" :description="task.missingInfoQuestions.join('；')" />
+      <a-form v-if="isOperator && task.status === 'PLANNING' && task.missingInfoQuestions?.length"
+              layout="vertical" style="margin-top: 12px" @finish="handleClarify">
+        <a-form-item v-for="question in task.missingInfoQuestions" :key="question" :label="question" required>
+          <a-input v-model:value="clarificationAnswers[question]" :maxlength="500" />
+        </a-form-item>
+        <a-button type="primary" html-type="submit" :loading="clarifying">提交补充信息</a-button>
+      </a-form>
     </a-card>
 
     <!-- 对应5.4.2规划上下文构建：参与规划的代理清单、能力覆盖情况、快照生成时间 -->
@@ -146,7 +153,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '../../store/auth'
 import { message } from 'ant-design-vue'
-import { getTask, getTaskEvents, getPlanVersions, getContextSnapshots, getStepAssignments, manualAction, terminateTask } from '../../api/task'
+import { getTask, getTaskEvents, getPlanVersions, getContextSnapshots, getStepAssignments, clarifyTask, manualAction, terminateTask } from '../../api/task'
 
 const authStore = useAuthStore()
 const isOperator = computed(() => authStore.role === 'OPERATOR')
@@ -174,6 +181,8 @@ const flightChannelResults = computed(() => [
 const terminateVisible = ref(false)
 const terminateReason = ref('')
 const confirmed = ref(false)
+const clarificationAnswers = ref({})
+const clarifying = ref(false)
 let pollTimer = null
 
 /** 可终止状态：PLANNING/SUPERVISING/PENDING_ASSIGNMENT/DOWNGRADING/EXECUTING/PENDING_MANUAL（对应5.5.6前置条件） */
@@ -233,9 +242,30 @@ async function fetchAll() {
 }
 
 async function handleManualAction(action) {
-  await manualAction(taskId, action)
-  message.success('操作已提交')
-  fetchAll()
+  const response = await manualAction(taskId, action)
+  await fetchAll()
+  if (response.data.status === 'PENDING_MANUAL') {
+    message.warning(response.data.failureReason || '处置未通过校验，任务仍待人工处理')
+  } else {
+    message.success('操作已提交')
+  }
+}
+
+async function handleClarify() {
+  const questions = task.value?.missingInfoQuestions || []
+  if (questions.some(question => !clarificationAnswers.value[question]?.trim())) {
+    message.warning('请逐条回答待补充问题')
+    return
+  }
+  clarifying.value = true
+  try {
+    await clarifyTask(taskId, Object.fromEntries(questions.map(question => [question, clarificationAnswers.value[question].trim()])))
+    clarificationAnswers.value = {}
+    await fetchAll()
+    message.success(task.value?.missingInfoQuestions?.length ? '补充已保存，请继续回答新问题' : '补充已保存')
+  } finally {
+    clarifying.value = false
+  }
 }
 
 async function handleTerminate() {

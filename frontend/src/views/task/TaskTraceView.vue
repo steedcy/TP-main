@@ -38,7 +38,7 @@
         <!-- 对应5.7.1界面元素：计划版本列表，须保留全部历史版本（业务规则4） -->
         <a-card title="计划版本列表" size="small" v-if="planVersions.length">
           <a-collapse>
-            <a-collapse-panel v-for="pv in planVersions" :key="pv.versionNo"
+            <a-collapse-panel v-for="pv in planVersions" :key="pv.versionNo" :id="`plan-version-${pv.id}`"
                                :header="`版本${pv.versionNo}（${sourceLabel(pv.source)}） - 冻结时间: ${pv.frozenAt || '未冻结'} - 可执行步骤数: ${pv.planSteps?.length ?? 0}`">
               <a-descriptions bordered :column="2" size="small">
                 <a-descriptions-item label="结构校验">{{ checkLabel(pv.structureCheckResult) }}</a-descriptions-item>
@@ -49,6 +49,24 @@
               </a-descriptions>
             </a-collapse-panel>
           </a-collapse>
+        </a-card>
+
+        <a-card v-if="selectedTask?.replanUsed" title="局部重规划版本对比" size="small" style="margin-top: 12px">
+          <a-descriptions bordered :column="1" size="small">
+            <a-descriptions-item label="使用次数">1 / 1</a-descriptions-item>
+            <a-descriptions-item label="触发原因">{{ selectedTask.replanningReason || '未记录' }}</a-descriptions-item>
+            <a-descriptions-item label="先行恢复与影响结论">
+              {{ replanRecoveryEvents.map(e => `${e.eventType}：${e.detailSummary || e.reasonCode || '无摘要'}`).join('；') || '无记录' }}
+            </a-descriptions-item>
+            <a-descriptions-item label="版本链接">
+              <a-space>
+                <a v-for="pv in planVersions" :key="pv.id" :href="`#plan-version-${pv.id}`">版本{{ pv.versionNo }}</a>
+              </a-space>
+            </a-descriptions-item>
+            <a-descriptions-item label="保留的已完成结果">
+              <pre>{{ JSON.stringify(preservedResults, null, 2) }}</pre>
+            </a-descriptions-item>
+          </a-descriptions>
         </a-card>
 
         <!-- 对应5.7.1界面元素：最终结果 -->
@@ -141,6 +159,13 @@ const filteredEvents = computed(() => {
   if (!eventTypeFilter.value.length) return events.value
   return events.value.filter((e) => eventTypeFilter.value.includes(e.eventType))
 })
+const replanRecoveryEvents = computed(() => events.value.filter(e =>
+  ['STEP_FAILED', 'CAPABILITY_GAP', 'REPLANNING_TRIGGERED', 'REPLAN_FAILED', 'REPLAN_SUCCEEDED'].includes(e.eventType)))
+const preservedResults = computed(() => (planVersions.value.at(-1)?.planSteps || [])
+  .filter(step => step.executionResult != null)
+  .map(step => ({ stepSeq: step.stepSeq, capabilityType: step.capabilityType,
+    executionResult: step.executionResult, outputParams: step.outputParams,
+    originalCommandId: step.originalCommandId })))
 
 async function fetchList() {
   const params = { taskCode: filters.taskCode || undefined, taskFamily: filters.taskFamily, status: filters.status, size: 50 }

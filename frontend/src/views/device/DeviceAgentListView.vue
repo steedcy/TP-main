@@ -47,11 +47,13 @@
 
 <script setup>
 import { onMounted, reactive, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import { message } from 'ant-design-vue'
 import { listAgents, disableAgent } from '../../api/device'
 
 const list = ref([])
-const filters = reactive({ agentStatus: undefined, onlineStatus: undefined })
+const route = useRoute()
+const filters = reactive({ agentStatus: undefined, onlineStatus: route.query.onlineStatus || undefined })
 const pagination = reactive({ current: 1, pageSize: 20, total: 0 })
 
 const columns = [
