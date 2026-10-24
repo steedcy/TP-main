@@ -16,6 +16,7 @@
         <a-menu-item key="TaskDefinitions" v-if="isConfigAdmin" @click="$router.push('/task-definitions')">任务定义</a-menu-item>
         <a-menu-item key="RiskRules" v-if="isConfigAdmin" @click="$router.push('/risk-rules')">风险规则配置</a-menu-item>
         <a-menu-item key="Users" v-if="isSystemAdmin" @click="$router.push('/users')">账号管理</a-menu-item>
+        <a-menu-item key="DemoDataReset" v-if="isSystemAdmin" @click="$router.push('/demo-data-reset')">标准演示数据复位</a-menu-item>
         <a-menu-item key="OperationLogs" @click="$router.push('/operation-logs')">操作记录</a-menu-item>
       </a-menu>
     </a-layout-sider>

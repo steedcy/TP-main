@@ -1,0 +1,863 @@
+[
+  {
+    "deviceCode": "SIM_F2_DISPLAY",
+    "deviceName": "智慧显示终端仿真体",
+    "deviceTypeCode": "SIMULATOR",
+    "isSimulator": true,
+    "simulatedDeviceType": "SMART_DISPLAY",
+    "areaCode": "F2_TEST",
+    "positionX": 805,
+    "positionY": 4200,
+    "accessEndpoint": "http://127.0.0.1:8091",
+    "accessCredentialRef": "local-test/SIM_F2_DISPLAY",
+    "statusReportInterval": 5,
+    "remark": "95用例准备；F2像素坐标；虚构业务数据，非实地标定",
+    "capabilities": [
+      {
+        "capabilityCode": "CAP_INFO_DISPLAY",
+        "capabilityName": "INFO_DISPLAY测试能力",
+        "capabilityType": "CAP_INFO_DISPLAY",
+        "inputParams": [
+          {
+            "name": "contentType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEXT",
+            "range": "TEXT/IMAGE/VIDEO/HTML"
+          },
+          {
+            "name": "contentData",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试信息：请前往F2服务点"
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "5~300"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "displayStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "errorMessage",
+            "type": "String",
+            "required": false
+          }
+        ],
+        "capabilityDescription": "按现有仿真驱动业务契约配置"
+      },
+      {
+        "capabilityCode": "CAP_FLIGHT_UPDATE",
+        "capabilityName": "FLIGHT_UPDATE测试能力",
+        "capabilityType": "CAP_FLIGHT_UPDATE",
+        "inputParams": [
+          {
+            "name": "flightNumber",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEST1022"
+          },
+          {
+            "name": "updateType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "GATE_CHANGE",
+            "range": "DELAY/EARLY/GATE_CHANGE/CANCEL"
+          },
+          {
+            "name": "updateContent",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试航班登机口变更至F2_TEST_GATE"
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "10~600"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "publishStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "publishTime",
+            "type": "String",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "按现有仿真驱动业务契约配置"
+      },
+      {
+        "capabilityCode": "CAP_NAVIGATION",
+        "capabilityName": "NAVIGATION测试能力",
+        "capabilityType": "CAP_NAVIGATION",
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "F2_TEST_GATE"
+          },
+          {
+            "name": "routePreference",
+            "type": "String",
+            "required": true,
+            "defaultValue": "BARRIER_FREE",
+            "range": "SHORTEST/BARRIER_FREE"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "routeGenerated",
+            "type": "Boolean",
+            "required": true
+          },
+          {
+            "name": "estimatedDistance",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "estimatedDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "waypointCount",
+            "type": "Integer",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "按现有仿真驱动业务契约配置"
+      }
+    ]
+  },
+  {
+    "deviceCode": "SIM_F2_BAGGAGE",
+    "deviceName": "行李测量仪仿真体",
+    "deviceTypeCode": "SIMULATOR",
+    "isSimulator": true,
+    "simulatedDeviceType": "BAGGAGE_SCANNER",
+    "areaCode": "F2_TEST",
+    "positionX": 805,
+    "positionY": 4050,
+    "accessEndpoint": "http://127.0.0.1:8092",
+    "accessCredentialRef": "local-test/SIM_F2_BAGGAGE",
+    "statusReportInterval": 5,
+    "remark": "95用例准备；F2像素坐标；虚构业务数据，非实地标定",
+    "capabilities": [
+      {
+        "capabilityCode": "CAP_BAGGAGE_MEASURE",
+        "capabilityName": "BAGGAGE_MEASURE测试能力",
+        "capabilityType": "CAP_BAGGAGE_MEASURE",
+        "inputParams": [
+          {
+            "name": "measureMode",
+            "type": "String",
+            "required": true,
+            "defaultValue": "AUTO",
+            "range": "AUTO/MANUAL"
+          },
+          {
+            "name": "timeout",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "30",
+            "range": "10~60"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "length",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "width",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "height",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "weight",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "isOversize",
+            "type": "Boolean",
+            "required": true
+          },
+          {
+            "name": "measureStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "baggageInfo",
+            "type": "String",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "按现有仿真驱动业务契约配置"
+      },
+      {
+        "capabilityCode": "CAP_OVERSIZE_ALERT",
+        "capabilityName": "OVERSIZE_ALERT测试能力",
+        "capabilityType": "CAP_OVERSIZE_ALERT",
+        "inputParams": [
+          {
+            "name": "baggageInfo",
+            "type": "String",
+            "required": true,
+            "defaultValue": "{\"length\": 80, \"width\": 55, \"height\": 35, \"weight\": 35}"
+          },
+          {
+            "name": "alertLevel",
+            "type": "String",
+            "required": true,
+            "defaultValue": "WARNING",
+            "range": "WARNING/ERROR"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "alertId",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "reportStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "reportTime",
+            "type": "String",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "按现有仿真驱动业务契约配置"
+      }
+    ]
+  },
+  {
+    "deviceCode": "SIM_F2_FLIGHT",
+    "deviceName": "航班信息屏仿真体",
+    "deviceTypeCode": "SIMULATOR",
+    "isSimulator": true,
+    "simulatedDeviceType": "FLIGHT_DELAY_BOARD",
+    "areaCode": "F2_TEST",
+    "positionX": 815,
+    "positionY": 4500,
+    "accessEndpoint": "http://127.0.0.1:8093",
+    "accessCredentialRef": "local-test/SIM_F2_FLIGHT",
+    "statusReportInterval": 5,
+    "remark": "95用例准备；F2像素坐标；虚构业务数据，非实地标定",
+    "capabilities": [
+      {
+        "capabilityCode": "CAP_FLIGHT_UPDATE",
+        "capabilityName": "FLIGHT_UPDATE测试能力",
+        "capabilityType": "CAP_FLIGHT_UPDATE",
+        "inputParams": [
+          {
+            "name": "flightNumber",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEST1022"
+          },
+          {
+            "name": "updateType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "GATE_CHANGE",
+            "range": "DELAY/EARLY/GATE_CHANGE/CANCEL"
+          },
+          {
+            "name": "updateContent",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试航班登机口变更至F2_TEST_GATE"
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "10~600"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "publishStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "publishTime",
+            "type": "String",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "按现有仿真驱动业务契约配置"
+      },
+      {
+        "capabilityCode": "CAP_INFO_DISPLAY",
+        "capabilityName": "INFO_DISPLAY测试能力",
+        "capabilityType": "CAP_INFO_DISPLAY",
+        "inputParams": [
+          {
+            "name": "contentType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEXT",
+            "range": "TEXT/IMAGE/VIDEO/HTML"
+          },
+          {
+            "name": "contentData",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试信息：请前往F2服务点"
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "5~300"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "displayStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "errorMessage",
+            "type": "String",
+            "required": false
+          }
+        ],
+        "capabilityDescription": "按现有仿真驱动业务契约配置"
+      }
+    ]
+  },
+  {
+    "deviceCode": "SIM_F2_ROBOT",
+    "deviceName": "移动服务机器人仿真体",
+    "deviceTypeCode": "SIMULATOR",
+    "isSimulator": true,
+    "simulatedDeviceType": "MOBILE_ROBOT",
+    "areaCode": "F2_TEST",
+    "positionX": 810,
+    "positionY": 4180,
+    "accessEndpoint": "http://127.0.0.1:8094",
+    "accessCredentialRef": "local-test/SIM_F2_ROBOT",
+    "statusReportInterval": 5,
+    "remark": "95用例准备；F2像素坐标；虚构业务数据，非实地标定",
+    "capabilities": [
+      {
+        "capabilityCode": "CAP_NAVIGATION",
+        "capabilityName": "NAVIGATION测试能力",
+        "capabilityType": "CAP_NAVIGATION",
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "F2_TEST_GATE"
+          },
+          {
+            "name": "routePreference",
+            "type": "String",
+            "required": true,
+            "defaultValue": "BARRIER_FREE",
+            "range": "SHORTEST/BARRIER_FREE"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "routeGenerated",
+            "type": "Boolean",
+            "required": true
+          },
+          {
+            "name": "estimatedDistance",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "estimatedDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "waypointCount",
+            "type": "Integer",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "按现有仿真驱动业务契约配置"
+      },
+      {
+        "capabilityCode": "CAP_ESCORT",
+        "capabilityName": "ESCORT测试能力",
+        "capabilityType": "CAP_ESCORT",
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "F2_TEST_GATE"
+          },
+          {
+            "name": "escortMode",
+            "type": "String",
+            "required": true,
+            "defaultValue": "LEAD",
+            "range": "LEAD/FOLLOW"
+          },
+          {
+            "name": "maxDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "600",
+            "range": "60~1800"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "arrivalStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualDistance",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "actualDuration",
+            "type": "Integer",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "按现有仿真驱动业务契约配置"
+      },
+      {
+        "capabilityCode": "CAP_NOTIFICATION",
+        "capabilityName": "NOTIFICATION测试能力",
+        "capabilityType": "CAP_NOTIFICATION",
+        "inputParams": [
+          {
+            "name": "notificationType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "BOTH",
+            "range": "VOICE/TEXT/BOTH"
+          },
+          {
+            "name": "notificationContent",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试旅客需要轮椅陪同，请现场服务人员协助"
+          },
+          {
+            "name": "repeatCount",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "1",
+            "range": "1~5"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "notificationStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualRepeatCount",
+            "type": "Integer",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "按现有仿真驱动业务契约配置"
+      },
+      {
+        "capabilityCode": "CAP_INFO_DISPLAY",
+        "capabilityName": "INFO_DISPLAY测试能力",
+        "capabilityType": "CAP_INFO_DISPLAY",
+        "inputParams": [
+          {
+            "name": "contentType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEXT",
+            "range": "TEXT/IMAGE/VIDEO/HTML"
+          },
+          {
+            "name": "contentData",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试信息：请前往F2服务点"
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "5~300"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "displayStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "errorMessage",
+            "type": "String",
+            "required": false
+          }
+        ],
+        "capabilityDescription": "按现有仿真驱动业务契约配置"
+      }
+    ]
+  },
+  {
+    "deviceCode": "SIM_F2_BAGGAGE_B",
+    "deviceName": "备用行李测量仪仿真体",
+    "deviceTypeCode": "SIMULATOR",
+    "isSimulator": true,
+    "simulatedDeviceType": "BAGGAGE_SCANNER",
+    "areaCode": "F2_TEST",
+    "positionX": 800,
+    "positionY": 4080,
+    "accessEndpoint": "http://127.0.0.1:8095",
+    "accessCredentialRef": "local-test/SIM_F2_BAGGAGE_B",
+    "statusReportInterval": 5,
+    "remark": "95用例准备；F2像素坐标；虚构业务数据，非实地标定",
+    "capabilities": [
+      {
+        "capabilityCode": "CAP_BAGGAGE_MEASURE",
+        "capabilityName": "BAGGAGE_MEASURE测试能力",
+        "capabilityType": "CAP_BAGGAGE_MEASURE",
+        "inputParams": [
+          {
+            "name": "measureMode",
+            "type": "String",
+            "required": true,
+            "defaultValue": "AUTO",
+            "range": "AUTO/MANUAL"
+          },
+          {
+            "name": "timeout",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "30",
+            "range": "10~60"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "length",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "width",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "height",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "weight",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "isOversize",
+            "type": "Boolean",
+            "required": true
+          },
+          {
+            "name": "measureStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "baggageInfo",
+            "type": "String",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "按现有仿真驱动业务契约配置"
+      },
+      {
+        "capabilityCode": "CAP_OVERSIZE_ALERT",
+        "capabilityName": "OVERSIZE_ALERT测试能力",
+        "capabilityType": "CAP_OVERSIZE_ALERT",
+        "inputParams": [
+          {
+            "name": "baggageInfo",
+            "type": "String",
+            "required": true,
+            "defaultValue": "{\"length\": 80, \"width\": 55, \"height\": 35, \"weight\": 35}"
+          },
+          {
+            "name": "alertLevel",
+            "type": "String",
+            "required": true,
+            "defaultValue": "WARNING",
+            "range": "WARNING/ERROR"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "alertId",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "reportStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "reportTime",
+            "type": "String",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "按现有仿真驱动业务契约配置"
+      }
+    ]
+  },
+  {
+    "deviceCode": "SIM_F2_ROBOT_B",
+    "deviceName": "备用移动机器人仿真体",
+    "deviceTypeCode": "SIMULATOR",
+    "isSimulator": true,
+    "simulatedDeviceType": "MOBILE_ROBOT",
+    "areaCode": "F2_TEST",
+    "positionX": 810,
+    "positionY": 4150,
+    "accessEndpoint": "http://127.0.0.1:8096",
+    "accessCredentialRef": "local-test/SIM_F2_ROBOT_B",
+    "statusReportInterval": 5,
+    "remark": "95用例准备；F2像素坐标；虚构业务数据，非实地标定",
+    "capabilities": [
+      {
+        "capabilityCode": "CAP_NAVIGATION",
+        "capabilityName": "NAVIGATION测试能力",
+        "capabilityType": "CAP_NAVIGATION",
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "F2_TEST_GATE"
+          },
+          {
+            "name": "routePreference",
+            "type": "String",
+            "required": true,
+            "defaultValue": "BARRIER_FREE",
+            "range": "SHORTEST/BARRIER_FREE"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "routeGenerated",
+            "type": "Boolean",
+            "required": true
+          },
+          {
+            "name": "estimatedDistance",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "estimatedDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "waypointCount",
+            "type": "Integer",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "按现有仿真驱动业务契约配置"
+      },
+      {
+        "capabilityCode": "CAP_ESCORT",
+        "capabilityName": "ESCORT测试能力",
+        "capabilityType": "CAP_ESCORT",
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "F2_TEST_GATE"
+          },
+          {
+            "name": "escortMode",
+            "type": "String",
+            "required": true,
+            "defaultValue": "LEAD",
+            "range": "LEAD/FOLLOW"
+          },
+          {
+            "name": "maxDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "600",
+            "range": "60~1800"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "arrivalStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualDistance",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "actualDuration",
+            "type": "Integer",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "按现有仿真驱动业务契约配置"
+      },
+      {
+        "capabilityCode": "CAP_NOTIFICATION",
+        "capabilityName": "NOTIFICATION测试能力",
+        "capabilityType": "CAP_NOTIFICATION",
+        "inputParams": [
+          {
+            "name": "notificationType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "BOTH",
+            "range": "VOICE/TEXT/BOTH"
+          },
+          {
+            "name": "notificationContent",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试旅客需要轮椅陪同，请现场服务人员协助"
+          },
+          {
+            "name": "repeatCount",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "1",
+            "range": "1~5"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "notificationStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualRepeatCount",
+            "type": "Integer",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "按现有仿真驱动业务契约配置"
+      },
+      {
+        "capabilityCode": "CAP_INFO_DISPLAY",
+        "capabilityName": "INFO_DISPLAY测试能力",
+        "capabilityType": "CAP_INFO_DISPLAY",
+        "inputParams": [
+          {
+            "name": "contentType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEXT",
+            "range": "TEXT/IMAGE/VIDEO/HTML"
+          },
+          {
+            "name": "contentData",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试信息：请前往F2服务点"
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "5~300"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "displayStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "errorMessage",
+            "type": "String",
+            "required": false
+          }
+        ],
+        "capabilityDescription": "按现有仿真驱动业务契约配置"
+      }
+    ]
+  }
+]

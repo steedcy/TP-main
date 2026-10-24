@@ -24,6 +24,7 @@ public enum ErrorCode {
     PARAM_MISSING(3000, "请求参数缺失", HttpStatus.BAD_REQUEST),
     PARAM_FORMAT_ERROR(3001, "参数格式错误", HttpStatus.BAD_REQUEST),
     PARAM_OUT_OF_RANGE(3002, "参数值超出范围", HttpStatus.BAD_REQUEST),
+    DEMO_RESET_BLOCKED(3003, "标准演示数据复位被活动任务或设备占用阻断", HttpStatus.CONFLICT),
 
     // 账号管理错误 40xx
     USER_NOT_FOUND(4001, "用户不存在", HttpStatus.NOT_FOUND),
