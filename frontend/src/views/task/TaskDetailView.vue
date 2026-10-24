@@ -126,9 +126,12 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { useAuthStore } from '../../store/auth'
 import { message } from 'ant-design-vue'
 import { getTask, getTaskEvents, getPlanVersions, getContextSnapshots, getStepAssignments, manualAction, terminateTask } from '../../api/task'
 
+const authStore = useAuthStore()
+const isOperator = computed(() => authStore.role === 'OPERATOR')
 const route = useRoute()
 const taskId = route.params.taskId
 const task = ref(null)
