@@ -1,0 +1,29 @@
+[
+  {
+    "definitionCode": "OVERSIZE_BAGGAGE_HANDLING",
+    "taskName": "超规行李处置",
+    "goalTemplate": "协助旅客处理超规行李，引导至行李处置点并完成尺寸重量测量",
+    "sceneParams": [{"name":"baggageLocation","type":"String","required":true,"range":"行李当前所在位置编码"}],
+    "availableCapabilityTypes": ["CAP_BAGGAGE_MEASURE","CAP_OVERSIZE_ALERT","CAP_NAVIGATION","CAP_NOTIFICATION"],
+    "constraintDescription": "超规行李处置全程不得引导旅客脱离监控区域；测量结果超标须触发超规事件上报",
+    "completionCondition": "行李已完成尺寸重量测量且超规事件（如有）已上报"
+  },
+  {
+    "definitionCode": "SPECIAL_PASSENGER_SERVICE",
+    "taskName": "特殊旅客服务",
+    "goalTemplate": "陪同或引导特殊旅客前往目标地点并完成必要通知",
+    "sceneParams": [{"name":"assistanceType","type":"String","required":true,"range":"协助类型，如轮椅/视障/听障陪同"}],
+    "availableCapabilityTypes": ["CAP_ESCORT","CAP_NAVIGATION","CAP_NOTIFICATION","CAP_INFO_DISPLAY"],
+    "constraintDescription": "陪同对象为特殊旅客时优先安排陪同服务而非仅空间引导；全程与现场人员保持通知联动",
+    "completionCondition": "旅客已到达目标地点"
+  },
+  {
+    "definitionCode": "FLIGHT_CHANGE_RESPONSE",
+    "taskName": "航班变更应对",
+    "goalTemplate": "将航班变更信息同步至受影响旅客并提供后续引导",
+    "sceneParams": [{"name":"flightNumber","type":"String","required":true,"range":"航班号"}],
+    "availableCapabilityTypes": ["CAP_FLIGHT_UPDATE","CAP_INFO_DISPLAY","CAP_NOTIFICATION","CAP_NAVIGATION"],
+    "constraintDescription": "航班变更信息发布须在旅客到达登机口前完成；涉及登机口变更时须同步空间引导",
+    "completionCondition": "航班变更信息已送达且旅客后续引导（如需）已完成"
+  }
+]
