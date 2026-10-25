@@ -181,7 +181,7 @@ public class TaskPlanningOrchestrator {
      */
     private void judgeAndRoute(Task task, PlanVersion planVersion, ContextSnapshot snapshot,
                                 PlanningResponse planningResponse) {
-        int minCandidateCount = minCandidateCount(planVersion, snapshot);
+        int minCandidateCount = minCandidateCount(planVersion, snapshot, task.getTaskFamily());
         RiskAssessmentResult riskResult;
         try {
             riskResult = riskAssessmentService.assess(planVersion, task.getTaskFamily(), snapshot.getGeneratedAt(),
@@ -218,12 +218,12 @@ public class TaskPlanningOrchestrator {
 
     /** 单次任务申请资源时的最小可用候选设备数量，跨全部步骤取最小值（对应RULE_RESOURCE_CRITICAL） */
     @SuppressWarnings("unchecked")
-    private int minCandidateCount(PlanVersion planVersion, ContextSnapshot snapshot) {
+    private int minCandidateCount(PlanVersion planVersion, ContextSnapshot snapshot, String taskFamily) {
         List<Map<String, Object>> steps = parseSteps(planVersion.getPlanSteps());
         int min = Integer.MAX_VALUE;
         for (Map<String, Object> step : steps) {
             String capabilityType = String.valueOf(step.get("capabilityType"));
-            int count = contextSnapshotService.countOnlineCandidates(snapshot, capabilityType);
+            int count = contextSnapshotService.countAvailableCandidates(snapshot, capabilityType, taskFamily);
             min = Math.min(min, count);
         }
         return min == Integer.MAX_VALUE ? 0 : min;

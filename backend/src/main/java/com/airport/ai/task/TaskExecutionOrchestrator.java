@@ -335,7 +335,7 @@ public class TaskExecutionOrchestrator {
         // 对应5.5.2业务规则7：完成判定以计划中定义的完成条件为依据，不以"已收到SUCCESS反馈"为完成
         Map<String, Object> step = findStep(assignment.getPlanVersionId(), assignment.getStepSeq());
         boolean completionSatisfied = "SUCCESS".equals(executionResult)
-                && isCompletionConditionSatisfied(step, outputParams);
+                && CompletionConditionEvaluator.satisfied(step, outputParams);
 
         if (completionSatisfied) {
             assignment.setStepStatus("COMPLETED");
@@ -561,30 +561,6 @@ public class TaskExecutionOrchestrator {
         return parseSteps(planVersion.getPlanSteps()).stream()
                 .filter(s -> stepSeq.equals(asInteger(s.get("stepSeq"))))
                 .findFirst().orElseThrow();
-    }
-
-    /**
-     * 完成条件判定为业务语义描述（如"旅客到达登机口"），本期以outputParams中约定的
-     * arrivalStatus/completed等标记做通用判定；未提供标记时以executionResult=SUCCESS为准
-     * （保留对业务规则7"不以已收到为完成"的语义区分，为后续接入更精细的条件解析预留扩展点）。
-     */
-    private boolean isCompletionConditionSatisfied(Map<String, Object> step, Map<String, Object> outputParams) {
-        if (outputParams == null || outputParams.isEmpty()) return false;
-        Object explicit = outputParams.get("completed");
-        if (explicit != null) return Boolean.TRUE.equals(explicit);
-        String marker = switch (String.valueOf(step.get("capabilityType"))) {
-            case "CAP_INFO_DISPLAY" -> "displayStatus";
-            case "CAP_FLIGHT_UPDATE" -> "publishStatus";
-            case "CAP_BAGGAGE_MEASURE" -> "measureStatus";
-            case "CAP_OVERSIZE_ALERT" -> "reportStatus";
-            case "CAP_ESCORT" -> "arrivalStatus";
-            case "CAP_NOTIFICATION" -> "notificationStatus";
-            case "CAP_NAVIGATION" -> "routeGenerated";
-            default -> "completed";
-        };
-        Object value=outputParams.get(marker);
-        return "arrivalStatus".equals(marker) ? "ARRIVED".equals(value)
-                : "routeGenerated".equals(marker) ? Boolean.TRUE.equals(value) : "SUCCESS".equals(value);
     }
 
     @SuppressWarnings("unchecked")

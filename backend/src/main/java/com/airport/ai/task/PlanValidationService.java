@@ -17,6 +17,9 @@ import java.util.*;
 public class PlanValidationService {
 
     private static final int MAX_STEPS = 5;
+    private static final java.util.regex.Pattern REFERENCED_PREDECESSOR = java.util.regex.Pattern.compile(
+            "(?:步骤\\s*(\\d+)\\s*完成后|依赖步骤\\s*(\\d+)|after\\s+step\\s*(\\d+)|depends\\s+on\\s+step\\s*(\\d+))",
+            java.util.regex.Pattern.CASE_INSENSITIVE);
 
     private final DeviceCapabilityMapper deviceCapabilityMapper;
 
@@ -49,6 +52,12 @@ public class PlanValidationService {
     @SuppressWarnings("unchecked")
     public PlanValidationResult validate(List<Map<String, Object>> steps, List<Map<String, Object>> snapshotAgents,
                                           List<String> allowedCapabilityTypes, String taskFamily) {
+        return validate(steps, snapshotAgents, allowedCapabilityTypes, taskFamily, 0);
+    }
+
+    @SuppressWarnings("unchecked")
+    public PlanValidationResult validate(List<Map<String, Object>> steps, List<Map<String, Object>> snapshotAgents,
+                                          List<String> allowedCapabilityTypes, String taskFamily, int completedPrefixCount) {
         PlanValidationResult result = new PlanValidationResult();
         if (steps == null || steps.isEmpty()) {
             result.failStructure("计划必须包含至少一个步骤", null, "ERR_STEP_FIELD_MISSING");
@@ -75,6 +84,32 @@ public class PlanValidationService {
             Object paramMapping = step.get("inputParams");
             if (paramMapping instanceof Map<?, ?> mapping && mapping.containsKey("__loop__")) {
                 result.failStructure("步骤包含循环/动态代码生成标记，平台不支持", stepSeq, "ERR_STEP_LOOP_DETECTED");
+            }
+        }
+        // Execution is strictly sequential. A step may depend only on a prior
+        // business step; a forward/self reference creates an impossible order.
+        for (int i = 0; i < steps.size(); i++) {
+            Map<String, Object> step = steps.get(i);
+            Integer seq = asInteger(step.get("stepSeq"));
+            if (seq == null) seq = i + 1;
+            for (String field : List.of("precondition", "completionCondition")) {
+                Object raw = step.get(field);
+                if (!(raw instanceof String text)) continue;
+                java.util.regex.Matcher references = REFERENCED_PREDECESSOR.matcher(text);
+                while (references.find()) {
+                    Integer predecessor = null;
+                    for (int group = 1; group <= references.groupCount(); group++) {
+                        if (references.group(group) != null) {
+                            predecessor = Integer.parseInt(references.group(group));
+                            break;
+                        }
+                    }
+                    if (predecessor != null && ((!seenStepSeq.contains(predecessor)
+                            && predecessor > completedPrefixCount) || predecessor >= seq)) {
+                        result.failStructure("步骤" + seq + "依赖不存在或尚未完成的步骤" + predecessor,
+                                seq, "ERR_STEP_DEPENDENCY_ORDER");
+                    }
+                }
             }
         }
 

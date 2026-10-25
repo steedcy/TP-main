@@ -11,6 +11,7 @@ import com.airport.ai.common.ErrorCode;
 import com.airport.ai.device.DeviceCapabilityMapper;
 import com.airport.ai.devicetype.dto.ParamDefinition;
 import com.airport.ai.taskdef.TaskDefinitionService;
+import com.airport.ai.task.MotionSafetyGuard;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -134,6 +135,18 @@ public class BaselineTemplateService {
         for (int i = 0; i < steps.size(); i++) {
             TemplateStep step = steps.get(i);
             int stepSeq = i + 1;
+            Map<String, Object> safetyCheck = new LinkedHashMap<>();
+            safetyCheck.put("capabilityType", step.getCapabilityType());
+            safetyCheck.put("completionCondition", step.getCompletionCondition());
+            Map<String, Object> mappedInputs = new LinkedHashMap<>();
+            for (ParamMapping mapping : step.getParamMapping()) {
+                mappedInputs.put(mapping.getTarget(), mapping.getSource());
+            }
+            safetyCheck.put("inputParams", mappedInputs);
+            List<String> safetyHits = MotionSafetyGuard.detect(safetyCheck);
+            if (!safetyHits.isEmpty()) {
+                mappingErrors.add("步骤" + stepSeq + "参数映射含运动安全控制字段: " + safetyHits);
+            }
             for (ParamMapping mapping : step.getParamMapping()) {
                 String source = mapping.getSource();
                 if (source.startsWith("TEMPLATE_INPUT.")) {

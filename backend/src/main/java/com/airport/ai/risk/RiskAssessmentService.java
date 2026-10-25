@@ -59,7 +59,7 @@ public class RiskAssessmentService {
      *                             普通空间引导场景即便步骤含CAP_ESCORT也不命中（对应5.4.5业务规则5、TBD-03结论②）
      * @param snapshotGeneratedAt  规划上下文快照生成时间，用于"接近过期"信号判定
      * @param modelCandidateDiverse 规划模型输出的候选差异信号标签（true=差异较大），由外部模型返回，不在本方法内计算
-     * @param minCandidateCount    本次任务申请资源时的最小可用候选设备数量（跨全部步骤取最小值）
+     * @param minCandidateCount    本次任务申请资源时的最小可用候选设备总数（跨全部步骤取最小值）
      */
     public RiskAssessmentResult assess(PlanVersion planVersion, String taskFamily, LocalDateTime snapshotGeneratedAt,
                                         boolean modelCandidateDiverse, int minCandidateCount) {
@@ -81,9 +81,12 @@ public class RiskAssessmentService {
         if (enabledCodes.contains(RULE_CROSS_ZONE) && hitsCrossZone(planVersion)) {
             return highRisk(RULE_CROSS_ZONE, "移动服务机器人跨区域连续服务，命中确定性高风险规则", null, ruleSetVersion);
         }
-        if (enabledCodes.contains(RULE_RESOURCE_CRITICAL) && minCandidateCount < resourceCriticalCandidateThreshold) {
+        // The selected device consumes one candidate. The rule is about spare devices,
+        // so a single online candidate means zero backups, not one.
+        int backupCandidateCount = Math.max(0, minCandidateCount - 1);
+        if (enabledCodes.contains(RULE_RESOURCE_CRITICAL) && backupCandidateCount < resourceCriticalCandidateThreshold) {
             return highRisk(RULE_RESOURCE_CRITICAL,
-                    "可用备用候选设备数量(" + minCandidateCount + ")低于配置阈值(" + resourceCriticalCandidateThreshold + ")，命中确定性高风险规则",
+                    "可用备用候选设备数量(" + backupCandidateCount + ")低于配置阈值(" + resourceCriticalCandidateThreshold + ")，命中确定性高风险规则",
                     null, ruleSetVersion);
         }
 

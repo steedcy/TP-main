@@ -64,7 +64,10 @@ class ReplanningHighRiskDowngradeTest {
         when(context.parseAgents("[]")).thenReturn(List.of());
         when(context.capabilityContext(eq(snapshot), anyList())).thenReturn(List.of());
         when(context.countOnlineCandidates(eq(snapshot), anyString())).thenReturn(1);
+        when(context.countAvailableCandidates(eq(snapshot), anyString(), eq("TEST_FAMILY"))).thenReturn(1);
         when(validation.validate(anyList(), anyList(), isNull(), eq("TEST_FAMILY")))
+                .thenAnswer(invocation -> new PlanValidationResult());
+        when(validation.validate(anyList(), anyList(), isNull(), eq("TEST_FAMILY"), eq(1)))
                 .thenAnswer(invocation -> new PlanValidationResult());
         PlanningResponse response = new PlanningResponse();
         response.setResultCode("0");

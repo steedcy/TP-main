@@ -194,7 +194,8 @@ public class ReplanningService {
 
         List<Map<String, Object>> snapshotAgents = contextSnapshotService.parseAgents(snapshot.getAgents());
         // Completed frozen actions retain their actual results and do not require currently online devices.
-        PlanValidationResult validation = planValidationService.validate(renumberedTail, snapshotAgents, allowedTypes, task.getTaskFamily());
+        PlanValidationResult validation = planValidationService.validate(renumberedTail, snapshotAgents,
+                allowedTypes, task.getTaskFamily(), failedStepSeq - 1);
         planValidationService.requireCoreScenarioCoverage(mergedSteps, task.getTaskFamily(), validation);
         if (mergedSteps.size() > MAX_STEPS) validation.failStructure("最终路径超过五步", null, "ERR_STEP_LIMIT_EXCEEDED");
 
@@ -230,7 +231,7 @@ public class ReplanningService {
 
         // 5.4.5：新版本仍须过监督判定，判高风险则按5.4.6自动基线降级（业务规则9）
         int minCandidateCount = renumberedTail.stream().map(step -> String.valueOf(step.get("capabilityType"))).distinct()
-                .mapToInt(cap -> contextSnapshotService.countOnlineCandidates(snapshot, cap))
+                .mapToInt(cap -> contextSnapshotService.countAvailableCandidates(snapshot, cap, task.getTaskFamily()))
                 .min().orElse(0);
         RiskAssessmentResult riskResult;
         try {

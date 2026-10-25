@@ -18,7 +18,7 @@ public enum ErrorCode {
     FORBIDDEN(2003, "无权限访问", HttpStatus.FORBIDDEN),
     ACCOUNT_INACTIVE(2004, "账号或密码错误", HttpStatus.FORBIDDEN),
     ACCOUNT_LOCKED(2005, "账号或密码错误", HttpStatus.FORBIDDEN),
-    ACCOUNT_JUST_LOCKED(2006, "连续3次密码输入错误，账号已锁定", HttpStatus.FORBIDDEN),
+    ACCOUNT_JUST_LOCKED(2006, "账号或密码错误", HttpStatus.FORBIDDEN),
 
     // 请求参数错误 3xxx
     PARAM_MISSING(3000, "请求参数缺失", HttpStatus.BAD_REQUEST),

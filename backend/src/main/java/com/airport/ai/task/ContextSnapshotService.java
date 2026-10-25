@@ -128,6 +128,21 @@ public class ContextSnapshotService {
         return count;
     }
 
+    /** Count agents that can actually serve this step now, for the spare-resource risk rule. */
+    public int countAvailableCandidates(ContextSnapshot snapshot, String capabilityType, String taskFamily) {
+        int count = 0;
+        for (Map<String, Object> agent : parseAgents(snapshot.getAgents())) {
+            Object caps = agent.get("capabilities");
+            if (caps instanceof List<?> list && list.contains(capabilityType)
+                    && "IDLE".equals(agent.get("workload"))
+                    && CoreScenarioChannelPolicy.matches(taskFamily, capabilityType,
+                    String.valueOf(agent.get("deviceTypeCode")), String.valueOf(agent.get("simulatedDeviceType")))) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     /** Reuse the same persisted snapshot facts for initial planning and replanning. */
     public List<Map<String, Object>> capabilityContext(ContextSnapshot snapshot, List<String> requiredTypes) {
         List<Map<String, Object>> agents = parseAgents(snapshot.getAgents());
