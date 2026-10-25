@@ -17,6 +17,7 @@ ui = read("TC-002-login-ui.json")
 roles = read("TC-003-role-menus.json")
 denials = read("TC-003-valid-denials.json")
 audit = read("TC-003-audit-scope.json")
+validation_order = read("TC-003-validation-order.json")
 assert all(auth["results"].values())
 assert ui["pass"] and len(ui["attempts"]) == 7
 assert lock["initialStates"]["A"] == {"status": "ACTIVE", "failedLoginAttempts": 0}
@@ -31,6 +32,7 @@ assert lock["afterOneMoreWrong"] == {"status": "ACTIVE", "failedLoginAttempts": 
 assert lock["audit"]["rowCount"] >= 6 and lock["audit"]["hasTimeIpResult"]
 assert not lock["audit"]["containsPassword"]
 assert roles["pass"] and denials["pass"] and audit["pass"]
+assert validation_order["reproduced"]
 
 updates = {
     "TC-001.S1": ("P", "空值提示、边界、密文且无明文切换；非法表单不发认证请求", "TC-001-auth.json;TC-001-S1-empty.png;TC-001-S1-boundaries.png", ""),
@@ -41,7 +43,7 @@ updates = {
     "TC-002.S3": ("P", "管理员解锁清零；两次错密后正确登录清零；再错一次不锁；审计无原口令", "TC-002-lockout.json", ""),
     "TC-002.S4": ("NT", "认证服务及数据库故障未实施隔离注入；共享PostgreSQL不可直接停机，需独立故障夹具与恢复证据", "", "NT-S3-001"),
     "TC-003.S1": ("P", "三角色菜单与授权页实测；管理员建账号、配置员连接测试、操作员任务提交均获授权", "TC-003-role-menus.json;TC-002-lockout.json;TC-003-permissions.json", ""),
-    "TC-003.S2": ("P", "七项有效载荷越权写入均403且用户/设备/任务数量不变；授权写入可执行", "TC-003-valid-denials.json;TC-002-lockout.json;TC-003-permissions.json", ""),
+    "TC-003.S2": ("F", "七项有效载荷越权写入均403且数据不变，但无权角色对同一账号写接口提交缺字段体先收到400；不符合未授权请求返回403", "TC-003-valid-denials.json;TC-003-validation-order.json;TC-003-permissions.json", "DEF-S3-001"),
     "TC-003.S3": ("P", "两类非管理员带admin筛选也仅见自身；管理员见多角色、关键操作及越权事件", "TC-003-audit-scope.json", ""),
 }
 
@@ -53,7 +55,7 @@ for row in rows:
     if row["stepId"] not in updates:
         continue
     status, actual, evidence, issue = updates[row["stepId"]]
-    assert row["status"] in {"NOT_RUN", status}
+    assert row["status"] in {"NOT_RUN", status, "P"} if row["stepId"] == "TC-003.S2" else row["status"] in {"NOT_RUN", status}
     row.update(status=status, observedAt="2026-10-25", actual=actual,
                evidence=";".join("acceptance/stage3/evidence/" + item for item in evidence.split(";")) if evidence else "",
                issue=issue)
@@ -69,7 +71,7 @@ for row in rules:
     if row["ruleId"] == "SRS_F001.R03":
         row.update(status="P", verifiedBy="TC-002.S1", evidence="acceptance/stage3/evidence/TC-002-lockout.json")
     elif row["ruleId"] == "SRS_F001.R04":
-        row.update(status="P", verifiedBy="TC-003.S2", evidence="acceptance/stage3/evidence/TC-003-valid-denials.json")
+        row.update(status="F", verifiedBy="TC-003.S2", evidence="acceptance/stage3/evidence/TC-003-validation-order.json", issue="DEF-S3-001")
 with rules_path.open("w", encoding="utf-8-sig", newline="") as target:
     writer = csv.DictWriter(target, fieldnames=rules[0].keys())
     writer.writeheader()
