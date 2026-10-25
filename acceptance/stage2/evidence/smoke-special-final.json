@@ -1,0 +1,509 @@
+{
+  "recordedAt": "2026-10-25T15:42:26.539587+08:00",
+  "case": "GROUP2_SPECIAL_THREE_CHANNELS",
+  "task": {
+    "id": 15,
+    "taskCode": "TASK-20261025-0015",
+    "taskGoal": "为虚构服务编号SP-R08-077安排轮椅协助，从F2_SERVICE_POINT会合并陪同至F2_TEST_GATE，并在智慧航显发布会合提示，由机器人通知现场人员。仅使用虚构服务信息，不记录真实身份。",
+    "taskFamily": "SPECIAL_PASSENGER_SERVICE",
+    "sceneParams": {
+      "serviceId": "SP-R08-077",
+      "assistanceType": "轮椅协助",
+      "originLocation": "F2_SERVICE_POINT",
+      "targetLocation": "F2_TEST_GATE",
+      "notificationType": "BOTH",
+      "repeatCount": 1,
+      "escortMode": "LEAD",
+      "maxDuration": 600,
+      "contentType": "TEXT",
+      "displayDuration": 60,
+      "contentData": "虚构轮椅旅客请在F2_SERVICE_POINT会合并陪同至F2_TEST_GATE"
+    },
+    "goalParsingResult": {
+      "completionCondition": "旅客已到达目标地点",
+      "origin": "F2_SERVICE_POINT",
+      "destination": "F2_TEST_GATE",
+      "originalGoal": "为虚构服务编号SP-R08-077安排轮椅协助，从F2_SERVICE_POINT会合并陪同至F2_TEST_GATE，并在智慧航显发布会合提示，由机器人通知现场人员。仅使用虚构服务信息，不记录真实身份。",
+      "constraints": [
+        "陪同对象为特殊旅客时优先安排陪同服务而非仅空间引导",
+        "全程与现场人员保持通知联动"
+      ]
+    },
+    "status": "COMPLETED",
+    "currentPlanVersionId": 20,
+    "replanUsed": false,
+    "replanningReason": null,
+    "manualTerminateReason": null,
+    "failureReason": null,
+    "missingInfoQuestions": null,
+    "downgradeReason": "监督判定高风险: RULE_ESCORT_SPECIAL_PASSENGER",
+    "isDryRun": false,
+    "createdAt": "2026-10-25T15:42:08.980723",
+    "updatedAt": "2026-10-25T15:42:24.653026",
+    "createdBy": "oprator"
+  },
+  "plans": [
+    {
+      "id": 19,
+      "versionNo": 1,
+      "source": "AUTONOMOUS",
+      "baselineTemplateId": null,
+      "snapshotId": "CTX-20261025-0013",
+      "planSteps": [
+        {
+          "stepSeq": 1,
+          "stepGoal": "智慧航显发布轮椅旅客会合提示信息",
+          "capabilityType": "CAP_INFO_DISPLAY",
+          "inputParams": {
+            "contentType": "TEXT",
+            "contentData": "虚构轮椅旅客请在F2_SERVICE_POINT会合并陪同至F2_TEST_GATE",
+            "displayDuration": 60
+          },
+          "precondition": "智慧航显设备在线且空闲，服务编号SP-R08-077已创建",
+          "completionCondition": "航显设备返回displayStatus为成功，提示内容已发布",
+          "failureHandling": "若航显发布失败，记录告警并继续执行机器人会合任务，由机器人语音补充提示",
+          "stepTimeout": 30
+        },
+        {
+          "stepSeq": 2,
+          "stepGoal": "机器人导航至F2_SERVICE_POINT会合点准备陪同",
+          "capabilityType": "CAP_NAVIGATION",
+          "inputParams": {
+            "targetLocation": "F2_SERVICE_POINT",
+            "routePreference": "BARRIER_FREE"
+          },
+          "precondition": "机器人当前在线空闲，航显提示已发布或发布失败已记录",
+          "completionCondition": "机器人到达F2_SERVICE_POINT，routeGenerated为true",
+          "failureHandling": "若导航失败，尝试切换另一台机器人执行；若均失败则返回1002",
+          "stepTimeout": 120
+        },
+        {
+          "stepSeq": 3,
+          "stepGoal": "机器人通知现场人员轮椅旅客协助需求",
+          "capabilityType": "CAP_NOTIFICATION",
+          "inputParams": {
+            "notificationType": "BOTH",
+            "notificationContent": "虚构轮椅旅客请在F2_SERVICE_POINT会合并陪同至F2_TEST_GATE",
+            "repeatCount": 1
+          },
+          "precondition": "机器人已到达F2_SERVICE_POINT，现场人员需接收协助通知",
+          "completionCondition": "通知状态返回成功，现场人员已收到语音及文字提示",
+          "failureHandling": "通知失败时机器人本地重复播报并上报平台告警",
+          "stepTimeout": 30
+        },
+        {
+          "stepSeq": 4,
+          "stepGoal": "机器人陪同轮椅旅客从会合点前往目标登机口",
+          "capabilityType": "CAP_ESCORT",
+          "inputParams": {
+            "targetLocation": "F2_TEST_GATE",
+            "escortMode": "LEAD",
+            "maxDuration": 600
+          },
+          "precondition": "现场人员已确认协助需求，旅客已在F2_SERVICE_POINT就位",
+          "completionCondition": "旅客到达F2_TEST_GATE，arrivalStatus为ARRIVED或成功状态",
+          "failureHandling": "超时或途中异常则上报平台并请求人工介入",
+          "stepTimeout": 600
+        }
+      ],
+      "structureCheckResult": "PASS",
+      "capabilityCheckResult": "PASS",
+      "constraintCheckResult": "PASS",
+      "validationErrors": [],
+      "riskLevel": "HIGH",
+      "riskReasonCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+      "judgmentBasis": "移动机器人陪同对象为特殊旅客，命中确定性高风险规则",
+      "confidence": 0.92,
+      "ruleSetVersion": "V1.0",
+      "frozenAt": "2026-10-25T15:42:20.166205",
+      "createdAt": "2026-10-25T15:42:20.153846"
+    },
+    {
+      "id": 20,
+      "versionNo": 2,
+      "source": "BASELINE_TEMPLATE",
+      "baselineTemplateId": 2,
+      "snapshotId": "CTX-20261025-0014",
+      "planSteps": [
+        {
+          "stepSeq": 1,
+          "capabilityType": "CAP_INFO_DISPLAY",
+          "paramMapping": [
+            {
+              "target": "contentType",
+              "source": "TEMPLATE_INPUT.contentType"
+            },
+            {
+              "target": "contentData",
+              "source": "TEMPLATE_INPUT.assistanceType"
+            },
+            {
+              "target": "displayDuration",
+              "source": "TEMPLATE_INPUT.displayDuration"
+            }
+          ],
+          "stepTimeout": 60,
+          "completionCondition": "displayStatus=SUCCESS",
+          "stepGoal": "执行CAP_INFO_DISPLAY能力（基线模板步骤）",
+          "precondition": "候选设备在线且空闲",
+          "failureHandling": "重试一次或转人工处理",
+          "inputParams": {}
+        },
+        {
+          "stepSeq": 2,
+          "capabilityType": "CAP_NOTIFICATION",
+          "paramMapping": [
+            {
+              "target": "notificationContent",
+              "source": "TEMPLATE_INPUT.assistanceType"
+            },
+            {
+              "target": "notificationType",
+              "source": "TEMPLATE_INPUT.notificationType"
+            },
+            {
+              "target": "repeatCount",
+              "source": "TEMPLATE_INPUT.repeatCount"
+            }
+          ],
+          "stepTimeout": 60,
+          "completionCondition": "notificationStatus=SUCCESS",
+          "stepGoal": "执行CAP_NOTIFICATION能力（基线模板步骤）",
+          "precondition": "候选设备在线且空闲",
+          "failureHandling": "重试一次或转人工处理",
+          "inputParams": {}
+        },
+        {
+          "stepSeq": 3,
+          "capabilityType": "CAP_ESCORT",
+          "paramMapping": [
+            {
+              "target": "targetLocation",
+              "source": "TEMPLATE_INPUT.targetLocation"
+            },
+            {
+              "target": "escortMode",
+              "source": "TEMPLATE_INPUT.escortMode"
+            },
+            {
+              "target": "maxDuration",
+              "source": "TEMPLATE_INPUT.maxDuration"
+            }
+          ],
+          "stepTimeout": 60,
+          "completionCondition": "arrivalStatus=ARRIVED",
+          "stepGoal": "执行CAP_ESCORT能力（基线模板步骤）",
+          "precondition": "候选设备在线且空闲",
+          "failureHandling": "重试一次或转人工处理",
+          "inputParams": {}
+        }
+      ],
+      "structureCheckResult": "PASS",
+      "capabilityCheckResult": "PASS",
+      "constraintCheckResult": "PASS",
+      "validationErrors": [],
+      "riskLevel": null,
+      "riskReasonCode": null,
+      "judgmentBasis": null,
+      "confidence": null,
+      "ruleSetVersion": null,
+      "frozenAt": "2026-10-25T15:42:20.203081",
+      "createdAt": "2026-10-25T15:42:20.200884"
+    }
+  ],
+  "assignments": [
+    {
+      "id": 36,
+      "stepSeq": 1,
+      "deviceAgentCode": "AGT-0158A712",
+      "commandId": "CMD-20261025154220-F6EECFD5",
+      "stepStatus": "COMPLETED",
+      "retryCount": 0,
+      "executionResult": "SUCCESS",
+      "reasonCode": null,
+      "outputParams": {
+        "errorMessage": "",
+        "actualDuration": 60,
+        "displayStatus": "SUCCESS"
+      },
+      "dispatchedAt": "2026-10-25T15:42:20.279391",
+      "feedbackAt": "2026-10-25T15:42:21.325289",
+      "rejectedAgentIds": []
+    },
+    {
+      "id": 37,
+      "stepSeq": 2,
+      "deviceAgentCode": "AGT-4652EF88",
+      "commandId": "CMD-20261025154221-A60698BE",
+      "stepStatus": "COMPLETED",
+      "retryCount": 0,
+      "executionResult": "SUCCESS",
+      "reasonCode": null,
+      "outputParams": {
+        "notificationStatus": "SUCCESS",
+        "actualRepeatCount": 1
+      },
+      "dispatchedAt": "2026-10-25T15:42:21.377296",
+      "feedbackAt": "2026-10-25T15:42:22.422863",
+      "rejectedAgentIds": []
+    },
+    {
+      "id": 38,
+      "stepSeq": 3,
+      "deviceAgentCode": "AGT-4652EF88",
+      "commandId": "CMD-20261025154222-FD47515E",
+      "stepStatus": "COMPLETED",
+      "retryCount": 0,
+      "executionResult": "SUCCESS",
+      "reasonCode": null,
+      "outputParams": {
+        "arrivalStatus": "ARRIVED",
+        "actualDistance": 85.2,
+        "actualDuration": 420
+      },
+      "dispatchedAt": "2026-10-25T15:42:22.4762",
+      "feedbackAt": "2026-10-25T15:42:24.646365",
+      "rejectedAgentIds": []
+    }
+  ],
+  "channels": [
+    {
+      "capability": "CAP_INFO_DISPLAY",
+      "deviceCode": "SIM_F2_DISPLAY",
+      "status": "COMPLETED",
+      "output": {
+        "errorMessage": "",
+        "actualDuration": 60,
+        "displayStatus": "SUCCESS"
+      }
+    },
+    {
+      "capability": "CAP_NOTIFICATION",
+      "deviceCode": "SIM_F2_ROBOT_B",
+      "status": "COMPLETED",
+      "output": {
+        "notificationStatus": "SUCCESS",
+        "actualRepeatCount": 1
+      }
+    },
+    {
+      "capability": "CAP_ESCORT",
+      "deviceCode": "SIM_F2_ROBOT_B",
+      "status": "COMPLETED",
+      "output": {
+        "arrivalStatus": "ARRIVED",
+        "actualDistance": 85.2,
+        "actualDuration": 420
+      }
+    }
+  ],
+  "events": [
+    {
+      "id": 255,
+      "taskId": 15,
+      "eventType": "GOAL_SUBMITTED",
+      "occurredAt": "2026-10-25T15:42:08.983234",
+      "trigger": "OPERATOR",
+      "reasonCode": null,
+      "detailSummary": "运行操作员oprator提交任务目标: 为虚构服务编号SP-R08-077安排轮椅协助，从F2_SERVICE_POINT会合并陪同至F2_TEST_GATE，并在智慧航显发布会合提示，由机器人通知现场人员。仅使用虚构服务信息，不记录真实身份。"
+    },
+    {
+      "id": 256,
+      "taskId": 15,
+      "eventType": "GOAL_CLARIFIED",
+      "occurredAt": "2026-10-25T15:42:10.424947",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+    },
+    {
+      "id": 257,
+      "taskId": 15,
+      "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+      "occurredAt": "2026-10-25T15:42:10.449361",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "生成规划上下文快照CTX-20261025-0013"
+    },
+    {
+      "id": 258,
+      "taskId": 15,
+      "eventType": "PLAN_GENERATED",
+      "occurredAt": "2026-10-25T15:42:20.156012",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+    },
+    {
+      "id": 259,
+      "taskId": 15,
+      "eventType": "PLAN_VALIDATED",
+      "occurredAt": "2026-10-25T15:42:20.167883",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+    },
+    {
+      "id": 260,
+      "taskId": 15,
+      "eventType": "SUPERVISION_JUDGED",
+      "occurredAt": "2026-10-25T15:42:20.17977",
+      "trigger": "SYSTEM",
+      "reasonCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+      "detailSummary": "监督判定: HIGH，移动机器人陪同对象为特殊旅客，命中确定性高风险规则"
+    },
+    {
+      "id": 261,
+      "taskId": 15,
+      "eventType": "BASELINE_DOWNGRADED",
+      "occurredAt": "2026-10-25T15:42:20.205615",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "已自动切换至基线模板特殊旅客服务标准模板(V1.2)，原因: 监督判定高风险: RULE_ESCORT_SPECIAL_PASSENGER"
+    },
+    {
+      "id": 262,
+      "taskId": 15,
+      "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+      "occurredAt": "2026-10-25T15:42:20.224921",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-0158A712(距离0.0,负载0)，向候选AGT-0158A712发起承接请求"
+    },
+    {
+      "id": 263,
+      "taskId": 15,
+      "eventType": "AGENT_ASSIGNED",
+      "occurredAt": "2026-10-25T15:42:20.274312",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "设备代理AGT-0158A712接受步骤1承接请求"
+    },
+    {
+      "id": 264,
+      "taskId": 15,
+      "eventType": "STEP_DISPATCHED",
+      "occurredAt": "2026-10-25T15:42:20.279391",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "指令CMD-20261025154220-F6EECFD5已下发至设备代理AGT-0158A712，业务意图: 执行CAP_INFO_DISPLAY能力（基线模板步骤）"
+    },
+    {
+      "id": 265,
+      "taskId": 15,
+      "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+      "occurredAt": "2026-10-25T15:42:21.325289",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "指令CMD-20261025154220-F6EECFD5收到设备代理AGT-0158A712执行反馈: SUCCESS"
+    },
+    {
+      "id": 266,
+      "taskId": 15,
+      "eventType": "STEP_COMPLETED",
+      "occurredAt": "2026-10-25T15:42:21.327889",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "步骤1完成条件已满足: displayStatus=SUCCESS"
+    },
+    {
+      "id": 267,
+      "taskId": 15,
+      "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+      "occurredAt": "2026-10-25T15:42:21.334346",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "步骤2候选排序（能力匹配->距离->负载）: AGT-4652EF88(距离0.0,负载0)；AGT-9362B1F4(距离0.0,负载0)，向候选AGT-4652EF88发起承接请求"
+    },
+    {
+      "id": 268,
+      "taskId": 15,
+      "eventType": "AGENT_ASSIGNED",
+      "occurredAt": "2026-10-25T15:42:21.374678",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "设备代理AGT-4652EF88接受步骤2承接请求"
+    },
+    {
+      "id": 269,
+      "taskId": 15,
+      "eventType": "STEP_DISPATCHED",
+      "occurredAt": "2026-10-25T15:42:21.377296",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "指令CMD-20261025154221-A60698BE已下发至设备代理AGT-4652EF88，业务意图: 执行CAP_NOTIFICATION能力（基线模板步骤）"
+    },
+    {
+      "id": 270,
+      "taskId": 15,
+      "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+      "occurredAt": "2026-10-25T15:42:22.422863",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "指令CMD-20261025154221-A60698BE收到设备代理AGT-4652EF88执行反馈: SUCCESS"
+    },
+    {
+      "id": 271,
+      "taskId": 15,
+      "eventType": "STEP_COMPLETED",
+      "occurredAt": "2026-10-25T15:42:22.427966",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "步骤2完成条件已满足: notificationStatus=SUCCESS"
+    },
+    {
+      "id": 272,
+      "taskId": 15,
+      "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+      "occurredAt": "2026-10-25T15:42:22.435682",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "步骤3候选排序（能力匹配->距离->负载）: AGT-4652EF88(距离0.0,负载0)；AGT-9362B1F4(距离0.0,负载0)，向候选AGT-4652EF88发起承接请求"
+    },
+    {
+      "id": 273,
+      "taskId": 15,
+      "eventType": "AGENT_ASSIGNED",
+      "occurredAt": "2026-10-25T15:42:22.474045",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "设备代理AGT-4652EF88接受步骤3承接请求"
+    },
+    {
+      "id": 274,
+      "taskId": 15,
+      "eventType": "STEP_DISPATCHED",
+      "occurredAt": "2026-10-25T15:42:22.478821",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "指令CMD-20261025154222-FD47515E已下发至设备代理AGT-4652EF88，业务意图: 执行CAP_ESCORT能力（基线模板步骤）"
+    },
+    {
+      "id": 275,
+      "taskId": 15,
+      "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+      "occurredAt": "2026-10-25T15:42:24.646365",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "指令CMD-20261025154222-FD47515E收到设备代理AGT-4652EF88执行反馈: SUCCESS"
+    },
+    {
+      "id": 276,
+      "taskId": 15,
+      "eventType": "STEP_COMPLETED",
+      "occurredAt": "2026-10-25T15:42:24.651345",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "步骤3完成条件已满足: arrivalStatus=ARRIVED"
+    },
+    {
+      "id": 277,
+      "taskId": 15,
+      "eventType": "TASK_COMPLETED",
+      "occurredAt": "2026-10-25T15:42:24.653026",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "全部步骤完成条件均已满足，任务完成"
+    }
+  ]
+}

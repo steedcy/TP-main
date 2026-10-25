@@ -1,0 +1,633 @@
+{
+  "recordedAt": "2026-10-25T15:42:08.559800+08:00",
+  "case": "GROUP2_BAGGAGE_BOTH_BRANCHES",
+  "results": [
+    {
+      "task": {
+        "id": 14,
+        "taskCode": "TASK-20261025-0014",
+        "taskGoal": "请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在F2_BAGGAGE_POINT测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。",
+        "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+        "sceneParams": {
+          "baggageId": "R08-OVERSIZE",
+          "baggageLocation": "F2_BAGGAGE_POINT",
+          "length": 80,
+          "width": 55,
+          "height": 35,
+          "weight": 35,
+          "targetLocation": "F2_TEST_GATE",
+          "routePreference": "BARRIER_FREE",
+          "measureMode": "AUTO",
+          "timeout": 30,
+          "alertLevel": "WARNING",
+          "contentType": "TEXT",
+          "displayDuration": 60,
+          "contentData": "虚构超规行李请前往F2_TEST_GATE办理"
+        },
+        "goalParsingResult": {
+          "completionCondition": "行李已完成尺寸重量测量且超规事件（如有）已上报",
+          "origin": "F2_BAGGAGE_POINT",
+          "destination": "F2_TEST_GATE",
+          "originalGoal": "请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在F2_BAGGAGE_POINT测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。",
+          "constraints": [
+            "超规行李处置全程不得引导旅客脱离监控区域",
+            "测量结果超标须触发超规事件上报"
+          ]
+        },
+        "status": "COMPLETED",
+        "currentPlanVersionId": 18,
+        "replanUsed": false,
+        "replanningReason": null,
+        "manualTerminateReason": null,
+        "failureReason": null,
+        "missingInfoQuestions": null,
+        "downgradeReason": "候选计划三类校验未通过，转基线模板降级",
+        "isDryRun": false,
+        "createdAt": "2026-10-25T15:41:50.175418",
+        "updatedAt": "2026-10-25T15:42:08.132835",
+        "createdBy": "oprator"
+      },
+      "plans": [
+        {
+          "id": 17,
+          "versionNo": 1,
+          "source": "AUTONOMOUS",
+          "baselineTemplateId": null,
+          "snapshotId": "CTX-20261025-0011",
+          "planSteps": [
+            {
+              "stepSeq": 1,
+              "stepGoal": "在F2_BAGGAGE_POINT对行李R08-OVERSIZE进行尺寸重量测量",
+              "capabilityType": "CAP_BAGGAGE_MEASURE",
+              "inputParams": {
+                "measureMode": "AUTO",
+                "timeout": 30
+              },
+              "precondition": "行李R08-OVERSIZE已放置于F2_BAGGAGE_POINT测量点，设备SIM_F2_BAGGAGE在线可用",
+              "completionCondition": "测量完成，返回length、width、height、weight、isOversize及measureStatus",
+              "failureHandling": "若测量失败或超时，重试一次AUTO模式；仍失败则切换至MANUAL模式并通知人工介入",
+              "stepTimeout": 35
+            },
+            {
+              "stepSeq": 2,
+              "stepGoal": "根据测量结果判断并上报超规事件",
+              "capabilityType": "CAP_OVERSIZE_ALERT",
+              "inputParams": {
+                "baggageInfo": "{\"baggageId\": \"R08-OVERSIZE\", \"length\": 80, \"width\": 55, \"height\": 35, \"weight\": 35, \"sumDimension\": 170}",
+                "alertLevel": "WARNING"
+              },
+              "precondition": "步骤1测量完成，且isOversize=true或人工确认超规（80+55+35=170>158且35>32，满足超规条件）",
+              "completionCondition": "超规事件上报成功，返回alertId、reportStatus及reportTime",
+              "failureHandling": "若上报失败，记录失败原因并尝试备用设备SIM_F2_BAGGAGE_B重试上报",
+              "stepTimeout": 30
+            },
+            {
+              "stepSeq": 3,
+              "stepGoal": "在智慧航显发布超规行李引导信息",
+              "capabilityType": "CAP_NOTIFICATION",
+              "inputParams": {
+                "notificationType": "TEXT",
+                "notificationContent": "虚构超规行李请前往F2_TEST_GATE办理",
+                "repeatCount": 1
+              },
+              "precondition": "步骤2超规事件上报成功，需通知旅客前往F2_TEST_GATE",
+              "completionCondition": "航显通知发布成功，返回notificationStatus",
+              "failureHandling": "若发布失败，尝试备用机器人设备SIM_F2_ROBOT_B重试通知",
+              "stepTimeout": 30
+            },
+            {
+              "stepSeq": 4,
+              "stepGoal": "机器人引导旅客至F2_TEST_GATE",
+              "capabilityType": "CAP_NAVIGATION",
+              "inputParams": {
+                "targetLocation": "F2_TEST_GATE",
+                "routePreference": "BARRIER_FREE"
+              },
+              "precondition": "步骤3通知已发布，旅客需物理引导至目的地",
+              "completionCondition": "导航路径生成成功，返回routeGenerated=true、estimatedDistance、estimatedDuration及waypointCount",
+              "failureHandling": "若路径生成失败，检查目标点可达性并尝试SHORTEST路径偏好作为备选",
+              "stepTimeout": 30
+            }
+          ],
+          "structureCheckResult": "PASS",
+          "capabilityCheckResult": "FAIL",
+          "constraintCheckResult": "PASS",
+          "validationErrors": [
+            {
+              "errorType": "CAPABILITY",
+              "description": "核心场景计划缺少必需渠道SMART_DISPLAY的能力CAP_INFO_DISPLAY",
+              "stepSeq": null,
+              "reasonCode": "ERR_REQUIRED_CHANNEL_MISSING"
+            }
+          ],
+          "riskLevel": null,
+          "riskReasonCode": null,
+          "judgmentBasis": null,
+          "confidence": 0.92,
+          "ruleSetVersion": null,
+          "frozenAt": null,
+          "createdAt": "2026-10-25T15:42:02.097334"
+        },
+        {
+          "id": 18,
+          "versionNo": 2,
+          "source": "BASELINE_TEMPLATE",
+          "baselineTemplateId": 1,
+          "snapshotId": "CTX-20261025-0012",
+          "planSteps": [
+            {
+              "stepSeq": 1,
+              "capabilityType": "CAP_NAVIGATION",
+              "paramMapping": [
+                {
+                  "target": "targetLocation",
+                  "source": "TEMPLATE_INPUT.baggageLocation"
+                },
+                {
+                  "target": "routePreference",
+                  "source": "TEMPLATE_INPUT.routePreference"
+                }
+              ],
+              "stepTimeout": 60,
+              "completionCondition": "routeGenerated=true",
+              "stepGoal": "执行CAP_NAVIGATION能力（基线模板步骤）",
+              "precondition": "候选设备在线且空闲",
+              "failureHandling": "重试一次或转人工处理",
+              "inputParams": {}
+            },
+            {
+              "stepSeq": 2,
+              "capabilityType": "CAP_BAGGAGE_MEASURE",
+              "paramMapping": [
+                {
+                  "target": "measureMode",
+                  "source": "TEMPLATE_INPUT.measureMode"
+                },
+                {
+                  "target": "timeout",
+                  "source": "TEMPLATE_INPUT.timeout"
+                }
+              ],
+              "stepTimeout": 60,
+              "completionCondition": "measureStatus=SUCCESS",
+              "stepGoal": "执行CAP_BAGGAGE_MEASURE能力（基线模板步骤）",
+              "precondition": "候选设备在线且空闲",
+              "failureHandling": "重试一次或转人工处理",
+              "inputParams": {}
+            },
+            {
+              "stepSeq": 3,
+              "capabilityType": "CAP_OVERSIZE_ALERT",
+              "paramMapping": [
+                {
+                  "target": "baggageInfo",
+                  "source": "STEP2_OUTPUT.baggageInfo"
+                },
+                {
+                  "target": "alertLevel",
+                  "source": "TEMPLATE_INPUT.alertLevel"
+                }
+              ],
+              "stepTimeout": 60,
+              "completionCondition": "reportStatus=SUCCESS",
+              "stepGoal": "执行CAP_OVERSIZE_ALERT能力（基线模板步骤）",
+              "precondition": "候选设备在线且空闲",
+              "failureHandling": "重试一次或转人工处理",
+              "inputParams": {}
+            },
+            {
+              "stepSeq": 4,
+              "capabilityType": "CAP_INFO_DISPLAY",
+              "paramMapping": [
+                {
+                  "target": "contentType",
+                  "source": "TEMPLATE_INPUT.contentType"
+                },
+                {
+                  "target": "contentData",
+                  "source": "TEMPLATE_INPUT.contentData"
+                },
+                {
+                  "target": "displayDuration",
+                  "source": "TEMPLATE_INPUT.displayDuration"
+                }
+              ],
+              "stepTimeout": 60,
+              "completionCondition": "displayStatus=SUCCESS",
+              "stepGoal": "执行CAP_INFO_DISPLAY能力（基线模板步骤）",
+              "precondition": "候选设备在线且空闲",
+              "failureHandling": "重试一次或转人工处理",
+              "inputParams": {}
+            }
+          ],
+          "structureCheckResult": "PASS",
+          "capabilityCheckResult": "PASS",
+          "constraintCheckResult": "PASS",
+          "validationErrors": [],
+          "riskLevel": null,
+          "riskReasonCode": null,
+          "judgmentBasis": null,
+          "confidence": null,
+          "ruleSetVersion": null,
+          "frozenAt": "2026-10-25T15:42:02.244736",
+          "createdAt": "2026-10-25T15:42:02.242076"
+        }
+      ],
+      "assignments": [
+        {
+          "id": 32,
+          "stepSeq": 1,
+          "deviceAgentCode": "AGT-4652EF88",
+          "commandId": "CMD-20261025154202-03A16617",
+          "stepStatus": "COMPLETED",
+          "retryCount": 0,
+          "executionResult": "SUCCESS",
+          "reasonCode": null,
+          "outputParams": {
+            "estimatedDuration": 295,
+            "estimatedDistance": 447.0,
+            "routeGenerated": true,
+            "waypointCount": 12
+          },
+          "dispatchedAt": "2026-10-25T15:42:02.46693",
+          "feedbackAt": "2026-10-25T15:42:04.697664",
+          "rejectedAgentIds": []
+        },
+        {
+          "id": 33,
+          "stepSeq": 2,
+          "deviceAgentCode": "AGT-2CCAF5B5",
+          "commandId": "CMD-20261025154204-4C1EAA18",
+          "stepStatus": "COMPLETED",
+          "retryCount": 0,
+          "executionResult": "SUCCESS",
+          "reasonCode": null,
+          "outputParams": {
+            "measureStatus": "SUCCESS",
+            "weight": 35.0,
+            "length": 80.0,
+            "isOversize": true,
+            "height": 35.0,
+            "width": 55.0,
+            "totalDimensionCm": 170.0,
+            "dimensionThresholdCm": 158,
+            "weightThresholdKg": 32,
+            "thresholdSource": "附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束",
+            "baggageInfo": "{\"measureStatus\":\"SUCCESS\",\"weight\":35.0,\"length\":80.0,\"isOversize\":true,\"height\":35.0,\"width\":55.0,\"totalDimensionCm\":170.0,\"dimensionThresholdCm\":158,\"weightThresholdKg\":32,\"thresholdSource\":\"附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束\"}"
+          },
+          "dispatchedAt": "2026-10-25T15:42:04.784425",
+          "feedbackAt": "2026-10-25T15:42:05.843035",
+          "rejectedAgentIds": []
+        },
+        {
+          "id": 34,
+          "stepSeq": 3,
+          "deviceAgentCode": "AGT-2CCAF5B5",
+          "commandId": "CMD-20261025154205-71577E9A",
+          "stepStatus": "COMPLETED",
+          "retryCount": 0,
+          "executionResult": "SUCCESS",
+          "reasonCode": null,
+          "outputParams": {
+            "reportTime": "2026-10-25T15:42:06.951003200+08:00",
+            "reportStatus": "SUCCESS",
+            "alertId": "ALERT-17955c7a-8e64-489d-8e07-3c462a4801bc"
+          },
+          "dispatchedAt": "2026-10-25T15:42:05.915114",
+          "feedbackAt": "2026-10-25T15:42:06.978415",
+          "rejectedAgentIds": []
+        },
+        {
+          "id": 35,
+          "stepSeq": 4,
+          "deviceAgentCode": "AGT-0158A712",
+          "commandId": "CMD-20261025154206-B5A485E2",
+          "stepStatus": "COMPLETED",
+          "retryCount": 0,
+          "executionResult": "SUCCESS",
+          "reasonCode": null,
+          "outputParams": {
+            "errorMessage": "",
+            "actualDuration": 60,
+            "displayStatus": "SUCCESS"
+          },
+          "dispatchedAt": "2026-10-25T15:42:07.047513",
+          "feedbackAt": "2026-10-25T15:42:08.122646",
+          "rejectedAgentIds": []
+        }
+      ],
+      "actions": [
+        {
+          "capability": "CAP_NAVIGATION",
+          "deviceAgentCode": "AGT-4652EF88",
+          "status": "COMPLETED",
+          "output": {
+            "estimatedDuration": 295,
+            "estimatedDistance": 447.0,
+            "routeGenerated": true,
+            "waypointCount": 12
+          }
+        },
+        {
+          "capability": "CAP_BAGGAGE_MEASURE",
+          "deviceAgentCode": "AGT-2CCAF5B5",
+          "status": "COMPLETED",
+          "output": {
+            "measureStatus": "SUCCESS",
+            "weight": 35.0,
+            "length": 80.0,
+            "isOversize": true,
+            "height": 35.0,
+            "width": 55.0,
+            "totalDimensionCm": 170.0,
+            "dimensionThresholdCm": 158,
+            "weightThresholdKg": 32,
+            "thresholdSource": "附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束",
+            "baggageInfo": "{\"measureStatus\":\"SUCCESS\",\"weight\":35.0,\"length\":80.0,\"isOversize\":true,\"height\":35.0,\"width\":55.0,\"totalDimensionCm\":170.0,\"dimensionThresholdCm\":158,\"weightThresholdKg\":32,\"thresholdSource\":\"附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束\"}"
+          }
+        },
+        {
+          "capability": "CAP_OVERSIZE_ALERT",
+          "deviceAgentCode": "AGT-2CCAF5B5",
+          "status": "COMPLETED",
+          "output": {
+            "reportTime": "2026-10-25T15:42:06.951003200+08:00",
+            "reportStatus": "SUCCESS",
+            "alertId": "ALERT-17955c7a-8e64-489d-8e07-3c462a4801bc"
+          }
+        },
+        {
+          "capability": "CAP_INFO_DISPLAY",
+          "deviceAgentCode": "AGT-0158A712",
+          "status": "COMPLETED",
+          "output": {
+            "errorMessage": "",
+            "actualDuration": 60,
+            "displayStatus": "SUCCESS"
+          }
+        }
+      ],
+      "events": [
+        {
+          "id": 228,
+          "taskId": 14,
+          "eventType": "GOAL_SUBMITTED",
+          "occurredAt": "2026-10-25T15:41:50.199535",
+          "trigger": "OPERATOR",
+          "reasonCode": null,
+          "detailSummary": "运行操作员oprator提交任务目标: 请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在F2_BAGGAGE_POINT测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。"
+        },
+        {
+          "id": 229,
+          "taskId": 14,
+          "eventType": "GOAL_CLARIFIED",
+          "occurredAt": "2026-10-25T15:41:52.714432",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+        },
+        {
+          "id": 230,
+          "taskId": 14,
+          "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+          "occurredAt": "2026-10-25T15:41:52.857411",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "生成规划上下文快照CTX-20261025-0011"
+        },
+        {
+          "id": 231,
+          "taskId": 14,
+          "eventType": "PLAN_GENERATED",
+          "occurredAt": "2026-10-25T15:42:02.118344",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+        },
+        {
+          "id": 232,
+          "taskId": 14,
+          "eventType": "PLAN_VALIDATED",
+          "occurredAt": "2026-10-25T15:42:02.18728",
+          "trigger": "SYSTEM",
+          "reasonCode": "ERR_VALIDATION_FAILED",
+          "detailSummary": "候选计划三类校验未通过: 1项错误"
+        },
+        {
+          "id": 233,
+          "taskId": 14,
+          "eventType": "BASELINE_DOWNGRADED",
+          "occurredAt": "2026-10-25T15:42:02.247023",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "已自动切换至基线模板超规行李处置标准模板(V1.3)，原因: 候选计划三类校验未通过，转基线模板降级"
+        },
+        {
+          "id": 234,
+          "taskId": 14,
+          "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+          "occurredAt": "2026-10-25T15:42:02.290123",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-4652EF88(距离0.0,负载0)；AGT-9362B1F4(距离0.0,负载0)，向候选AGT-4652EF88发起承接请求"
+        },
+        {
+          "id": 235,
+          "taskId": 14,
+          "eventType": "AGENT_ASSIGNED",
+          "occurredAt": "2026-10-25T15:42:02.449076",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "设备代理AGT-4652EF88接受步骤1承接请求"
+        },
+        {
+          "id": 236,
+          "taskId": 14,
+          "eventType": "STEP_DISPATCHED",
+          "occurredAt": "2026-10-25T15:42:02.469496",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "指令CMD-20261025154202-03A16617已下发至设备代理AGT-4652EF88，业务意图: 执行CAP_NAVIGATION能力（基线模板步骤）"
+        },
+        {
+          "id": 237,
+          "taskId": 14,
+          "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+          "occurredAt": "2026-10-25T15:42:04.697664",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "指令CMD-20261025154202-03A16617收到设备代理AGT-4652EF88执行反馈: SUCCESS"
+        },
+        {
+          "id": 238,
+          "taskId": 14,
+          "eventType": "STEP_COMPLETED",
+          "occurredAt": "2026-10-25T15:42:04.711736",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "步骤1完成条件已满足: routeGenerated=true"
+        },
+        {
+          "id": 239,
+          "taskId": 14,
+          "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+          "occurredAt": "2026-10-25T15:42:04.727303",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "步骤2候选排序（能力匹配->距离->负载）: AGT-2CCAF5B5(距离0.0,负载0)；AGT-4B552506(距离0.0,负载0)，向候选AGT-2CCAF5B5发起承接请求"
+        },
+        {
+          "id": 240,
+          "taskId": 14,
+          "eventType": "AGENT_ASSIGNED",
+          "occurredAt": "2026-10-25T15:42:04.779377",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "设备代理AGT-2CCAF5B5接受步骤2承接请求"
+        },
+        {
+          "id": 241,
+          "taskId": 14,
+          "eventType": "STEP_DISPATCHED",
+          "occurredAt": "2026-10-25T15:42:04.787004",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "指令CMD-20261025154204-4C1EAA18已下发至设备代理AGT-2CCAF5B5，业务意图: 执行CAP_BAGGAGE_MEASURE能力（基线模板步骤）"
+        },
+        {
+          "id": 242,
+          "taskId": 14,
+          "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+          "occurredAt": "2026-10-25T15:42:05.843035",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "指令CMD-20261025154204-4C1EAA18收到设备代理AGT-2CCAF5B5执行反馈: SUCCESS"
+        },
+        {
+          "id": 243,
+          "taskId": 14,
+          "eventType": "STEP_COMPLETED",
+          "occurredAt": "2026-10-25T15:42:05.849815",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "步骤2完成条件已满足: measureStatus=SUCCESS"
+        },
+        {
+          "id": 244,
+          "taskId": 14,
+          "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+          "occurredAt": "2026-10-25T15:42:05.862222",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "步骤3候选排序（能力匹配->距离->负载）: AGT-2CCAF5B5(距离0.0,负载0)；AGT-4B552506(距离0.0,负载0)，向候选AGT-2CCAF5B5发起承接请求"
+        },
+        {
+          "id": 245,
+          "taskId": 14,
+          "eventType": "AGENT_ASSIGNED",
+          "occurredAt": "2026-10-25T15:42:05.912748",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "设备代理AGT-2CCAF5B5接受步骤3承接请求"
+        },
+        {
+          "id": 246,
+          "taskId": 14,
+          "eventType": "STEP_DISPATCHED",
+          "occurredAt": "2026-10-25T15:42:05.917329",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "指令CMD-20261025154205-71577E9A已下发至设备代理AGT-2CCAF5B5，业务意图: 执行CAP_OVERSIZE_ALERT能力（基线模板步骤）"
+        },
+        {
+          "id": 247,
+          "taskId": 14,
+          "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+          "occurredAt": "2026-10-25T15:42:06.978415",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "指令CMD-20261025154205-71577E9A收到设备代理AGT-2CCAF5B5执行反馈: SUCCESS"
+        },
+        {
+          "id": 248,
+          "taskId": 14,
+          "eventType": "STEP_COMPLETED",
+          "occurredAt": "2026-10-25T15:42:06.983568",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "步骤3完成条件已满足: reportStatus=SUCCESS"
+        },
+        {
+          "id": 249,
+          "taskId": 14,
+          "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+          "occurredAt": "2026-10-25T15:42:06.996166",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "步骤4候选排序（能力匹配->距离->负载）: AGT-0158A712(距离0.0,负载0)，向候选AGT-0158A712发起承接请求"
+        },
+        {
+          "id": 250,
+          "taskId": 14,
+          "eventType": "AGENT_ASSIGNED",
+          "occurredAt": "2026-10-25T15:42:07.042535",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "设备代理AGT-0158A712接受步骤4承接请求"
+        },
+        {
+          "id": 251,
+          "taskId": 14,
+          "eventType": "STEP_DISPATCHED",
+          "occurredAt": "2026-10-25T15:42:07.047513",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "指令CMD-20261025154206-B5A485E2已下发至设备代理AGT-0158A712，业务意图: 执行CAP_INFO_DISPLAY能力（基线模板步骤）"
+        },
+        {
+          "id": 252,
+          "taskId": 14,
+          "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+          "occurredAt": "2026-10-25T15:42:08.122646",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "指令CMD-20261025154206-B5A485E2收到设备代理AGT-0158A712执行反馈: SUCCESS"
+        },
+        {
+          "id": 253,
+          "taskId": 14,
+          "eventType": "STEP_COMPLETED",
+          "occurredAt": "2026-10-25T15:42:08.130349",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "步骤4完成条件已满足: displayStatus=SUCCESS"
+        },
+        {
+          "id": 254,
+          "taskId": 14,
+          "eventType": "TASK_COMPLETED",
+          "occurredAt": "2026-10-25T15:42:08.132835",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "全部步骤完成条件均已满足，任务完成"
+        }
+      ],
+      "sample": [
+        {
+          "height": 35.0,
+          "length": 80.0,
+          "sample": "OVERSIZE",
+          "width": 55.0,
+          "weight": 35.0
+        },
+        {
+          "length": 80.0,
+          "sample": "OVERSIZE",
+          "width": 55.0,
+          "weight": 35.0,
+          "height": 35.0
+        }
+      ]
+    }
+  ]
+}

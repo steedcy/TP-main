@@ -1,0 +1,264 @@
+{
+  "recordedAt": "2026-10-25T15:33:36.627326+08:00",
+  "case": "GROUP2_SPECIAL_THREE_CHANNELS",
+  "task": {
+    "id": 8,
+    "taskCode": "TASK-20261025-0008",
+    "taskGoal": "为虚构服务编号SP-R08-077安排轮椅协助，从F2_SERVICE_POINT会合并陪同至F2_TEST_GATE，并在智慧航显发布会合提示，由机器人通知现场人员。仅使用虚构服务信息，不记录真实身份。",
+    "taskFamily": "SPECIAL_PASSENGER_SERVICE",
+    "sceneParams": {
+      "serviceId": "SP-R08-077",
+      "assistanceType": "轮椅协助",
+      "originLocation": "F2_SERVICE_POINT",
+      "targetLocation": "F2_TEST_GATE",
+      "notificationType": "BOTH",
+      "repeatCount": 1,
+      "escortMode": "LEAD",
+      "maxDuration": 600,
+      "contentType": "TEXT",
+      "displayDuration": 60,
+      "contentData": "虚构轮椅旅客请在F2_SERVICE_POINT会合并陪同至F2_TEST_GATE"
+    },
+    "goalParsingResult": {
+      "completionCondition": "旅客已到达目标地点",
+      "origin": "F2_SERVICE_POINT",
+      "destination": "F2_TEST_GATE",
+      "originalGoal": "为虚构服务编号SP-R08-077安排轮椅协助，从F2_SERVICE_POINT会合并陪同至F2_TEST_GATE，并在智慧航显发布会合提示，由机器人通知现场人员。仅使用虚构服务信息，不记录真实身份。",
+      "constraints": [
+        "陪同对象为特殊旅客时优先安排陪同服务而非仅空间引导",
+        "全程与现场人员保持通知联动"
+      ]
+    },
+    "status": "PENDING_MANUAL",
+    "currentPlanVersionId": 8,
+    "replanUsed": false,
+    "replanningReason": null,
+    "manualTerminateReason": null,
+    "failureReason": "监督判定高风险: RULE_ESCORT_SPECIAL_PASSENGER；所选基线模板校验失败",
+    "missingInfoQuestions": null,
+    "downgradeReason": null,
+    "isDryRun": false,
+    "createdAt": "2026-10-25T15:33:23.553284",
+    "updatedAt": "2026-10-25T15:33:34.516073",
+    "createdBy": "oprator"
+  },
+  "plans": [
+    {
+      "id": 8,
+      "versionNo": 1,
+      "source": "AUTONOMOUS",
+      "baselineTemplateId": null,
+      "snapshotId": "CTX-20261025-0003",
+      "planSteps": [
+        {
+          "stepSeq": 1,
+          "stepGoal": "在智慧航显发布虚构轮椅旅客会合提示信息",
+          "capabilityType": "CAP_INFO_DISPLAY",
+          "inputParams": {
+            "contentType": "TEXT",
+            "contentData": "虚构轮椅旅客请在F2_SERVICE_POINT会合并陪同至F2_TEST_GATE",
+            "displayDuration": 60
+          },
+          "precondition": "智慧航显设备在线且空闲，服务信息已准备就绪",
+          "completionCondition": "航显成功发布提示信息，返回displayStatus为成功状态",
+          "failureHandling": "如航显发布失败，尝试备用智慧航显设备或通知现场人员手动协助",
+          "stepTimeout": 30
+        },
+        {
+          "stepSeq": 2,
+          "stepGoal": "机器人前往F2_SERVICE_POINT会合点准备陪同",
+          "capabilityType": "CAP_NAVIGATION",
+          "inputParams": {
+            "targetLocation": "F2_SERVICE_POINT",
+            "routePreference": "BARRIER_FREE"
+          },
+          "precondition": "步骤1航显提示已发布，机器人已在线且空闲",
+          "completionCondition": "机器人成功到达F2_SERVICE_POINT，routeGenerated为true",
+          "failureHandling": "导航失败时重新规划无障碍路径或切换备用机器人",
+          "stepTimeout": 120
+        },
+        {
+          "stepSeq": 3,
+          "stepGoal": "机器人从F2_SERVICE_POINT陪同旅客至F2_TEST_GATE",
+          "capabilityType": "CAP_ESCORT",
+          "inputParams": {
+            "targetLocation": "F2_TEST_GATE",
+            "escortMode": "LEAD",
+            "maxDuration": 600
+          },
+          "precondition": "步骤2机器人已到达F2_SERVICE_POINT，旅客已会合",
+          "completionCondition": "旅客已到达F2_TEST_GATE，arrivalStatus为成功状态",
+          "failureHandling": "超时或路径异常时通知现场人员介入协助",
+          "stepTimeout": 600
+        },
+        {
+          "stepSeq": 4,
+          "stepGoal": "机器人通知现场人员轮椅旅客已到达目标地点",
+          "capabilityType": "CAP_NOTIFICATION",
+          "inputParams": {
+            "notificationType": "BOTH",
+            "notificationContent": "虚构服务编号SP-R08-077轮椅旅客已到达F2_TEST_GATE，请现场服务人员接应",
+            "repeatCount": 1
+          },
+          "precondition": "步骤3陪同完成，旅客已到达F2_TEST_GATE",
+          "completionCondition": "通知成功发送，notificationStatus为成功状态",
+          "failureHandling": "通知失败时尝试重复发送或切换备用通知设备",
+          "stepTimeout": 30
+        }
+      ],
+      "structureCheckResult": "PASS",
+      "capabilityCheckResult": "PASS",
+      "constraintCheckResult": "PASS",
+      "validationErrors": [],
+      "riskLevel": "HIGH",
+      "riskReasonCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+      "judgmentBasis": "移动机器人陪同对象为特殊旅客，命中确定性高风险规则",
+      "confidence": 0.92,
+      "ruleSetVersion": "V1.0",
+      "frozenAt": "2026-10-25T15:33:34.493267",
+      "createdAt": "2026-10-25T15:33:34.483025"
+    },
+    {
+      "id": 9,
+      "versionNo": 2,
+      "source": "BASELINE_TEMPLATE",
+      "baselineTemplateId": 2,
+      "snapshotId": "CTX-20261025-0004",
+      "planSteps": [
+        {
+          "stepSeq": 1,
+          "capabilityType": "CAP_NOTIFICATION",
+          "paramMapping": [
+            {
+              "target": "notificationContent",
+              "source": "TEMPLATE_INPUT.assistanceType"
+            },
+            {
+              "target": "notificationType",
+              "source": "TEMPLATE_INPUT.notificationType"
+            },
+            {
+              "target": "repeatCount",
+              "source": "TEMPLATE_INPUT.repeatCount"
+            }
+          ],
+          "stepTimeout": 60,
+          "completionCondition": "notificationStatus=SUCCESS",
+          "stepGoal": "执行CAP_NOTIFICATION能力（基线模板步骤）",
+          "precondition": "候选设备在线且空闲",
+          "failureHandling": "重试一次或转人工处理",
+          "inputParams": {}
+        },
+        {
+          "stepSeq": 2,
+          "capabilityType": "CAP_ESCORT",
+          "paramMapping": [
+            {
+              "target": "targetLocation",
+              "source": "TEMPLATE_INPUT.targetLocation"
+            },
+            {
+              "target": "escortMode",
+              "source": "TEMPLATE_INPUT.escortMode"
+            },
+            {
+              "target": "maxDuration",
+              "source": "TEMPLATE_INPUT.maxDuration"
+            }
+          ],
+          "stepTimeout": 60,
+          "completionCondition": "arrivalStatus=ARRIVED",
+          "stepGoal": "执行CAP_ESCORT能力（基线模板步骤）",
+          "precondition": "候选设备在线且空闲",
+          "failureHandling": "重试一次或转人工处理",
+          "inputParams": {}
+        }
+      ],
+      "structureCheckResult": "PASS",
+      "capabilityCheckResult": "FAIL",
+      "constraintCheckResult": "PASS",
+      "validationErrors": [
+        {
+          "errorType": "CAPABILITY",
+          "description": "核心场景计划缺少必需渠道SMART_DISPLAY的能力CAP_INFO_DISPLAY",
+          "stepSeq": null,
+          "reasonCode": "ERR_REQUIRED_CHANNEL_MISSING"
+        }
+      ],
+      "riskLevel": null,
+      "riskReasonCode": null,
+      "judgmentBasis": null,
+      "confidence": null,
+      "ruleSetVersion": null,
+      "frozenAt": null,
+      "createdAt": "2026-10-25T15:33:34.513518"
+    }
+  ],
+  "assignments": [],
+  "channels": [],
+  "events": [
+    {
+      "id": 116,
+      "taskId": 8,
+      "eventType": "GOAL_SUBMITTED",
+      "occurredAt": "2026-10-25T15:33:23.555808",
+      "trigger": "OPERATOR",
+      "reasonCode": null,
+      "detailSummary": "运行操作员oprator提交任务目标: 为虚构服务编号SP-R08-077安排轮椅协助，从F2_SERVICE_POINT会合并陪同至F2_TEST_GATE，并在智慧航显发布会合提示，由机器人通知现场人员。仅使用虚构服务信息，不记录真实身份。"
+    },
+    {
+      "id": 117,
+      "taskId": 8,
+      "eventType": "GOAL_CLARIFIED",
+      "occurredAt": "2026-10-25T15:33:25.262854",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+    },
+    {
+      "id": 118,
+      "taskId": 8,
+      "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+      "occurredAt": "2026-10-25T15:33:25.275539",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "生成规划上下文快照CTX-20261025-0003"
+    },
+    {
+      "id": 119,
+      "taskId": 8,
+      "eventType": "PLAN_GENERATED",
+      "occurredAt": "2026-10-25T15:33:34.48562",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+    },
+    {
+      "id": 120,
+      "taskId": 8,
+      "eventType": "PLAN_VALIDATED",
+      "occurredAt": "2026-10-25T15:33:34.493267",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+    },
+    {
+      "id": 121,
+      "taskId": 8,
+      "eventType": "SUPERVISION_JUDGED",
+      "occurredAt": "2026-10-25T15:33:34.500884",
+      "trigger": "SYSTEM",
+      "reasonCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+      "detailSummary": "监督判定: HIGH，移动机器人陪同对象为特殊旅客，命中确定性高风险规则"
+    },
+    {
+      "id": 122,
+      "taskId": 8,
+      "eventType": "BASELINE_DOWNGRADED",
+      "occurredAt": "2026-10-25T15:33:34.516073",
+      "trigger": "SYSTEM",
+      "reasonCode": "ERR_TEMPLATE_VALIDATION_FAILED",
+      "detailSummary": "所选基线模板特殊旅客服务标准模板三类校验未通过"
+    }
+  ]
+}

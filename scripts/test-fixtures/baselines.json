@@ -32,6 +32,24 @@
         "type": "String",
         "required": true,
         "defaultValue": "WARNING"
+    },
+    {
+      "name": "contentType",
+      "type": "String",
+      "required": true,
+      "defaultValue": "TEXT"
+    },
+    {
+      "name": "contentData",
+      "type": "String",
+      "required": true,
+      "defaultValue": "虚构超规行李请前往F2测试服务点办理"
+    },
+    {
+      "name": "displayDuration",
+      "type": "Integer",
+      "required": true,
+      "defaultValue": "60"
       }
     ],
     "steps": [
@@ -79,12 +97,23 @@
         ],
         "stepTimeout": 60,
         "completionCondition": "reportStatus=SUCCESS"
+    },
+    {
+      "capabilityType": "CAP_INFO_DISPLAY",
+      "paramMapping": [
+        {"target": "contentType", "source": "TEMPLATE_INPUT.contentType"},
+        {"target": "contentData", "source": "TEMPLATE_INPUT.contentData"},
+        {"target": "displayDuration", "source": "TEMPLATE_INPUT.displayDuration"}
+      ],
+      "stepTimeout": 60,
+      "completionCondition": "displayStatus=SUCCESS"
       }
     ],
     "devices": [
       "SIM_F2_ROBOT",
       "SIM_F2_BAGGAGE",
-      "SIM_F2_BAGGAGE"
+    "SIM_F2_BAGGAGE",
+    "SIM_F2_DISPLAY"
     ]
   },
   {
@@ -127,9 +156,31 @@
         "required": true,
         "defaultValue": "600",
         "range": "60~1800"
+    },
+    {
+      "name": "contentType",
+      "type": "String",
+      "required": true,
+      "defaultValue": "TEXT"
+    },
+    {
+      "name": "displayDuration",
+      "type": "Integer",
+      "required": true,
+      "defaultValue": "60"
       }
     ],
     "steps": [
+    {
+      "capabilityType": "CAP_INFO_DISPLAY",
+      "paramMapping": [
+        {"target": "contentType", "source": "TEMPLATE_INPUT.contentType"},
+        {"target": "contentData", "source": "TEMPLATE_INPUT.assistanceType"},
+        {"target": "displayDuration", "source": "TEMPLATE_INPUT.displayDuration"}
+      ],
+      "stepTimeout": 60,
+      "completionCondition": "displayStatus=SUCCESS"
+    },
       {
         "capabilityType": "CAP_NOTIFICATION",
         "paramMapping": [
@@ -170,6 +221,7 @@
       }
     ],
     "devices": [
+    "SIM_F2_DISPLAY",
       "SIM_F2_ROBOT",
       "SIM_F2_ROBOT"
     ]

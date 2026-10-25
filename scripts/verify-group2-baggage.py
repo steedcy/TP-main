@@ -3,6 +3,7 @@ import importlib.util
 import json
 import pathlib
 import time
+import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("localenv", ROOT / "scripts/local-test-environment.py")
@@ -18,11 +19,12 @@ def sample(name):
 
 def run(name, dimensions, weight):
     length, width, height = dimensions
-    goal = (f"请为虚构行李R08-{name}在F2_BAGGAGE_POINT测量，尺寸为{length}×{width}×{height}厘米、"
-            f"重量{weight}千克；若超规，请在智慧航显提示并由机器人引导至F2_TEST_GATE。只保留虚构编号与测量结果。")
+    goal = (f"请为虚构旅客P-R08-{name}的行李R08-{name}在F2_BAGGAGE_POINT测量，尺寸为{length}×{width}×{height}厘米、"
+            f"重量{weight}千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；"
+            "超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。")
     scene = {"baggageId": f"R08-{name}", "baggageLocation": "F2_BAGGAGE_POINT",
              "length": length, "width": width, "height": height, "weight": weight,
-             "targetLocation": "F2_TEST_GATE", "counterLocation": "F2_TEST_COUNTER",
+             "targetLocation": "F2_TEST_GATE",
              "routePreference": "BARRIER_FREE", "measureMode": "AUTO", "timeout": 30,
              "alertLevel": "WARNING", "contentType": "TEXT", "displayDuration": 60,
              "contentData": "虚构超规行李请前往F2_TEST_GATE办理"}
@@ -33,8 +35,9 @@ def run(name, dimensions, weight):
     while time.monotonic() < deadline:
         questions = task.get("missingInfoQuestions") or []
         if task["status"] == "PLANNING" and questions and rounds < 3:
-            answer = (f"虚构行李R08-{name}位于F2_BAGGAGE_POINT，尺寸{length}×{width}×{height}厘米、"
-                      f"重量{weight}千克；如超规请前往F2_TEST_GATE和虚构柜台F2_TEST_COUNTER。")
+            answer = (f"虚构旅客P-R08-{name}与行李R08-{name}均位于F2_BAGGAGE_POINT；尺寸{length}×{width}×{height}厘米、"
+                      f"重量{weight}千克。按附录F，长宽高之和超过158厘米或重量超过32千克为超规；"
+                      "自动测量无需人工复核，唯一目的地F2_TEST_GATE。")
             task = api(f"/tasks/{task_id}/clarify", "POST", {"answers": {q: answer for q in questions}})
             rounds += 1
             continue
@@ -52,8 +55,11 @@ def run(name, dimensions, weight):
             "events": api(f"/tasks/{task_id}/events")}
 
 results = []
+samples = (("NORMAL", (55, 40, 20), 10), ("OVERSIZE", (80, 55, 35), 35))
+if "--oversize-only" in sys.argv:
+    samples = samples[1:]
 try:
-    for name, dimensions, weight in (("NORMAL", (55, 40, 20), 10), ("OVERSIZE", (80, 55, 35), 35)):
+    for name, dimensions, weight in samples:
         fixture = sample(name)
         result = run(name, dimensions, weight)
         result["sample"] = fixture
@@ -63,7 +69,7 @@ finally:
 
 destination = env.EVIDENCE / ("20261024-group2-baggage-" + time.strftime("%H%M%S") + ".json")
 env.save(destination, {"recordedAt": env.stamp(), "case": "GROUP2_BAGGAGE_BOTH_BRANCHES", "results": results})
-for result, expected in zip(results, (False, True)):
+for result, expected in zip(results, (False, True) if len(samples) == 2 else (True,)):
     task = result["task"]
     measure = next((a for a in result["actions"] if a["capability"] == "CAP_BAGGAGE_MEASURE"), None)
     assert task["status"] == "COMPLETED", f"task {task['id']} ended {task['status']}"
