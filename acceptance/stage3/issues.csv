@@ -1,4 +1,4 @@
-编号,类型,级别,关联用例步骤,关联需求规则,状态,事实,证据,阶段4动作
+﻿编号,类型,级别,关联用例步骤,关联需求规则,状态,事实,证据,阶段4动作
 DEF-S3-001,缺陷,中,TC-003.S2,SRS_F001.R04,待修复,无权操作员对POST /api/v1/users提交缺字段体返回400而有效体返回403；均未创建账号；原步骤要求未授权请求返回403,acceptance/stage3/evidence/TC-003-validation-order.json,使权限校验先于请求体校验并完整复测TC-003与邻接用例
 NT-S3-001,前置缺口,待定,TC-002.S4,SRS_F001,待补夹具,尚无独立认证服务和数据库故障注入夹具；未对共享PostgreSQL停机,acceptance/stage3/steps.csv,在隔离环境注入两类故障并核对统一提示和恢复
 DEF-S3-002,缺陷,中,TC-004.S2,SRS_F002.R02,待修复,正式COMPLETED为6且试运行COMPLETED为6；总览九状态的COMPLETED显示12,acceptance/stage3/evidence/TC-004-overview-api.json,统计排除试运行任务并复测九状态和跳转
@@ -10,3 +10,11 @@ NT-S3-005,前置缺口,待定,TC-072.S2,SRS_F024.R04,待补分支,任务19完成
 DEF-S3-004,缺陷,高,TC-077.S1～S3、AC-020,SRS_F025.R01,待修复,任务22有轮椅协助预置起终点及虚构服务编号；模型三轮要求任务定义外字段和身份确认后转人工,acceptance/stage3/evidence/TC-077-special-202424.json,校正必要信息判定和任务定义联动；完整重测陪同与资源缺口
 DEF-S3-005,缺陷,高,TC-080.S2、TC-081.S1～S3、AC-021、AC-022,SRS_F026.R04,待修复,任务24已有航班号时间登机口变更内容但三轮要求机器人ID与路线编码；无三渠道计划/结果,acceptance/stage3/evidence/TC-080-081-flight-202550.json,仅按基线条件必填补充；不要求操作员指定物理设备/路线；复测四类事件和三渠道
 NT-S3-006,前置缺口,待定,TC-080.S1,SRS_F026.R01,待补分支,本轮只执行结构化登机口变更；延误提前取消及仿真事件触发和页面字段边界未执行,acceptance/stage3/evidence/TC-080-081-flight-202500.json,补四类事件双触发及字段边界
+DEF-S3-006,缺陷,中,TC-063.S1,SRS_F020.R06,待修复,任务列表没有目标关键字筛选，默认时间范围为空；仅状态、任务族、任务号筛选可用,acceptance/stage3/evidence/TC-063-task-search.json,补目标关键字与默认今日，重测列表及总览跳转
+DEF-S3-007,缺陷,中,TC-063.S3,SRS_F020,待修复,不存在详情的 API 返回404，但浏览器停在缺失记录路由，未提示并返回列表,acceptance/stage3/evidence/TC-063-task-search.json;acceptance/stage3/evidence/TC-063-S3-missing.png,处理404/归档详情回退，重测403审计
+DEF-S3-008,缺陷,中,TC-084.S1,SRS_F027.R01,待修复,追溯页计划版本展开仅列三类校验结果，未显示各版本步骤明细,acceptance/stage3/evidence/TC-084-trace.json;acceptance/stage3/evidence/TC-084-trace-plan.png,渲染并核对每版步骤、来源和冻结时间
+NT-S3-007,前置缺口,待定,TC-084.S3,SRS_F027,待补夹具,空态已见；缺事件区段的任务夹具尚未准备,acceptance/stage3/evidence/TC-084-trace.json,准备缺事件任务并核对提示和无伪造
+DEF-S3-009,缺陷,中,TC-085.S1,SRS_F028.R03,待修复,12条账号状态变更日志详情为空，未提供变更前后关键字段摘要,acceptance/stage3/evidence/TC-085-operation-log.json;acceptance/stage3/evidence/TC-085-audit-detail.png,写入脱敏变更摘要并复测详情和关联任务
+NT-S3-008,前置缺口,待定,TC-085.S2,SRS_F028,待补样本,角色范围、空态、只读已抽查；敏感字段和全部记录范围未穷尽,acceptance/stage3/evidence/TC-085-operation-log.json,补多类型敏感日志和角色样本，核对掩码
+DEF-S3-010,缺陷,中,TC-086.S1,SRS_NF001,待修复,管理员GET /users响应包含passwordHash；虽未暴露原始密码，密码摘要不应发给前端,acceptance/stage3/evidence/TC-086-sensitive.json,用户列表和创建响应改为无凭据视图；复测授权与页面显示
+NT-S3-009,前置缺口,待定,TC-086.S2,SRS_NF001.R01,待补分支,本轮仅检查隔离库字段、用户/设备列表和145条审计详情；失败、配置变更与追溯页面分支未穷尽,acceptance/stage3/evidence/TC-086-sensitive.json,补异常与变更分支及页面敏感信息检查
