@@ -1,4 +1,4 @@
-﻿stepId,caseId,action,expected,status,observedAt,actual,evidence,issue
+stepId,caseId,action,expected,status,observedAt,actual,evidence,issue
 TC-001.S1,TC-001,打开登录页；检查空账号、空密码、长度边界及超界，再用合法账号密码登录。,账号、密码默认空且必填；空账号提示“请输入账号”，空值拦截且不发认证请求；账号1～32位、密码8～32位；密码密文、不回显、无明文切换。,P,2026-10-25,空值提示、边界、密文且无明文切换；非法表单不发认证请求,acceptance/stage3/evidence/TC-001-auth.json;acceptance/stage3/evidence/TC-001-S1-empty.png;acceptance/stage3/evidence/TC-001-S1-boundaries.png,
 TC-001.S2,TC-001,三类角色分别登录，查看默认页面、右上角用户及角色，再退出并继续操作。,建立会话并加载相应预置权限，进入运行总览；显示当前账号和角色。退出销毁会话并返回登录页，原会话不能继续操作。,P,2026-10-25,三角色登录进入总览；退出后旧令牌401且受保护页跳转登录,acceptance/stage3/evidence/TC-001-auth.json;acceptance/stage3/evidence/TC-001-S2-admin.png;acceptance/stage3/evidence/TC-001-S2-oprator.png;acceptance/stage3/evidence/TC-001-S2-set.png,
 TC-001.S3,TC-001,核对登录和退出记录。,含账号、时间、来源IP、结果；无密码原值。,P,2026-10-25,本轮登录/退出审计有账号、时间、IP、结果，未含口令原值,acceptance/stage3/evidence/TC-001-auth.json,
@@ -74,7 +74,7 @@ TC-029.S1,TC-029,尝试未静态通过模板试运行，或输入缺必填、设
 TC-029.S2,TC-029,分别让某步执行失败或超时，再尝试启用未试运行及失败版本。,试运行终止，保存失败步骤和原因，显示总体/步骤结果和耗时，模板保持草稿；未试运行/失败版本拒绝启用。,P,2026-10-26,模拟设备FAILED/TIMEOUT使任务30/31失败，各保存步骤原因和1秒耗时，模板保持DRAFT且两次启用均400；未试运行草稿启用亦400,acceptance/stage3/evidence/TC-029-baseline-dryrun-guards.json;acceptance/stage3/evidence/TC-029-baseline-dryrun-failures.json,
 TC-030.S1,TC-030,发起试运行，在执行中由配置管理员中止。,请求设备结束当前业务任务，记录中止事件；使用五步和运动安全边界约束。,NT,2026-10-26,任务29在EXECUTING且STEP_DISPATCHED后管理员取消返回CANCELLED，TASK_CANCEL已下发并有中止事件；五步和运动安全边界在该中止路径未独立挑战,acceptance/stage3/evidence/TC-030-baseline-dryrun-cancel.json,NT-S3-022
 TC-030.S2,TC-030,修改已通过版本形成新版本，尝试直接启用，再重新试运行成功后启用。,旧试运行结论不继承；新版本须重新试运行成功才可启用，保存新版本测试/启用记录。,P,2026-10-26,V1.0试运行通过启用后编辑为V1.1草稿，直接启用400；V1.1再次试运行成功后启用；四次计划快照分别冻结V1.0～V1.3，模板操作有审计,acceptance/stage3/evidence/TC-028-030-baseline-dryrun-lifecycle.json;acceptance/stage3/evidence/TC-028-baseline-dryrun-ui-attempt1.json;acceptance/stage3/evidence/TC-028-baseline-dryrun-ui.json;acceptance/stage3/evidence/TC-028-baseline-dryrun-ui.png;acceptance/stage3/evidence/TC-028-030-baseline-dryrun-summary.json;acceptance/stage3/evidence/TC-028-baseline-dryrun-audit.json,
-TC-031.S1,TC-031,在提交页验证目标空值及1、500位/超界，选择和不选择任务族，填写动态场景参数后提交。,目标默认空、必填1～500位，空值提交不可用；任务族可选三核心及扩展，未选由目标判定；场景参数可选且随任务族动态展示；生成待规划实例。,NOT_RUN,,,,
+TC-031.S1,TC-031,在提交页验证目标空值及1、500位/超界，选择和不选择任务族，填写动态场景参数后提交。,目标默认空、必填1～500位，空值提交不可用；任务族可选三核心及扩展，未选由目标判定；场景参数可选且随任务族动态展示；生成待规划实例。,F,2026-10-26,扩展定义可选且空目标按钮禁用；定义的必填sampleLocation未随任务族显示，缺参提交创建任务33后才追问；仅测空/501位，1/500边界未全测,acceptance/stage3/evidence/TC-031-068-dynamic-ui.json;acceptance/stage3/evidence/TC-031-068-submit-dynamic.png;acceptance/stage3/evidence/TC-031-068-dynamic-submit.json,DEF-S3-028;DEF-S3-029
 TC-031.S2,TC-031,查看解析和原始目标，完整后进入上下文构建。,原文保存不改写；提取原始目标、起点、目的地、约束、完成条件、缺失信息；完整才进入上下文。只保存必要协助信息，不保存真实身份。,NOT_RUN,,,,
 TC-031.S3,TC-031,另建任务在计划生成前取消并查看事件。,取消置人工终止，保存原始目标和取消原因；提交、补充及取消均进入任务时间线，降级不改原目标。,NOT_RUN,,,,
 TC-032.S1,TC-032,第一个目标提交后逐项回答待补充问题，补齐后继续。,问题逐条展示于对应输入框；提交补充重新理解，补齐前不生成计划；不臆造地点、能力或身份；完整后继续。,NOT_RUN,,,,
@@ -147,8 +147,8 @@ TC-066.S2,TC-066,确认后检查后续步骤、取消消息、占用和历史结
 TC-066.S3,TC-066,查看各设备响应、时间线和操作记录。,终止操作者、时间、原因及响应完整记录。,NOT_RUN,,,,
 TC-067.S1,TC-067,查看不同状态的终止入口并对终态尝试终止。,待规划/监督判定中/待分配/降级执行中/执行中/待人工可终止；三终态不可终止并提示。,NOT_RUN,,,,
 TC-067.S2,TC-067,终止设备取消不响应的任务。,超时后仍释放平台占用；记录未响应设备和原因，生成异常提示人工核实现场状态，不恢复任务执行。,NOT_RUN,,,,
-TC-068.S1,TC-068,查看三预置任务族，新增一个基于现有能力的任务定义并编辑。,名称唯一1～64位、目标模板1～500位；场景参数、能力、约束、完成条件必填；只定义场景与规则，不写死规划步骤，不新增页面/协议/能力类型。 场景参数行包含参数名、类型、必填和说明；录入项默认空。,NOT_RUN,,,,
-TC-068.S2,TC-068,在提交页选择新定义，生成计划；停用该定义。,场景参数动态显示，约束参与校验、完成条件参与完成判定，候选及实际路径≤5步；停用后不可新选，已有任务不受影响；新增修改停用留痕。,NOT_RUN,,,,
+TC-068.S1,TC-068,查看三预置任务族，新增一个基于现有能力的任务定义并编辑。,名称唯一1～64位、目标模板1～500位；场景参数、能力、约束、完成条件必填；只定义场景与规则，不写死规划步骤，不新增页面/协议/能力类型。 场景参数行包含参数名、类型、必填和说明；录入项默认空。,F,2026-10-26,扩展定义创建/编辑及名称等非法输入拒绝；空约束仍可创建，与约束必填不符；一次性空约束定义已删除,acceptance/stage3/evidence/TC-068-dynamic-definition-api.json;acceptance/stage3/evidence/TC-068-empty-constraint.json;acceptance/stage3/evidence/TC-068-definition-edit.png,DEF-S3-030
+TC-068.S2,TC-068,在提交页选择新定义，生成计划；停用该定义。,场景参数动态显示，约束参与校验、完成条件参与完成判定，候选及实际路径≤5步；停用后不可新选，已有任务不受影响；新增修改停用留痕。,F,2026-10-26,新定义可选但无动态参数；缺必填输入仍建任务33；停用后提交不可选且新提交400，旧任务可查，三类操作日志齐全；计划≤5步与完成判定未测,acceptance/stage3/evidence/TC-031-068-dynamic-ui.json;acceptance/stage3/evidence/TC-031-068-submit-dynamic.png;acceptance/stage3/evidence/TC-031-068-dynamic-submit.json;acceptance/stage3/evidence/TC-068-dynamic-disable.json;acceptance/stage3/evidence/TC-068-disabled-ui.json;acceptance/stage3/evidence/TC-068-disabled-submit.png;acceptance/stage3/evidence/TC-068-disabled-history-filter.png,DEF-S3-028;DEF-S3-029
 TC-069.S1,TC-069,尝试删除三预置任务族；维护其场景参数与约束。,预置标识清楚、不可删除，但允许按需求编辑参数与约束。,NOT_RUN,,,,
 TC-069.S2,TC-069,提交重复名、缺必填及不存在/未启用能力定义。,拒绝保存并提示重复、必填或能力缺口，不进入提交页可选集合。,NOT_RUN,,,,
 TC-070.S1,TC-070,进入态势并缩放，选择图标和类型筛选。,图标按左上原点像素坐标同比例换算，底图保持比例；显示类型、名称、绿色在线/灰色离线、空闲占用角标，默认五类型全选。,NOT_RUN,,,,

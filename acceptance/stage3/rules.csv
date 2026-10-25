@@ -1,4 +1,4 @@
-﻿ruleId,requirement,text,candidateStep,status,verifiedBy,evidence,issue
+ruleId,requirement,text,candidateStep,status,verifiedBy,evidence,issue
 SRS_F001.R01,SRS_F001,密码不得明文保存，使用不可逆摘要（加盐）存储；数据库与日志中不得出现密码原值,TC-001.S3,NOT_RUN,,,
 SRS_F001.R02,SRS_F001,会话空闲30分钟后失效，失效后任何操作跳转登录页并提示重新登录,TC-002.S4,P,TC-087.S1,acceptance/stage3/evidence/TC-087-idle-session.json,
 SRS_F001.R03,SRS_F001,停用账号拒绝登录，且不得建立会话,TC-002.S1,P,TC-002.S1,acceptance/stage3/evidence/TC-002-lockout.json,
@@ -90,7 +90,7 @@ SRS_F009.R05,SRS_F009,试运行实例不计入运行总览的正式任务统计�
 SRS_F009.R06,SRS_F009,模板版本发生变更后需重新试运行，原试运行结论不继承至新版本,TC-030.S2,P,TC-030.S2,acceptance/stage3/evidence/TC-028-030-baseline-dryrun-lifecycle.json;acceptance/stage3/evidence/TC-028-baseline-dryrun-ui-attempt1.json;acceptance/stage3/evidence/TC-028-baseline-dryrun-ui.json;acceptance/stage3/evidence/TC-028-baseline-dryrun-ui.png;acceptance/stage3/evidence/TC-028-030-baseline-dryrun-summary.json;acceptance/stage3/evidence/TC-028-baseline-dryrun-audit.json,
 SRS_F009.R07,SRS_F009,试运行同样受五步限制与运动安全边界约束,TC-030.S1,NT,TC-030.S1,acceptance/stage3/evidence/TC-030-baseline-dryrun-cancel.json,NT-S3-022
 SRS_F009.R08,SRS_F009,试运行的发起、结果和模板启用均写入操作记录,TC-029.S2,F,TC-028.S2,acceptance/stage3/evidence/TC-028-030-baseline-dryrun-lifecycle.json;acceptance/stage3/evidence/TC-028-baseline-dryrun-ui-attempt1.json;acceptance/stage3/evidence/TC-028-baseline-dryrun-ui.json;acceptance/stage3/evidence/TC-028-baseline-dryrun-ui.png;acceptance/stage3/evidence/TC-028-030-baseline-dryrun-summary.json;acceptance/stage3/evidence/TC-028-baseline-dryrun-audit.json,DEF-S3-027
-SRS_F010.R01,SRS_F010,支持输入开放式自然语言任务目标及可选场景参数,TC-031.S1,NOT_RUN,,,
+SRS_F010.R01,SRS_F010,支持输入开放式自然语言任务目标及可选场景参数,TC-031.S1,F,TC-031.S1,acceptance/stage3/evidence/TC-031-068-dynamic-ui.json;acceptance/stage3/evidence/TC-031-068-submit-dynamic.png;acceptance/stage3/evidence/TC-031-068-dynamic-submit.json,DEF-S3-028
 SRS_F010.R02,SRS_F010,系统应提取原始目标、起点、目的地、约束条件、完成条件和缺失信息六项内容,TC-031.S2,NOT_RUN,,,
 SRS_F010.R03,SRS_F010,关键信息缺失时返回待补充问题，不得臆造地点、设备能力或旅客身份信息,TC-032.S1,NOT_RUN,,,
 SRS_F010.R04,SRS_F010,信息补充完成前不得进入计划生成,TC-031.S3,NOT_RUN,,,
@@ -201,13 +201,13 @@ SRS_F021.R06,SRS_F021,已完成步骤的结果保留，不做回滚或补偿,TC-
 SRS_F021.R07,SRS_F021,任务终止后状态置为人工终止，为终态，不可再恢复执行,TC-066.S2,NOT_RUN,,,
 SRS_F021.R08,SRS_F021,终止操作人、时间、原因、各设备响应结果写入任务事件时间线和操作记录,TC-066.S3,NOT_RUN,,,
 SRS_F022.R01,SRS_F022,预置超规行李处置、特殊旅客服务和航班变更应对三类任务族，不可删除,TC-069.S1,NOT_RUN,,,
-SRS_F022.R02,SRS_F022,任务族只规定场景数据、可用能力类型、约束和完成条件，不预先写死自主规划步骤,TC-068.S1,NOT_RUN,,,
-SRS_F022.R03,SRS_F022,配置管理员可基于已有能力类型新增其他旅客服务任务定义，至少维护任务名称、自然语言目标、场景参数、约束和预期完成条件,TC-068.S1,NOT_RUN,,,
+SRS_F022.R02,SRS_F022,任务族只规定场景数据、可用能力类型、约束和完成条件，不预先写死自主规划步骤,TC-068.S1,P,TC-068.S1,acceptance/stage3/evidence/TC-068-dynamic-definition-api.json;acceptance/stage3/evidence/TC-068-empty-constraint.json;acceptance/stage3/evidence/TC-068-definition-edit.png,
+SRS_F022.R03,SRS_F022,配置管理员可基于已有能力类型新增其他旅客服务任务定义，至少维护任务名称、自然语言目标、场景参数、约束和预期完成条件,TC-068.S1,F,TC-068.S1,acceptance/stage3/evidence/TC-068-dynamic-definition-api.json;acceptance/stage3/evidence/TC-068-empty-constraint.json;acceptance/stage3/evidence/TC-068-definition-edit.png,DEF-S3-030
 SRS_F022.R04,SRS_F022,扩展任务不得要求新增页面、设备协议或能力类型,TC-068.S1,NOT_RUN,,,
 SRS_F022.R05,SRS_F022,扩展任务的每个计划版本及最终实际执行路径均不得超出5个可执行步骤,TC-068.S2,NOT_RUN,,,
 SRS_F022.R06,SRS_F022,任务定义中引用的能力类型必须为已启用能力类型，否则保存失败并提示能力缺口,TC-069.S2,NOT_RUN,,,
 SRS_F022.R07,SRS_F022,任务定义的约束条件参与5.4.4约束校验，完成条件参与步骤与任务完成判定,TC-068.S2,NOT_RUN,,,
-SRS_F022.R08,SRS_F022,任务定义的新增、修改和停用均写入操作记录,TC-068.S2,NOT_RUN,,,
+SRS_F022.R08,SRS_F022,任务定义的新增、修改和停用均写入操作记录,TC-068.S2,P,TC-068.S2,acceptance/stage3/evidence/TC-068-dynamic-disable.json;acceptance/stage3/evidence/TC-068-disabled-ui.json;acceptance/stage3/evidence/TC-068-disabled-submit.png;acceptance/stage3/evidence/TC-068-disabled-history-filter.png,
 SRS_F023.R01,SRS_F023,二维态势加载预置航站楼局部区域平面图，按最新状态展示设备位置、名称、在线状态和工作状态,TC-071.S2,NOT_RUN,,,
 SRS_F023.R02,SRS_F023,选中图标可查看能力摘要、当前任务和最后上报时间,TC-070.S2,NOT_RUN,,,
 SRS_F023.R03,SRS_F023,态势数据采用5秒定时刷新或轻量消息推送，二者实现其一即可,TC-070.S2,NOT_RUN,,,
