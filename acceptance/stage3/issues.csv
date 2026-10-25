@@ -1,3 +1,12 @@
 编号,类型,级别,关联用例步骤,关联需求规则,状态,事实,证据,阶段4动作
 DEF-S3-001,缺陷,中,TC-003.S2,SRS_F001.R04,待修复,无权操作员对POST /api/v1/users提交缺字段体返回400而有效体返回403；均未创建账号；原步骤要求未授权请求返回403,acceptance/stage3/evidence/TC-003-validation-order.json,使权限校验先于请求体校验并完整复测TC-003与邻接用例
 NT-S3-001,前置缺口,待定,TC-002.S4,SRS_F001,待补夹具,尚无独立认证服务和数据库故障注入夹具；未对共享PostgreSQL停机,acceptance/stage3/steps.csv,在隔离环境注入两类故障并核对统一提示和恢复
+DEF-S3-002,缺陷,中,TC-004.S2,SRS_F002.R02,待修复,正式COMPLETED为6且试运行COMPLETED为6；总览九状态的COMPLETED显示12,acceptance/stage3/evidence/TC-004-overview-api.json,统计排除试运行任务并复测九状态和跳转
+NT-S3-002,前置缺口,待定,TC-004.S1,SRS_F002,待补夹具,隔离库仅有3种正式任务状态且缺五类异常完整样本,acceptance/stage3/evidence/TC-004-overview-api.json,准备九状态与五类异常独立夹具后对照指标
+NT-S3-003,前置缺口,待定,TC-004.S4,SRS_F002,待补夹具,尚无单个总览指标查询失败或超时的隔离注入点,acceptance/stage3/steps.csv,单指标注入故障并核对局部占位与其余区域
+DEF-S3-003,缺陷,高,TC-073.S1、TC-073.S2、AC-018,SRS_F024.R03,待修复,非超规任务20带baggageLocation却三轮误报其缺失后转人工；未测量或完成,acceptance/stage3/evidence/TC-072-073-baggage-202259.json,规划澄清须尊重已提交场景参数；重测非超规及相邻超规路径
+NT-S3-004,前置缺口,待定,TC-072.S1、AC-017,SRS_F024.R01,待补分支,只完成操作员目标与仿真测量样本设置；未独立验证模拟测量事件自动触发和柜台可选,acceptance/stage3/evidence/TC-072-073-baggage-202230.json,补事件触发与柜台字段分支
+NT-S3-005,前置缺口,待定,TC-072.S2,SRS_F024.R04,待补分支,任务19完成基线执行但办理说明页面及另一风险判定分支未观察,acceptance/stage3/evidence/TC-072-073-baggage-202230.json,补页面内容和风险判定分支证据
+DEF-S3-004,缺陷,高,TC-077.S1～S3、AC-020,SRS_F025.R01,待修复,任务22有轮椅协助预置起终点及虚构服务编号；模型三轮要求任务定义外字段和身份确认后转人工,acceptance/stage3/evidence/TC-077-special-202424.json,校正必要信息判定和任务定义联动；完整重测陪同与资源缺口
+DEF-S3-005,缺陷,高,TC-080.S2、TC-081.S1～S3、AC-021、AC-022,SRS_F026.R04,待修复,任务24已有航班号时间登机口变更内容但三轮要求机器人ID与路线编码；无三渠道计划/结果,acceptance/stage3/evidence/TC-080-081-flight-202550.json,仅按基线条件必填补充；不要求操作员指定物理设备/路线；复测四类事件和三渠道
+NT-S3-006,前置缺口,待定,TC-080.S1,SRS_F026.R01,待补分支,本轮只执行结构化登机口变更；延误提前取消及仿真事件触发和页面字段边界未执行,acceptance/stage3/evidence/TC-080-081-flight-202500.json,补四类事件双触发及字段边界
