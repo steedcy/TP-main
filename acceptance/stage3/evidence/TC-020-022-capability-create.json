@@ -1,0 +1,89 @@
+{
+  "observedAt": "2026-10-25T16:44:18.770134+00:00",
+  "runtimeInput": "V1.5",
+  "isolatedSchema": "tip_stage2_v14",
+  "deviceCode": "S3_TC020_DISPLAY",
+  "capabilityCode": "S3_TC020_INFO",
+  "invalid": {
+    "duplicateCode": {
+      "httpStatus": 409,
+      "message": "能力编码已存在"
+    },
+    "emptyInput": {
+      "httpStatus": 400,
+      "message": "请定义至少1个输入参数"
+    },
+    "emptyOutput": {
+      "httpStatus": 400,
+      "message": "请定义至少1个输出参数"
+    },
+    "missingInputName": {
+      "httpStatus": 400,
+      "message": "参数名不能为空"
+    },
+    "outOfBoundary": {
+      "httpStatus": 400,
+      "message": "能力类型超出设备类型边界"
+    },
+    "unknownStandardType": {
+      "httpStatus": 400,
+      "message": "能力类型超出设备类型边界"
+    }
+  },
+  "cleanup": {
+    "deviceStatus": "DELETED",
+    "capabilityRows": "0"
+  },
+  "initialCapabilities": 0,
+  "created": {
+    "capabilityCode": "S3_TC020_INFO",
+    "capabilityName": "阶段三信息展示",
+    "capabilityType": "CAP_INFO_DISPLAY",
+    "inputParams": [
+      {
+        "name": "contentType",
+        "type": "String",
+        "required": true,
+        "defaultValue": "TEXT",
+        "range": "TEXT"
+      },
+      {
+        "name": "contentData",
+        "type": "String",
+        "required": true,
+        "defaultValue": "stage3",
+        "range": "非空"
+      },
+      {
+        "name": "displayDuration",
+        "type": "Number",
+        "required": true,
+        "defaultValue": "30",
+        "range": "1～60"
+      }
+    ],
+    "outputParams": [
+      {
+        "name": "displayStatus",
+        "type": "String",
+        "required": true,
+        "defaultValue": null,
+        "range": "结果"
+      }
+    ],
+    "applicableConditions": "F2 且设备在线",
+    "capabilityDescription": "阶段三临时能力配置",
+    "capabilityStatus": "UNTESTED",
+    "lastTestAt": null
+  },
+  "listed": [
+    {
+      "capabilityCode": "S3_TC020_INFO",
+      "capabilityStatus": "UNTESTED",
+      "lastTestAt": null
+    }
+  ],
+  "codesAfterInvalid": [
+    "S3_TC020_INFO"
+  ]
+}
