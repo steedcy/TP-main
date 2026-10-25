@@ -1,6 +1,6 @@
 ﻿ruleId,requirement,text,candidateStep,status,verifiedBy,evidence,issue
 SRS_F001.R01,SRS_F001,密码不得明文保存，使用不可逆摘要（加盐）存储；数据库与日志中不得出现密码原值,TC-001.S3,NOT_RUN,,,
-SRS_F001.R02,SRS_F001,会话空闲30分钟后失效，失效后任何操作跳转登录页并提示重新登录,TC-002.S4,NOT_RUN,,,
+SRS_F001.R02,SRS_F001,会话空闲30分钟后失效，失效后任何操作跳转登录页并提示重新登录,TC-002.S4,P,TC-087.S1,acceptance/stage3/evidence/TC-087-idle-session.json,
 SRS_F001.R03,SRS_F001,停用账号拒绝登录，且不得建立会话,TC-002.S1,P,TC-002.S1,acceptance/stage3/evidence/TC-002-lockout.json,
 SRS_F001.R04,SRS_F001,三类可登录角色的权限由服务端在每次接口调用时校验，不得只依赖前端菜单或按钮隐藏,TC-003.S2,F,TC-003.S2,acceptance/stage3/evidence/TC-003-validation-order.json,DEF-S3-001
 SRS_F001.R05,SRS_F001,无权限的接口调用返回403并写入操作记录，前端不展示越权入口,TC-003.S3,NOT_RUN,,,
@@ -48,7 +48,7 @@ SRS_F005.R08,SRS_F005,状态上报数据格式非法时丢弃该次上报并记�
 SRS_F006A.R01,SRS_F006A,系统预置五类设备类型（智慧航显、智能行李测量设备、航延屏、移动服务机器人、仿真体），不可新增或删除,TC-017.S3,P,TC-017.S1,acceptance/stage3/evidence/TC-017-type-matrix-api.json;acceptance/stage3/evidence/TC-017-type-boundary.json,
 SRS_F006A.R02,SRS_F006A,系统预置八类标准能力类型（综合信息展示、行李尺寸重量测量、超规事件上报、航班变更信息发布、空间引导、陪同服务、现场通知、仿真状态生成），不可新增或删除,TC-017.S3,P,TC-017.S1,acceptance/stage3/evidence/TC-017-type-matrix-api.json;acceptance/stage3/evidence/TC-017-type-boundary.json,
 SRS_F006A.R03,SRS_F006A,每类设备类型至少支持1个能力类型,TC-017.S2,P,TC-017.S2,acceptance/stage3/evidence/TC-017-type-edit.json,
-SRS_F006A.R04,SRS_F006A,"仿真体的能力类型为""仿真状态生成""+继承模拟设备类型的能力",TC-017.S3,NOT_RUN,,,
+SRS_F006A.R04,SRS_F006A,"仿真体的能力类型为""仿真状态生成""+继承模拟设备类型的能力",TC-017.S3,F,TC-017.S3,acceptance/stage3/evidence/TC-017-simulator-inheritance.json,DEF-S3-020
 SRS_F006A.R05,SRS_F006A,设备实例创建时，自动加载其类型的全部标准能力模板（可选择性启用）,TC-018.S3,NOT_RUN,,,
 SRS_F006A.R06,SRS_F006A,设备实例配置能力时，能力类型必须在其设备类型的支持范围内，否则保存时拒绝并提示越界,TC-018.S1,NOT_RUN,,,
 SRS_F006A.R07,SRS_F006A,能力模板的能力类型必须在其所属设备类型的支持范围内,TC-018.S1,NOT_RUN,,,
@@ -263,7 +263,7 @@ SRS_F028.R06,SRS_F028,记录详情中的凭据类字段以掩码展示，不得�
 SRS_F028.R07,SRS_F028,操作记录查询仅系统管理员可见全量；其他角色仅可见与自身相关记录,TC-085.S2,NOT_RUN,,,
 SRS_F028.R08,SRS_F028,操作记录与任务事件时间线通过任务编号或对象标识关联，支持交叉追溯,TC-085.S1,NOT_RUN,,,
 SRS_NF001.R01,SRS_NF001,密码使用不可逆摘要（加盐）保存；敏感凭据不在页面回显原值，数据库与日志中不得出现密码或凭据原值,TC-086.S1,NT,TC-086.S1,acceptance/stage3/evidence/TC-086-sensitive.json,NT-S3-009
-SRS_NF002.R01,SRS_NF002,会话空闲30分钟后失效，失效后任何操作跳转登录页,TC-087.S1,NOT_RUN,,,
+SRS_NF002.R01,SRS_NF002,会话空闲30分钟后失效，失效后任何操作跳转登录页,TC-087.S1,P,TC-087.S1,acceptance/stage3/evidence/TC-087-idle-session.json,
 SRS_NF003.R01,SRS_NF003,不保存旅客真实身份信息，演示使用虚构或脱敏数据；提交给规划模型的内容须脱敏,TC-031.S2,NOT_RUN,,,
 SRS_NF004.R01,SRS_NF004,三类预置角色权限由服务端逐接口校验，不得只依赖前端菜单控制；登录、配置变更和人工终止写入操作记录,TC-003.S3,NOT_RUN,,,
 SRS_NF005.R01,SRS_NF005,平台不得下发运动安全控制指令；设备代理对含运动安全字段的消息执行拦截并记录,TC-040.S2,NOT_RUN,,,
@@ -271,9 +271,9 @@ SRS_NF006.R01,SRS_NF006,并发后台用户不超过10人，接入设备或仿真
 SRS_NF007.R01,SRS_NF007,一般页面95%请求秒级响应（≤1秒）,TC-088.S2,NOT_RUN,,,
 SRS_NF008.R01,SRS_NF008,开放式自主规划单次请求60秒超时；超时后转基线模板或人工降级，不得下发设备指令,TC-047.S1,NOT_RUN,,,
 SRS_NF009.R01,SRS_NF009,二维态势刷新不超过15秒；支持20个设备按15秒周期上报,TC-089.S1,NOT_RUN,,,
-SRS_NF010.R01,SRS_NF010,支持Chrome、Edge当前主版本,TC-090.S1,NOT_RUN,,,
+SRS_NF010.R01,SRS_NF010,支持Chrome、Edge当前主版本,TC-090.S1,NT,TC-090.S1,acceptance/stage3/evidence/TC-090-browser-layout.json,NT-S3-011
 SRS_NF011.R01,SRS_NF011,演示环境连续运行8小时无导致核心流程中断的严重故障,TC-091.S1,NOT_RUN,,,
-SRS_NF012.R01,SRS_NF012,推荐分辨率1920×1080，最低1366×768；界面在最低分辨率下无横向滚动与元素遮挡,TC-090.S2,NOT_RUN,,,
+SRS_NF012.R01,SRS_NF012,推荐分辨率1920×1080，最低1366×768；界面在最低分辨率下无横向滚动与元素遮挡,TC-090.S2,P,TC-090.S2,acceptance/stage3/evidence/TC-090-browser-layout.json;acceptance/stage3/evidence/TC-090-Chrome-device-modal.png;acceptance/stage3/evidence/TC-090-Chrome-task-modal.png;acceptance/stage3/evidence/TC-090-Edge-device-modal.png;acceptance/stage3/evidence/TC-090-Edge-task-modal.png,
 SRS_NF013.R01,SRS_NF013,部署环境为一套服务器或开发验证环境即可，不要求高可用集群与异地容灾,TC-092.S1,NOT_RUN,,,
 SRS_NF014.R01,SRS_NF014,设备接入以模拟适配器实现的统一设备接口为验收基线，新增同类设备不需修改业务功能代码,TC-093.S1,NOT_RUN,,,
 SRS_NF015.R01,SRS_NF015,规划模型、监督服务不可用时系统须保持可用：按基线降级或转人工处理，不得因外部服务异常导致平台不可访问,TC-047.S1,NOT_RUN,,,
