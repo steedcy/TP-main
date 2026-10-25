@@ -2,10 +2,23 @@ package com.airport.ai.task;
 
 import com.airport.ai.device.Device;
 import java.util.Map;
+import java.util.Set;
 
 /** Physical channel required by the three preset passenger-service scenarios. */
 public final class CoreScenarioChannelPolicy {
+    private static final Set<String> FLIGHT_CHANNELS = Set.of(
+            "CAP_FLIGHT_UPDATE", "CAP_INFO_DISPLAY", "CAP_NOTIFICATION", "CAP_NAVIGATION");
+    private static final Set<String> FLIGHT_PUBLICATION_CHANNELS = Set.of(
+            "CAP_FLIGHT_UPDATE", "CAP_INFO_DISPLAY", "CAP_NOTIFICATION");
     private CoreScenarioChannelPolicy() {}
+
+    public static boolean isFlightChannel(String taskFamily, String capabilityType) {
+        return "FLIGHT_CHANGE_RESPONSE".equals(taskFamily) && FLIGHT_CHANNELS.contains(capabilityType);
+    }
+
+    public static boolean isFlightPublication(String capabilityType) {
+        return FLIGHT_PUBLICATION_CHANNELS.contains(capabilityType);
+    }
 
     public static String requiredType(String taskFamily, String capabilityType) {
         if (taskFamily == null || capabilityType == null) return null;

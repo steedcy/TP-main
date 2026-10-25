@@ -156,6 +156,11 @@ public class TaskExecutionOrchestrator {
         assignment.setRetryCount(0);
 
         if (candidates.isEmpty()) {
+            if (!Boolean.TRUE.equals(currentTask.getIsDryRun()) && rejected.isEmpty()
+                    && CoreScenarioChannelPolicy.isFlightChannel(currentTask.getTaskFamily(), capabilityType)) {
+                skipUnavailableFlightChannel(currentTask, assignment, capabilityType);
+                return;
+            }
             // 异常路径2a/4b：无候选或全部候选已拒绝，进入5.5.3异常识别与恢复
             taskEventService.append(taskId, "STEP_ASSIGNMENT_FAILED", "SYSTEM", "ERR_NO_CANDIDATE_AVAILABLE",
                     "步骤" + stepSeq + "无可用候选设备（已尝试" + rejected.size() + "个候选均拒绝或无候选）");
@@ -421,7 +426,56 @@ public class TaskExecutionOrchestrator {
             return;
         }
 
+        completeAvailableChannels(taskId, planVersionId, all);
+    }
+
+    /** 5.6.5备选路径5a：只跳过确实无在线空闲候选的航班渠道，不把拒绝或执行失败当作覆盖成功。 */
+    private void skipUnavailableFlightChannel(Task task, TaskStepAssignment assignment, String capabilityType) {
+        String channel = CoreScenarioChannelPolicy.requiredType(task.getTaskFamily(), capabilityType);
+        assignment.setStepStatus("SKIPPED");
+        assignment.setReasonCode("FLIGHT_CHANNEL_UNAVAILABLE");
+        assignment.setOutputParams(toJson(Map.of("channelResult", "UNCOVERED", "capabilityType", capabilityType,
+                "requiredDeviceType", channel, "reason", "NO_ONLINE_IDLE_CANDIDATE")));
+        assignment.setUpdatedAt(LocalDateTime.now());
+        assignmentMapper.update(assignment);
+        taskEventService.append(task.getId(), "FLIGHT_CHANNEL_UNCOVERED", "SYSTEM", "FLIGHT_CHANNEL_UNAVAILABLE",
+                "步骤" + assignment.getStepSeq() + "所需" + channel + "渠道无在线空闲候选，未下发设备命令");
+
+        List<TaskStepAssignment> all = assignmentMapper.findByPlanVersionIdOrderByStepSeqAsc(assignment.getPlanVersionId());
+        Optional<TaskStepAssignment> next = all.stream()
+                .filter(a -> a.getStepSeq() > assignment.getStepSeq() && "PENDING_ASSIGNMENT".equals(a.getStepStatus()))
+                .min(Comparator.comparing(TaskStepAssignment::getStepSeq));
+        if (next.isPresent()) assignStep(task.getId(), assignment.getPlanVersionId(), next.get().getStepSeq());
+        else completeAvailableChannels(task.getId(), assignment.getPlanVersionId(), all);
+    }
+
+    private void completeAvailableChannels(Long taskId, Long planVersionId, List<TaskStepAssignment> all) {
         Task task = taskMapper.findById(taskId).orElseThrow();
+        if ("FLIGHT_CHANGE_RESPONSE".equals(task.getTaskFamily()) && !Boolean.TRUE.equals(task.getIsDryRun())) {
+            List<Map<String, Object>> steps = parseSteps(planVersionMapper.findById(planVersionId).orElseThrow().getPlanSteps());
+            Map<Integer, String> capabilities = steps.stream().collect(Collectors.toMap(
+                    step -> asInteger(step.get("stepSeq")), step -> String.valueOf(step.get("capabilityType"))));
+            List<String> covered = all.stream().filter(a -> "COMPLETED".equals(a.getStepStatus()))
+                    .map(a -> capabilities.get(a.getStepSeq())).toList();
+            List<String> uncovered = all.stream().filter(a -> "FLIGHT_CHANNEL_UNAVAILABLE".equals(a.getReasonCode()))
+                    .map(a -> capabilities.get(a.getStepSeq())).toList();
+            if (covered.stream().noneMatch(CoreScenarioChannelPolicy::isFlightPublication)) {
+                task.setStatus(TaskStatus.PENDING_MANUAL);
+                task.setFailureReason("无任何已完成的航班信息发布渠道；未覆盖渠道: " + uncovered);
+                task.setUpdatedAt(LocalDateTime.now());
+                taskMapper.update(task);
+                taskEventService.append(taskId, "TASK_PENDING_MANUAL", "SYSTEM", "FLIGHT_PUBLICATION_UNAVAILABLE",
+                        task.getFailureReason());
+                return;
+            }
+            task.setStatus(TaskStatus.COMPLETED);
+            task.setUpdatedAt(LocalDateTime.now());
+            taskMapper.update(task);
+            taskEventService.append(taskId, "TASK_COMPLETED", "SYSTEM", null,
+                    "航班变更可用渠道执行完成；已覆盖: " + covered + "；未覆盖: " + uncovered);
+            return;
+        }
+
         task.setStatus(TaskStatus.COMPLETED);
         task.setUpdatedAt(LocalDateTime.now());
         taskMapper.update(task);

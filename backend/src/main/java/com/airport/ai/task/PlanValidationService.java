@@ -78,6 +78,12 @@ public class PlanValidationService {
             }
         }
 
+        // 5.6.5备选路径5a：航班变更允许缺席的物理渠道留在计划中并在执行时标为未覆盖。
+        // 至少一个发布渠道必须实际可用；未知能力和其他任务族仍走原有硬闸门。
+        boolean partialFlightAvailable = "FLIGHT_CHANGE_RESPONSE".equals(taskFamily)
+                && List.of("CAP_FLIGHT_UPDATE", "CAP_INFO_DISPLAY", "CAP_NOTIFICATION").stream()
+                .anyMatch(type -> countOnlineCandidates(snapshotAgents, type, taskFamily) > 0);
+
         // 2. 能力校验：所需能力存在且已启用、存在可承接该步骤的候选代理、代理在线
         for (int i = 0; i < steps.size(); i++) {
             Map<String, Object> step = steps.get(i);
@@ -90,14 +96,18 @@ public class PlanValidationService {
             boolean existsEnabledInstance = deviceCapabilityMapper.existsByCapabilityTypeAndCapabilityStatus(
                     capabilityType, "ENABLED");
             if (!existsEnabledInstance) {
-                result.failCapability("能力类型" + capabilityType + "不存在已启用实例", stepSeq, "ERR_CAPABILITY_GAP");
+                if (!partialFlightAvailable || !CoreScenarioChannelPolicy.isFlightChannel(taskFamily, capabilityType)) {
+                    result.failCapability("能力类型" + capabilityType + "不存在已启用实例", stepSeq, "ERR_CAPABILITY_GAP");
+                }
                 continue;
             }
             long onlineCandidates = countOnlineCandidates(snapshotAgents, capabilityType, taskFamily);
             if (onlineCandidates == 0) {
-                String required = CoreScenarioChannelPolicy.requiredType(taskFamily, capabilityType);
-                result.failCapability("能力类型" + capabilityType + "无在线候选代理"
-                        + (required == null ? "" : "（要求渠道" + required + "）"), stepSeq, "ERR_NO_ONLINE_CANDIDATE");
+                if (!partialFlightAvailable || !CoreScenarioChannelPolicy.isFlightChannel(taskFamily, capabilityType)) {
+                    String required = CoreScenarioChannelPolicy.requiredType(taskFamily, capabilityType);
+                    result.failCapability("能力类型" + capabilityType + "无在线候选代理"
+                            + (required == null ? "" : "（要求渠道" + required + "）"), stepSeq, "ERR_NO_ONLINE_CANDIDATE");
+                }
             }
         }
 

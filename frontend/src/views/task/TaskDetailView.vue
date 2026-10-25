@@ -175,7 +175,7 @@ const flightChannelResults = computed(() => [
   const assignments = stepAssignments.value.filter(a => channel.capabilities.includes(
     currentSteps.value.find(s => s.stepSeq === a.stepSeq)?.capabilityType))
   return { name: channel.name, summary: assignments.length
-    ? assignments.map(a => `${a.deviceAgentCode || '未分配'}：${stepStatusLabel(a.stepStatus)}${a.feedbackAt ? `，反馈时间 ${a.feedbackAt}` : ''}`).join('；')
+    ? assignments.map(flightAssignmentSummary).join('；')
     : '未覆盖（计划缺少该渠道）' }
 }))
 const terminateVisible = ref(false)
@@ -228,6 +228,17 @@ function checkLabel(result) {
 function stepStatusLabel(status) {
   const map = { PENDING_ASSIGNMENT: '待分配', EXECUTING: '执行中', COMPLETED: '已完成', FAILED: '失败', FROZEN: '已冻结', SKIPPED: '条件分支跳过' }
   return map[status] || status
+}
+function flightAssignmentSummary(assignment) {
+  if (assignment.stepStatus === 'SKIPPED' && assignment.reasonCode === 'FLIGHT_CHANNEL_UNAVAILABLE') {
+    return '未覆盖（无在线空闲的正确渠道设备）'
+  }
+  const started = Date.parse(assignment.dispatchedAt)
+  const ended = Date.parse(assignment.feedbackAt)
+  const responseTime = Number.isFinite(started) && Number.isFinite(ended)
+    ? `，响应时长 ${Math.max(0, ((ended - started) / 1000)).toFixed(1)} 秒` : ''
+  return `${assignment.deviceAgentCode || '未分配'}：${stepStatusLabel(assignment.stepStatus)}`
+    + `${assignment.feedbackAt ? `，完成时间 ${assignment.feedbackAt}${responseTime}` : ''}`
 }
 
 async function fetchAll() {
