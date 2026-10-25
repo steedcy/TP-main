@@ -1,0 +1,80 @@
+{
+  "observedAt": "2026-10-25T16:49:01.474257+00:00",
+  "runtimeInput": "V1.5",
+  "templateName": "S3_TC025_ORDERED",
+  "invalid": {
+    "duplicateName": {
+      "httpStatus": 409,
+      "message": "模板名称已存在"
+    },
+    "sixSteps": {
+      "httpStatus": 400,
+      "message": "模板步骤总数超过5"
+    },
+    "capabilityGap": {
+      "httpStatus": 400,
+      "message": "以下能力类型未存在已启用实例: [CAP_SIM_STATUS]"
+    },
+    "undefinedInput": {
+      "httpStatus": 400,
+      "message": "[步骤1参数映射引用未定义的模板输入参数: noSuchInput, 必填模板输入参数无步骤映射来源: displayDuration, 必填模板输入参数无步骤映射来源: contentData, 必填模板输入参数无步骤映射来源: contentType]"
+    },
+    "requiredUnmapped": {
+      "httpStatus": 400,
+      "message": "[必填模板输入参数无步骤映射来源: neverMapped]"
+    },
+    "emptyCompletion": {
+      "httpStatus": 400,
+      "message": "请输入步骤完成条件"
+    },
+    "timeoutBelowTen": {
+      "httpStatus": 400,
+      "message": "最小不能小于10"
+    },
+    "timeoutAboveSixHundred": {
+      "httpStatus": 400,
+      "message": "最大不能超过600"
+    },
+    "undefinedPriorOutput": {
+      "httpStatus": 200,
+      "message": "success",
+      "createdStatus": "DRAFT"
+    }
+  },
+  "cleanup": {
+    "namesAbsent": true,
+    "countRestored": true
+  },
+  "created": {
+    "id": 4,
+    "templateName": "S3_TC025_ORDERED",
+    "templateIntent": "OVERSIZE_BAGGAGE_HANDLING",
+    "templateVersion": "V1.0",
+    "templateStatus": "DRAFT",
+    "isPreset": false
+  },
+  "savedStepOrder": [
+    "CAP_INFO_DISPLAY",
+    "CAP_NAVIGATION",
+    "CAP_BAGGAGE_MEASURE",
+    "CAP_OVERSIZE_ALERT"
+  ],
+  "savedStepSeq": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "savedStepTimeouts": [
+    60,
+    60,
+    60,
+    60
+  ],
+  "savedRequiredInputCount": 8,
+  "detailMatchesList": true,
+  "newNamesAfterInvalid": [
+    "S3_TC025_ORDERED",
+    "S3_TC026_BAD_OUTPUT"
+  ]
+}
