@@ -22,3 +22,9 @@ DEF-S3-011,缺陷,中,TC-008.S1,SRS_F003,待修复,新增设备表单默认真�
 DEF-S3-012,缺陷,中,TC-008.S1,SRS_F003,待修复,所属区域是自由文本输入而不是预置区域选项,acceptance/stage3/evidence/TC-008-create-defaults.png,使用预置区域选择器并在服务端验证；复测合法/非法区域
 DEF-S3-013,缺陷,中,TC-008.S2,SRS_F003,待修复,设备列表缺在线状态筛选和在线状态列，仅有启停状态,acceptance/stage3/evidence/TC-008-device-list.png,从代理/设备心跳提供在线状态并实现筛选；复测在线离线样本
 DEF-S3-014,缺陷,中,TC-009.S2,SRS_F003,待修复,连接测试把不可达和读超时均保存为ResourceAccessException，非法响应仅为RestClientException；不能区分各自原因,acceptance/stage3/evidence/TC-009-connection-failures.json,按连接拒绝、读取超时、响应格式/字段错误归因并显示；复测三分支及代理保护
+NT-S3-010,前置缺口,待定,TC-014.S2,SRS_F005.R04,待补分支,心跳暂停离线与恢复及候选过滤已实测；页面高亮、离线任务影响说明和新任务分配拒绝尚未执行,acceptance/stage3/evidence/TC-014-heartbeat.json,准备离线占用任务与浏览器观察，复测离线提示及分配保护
+DEF-S3-015,缺陷,中,TC-014.S3,SRS_F005,待修复,配置管理员运行界面没有心跳超时阈值设置；仅有状态上报周期，无法执行10～120秒阈值边界与生效验证,acceptance/stage3/evidence/TC-014-heartbeat-threshold.json;acceptance/stage3/evidence/TC-014-heartbeat-threshold-ui.png,提供可验证的心跳超时阈值配置和10～120秒校验，再按新阈值重测离线
+DEF-S3-016,缺陷,中,TC-015.S1,SRS_F005.R08,待修复,设备非法状态上报400、错误身份401且状态未覆盖，但未写任何格式异常设备事件,acceptance/stage3/evidence/TC-015-invalid-report.json,对非法上报和身份拒绝记录脱敏异常事件并保持状态不变；复测事件数量和原因码
+DEF-S3-017,缺陷,中,TC-017.S1,SRS_F006A,待修复,设备类型列表不显示支持能力数、模板数、实例数；详情仅显式显示实例数，另外两项只能手数,acceptance/stage3/evidence/TC-017-type-boundary.json;acceptance/stage3/evidence/TC-017-type-matrix-api.json,在类型列表或详情显示三项数量并与实例/模板记录对照复测
+DEF-S3-018,缺陷,中,TC-017.S3,SRS_F006A,待修复,五类型八能力矩阵正确，但能力约束矩阵页无Excel导出入口,acceptance/stage3/evidence/TC-017-type-boundary.json;acceptance/stage3/evidence/TC-017-type-matrix-api.json,实现矩阵Excel导出并比对单元格；复测仿真体继承
+DEF-S3-019,缺陷,中,TC-017.S2,SRS_F006A.R09,待修复,设备类型边界修改已记录操作人和时间，但三条审计的detail均为空，无法追溯修改内容,acceptance/stage3/evidence/TC-017-type-edit.json,写入脱敏的前后支持能力及文本字段摘要；复测审计和边界有效性
