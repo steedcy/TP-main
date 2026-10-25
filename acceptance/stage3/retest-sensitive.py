@@ -29,16 +29,17 @@ users = [line.split("|", 1) for line in user_lines]
 hashes = [value for _, value in users]
 
 device_lines = db.query(db.source,
-    f"SELECT device_code,coalesce(device_token_hash,''),coalesce(device_token_ciphertext,'') "
+    f"SELECT device_code,coalesce(device_token_hash,''),coalesce(device_token_ciphertext,''),"
+    f"coalesce(access_credential_ref,'') "
     f"FROM {schema}.devices ORDER BY device_code").splitlines()
-devices = [line.split("|", 2) for line in device_lines]
+devices = [line.split("|", 3) for line in device_lines]
 device_secrets = local.secrets()
 matched_device_hashes = sum(
     hash_value == hashlib.sha256(device_secrets[code].encode()).hexdigest()
-    for code, hash_value, _ in devices if code in device_secrets)
+    for code, hash_value, _, _ in devices if code in device_secrets)
 plain_device_tokens_in_db = any(
     token and any(token == value for value in (code, hash_value, ciphertext))
-    for code, hash_value, ciphertext in devices for token in device_secrets.values())
+    for code, hash_value, ciphertext, _ in devices for token in device_secrets.values())
 
 admin_users = local.API("系统管理员")("/users?page=1&size=100")
 config_devices = local.API("配置管理员")("/devices?page=1&size=100")
@@ -68,7 +69,7 @@ evidence = {
     "deviceCount": len(devices),
     "deviceSecretCount": len(device_secrets),
     "matchedDeviceTokenHashes": matched_device_hashes,
-    "configuredDeviceCiphertextsNonempty": all(ciphertext for code, _, ciphertext in devices if code in device_secrets),
+    "configuredDeviceCiphertextsNonempty": all(ciphertext for code, _, ciphertext, _ in devices if code in device_secrets),
     "plainDeviceTokensInDatabaseFields": plain_device_tokens_in_db,
     "plainDeviceTokensInListResponse": any(token in device_api_json for token in device_secrets.values()),
     "deviceListExposesTokenHashOrCiphertext": any(
@@ -77,6 +78,8 @@ evidence = {
     "operationLogCountChecked": len(log_lines),
     "plainUserPasswordsInLogDetail": any(password and password in line for password in passwords for line in log_lines),
     "plainDeviceTokensInLogDetail": any(token and token in line for token in device_secrets.values() for line in log_lines),
+    "deviceCredentialRefsInLogDetailCount": sum(
+        1 for _, _, _, credential_ref in devices if credential_ref and any(credential_ref in line for line in log_lines)),
 }
 out = HERE / "evidence/TC-086-sensitive.json"
 out.write_text(json.dumps(evidence, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
