@@ -1,0 +1,80 @@
+{
+  "observedAt": "2026-10-25T17:23:21.021Z",
+  "runtimeInput": "V1.5",
+  "taskId": 37,
+  "taskCode": "TASK-20261026-0037",
+  "questions": [
+    "行李当前所在位置编码（baggageLocation）未提供，请补充测量地点"
+  ],
+  "observations": {
+    "modalText": "补充信息\n\n系统在目标理解中发现以下信息缺失，请逐条补充后重新提交：\n\n行李当前所在位置编码（baggageLocation）未提供，请补充测量地点\n放弃并取消任务\nCancelOK",
+    "questionInputCount": 1,
+    "initialSubmitDisabled": true,
+    "answer": "F2_BAGGAGE_POINT",
+    "filledSubmitEnabled": true,
+    "clarifyRequestBody": {
+      "answers": {
+        "行李当前所在位置编码（baggageLocation）未提供，请补充测量地点": "F2_BAGGAGE_POINT"
+      }
+    },
+    "clarifyHttp": 200,
+    "clarifyResponse": {
+      "code": 200,
+      "message": "success",
+      "data": {
+        "id": 37,
+        "taskCode": "TASK-20261026-0037",
+        "taskGoal": "请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在待补充的地点测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。",
+        "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+        "sceneParams": {
+          "measureMode": "AUTO",
+          "contentData": "虚构超规行李请前往F2_TEST_GATE办理",
+          "length": 80,
+          "alertLevel": "WARNING",
+          "weight": 35,
+          "baggageId": "R08-OVERSIZE",
+          "clarificationAnswers": [
+            {
+              "questions": [
+                "行李当前所在位置编码（baggageLocation）未提供，请补充测量地点"
+              ],
+              "answers": {
+                "行李当前所在位置编码（baggageLocation）未提供，请补充测量地点": "F2_BAGGAGE_POINT"
+              }
+            }
+          ],
+          "targetLocation": "F2_TEST_GATE",
+          "routePreference": "BARRIER_FREE",
+          "timeout": 30,
+          "displayDuration": 60,
+          "width": 55,
+          "contentType": "TEXT",
+          "height": 35
+        },
+        "goalParsingResult": {
+          "completionCondition": "行李已完成尺寸重量测量且超规事件（如有）已上报",
+          "origin": "F2_BAGGAGE_POINT",
+          "destination": "F2_TEST_GATE",
+          "originalGoal": "请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在待补充的地点测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。",
+          "constraints": [
+            "超规行李处置全程不得引导旅客脱离监控区域",
+            "测量结果超标须触发超规事件上报"
+          ]
+        },
+        "status": "PLANNING",
+        "currentPlanVersionId": null,
+        "replanUsed": false,
+        "replanningReason": null,
+        "manualTerminateReason": null,
+        "failureReason": null,
+        "missingInfoQuestions": null,
+        "downgradeReason": null,
+        "isDryRun": false,
+        "createdAt": "2026-10-26T01:22:58.010989",
+        "updatedAt": "2026-10-26T01:22:58.010989",
+        "createdBy": "oprator"
+      },
+      "timestamp": "2026-10-26T01:23:36.907941800+08:00"
+    }
+  }
+}
