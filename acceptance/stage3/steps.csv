@@ -84,7 +84,7 @@ TC-034.S1,TC-034,让目标理解请求超过60秒或返回异常。,记录异常
 TC-034.S2,TC-034,查看基线可用及不可用情况下的状态。,可用基线经校验执行原目标；不可用转待人工处理，原始目标保持不变。 规划服务异常期间总览、设备查询、任务详情仍可访问。,NOT_RUN,,,,
 TC-035.S1,TC-035,生成上下文并查看规划依据及能力覆盖情况。,含全部启用代理能力、在线状态、位置、负载、可用时间和生成时间；候选排除离线/停用/归档，能力排除未测试、测试失败或停用；快照随任务保存。,F,2026-10-26,任务38/39/41上下文正确排除离线/停用/归档代理及UNTESTED/TESTED_FAILED/DISABLED能力，含位置/负载/生成时间并持久化；任务43期间航显代理真实BUSY但availableUntil为null,acceptance/stage3/evidence/TC-035-context-exclusions.json;acceptance/stage3/evidence/TC-035-context-capability-status.json;acceptance/stage3/evidence/TC-035-context-archived-agent.json;acceptance/stage3/evidence/TC-035-context-archived-agent-retry.json;acceptance/stage3/evidence/TC-035-context-busy-availability.json,DEF-S3-031
 TC-035.S2,TC-035,记录首次上下文快照及模型实际请求摘要；改变设备位置/在线/负载后触发局部重规划，检查新旧快照和新模型请求。,原快照内容不变；重规划重新生成、单独保存快照，生成时间及新事实正确。模型请求仅使用对应快照事实，目标/场景/上下文均脱敏，不含真实旅客身份信息。,NOT_RUN,,,,
-TC-036.S1,TC-036,构建全部所需能力缺失任务的上下文。,生成能力缺口异常，转基线判断或待人工，不调用规划模型。,NOT_RUN,,,,
+TC-036.S1,TC-036,构建全部所需能力缺失任务的上下文。,生成能力缺口异常，转基线判断或待人工，不调用规划模型。,P,2026-10-26,任务44/45全部四类必需能力缺失，初始上下文记录完整缺口并产生ERR_CAPABILITY_GAP_ALL_MISSING；无自主计划/设备指令，基线校验失败转PENDING_MANUAL；受控模型日志仅1次目标理解请求、0次规划请求；状态均恢复,acceptance/stage3/evidence/TC-036-capability-gap-20261026T033200Z.json;acceptance/stage3/evidence/TC-036-capability-gap-20261026T033358Z.json,
 TC-036.S2,TC-036,令部分代理查询失败并构建上下文。,仅用查询成功代理构建，快照标注失败清单，能力覆盖提示与有效候选一致。,NOT_RUN,,,,
 TC-037.S1,TC-037,发起规划并查看任务详情的候选计划。,显示目标、步骤序号/目标/能力/参数/前置/完成/失败处理、候选设备、关键参数来源、快照摘要及规划说明；计划来源自主规划。 展示本版本可执行步骤数和剩余额度，初始上限5；版本号在校验后冻结生成。,NOT_RUN,,,,
 TC-037.S2,TC-037,生成5个可执行动作及含条件节点的计划，进入校验。,每版本动作最多5个，条件节点不计、分支动作计数；只引用上下文已启用能力，实际路径也最多5步；通过校验才冻结版本，未通过不分配或下发。,NOT_RUN,,,,

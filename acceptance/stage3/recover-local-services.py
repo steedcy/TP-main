@@ -42,7 +42,9 @@ while time.monotonic() < deadline:
 ev["allSixOnlineIdle"] = len(ev["after"]) == 6 and all(
     a["agentStatus"] == "ENABLED" and a["onlineStatus"] == "ONLINE" and
     a["workStatus"] == "IDLE" for a in ev["after"])
-(Path(__file__).parent / "evidence/stage3-services-recovered-20261026.json").write_text(
+evidence_path = Path(__file__).parent / "evidence" / (
+    "stage3-services-recovered-" + datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + ".json")
+evidence_path.write_text(
     json.dumps(ev, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 print(json.dumps({"allSixOnlineIdle": ev["allSixOnlineIdle"],
                   "codes": [a["deviceCode"] for a in ev["after"]]}, ensure_ascii=False))
