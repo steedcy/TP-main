@@ -1,0 +1,24 @@
+{
+  "observedAt": "2026-10-26T19:45:45.094Z",
+  "runtimeInput": "V1.5",
+  "browser": "Chrome",
+  "taskId": 55,
+  "route": "/tasks/55",
+  "taskCodeVisible": 1,
+  "taskHeader": "任务编号\tTASK-20261026-0055\t状态\t已完成\n任务目标\t虚构航班R08Z81登机口由GATE_A05改至F2_TEST_GATE，更新航班信息屏，通知旅客并引导至新登机口。仅为测试。\n任务族\tFLIGHT_CHANGE_RESPONSE\t失败/降级原因\t监督判定高风险: RULE_RESOURCE_CRITICAL",
+  "tabs": [
+    "版本1（自主规划）",
+    "版本2（基线模板）"
+  ],
+  "planViews": [
+    {
+      "tab": "版本1（自主规划）",
+      "text": "结构校验\t通过\t能力校验\t通过\n约束校验\t通过\t冻结时间\t2026-10-26T12:22:49.536706\n风险等级\tHIGH\t风险原因\tRULE_RESOURCE_CRITICAL\n判定依据\t可用备用候选设备数量(0)低于配置阈值(1)，命中确定性高风险规则\n置信度\t0.99\t规则集版本\tV1.0\n\n候选步骤：\n\n步骤\t步骤目标\t所需能力\t前置条件\t完成条件\t失败处理\n1\t执行既定CAP_FLIGHT_UPDATE\tCAP_FLIGHT_UPDATE\t设备在线空闲且前序步骤完成\tpublishStatus=SUCCESS\t一次重试、候选切换，失败转局部重新规划或人工\n2\t执行既定CAP_INFO_DISPLAY\tCAP_INFO_DISPLAY\t设备在线空闲且前序步骤完成\tdisplayStatus=SUCCESS\t一次重试、候选切换，失败转局部重新规划或人工\n3\t执行既定CAP_NOTIFICATION\tCAP_NOTIFICATION\t设备在线空闲且前序步骤完成\tnotificationStatus=SUCCESS\t一次重试、候选切换，失败转局部重新规划或人工\n4\t执行既定CAP_NAVIGATION\tCAP_NAVIGATION\t设备在线空闲且前序步骤完成\trouteGenerated=true\t一次重试、候选切换，失败转局部重新规划或人工"
+    },
+    {
+      "tab": "版本2（基线模板）",
+      "text": "结构校验\t通过\t能力校验\t通过\n约束校验\t通过\t冻结时间\t2026-10-26T12:22:49.579077\n\n候选步骤：\n\n步骤\t步骤目标\t所需能力\t前置条件\t完成条件\t失败处理\n1\t执行CAP_FLIGHT_UPDATE能力（基线模板步骤）\tCAP_FLIGHT_UPDATE\t候选设备在线且空闲\tpublishStatus=SUCCESS\t重试一次或转人工处理\n2\t执行CAP_INFO_DISPLAY能力（基线模板步骤）\tCAP_INFO_DISPLAY\t候选设备在线且空闲\tdisplayStatus=SUCCESS\t重试一次或转人工处理\n3\t执行CAP_NOTIFICATION能力（基线模板步骤）\tCAP_NOTIFICATION\t候选设备在线且空闲\tnotificationStatus=SUCCESS\t重试一次或转人工处理\n4\t执行CAP_NAVIGATION能力（基线模板步骤）\tCAP_NAVIGATION\t候选设备在线且空闲\trouteGenerated=true\t重试一次或转人工处理"
+    }
+  ],
+  "screenshot": "SRS_F020-R02-supervision-task55.png"
+}
