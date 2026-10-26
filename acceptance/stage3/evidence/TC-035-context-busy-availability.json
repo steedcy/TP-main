@@ -1,0 +1,1334 @@
+{
+  "observedAt": "2026-10-26T01:44:56.541422+00:00",
+  "runtimeInput": "V1.5",
+  "schema": "tip_stage2_v14",
+  "templateBefore": {
+    "id": 15,
+    "templateName": "S3_TC028_DISPLAY_DRYRUN",
+    "templateIntent": "OVERSIZE_BAGGAGE_HANDLING",
+    "isPreset": false,
+    "inputParams": [
+      {
+        "name": "contentType",
+        "type": "String",
+        "required": true,
+        "defaultValue": "TEXT",
+        "range": null
+      },
+      {
+        "name": "contentData",
+        "type": "String",
+        "required": true,
+        "defaultValue": "阶段三试运行信息",
+        "range": null
+      },
+      {
+        "name": "displayDuration",
+        "type": "Integer",
+        "required": true,
+        "defaultValue": "60",
+        "range": null
+      }
+    ],
+    "steps": [
+      {
+        "stepSeq": 1,
+        "capabilityType": "CAP_INFO_DISPLAY",
+        "paramMapping": [
+          {
+            "target": "contentType",
+            "source": "TEMPLATE_INPUT.contentType"
+          },
+          {
+            "target": "contentData",
+            "source": "TEMPLATE_INPUT.contentData"
+          },
+          {
+            "target": "displayDuration",
+            "source": "TEMPLATE_INPUT.displayDuration"
+          }
+        ],
+        "stepTimeout": 60,
+        "completionCondition": "displayStatus=SUCCESS"
+      }
+    ],
+    "templateVersion": "V1.8",
+    "templateStatus": "DISABLED",
+    "updatedAt": "2026-10-26T01:03:12.979605",
+    "updatedBy": "set"
+  },
+  "displayAgentBefore": {
+    "agentId": "AGT-0158A712",
+    "deviceCode": "SIM_F2_DISPLAY",
+    "deviceName": "智慧显示终端仿真体",
+    "agentStatus": "ENABLED",
+    "onlineStatus": "ONLINE",
+    "workStatus": "IDLE",
+    "currentTaskId": null,
+    "currentStepSeq": null,
+    "lastReportedAt": "2026-10-26T09:44:55.195573"
+  },
+  "dryRun": {
+    "draftVersion": "V1.9",
+    "draftStatus": "DRAFT",
+    "delayMs": 45000,
+    "started": {
+      "taskId": 42,
+      "taskCode": "TASK-20261026-0042",
+      "result": "RUNNING",
+      "stepResults": [
+        {
+          "stepSeq": 1,
+          "result": "PENDING_ASSIGNMENT",
+          "duration": 0,
+          "failureReason": null
+        }
+      ],
+      "events": [
+        {
+          "eventType": "DRY_RUN_STARTED",
+          "trigger": "OPERATOR",
+          "detailSummary": "配置管理员set对模板S3_TC028_DISPLAY_DRYRUN(V1.9)发起试运行",
+          "occurredAt": "2026-10-26T09:44:56.743065"
+        },
+        {
+          "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+          "trigger": "SYSTEM",
+          "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-0158A712(距离0.0,负载0)，向候选AGT-0158A712发起承接请求",
+          "occurredAt": "2026-10-26T09:44:56.779272"
+        }
+      ],
+      "failureReason": null
+    },
+    "displayAtBusy": {
+      "agentId": "AGT-0158A712",
+      "deviceCode": "SIM_F2_DISPLAY",
+      "deviceName": "智慧显示终端仿真体",
+      "agentStatus": "ENABLED",
+      "onlineStatus": "ONLINE",
+      "workStatus": "BUSY",
+      "currentTaskId": 42,
+      "currentStepSeq": 1,
+      "lastReportedAt": "2026-10-26T09:44:55.195573"
+    },
+    "taskStatusAtBusy": "RUNNING",
+    "statusAtSnapshot": "RUNNING",
+    "agentAtSnapshot": {
+      "agentId": "AGT-0158A712",
+      "deviceCode": "SIM_F2_DISPLAY",
+      "deviceName": "智慧显示终端仿真体",
+      "agentStatus": "ENABLED",
+      "onlineStatus": "ONLINE",
+      "workStatus": "BUSY",
+      "currentTaskId": 42,
+      "currentStepSeq": 1,
+      "lastReportedAt": "2026-10-26T09:45:10.294746"
+    }
+  },
+  "task": {
+    "request": {
+      "taskGoal": "请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在F2_BAGGAGE_POINT测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。",
+      "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+      "sceneParams": {
+        "baggageId": "R08-OVERSIZE",
+        "baggageLocation": "F2_BAGGAGE_POINT",
+        "length": 80,
+        "width": 55,
+        "height": 35,
+        "weight": 35,
+        "targetLocation": "F2_TEST_GATE",
+        "routePreference": "BARRIER_FREE",
+        "measureMode": "AUTO",
+        "timeout": 30,
+        "alertLevel": "WARNING",
+        "contentType": "TEXT",
+        "displayDuration": 60,
+        "contentData": "虚构超规行李请前往F2_TEST_GATE办理"
+      }
+    },
+    "submitResponse": {
+      "id": 43,
+      "taskCode": "TASK-20261026-0043",
+      "taskGoal": "请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在F2_BAGGAGE_POINT测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。",
+      "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+      "sceneParams": {
+        "baggageId": "R08-OVERSIZE",
+        "baggageLocation": "F2_BAGGAGE_POINT",
+        "length": 80,
+        "width": 55,
+        "height": 35,
+        "weight": 35,
+        "targetLocation": "F2_TEST_GATE",
+        "routePreference": "BARRIER_FREE",
+        "measureMode": "AUTO",
+        "timeout": 30,
+        "alertLevel": "WARNING",
+        "contentType": "TEXT",
+        "displayDuration": 60,
+        "contentData": "虚构超规行李请前往F2_TEST_GATE办理"
+      },
+      "goalParsingResult": {
+        "completionCondition": "行李已完成尺寸重量测量且超规事件（如有）已上报",
+        "origin": "F2_BAGGAGE_POINT",
+        "destination": "F2_TEST_GATE",
+        "originalGoal": "请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在F2_BAGGAGE_POINT测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。",
+        "constraints": [
+          "超规行李处置全程不得引导旅客脱离监控区域",
+          "测量结果超标须触发超规事件上报"
+        ]
+      },
+      "status": "PLANNING",
+      "currentPlanVersionId": null,
+      "replanUsed": false,
+      "replanningReason": null,
+      "manualTerminateReason": null,
+      "failureReason": null,
+      "missingInfoQuestions": [
+        "sceneParams中缺少必需参数baggageLocation（行李当前所在位置编码），虽然输入中存在baggageLocation字段，但需确认该值\"F2_BAGGAGE_POINT\"是否为有效的行李当前所在位置编码而非测量点或目标地点的混淆"
+      ],
+      "downgradeReason": null,
+      "isDryRun": false,
+      "createdAt": "2026-10-26T09:44:57.2247128",
+      "updatedAt": "2026-10-26T09:44:57.2247128",
+      "createdBy": "oprator"
+    },
+    "id": 43,
+    "clarifications": [
+      {
+        "round": 1,
+        "questions": [
+          "sceneParams中缺少必需参数baggageLocation（行李当前所在位置编码），虽然输入中存在baggageLocation字段，但需确认该值\"F2_BAGGAGE_POINT\"是否为有效的行李当前所在位置编码而非测量点或目标地点的混淆"
+        ],
+        "answers": {
+          "sceneParams中缺少必需参数baggageLocation（行李当前所在位置编码），虽然输入中存在baggageLocation字段，但需确认该值\"F2_BAGGAGE_POINT\"是否为有效的行李当前所在位置编码而非测量点或目标地点的混淆": "F2_BAGGAGE_POINT是预置虚构行李当前位置，尺寸80乘55乘35厘米、重35千克；目标F2_TEST_GATE，无需先引导到其他点。"
+        },
+        "response": {
+          "id": 43,
+          "taskCode": "TASK-20261026-0043",
+          "taskGoal": "请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在F2_BAGGAGE_POINT测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。",
+          "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+          "sceneParams": {
+            "baggageLocation": "F2_BAGGAGE_POINT",
+            "measureMode": "AUTO",
+            "contentData": "虚构超规行李请前往F2_TEST_GATE办理",
+            "length": 80,
+            "alertLevel": "WARNING",
+            "weight": 35,
+            "baggageId": "R08-OVERSIZE",
+            "clarificationAnswers": [
+              {
+                "questions": [
+                  "sceneParams中缺少必需参数baggageLocation（行李当前所在位置编码），虽然输入中存在baggageLocation字段，但需确认该值\"F2_BAGGAGE_POINT\"是否为有效的行李当前所在位置编码而非测量点或目标地点的混淆"
+                ],
+                "answers": {
+                  "sceneParams中缺少必需参数baggageLocation（行李当前所在位置编码），虽然输入中存在baggageLocation字段，但需确认该值\"F2_BAGGAGE_POINT\"是否为有效的行李当前所在位置编码而非测量点或目标地点的混淆": "F2_BAGGAGE_POINT是预置虚构行李当前位置，尺寸80乘55乘35厘米、重35千克；目标F2_TEST_GATE，无需先引导到其他点。"
+                }
+              }
+            ],
+            "targetLocation": "F2_TEST_GATE",
+            "routePreference": "BARRIER_FREE",
+            "timeout": 30,
+            "displayDuration": 60,
+            "width": 55,
+            "contentType": "TEXT",
+            "height": 35
+          },
+          "goalParsingResult": {
+            "completionCondition": "行李已完成尺寸重量测量且超规事件（如有）已上报",
+            "origin": "F2_BAGGAGE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在F2_BAGGAGE_POINT测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。",
+            "constraints": [
+              "超规行李处置全程不得引导旅客脱离监控区域",
+              "测量结果超标须触发超规事件上报"
+            ]
+          },
+          "status": "PLANNING",
+          "currentPlanVersionId": null,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": null,
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-10-26T09:44:57.224713",
+          "updatedAt": "2026-10-26T09:44:57.224713",
+          "createdBy": "oprator"
+        },
+        "afterStatus": "DOWNGRADING"
+      }
+    ],
+    "final": {
+      "id": 43,
+      "taskCode": "TASK-20261026-0043",
+      "taskGoal": "请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在F2_BAGGAGE_POINT测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。",
+      "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+      "sceneParams": {
+        "baggageLocation": "F2_BAGGAGE_POINT",
+        "measureMode": "AUTO",
+        "contentData": "虚构超规行李请前往F2_TEST_GATE办理",
+        "length": 80,
+        "alertLevel": "WARNING",
+        "weight": 35,
+        "baggageId": "R08-OVERSIZE",
+        "clarificationAnswers": [
+          {
+            "questions": [
+              "sceneParams中缺少必需参数baggageLocation（行李当前所在位置编码），虽然输入中存在baggageLocation字段，但需确认该值\"F2_BAGGAGE_POINT\"是否为有效的行李当前所在位置编码而非测量点或目标地点的混淆"
+            ],
+            "answers": {
+              "sceneParams中缺少必需参数baggageLocation（行李当前所在位置编码），虽然输入中存在baggageLocation字段，但需确认该值\"F2_BAGGAGE_POINT\"是否为有效的行李当前所在位置编码而非测量点或目标地点的混淆": "F2_BAGGAGE_POINT是预置虚构行李当前位置，尺寸80乘55乘35厘米、重35千克；目标F2_TEST_GATE，无需先引导到其他点。"
+            }
+          }
+        ],
+        "targetLocation": "F2_TEST_GATE",
+        "routePreference": "BARRIER_FREE",
+        "timeout": 30,
+        "displayDuration": 60,
+        "width": 55,
+        "contentType": "TEXT",
+        "height": 35
+      },
+      "goalParsingResult": {
+        "completionCondition": "行李已完成尺寸重量测量且超规事件（如有）已上报",
+        "origin": "F2_BAGGAGE_POINT",
+        "destination": "F2_TEST_GATE",
+        "originalGoal": "请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在F2_BAGGAGE_POINT测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。",
+        "constraints": [
+          "超规行李处置全程不得引导旅客脱离监控区域",
+          "测量结果超标须触发超规事件上报"
+        ]
+      },
+      "status": "MANUAL_TERMINATED",
+      "currentPlanVersionId": 42,
+      "replanUsed": false,
+      "replanningReason": null,
+      "manualTerminateReason": "阶段3忙碌代理上下文复测清场",
+      "failureReason": null,
+      "missingInfoQuestions": null,
+      "downgradeReason": "候选计划三类校验未通过，转基线模板降级",
+      "isDryRun": false,
+      "createdAt": "2026-10-26T09:44:57.224713",
+      "updatedAt": "2026-10-26T09:45:14.5437119",
+      "createdBy": "oprator"
+    }
+  },
+  "snapshot": {
+    "raw": [
+      {
+        "id": 28,
+        "snapshotCode": "CTX-20261026-0028",
+        "taskId": 43,
+        "agents": "[{\"agentId\":\"AGT-4652EF88\",\"deviceCode\":\"SIM_F2_ROBOT_B\",\"deviceTypeCode\":\"SIMULATOR\",\"simulatedDeviceType\":\"MOBILE_ROBOT\",\"businessStatus\":{\"scenarioResult\":\"SUCCESS\",\"simulatedDeviceType\":\"MOBILE_ROBOT\"},\"capabilities\":[\"CAP_NAVIGATION\",\"CAP_ESCORT\",\"CAP_NOTIFICATION\",\"CAP_INFO_DISPLAY\"],\"capabilitySchemas\":[{\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"routePreference\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BARRIER_FREE\",\"range\":\"SHORTEST/BARRIER_FREE\"}],\"outputParams\":[{\"name\":\"routeGenerated\",\"type\":\"Boolean\",\"required\":true},{\"name\":\"estimatedDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"estimatedDuration\",\"type\":\"Integer\",\"required\":true},{\"name\":\"waypointCount\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_ESCORT\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"escortMode\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"LEAD\",\"range\":\"LEAD/FOLLOW\"},{\"name\":\"maxDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"600\",\"range\":\"60~1800\"}],\"outputParams\":[{\"name\":\"arrivalStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"actualDuration\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_NOTIFICATION\",\"inputParams\":[{\"name\":\"notificationType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BOTH\",\"range\":\"VOICE/TEXT/BOTH\"},{\"name\":\"notificationContent\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试旅客需要轮椅陪同，请现场服务人员协助\"},{\"name\":\"repeatCount\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"1\",\"range\":\"1~5\"}],\"outputParams\":[{\"name\":\"notificationStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualRepeatCount\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_INFO_DISPLAY\",\"inputParams\":[{\"name\":\"contentType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"TEXT\",\"range\":\"TEXT/IMAGE/VIDEO/HTML\"},{\"name\":\"contentData\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试信息：请前往F2服务点\"},{\"name\":\"displayDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"60\",\"range\":\"5~300\"}],\"outputParams\":[{\"name\":\"displayStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualDuration\",\"type\":\"Integer\",\"required\":true},{\"name\":\"errorMessage\",\"type\":\"String\",\"required\":false}]}],\"onlineStatus\":\"ONLINE\",\"location\":{\"x\":810.00,\"y\":4150.00,\"zone\":\"F2_TEST\"},\"workload\":\"IDLE\",\"availableUntil\":null},{\"agentId\":\"AGT-0158A712\",\"deviceCode\":\"SIM_F2_DISPLAY\",\"deviceTypeCode\":\"SIMULATOR\",\"simulatedDeviceType\":\"SMART_DISPLAY\",\"businessStatus\":{\"scenarioResult\":\"SUCCESS\",\"simulatedDeviceType\":\"SMART_DISPLAY\"},\"capabilities\":[\"CAP_NAVIGATION\",\"CAP_FLIGHT_UPDATE\",\"CAP_INFO_DISPLAY\"],\"capabilitySchemas\":[{\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"routePreference\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BARRIER_FREE\",\"range\":\"SHORTEST/BARRIER_FREE\"}],\"outputParams\":[{\"name\":\"routeGenerated\",\"type\":\"Boolean\",\"required\":true},{\"name\":\"estimatedDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"estimatedDuration\",\"type\":\"Integer\",\"required\":true},{\"name\":\"waypointCount\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_FLIGHT_UPDATE\",\"inputParams\":[{\"name\":\"flightNumber\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"TEST1022\"},{\"name\":\"updateType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"GATE_CHANGE\",\"range\":\"DELAY/EARLY/GATE_CHANGE/CANCEL\"},{\"name\":\"updateContent\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试航班登机口变更至F2_TEST_GATE\"},{\"name\":\"displayDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"60\",\"range\":\"10~600\"}],\"outputParams\":[{\"name\":\"publishStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"publishTime\",\"type\":\"String\",\"required\":true}]},{\"capabilityType\":\"CAP_INFO_DISPLAY\",\"inputParams\":[{\"name\":\"contentType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"TEXT\",\"range\":\"TEXT/IMAGE/VIDEO/HTML\"},{\"name\":\"contentData\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试信息：请前往F2服务点\"},{\"name\":\"displayDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"60\",\"range\":\"5~300\"}],\"outputParams\":[{\"name\":\"displayStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualDuration\",\"type\":\"Integer\",\"required\":true},{\"name\":\"errorMessage\",\"type\":\"String\",\"required\":false}]}],\"onlineStatus\":\"ONLINE\",\"location\":{\"x\":805.00,\"y\":4200.00,\"zone\":\"F2_TEST\"},\"workload\":\"BUSY\",\"availableUntil\":null},{\"agentId\":\"AGT-F9B433BD\",\"deviceCode\":\"SIM_F2_FLIGHT\",\"deviceTypeCode\":\"SIMULATOR\",\"simulatedDeviceType\":\"FLIGHT_DELAY_BOARD\",\"businessStatus\":{\"scenarioResult\":\"SUCCESS\",\"simulatedDeviceType\":\"FLIGHT_DELAY_BOARD\"},\"capabilities\":[\"CAP_FLIGHT_UPDATE\",\"CAP_INFO_DISPLAY\"],\"capabilitySchemas\":[{\"capabilityType\":\"CAP_FLIGHT_UPDATE\",\"inputParams\":[{\"name\":\"flightNumber\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"TEST1022\"},{\"name\":\"updateType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"GATE_CHANGE\",\"range\":\"DELAY/EARLY/GATE_CHANGE/CANCEL\"},{\"name\":\"updateContent\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试航班登机口变更至F2_TEST_GATE\"},{\"name\":\"displayDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"60\",\"range\":\"10~600\"}],\"outputParams\":[{\"name\":\"publishStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"publishTime\",\"type\":\"String\",\"required\":true}]},{\"capabilityType\":\"CAP_INFO_DISPLAY\",\"inputParams\":[{\"name\":\"contentType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"TEXT\",\"range\":\"TEXT/IMAGE/VIDEO/HTML\"},{\"name\":\"contentData\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试信息：请前往F2服务点\"},{\"name\":\"displayDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"60\",\"range\":\"5~300\"}],\"outputParams\":[{\"name\":\"displayStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualDuration\",\"type\":\"Integer\",\"required\":true},{\"name\":\"errorMessage\",\"type\":\"String\",\"required\":false}]}],\"onlineStatus\":\"ONLINE\",\"location\":{\"x\":815.00,\"y\":4500.00,\"zone\":\"F2_TEST\"},\"workload\":\"IDLE\",\"availableUntil\":null},{\"agentId\":\"AGT-2CCAF5B5\",\"deviceCode\":\"SIM_F2_BAGGAGE_B\",\"deviceTypeCode\":\"SIMULATOR\",\"simulatedDeviceType\":\"BAGGAGE_SCANNER\",\"businessStatus\":{\"scenarioResult\":\"SUCCESS\",\"simulatedDeviceType\":\"BAGGAGE_SCANNER\"},\"capabilities\":[\"CAP_BAGGAGE_MEASURE\",\"CAP_OVERSIZE_ALERT\"],\"capabilitySchemas\":[{\"capabilityType\":\"CAP_BAGGAGE_MEASURE\",\"inputParams\":[{\"name\":\"measureMode\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"AUTO\",\"range\":\"AUTO/MANUAL\"},{\"name\":\"timeout\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"30\",\"range\":\"10~60\"}],\"outputParams\":[{\"name\":\"length\",\"type\":\"Double\",\"required\":true},{\"name\":\"width\",\"type\":\"Double\",\"required\":true},{\"name\":\"height\",\"type\":\"Double\",\"required\":true},{\"name\":\"weight\",\"type\":\"Double\",\"required\":true},{\"name\":\"isOversize\",\"type\":\"Boolean\",\"required\":true},{\"name\":\"measureStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"baggageInfo\",\"type\":\"String\",\"required\":true}]},{\"capabilityType\":\"CAP_OVERSIZE_ALERT\",\"inputParams\":[{\"name\":\"baggageInfo\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"{\\\"length\\\": 80, \\\"width\\\": 55, \\\"height\\\": 35, \\\"weight\\\": 35}\"},{\"name\":\"alertLevel\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"WARNING\",\"range\":\"WARNING/ERROR\"}],\"outputParams\":[{\"name\":\"alertId\",\"type\":\"String\",\"required\":true},{\"name\":\"reportStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"reportTime\",\"type\":\"String\",\"required\":true}]}],\"onlineStatus\":\"ONLINE\",\"location\":{\"x\":800.00,\"y\":4080.00,\"zone\":\"F2_TEST\"},\"workload\":\"IDLE\",\"availableUntil\":null},{\"agentId\":\"AGT-9362B1F4\",\"deviceCode\":\"SIM_F2_ROBOT\",\"deviceTypeCode\":\"SIMULATOR\",\"simulatedDeviceType\":\"MOBILE_ROBOT\",\"businessStatus\":{\"scenarioResult\":\"SUCCESS\",\"simulatedDeviceType\":\"MOBILE_ROBOT\"},\"capabilities\":[\"CAP_NAVIGATION\",\"CAP_ESCORT\",\"CAP_NOTIFICATION\",\"CAP_INFO_DISPLAY\"],\"capabilitySchemas\":[{\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"routePreference\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BARRIER_FREE\",\"range\":\"SHORTEST/BARRIER_FREE\"}],\"outputParams\":[{\"name\":\"routeGenerated\",\"type\":\"Boolean\",\"required\":true},{\"name\":\"estimatedDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"estimatedDuration\",\"type\":\"Integer\",\"required\":true},{\"name\":\"waypointCount\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_ESCORT\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"escortMode\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"LEAD\",\"range\":\"LEAD/FOLLOW\"},{\"name\":\"maxDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"600\",\"range\":\"60~1800\"}],\"outputParams\":[{\"name\":\"arrivalStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"actualDuration\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_NOTIFICATION\",\"inputParams\":[{\"name\":\"notificationType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BOTH\",\"range\":\"VOICE/TEXT/BOTH\"},{\"name\":\"notificationContent\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试旅客需要轮椅陪同，请现场服务人员协助\"},{\"name\":\"repeatCount\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"1\",\"range\":\"1~5\"}],\"outputParams\":[{\"name\":\"notificationStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualRepeatCount\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_INFO_DISPLAY\",\"inputParams\":[{\"name\":\"contentType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"TEXT\",\"range\":\"TEXT/IMAGE/VIDEO/HTML\"},{\"name\":\"contentData\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试信息：请前往F2服务点\"},{\"name\":\"displayDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"60\",\"range\":\"5~300\"}],\"outputParams\":[{\"name\":\"displayStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualDuration\",\"type\":\"Integer\",\"required\":true},{\"name\":\"errorMessage\",\"type\":\"String\",\"required\":false}]}],\"onlineStatus\":\"ONLINE\",\"location\":{\"x\":805.00,\"y\":4050.00,\"zone\":\"F2_TEST\"},\"workload\":\"IDLE\",\"availableUntil\":null},{\"agentId\":\"AGT-4B552506\",\"deviceCode\":\"SIM_F2_BAGGAGE\",\"deviceTypeCode\":\"SIMULATOR\",\"simulatedDeviceType\":\"BAGGAGE_SCANNER\",\"businessStatus\":{\"scenarioResult\":\"SUCCESS\",\"simulatedDeviceType\":\"BAGGAGE_SCANNER\"},\"capabilities\":[\"CAP_BAGGAGE_MEASURE\",\"CAP_OVERSIZE_ALERT\"],\"capabilitySchemas\":[{\"capabilityType\":\"CAP_BAGGAGE_MEASURE\",\"inputParams\":[{\"name\":\"measureMode\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"AUTO\",\"range\":\"AUTO/MANUAL\"},{\"name\":\"timeout\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"30\",\"range\":\"10~60\"}],\"outputParams\":[{\"name\":\"length\",\"type\":\"Double\",\"required\":true},{\"name\":\"width\",\"type\":\"Double\",\"required\":true},{\"name\":\"height\",\"type\":\"Double\",\"required\":true},{\"name\":\"weight\",\"type\":\"Double\",\"required\":true},{\"name\":\"isOversize\",\"type\":\"Boolean\",\"required\":true},{\"name\":\"measureStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"baggageInfo\",\"type\":\"String\",\"required\":true}]},{\"capabilityType\":\"CAP_OVERSIZE_ALERT\",\"inputParams\":[{\"name\":\"baggageInfo\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"{\\\"length\\\": 80, \\\"width\\\": 55, \\\"height\\\": 35, \\\"weight\\\": 35}\"},{\"name\":\"alertLevel\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"WARNING\",\"range\":\"WARNING/ERROR\"}],\"outputParams\":[{\"name\":\"alertId\",\"type\":\"String\",\"required\":true},{\"name\":\"reportStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"reportTime\",\"type\":\"String\",\"required\":true}]}],\"onlineStatus\":\"ONLINE\",\"location\":{\"x\":805.00,\"y\":4050.00,\"zone\":\"F2_TEST\"},\"workload\":\"IDLE\",\"availableUntil\":null}]",
+        "capabilityCoverage": "{\"available\":[\"CAP_NAVIGATION\",\"CAP_BAGGAGE_MEASURE\",\"CAP_OVERSIZE_ALERT\",\"CAP_INFO_DISPLAY\"],\"missing\":[]}",
+        "failedAgentCodes": "[]",
+        "generatedAt": "2026-10-26T09:45:14.118548"
+      },
+      {
+        "id": 27,
+        "snapshotCode": "CTX-20261026-0027",
+        "taskId": 43,
+        "agents": "[{\"agentId\":\"AGT-4652EF88\",\"deviceCode\":\"SIM_F2_ROBOT_B\",\"deviceTypeCode\":\"SIMULATOR\",\"simulatedDeviceType\":\"MOBILE_ROBOT\",\"businessStatus\":{\"scenarioResult\":\"SUCCESS\",\"simulatedDeviceType\":\"MOBILE_ROBOT\"},\"capabilities\":[\"CAP_NAVIGATION\",\"CAP_ESCORT\",\"CAP_NOTIFICATION\",\"CAP_INFO_DISPLAY\"],\"capabilitySchemas\":[{\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"routePreference\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BARRIER_FREE\",\"range\":\"SHORTEST/BARRIER_FREE\"}],\"outputParams\":[{\"name\":\"routeGenerated\",\"type\":\"Boolean\",\"required\":true},{\"name\":\"estimatedDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"estimatedDuration\",\"type\":\"Integer\",\"required\":true},{\"name\":\"waypointCount\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_ESCORT\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"escortMode\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"LEAD\",\"range\":\"LEAD/FOLLOW\"},{\"name\":\"maxDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"600\",\"range\":\"60~1800\"}],\"outputParams\":[{\"name\":\"arrivalStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"actualDuration\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_NOTIFICATION\",\"inputParams\":[{\"name\":\"notificationType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BOTH\",\"range\":\"VOICE/TEXT/BOTH\"},{\"name\":\"notificationContent\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试旅客需要轮椅陪同，请现场服务人员协助\"},{\"name\":\"repeatCount\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"1\",\"range\":\"1~5\"}],\"outputParams\":[{\"name\":\"notificationStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualRepeatCount\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_INFO_DISPLAY\",\"inputParams\":[{\"name\":\"contentType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"TEXT\",\"range\":\"TEXT/IMAGE/VIDEO/HTML\"},{\"name\":\"contentData\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试信息：请前往F2服务点\"},{\"name\":\"displayDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"60\",\"range\":\"5~300\"}],\"outputParams\":[{\"name\":\"displayStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualDuration\",\"type\":\"Integer\",\"required\":true},{\"name\":\"errorMessage\",\"type\":\"String\",\"required\":false}]}],\"onlineStatus\":\"ONLINE\",\"location\":{\"x\":810.00,\"y\":4150.00,\"zone\":\"F2_TEST\"},\"workload\":\"IDLE\",\"availableUntil\":null},{\"agentId\":\"AGT-2CCAF5B5\",\"deviceCode\":\"SIM_F2_BAGGAGE_B\",\"deviceTypeCode\":\"SIMULATOR\",\"simulatedDeviceType\":\"BAGGAGE_SCANNER\",\"businessStatus\":{\"scenarioResult\":\"SUCCESS\",\"simulatedDeviceType\":\"BAGGAGE_SCANNER\"},\"capabilities\":[\"CAP_BAGGAGE_MEASURE\",\"CAP_OVERSIZE_ALERT\"],\"capabilitySchemas\":[{\"capabilityType\":\"CAP_BAGGAGE_MEASURE\",\"inputParams\":[{\"name\":\"measureMode\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"AUTO\",\"range\":\"AUTO/MANUAL\"},{\"name\":\"timeout\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"30\",\"range\":\"10~60\"}],\"outputParams\":[{\"name\":\"length\",\"type\":\"Double\",\"required\":true},{\"name\":\"width\",\"type\":\"Double\",\"required\":true},{\"name\":\"height\",\"type\":\"Double\",\"required\":true},{\"name\":\"weight\",\"type\":\"Double\",\"required\":true},{\"name\":\"isOversize\",\"type\":\"Boolean\",\"required\":true},{\"name\":\"measureStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"baggageInfo\",\"type\":\"String\",\"required\":true}]},{\"capabilityType\":\"CAP_OVERSIZE_ALERT\",\"inputParams\":[{\"name\":\"baggageInfo\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"{\\\"length\\\": 80, \\\"width\\\": 55, \\\"height\\\": 35, \\\"weight\\\": 35}\"},{\"name\":\"alertLevel\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"WARNING\",\"range\":\"WARNING/ERROR\"}],\"outputParams\":[{\"name\":\"alertId\",\"type\":\"String\",\"required\":true},{\"name\":\"reportStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"reportTime\",\"type\":\"String\",\"required\":true}]}],\"onlineStatus\":\"ONLINE\",\"location\":{\"x\":800.00,\"y\":4080.00,\"zone\":\"F2_TEST\"},\"workload\":\"IDLE\",\"availableUntil\":null},{\"agentId\":\"AGT-0158A712\",\"deviceCode\":\"SIM_F2_DISPLAY\",\"deviceTypeCode\":\"SIMULATOR\",\"simulatedDeviceType\":\"SMART_DISPLAY\",\"businessStatus\":{\"scenarioResult\":\"SUCCESS\",\"simulatedDeviceType\":\"SMART_DISPLAY\"},\"capabilities\":[\"CAP_NAVIGATION\",\"CAP_FLIGHT_UPDATE\",\"CAP_INFO_DISPLAY\"],\"capabilitySchemas\":[{\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"routePreference\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BARRIER_FREE\",\"range\":\"SHORTEST/BARRIER_FREE\"}],\"outputParams\":[{\"name\":\"routeGenerated\",\"type\":\"Boolean\",\"required\":true},{\"name\":\"estimatedDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"estimatedDuration\",\"type\":\"Integer\",\"required\":true},{\"name\":\"waypointCount\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_FLIGHT_UPDATE\",\"inputParams\":[{\"name\":\"flightNumber\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"TEST1022\"},{\"name\":\"updateType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"GATE_CHANGE\",\"range\":\"DELAY/EARLY/GATE_CHANGE/CANCEL\"},{\"name\":\"updateContent\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试航班登机口变更至F2_TEST_GATE\"},{\"name\":\"displayDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"60\",\"range\":\"10~600\"}],\"outputParams\":[{\"name\":\"publishStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"publishTime\",\"type\":\"String\",\"required\":true}]},{\"capabilityType\":\"CAP_INFO_DISPLAY\",\"inputParams\":[{\"name\":\"contentType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"TEXT\",\"range\":\"TEXT/IMAGE/VIDEO/HTML\"},{\"name\":\"contentData\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试信息：请前往F2服务点\"},{\"name\":\"displayDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"60\",\"range\":\"5~300\"}],\"outputParams\":[{\"name\":\"displayStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualDuration\",\"type\":\"Integer\",\"required\":true},{\"name\":\"errorMessage\",\"type\":\"String\",\"required\":false}]}],\"onlineStatus\":\"ONLINE\",\"location\":{\"x\":805.00,\"y\":4200.00,\"zone\":\"F2_TEST\"},\"workload\":\"BUSY\",\"availableUntil\":null},{\"agentId\":\"AGT-F9B433BD\",\"deviceCode\":\"SIM_F2_FLIGHT\",\"deviceTypeCode\":\"SIMULATOR\",\"simulatedDeviceType\":\"FLIGHT_DELAY_BOARD\",\"businessStatus\":{\"scenarioResult\":\"SUCCESS\",\"simulatedDeviceType\":\"FLIGHT_DELAY_BOARD\"},\"capabilities\":[\"CAP_FLIGHT_UPDATE\",\"CAP_INFO_DISPLAY\"],\"capabilitySchemas\":[{\"capabilityType\":\"CAP_FLIGHT_UPDATE\",\"inputParams\":[{\"name\":\"flightNumber\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"TEST1022\"},{\"name\":\"updateType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"GATE_CHANGE\",\"range\":\"DELAY/EARLY/GATE_CHANGE/CANCEL\"},{\"name\":\"updateContent\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试航班登机口变更至F2_TEST_GATE\"},{\"name\":\"displayDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"60\",\"range\":\"10~600\"}],\"outputParams\":[{\"name\":\"publishStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"publishTime\",\"type\":\"String\",\"required\":true}]},{\"capabilityType\":\"CAP_INFO_DISPLAY\",\"inputParams\":[{\"name\":\"contentType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"TEXT\",\"range\":\"TEXT/IMAGE/VIDEO/HTML\"},{\"name\":\"contentData\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试信息：请前往F2服务点\"},{\"name\":\"displayDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"60\",\"range\":\"5~300\"}],\"outputParams\":[{\"name\":\"displayStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualDuration\",\"type\":\"Integer\",\"required\":true},{\"name\":\"errorMessage\",\"type\":\"String\",\"required\":false}]}],\"onlineStatus\":\"ONLINE\",\"location\":{\"x\":815.00,\"y\":4500.00,\"zone\":\"F2_TEST\"},\"workload\":\"IDLE\",\"availableUntil\":null},{\"agentId\":\"AGT-4B552506\",\"deviceCode\":\"SIM_F2_BAGGAGE\",\"deviceTypeCode\":\"SIMULATOR\",\"simulatedDeviceType\":\"BAGGAGE_SCANNER\",\"businessStatus\":{\"scenarioResult\":\"SUCCESS\",\"simulatedDeviceType\":\"BAGGAGE_SCANNER\"},\"capabilities\":[\"CAP_BAGGAGE_MEASURE\",\"CAP_OVERSIZE_ALERT\"],\"capabilitySchemas\":[{\"capabilityType\":\"CAP_BAGGAGE_MEASURE\",\"inputParams\":[{\"name\":\"measureMode\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"AUTO\",\"range\":\"AUTO/MANUAL\"},{\"name\":\"timeout\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"30\",\"range\":\"10~60\"}],\"outputParams\":[{\"name\":\"length\",\"type\":\"Double\",\"required\":true},{\"name\":\"width\",\"type\":\"Double\",\"required\":true},{\"name\":\"height\",\"type\":\"Double\",\"required\":true},{\"name\":\"weight\",\"type\":\"Double\",\"required\":true},{\"name\":\"isOversize\",\"type\":\"Boolean\",\"required\":true},{\"name\":\"measureStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"baggageInfo\",\"type\":\"String\",\"required\":true}]},{\"capabilityType\":\"CAP_OVERSIZE_ALERT\",\"inputParams\":[{\"name\":\"baggageInfo\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"{\\\"length\\\": 80, \\\"width\\\": 55, \\\"height\\\": 35, \\\"weight\\\": 35}\"},{\"name\":\"alertLevel\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"WARNING\",\"range\":\"WARNING/ERROR\"}],\"outputParams\":[{\"name\":\"alertId\",\"type\":\"String\",\"required\":true},{\"name\":\"reportStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"reportTime\",\"type\":\"String\",\"required\":true}]}],\"onlineStatus\":\"ONLINE\",\"location\":{\"x\":805.00,\"y\":4050.00,\"zone\":\"F2_TEST\"},\"workload\":\"IDLE\",\"availableUntil\":null},{\"agentId\":\"AGT-9362B1F4\",\"deviceCode\":\"SIM_F2_ROBOT\",\"deviceTypeCode\":\"SIMULATOR\",\"simulatedDeviceType\":\"MOBILE_ROBOT\",\"businessStatus\":{\"scenarioResult\":\"SUCCESS\",\"simulatedDeviceType\":\"MOBILE_ROBOT\"},\"capabilities\":[\"CAP_NAVIGATION\",\"CAP_ESCORT\",\"CAP_NOTIFICATION\",\"CAP_INFO_DISPLAY\"],\"capabilitySchemas\":[{\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"routePreference\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BARRIER_FREE\",\"range\":\"SHORTEST/BARRIER_FREE\"}],\"outputParams\":[{\"name\":\"routeGenerated\",\"type\":\"Boolean\",\"required\":true},{\"name\":\"estimatedDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"estimatedDuration\",\"type\":\"Integer\",\"required\":true},{\"name\":\"waypointCount\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_ESCORT\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"escortMode\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"LEAD\",\"range\":\"LEAD/FOLLOW\"},{\"name\":\"maxDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"600\",\"range\":\"60~1800\"}],\"outputParams\":[{\"name\":\"arrivalStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"actualDuration\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_NOTIFICATION\",\"inputParams\":[{\"name\":\"notificationType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BOTH\",\"range\":\"VOICE/TEXT/BOTH\"},{\"name\":\"notificationContent\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试旅客需要轮椅陪同，请现场服务人员协助\"},{\"name\":\"repeatCount\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"1\",\"range\":\"1~5\"}],\"outputParams\":[{\"name\":\"notificationStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualRepeatCount\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_INFO_DISPLAY\",\"inputParams\":[{\"name\":\"contentType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"TEXT\",\"range\":\"TEXT/IMAGE/VIDEO/HTML\"},{\"name\":\"contentData\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试信息：请前往F2服务点\"},{\"name\":\"displayDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"60\",\"range\":\"5~300\"}],\"outputParams\":[{\"name\":\"displayStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualDuration\",\"type\":\"Integer\",\"required\":true},{\"name\":\"errorMessage\",\"type\":\"String\",\"required\":false}]}],\"onlineStatus\":\"ONLINE\",\"location\":{\"x\":805.00,\"y\":4050.00,\"zone\":\"F2_TEST\"},\"workload\":\"IDLE\",\"availableUntil\":null}]",
+        "capabilityCoverage": "{\"available\":[\"CAP_BAGGAGE_MEASURE\",\"CAP_OVERSIZE_ALERT\",\"CAP_NAVIGATION\",\"CAP_NOTIFICATION\"],\"missing\":[]}",
+        "failedAgentCodes": "[]",
+        "generatedAt": "2026-10-26T09:45:02.123207"
+      }
+    ],
+    "initial": {
+      "id": 27,
+      "snapshotCode": "CTX-20261026-0027",
+      "taskId": 43,
+      "agents": "[{\"agentId\":\"AGT-4652EF88\",\"deviceCode\":\"SIM_F2_ROBOT_B\",\"deviceTypeCode\":\"SIMULATOR\",\"simulatedDeviceType\":\"MOBILE_ROBOT\",\"businessStatus\":{\"scenarioResult\":\"SUCCESS\",\"simulatedDeviceType\":\"MOBILE_ROBOT\"},\"capabilities\":[\"CAP_NAVIGATION\",\"CAP_ESCORT\",\"CAP_NOTIFICATION\",\"CAP_INFO_DISPLAY\"],\"capabilitySchemas\":[{\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"routePreference\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BARRIER_FREE\",\"range\":\"SHORTEST/BARRIER_FREE\"}],\"outputParams\":[{\"name\":\"routeGenerated\",\"type\":\"Boolean\",\"required\":true},{\"name\":\"estimatedDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"estimatedDuration\",\"type\":\"Integer\",\"required\":true},{\"name\":\"waypointCount\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_ESCORT\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"escortMode\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"LEAD\",\"range\":\"LEAD/FOLLOW\"},{\"name\":\"maxDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"600\",\"range\":\"60~1800\"}],\"outputParams\":[{\"name\":\"arrivalStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"actualDuration\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_NOTIFICATION\",\"inputParams\":[{\"name\":\"notificationType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BOTH\",\"range\":\"VOICE/TEXT/BOTH\"},{\"name\":\"notificationContent\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试旅客需要轮椅陪同，请现场服务人员协助\"},{\"name\":\"repeatCount\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"1\",\"range\":\"1~5\"}],\"outputParams\":[{\"name\":\"notificationStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualRepeatCount\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_INFO_DISPLAY\",\"inputParams\":[{\"name\":\"contentType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"TEXT\",\"range\":\"TEXT/IMAGE/VIDEO/HTML\"},{\"name\":\"contentData\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试信息：请前往F2服务点\"},{\"name\":\"displayDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"60\",\"range\":\"5~300\"}],\"outputParams\":[{\"name\":\"displayStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualDuration\",\"type\":\"Integer\",\"required\":true},{\"name\":\"errorMessage\",\"type\":\"String\",\"required\":false}]}],\"onlineStatus\":\"ONLINE\",\"location\":{\"x\":810.00,\"y\":4150.00,\"zone\":\"F2_TEST\"},\"workload\":\"IDLE\",\"availableUntil\":null},{\"agentId\":\"AGT-2CCAF5B5\",\"deviceCode\":\"SIM_F2_BAGGAGE_B\",\"deviceTypeCode\":\"SIMULATOR\",\"simulatedDeviceType\":\"BAGGAGE_SCANNER\",\"businessStatus\":{\"scenarioResult\":\"SUCCESS\",\"simulatedDeviceType\":\"BAGGAGE_SCANNER\"},\"capabilities\":[\"CAP_BAGGAGE_MEASURE\",\"CAP_OVERSIZE_ALERT\"],\"capabilitySchemas\":[{\"capabilityType\":\"CAP_BAGGAGE_MEASURE\",\"inputParams\":[{\"name\":\"measureMode\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"AUTO\",\"range\":\"AUTO/MANUAL\"},{\"name\":\"timeout\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"30\",\"range\":\"10~60\"}],\"outputParams\":[{\"name\":\"length\",\"type\":\"Double\",\"required\":true},{\"name\":\"width\",\"type\":\"Double\",\"required\":true},{\"name\":\"height\",\"type\":\"Double\",\"required\":true},{\"name\":\"weight\",\"type\":\"Double\",\"required\":true},{\"name\":\"isOversize\",\"type\":\"Boolean\",\"required\":true},{\"name\":\"measureStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"baggageInfo\",\"type\":\"String\",\"required\":true}]},{\"capabilityType\":\"CAP_OVERSIZE_ALERT\",\"inputParams\":[{\"name\":\"baggageInfo\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"{\\\"length\\\": 80, \\\"width\\\": 55, \\\"height\\\": 35, \\\"weight\\\": 35}\"},{\"name\":\"alertLevel\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"WARNING\",\"range\":\"WARNING/ERROR\"}],\"outputParams\":[{\"name\":\"alertId\",\"type\":\"String\",\"required\":true},{\"name\":\"reportStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"reportTime\",\"type\":\"String\",\"required\":true}]}],\"onlineStatus\":\"ONLINE\",\"location\":{\"x\":800.00,\"y\":4080.00,\"zone\":\"F2_TEST\"},\"workload\":\"IDLE\",\"availableUntil\":null},{\"agentId\":\"AGT-0158A712\",\"deviceCode\":\"SIM_F2_DISPLAY\",\"deviceTypeCode\":\"SIMULATOR\",\"simulatedDeviceType\":\"SMART_DISPLAY\",\"businessStatus\":{\"scenarioResult\":\"SUCCESS\",\"simulatedDeviceType\":\"SMART_DISPLAY\"},\"capabilities\":[\"CAP_NAVIGATION\",\"CAP_FLIGHT_UPDATE\",\"CAP_INFO_DISPLAY\"],\"capabilitySchemas\":[{\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"routePreference\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BARRIER_FREE\",\"range\":\"SHORTEST/BARRIER_FREE\"}],\"outputParams\":[{\"name\":\"routeGenerated\",\"type\":\"Boolean\",\"required\":true},{\"name\":\"estimatedDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"estimatedDuration\",\"type\":\"Integer\",\"required\":true},{\"name\":\"waypointCount\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_FLIGHT_UPDATE\",\"inputParams\":[{\"name\":\"flightNumber\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"TEST1022\"},{\"name\":\"updateType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"GATE_CHANGE\",\"range\":\"DELAY/EARLY/GATE_CHANGE/CANCEL\"},{\"name\":\"updateContent\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试航班登机口变更至F2_TEST_GATE\"},{\"name\":\"displayDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"60\",\"range\":\"10~600\"}],\"outputParams\":[{\"name\":\"publishStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"publishTime\",\"type\":\"String\",\"required\":true}]},{\"capabilityType\":\"CAP_INFO_DISPLAY\",\"inputParams\":[{\"name\":\"contentType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"TEXT\",\"range\":\"TEXT/IMAGE/VIDEO/HTML\"},{\"name\":\"contentData\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试信息：请前往F2服务点\"},{\"name\":\"displayDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"60\",\"range\":\"5~300\"}],\"outputParams\":[{\"name\":\"displayStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualDuration\",\"type\":\"Integer\",\"required\":true},{\"name\":\"errorMessage\",\"type\":\"String\",\"required\":false}]}],\"onlineStatus\":\"ONLINE\",\"location\":{\"x\":805.00,\"y\":4200.00,\"zone\":\"F2_TEST\"},\"workload\":\"BUSY\",\"availableUntil\":null},{\"agentId\":\"AGT-F9B433BD\",\"deviceCode\":\"SIM_F2_FLIGHT\",\"deviceTypeCode\":\"SIMULATOR\",\"simulatedDeviceType\":\"FLIGHT_DELAY_BOARD\",\"businessStatus\":{\"scenarioResult\":\"SUCCESS\",\"simulatedDeviceType\":\"FLIGHT_DELAY_BOARD\"},\"capabilities\":[\"CAP_FLIGHT_UPDATE\",\"CAP_INFO_DISPLAY\"],\"capabilitySchemas\":[{\"capabilityType\":\"CAP_FLIGHT_UPDATE\",\"inputParams\":[{\"name\":\"flightNumber\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"TEST1022\"},{\"name\":\"updateType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"GATE_CHANGE\",\"range\":\"DELAY/EARLY/GATE_CHANGE/CANCEL\"},{\"name\":\"updateContent\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试航班登机口变更至F2_TEST_GATE\"},{\"name\":\"displayDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"60\",\"range\":\"10~600\"}],\"outputParams\":[{\"name\":\"publishStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"publishTime\",\"type\":\"String\",\"required\":true}]},{\"capabilityType\":\"CAP_INFO_DISPLAY\",\"inputParams\":[{\"name\":\"contentType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"TEXT\",\"range\":\"TEXT/IMAGE/VIDEO/HTML\"},{\"name\":\"contentData\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试信息：请前往F2服务点\"},{\"name\":\"displayDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"60\",\"range\":\"5~300\"}],\"outputParams\":[{\"name\":\"displayStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualDuration\",\"type\":\"Integer\",\"required\":true},{\"name\":\"errorMessage\",\"type\":\"String\",\"required\":false}]}],\"onlineStatus\":\"ONLINE\",\"location\":{\"x\":815.00,\"y\":4500.00,\"zone\":\"F2_TEST\"},\"workload\":\"IDLE\",\"availableUntil\":null},{\"agentId\":\"AGT-4B552506\",\"deviceCode\":\"SIM_F2_BAGGAGE\",\"deviceTypeCode\":\"SIMULATOR\",\"simulatedDeviceType\":\"BAGGAGE_SCANNER\",\"businessStatus\":{\"scenarioResult\":\"SUCCESS\",\"simulatedDeviceType\":\"BAGGAGE_SCANNER\"},\"capabilities\":[\"CAP_BAGGAGE_MEASURE\",\"CAP_OVERSIZE_ALERT\"],\"capabilitySchemas\":[{\"capabilityType\":\"CAP_BAGGAGE_MEASURE\",\"inputParams\":[{\"name\":\"measureMode\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"AUTO\",\"range\":\"AUTO/MANUAL\"},{\"name\":\"timeout\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"30\",\"range\":\"10~60\"}],\"outputParams\":[{\"name\":\"length\",\"type\":\"Double\",\"required\":true},{\"name\":\"width\",\"type\":\"Double\",\"required\":true},{\"name\":\"height\",\"type\":\"Double\",\"required\":true},{\"name\":\"weight\",\"type\":\"Double\",\"required\":true},{\"name\":\"isOversize\",\"type\":\"Boolean\",\"required\":true},{\"name\":\"measureStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"baggageInfo\",\"type\":\"String\",\"required\":true}]},{\"capabilityType\":\"CAP_OVERSIZE_ALERT\",\"inputParams\":[{\"name\":\"baggageInfo\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"{\\\"length\\\": 80, \\\"width\\\": 55, \\\"height\\\": 35, \\\"weight\\\": 35}\"},{\"name\":\"alertLevel\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"WARNING\",\"range\":\"WARNING/ERROR\"}],\"outputParams\":[{\"name\":\"alertId\",\"type\":\"String\",\"required\":true},{\"name\":\"reportStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"reportTime\",\"type\":\"String\",\"required\":true}]}],\"onlineStatus\":\"ONLINE\",\"location\":{\"x\":805.00,\"y\":4050.00,\"zone\":\"F2_TEST\"},\"workload\":\"IDLE\",\"availableUntil\":null},{\"agentId\":\"AGT-9362B1F4\",\"deviceCode\":\"SIM_F2_ROBOT\",\"deviceTypeCode\":\"SIMULATOR\",\"simulatedDeviceType\":\"MOBILE_ROBOT\",\"businessStatus\":{\"scenarioResult\":\"SUCCESS\",\"simulatedDeviceType\":\"MOBILE_ROBOT\"},\"capabilities\":[\"CAP_NAVIGATION\",\"CAP_ESCORT\",\"CAP_NOTIFICATION\",\"CAP_INFO_DISPLAY\"],\"capabilitySchemas\":[{\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"routePreference\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BARRIER_FREE\",\"range\":\"SHORTEST/BARRIER_FREE\"}],\"outputParams\":[{\"name\":\"routeGenerated\",\"type\":\"Boolean\",\"required\":true},{\"name\":\"estimatedDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"estimatedDuration\",\"type\":\"Integer\",\"required\":true},{\"name\":\"waypointCount\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_ESCORT\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"escortMode\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"LEAD\",\"range\":\"LEAD/FOLLOW\"},{\"name\":\"maxDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"600\",\"range\":\"60~1800\"}],\"outputParams\":[{\"name\":\"arrivalStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"actualDuration\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_NOTIFICATION\",\"inputParams\":[{\"name\":\"notificationType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BOTH\",\"range\":\"VOICE/TEXT/BOTH\"},{\"name\":\"notificationContent\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试旅客需要轮椅陪同，请现场服务人员协助\"},{\"name\":\"repeatCount\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"1\",\"range\":\"1~5\"}],\"outputParams\":[{\"name\":\"notificationStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualRepeatCount\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_INFO_DISPLAY\",\"inputParams\":[{\"name\":\"contentType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"TEXT\",\"range\":\"TEXT/IMAGE/VIDEO/HTML\"},{\"name\":\"contentData\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试信息：请前往F2服务点\"},{\"name\":\"displayDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"60\",\"range\":\"5~300\"}],\"outputParams\":[{\"name\":\"displayStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualDuration\",\"type\":\"Integer\",\"required\":true},{\"name\":\"errorMessage\",\"type\":\"String\",\"required\":false}]}],\"onlineStatus\":\"ONLINE\",\"location\":{\"x\":805.00,\"y\":4050.00,\"zone\":\"F2_TEST\"},\"workload\":\"IDLE\",\"availableUntil\":null}]",
+      "capabilityCoverage": "{\"available\":[\"CAP_BAGGAGE_MEASURE\",\"CAP_OVERSIZE_ALERT\",\"CAP_NAVIGATION\",\"CAP_NOTIFICATION\"],\"missing\":[]}",
+      "failedAgentCodes": "[]",
+      "generatedAt": "2026-10-26T09:45:02.123207"
+    },
+    "agents": [
+      {
+        "agentId": "AGT-4652EF88",
+        "deviceCode": "SIM_F2_ROBOT_B",
+        "deviceTypeCode": "SIMULATOR",
+        "simulatedDeviceType": "MOBILE_ROBOT",
+        "businessStatus": {
+          "scenarioResult": "SUCCESS",
+          "simulatedDeviceType": "MOBILE_ROBOT"
+        },
+        "capabilities": [
+          "CAP_NAVIGATION",
+          "CAP_ESCORT",
+          "CAP_NOTIFICATION",
+          "CAP_INFO_DISPLAY"
+        ],
+        "capabilitySchemas": [
+          {
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": [
+              {
+                "name": "targetLocation",
+                "type": "String",
+                "required": true,
+                "defaultValue": "F2_TEST_GATE"
+              },
+              {
+                "name": "routePreference",
+                "type": "String",
+                "required": true,
+                "defaultValue": "BARRIER_FREE",
+                "range": "SHORTEST/BARRIER_FREE"
+              }
+            ],
+            "outputParams": [
+              {
+                "name": "routeGenerated",
+                "type": "Boolean",
+                "required": true
+              },
+              {
+                "name": "estimatedDistance",
+                "type": "Double",
+                "required": true
+              },
+              {
+                "name": "estimatedDuration",
+                "type": "Integer",
+                "required": true
+              },
+              {
+                "name": "waypointCount",
+                "type": "Integer",
+                "required": true
+              }
+            ]
+          },
+          {
+            "capabilityType": "CAP_ESCORT",
+            "inputParams": [
+              {
+                "name": "targetLocation",
+                "type": "String",
+                "required": true,
+                "defaultValue": "F2_TEST_GATE"
+              },
+              {
+                "name": "escortMode",
+                "type": "String",
+                "required": true,
+                "defaultValue": "LEAD",
+                "range": "LEAD/FOLLOW"
+              },
+              {
+                "name": "maxDuration",
+                "type": "Integer",
+                "required": true,
+                "defaultValue": "600",
+                "range": "60~1800"
+              }
+            ],
+            "outputParams": [
+              {
+                "name": "arrivalStatus",
+                "type": "String",
+                "required": true
+              },
+              {
+                "name": "actualDistance",
+                "type": "Double",
+                "required": true
+              },
+              {
+                "name": "actualDuration",
+                "type": "Integer",
+                "required": true
+              }
+            ]
+          },
+          {
+            "capabilityType": "CAP_NOTIFICATION",
+            "inputParams": [
+              {
+                "name": "notificationType",
+                "type": "String",
+                "required": true,
+                "defaultValue": "BOTH",
+                "range": "VOICE/TEXT/BOTH"
+              },
+              {
+                "name": "notificationContent",
+                "type": "String",
+                "required": true,
+                "defaultValue": "测试旅客需要轮椅陪同，请现场服务人员协助"
+              },
+              {
+                "name": "repeatCount",
+                "type": "Integer",
+                "required": true,
+                "defaultValue": "1",
+                "range": "1~5"
+              }
+            ],
+            "outputParams": [
+              {
+                "name": "notificationStatus",
+                "type": "String",
+                "required": true
+              },
+              {
+                "name": "actualRepeatCount",
+                "type": "Integer",
+                "required": true
+              }
+            ]
+          },
+          {
+            "capabilityType": "CAP_INFO_DISPLAY",
+            "inputParams": [
+              {
+                "name": "contentType",
+                "type": "String",
+                "required": true,
+                "defaultValue": "TEXT",
+                "range": "TEXT/IMAGE/VIDEO/HTML"
+              },
+              {
+                "name": "contentData",
+                "type": "String",
+                "required": true,
+                "defaultValue": "测试信息：请前往F2服务点"
+              },
+              {
+                "name": "displayDuration",
+                "type": "Integer",
+                "required": true,
+                "defaultValue": "60",
+                "range": "5~300"
+              }
+            ],
+            "outputParams": [
+              {
+                "name": "displayStatus",
+                "type": "String",
+                "required": true
+              },
+              {
+                "name": "actualDuration",
+                "type": "Integer",
+                "required": true
+              },
+              {
+                "name": "errorMessage",
+                "type": "String",
+                "required": false
+              }
+            ]
+          }
+        ],
+        "onlineStatus": "ONLINE",
+        "location": {
+          "x": 810.0,
+          "y": 4150.0,
+          "zone": "F2_TEST"
+        },
+        "workload": "IDLE",
+        "availableUntil": null
+      },
+      {
+        "agentId": "AGT-2CCAF5B5",
+        "deviceCode": "SIM_F2_BAGGAGE_B",
+        "deviceTypeCode": "SIMULATOR",
+        "simulatedDeviceType": "BAGGAGE_SCANNER",
+        "businessStatus": {
+          "scenarioResult": "SUCCESS",
+          "simulatedDeviceType": "BAGGAGE_SCANNER"
+        },
+        "capabilities": [
+          "CAP_BAGGAGE_MEASURE",
+          "CAP_OVERSIZE_ALERT"
+        ],
+        "capabilitySchemas": [
+          {
+            "capabilityType": "CAP_BAGGAGE_MEASURE",
+            "inputParams": [
+              {
+                "name": "measureMode",
+                "type": "String",
+                "required": true,
+                "defaultValue": "AUTO",
+                "range": "AUTO/MANUAL"
+              },
+              {
+                "name": "timeout",
+                "type": "Integer",
+                "required": true,
+                "defaultValue": "30",
+                "range": "10~60"
+              }
+            ],
+            "outputParams": [
+              {
+                "name": "length",
+                "type": "Double",
+                "required": true
+              },
+              {
+                "name": "width",
+                "type": "Double",
+                "required": true
+              },
+              {
+                "name": "height",
+                "type": "Double",
+                "required": true
+              },
+              {
+                "name": "weight",
+                "type": "Double",
+                "required": true
+              },
+              {
+                "name": "isOversize",
+                "type": "Boolean",
+                "required": true
+              },
+              {
+                "name": "measureStatus",
+                "type": "String",
+                "required": true
+              },
+              {
+                "name": "baggageInfo",
+                "type": "String",
+                "required": true
+              }
+            ]
+          },
+          {
+            "capabilityType": "CAP_OVERSIZE_ALERT",
+            "inputParams": [
+              {
+                "name": "baggageInfo",
+                "type": "String",
+                "required": true,
+                "defaultValue": "{\"length\": 80, \"width\": 55, \"height\": 35, \"weight\": 35}"
+              },
+              {
+                "name": "alertLevel",
+                "type": "String",
+                "required": true,
+                "defaultValue": "WARNING",
+                "range": "WARNING/ERROR"
+              }
+            ],
+            "outputParams": [
+              {
+                "name": "alertId",
+                "type": "String",
+                "required": true
+              },
+              {
+                "name": "reportStatus",
+                "type": "String",
+                "required": true
+              },
+              {
+                "name": "reportTime",
+                "type": "String",
+                "required": true
+              }
+            ]
+          }
+        ],
+        "onlineStatus": "ONLINE",
+        "location": {
+          "x": 800.0,
+          "y": 4080.0,
+          "zone": "F2_TEST"
+        },
+        "workload": "IDLE",
+        "availableUntil": null
+      },
+      {
+        "agentId": "AGT-0158A712",
+        "deviceCode": "SIM_F2_DISPLAY",
+        "deviceTypeCode": "SIMULATOR",
+        "simulatedDeviceType": "SMART_DISPLAY",
+        "businessStatus": {
+          "scenarioResult": "SUCCESS",
+          "simulatedDeviceType": "SMART_DISPLAY"
+        },
+        "capabilities": [
+          "CAP_NAVIGATION",
+          "CAP_FLIGHT_UPDATE",
+          "CAP_INFO_DISPLAY"
+        ],
+        "capabilitySchemas": [
+          {
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": [
+              {
+                "name": "targetLocation",
+                "type": "String",
+                "required": true,
+                "defaultValue": "F2_TEST_GATE"
+              },
+              {
+                "name": "routePreference",
+                "type": "String",
+                "required": true,
+                "defaultValue": "BARRIER_FREE",
+                "range": "SHORTEST/BARRIER_FREE"
+              }
+            ],
+            "outputParams": [
+              {
+                "name": "routeGenerated",
+                "type": "Boolean",
+                "required": true
+              },
+              {
+                "name": "estimatedDistance",
+                "type": "Double",
+                "required": true
+              },
+              {
+                "name": "estimatedDuration",
+                "type": "Integer",
+                "required": true
+              },
+              {
+                "name": "waypointCount",
+                "type": "Integer",
+                "required": true
+              }
+            ]
+          },
+          {
+            "capabilityType": "CAP_FLIGHT_UPDATE",
+            "inputParams": [
+              {
+                "name": "flightNumber",
+                "type": "String",
+                "required": true,
+                "defaultValue": "TEST1022"
+              },
+              {
+                "name": "updateType",
+                "type": "String",
+                "required": true,
+                "defaultValue": "GATE_CHANGE",
+                "range": "DELAY/EARLY/GATE_CHANGE/CANCEL"
+              },
+              {
+                "name": "updateContent",
+                "type": "String",
+                "required": true,
+                "defaultValue": "测试航班登机口变更至F2_TEST_GATE"
+              },
+              {
+                "name": "displayDuration",
+                "type": "Integer",
+                "required": true,
+                "defaultValue": "60",
+                "range": "10~600"
+              }
+            ],
+            "outputParams": [
+              {
+                "name": "publishStatus",
+                "type": "String",
+                "required": true
+              },
+              {
+                "name": "publishTime",
+                "type": "String",
+                "required": true
+              }
+            ]
+          },
+          {
+            "capabilityType": "CAP_INFO_DISPLAY",
+            "inputParams": [
+              {
+                "name": "contentType",
+                "type": "String",
+                "required": true,
+                "defaultValue": "TEXT",
+                "range": "TEXT/IMAGE/VIDEO/HTML"
+              },
+              {
+                "name": "contentData",
+                "type": "String",
+                "required": true,
+                "defaultValue": "测试信息：请前往F2服务点"
+              },
+              {
+                "name": "displayDuration",
+                "type": "Integer",
+                "required": true,
+                "defaultValue": "60",
+                "range": "5~300"
+              }
+            ],
+            "outputParams": [
+              {
+                "name": "displayStatus",
+                "type": "String",
+                "required": true
+              },
+              {
+                "name": "actualDuration",
+                "type": "Integer",
+                "required": true
+              },
+              {
+                "name": "errorMessage",
+                "type": "String",
+                "required": false
+              }
+            ]
+          }
+        ],
+        "onlineStatus": "ONLINE",
+        "location": {
+          "x": 805.0,
+          "y": 4200.0,
+          "zone": "F2_TEST"
+        },
+        "workload": "BUSY",
+        "availableUntil": null
+      },
+      {
+        "agentId": "AGT-F9B433BD",
+        "deviceCode": "SIM_F2_FLIGHT",
+        "deviceTypeCode": "SIMULATOR",
+        "simulatedDeviceType": "FLIGHT_DELAY_BOARD",
+        "businessStatus": {
+          "scenarioResult": "SUCCESS",
+          "simulatedDeviceType": "FLIGHT_DELAY_BOARD"
+        },
+        "capabilities": [
+          "CAP_FLIGHT_UPDATE",
+          "CAP_INFO_DISPLAY"
+        ],
+        "capabilitySchemas": [
+          {
+            "capabilityType": "CAP_FLIGHT_UPDATE",
+            "inputParams": [
+              {
+                "name": "flightNumber",
+                "type": "String",
+                "required": true,
+                "defaultValue": "TEST1022"
+              },
+              {
+                "name": "updateType",
+                "type": "String",
+                "required": true,
+                "defaultValue": "GATE_CHANGE",
+                "range": "DELAY/EARLY/GATE_CHANGE/CANCEL"
+              },
+              {
+                "name": "updateContent",
+                "type": "String",
+                "required": true,
+                "defaultValue": "测试航班登机口变更至F2_TEST_GATE"
+              },
+              {
+                "name": "displayDuration",
+                "type": "Integer",
+                "required": true,
+                "defaultValue": "60",
+                "range": "10~600"
+              }
+            ],
+            "outputParams": [
+              {
+                "name": "publishStatus",
+                "type": "String",
+                "required": true
+              },
+              {
+                "name": "publishTime",
+                "type": "String",
+                "required": true
+              }
+            ]
+          },
+          {
+            "capabilityType": "CAP_INFO_DISPLAY",
+            "inputParams": [
+              {
+                "name": "contentType",
+                "type": "String",
+                "required": true,
+                "defaultValue": "TEXT",
+                "range": "TEXT/IMAGE/VIDEO/HTML"
+              },
+              {
+                "name": "contentData",
+                "type": "String",
+                "required": true,
+                "defaultValue": "测试信息：请前往F2服务点"
+              },
+              {
+                "name": "displayDuration",
+                "type": "Integer",
+                "required": true,
+                "defaultValue": "60",
+                "range": "5~300"
+              }
+            ],
+            "outputParams": [
+              {
+                "name": "displayStatus",
+                "type": "String",
+                "required": true
+              },
+              {
+                "name": "actualDuration",
+                "type": "Integer",
+                "required": true
+              },
+              {
+                "name": "errorMessage",
+                "type": "String",
+                "required": false
+              }
+            ]
+          }
+        ],
+        "onlineStatus": "ONLINE",
+        "location": {
+          "x": 815.0,
+          "y": 4500.0,
+          "zone": "F2_TEST"
+        },
+        "workload": "IDLE",
+        "availableUntil": null
+      },
+      {
+        "agentId": "AGT-4B552506",
+        "deviceCode": "SIM_F2_BAGGAGE",
+        "deviceTypeCode": "SIMULATOR",
+        "simulatedDeviceType": "BAGGAGE_SCANNER",
+        "businessStatus": {
+          "scenarioResult": "SUCCESS",
+          "simulatedDeviceType": "BAGGAGE_SCANNER"
+        },
+        "capabilities": [
+          "CAP_BAGGAGE_MEASURE",
+          "CAP_OVERSIZE_ALERT"
+        ],
+        "capabilitySchemas": [
+          {
+            "capabilityType": "CAP_BAGGAGE_MEASURE",
+            "inputParams": [
+              {
+                "name": "measureMode",
+                "type": "String",
+                "required": true,
+                "defaultValue": "AUTO",
+                "range": "AUTO/MANUAL"
+              },
+              {
+                "name": "timeout",
+                "type": "Integer",
+                "required": true,
+                "defaultValue": "30",
+                "range": "10~60"
+              }
+            ],
+            "outputParams": [
+              {
+                "name": "length",
+                "type": "Double",
+                "required": true
+              },
+              {
+                "name": "width",
+                "type": "Double",
+                "required": true
+              },
+              {
+                "name": "height",
+                "type": "Double",
+                "required": true
+              },
+              {
+                "name": "weight",
+                "type": "Double",
+                "required": true
+              },
+              {
+                "name": "isOversize",
+                "type": "Boolean",
+                "required": true
+              },
+              {
+                "name": "measureStatus",
+                "type": "String",
+                "required": true
+              },
+              {
+                "name": "baggageInfo",
+                "type": "String",
+                "required": true
+              }
+            ]
+          },
+          {
+            "capabilityType": "CAP_OVERSIZE_ALERT",
+            "inputParams": [
+              {
+                "name": "baggageInfo",
+                "type": "String",
+                "required": true,
+                "defaultValue": "{\"length\": 80, \"width\": 55, \"height\": 35, \"weight\": 35}"
+              },
+              {
+                "name": "alertLevel",
+                "type": "String",
+                "required": true,
+                "defaultValue": "WARNING",
+                "range": "WARNING/ERROR"
+              }
+            ],
+            "outputParams": [
+              {
+                "name": "alertId",
+                "type": "String",
+                "required": true
+              },
+              {
+                "name": "reportStatus",
+                "type": "String",
+                "required": true
+              },
+              {
+                "name": "reportTime",
+                "type": "String",
+                "required": true
+              }
+            ]
+          }
+        ],
+        "onlineStatus": "ONLINE",
+        "location": {
+          "x": 805.0,
+          "y": 4050.0,
+          "zone": "F2_TEST"
+        },
+        "workload": "IDLE",
+        "availableUntil": null
+      },
+      {
+        "agentId": "AGT-9362B1F4",
+        "deviceCode": "SIM_F2_ROBOT",
+        "deviceTypeCode": "SIMULATOR",
+        "simulatedDeviceType": "MOBILE_ROBOT",
+        "businessStatus": {
+          "scenarioResult": "SUCCESS",
+          "simulatedDeviceType": "MOBILE_ROBOT"
+        },
+        "capabilities": [
+          "CAP_NAVIGATION",
+          "CAP_ESCORT",
+          "CAP_NOTIFICATION",
+          "CAP_INFO_DISPLAY"
+        ],
+        "capabilitySchemas": [
+          {
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": [
+              {
+                "name": "targetLocation",
+                "type": "String",
+                "required": true,
+                "defaultValue": "F2_TEST_GATE"
+              },
+              {
+                "name": "routePreference",
+                "type": "String",
+                "required": true,
+                "defaultValue": "BARRIER_FREE",
+                "range": "SHORTEST/BARRIER_FREE"
+              }
+            ],
+            "outputParams": [
+              {
+                "name": "routeGenerated",
+                "type": "Boolean",
+                "required": true
+              },
+              {
+                "name": "estimatedDistance",
+                "type": "Double",
+                "required": true
+              },
+              {
+                "name": "estimatedDuration",
+                "type": "Integer",
+                "required": true
+              },
+              {
+                "name": "waypointCount",
+                "type": "Integer",
+                "required": true
+              }
+            ]
+          },
+          {
+            "capabilityType": "CAP_ESCORT",
+            "inputParams": [
+              {
+                "name": "targetLocation",
+                "type": "String",
+                "required": true,
+                "defaultValue": "F2_TEST_GATE"
+              },
+              {
+                "name": "escortMode",
+                "type": "String",
+                "required": true,
+                "defaultValue": "LEAD",
+                "range": "LEAD/FOLLOW"
+              },
+              {
+                "name": "maxDuration",
+                "type": "Integer",
+                "required": true,
+                "defaultValue": "600",
+                "range": "60~1800"
+              }
+            ],
+            "outputParams": [
+              {
+                "name": "arrivalStatus",
+                "type": "String",
+                "required": true
+              },
+              {
+                "name": "actualDistance",
+                "type": "Double",
+                "required": true
+              },
+              {
+                "name": "actualDuration",
+                "type": "Integer",
+                "required": true
+              }
+            ]
+          },
+          {
+            "capabilityType": "CAP_NOTIFICATION",
+            "inputParams": [
+              {
+                "name": "notificationType",
+                "type": "String",
+                "required": true,
+                "defaultValue": "BOTH",
+                "range": "VOICE/TEXT/BOTH"
+              },
+              {
+                "name": "notificationContent",
+                "type": "String",
+                "required": true,
+                "defaultValue": "测试旅客需要轮椅陪同，请现场服务人员协助"
+              },
+              {
+                "name": "repeatCount",
+                "type": "Integer",
+                "required": true,
+                "defaultValue": "1",
+                "range": "1~5"
+              }
+            ],
+            "outputParams": [
+              {
+                "name": "notificationStatus",
+                "type": "String",
+                "required": true
+              },
+              {
+                "name": "actualRepeatCount",
+                "type": "Integer",
+                "required": true
+              }
+            ]
+          },
+          {
+            "capabilityType": "CAP_INFO_DISPLAY",
+            "inputParams": [
+              {
+                "name": "contentType",
+                "type": "String",
+                "required": true,
+                "defaultValue": "TEXT",
+                "range": "TEXT/IMAGE/VIDEO/HTML"
+              },
+              {
+                "name": "contentData",
+                "type": "String",
+                "required": true,
+                "defaultValue": "测试信息：请前往F2服务点"
+              },
+              {
+                "name": "displayDuration",
+                "type": "Integer",
+                "required": true,
+                "defaultValue": "60",
+                "range": "5~300"
+              }
+            ],
+            "outputParams": [
+              {
+                "name": "displayStatus",
+                "type": "String",
+                "required": true
+              },
+              {
+                "name": "actualDuration",
+                "type": "Integer",
+                "required": true
+              },
+              {
+                "name": "errorMessage",
+                "type": "String",
+                "required": false
+              }
+            ]
+          }
+        ],
+        "onlineStatus": "ONLINE",
+        "location": {
+          "x": 805.0,
+          "y": 4050.0,
+          "zone": "F2_TEST"
+        },
+        "workload": "IDLE",
+        "availableUntil": null
+      }
+    ]
+  },
+  "restore": {
+    "dryRunCancel": {
+      "taskId": 42,
+      "taskCode": "TASK-20261026-0042",
+      "result": "CANCELLED",
+      "stepResults": [
+        {
+          "stepSeq": 1,
+          "result": "FROZEN",
+          "duration": 0,
+          "failureReason": null
+        }
+      ],
+      "events": [
+        {
+          "eventType": "DRY_RUN_STARTED",
+          "trigger": "OPERATOR",
+          "detailSummary": "配置管理员set对模板S3_TC028_DISPLAY_DRYRUN(V1.9)发起试运行",
+          "occurredAt": "2026-10-26T09:44:56.743065"
+        },
+        {
+          "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+          "trigger": "SYSTEM",
+          "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-0158A712(距离0.0,负载0)，向候选AGT-0158A712发起承接请求",
+          "occurredAt": "2026-10-26T09:44:56.779272"
+        },
+        {
+          "eventType": "AGENT_ASSIGNED",
+          "trigger": "SYSTEM",
+          "detailSummary": "设备代理AGT-0158A712接受步骤1承接请求",
+          "occurredAt": "2026-10-26T09:44:56.831536"
+        },
+        {
+          "eventType": "STEP_DISPATCHED",
+          "trigger": "SYSTEM",
+          "detailSummary": "指令CMD-20261026094456-9D38E56D已下发至设备代理AGT-0158A712，业务意图: null",
+          "occurredAt": "2026-10-26T09:44:56.836126"
+        },
+        {
+          "eventType": "TASK_CANCEL_REQUESTED",
+          "trigger": "OPERATOR",
+          "detailSummary": "已向设备代理AGT-0158A712发送业务任务取消请求",
+          "occurredAt": "2026-10-26T09:45:14.393248"
+        },
+        {
+          "eventType": "MANUAL_TERMINATED",
+          "trigger": "OPERATOR",
+          "detailSummary": "运行操作员set人工终止任务，原因: 配置管理员取消模板试运行，涉及设备: [AGT-0158A712]",
+          "occurredAt": "2026-10-26T09:45:14.402870"
+        },
+        {
+          "eventType": "DRY_RUN_FAILED",
+          "trigger": "SYSTEM",
+          "detailSummary": "配置管理员取消模板试运行",
+          "occurredAt": "2026-10-26T09:45:14.437034"
+        }
+      ],
+      "failureReason": "配置管理员取消模板试运行"
+    },
+    "delayMs": 1000,
+    "templateStatus": "DISABLED",
+    "allSixOnlineIdle": true,
+    "dryRunFinal": {
+      "taskId": 42,
+      "taskCode": "TASK-20261026-0042",
+      "result": "CANCELLED",
+      "stepResults": [
+        {
+          "stepSeq": 1,
+          "result": "FROZEN",
+          "duration": 0,
+          "failureReason": null
+        }
+      ],
+      "events": [
+        {
+          "eventType": "DRY_RUN_STARTED",
+          "trigger": "OPERATOR",
+          "detailSummary": "配置管理员set对模板S3_TC028_DISPLAY_DRYRUN(V1.9)发起试运行",
+          "occurredAt": "2026-10-26T09:44:56.743065"
+        },
+        {
+          "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+          "trigger": "SYSTEM",
+          "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-0158A712(距离0.0,负载0)，向候选AGT-0158A712发起承接请求",
+          "occurredAt": "2026-10-26T09:44:56.779272"
+        },
+        {
+          "eventType": "AGENT_ASSIGNED",
+          "trigger": "SYSTEM",
+          "detailSummary": "设备代理AGT-0158A712接受步骤1承接请求",
+          "occurredAt": "2026-10-26T09:44:56.831536"
+        },
+        {
+          "eventType": "STEP_DISPATCHED",
+          "trigger": "SYSTEM",
+          "detailSummary": "指令CMD-20261026094456-9D38E56D已下发至设备代理AGT-0158A712，业务意图: null",
+          "occurredAt": "2026-10-26T09:44:56.836126"
+        },
+        {
+          "eventType": "TASK_CANCEL_REQUESTED",
+          "trigger": "OPERATOR",
+          "detailSummary": "已向设备代理AGT-0158A712发送业务任务取消请求",
+          "occurredAt": "2026-10-26T09:45:14.393248"
+        },
+        {
+          "eventType": "MANUAL_TERMINATED",
+          "trigger": "OPERATOR",
+          "detailSummary": "运行操作员set人工终止任务，原因: 配置管理员取消模板试运行，涉及设备: [AGT-0158A712]",
+          "occurredAt": "2026-10-26T09:45:14.402870"
+        },
+        {
+          "eventType": "DRY_RUN_FAILED",
+          "trigger": "SYSTEM",
+          "detailSummary": "配置管理员取消模板试运行",
+          "occurredAt": "2026-10-26T09:45:14.437034"
+        }
+      ],
+      "failureReason": "配置管理员取消模板试运行"
+    }
+  }
+}

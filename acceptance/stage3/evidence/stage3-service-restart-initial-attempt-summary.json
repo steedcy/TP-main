@@ -1,0 +1,18 @@
+{
+  "kind": "reconstructed diagnostic summary, not raw test evidence",
+  "observedAtLocal": "2026-10-26 09:31-09:34 Asia/Shanghai",
+  "source": "tool command outputs and .local-test/backend.log",
+  "incident": "After host processes stopped, the generic backend launcher initially started against public. It was stopped before any formal case was run. Six simulators were bound to public agent identities but their stage-3 tokens did not bring those agents online. The diagnostic file stage3-services-recovered-20261026.json from this failed attempt was overwritten by the successful isolated recovery attempt; this summary preserves the known failure facts without claiming to reproduce the lost raw file.",
+  "initialFlywaySchema": "public",
+  "publicAgentIdsObserved": [
+    "AGT-62EAF5EA",
+    "AGT-D602D701",
+    "AGT-B0D7BDAD",
+    "AGT-CCDDEB4A",
+    "AGT-1C13535E",
+    "AGT-3A36BBB4"
+  ],
+  "publicAgentOnlineStatusAfterIncorrectBinding": "all OFFLINE",
+  "formalStage3CasesExecutedInThisState": 0,
+  "resolution": "Stop public backend and simulators; launch backend with currentSchema=tip_stage2_v14 and matching Flyway schemas; restart simulators and rebind to isolated agent IDs. See stage3-service-restart-audit.json and stage3-services-recovered-20261026.json."
+}
