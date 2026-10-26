@@ -1,0 +1,341 @@
+{
+  "observedAt": "2026-10-26T04:02:03.215540+00:00",
+  "runtimeInput": "V1.5",
+  "schema": "tip_stage2_v14",
+  "fixtureModeBefore": {
+    "goal": "success",
+    "planning": "success",
+    "replanning": "success",
+    "delaySeconds": 65
+  },
+  "fixtureModeDuring": {
+    "goal": "timeout",
+    "planning": "success",
+    "replanning": "success",
+    "delaySeconds": 65
+  },
+  "beforeMaxTaskId": 46,
+  "request": {
+    "taskGoal": "请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在F2_BAGGAGE_POINT测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。",
+    "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+    "sceneParams": {
+      "baggageId": "R08-OVERSIZE",
+      "baggageLocation": "F2_BAGGAGE_POINT",
+      "length": 80,
+      "width": 55,
+      "height": 35,
+      "weight": 35,
+      "targetLocation": "F2_TEST_GATE",
+      "routePreference": "BARRIER_FREE",
+      "measureMode": "AUTO",
+      "timeout": 30,
+      "alertLevel": "WARNING",
+      "contentType": "TEXT",
+      "displayDuration": 60,
+      "contentData": "虚构超规行李请前往F2_TEST_GATE办理"
+    }
+  },
+  "submit": null,
+  "submitError": "HTTP 503: 目标理解服务调用超时或不可用: I/O error on POST request for \"http://127.0.0.1:8099/v1/goal/understand\": Read timed out",
+  "submitElapsedSeconds": 60.21799999999985,
+  "concurrentReads": {
+    "taskIdAtFiveSeconds": 46,
+    "dashboard": {
+      "ok": true,
+      "elapsedSeconds": 0.06199999999989814,
+      "status": null,
+      "response": {
+        "metrics": {
+          "agentTotal": 6,
+          "agentOnline": 6,
+          "taskInProgress": 0,
+          "pendingManual": 15,
+          "unhandledExceptions": 0,
+          "replanningCount": 0,
+          "statusCounts": {
+            "PLANNING": 0,
+            "SUPERVISING": 0,
+            "PENDING_ASSIGNMENT": 0,
+            "DOWNGRADING": 0,
+            "EXECUTING": 0,
+            "COMPLETED": 21,
+            "FAILED": 3,
+            "PENDING_MANUAL": 15,
+            "MANUAL_TERMINATED": 7
+          }
+        },
+        "latestExceptions": [],
+        "period": "TODAY"
+      }
+    },
+    "devices": {
+      "ok": true,
+      "elapsedSeconds": 0.04700000000048021,
+      "status": null,
+      "response": {
+        "content": [
+          {
+            "id": 1,
+            "deviceCode": "SIM_F2_DISPLAY",
+            "deviceName": "智慧显示终端仿真体",
+            "deviceTypeCode": "SIMULATOR",
+            "isSimulator": true,
+            "simulatedDeviceType": "SMART_DISPLAY",
+            "areaCode": "F2_TEST",
+            "positionX": 805.0,
+            "positionY": 4200.0,
+            "accessEndpoint": "http://127.0.0.1:8091",
+            "accessCredentialRefMasked": "lo****AY",
+            "statusReportInterval": 5,
+            "connectionTestStatus": "PASSED",
+            "connectionTestResult": "身份、协议版本及状态快照校验通过",
+            "remark": "95用例准备；F2像素坐标；虚构业务数据，非实地标定",
+            "deviceStatus": "ACTIVE",
+            "createdAt": "2026-10-25T15:28:53.863276",
+            "updatedAt": "2026-10-25T20:55:07.358374"
+          },
+          {
+            "id": 2,
+            "deviceCode": "SIM_F2_BAGGAGE",
+            "deviceName": "行李测量仪仿真体",
+            "deviceTypeCode": "SIMULATOR",
+            "isSimulator": true,
+            "simulatedDeviceType": "BAGGAGE_SCANNER",
+            "areaCode": "F2_TEST",
+            "positionX": 805.0,
+            "positionY": 4050.0,
+            "accessEndpoint": "http://127.0.0.1:8092",
+            "accessCredentialRefMasked": "lo****GE",
+            "statusReportInterval": 5,
+            "connectionTestStatus": "PASSED",
+            "connectionTestResult": "身份、协议版本及状态快照校验通过",
+            "remark": "95用例准备；F2像素坐标；虚构业务数据，非实地标定",
+            "deviceStatus": "ACTIVE",
+            "createdAt": "2026-10-25T15:28:53.863276",
+            "updatedAt": "2026-10-25T15:29:17.60681"
+          },
+          {
+            "id": 3,
+            "deviceCode": "SIM_F2_FLIGHT",
+            "deviceName": "航班信息屏仿真体",
+            "deviceTypeCode": "SIMULATOR",
+            "isSimulator": true,
+            "simulatedDeviceType": "FLIGHT_DELAY_BOARD",
+            "areaCode": "F2_TEST",
+            "positionX": 815.0,
+            "positionY": 4500.0,
+            "accessEndpoint": "http://127.0.0.1:8093",
+            "accessCredentialRefMasked": "lo****HT",
+            "statusReportInterval": 5,
+            "connectionTestStatus": "PASSED",
+            "connectionTestResult": "身份、协议版本及状态快照校验通过",
+            "remark": "95用例准备；F2像素坐标；虚构业务数据，非实地标定",
+            "deviceStatus": "ACTIVE",
+            "createdAt": "2026-10-25T15:28:53.863276",
+            "updatedAt": "2026-10-25T15:29:17.626201"
+          },
+          {
+            "id": 4,
+            "deviceCode": "SIM_F2_ROBOT",
+            "deviceName": "移动服务机器人仿真体",
+            "deviceTypeCode": "SIMULATOR",
+            "isSimulator": true,
+            "simulatedDeviceType": "MOBILE_ROBOT",
+            "areaCode": "F2_TEST",
+            "positionX": 810.0,
+            "positionY": 4180.0,
+            "accessEndpoint": "http://127.0.0.1:8094",
+            "accessCredentialRefMasked": "lo****OT",
+            "statusReportInterval": 5,
+            "connectionTestStatus": "PASSED",
+            "connectionTestResult": "身份、协议版本及状态快照校验通过",
+            "remark": "95用例准备；F2像素坐标；虚构业务数据，非实地标定",
+            "deviceStatus": "ACTIVE",
+            "createdAt": "2026-10-25T15:28:53.863276",
+            "updatedAt": "2026-10-25T15:29:17.649597"
+          },
+          {
+            "id": 5,
+            "deviceCode": "SIM_F2_BAGGAGE_B",
+            "deviceName": "备用行李测量仪仿真体",
+            "deviceTypeCode": "SIMULATOR",
+            "isSimulator": true,
+            "simulatedDeviceType": "BAGGAGE_SCANNER",
+            "areaCode": "F2_TEST",
+            "positionX": 800.0,
+            "positionY": 4080.0,
+            "accessEndpoint": "http://127.0.0.1:8095",
+            "accessCredentialRefMasked": "lo****_B",
+            "statusReportInterval": 5,
+            "connectionTestStatus": "PASSED",
+            "connectionTestResult": "身份、协议版本及状态快照校验通过",
+            "remark": "95用例准备；F2像素坐标；虚构业务数据，非实地标定",
+            "deviceStatus": "ACTIVE",
+            "createdAt": "2026-10-25T15:28:53.863276",
+            "updatedAt": "2026-10-25T15:29:17.673792"
+          },
+          {
+            "id": 6,
+            "deviceCode": "SIM_F2_ROBOT_B",
+            "deviceName": "备用移动机器人仿真体",
+            "deviceTypeCode": "SIMULATOR",
+            "isSimulator": true,
+            "simulatedDeviceType": "MOBILE_ROBOT",
+            "areaCode": "F2_TEST",
+            "positionX": 805.0,
+            "positionY": 4050.0,
+            "accessEndpoint": "http://127.0.0.1:8096",
+            "accessCredentialRefMasked": "lo****_B",
+            "statusReportInterval": 5,
+            "connectionTestStatus": "PASSED",
+            "connectionTestResult": "身份、协议版本及状态快照校验通过",
+            "remark": "95用例准备；F2像素坐标；虚构业务数据，非实地标定",
+            "deviceStatus": "ACTIVE",
+            "createdAt": "2026-10-25T15:28:53.863276",
+            "updatedAt": "2026-10-25T15:29:17.701711"
+          }
+        ],
+        "totalElements": 6,
+        "page": 1,
+        "size": 20
+      }
+    },
+    "task": {
+      "ok": true,
+      "elapsedSeconds": 0.01599999999962165,
+      "status": "COMPLETED",
+      "response": {
+        "id": 19,
+        "taskCode": "TASK-20261025-0019",
+        "taskGoal": "请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在F2_BAGGAGE_POINT测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。",
+        "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+        "sceneParams": {
+          "baggageId": "R08-OVERSIZE",
+          "baggageLocation": "F2_BAGGAGE_POINT",
+          "length": 80,
+          "width": 55,
+          "height": 35,
+          "weight": 35,
+          "targetLocation": "F2_TEST_GATE",
+          "routePreference": "BARRIER_FREE",
+          "measureMode": "AUTO",
+          "timeout": 30,
+          "alertLevel": "WARNING",
+          "contentType": "TEXT",
+          "displayDuration": 60,
+          "contentData": "虚构超规行李请前往F2_TEST_GATE办理"
+        },
+        "goalParsingResult": {
+          "completionCondition": "行李已完成尺寸重量测量且超规事件（如有）已上报",
+          "origin": "F2_BAGGAGE_POINT",
+          "destination": "F2_TEST_GATE",
+          "originalGoal": "请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在F2_BAGGAGE_POINT测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。",
+          "constraints": [
+            "超规行李处置全程不得引导旅客脱离监控区域",
+            "测量结果超标须触发超规事件上报"
+          ]
+        },
+        "status": "COMPLETED",
+        "currentPlanVersionId": 24,
+        "replanUsed": false,
+        "replanningReason": null,
+        "manualTerminateReason": null,
+        "failureReason": null,
+        "missingInfoQuestions": null,
+        "downgradeReason": "候选计划三类校验未通过，转基线模板降级",
+        "isDryRun": false,
+        "createdAt": "2026-10-25T20:22:13.491926",
+        "updatedAt": "2026-10-25T20:22:29.411601",
+        "createdBy": "oprator"
+      }
+    }
+  },
+  "afterMaxTaskId": 47,
+  "task": {
+    "id": 47,
+    "taskCode": "TASK-20261026-0047",
+    "taskGoal": "请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在F2_BAGGAGE_POINT测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。",
+    "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+    "sceneParams": {
+      "baggageId": "R08-OVERSIZE",
+      "baggageLocation": "F2_BAGGAGE_POINT",
+      "length": 80,
+      "width": 55,
+      "height": 35,
+      "weight": 35,
+      "targetLocation": "F2_TEST_GATE",
+      "routePreference": "BARRIER_FREE",
+      "measureMode": "AUTO",
+      "timeout": 30,
+      "alertLevel": "WARNING",
+      "contentType": "TEXT",
+      "displayDuration": 60,
+      "contentData": "虚构超规行李请前往F2_TEST_GATE办理"
+    },
+    "goalParsingResult": null,
+    "status": "PLANNING",
+    "currentPlanVersionId": null,
+    "replanUsed": false,
+    "replanningReason": null,
+    "manualTerminateReason": null,
+    "failureReason": null,
+    "missingInfoQuestions": null,
+    "downgradeReason": null,
+    "isDryRun": false,
+    "createdAt": "2026-10-26T12:02:03.519628",
+    "updatedAt": "2026-10-26T12:02:03.519628",
+    "createdBy": "oprator"
+  },
+  "events": [
+    {
+      "id": 600,
+      "taskId": 47,
+      "eventType": "GOAL_SUBMITTED",
+      "occurredAt": "2026-10-26T12:02:03.543538",
+      "trigger": "OPERATOR",
+      "reasonCode": null,
+      "detailSummary": "运行操作员oprator提交任务目标: 请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在F2_BAGGAGE_POINT测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。"
+    },
+    {
+      "id": 601,
+      "taskId": 47,
+      "eventType": "GOAL_UNDERSTANDING_FAILED",
+      "occurredAt": "2026-10-26T12:03:03.674727",
+      "trigger": "SYSTEM",
+      "reasonCode": "ERR_GOAL_UNDERSTANDING_TIMEOUT",
+      "detailSummary": "目标理解调用规划模型服务失败: 目标理解服务调用超时或不可用: I/O error on POST request for \"http://127.0.0.1:8099/v1/goal/understand\": Read timed out"
+    }
+  ],
+  "contexts": [],
+  "plans": [],
+  "modelRequests": [
+    {
+      "at": "2026-10-26T12:02:03.677967+08:00",
+      "phase": "goal",
+      "mode": "timeout",
+      "request": {
+        "requestId": "a94510dc-f808-4045-b057-d41531fe0b7c",
+        "taskGoal": "请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在F2_BAGGAGE_POINT测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。",
+        "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+        "sceneParams": {
+          "baggageId": "R08-OVERSIZE",
+          "baggageLocation": "F2_BAGGAGE_POINT",
+          "length": 80,
+          "width": 55,
+          "height": 35,
+          "weight": 35,
+          "targetLocation": "F2_TEST_GATE",
+          "routePreference": "BARRIER_FREE",
+          "measureMode": "AUTO",
+          "timeout": 30,
+          "alertLevel": "WARNING",
+          "contentType": "TEXT",
+          "displayDuration": 60,
+          "contentData": "虚构超规行李请前往F2_TEST_GATE办理"
+        },
+        "clarificationAnswers": null
+      }
+    }
+  ],
+  "fixtureModeRestored": true
+}
