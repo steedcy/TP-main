@@ -1,0 +1,931 @@
+{
+  "observedAt": "2026-10-27T06:07:55.210136+00:00",
+  "runtimeInput": "V1.5",
+  "isolatedSchema": "tip_stage2_v14",
+  "definition": {
+    "id": 1,
+    "definitionCode": "OVERSIZE_BAGGAGE_HANDLING",
+    "taskName": "超规行李处置",
+    "goalTemplate": "协助旅客处理超规行李，引导至行李处置点并完成尺寸重量测量",
+    "sceneParams": [
+      {
+        "name": "baggageLocation",
+        "type": "String",
+        "required": true,
+        "range": "行李当前所在位置编码"
+      }
+    ],
+    "availableCapabilityTypes": [
+      "CAP_BAGGAGE_MEASURE",
+      "CAP_OVERSIZE_ALERT",
+      "CAP_NAVIGATION",
+      "CAP_NOTIFICATION"
+    ],
+    "constraintDescription": "超规行李处置全程不得引导旅客脱离监控区域；测量结果超标须触发超规事件上报",
+    "completionCondition": "行李已完成尺寸重量测量且超规事件（如有）已上报",
+    "isPreset": true,
+    "definitionStatus": "ENABLED",
+    "updatedAt": "2026-10-26T01:18:10.446511",
+    "updatedBy": "set"
+  },
+  "displayCapabilities": [
+    {
+      "id": 3,
+      "capabilityCode": "CAP_NAVIGATION",
+      "capabilityName": "NAVIGATION测试能力",
+      "capabilityType": "CAP_NAVIGATION",
+      "inputParams": [
+        {
+          "name": "targetLocation",
+          "type": "String",
+          "required": true,
+          "defaultValue": "F2_TEST_GATE",
+          "range": null
+        },
+        {
+          "name": "routePreference",
+          "type": "String",
+          "required": true,
+          "defaultValue": "BARRIER_FREE",
+          "range": "SHORTEST/BARRIER_FREE"
+        }
+      ],
+      "outputParams": [
+        {
+          "name": "routeGenerated",
+          "type": "Boolean",
+          "required": true,
+          "defaultValue": null,
+          "range": null
+        },
+        {
+          "name": "estimatedDistance",
+          "type": "Double",
+          "required": true,
+          "defaultValue": null,
+          "range": null
+        },
+        {
+          "name": "estimatedDuration",
+          "type": "Integer",
+          "required": true,
+          "defaultValue": null,
+          "range": null
+        },
+        {
+          "name": "waypointCount",
+          "type": "Integer",
+          "required": true,
+          "defaultValue": null,
+          "range": null
+        }
+      ],
+      "applicableConditions": null,
+      "capabilityStatus": "ENABLED",
+      "testResult": "实际设备代理调用通过，指令 TEST-99dc600b043c43499a0991bd10",
+      "lastTestAt": "2026-10-25T15:29:35.309325",
+      "capabilityDescription": "按现有仿真驱动业务契约配置"
+    },
+    {
+      "id": 2,
+      "capabilityCode": "CAP_FLIGHT_UPDATE",
+      "capabilityName": "FLIGHT_UPDATE测试能力",
+      "capabilityType": "CAP_FLIGHT_UPDATE",
+      "inputParams": [
+        {
+          "name": "flightNumber",
+          "type": "String",
+          "required": true,
+          "defaultValue": "TEST1022",
+          "range": null
+        },
+        {
+          "name": "updateType",
+          "type": "String",
+          "required": true,
+          "defaultValue": "GATE_CHANGE",
+          "range": "DELAY/EARLY/GATE_CHANGE/CANCEL"
+        },
+        {
+          "name": "updateContent",
+          "type": "String",
+          "required": true,
+          "defaultValue": "测试航班登机口变更至F2_TEST_GATE",
+          "range": null
+        },
+        {
+          "name": "displayDuration",
+          "type": "Integer",
+          "required": true,
+          "defaultValue": "60",
+          "range": "10~600"
+        }
+      ],
+      "outputParams": [
+        {
+          "name": "publishStatus",
+          "type": "String",
+          "required": true,
+          "defaultValue": null,
+          "range": null
+        },
+        {
+          "name": "publishTime",
+          "type": "String",
+          "required": true,
+          "defaultValue": null,
+          "range": null
+        }
+      ],
+      "applicableConditions": null,
+      "capabilityStatus": "ENABLED",
+      "testResult": "实际设备代理调用通过，指令 TEST-c4fa2833c10f4392bcdf15a3c9",
+      "lastTestAt": "2026-10-25T15:29:35.245647",
+      "capabilityDescription": "按现有仿真驱动业务契约配置"
+    },
+    {
+      "id": 1,
+      "capabilityCode": "CAP_INFO_DISPLAY",
+      "capabilityName": "INFO_DISPLAY测试能力",
+      "capabilityType": "CAP_INFO_DISPLAY",
+      "inputParams": [
+        {
+          "name": "contentType",
+          "type": "String",
+          "required": true,
+          "defaultValue": "TEXT",
+          "range": "TEXT/IMAGE/VIDEO/HTML"
+        },
+        {
+          "name": "contentData",
+          "type": "String",
+          "required": true,
+          "defaultValue": "测试信息：请前往F2服务点",
+          "range": null
+        },
+        {
+          "name": "displayDuration",
+          "type": "Integer",
+          "required": true,
+          "defaultValue": "60",
+          "range": "5~300"
+        }
+      ],
+      "outputParams": [
+        {
+          "name": "displayStatus",
+          "type": "String",
+          "required": true,
+          "defaultValue": null,
+          "range": null
+        },
+        {
+          "name": "actualDuration",
+          "type": "Integer",
+          "required": true,
+          "defaultValue": null,
+          "range": null
+        },
+        {
+          "name": "errorMessage",
+          "type": "String",
+          "required": false,
+          "defaultValue": null,
+          "range": null
+        }
+      ],
+      "applicableConditions": null,
+      "capabilityStatus": "ENABLED",
+      "testResult": "实际设备代理调用通过，指令 TEST-08dbcfadc627471d8b29ed1e33",
+      "lastTestAt": "2026-10-26T00:46:57.513255",
+      "capabilityDescription": "按现有仿真驱动业务契约配置"
+    }
+  ],
+  "tasks": {
+    "19": {
+      "task": {
+        "id": 19,
+        "taskCode": "TASK-20261025-0019",
+        "taskGoal": "请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在F2_BAGGAGE_POINT测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。",
+        "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+        "sceneParams": {
+          "baggageId": "R08-OVERSIZE",
+          "baggageLocation": "F2_BAGGAGE_POINT",
+          "length": 80,
+          "width": 55,
+          "height": 35,
+          "weight": 35,
+          "targetLocation": "F2_TEST_GATE",
+          "routePreference": "BARRIER_FREE",
+          "measureMode": "AUTO",
+          "timeout": 30,
+          "alertLevel": "WARNING",
+          "contentType": "TEXT",
+          "displayDuration": 60,
+          "contentData": "虚构超规行李请前往F2_TEST_GATE办理"
+        },
+        "goalParsingResult": {
+          "completionCondition": "行李已完成尺寸重量测量且超规事件（如有）已上报",
+          "origin": "F2_BAGGAGE_POINT",
+          "destination": "F2_TEST_GATE",
+          "originalGoal": "请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在F2_BAGGAGE_POINT测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。",
+          "constraints": [
+            "超规行李处置全程不得引导旅客脱离监控区域",
+            "测量结果超标须触发超规事件上报"
+          ]
+        },
+        "status": "COMPLETED",
+        "currentPlanVersionId": 24,
+        "replanUsed": false,
+        "replanningReason": null,
+        "manualTerminateReason": null,
+        "failureReason": null,
+        "missingInfoQuestions": null,
+        "downgradeReason": "候选计划三类校验未通过，转基线模板降级",
+        "isDryRun": false,
+        "createdAt": "2026-10-25T20:22:13.491926",
+        "updatedAt": "2026-10-25T20:22:29.411601",
+        "createdBy": "oprator"
+      },
+      "plans": [
+        {
+          "id": 23,
+          "versionNo": 1,
+          "source": "AUTONOMOUS",
+          "baselineTemplateId": null,
+          "snapshotId": "CTX-20261025-0017",
+          "planSteps": [
+            {
+              "stepSeq": 1,
+              "stepGoal": "在F2_BAGGAGE_POINT对行李R08-OVERSIZE进行尺寸重量测量",
+              "capabilityType": "CAP_BAGGAGE_MEASURE",
+              "inputParams": {
+                "measureMode": "AUTO",
+                "timeout": 30
+              },
+              "precondition": "行李R08-OVERSIZE已放置于F2_BAGGAGE_POINT测量点，设备在线可用",
+              "completionCondition": "测量完成，返回length=80、width=55、height=35、weight=35及isOversize=true结果",
+              "failureHandling": "测量超时或失败时重试一次，仍失败则人工介入处理",
+              "stepTimeout": 35
+            },
+            {
+              "stepSeq": 2,
+              "stepGoal": "上报超规行李事件（尺寸80×55×35厘米、重量35千克，超规阈值触发）",
+              "capabilityType": "CAP_OVERSIZE_ALERT",
+              "inputParams": {
+                "baggageInfo": "{\"baggageId\":\"R08-OVERSIZE\",\"length\":80,\"width\":55,\"height\":35,\"weight\":35,\"location\":\"F2_BAGGAGE_POINT\",\"sumDimension\":170}",
+                "alertLevel": "WARNING"
+              },
+              "precondition": "步骤1测量完成且确认isOversize=true（长宽高之和170>158或重量35>32）",
+              "completionCondition": "超规事件上报成功，返回alertId及reportStatus=SUCCESS",
+              "failureHandling": "上报失败则记录日志并尝试备用设备重报，确保事件不丢失",
+              "stepTimeout": 30
+            },
+            {
+              "stepSeq": 3,
+              "stepGoal": "通过智慧航显在F2_TEST区域提示超规行李处置信息",
+              "capabilityType": "CAP_NOTIFICATION",
+              "inputParams": {
+                "notificationType": "TEXT",
+                "notificationContent": "虚构超规行李请前往F2_TEST_GATE办理",
+                "repeatCount": 1
+              },
+              "precondition": "步骤2超规事件上报成功，需向旅客/现场展示提示信息",
+              "completionCondition": "通知发布成功，notificationStatus返回SUCCESS",
+              "failureHandling": "通知失败不影响核心流程，记录日志后续人工补播",
+              "stepTimeout": 30
+            },
+            {
+              "stepSeq": 4,
+              "stepGoal": "机器人引导旅客至F2_TEST_GATE超规行李处置点",
+              "capabilityType": "CAP_NAVIGATION",
+              "inputParams": {
+                "targetLocation": "F2_TEST_GATE",
+                "routePreference": "BARRIER_FREE"
+              },
+              "precondition": "步骤2超规事件已上报，需执行旅客引导；机器人位于F2_TEST区域可用",
+              "completionCondition": "导航路线生成成功，routeGenerated=true，机器人开始执行引导",
+              "failureHandling": "导航失败时切换备用机器人或通知人工引导",
+              "stepTimeout": 60
+            }
+          ],
+          "structureCheckResult": "PASS",
+          "capabilityCheckResult": "FAIL",
+          "constraintCheckResult": "PASS",
+          "validationErrors": [
+            {
+              "errorType": "CAPABILITY",
+              "description": "核心场景计划缺少必需渠道SMART_DISPLAY的能力CAP_INFO_DISPLAY",
+              "stepSeq": null,
+              "reasonCode": "ERR_REQUIRED_CHANNEL_MISSING"
+            }
+          ],
+          "riskLevel": null,
+          "riskReasonCode": null,
+          "judgmentBasis": null,
+          "confidence": 0.92,
+          "ruleSetVersion": null,
+          "frozenAt": null,
+          "createdAt": "2026-10-25T20:22:23.904047"
+        },
+        {
+          "id": 24,
+          "versionNo": 2,
+          "source": "BASELINE_TEMPLATE",
+          "baselineTemplateId": 1,
+          "snapshotId": "CTX-20261025-0018",
+          "planSteps": [
+            {
+              "stepSeq": 1,
+              "capabilityType": "CAP_NAVIGATION",
+              "paramMapping": [
+                {
+                  "target": "targetLocation",
+                  "source": "TEMPLATE_INPUT.baggageLocation"
+                },
+                {
+                  "target": "routePreference",
+                  "source": "TEMPLATE_INPUT.routePreference"
+                }
+              ],
+              "stepTimeout": 60,
+              "completionCondition": "routeGenerated=true",
+              "stepGoal": "执行CAP_NAVIGATION能力（基线模板步骤）",
+              "precondition": "候选设备在线且空闲",
+              "failureHandling": "重试一次或转人工处理",
+              "inputParams": {}
+            },
+            {
+              "stepSeq": 2,
+              "capabilityType": "CAP_BAGGAGE_MEASURE",
+              "paramMapping": [
+                {
+                  "target": "measureMode",
+                  "source": "TEMPLATE_INPUT.measureMode"
+                },
+                {
+                  "target": "timeout",
+                  "source": "TEMPLATE_INPUT.timeout"
+                }
+              ],
+              "stepTimeout": 60,
+              "completionCondition": "measureStatus=SUCCESS",
+              "stepGoal": "执行CAP_BAGGAGE_MEASURE能力（基线模板步骤）",
+              "precondition": "候选设备在线且空闲",
+              "failureHandling": "重试一次或转人工处理",
+              "inputParams": {}
+            },
+            {
+              "stepSeq": 3,
+              "capabilityType": "CAP_OVERSIZE_ALERT",
+              "paramMapping": [
+                {
+                  "target": "baggageInfo",
+                  "source": "STEP2_OUTPUT.baggageInfo"
+                },
+                {
+                  "target": "alertLevel",
+                  "source": "TEMPLATE_INPUT.alertLevel"
+                }
+              ],
+              "stepTimeout": 60,
+              "completionCondition": "reportStatus=SUCCESS",
+              "stepGoal": "执行CAP_OVERSIZE_ALERT能力（基线模板步骤）",
+              "precondition": "候选设备在线且空闲",
+              "failureHandling": "重试一次或转人工处理",
+              "inputParams": {}
+            },
+            {
+              "stepSeq": 4,
+              "capabilityType": "CAP_INFO_DISPLAY",
+              "paramMapping": [
+                {
+                  "target": "contentType",
+                  "source": "TEMPLATE_INPUT.contentType"
+                },
+                {
+                  "target": "contentData",
+                  "source": "TEMPLATE_INPUT.contentData"
+                },
+                {
+                  "target": "displayDuration",
+                  "source": "TEMPLATE_INPUT.displayDuration"
+                }
+              ],
+              "stepTimeout": 60,
+              "completionCondition": "displayStatus=SUCCESS",
+              "stepGoal": "执行CAP_INFO_DISPLAY能力（基线模板步骤）",
+              "precondition": "候选设备在线且空闲",
+              "failureHandling": "重试一次或转人工处理",
+              "inputParams": {}
+            }
+          ],
+          "structureCheckResult": "PASS",
+          "capabilityCheckResult": "PASS",
+          "constraintCheckResult": "PASS",
+          "validationErrors": [],
+          "riskLevel": null,
+          "riskReasonCode": null,
+          "judgmentBasis": null,
+          "confidence": null,
+          "ruleSetVersion": null,
+          "frozenAt": "2026-10-25T20:22:23.94724",
+          "createdAt": "2026-10-25T20:22:23.944628"
+        }
+      ]
+    },
+    "86": {
+      "task": {
+        "id": 86,
+        "taskCode": "TASK-20261027-0086",
+        "taskGoal": "请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在F2_BAGGAGE_POINT测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。",
+        "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+        "sceneParams": {
+          "baggageId": "R08-OVERSIZE",
+          "baggageLocation": "F2_BAGGAGE_POINT",
+          "length": 80,
+          "width": 55,
+          "height": 35,
+          "weight": 35,
+          "targetLocation": "F2_TEST_GATE",
+          "routePreference": "BARRIER_FREE",
+          "measureMode": "AUTO",
+          "timeout": 30,
+          "alertLevel": "WARNING",
+          "contentType": "TEXT",
+          "displayDuration": 60,
+          "contentData": "虚构超规行李请前往F2_TEST_GATE办理"
+        },
+        "goalParsingResult": {
+          "completionCondition": "既定业务完成条件满足",
+          "origin": "F2_SERVICE_POINT",
+          "destination": "F2_TEST_GATE",
+          "originalGoal": "请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在F2_BAGGAGE_POINT测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。",
+          "constraints": [
+            "不得下发运动安全控制指令"
+          ]
+        },
+        "status": "COMPLETED",
+        "currentPlanVersionId": 90,
+        "replanUsed": false,
+        "replanningReason": null,
+        "manualTerminateReason": null,
+        "failureReason": null,
+        "missingInfoQuestions": null,
+        "downgradeReason": "候选计划三类校验未通过，转基线模板降级",
+        "isDryRun": false,
+        "createdAt": "2026-10-27T14:02:11.070154",
+        "updatedAt": "2026-10-27T14:02:57.353994",
+        "createdBy": "oprator"
+      },
+      "plans": [
+        {
+          "id": 89,
+          "versionNo": 1,
+          "source": "AUTONOMOUS",
+          "baselineTemplateId": null,
+          "snapshotId": "CTX-20261027-0069",
+          "planSteps": [
+            {
+              "stepSeq": 1,
+              "capabilityType": "CAP_NAVIGATION",
+              "paramMapping": [
+                {
+                  "target": "targetLocation",
+                  "source": "TEMPLATE_INPUT.baggageLocation"
+                },
+                {
+                  "target": "routePreference",
+                  "source": "TEMPLATE_INPUT.routePreference"
+                }
+              ],
+              "stepTimeout": 60,
+              "completionCondition": "routeGenerated=true",
+              "stepGoal": "执行CAP_NAVIGATION能力（基线模板步骤）",
+              "precondition": "候选设备在线且空闲",
+              "failureHandling": "重试一次或转人工处理",
+              "inputParams": {}
+            },
+            {
+              "stepSeq": 2,
+              "capabilityType": "CAP_BAGGAGE_MEASURE",
+              "paramMapping": [
+                {
+                  "target": "measureMode",
+                  "source": "TEMPLATE_INPUT.measureMode"
+                },
+                {
+                  "target": "timeout",
+                  "source": "TEMPLATE_INPUT.timeout"
+                }
+              ],
+              "stepTimeout": 60,
+              "completionCondition": "measureStatus=SUCCESS",
+              "stepGoal": "执行CAP_BAGGAGE_MEASURE能力（基线模板步骤）",
+              "precondition": "候选设备在线且空闲",
+              "failureHandling": "重试一次或转人工处理",
+              "inputParams": {}
+            },
+            {
+              "stepSeq": 3,
+              "capabilityType": "CAP_OVERSIZE_ALERT",
+              "paramMapping": [
+                {
+                  "target": "baggageInfo",
+                  "source": "STEP2_OUTPUT.baggageInfo"
+                },
+                {
+                  "target": "alertLevel",
+                  "source": "TEMPLATE_INPUT.alertLevel"
+                }
+              ],
+              "stepTimeout": 60,
+              "completionCondition": "reportStatus=SUCCESS",
+              "stepGoal": "执行CAP_OVERSIZE_ALERT能力（基线模板步骤）",
+              "precondition": "候选设备在线且空闲",
+              "failureHandling": "重试一次或转人工处理",
+              "inputParams": {}
+            },
+            {
+              "stepSeq": 4,
+              "capabilityType": "CAP_INFO_DISPLAY",
+              "paramMapping": [
+                {
+                  "target": "contentType",
+                  "source": "TEMPLATE_INPUT.contentType"
+                },
+                {
+                  "target": "contentData",
+                  "source": "TEMPLATE_INPUT.contentData"
+                },
+                {
+                  "target": "displayDuration",
+                  "source": "TEMPLATE_INPUT.displayDuration"
+                }
+              ],
+              "stepTimeout": 60,
+              "completionCondition": "displayStatus=SUCCESS",
+              "stepGoal": "执行CAP_INFO_DISPLAY能力（基线模板步骤）",
+              "precondition": "候选设备在线且空闲",
+              "failureHandling": "重试一次或转人工处理",
+              "inputParams": {}
+            }
+          ],
+          "structureCheckResult": "PASS",
+          "capabilityCheckResult": "PASS",
+          "constraintCheckResult": "FAIL",
+          "validationErrors": [
+            {
+              "errorType": "CONSTRAINT",
+              "description": "步骤所需能力CAP_INFO_DISPLAY超出任务定义声明的可用能力类型范围: [CAP_BAGGAGE_MEASURE, CAP_OVERSIZE_ALERT, CAP_NAVIGATION, CAP_NOTIFICATION]",
+              "stepSeq": 4,
+              "reasonCode": "ERR_CAPABILITY_NOT_IN_TASK_DEFINITION"
+            }
+          ],
+          "riskLevel": null,
+          "riskReasonCode": null,
+          "judgmentBasis": null,
+          "confidence": 0.99,
+          "ruleSetVersion": null,
+          "frozenAt": null,
+          "createdAt": "2026-10-27T14:02:11.318058"
+        },
+        {
+          "id": 90,
+          "versionNo": 2,
+          "source": "BASELINE_TEMPLATE",
+          "baselineTemplateId": 1,
+          "snapshotId": "CTX-20261027-0070",
+          "planSteps": [
+            {
+              "stepSeq": 1,
+              "capabilityType": "CAP_NAVIGATION",
+              "paramMapping": [
+                {
+                  "target": "targetLocation",
+                  "source": "TEMPLATE_INPUT.baggageLocation"
+                },
+                {
+                  "target": "routePreference",
+                  "source": "TEMPLATE_INPUT.routePreference"
+                }
+              ],
+              "stepTimeout": 60,
+              "completionCondition": "routeGenerated=true",
+              "stepGoal": "执行CAP_NAVIGATION能力（基线模板步骤）",
+              "precondition": "候选设备在线且空闲",
+              "failureHandling": "重试一次或转人工处理",
+              "inputParams": {}
+            },
+            {
+              "stepSeq": 2,
+              "capabilityType": "CAP_BAGGAGE_MEASURE",
+              "paramMapping": [
+                {
+                  "target": "measureMode",
+                  "source": "TEMPLATE_INPUT.measureMode"
+                },
+                {
+                  "target": "timeout",
+                  "source": "TEMPLATE_INPUT.timeout"
+                }
+              ],
+              "stepTimeout": 60,
+              "completionCondition": "measureStatus=SUCCESS",
+              "stepGoal": "执行CAP_BAGGAGE_MEASURE能力（基线模板步骤）",
+              "precondition": "候选设备在线且空闲",
+              "failureHandling": "重试一次或转人工处理",
+              "inputParams": {}
+            },
+            {
+              "stepSeq": 3,
+              "capabilityType": "CAP_OVERSIZE_ALERT",
+              "paramMapping": [
+                {
+                  "target": "baggageInfo",
+                  "source": "STEP2_OUTPUT.baggageInfo"
+                },
+                {
+                  "target": "alertLevel",
+                  "source": "TEMPLATE_INPUT.alertLevel"
+                }
+              ],
+              "stepTimeout": 60,
+              "completionCondition": "reportStatus=SUCCESS",
+              "stepGoal": "执行CAP_OVERSIZE_ALERT能力（基线模板步骤）",
+              "precondition": "候选设备在线且空闲",
+              "failureHandling": "重试一次或转人工处理",
+              "inputParams": {}
+            },
+            {
+              "stepSeq": 4,
+              "capabilityType": "CAP_INFO_DISPLAY",
+              "paramMapping": [
+                {
+                  "target": "contentType",
+                  "source": "TEMPLATE_INPUT.contentType"
+                },
+                {
+                  "target": "contentData",
+                  "source": "TEMPLATE_INPUT.contentData"
+                },
+                {
+                  "target": "displayDuration",
+                  "source": "TEMPLATE_INPUT.displayDuration"
+                }
+              ],
+              "stepTimeout": 60,
+              "completionCondition": "displayStatus=SUCCESS",
+              "stepGoal": "执行CAP_INFO_DISPLAY能力（基线模板步骤）",
+              "precondition": "候选设备在线且空闲",
+              "failureHandling": "重试一次或转人工处理",
+              "inputParams": {}
+            }
+          ],
+          "structureCheckResult": "PASS",
+          "capabilityCheckResult": "PASS",
+          "constraintCheckResult": "PASS",
+          "validationErrors": [],
+          "riskLevel": null,
+          "riskReasonCode": null,
+          "judgmentBasis": null,
+          "confidence": null,
+          "ruleSetVersion": null,
+          "frozenAt": "2026-10-27T14:02:11.460807",
+          "createdAt": "2026-10-27T14:02:11.458208"
+        }
+      ]
+    },
+    "87": {
+      "task": {
+        "id": 87,
+        "taskCode": "TASK-20261027-0087",
+        "taskGoal": "请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在F2_BAGGAGE_POINT测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。",
+        "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+        "sceneParams": {
+          "baggageId": "R08-OVERSIZE",
+          "baggageLocation": "F2_BAGGAGE_POINT",
+          "length": 80,
+          "width": 55,
+          "height": 35,
+          "weight": 35,
+          "targetLocation": "F2_TEST_GATE",
+          "routePreference": "BARRIER_FREE",
+          "measureMode": "AUTO",
+          "timeout": 30,
+          "alertLevel": "WARNING",
+          "contentType": "TEXT",
+          "displayDuration": 60,
+          "contentData": "虚构超规行李请前往F2_TEST_GATE办理"
+        },
+        "goalParsingResult": {
+          "completionCondition": "既定业务完成条件满足",
+          "origin": "F2_SERVICE_POINT",
+          "destination": "F2_TEST_GATE",
+          "originalGoal": "请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在F2_BAGGAGE_POINT测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。",
+          "constraints": [
+            "不得下发运动安全控制指令"
+          ]
+        },
+        "status": "COMPLETED",
+        "currentPlanVersionId": 92,
+        "replanUsed": false,
+        "replanningReason": null,
+        "manualTerminateReason": null,
+        "failureReason": null,
+        "missingInfoQuestions": null,
+        "downgradeReason": "候选计划三类校验未通过，转基线模板降级",
+        "isDryRun": false,
+        "createdAt": "2026-10-27T14:04:55.269827",
+        "updatedAt": "2026-10-27T14:05:41.784386",
+        "createdBy": "oprator"
+      },
+      "plans": [
+        {
+          "id": 91,
+          "versionNo": 1,
+          "source": "AUTONOMOUS",
+          "baselineTemplateId": null,
+          "snapshotId": "CTX-20261027-0071",
+          "planSteps": [
+            {
+              "stepSeq": 1,
+              "stepGoal": "在F2_BAGGAGE_POINT对行李R08-OVERSIZE进行尺寸重量测量",
+              "capabilityType": "CAP_BAGGAGE_MEASURE",
+              "inputParams": {
+                "measureMode": "AUTO",
+                "timeout": 30
+              },
+              "precondition": "行李R08-OVERSIZE已放置于F2_BAGGAGE_POINT测量点，设备在线可用",
+              "completionCondition": "measureStatus=SUCCESS",
+              "failureHandling": "测量超时或失败时重试一次，仍失败则人工介入处理",
+              "stepTimeout": 35
+            },
+            {
+              "stepSeq": 2,
+              "stepGoal": "上报超规行李事件（尺寸80×55×35厘米、重量35千克，超规阈值触发）",
+              "capabilityType": "CAP_OVERSIZE_ALERT",
+              "inputParams": {
+                "baggageInfo": "{\"baggageId\":\"R08-OVERSIZE\",\"length\":80,\"width\":55,\"height\":35,\"weight\":35,\"location\":\"F2_BAGGAGE_POINT\",\"sumDimension\":170}",
+                "alertLevel": "WARNING"
+              },
+              "precondition": "步骤1测量完成且确认isOversize=true（长宽高之和170>158或重量35>32）",
+              "completionCondition": "reportStatus=SUCCESS",
+              "failureHandling": "上报失败则记录日志并尝试备用设备重报，确保事件不丢失",
+              "stepTimeout": 30
+            },
+            {
+              "stepSeq": 3,
+              "stepGoal": "通过智慧航显提示虚构旅客前往F2_TEST_GATE处置超规行李",
+              "capabilityType": "CAP_INFO_DISPLAY",
+              "inputParams": {
+                "contentType": "TEXT",
+                "contentData": "虚构超规行李请前往F2_TEST_GATE办理",
+                "displayDuration": 60
+              },
+              "precondition": "步骤2超规事件上报成功，需向旅客/现场展示提示信息",
+              "completionCondition": "displayStatus=SUCCESS",
+              "failureHandling": "通知失败不影响核心流程，记录日志后续人工补播",
+              "stepTimeout": 30
+            },
+            {
+              "stepSeq": 4,
+              "stepGoal": "机器人引导旅客至F2_TEST_GATE超规行李处置点",
+              "capabilityType": "CAP_NAVIGATION",
+              "inputParams": {
+                "targetLocation": "F2_TEST_GATE",
+                "routePreference": "BARRIER_FREE"
+              },
+              "precondition": "步骤2超规事件已上报，需执行旅客引导；机器人位于F2_TEST区域可用",
+              "completionCondition": "routeGenerated=true",
+              "failureHandling": "导航失败时切换备用机器人或通知人工引导",
+              "stepTimeout": 60
+            }
+          ],
+          "structureCheckResult": "PASS",
+          "capabilityCheckResult": "PASS",
+          "constraintCheckResult": "FAIL",
+          "validationErrors": [
+            {
+              "errorType": "CONSTRAINT",
+              "description": "步骤所需能力CAP_INFO_DISPLAY超出任务定义声明的可用能力类型范围: [CAP_BAGGAGE_MEASURE, CAP_OVERSIZE_ALERT, CAP_NAVIGATION, CAP_NOTIFICATION]",
+              "stepSeq": 3,
+              "reasonCode": "ERR_CAPABILITY_NOT_IN_TASK_DEFINITION"
+            }
+          ],
+          "riskLevel": null,
+          "riskReasonCode": null,
+          "judgmentBasis": null,
+          "confidence": 0.99,
+          "ruleSetVersion": null,
+          "frozenAt": null,
+          "createdAt": "2026-10-27T14:04:55.639813"
+        },
+        {
+          "id": 92,
+          "versionNo": 2,
+          "source": "BASELINE_TEMPLATE",
+          "baselineTemplateId": 1,
+          "snapshotId": "CTX-20261027-0072",
+          "planSteps": [
+            {
+              "stepSeq": 1,
+              "capabilityType": "CAP_NAVIGATION",
+              "paramMapping": [
+                {
+                  "target": "targetLocation",
+                  "source": "TEMPLATE_INPUT.baggageLocation"
+                },
+                {
+                  "target": "routePreference",
+                  "source": "TEMPLATE_INPUT.routePreference"
+                }
+              ],
+              "stepTimeout": 60,
+              "completionCondition": "routeGenerated=true",
+              "stepGoal": "执行CAP_NAVIGATION能力（基线模板步骤）",
+              "precondition": "候选设备在线且空闲",
+              "failureHandling": "重试一次或转人工处理",
+              "inputParams": {}
+            },
+            {
+              "stepSeq": 2,
+              "capabilityType": "CAP_BAGGAGE_MEASURE",
+              "paramMapping": [
+                {
+                  "target": "measureMode",
+                  "source": "TEMPLATE_INPUT.measureMode"
+                },
+                {
+                  "target": "timeout",
+                  "source": "TEMPLATE_INPUT.timeout"
+                }
+              ],
+              "stepTimeout": 60,
+              "completionCondition": "measureStatus=SUCCESS",
+              "stepGoal": "执行CAP_BAGGAGE_MEASURE能力（基线模板步骤）",
+              "precondition": "候选设备在线且空闲",
+              "failureHandling": "重试一次或转人工处理",
+              "inputParams": {}
+            },
+            {
+              "stepSeq": 3,
+              "capabilityType": "CAP_OVERSIZE_ALERT",
+              "paramMapping": [
+                {
+                  "target": "baggageInfo",
+                  "source": "STEP2_OUTPUT.baggageInfo"
+                },
+                {
+                  "target": "alertLevel",
+                  "source": "TEMPLATE_INPUT.alertLevel"
+                }
+              ],
+              "stepTimeout": 60,
+              "completionCondition": "reportStatus=SUCCESS",
+              "stepGoal": "执行CAP_OVERSIZE_ALERT能力（基线模板步骤）",
+              "precondition": "候选设备在线且空闲",
+              "failureHandling": "重试一次或转人工处理",
+              "inputParams": {}
+            },
+            {
+              "stepSeq": 4,
+              "capabilityType": "CAP_INFO_DISPLAY",
+              "paramMapping": [
+                {
+                  "target": "contentType",
+                  "source": "TEMPLATE_INPUT.contentType"
+                },
+                {
+                  "target": "contentData",
+                  "source": "TEMPLATE_INPUT.contentData"
+                },
+                {
+                  "target": "displayDuration",
+                  "source": "TEMPLATE_INPUT.displayDuration"
+                }
+              ],
+              "stepTimeout": 60,
+              "completionCondition": "displayStatus=SUCCESS",
+              "stepGoal": "执行CAP_INFO_DISPLAY能力（基线模板步骤）",
+              "precondition": "候选设备在线且空闲",
+              "failureHandling": "重试一次或转人工处理",
+              "inputParams": {}
+            }
+          ],
+          "structureCheckResult": "PASS",
+          "capabilityCheckResult": "PASS",
+          "constraintCheckResult": "PASS",
+          "validationErrors": [],
+          "riskLevel": null,
+          "riskReasonCode": null,
+          "judgmentBasis": null,
+          "confidence": null,
+          "ruleSetVersion": null,
+          "frozenAt": "2026-10-27T14:04:55.817319",
+          "createdAt": "2026-10-27T14:04:55.814839"
+        }
+      ]
+    }
+  }
+}
