@@ -1,0 +1,435 @@
+{
+  "observedAt": "2026-10-27T01:26:46.274563+00:00",
+  "runtimeInput": "V1.5",
+  "isolatedSchema": "tip_stage2_v14",
+  "goalMarker": "S3_TC064_RETRY_POSITIVE_20261027",
+  "sourcePlanId": 74,
+  "fixtureModeBefore": {
+    "goal": "success",
+    "planning": "success",
+    "replanning": "success",
+    "delaySeconds": 65
+  },
+  "clarifications": [
+    {
+      "turn": 1,
+      "questions": [
+        "请提供协助类型（如轮椅/视障/听障陪同）",
+        "请提供起点位置（旅客当前所在位置）",
+        "请提供目标地点（旅客需要前往的目的地）"
+      ],
+      "returnedStatus": "PLANNING"
+    },
+    {
+      "turn": 2,
+      "questions": [
+        "请提供协助类型（如轮椅/视障/听障陪同），当前回答为'虚构测试资料未确认，暂不能给出该字段'，请明确具体协助类型",
+        "请提供起点位置（旅客当前所在位置），当前回答为'虚构测试资料未确认，暂不能给出该字段'，请明确具体位置编码",
+        "请提供目标地点（旅客需要前往的目的地），当前回答为'虚构测试资料未确认，暂不能给出该字段'，请明确具体目的地编码"
+      ],
+      "returnedStatus": "PLANNING"
+    },
+    {
+      "turn": 3,
+      "questions": [
+        "请提供协助类型（如轮椅/视障/听障陪同），当前回答为'虚构测试资料未确认，暂不能给出该字段'，请明确具体协助类型",
+        "请提供起点位置（旅客当前所在位置），当前回答为'虚构测试资料未确认，暂不能给出该字段'，请明确具体位置编码",
+        "请提供目标地点（旅客需要前往的目的地），当前回答为'虚构测试资料未确认，暂不能给出该字段'，请明确具体目的地编码"
+      ],
+      "returnedStatus": "PENDING_MANUAL"
+    }
+  ],
+  "fixtureModeRestored": true,
+  "created": {
+    "id": 71,
+    "taskCode": "TASK-20261027-0071",
+    "status": "PLANNING",
+    "taskGoal": "请协助一名虚构旅客完成机场特殊旅客服务，服务类型及起终点尚待确认。S3_TC064_RETRY_POSITIVE_20261027"
+  },
+  "before": {
+    "status": "PENDING_MANUAL",
+    "failureReason": "三轮信息补充后仍缺少关键信息，需人工处理",
+    "currentPlanVersionId": null
+  },
+  "fixtureModeDuring": {
+    "goal": "success",
+    "planning": "success",
+    "replanning": "success",
+    "delaySeconds": 65,
+    "initialPlanSteps": [
+      {
+        "stepSeq": 1,
+        "capabilityType": "CAP_INFO_DISPLAY",
+        "paramMapping": [
+          {
+            "target": "contentType",
+            "source": "TEMPLATE_INPUT.contentType"
+          },
+          {
+            "target": "contentData",
+            "source": "TEMPLATE_INPUT.assistanceType"
+          },
+          {
+            "target": "displayDuration",
+            "source": "TEMPLATE_INPUT.displayDuration"
+          }
+        ],
+        "stepTimeout": 60,
+        "completionCondition": "displayStatus=SUCCESS",
+        "stepGoal": "执行CAP_INFO_DISPLAY能力（基线模板步骤）",
+        "precondition": "候选设备在线且空闲",
+        "failureHandling": "重试一次或转人工处理",
+        "inputParams": {}
+      },
+      {
+        "stepSeq": 2,
+        "capabilityType": "CAP_NOTIFICATION",
+        "paramMapping": [
+          {
+            "target": "notificationContent",
+            "source": "TEMPLATE_INPUT.assistanceType"
+          },
+          {
+            "target": "notificationType",
+            "source": "TEMPLATE_INPUT.notificationType"
+          },
+          {
+            "target": "repeatCount",
+            "source": "TEMPLATE_INPUT.repeatCount"
+          }
+        ],
+        "stepTimeout": 60,
+        "completionCondition": "notificationStatus=SUCCESS",
+        "stepGoal": "执行CAP_NOTIFICATION能力（基线模板步骤）",
+        "precondition": "候选设备在线且空闲",
+        "failureHandling": "重试一次或转人工处理",
+        "inputParams": {}
+      },
+      {
+        "stepSeq": 3,
+        "capabilityType": "CAP_ESCORT",
+        "paramMapping": [
+          {
+            "target": "targetLocation",
+            "source": "TEMPLATE_INPUT.targetLocation"
+          },
+          {
+            "target": "escortMode",
+            "source": "TEMPLATE_INPUT.escortMode"
+          },
+          {
+            "target": "maxDuration",
+            "source": "TEMPLATE_INPUT.maxDuration"
+          }
+        ],
+        "stepTimeout": 60,
+        "completionCondition": "arrivalStatus=ARRIVED",
+        "stepGoal": "执行CAP_ESCORT能力（基线模板步骤）",
+        "precondition": "候选设备在线且空闲",
+        "failureHandling": "重试一次或转人工处理",
+        "inputParams": {}
+      }
+    ]
+  },
+  "action": {
+    "accepted": true,
+    "returned": {
+      "status": "DOWNGRADING",
+      "failureReason": null,
+      "currentPlanVersionId": 76
+    }
+  },
+  "after": {
+    "status": "EXECUTING",
+    "failureReason": null,
+    "currentPlanVersionId": 76,
+    "replanUsed": false
+  },
+  "plans": [
+    {
+      "id": 76,
+      "versionNo": 1,
+      "source": "BASELINE_TEMPLATE",
+      "baselineTemplateId": 2,
+      "snapshotId": "CTX-20261027-0059",
+      "planSteps": [
+        {
+          "stepSeq": 1,
+          "capabilityType": "CAP_INFO_DISPLAY",
+          "paramMapping": [
+            {
+              "target": "contentType",
+              "source": "TEMPLATE_INPUT.contentType"
+            },
+            {
+              "target": "contentData",
+              "source": "TEMPLATE_INPUT.assistanceType"
+            },
+            {
+              "target": "displayDuration",
+              "source": "TEMPLATE_INPUT.displayDuration"
+            }
+          ],
+          "stepTimeout": 60,
+          "completionCondition": "displayStatus=SUCCESS",
+          "stepGoal": "执行CAP_INFO_DISPLAY能力（基线模板步骤）",
+          "precondition": "候选设备在线且空闲",
+          "failureHandling": "重试一次或转人工处理",
+          "inputParams": {}
+        },
+        {
+          "stepSeq": 2,
+          "capabilityType": "CAP_NOTIFICATION",
+          "paramMapping": [
+            {
+              "target": "notificationContent",
+              "source": "TEMPLATE_INPUT.assistanceType"
+            },
+            {
+              "target": "notificationType",
+              "source": "TEMPLATE_INPUT.notificationType"
+            },
+            {
+              "target": "repeatCount",
+              "source": "TEMPLATE_INPUT.repeatCount"
+            }
+          ],
+          "stepTimeout": 60,
+          "completionCondition": "notificationStatus=SUCCESS",
+          "stepGoal": "执行CAP_NOTIFICATION能力（基线模板步骤）",
+          "precondition": "候选设备在线且空闲",
+          "failureHandling": "重试一次或转人工处理",
+          "inputParams": {}
+        },
+        {
+          "stepSeq": 3,
+          "capabilityType": "CAP_ESCORT",
+          "paramMapping": [
+            {
+              "target": "targetLocation",
+              "source": "TEMPLATE_INPUT.targetLocation"
+            },
+            {
+              "target": "escortMode",
+              "source": "TEMPLATE_INPUT.escortMode"
+            },
+            {
+              "target": "maxDuration",
+              "source": "TEMPLATE_INPUT.maxDuration"
+            }
+          ],
+          "stepTimeout": 60,
+          "completionCondition": "arrivalStatus=ARRIVED",
+          "stepGoal": "执行CAP_ESCORT能力（基线模板步骤）",
+          "precondition": "候选设备在线且空闲",
+          "failureHandling": "重试一次或转人工处理",
+          "inputParams": {}
+        }
+      ],
+      "structureCheckResult": "PASS",
+      "capabilityCheckResult": "PASS",
+      "constraintCheckResult": "PASS",
+      "validationErrors": [],
+      "riskLevel": null,
+      "riskReasonCode": null,
+      "judgmentBasis": null,
+      "confidence": null,
+      "ruleSetVersion": null,
+      "frozenAt": "2026-10-27T09:27:12.805071",
+      "createdAt": "2026-10-27T09:27:12.802432"
+    }
+  ],
+  "events": [
+    {
+      "id": 1018,
+      "taskId": 71,
+      "eventType": "GOAL_SUBMITTED",
+      "occurredAt": "2026-10-27T09:26:46.300945",
+      "trigger": "OPERATOR",
+      "reasonCode": null,
+      "detailSummary": "运行操作员oprator提交任务目标: 请协助一名虚构旅客完成机场特殊旅客服务，服务类型及起终点尚待确认。S3_TC064_RETRY_POSITIVE_20261027"
+    },
+    {
+      "id": 1019,
+      "taskId": 71,
+      "eventType": "GOAL_CLARIFIED",
+      "occurredAt": "2026-10-27T09:26:49.729379",
+      "trigger": "SYSTEM",
+      "reasonCode": "INFO_INCOMPLETE",
+      "detailSummary": "目标理解发现信息缺失，已补充0轮，待补充问题: [请提供协助类型（如轮椅/视障/听障陪同）, 请提供起点位置（旅客当前所在位置）, 请提供目标地点（旅客需要前往的目的地）]"
+    },
+    {
+      "id": 1020,
+      "taskId": 71,
+      "eventType": "GOAL_CLARIFIED",
+      "occurredAt": "2026-10-27T09:26:49.757466",
+      "trigger": "OPERATOR",
+      "reasonCode": null,
+      "detailSummary": "运行操作员oprator补充信息: {请提供协助类型（如轮椅/视障/听障陪同）=虚构测试资料未确认，暂不能给出该字段, 请提供起点位置（旅客当前所在位置）=虚构测试资料未确认，暂不能给出该字段, 请提供目标地点（旅客需要前往的目的地）=虚构测试资料未确认，暂不能给出该字段}"
+    },
+    {
+      "id": 1021,
+      "taskId": 71,
+      "eventType": "GOAL_CLARIFIED",
+      "occurredAt": "2026-10-27T09:26:54.539031",
+      "trigger": "SYSTEM",
+      "reasonCode": "INFO_INCOMPLETE",
+      "detailSummary": "目标理解发现信息缺失，已补充1轮，待补充问题: [请提供协助类型（如轮椅/视障/听障陪同），当前回答为'虚构测试资料未确认，暂不能给出该字段'，请明确具体协助类型, 请提供起点位置（旅客当前所在位置），当前回答为'虚构测试资料未确认，暂不能给出该字段'，请明确具体位置编码, 请提供目标地点（旅客需要前往的目的地），当前回答为'虚构测试资料未确认，暂不能给出该字段'，请明确具体目的地编码]"
+    },
+    {
+      "id": 1022,
+      "taskId": 71,
+      "eventType": "GOAL_CLARIFIED",
+      "occurredAt": "2026-10-27T09:26:54.54829",
+      "trigger": "OPERATOR",
+      "reasonCode": null,
+      "detailSummary": "运行操作员oprator补充信息: {请提供协助类型（如轮椅/视障/听障陪同），当前回答为'虚构测试资料未确认，暂不能给出该字段'，请明确具体协助类型=虚构测试资料未确认，暂不能给出该字段, 请提供起点位置（旅客当前所在位置），当前回答为'虚构测试资料未确认，暂不能给出该字段'，请明确具体位置编码=虚构测试资料未确认，暂不能给出该字段, 请提供目标地点（旅客需要前往的目的地），当前回答为'虚构测试资料未确认，暂不能给出该字段'，请明确具体目的地编码=虚构测试资料未确认，暂不能给出该字段}"
+    },
+    {
+      "id": 1023,
+      "taskId": 71,
+      "eventType": "GOAL_CLARIFIED",
+      "occurredAt": "2026-10-27T09:26:58.489568",
+      "trigger": "SYSTEM",
+      "reasonCode": "INFO_INCOMPLETE",
+      "detailSummary": "目标理解发现信息缺失，已补充2轮，待补充问题: [请提供协助类型（如轮椅/视障/听障陪同），当前回答为'虚构测试资料未确认，暂不能给出该字段'，请明确具体协助类型, 请提供起点位置（旅客当前所在位置），当前回答为'虚构测试资料未确认，暂不能给出该字段'，请明确具体位置编码, 请提供目标地点（旅客需要前往的目的地），当前回答为'虚构测试资料未确认，暂不能给出该字段'，请明确具体目的地编码]"
+    },
+    {
+      "id": 1024,
+      "taskId": 71,
+      "eventType": "GOAL_CLARIFIED",
+      "occurredAt": "2026-10-27T09:26:58.510167",
+      "trigger": "OPERATOR",
+      "reasonCode": null,
+      "detailSummary": "运行操作员oprator补充信息: {请提供协助类型（如轮椅/视障/听障陪同），当前回答为'虚构测试资料未确认，暂不能给出该字段'，请明确具体协助类型=虚构测试资料未确认，暂不能给出该字段, 请提供起点位置（旅客当前所在位置），当前回答为'虚构测试资料未确认，暂不能给出该字段'，请明确具体位置编码=虚构测试资料未确认，暂不能给出该字段, 请提供目标地点（旅客需要前往的目的地），当前回答为'虚构测试资料未确认，暂不能给出该字段'，请明确具体目的地编码=虚构测试资料未确认，暂不能给出该字段}"
+    },
+    {
+      "id": 1025,
+      "taskId": 71,
+      "eventType": "GOAL_CLARIFIED",
+      "occurredAt": "2026-10-27T09:27:04.210673",
+      "trigger": "SYSTEM",
+      "reasonCode": "INFO_INCOMPLETE",
+      "detailSummary": "目标理解发现信息缺失，已补充3轮，待补充问题: [请提供协助类型（如轮椅/视障/听障陪同），当前回答为'虚构测试资料未确认，暂不能给出该字段'，请明确具体协助类型, 请提供起点位置（旅客当前所在位置），当前回答为'虚构测试资料未确认，暂不能给出该字段'，请明确具体位置编码, 请提供目标地点（旅客需要前往的目的地），当前回答为'虚构测试资料未确认，暂不能给出该字段'，请明确具体目的地编码]"
+    },
+    {
+      "id": 1026,
+      "taskId": 71,
+      "eventType": "TASK_MANUAL_REQUIRED",
+      "occurredAt": "2026-10-27T09:27:04.210673",
+      "trigger": "SYSTEM",
+      "reasonCode": "INFO_INCOMPLETE",
+      "detailSummary": "三轮信息补充后仍缺少关键信息，需人工处理"
+    },
+    {
+      "id": 1027,
+      "taskId": 71,
+      "eventType": "REPLANNING_TRIGGERED",
+      "occurredAt": "2026-10-27T09:27:04.281892",
+      "trigger": "OPERATOR",
+      "reasonCode": null,
+      "detailSummary": "运行操作员oprator选择RETRY_PLANNING"
+    },
+    {
+      "id": 1028,
+      "taskId": 71,
+      "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+      "occurredAt": "2026-10-27T09:27:04.303233",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "生成规划上下文快照CTX-20261027-0058"
+    },
+    {
+      "id": 1029,
+      "taskId": 71,
+      "eventType": "PLAN_GENERATED",
+      "occurredAt": "2026-10-27T09:27:12.789628",
+      "trigger": "SYSTEM",
+      "reasonCode": "ERR_PLANNING_MODEL_FAILED",
+      "detailSummary": "候选计划生成调用失败: Kimi 未能生成可行候选计划"
+    },
+    {
+      "id": 1030,
+      "taskId": 71,
+      "eventType": "BASELINE_DOWNGRADED",
+      "occurredAt": "2026-10-27T09:27:12.81837",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "已自动切换至基线模板特殊旅客服务标准模板(V1.2)，原因: 候选计划生成失败或模型服务不可用"
+    },
+    {
+      "id": 1031,
+      "taskId": 71,
+      "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+      "occurredAt": "2026-10-27T09:27:12.837435",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-0158A712(距离0.0,负载0)，向候选AGT-0158A712发起承接请求"
+    },
+    {
+      "id": 1032,
+      "taskId": 71,
+      "eventType": "AGENT_ASSIGNED",
+      "occurredAt": "2026-10-27T09:27:12.860252",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "设备代理AGT-0158A712接受步骤1承接请求"
+    },
+    {
+      "id": 1033,
+      "taskId": 71,
+      "eventType": "STEP_DISPATCHED",
+      "occurredAt": "2026-10-27T09:27:12.865327",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "指令CMD-20261027092712-60C6243A已下发至设备代理AGT-0158A712，业务意图: 执行CAP_INFO_DISPLAY能力（基线模板步骤）"
+    }
+  ],
+  "modelRequests": [],
+  "statusBeforeCleanup": "EXECUTING",
+  "cleanup": "MANUAL_TERMINATED",
+  "simulatorAgents": [
+    {
+      "deviceCode": "SIM_F2_DISPLAY",
+      "agentStatus": "ENABLED",
+      "onlineStatus": "ONLINE",
+      "workStatus": "BUSY",
+      "currentTaskId": 71
+    },
+    {
+      "deviceCode": "SIM_F2_BAGGAGE",
+      "agentStatus": "ENABLED",
+      "onlineStatus": "ONLINE",
+      "workStatus": "IDLE",
+      "currentTaskId": null
+    },
+    {
+      "deviceCode": "SIM_F2_FLIGHT",
+      "agentStatus": "ENABLED",
+      "onlineStatus": "ONLINE",
+      "workStatus": "IDLE",
+      "currentTaskId": null
+    },
+    {
+      "deviceCode": "SIM_F2_ROBOT",
+      "agentStatus": "ENABLED",
+      "onlineStatus": "ONLINE",
+      "workStatus": "IDLE",
+      "currentTaskId": null
+    },
+    {
+      "deviceCode": "SIM_F2_BAGGAGE_B",
+      "agentStatus": "ENABLED",
+      "onlineStatus": "ONLINE",
+      "workStatus": "IDLE",
+      "currentTaskId": null
+    },
+    {
+      "deviceCode": "SIM_F2_ROBOT_B",
+      "agentStatus": "ENABLED",
+      "onlineStatus": "ONLINE",
+      "workStatus": "IDLE",
+      "currentTaskId": null
+    }
+  ]
+}
