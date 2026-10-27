@@ -1,0 +1,94 @@
+{
+  "classifiedAt": "2026-10-27T13:40:52.593450+08:00",
+  "runtimeInput": "V1.5",
+  "sourceEvidence": "acceptance/stage3/evidence/TC-050-baseline-failure-20261027T042130Z.json",
+  "sourceSha256": "2cdf7d620f8d376837e3bf738d89ef1e4b31572b8607bbb7415bb849424c6f8f",
+  "taskId": 83,
+  "taskStatus": "PENDING_MANUAL",
+  "exceptions": [
+    {
+      "id": 5,
+      "taskId": 83,
+      "stepSeq": 1,
+      "exceptionType": "CAPABILITY_GAP",
+      "occurredAt": "2026-10-27T12:21:36.256688",
+      "recoveryAction": "无可用候选设备，恢复动作未执行",
+      "recoveryResult": "FAILED",
+      "impactConclusion": "候选设备切换恢复失败，当前计划不可继续执行",
+      "reasonCode": "步骤1无可用候选设备",
+      "exceptionStatus": "RESOLVED",
+      "resolvedAt": "2026-10-27T12:21:36.26319",
+      "resolvedBy": "SYSTEM"
+    },
+    {
+      "id": 4,
+      "taskId": 83,
+      "stepSeq": 1,
+      "exceptionType": "STEP_FAILED",
+      "occurredAt": "2026-10-27T12:21:36.231668",
+      "recoveryAction": "候选设备切换",
+      "recoveryResult": "SUCCESS",
+      "impactConclusion": "已切换候选设备重新分配，计划可继续执行，不触发重新规划",
+      "reasonCode": "执行结果: FAILED，原因: SIMULATED_DEVICE_ERROR",
+      "exceptionStatus": "RESOLVED",
+      "resolvedAt": "2026-10-27T12:21:36.31686",
+      "resolvedBy": "SYSTEM"
+    },
+    {
+      "id": 3,
+      "taskId": 83,
+      "stepSeq": 1,
+      "exceptionType": "STEP_FAILED",
+      "occurredAt": "2026-10-27T12:21:33.955848",
+      "recoveryAction": "候选设备切换",
+      "recoveryResult": "SUCCESS",
+      "impactConclusion": "已切换候选设备重新分配，计划可继续执行，不触发重新规划",
+      "reasonCode": "执行结果: FAILED，原因: SIMULATED_DEVICE_ERROR",
+      "exceptionStatus": "RESOLVED",
+      "resolvedAt": "2026-10-27T12:21:33.999547",
+      "resolvedBy": "SYSTEM"
+    }
+  ],
+  "recoveryEvents": [
+    {
+      "id": 1201,
+      "taskId": 83,
+      "eventType": "EXCEPTION_RECOVERED",
+      "occurredAt": "2026-10-27T12:21:34.004978",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "恢复动作: 候选设备切换，结果: 成功，步骤1已重新分配"
+    },
+    {
+      "id": 1211,
+      "taskId": 83,
+      "eventType": "EXCEPTION_RECOVERY_FAILED",
+      "occurredAt": "2026-10-27T12:21:36.26105",
+      "trigger": "SYSTEM",
+      "reasonCode": "CAPABILITY_GAP",
+      "detailSummary": "恢复动作: 无可用候选设备，恢复动作未执行，结果: 失败，判断计划是否可继续"
+    },
+    {
+      "id": 1215,
+      "taskId": 83,
+      "eventType": "EXCEPTION_RECOVERED",
+      "occurredAt": "2026-10-27T12:21:36.317443",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "恢复动作: 候选设备切换，结果: 成功，步骤1已重新分配"
+    }
+  ],
+  "replanFailedEventIds": [
+    1214
+  ],
+  "exceptionIdsWhoseExactImpactConclusionIsAbsentFromTimeline": [
+    5,
+    4,
+    3
+  ],
+  "recoveryEventIdsWithNullReasonCode": [
+    1201,
+    1215
+  ],
+  "finding": "Exception records hold all five fields; the task timeline omits each exact impact conclusion, two recovery events lack reasonCode, and a recovered event follows replan failure while the task is pending manual."
+}
