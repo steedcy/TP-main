@@ -1,0 +1,317 @@
+{
+  "observedAt": "2026-10-27T00:47:00.931462+00:00",
+  "runtimeInput": "V1.5",
+  "isolatedSchema": "tip_stage2_v14",
+  "goalMarker": "S3_TC064_MARK_FAILED_20261027",
+  "clarifications": [
+    {
+      "round": 1,
+      "questions": [
+        "sceneParams中缺少必需参数baggageLocation（行李当前所在位置编码），请确认行李当前所在位置编码"
+      ],
+      "answer": "虚构旅客P-S3_TC064_MARK_FAILED_20261027及行李R-S3_TC064_MARK_FAILED_20261027位于F2_BAGGAGE_POINT；尺寸55×40×20厘米，重量10千克。本件如实判定为非超规，只测量记录后结束，自动测量无需人工复核。"
+    }
+  ],
+  "created": {
+    "id": 68,
+    "taskCode": "TASK-20261027-0068",
+    "status": "PLANNING",
+    "taskGoal": "请为虚构旅客P-S3_TC064_MARK_FAILED_20261027的行李R-S3_TC064_MARK_FAILED_20261027在F2_BAGGAGE_POINT测量，尺寸为55×40×20厘米、重量10千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；该件为非超规样本，请如实测量判定，仅记录测量后结束，不触发超规事件、航显提示或机器人引导。全部是虚构测试对象。",
+    "createdAt": "2026-10-27T08:47:00.95971"
+  },
+  "beforeAction": {
+    "id": 68,
+    "taskCode": "TASK-20261027-0068",
+    "status": "COMPLETED",
+    "failureReason": null,
+    "missingInfoQuestions": null,
+    "currentPlanVersionId": 73,
+    "updatedAt": "2026-10-27T08:47:17.27849"
+  },
+  "events": [
+    {
+      "id": 931,
+      "eventType": "GOAL_SUBMITTED",
+      "occurredAt": "2026-10-27T08:47:00.962242",
+      "trigger": "OPERATOR",
+      "reasonCode": null,
+      "detailSummary": "运行操作员oprator提交任务目标: 请为虚构旅客P-S3_TC064_MARK_FAILED_20261027的行李R-S3_TC064_MARK_FAILED_20261027在F2_BAGGAGE_POINT测量，尺寸为55×40×20厘米、重量10千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；该件为非超规样本，请如实测量判定，仅记录测量后结束，不触发超规事件、航显提示或机器人引导。全部是虚构测试对象。"
+    },
+    {
+      "id": 932,
+      "eventType": "GOAL_CLARIFIED",
+      "occurredAt": "2026-10-27T08:47:04.44236",
+      "trigger": "SYSTEM",
+      "reasonCode": "INFO_INCOMPLETE",
+      "detailSummary": "目标理解发现信息缺失，已补充0轮，待补充问题: [sceneParams中缺少必需参数baggageLocation（行李当前所在位置编码），请确认行李当前所在位置编码]"
+    },
+    {
+      "id": 933,
+      "eventType": "GOAL_CLARIFIED",
+      "occurredAt": "2026-10-27T08:47:04.483199",
+      "trigger": "OPERATOR",
+      "reasonCode": null,
+      "detailSummary": "运行操作员oprator补充信息: {sceneParams中缺少必需参数baggageLocation（行李当前所在位置编码），请确认行李当前所在位置编码=虚构旅客P-S3_TC064_MARK_FAILED_20261027及行李R-S3_TC064_MARK_FAILED_20261027位于F2_BAGGAGE_POINT；尺寸55×40×20厘米，重量10千克。本件如实判定为非超规，只测量记录后结束，自动测量无需人工复核。}"
+    },
+    {
+      "id": 934,
+      "eventType": "GOAL_CLARIFIED",
+      "occurredAt": "2026-10-27T08:47:06.456931",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+    },
+    {
+      "id": 935,
+      "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+      "occurredAt": "2026-10-27T08:47:06.522593",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "生成规划上下文快照CTX-20261027-0053"
+    },
+    {
+      "id": 936,
+      "eventType": "PLAN_GENERATED",
+      "occurredAt": "2026-10-27T08:47:11.552473",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+    },
+    {
+      "id": 937,
+      "eventType": "PLAN_VALIDATED",
+      "occurredAt": "2026-10-27T08:47:11.568604",
+      "trigger": "SYSTEM",
+      "reasonCode": "ERR_VALIDATION_FAILED",
+      "detailSummary": "候选计划三类校验未通过: 3项错误"
+    },
+    {
+      "id": 938,
+      "eventType": "BASELINE_DOWNGRADED",
+      "occurredAt": "2026-10-27T08:47:11.631805",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "已自动切换至基线模板超规行李处置标准模板(V1.3)，原因: 候选计划三类校验未通过，转基线模板降级"
+    },
+    {
+      "id": 939,
+      "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+      "occurredAt": "2026-10-27T08:47:11.641927",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-4652EF88(距离0.0,负载0)；AGT-9362B1F4(距离0.0,负载0)，向候选AGT-4652EF88发起承接请求"
+    },
+    {
+      "id": 940,
+      "eventType": "AGENT_ASSIGNED",
+      "occurredAt": "2026-10-27T08:47:11.733838",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "设备代理AGT-4652EF88接受步骤1承接请求"
+    },
+    {
+      "id": 941,
+      "eventType": "STEP_DISPATCHED",
+      "occurredAt": "2026-10-27T08:47:11.749104",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "指令CMD-20261027084711-A5D9AFE8已下发至设备代理AGT-4652EF88，业务意图: 执行CAP_NAVIGATION能力（基线模板步骤）"
+    },
+    {
+      "id": 942,
+      "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+      "occurredAt": "2026-10-27T08:47:13.958997",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "指令CMD-20261027084711-A5D9AFE8收到设备代理AGT-4652EF88执行反馈: SUCCESS"
+    },
+    {
+      "id": 943,
+      "eventType": "STEP_COMPLETED",
+      "occurredAt": "2026-10-27T08:47:13.961519",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "步骤1完成条件已满足: routeGenerated=true"
+    },
+    {
+      "id": 944,
+      "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+      "occurredAt": "2026-10-27T08:47:13.966617",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "步骤2候选排序（能力匹配->距离->负载）: AGT-2CCAF5B5(距离0.0,负载0)；AGT-4B552506(距离0.0,负载0)，向候选AGT-2CCAF5B5发起承接请求"
+    },
+    {
+      "id": 945,
+      "eventType": "AGENT_ASSIGNED",
+      "occurredAt": "2026-10-27T08:47:14.041663",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "设备代理AGT-2CCAF5B5接受步骤2承接请求"
+    },
+    {
+      "id": 946,
+      "eventType": "STEP_DISPATCHED",
+      "occurredAt": "2026-10-27T08:47:14.043917",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "指令CMD-20261027084713-AEEA5A66已下发至设备代理AGT-2CCAF5B5，业务意图: 执行CAP_BAGGAGE_MEASURE能力（基线模板步骤）"
+    },
+    {
+      "id": 947,
+      "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+      "occurredAt": "2026-10-27T08:47:15.116877",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "指令CMD-20261027084713-AEEA5A66收到设备代理AGT-2CCAF5B5执行反馈: SUCCESS"
+    },
+    {
+      "id": 948,
+      "eventType": "STEP_COMPLETED",
+      "occurredAt": "2026-10-27T08:47:15.121931",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "步骤2完成条件已满足: measureStatus=SUCCESS"
+    },
+    {
+      "id": 949,
+      "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+      "occurredAt": "2026-10-27T08:47:15.127041",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "步骤3候选排序（能力匹配->距离->负载）: AGT-2CCAF5B5(距离0.0,负载0)；AGT-4B552506(距离0.0,负载0)，向候选AGT-2CCAF5B5发起承接请求"
+    },
+    {
+      "id": 950,
+      "eventType": "AGENT_ASSIGNED",
+      "occurredAt": "2026-10-27T08:47:15.152405",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "设备代理AGT-2CCAF5B5接受步骤3承接请求"
+    },
+    {
+      "id": 951,
+      "eventType": "STEP_DISPATCHED",
+      "occurredAt": "2026-10-27T08:47:15.154924",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "指令CMD-20261027084715-A409C28D已下发至设备代理AGT-2CCAF5B5，业务意图: 执行CAP_OVERSIZE_ALERT能力（基线模板步骤）"
+    },
+    {
+      "id": 952,
+      "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+      "occurredAt": "2026-10-27T08:47:16.20093",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "指令CMD-20261027084715-A409C28D收到设备代理AGT-2CCAF5B5执行反馈: SUCCESS"
+    },
+    {
+      "id": 953,
+      "eventType": "STEP_COMPLETED",
+      "occurredAt": "2026-10-27T08:47:16.203138",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "步骤3完成条件已满足: reportStatus=SUCCESS"
+    },
+    {
+      "id": 954,
+      "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+      "occurredAt": "2026-10-27T08:47:16.210534",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "步骤4候选排序（能力匹配->距离->负载）: AGT-0158A712(距离0.0,负载0)，向候选AGT-0158A712发起承接请求"
+    },
+    {
+      "id": 955,
+      "eventType": "AGENT_ASSIGNED",
+      "occurredAt": "2026-10-27T08:47:16.231129",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "设备代理AGT-0158A712接受步骤4承接请求"
+    },
+    {
+      "id": 956,
+      "eventType": "STEP_DISPATCHED",
+      "occurredAt": "2026-10-27T08:47:16.23453",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "指令CMD-20261027084716-BF228F1F已下发至设备代理AGT-0158A712，业务意图: 执行CAP_INFO_DISPLAY能力（基线模板步骤）"
+    },
+    {
+      "id": 957,
+      "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+      "occurredAt": "2026-10-27T08:47:17.274097",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "指令CMD-20261027084716-BF228F1F收到设备代理AGT-0158A712执行反馈: SUCCESS"
+    },
+    {
+      "id": 958,
+      "eventType": "STEP_COMPLETED",
+      "occurredAt": "2026-10-27T08:47:17.27849",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "步骤4完成条件已满足: displayStatus=SUCCESS"
+    },
+    {
+      "id": 959,
+      "eventType": "TASK_COMPLETED",
+      "occurredAt": "2026-10-27T08:47:17.280683",
+      "trigger": "SYSTEM",
+      "reasonCode": null,
+      "detailSummary": "全部步骤完成条件均已满足，任务完成"
+    }
+  ],
+  "audit": {
+    "TASK_MANUAL_ACTION": [],
+    "TASK_DEFINITION_UPDATE": [
+      {
+        "id": 653,
+        "username": "set",
+        "role": "CONFIG_ADMIN",
+        "operationType": "TASK_DEFINITION_UPDATE",
+        "operationTarget": "超规行李处置",
+        "operationResult": "SUCCESS",
+        "sourceIp": "127.0.0.1",
+        "createdAt": "2026-10-26T01:18:10.446511",
+        "detail": null
+      },
+      {
+        "id": 652,
+        "username": "set",
+        "role": "CONFIG_ADMIN",
+        "operationType": "TASK_DEFINITION_UPDATE",
+        "operationTarget": "超规行李处置",
+        "operationResult": "SUCCESS",
+        "sourceIp": "127.0.0.1",
+        "createdAt": "2026-10-26T01:18:10.41157",
+        "detail": null
+      }
+    ],
+    "RISK_RULE_CHANGE": [
+      {
+        "id": 825,
+        "username": "set",
+        "role": "CONFIG_ADMIN",
+        "operationType": "RISK_RULE_CHANGE",
+        "operationTarget": "S3_TC043_RULE",
+        "operationResult": "SUCCESS",
+        "sourceIp": "127.0.0.1",
+        "createdAt": "2026-10-26T15:12:47.130877",
+        "detail": "{\"before\":{\"ruleContent\":\"阶段三临时规则 V1.1\",\"enabled\":true},\"action\":\"UPDATE\",\"after\":{\"ruleContent\":\"阶段三临时规则 V1.1\",\"enabled\":false}}"
+      },
+      {
+        "id": 824,
+        "username": "set",
+        "role": "CONFIG_ADMIN",
+        "operationType": "RISK_RULE_CHANGE",
+        "operationTarget": "S3_TC043_RULE",
+        "operationResult": "SUCCESS",
+        "sourceIp": "127.0.0.1",
+        "createdAt": "2026-10-26T15:12:47.101655",
+        "detail": "{\"before\":{\"ruleContent\":\"阶段三临时规则 V1.1\",\"enabled\":false},\"action\":\"UPDATE\",\"after\":{\"ruleContent\":\"阶段三临时规则 V1.1\",\"enabled\":true}}"
+      }
+    ]
+  },
+  "finalStatus": "COMPLETED"
+}
