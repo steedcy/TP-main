@@ -12,6 +12,7 @@ async function main() {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } })
   const evidence = { observedAt: new Date().toISOString(), runtimeInput: 'V1.5', browser: 'Chrome',
     requests: [], filters: {}, navigation: {} }
+  const stamp = evidence.observedAt.replace(/[-:.]/g, '').replace(/\d{3}Z$/, 'Z')
   page.on('response', response => {
     if (response.url().includes('/api/v1/task-exceptions')) {
       evidence.requests.push({ url: response.url(), status: response.status() })
@@ -23,13 +24,27 @@ async function main() {
     await page.locator('input[placeholder="密码"]').fill(password)
     await page.locator('button[type="submit"]').click()
     await page.waitForURL('**/overview')
+    await page.waitForLoadState('networkidle')
+    await page.waitForFunction(() => [...document.querySelectorAll('.ant-statistic')]
+      .some(el => el.innerText.includes('未处置异常数') && /未处置异常数\s+\d+/.test(el.innerText)))
+    evidence.overview = {
+      pendingMetric: await page.locator('.ant-statistic').filter({ hasText: '未处置异常数' }).innerText(),
+    }
+    evidence.overviewScreenshot = `TC-058-overview-pending-${stamp}.png`
+    await page.screenshot({ path: path.join(__dirname, 'evidence', evidence.overviewScreenshot) })
+    await page.getByText('未处置异常数', { exact: true }).click()
+    await page.waitForURL('**/task-exceptions?exceptionStatus=PENDING')
+    await page.waitForLoadState('networkidle')
+    evidence.overview.pendingLink = page.url()
+    evidence.overview.pendingRows = await page.locator('tbody tr').allInnerTexts()
     await page.goto('http://127.0.0.1:5173/task-exceptions', { waitUntil: 'networkidle' })
     evidence.defaultRows = await page.locator('tbody tr').allInnerTexts()
     evidence.headers = await page.locator('thead th').allInnerTexts()
     evidence.selects = await page.locator('.ant-select').count()
     evidence.historyControl = await page.getByText('历史列表', { exact: true }).count()
     evidence.reasonCodeVisible = evidence.headers.some(h => h.includes('原因码'))
-    await page.screenshot({ path: path.join(__dirname, 'evidence', 'TC-058-exception-list-default.png') })
+    evidence.defaultScreenshot = `TC-058-exception-list-default-${stamp}.png`
+    await page.screenshot({ path: path.join(__dirname, 'evidence', evidence.defaultScreenshot) })
     const typeSelect = page.locator('.ant-select').first()
     for (const label of ['设备离线', '能力缺口', '执行超时', '步骤失败', '重新规划失败']) {
       await typeSelect.click()
@@ -40,6 +55,17 @@ async function main() {
     }
     await typeSelect.locator('.ant-select-clear').click()
     await page.waitForTimeout(250)
+    const statusSelect = page.locator('.ant-select').nth(1)
+    await statusSelect.click()
+    await page.locator('.ant-select-dropdown:visible').getByText('待处置', { exact: true }).click()
+    await page.waitForTimeout(250)
+    evidence.filters.pending = await page.locator('tbody tr').allInnerTexts()
+    await statusSelect.click()
+    await page.locator('.ant-select-dropdown:visible').getByText('已处置', { exact: true }).click()
+    await page.waitForTimeout(250)
+    evidence.filters.resolved = await page.locator('tbody tr').allInnerTexts()
+    evidence.resolvedScreenshot = `TC-058-exception-list-resolved-${stamp}.png`
+    await page.screenshot({ path: path.join(__dirname, 'evidence', evidence.resolvedScreenshot) })
     const taskLink = page.locator('tbody tr a[href^="/tasks/"]').first()
     evidence.navigation.linkCount = await taskLink.count()
     if (evidence.navigation.linkCount) {
@@ -49,8 +75,7 @@ async function main() {
       evidence.navigation.landed = page.url()
     }
   } finally {
-    const out = path.join(__dirname, 'evidence', 'TC-058-exception-list-ui-' +
-      evidence.observedAt.replace(/[-:.]/g, '').replace(/\d{3}Z$/, 'Z') + '.json')
+    const out = path.join(__dirname, 'evidence', 'TC-058-exception-list-ui-' + stamp + '.json')
     fs.writeFileSync(out, JSON.stringify(evidence, null, 2) + '\n')
     console.log(JSON.stringify({ evidence: path.basename(out), defaultRows: evidence.defaultRows,
       headers: evidence.headers, filters: Object.keys(evidence.filters), navigation: evidence.navigation }))
