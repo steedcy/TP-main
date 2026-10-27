@@ -1,0 +1,377 @@
+{
+  "observedAt": "2026-10-27T04:17:35.509294+00:00",
+  "runtimeInput": "V1.5",
+  "isolatedSchema": "tip_stage2_v14",
+  "sourceTaskId": 19,
+  "request": {
+    "taskGoal": "请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在F2_BAGGAGE_POINT测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。",
+    "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+    "sceneParams": {
+      "baggageId": "R08-OVERSIZE",
+      "baggageLocation": "F2_BAGGAGE_POINT",
+      "length": 80,
+      "width": 55,
+      "height": 35,
+      "weight": 35,
+      "targetLocation": "F2_TEST_GATE",
+      "routePreference": "BARRIER_FREE",
+      "measureMode": "AUTO",
+      "timeout": 30,
+      "alertLevel": "WARNING",
+      "contentType": "TEXT",
+      "displayDuration": 60,
+      "contentData": "虚构超规行李请前往F2_TEST_GATE办理"
+    }
+  },
+  "fixtureBefore": {
+    "goal": "success",
+    "planning": "success",
+    "replanning": "success",
+    "delaySeconds": 65
+  },
+  "fixtureDuring": {
+    "goal": "success",
+    "planning": "malformed",
+    "replanning": "success",
+    "delaySeconds": 65
+  },
+  "robotAgentsBefore": {
+    "SIM_F2_ROBOT": {
+      "agentId": "AGT-9362B1F4",
+      "deviceCode": "SIM_F2_ROBOT",
+      "deviceName": "移动服务机器人仿真体",
+      "agentStatus": "ENABLED",
+      "onlineStatus": "ONLINE",
+      "workStatus": "IDLE",
+      "currentTaskId": null,
+      "currentStepSeq": null,
+      "lastReportedAt": "2026-10-27T12:17:33.662089"
+    },
+    "SIM_F2_ROBOT_B": {
+      "agentId": "AGT-4652EF88",
+      "deviceCode": "SIM_F2_ROBOT_B",
+      "deviceName": "备用移动机器人仿真体",
+      "agentStatus": "ENABLED",
+      "onlineStatus": "ONLINE",
+      "workStatus": "IDLE",
+      "currentTaskId": null,
+      "currentStepSeq": null,
+      "lastReportedAt": "2026-10-27T12:17:33.746314"
+    }
+  },
+  "scenarioControls": {
+    "SIM_F2_ROBOT": {
+      "scenarioResult": "FAILED"
+    },
+    "SIM_F2_ROBOT_B": {
+      "scenarioResult": "FAILED"
+    }
+  },
+  "clarifications": [
+    {
+      "questions": [
+        "任务目标中提到的'虚构旅客P-R08-OVERSIZE'是否为需要引导的旅客？如需引导旅客，该旅客当前位置在哪里？（任务约束要求全程不得引导旅客脱离监控区域，需确认旅客起始位置）",
+        "任务目标提到'由机器人引导至唯一目的地F2_TEST_GATE'，但OVERSIZE_BAGGAGE_HANDLING任务定义中sceneParams仅要求baggageLocation，未定义targetLocation参数。请确认：引导至F2_TEST_GATE是否属于本任务范畴，还是需要关联其他任务（如SPECIAL_PASSENGER_SERVICE）？",
+        "任务目标中旅客和行李均为'虚构测试对象'，请确认是否需要在真实生产环境中执行此操作，还是仅作为测试指令？"
+      ],
+      "answer": "全部为虚构测试数据：行李及旅客当前均位于F2_BAGGAGE_POINT；先在此完成测量和超规上报，再由智慧航显提示并引导至唯一目的地F2_TEST_GATE。额外场景参数仅为设备能力输入，不改变原始目标、完成条件或行李当前位置。",
+      "returnedStatus": "PLANNING"
+    },
+    {
+      "questions": [
+        "任务目标中要求'由机器人引导至唯一目的地F2_TEST_GATE'，但OVERSIZE_BAGGAGE_HANDLING任务定义的sceneParams仅包含baggageLocation（行李当前所在位置），未定义targetLocation参数。操作员回答确认'引导至F2_TEST_GATE'为任务内容，但该参数不在任务定义的场景参数范围内。请明确：是否将targetLocation:F2_TEST_GATE作为OVERSIZE_BAGGAGE_HANDLING任务的扩展场景参数纳入，还是需要拆分为独立的导航/引导任务？",
+        "任务约束要求'全程不得引导旅客脱离监控区域'，但操作员仅说明旅客当前位于F2_BAGGAGE_POINT，未确认F2_BAGGAGE_POINT至F2_TEST_GATE的全程路线是否均在监控区域内。请确认该路线是否满足监控覆盖要求。"
+      ],
+      "answer": "全部为虚构测试数据：行李及旅客当前均位于F2_BAGGAGE_POINT；先在此完成测量和超规上报，再由智慧航显提示并引导至唯一目的地F2_TEST_GATE。额外场景参数仅为设备能力输入，不改变原始目标、完成条件或行李当前位置。",
+      "returnedStatus": "PLANNING"
+    },
+    {
+      "questions": [
+        "任务约束要求'全程不得引导旅客脱离监控区域'，操作员多次回答未明确确认F2_BAGGAGE_POINT至F2_TEST_GATE的全程路线是否在监控覆盖范围内，请明确确认该路线是否满足监控覆盖要求。",
+        "任务目标包含'由机器人引导至唯一目的地F2_TEST_GATE'，但OVERSIZE_BAGGAGE_HANDLING任务定义的sceneParams未定义targetLocation参数，操作员回答未明确该引导是否作为本任务扩展参数纳入或需拆分任务，请明确确认：引导至F2_TEST_GATE是否纳入本OVERSIZE_BAGGAGE_HANDLING任务统一执行，且该目的地参数是否作为任务必需完成条件的一部分？"
+      ],
+      "answer": "全部为虚构测试数据：行李及旅客当前均位于F2_BAGGAGE_POINT；先在此完成测量和超规上报，再由智慧航显提示并引导至唯一目的地F2_TEST_GATE。额外场景参数仅为设备能力输入，不改变原始目标、完成条件或行李当前位置。",
+      "returnedStatus": "PENDING_MANUAL"
+    }
+  ],
+  "restore": {
+    "fixtureExact": true,
+    "SIM_F2_ROBOT": {
+      "scenarioResult": "SUCCESS"
+    },
+    "SIM_F2_ROBOT_B": {
+      "scenarioResult": "SUCCESS"
+    },
+    "cleanup": "MANUAL_TERMINATED",
+    "agents": [
+      {
+        "agentId": "AGT-0158A712",
+        "deviceCode": "SIM_F2_DISPLAY",
+        "deviceName": "智慧显示终端仿真体",
+        "agentStatus": "ENABLED",
+        "onlineStatus": "ONLINE",
+        "workStatus": "IDLE",
+        "currentTaskId": null,
+        "currentStepSeq": null,
+        "lastReportedAt": "2026-10-27T12:18:03.749173"
+      },
+      {
+        "agentId": "AGT-4B552506",
+        "deviceCode": "SIM_F2_BAGGAGE",
+        "deviceName": "行李测量仪仿真体",
+        "agentStatus": "ENABLED",
+        "onlineStatus": "ONLINE",
+        "workStatus": "IDLE",
+        "currentTaskId": null,
+        "currentStepSeq": null,
+        "lastReportedAt": "2026-10-27T12:18:03.856858"
+      },
+      {
+        "agentId": "AGT-F9B433BD",
+        "deviceCode": "SIM_F2_FLIGHT",
+        "deviceName": "航班信息屏仿真体",
+        "agentStatus": "ENABLED",
+        "onlineStatus": "ONLINE",
+        "workStatus": "IDLE",
+        "currentTaskId": null,
+        "currentStepSeq": null,
+        "lastReportedAt": "2026-10-27T12:18:04.1888"
+      },
+      {
+        "agentId": "AGT-9362B1F4",
+        "deviceCode": "SIM_F2_ROBOT",
+        "deviceName": "移动服务机器人仿真体",
+        "agentStatus": "ENABLED",
+        "onlineStatus": "ONLINE",
+        "workStatus": "IDLE",
+        "currentTaskId": null,
+        "currentStepSeq": null,
+        "lastReportedAt": "2026-10-27T12:18:05.312683"
+      },
+      {
+        "agentId": "AGT-2CCAF5B5",
+        "deviceCode": "SIM_F2_BAGGAGE_B",
+        "deviceName": "备用行李测量仪仿真体",
+        "agentStatus": "ENABLED",
+        "onlineStatus": "ONLINE",
+        "workStatus": "IDLE",
+        "currentTaskId": null,
+        "currentStepSeq": null,
+        "lastReportedAt": "2026-10-27T12:18:03.839427"
+      },
+      {
+        "agentId": "AGT-4652EF88",
+        "deviceCode": "SIM_F2_ROBOT_B",
+        "deviceName": "备用移动机器人仿真体",
+        "agentStatus": "ENABLED",
+        "onlineStatus": "ONLINE",
+        "workStatus": "IDLE",
+        "currentTaskId": null,
+        "currentStepSeq": null,
+        "lastReportedAt": "2026-10-27T12:18:05.347267"
+      }
+    ]
+  },
+  "submitted": {
+    "id": 82,
+    "taskCode": "TASK-20261027-0082",
+    "status": "PLANNING",
+    "createdAt": "2026-10-27T12:17:35.5653105"
+  },
+  "task": {
+    "id": 82,
+    "taskCode": "TASK-20261027-0082",
+    "taskGoal": "请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在F2_BAGGAGE_POINT测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。",
+    "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+    "sceneParams": {
+      "baggageLocation": "F2_BAGGAGE_POINT",
+      "measureMode": "AUTO",
+      "contentData": "虚构超规行李请前往F2_TEST_GATE办理",
+      "length": 80,
+      "alertLevel": "WARNING",
+      "weight": 35,
+      "baggageId": "R08-OVERSIZE",
+      "clarificationAnswers": [
+        {
+          "questions": [
+            "任务目标中提到的'虚构旅客P-R08-OVERSIZE'是否为需要引导的旅客？如需引导旅客，该旅客当前位置在哪里？（任务约束要求全程不得引导旅客脱离监控区域，需确认旅客起始位置）",
+            "任务目标提到'由机器人引导至唯一目的地F2_TEST_GATE'，但OVERSIZE_BAGGAGE_HANDLING任务定义中sceneParams仅要求baggageLocation，未定义targetLocation参数。请确认：引导至F2_TEST_GATE是否属于本任务范畴，还是需要关联其他任务（如SPECIAL_PASSENGER_SERVICE）？",
+            "任务目标中旅客和行李均为'虚构测试对象'，请确认是否需要在真实生产环境中执行此操作，还是仅作为测试指令？"
+          ],
+          "answers": {
+            "任务目标提到'由机器人引导至唯一目的地F2_TEST_GATE'，但OVERSIZE_BAGGAGE_HANDLING任务定义中sceneParams仅要求baggageLocation，未定义targetLocation参数。请确认：引导至F2_TEST_GATE是否属于本任务范畴，还是需要关联其他任务（如SPECIAL_PASSENGER_SERVICE）？": "全部为虚构测试数据：行李及旅客当前均位于F2_BAGGAGE_POINT；先在此完成测量和超规上报，再由智慧航显提示并引导至唯一目的地F2_TEST_GATE。额外场景参数仅为设备能力输入，不改变原始目标、完成条件或行李当前位置。",
+            "任务目标中提到的'虚构旅客P-R08-OVERSIZE'是否为需要引导的旅客？如需引导旅客，该旅客当前位置在哪里？（任务约束要求全程不得引导旅客脱离监控区域，需确认旅客起始位置）": "全部为虚构测试数据：行李及旅客当前均位于F2_BAGGAGE_POINT；先在此完成测量和超规上报，再由智慧航显提示并引导至唯一目的地F2_TEST_GATE。额外场景参数仅为设备能力输入，不改变原始目标、完成条件或行李当前位置。",
+            "任务目标中旅客和行李均为'虚构测试对象'，请确认是否需要在真实生产环境中执行此操作，还是仅作为测试指令？": "全部为虚构测试数据：行李及旅客当前均位于F2_BAGGAGE_POINT；先在此完成测量和超规上报，再由智慧航显提示并引导至唯一目的地F2_TEST_GATE。额外场景参数仅为设备能力输入，不改变原始目标、完成条件或行李当前位置。"
+          }
+        },
+        {
+          "questions": [
+            "任务目标中要求'由机器人引导至唯一目的地F2_TEST_GATE'，但OVERSIZE_BAGGAGE_HANDLING任务定义的sceneParams仅包含baggageLocation（行李当前所在位置），未定义targetLocation参数。操作员回答确认'引导至F2_TEST_GATE'为任务内容，但该参数不在任务定义的场景参数范围内。请明确：是否将targetLocation:F2_TEST_GATE作为OVERSIZE_BAGGAGE_HANDLING任务的扩展场景参数纳入，还是需要拆分为独立的导航/引导任务？",
+            "任务约束要求'全程不得引导旅客脱离监控区域'，但操作员仅说明旅客当前位于F2_BAGGAGE_POINT，未确认F2_BAGGAGE_POINT至F2_TEST_GATE的全程路线是否均在监控区域内。请确认该路线是否满足监控覆盖要求。"
+          ],
+          "answers": {
+            "任务约束要求'全程不得引导旅客脱离监控区域'，但操作员仅说明旅客当前位于F2_BAGGAGE_POINT，未确认F2_BAGGAGE_POINT至F2_TEST_GATE的全程路线是否均在监控区域内。请确认该路线是否满足监控覆盖要求。": "全部为虚构测试数据：行李及旅客当前均位于F2_BAGGAGE_POINT；先在此完成测量和超规上报，再由智慧航显提示并引导至唯一目的地F2_TEST_GATE。额外场景参数仅为设备能力输入，不改变原始目标、完成条件或行李当前位置。",
+            "任务目标中要求'由机器人引导至唯一目的地F2_TEST_GATE'，但OVERSIZE_BAGGAGE_HANDLING任务定义的sceneParams仅包含baggageLocation（行李当前所在位置），未定义targetLocation参数。操作员回答确认'引导至F2_TEST_GATE'为任务内容，但该参数不在任务定义的场景参数范围内。请明确：是否将targetLocation:F2_TEST_GATE作为OVERSIZE_BAGGAGE_HANDLING任务的扩展场景参数纳入，还是需要拆分为独立的导航/引导任务？": "全部为虚构测试数据：行李及旅客当前均位于F2_BAGGAGE_POINT；先在此完成测量和超规上报，再由智慧航显提示并引导至唯一目的地F2_TEST_GATE。额外场景参数仅为设备能力输入，不改变原始目标、完成条件或行李当前位置。"
+          }
+        },
+        {
+          "questions": [
+            "任务约束要求'全程不得引导旅客脱离监控区域'，操作员多次回答未明确确认F2_BAGGAGE_POINT至F2_TEST_GATE的全程路线是否在监控覆盖范围内，请明确确认该路线是否满足监控覆盖要求。",
+            "任务目标包含'由机器人引导至唯一目的地F2_TEST_GATE'，但OVERSIZE_BAGGAGE_HANDLING任务定义的sceneParams未定义targetLocation参数，操作员回答未明确该引导是否作为本任务扩展参数纳入或需拆分任务，请明确确认：引导至F2_TEST_GATE是否纳入本OVERSIZE_BAGGAGE_HANDLING任务统一执行，且该目的地参数是否作为任务必需完成条件的一部分？"
+          ],
+          "answers": {
+            "任务约束要求'全程不得引导旅客脱离监控区域'，操作员多次回答未明确确认F2_BAGGAGE_POINT至F2_TEST_GATE的全程路线是否在监控覆盖范围内，请明确确认该路线是否满足监控覆盖要求。": "全部为虚构测试数据：行李及旅客当前均位于F2_BAGGAGE_POINT；先在此完成测量和超规上报，再由智慧航显提示并引导至唯一目的地F2_TEST_GATE。额外场景参数仅为设备能力输入，不改变原始目标、完成条件或行李当前位置。",
+            "任务目标包含'由机器人引导至唯一目的地F2_TEST_GATE'，但OVERSIZE_BAGGAGE_HANDLING任务定义的sceneParams未定义targetLocation参数，操作员回答未明确该引导是否作为本任务扩展参数纳入或需拆分任务，请明确确认：引导至F2_TEST_GATE是否纳入本OVERSIZE_BAGGAGE_HANDLING任务统一执行，且该目的地参数是否作为任务必需完成条件的一部分？": "全部为虚构测试数据：行李及旅客当前均位于F2_BAGGAGE_POINT；先在此完成测量和超规上报，再由智慧航显提示并引导至唯一目的地F2_TEST_GATE。额外场景参数仅为设备能力输入，不改变原始目标、完成条件或行李当前位置。"
+          }
+        }
+      ],
+      "targetLocation": "F2_TEST_GATE",
+      "routePreference": "BARRIER_FREE",
+      "timeout": 30,
+      "displayDuration": 60,
+      "width": 55,
+      "contentType": "TEXT",
+      "height": 35
+    },
+    "goalParsingResult": {
+      "completionCondition": "行李已完成尺寸重量测量且超规事件（如有）已上报",
+      "origin": "F2_BAGGAGE_POINT",
+      "destination": "F2_TEST_GATE",
+      "originalGoal": "请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在F2_BAGGAGE_POINT测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。",
+      "constraints": [
+        "超规行李处置全程不得引导旅客脱离监控区域",
+        "测量结果超标须触发超规事件上报"
+      ]
+    },
+    "status": "PENDING_MANUAL",
+    "currentPlanVersionId": null,
+    "replanUsed": false,
+    "replanningReason": null,
+    "manualTerminateReason": null,
+    "failureReason": "三轮信息补充后仍缺少关键信息，需人工处理",
+    "missingInfoQuestions": [
+      "任务约束要求'全程不得引导旅客脱离监控区域'，操作员多次回答未明确确认F2_BAGGAGE_POINT至F2_TEST_GATE的全程路线是否在监控覆盖范围内，请明确确认该路线是否满足监控覆盖要求。",
+      "任务目标包含'由机器人引导至唯一目的地F2_TEST_GATE'，但OVERSIZE_BAGGAGE_HANDLING任务定义的sceneParams未定义targetLocation参数，操作员回答未明确该引导是否作为本任务扩展参数纳入或需拆分任务，请明确确认：引导至F2_TEST_GATE是否纳入本OVERSIZE_BAGGAGE_HANDLING任务统一执行，且该目的地参数是否作为任务必需完成条件的一部分？"
+    ],
+    "downgradeReason": null,
+    "isDryRun": false,
+    "createdAt": "2026-10-27T12:17:35.565311",
+    "updatedAt": "2026-10-27T12:17:35.565311",
+    "createdBy": "oprator"
+  },
+  "plans": [],
+  "assignments": [],
+  "events": [
+    {
+      "id": 1177,
+      "taskId": 82,
+      "eventType": "GOAL_SUBMITTED",
+      "occurredAt": "2026-10-27T12:17:35.567558",
+      "trigger": "OPERATOR",
+      "reasonCode": null,
+      "detailSummary": "运行操作员oprator提交任务目标: 请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在F2_BAGGAGE_POINT测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。"
+    },
+    {
+      "id": 1178,
+      "taskId": 82,
+      "eventType": "GOAL_CLARIFIED",
+      "occurredAt": "2026-10-27T12:17:43.065442",
+      "trigger": "SYSTEM",
+      "reasonCode": "INFO_INCOMPLETE",
+      "detailSummary": "目标理解发现信息缺失，已补充0轮，待补充问题: [任务目标中提到的'虚构旅客P-R08-OVERSIZE'是否为需要引导的旅客？如需引导旅客，该旅客当前位置在哪里？（任务约束要求全程不得引导旅客脱离监控区域，需确认旅客起始位置）, 任务目标提到'由机器人引导至唯一目的地F2_TEST_GATE'，但OVERSIZE_BAGGAGE_HANDLING任务定义中sceneParams仅要求baggageLocation，未定义targetLocation参数。请确认：引导至F2_TEST_GATE是否属于本任务范畴，还是需要关联其他任务（如SPECIAL_PASSENGER_SERVICE）？, 任务目标中旅客和行李均为'虚构测试对象'，请确认是否需要在真实生产环境中执行此操作，还是仅作为测试指令？]"
+    },
+    {
+      "id": 1179,
+      "taskId": 82,
+      "eventType": "GOAL_CLARIFIED",
+      "occurredAt": "2026-10-27T12:17:43.111063",
+      "trigger": "OPERATOR",
+      "reasonCode": null,
+      "detailSummary": "运行操作员oprator补充信息: {任务目标中提到的'虚构旅客P-R08-OVERSIZE'是否为需要引导的旅客？如需引导旅客，该旅客当前位置在哪里？（任务约束要求全程不得引导旅客脱离监控区域，需确认旅客起始位置）=全部为虚构测试数据：行李及旅客当前均位于F2_BAGGAGE_POINT；先在此完成测量和超规上报，再由智慧航显提示并引导至唯一目的地F2_TEST_GATE。额外场景参数仅为设备能力输入，不改变原始目标、完成条件或行李当前位置。, 任务目标提到'由机器人引导至唯一目的地F2_TEST_GATE'，但OVERSIZE_BAGGAGE_HANDLING任务定义中sceneParams仅要求baggageLocation，未定义targetLocation参数。请确认：引导至F2_TEST_GATE是否属于本任务范畴，还是需要关联其他任务（如SPECIAL_PASSENGER_SERVICE）？=全部为虚构测试数据：行李及旅客当前均位于F2_BAGGAGE_POINT；先在此完成测量和超规上报，再由智慧航显提示并引导至唯一目的地F2_TEST_GATE。额外场景参数仅为设备能力输入，不改变原始目标、完成条件或行李当前位置。, 任务目标中旅客和行李均为'虚构测试对象'，请确认是否需要在真实生产环境中执行此操作，还是仅作为测试指令？=全部为虚构测试数据：行李及旅客当前均位于F2_BAGGAGE_POINT；先在此完成测量和超规上报，再由智慧航显提示并引导至唯一目的地F2_TEST_GATE。额外场景参数仅为设备能力输入，不改变原始目标、完成条件或行李当前位置。}"
+    },
+    {
+      "id": 1180,
+      "taskId": 82,
+      "eventType": "GOAL_CLARIFIED",
+      "occurredAt": "2026-10-27T12:17:50.966513",
+      "trigger": "SYSTEM",
+      "reasonCode": "INFO_INCOMPLETE",
+      "detailSummary": "目标理解发现信息缺失，已补充1轮，待补充问题: [任务目标中要求'由机器人引导至唯一目的地F2_TEST_GATE'，但OVERSIZE_BAGGAGE_HANDLING任务定义的sceneParams仅包含baggageLocation（行李当前所在位置），未定义targetLocation参数。操作员回答确认'引导至F2_TEST_GATE'为任务内容，但该参数不在任务定义的场景参数范围内。请明确：是否将targetLocation:F2_TEST_GATE作为OVERSIZE_BAGGAGE_HANDLING任务的扩展场景参数纳入，还是需要拆分为独立的导航/引导任务？, 任务约束要求'全程不得引导旅客脱离监控区域'，但操作员仅说明旅客当前位于F2_BAGGAGE_POINT，未确认F2_BAGGAGE_POINT至F2_TEST_GATE的全程路线是否均在监控区域内。请确认该路线是否满足监控覆盖要求。]"
+    },
+    {
+      "id": 1181,
+      "taskId": 82,
+      "eventType": "GOAL_CLARIFIED",
+      "occurredAt": "2026-10-27T12:17:51.009959",
+      "trigger": "OPERATOR",
+      "reasonCode": null,
+      "detailSummary": "运行操作员oprator补充信息: {任务目标中要求'由机器人引导至唯一目的地F2_TEST_GATE'，但OVERSIZE_BAGGAGE_HANDLING任务定义的sceneParams仅包含baggageLocation（行李当前所在位置），未定义targetLocation参数。操作员回答确认'引导至F2_TEST_GATE'为任务内容，但该参数不在任务定义的场景参数范围内。请明确：是否将targetLocation:F2_TEST_GATE作为OVERSIZE_BAGGAGE_HANDLING任务的扩展场景参数纳入，还是需要拆分为独立的导航/引导任务？=全部为虚构测试数据：行李及旅客当前均位于F2_BAGGAGE_POINT；先在此完成测量和超规上报，再由智慧航显提示并引导至唯一目的地F2_TEST_GATE。额外场景参数仅为设备能力输入，不改变原始目标、完成条件或行李当前位置。, 任务约束要求'全程不得引导旅客脱离监控区域'，但操作员仅说明旅客当前位于F2_BAGGAGE_POINT，未确认F2_BAGGAGE_POINT至F2_TEST_GATE的全程路线是否均在监控区域内。请确认该路线是否满足监控覆盖要求。=全部为虚构测试数据：行李及旅客当前均位于F2_BAGGAGE_POINT；先在此完成测量和超规上报，再由智慧航显提示并引导至唯一目的地F2_TEST_GATE。额外场景参数仅为设备能力输入，不改变原始目标、完成条件或行李当前位置。}"
+    },
+    {
+      "id": 1182,
+      "taskId": 82,
+      "eventType": "GOAL_CLARIFIED",
+      "occurredAt": "2026-10-27T12:17:57.952935",
+      "trigger": "SYSTEM",
+      "reasonCode": "INFO_INCOMPLETE",
+      "detailSummary": "目标理解发现信息缺失，已补充2轮，待补充问题: [任务约束要求'全程不得引导旅客脱离监控区域'，操作员多次回答未明确确认F2_BAGGAGE_POINT至F2_TEST_GATE的全程路线是否在监控覆盖范围内，请明确确认该路线是否满足监控覆盖要求。, 任务目标包含'由机器人引导至唯一目的地F2_TEST_GATE'，但OVERSIZE_BAGGAGE_HANDLING任务定义的sceneParams未定义targetLocation参数，操作员回答未明确该引导是否作为本任务扩展参数纳入或需拆分任务，请明确确认：引导至F2_TEST_GATE是否纳入本OVERSIZE_BAGGAGE_HANDLING任务统一执行，且该目的地参数是否作为任务必需完成条件的一部分？]"
+    },
+    {
+      "id": 1183,
+      "taskId": 82,
+      "eventType": "GOAL_CLARIFIED",
+      "occurredAt": "2026-10-27T12:17:57.985446",
+      "trigger": "OPERATOR",
+      "reasonCode": null,
+      "detailSummary": "运行操作员oprator补充信息: {任务约束要求'全程不得引导旅客脱离监控区域'，操作员多次回答未明确确认F2_BAGGAGE_POINT至F2_TEST_GATE的全程路线是否在监控覆盖范围内，请明确确认该路线是否满足监控覆盖要求。=全部为虚构测试数据：行李及旅客当前均位于F2_BAGGAGE_POINT；先在此完成测量和超规上报，再由智慧航显提示并引导至唯一目的地F2_TEST_GATE。额外场景参数仅为设备能力输入，不改变原始目标、完成条件或行李当前位置。, 任务目标包含'由机器人引导至唯一目的地F2_TEST_GATE'，但OVERSIZE_BAGGAGE_HANDLING任务定义的sceneParams未定义targetLocation参数，操作员回答未明确该引导是否作为本任务扩展参数纳入或需拆分任务，请明确确认：引导至F2_TEST_GATE是否纳入本OVERSIZE_BAGGAGE_HANDLING任务统一执行，且该目的地参数是否作为任务必需完成条件的一部分？=全部为虚构测试数据：行李及旅客当前均位于F2_BAGGAGE_POINT；先在此完成测量和超规上报，再由智慧航显提示并引导至唯一目的地F2_TEST_GATE。额外场景参数仅为设备能力输入，不改变原始目标、完成条件或行李当前位置。}"
+    },
+    {
+      "id": 1184,
+      "taskId": 82,
+      "eventType": "GOAL_CLARIFIED",
+      "occurredAt": "2026-10-27T12:18:05.197381",
+      "trigger": "SYSTEM",
+      "reasonCode": "INFO_INCOMPLETE",
+      "detailSummary": "目标理解发现信息缺失，已补充3轮，待补充问题: [任务约束要求'全程不得引导旅客脱离监控区域'，操作员多次回答未明确确认F2_BAGGAGE_POINT至F2_TEST_GATE的全程路线是否在监控覆盖范围内，请明确确认该路线是否满足监控覆盖要求。, 任务目标包含'由机器人引导至唯一目的地F2_TEST_GATE'，但OVERSIZE_BAGGAGE_HANDLING任务定义的sceneParams未定义targetLocation参数，操作员回答未明确该引导是否作为本任务扩展参数纳入或需拆分任务，请明确确认：引导至F2_TEST_GATE是否纳入本OVERSIZE_BAGGAGE_HANDLING任务统一执行，且该目的地参数是否作为任务必需完成条件的一部分？]"
+    },
+    {
+      "id": 1185,
+      "taskId": 82,
+      "eventType": "TASK_MANUAL_REQUIRED",
+      "occurredAt": "2026-10-27T12:18:05.197381",
+      "trigger": "SYSTEM",
+      "reasonCode": "INFO_INCOMPLETE",
+      "detailSummary": "三轮信息补充后仍缺少关键信息，需人工处理"
+    }
+  ],
+  "exceptions": [
+    {
+      "id": 2,
+      "taskId": 79,
+      "stepSeq": 1,
+      "exceptionType": "CAPABILITY_GAP",
+      "occurredAt": "2026-10-27T12:04:10.606047",
+      "recoveryAction": null,
+      "recoveryResult": null,
+      "impactConclusion": null,
+      "reasonCode": "步骤1无可用候选设备",
+      "exceptionStatus": "PENDING",
+      "resolvedAt": null,
+      "resolvedBy": null
+    },
+    {
+      "id": 1,
+      "taskId": 58,
+      "stepSeq": 1,
+      "exceptionType": "CAPABILITY_GAP",
+      "occurredAt": "2026-10-26T15:52:20.102162",
+      "recoveryAction": null,
+      "recoveryResult": null,
+      "impactConclusion": null,
+      "reasonCode": "步骤1无可用候选设备",
+      "exceptionStatus": "PENDING",
+      "resolvedAt": null,
+      "resolvedBy": null
+    }
+  ]
+}
