@@ -1,0 +1,40 @@
+{
+  "observedAt": "2026-10-27T01:20:17.330Z",
+  "runtimeInput": "V1.5",
+  "browser": "Chrome",
+  "taskId": 19,
+  "route": "/tasks/19",
+  "header": "任务编号\tTASK-20261025-0019\t状态\t已完成\n任务目标\t请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在F2_BAGGAGE_POINT测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。\n任务族\tOVERSIZE_BAGGAGE_HANDLING\t失败/降级原因\t候选计划三类校验未通过，转基线模板降级",
+  "cards": [
+    {
+      "title": "目标理解结果",
+      "text": "目标理解结果\n起点\tF2_BAGGAGE_POINT\n目的地\tF2_TEST_GATE\n约束条件\t超规行李处置全程不得引导旅客脱离监控区域；测量结果超标须触发超规事件上报\n完成条件\t行李已完成尺寸重量测量且超规事件（如有）已上报"
+    },
+    {
+      "title": "规划依据（上下文快照）",
+      "text": "规划依据（上下文快照）\nCTX-20261025-0018 - 生成时间: 2026-10-25T20:22:23.94233\nCTX-20261025-0017 - 生成时间: 2026-10-25T20:22:15.383554"
+    },
+    {
+      "title": "计划版本与校验/判定结果",
+      "text": "计划版本与校验/判定结果\n版本1（自主规划）\n版本2（基线模板）\n结构校验\t通过\t能力校验\t不通过\n约束校验\t通过\t冻结时间\t未冻结\n置信度\t0.92\n校验错误清单\n[CAPABILITY] 步骤—：核心场景计划缺少必需渠道SMART_DISPLAY的能力CAP_INFO_DISPLAY（ERR_REQUIRED_CHANNEL_MISSING）\n\n候选步骤：\n\n步骤\t步骤目标\t所需能力\t前置条件\t完成条件\t失败处理\n1\t在F2_BAGGAGE_POINT对行李R08-OVERSIZE进行尺寸重量测量\tCAP_BAGGAGE_MEASURE\t行李R08-OVERSIZE已放置于F2_BAGGAGE_POINT测量点，设备在线可用\t测量完成，返回length=80、width=55、height=35、weight=35及isOversize=true结果\t测量超时或失败时重试一次，仍失败则人工介入处理\n2\t上报超规行李事件（尺寸80×55×35厘米、重量35千克，超规阈值触发）\tCAP_OVERSIZE_ALERT\t步骤1测量完成且确认isOversize=true（长宽高之和170>158或重量35>32）\t超规事件上报成功，返回alertId及reportStatus=SUCCESS\t上报失败则记录日志并尝试备用设备重报，确保事件不丢失\n3\t通过智慧航显在F2_TEST区域提示超规行李处置信息\tCAP_NOTIFICATION\t步骤2超规事件上报成功，需向旅客/现场展示提示信息\t通知发布成功，notificationStatus返回SUCCESS\t通知失败不影响核心流程，记录日志后续人工补播\n4\t机器人引导旅客至F2_TEST_GATE超规行李处置点\tCAP_NAVIGATION\t步骤2超规事件已上报，需执行旅客引导；机器人位于F2_TEST区域可用\t导航路线生成成功，routeGenerated=true，机器人开始执行引导\t导航失败时切换备用机器人或通知人工引导"
+    },
+    {
+      "title": "步骤设备分配与执行情况",
+      "text": "步骤设备分配与执行情况\n步骤\t分配设备\t指令编号\t步骤状态\t重试次数\t执行结果\t下发时间\t反馈时间\n1\tAGT-4652EF88\tCMD-20261025202223-E618F15C\t已完成\t0\tSUCCESS\t2026-10-25T20:22:24.021697\t2026-10-25T20:22:26.177519\n2\tAGT-2CCAF5B5\tCMD-20261025202226-E8EF109A\t已完成\t0\tSUCCESS\t2026-10-25T20:22:26.20916\t2026-10-25T20:22:27.248445\n3\tAGT-2CCAF5B5\tCMD-20261025202227-6E309119\t已完成\t0\tSUCCESS\t2026-10-25T20:22:27.286344\t2026-10-25T20:22:28.332068\n4\tAGT-0158A712\tCMD-20261025202228-FF1DA878\t已完成\t0\tSUCCESS\t2026-10-25T20:22:28.365464\t2026-10-25T20:22:29.406824"
+    },
+    {
+      "title": "行李测量与超规判定",
+      "text": "行李测量与超规判定\n长×宽×高\t80×55×35 cm\t重量\t35 kg\n超规判定\t超规\t阈值\t三边和 ＞ 158 cm 或重量 ＞ 32 kg\n阈值来源\t附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束"
+    },
+    {
+      "title": "事件时间线（只读，事件仅可追加不可修改删除，对应5.7.1）",
+      "text": "事件时间线（只读，事件仅可追加不可修改删除，对应5.7.1）\n2026-10-25T20:22:13.491926 - GOAL_SUBMITTED ：运行操作员oprator提交任务目标: 请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在F2_BAGGAGE_POINT测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。\n2026-10-25T20:22:15.369618 - GOAL_CLARIFIED ：目标理解完成，关键信息已完整，进入规划上下文构建\n2026-10-25T20:22:15.397614 - CONTEXT_SNAPSHOT_GENERATED ：生成规划上下文快照CTX-20261025-0017\n2026-10-25T20:22:23.921475 - PLAN_GENERATED ：候选计划生成完成，来源AUTONOMOUS，版本1\n2026-10-25T20:22:23.928713 - PLAN_VALIDATED ：候选计划三类校验未通过: 1项错误\n2026-10-25T20:22:23.94724 - BASELINE_DOWNGRADED ：已自动切换至基线模板超规行李处置标准模板(V1.3)，原因: 候选计划三类校验未通过，转基线模板降级\n2026-10-25T20:22:23.969887 - AGENT_ASSIGNMENT_REQUESTED ：步骤1候选排序（能力匹配->距离->负载）: AGT-4652EF88(距离0.0,负载0)；AGT-9362B1F4(距离0.0,负载0)，向候选AGT-4652EF88发起承接请求\n2026-10-25T20:22:24.019189 - AGENT_ASSIGNED ：设备代理AGT-4652EF88接受步骤1承接请求\n2026-10-25T20:22:24.024236 - STEP_DISPATCHED ：指令CMD-20261025202223-E618F15C已下发至设备代理AGT-4652EF88，业务意图: 执行CAP_NAVIGATION能力（基线模板步骤）\n2026-10-25T20:22:26.177519 - EXECUTION_FEEDBACK_RECEIVED ：指令CMD-20261025202223-E618F15C收到设备代理AGT-4652EF88执行反馈: SUCCESS\n2026-10-25T20:22:26.182591 - STEP_COMPLETED ：步骤1完成条件已满足: routeGenerated=true\n2026-10-25T20:22:26.187026 - AGENT_ASSIGNMENT_REQUESTED ：步骤2候选排序（能力匹配->距离->负载）: AGT-2CCAF5B5(距离0.0,负载0)；AGT-4B552506(距离0.0,负载0)，向候选AGT-2CCAF5B5发起承接请求\n2026-10-25T20:22:26.207425 - AGENT_ASSIGNED ：设备代理AGT-2CCAF5B5接受步骤2承接请求\n2026-10-25T20:22:26.21032 - STEP_DISPATCHED ：指令CMD-20261025202226-E8EF109A已下发至设备代理AGT-2CCAF5B5，业务意图: 执行CAP_BAGGAGE_MEASURE能力（基线模板步骤）\n2026-10-25T20:22:27.248445 - EXECUTION_FEEDBACK_RECEIVED ：指令CMD-20261025202226-E8EF109A收到设备代理AGT-2CCAF5B5执行反馈: SUCCESS\n2026-10-25T20:22:27.251037 - STEP_COMPLETED ：步骤2完成条件已满足: measureStatus=SUCCESS\n2026-10-25T20:22:27.258755 - AGENT_ASSIGNMENT_REQUESTED ：步骤3候选排序（能力匹配->距离->负载）: AGT-2CCAF5B5(距离0.0,负载0)；AGT-4B552506(距离0.0,负载0)，向候选AGT-2CCAF5B5发起承接请求\n2026-10-25T20:22:27.283793 - AGENT_ASSIGNED ：设备代理AGT-2CCAF5B5接受步骤3承接请求\n2026-10-25T20:22:27.288453 - STEP_DISPATCHED ：指令CMD-20261025202227-6E309119已下发至设备代理AGT-2CCAF5B5，业务意图: 执行CAP_OVERSIZE_ALERT能力（基线模板步骤）\n2026-10-25T20:22:28.332068 - EXECUTION_FEEDBACK_RECEIVED ：指令CMD-20261025202227-6E309119收到设备代理AGT-2CCAF5B5执行反馈: SUCCESS\n2026-10-25T20:22:28.33462 - STEP_COMPLETED ：步骤3完成条件已满足: reportStatus=SUCCESS\n2026-10-25T20:22:28.339602 - AGENT_ASSIGNMENT_REQUESTED ：步骤4候选排序（能力匹配->距离->负载）: AGT-0158A712(距离0.0,负载0)，向候选AGT-0158A712发起承接请求\n2026-10-25T20:22:28.362962 - AGENT_ASSIGNED ：设备代理AGT-0158A712接受步骤4承接请求\n2026-10-25T20:22:28.365464 - STEP_DISPATCHED ：指令CMD-20261025202228-FF1DA878已下发至设备代理AGT-0158A712，业务意图: 执行CAP_INFO_DISPLAY能力（基线模板步骤）\n2026-10-25T20:22:29.406824 - EXECUTION_FEEDBACK_RECEIVED ：指令CMD-20261025202228-FF1DA878收到设备代理AGT-0158A712执行反馈: SUCCESS\n2026-10-25T20:22:29.409044 - STEP_COMPLETED ：步骤4完成条件已满足: displayStatus=SUCCESS\n2026-10-25T20:22:29.411601 - TASK_COMPLETED ：全部步骤完成条件均已满足，任务完成"
+    }
+  ],
+  "planTabs": [
+    "版本1（自主规划）",
+    "版本2（基线模板）"
+  ],
+  "timelineItemCount": 27,
+  "screenshot": "TC-063-task-detail-fields-task19.png"
+}

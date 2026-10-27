@@ -8,6 +8,7 @@ const line = fs.readFileSync(path.join(root, 'user.md'), 'utf8').split(/\r?\n/)
 const [, , username, password] = line.split('|')
 const taskId = Number(process.argv[2])
 if (!Number.isInteger(taskId) || taskId < 1) throw new Error('Task ID required')
+const evidencePrefix = taskId === 64 ? 'TC-066' : 'TC-064'
 
 async function main() {
   const browser = await chromium.launch({
@@ -43,7 +44,7 @@ async function main() {
     await modal.locator('textarea').fill('阶段3人工终止边界复测')
     await modal.locator('input[type="checkbox"]').check()
     ev.checkedEnabled = await modal.locator('.ant-modal-footer .ant-btn-primary').isEnabled()
-    ev.screenshot = `TC-066-terminate-modal-${taskId}.png`
+    ev.screenshot = `${evidencePrefix}-terminate-modal-${taskId}.png`
     await page.screenshot({ path: path.join(__dirname, 'evidence', ev.screenshot), fullPage: true })
     const responsePromise = page.waitForResponse(r =>
       r.url().includes(`/tasks/${taskId}/terminate`) && r.request().method() === 'POST',
@@ -56,7 +57,7 @@ async function main() {
     ev.modalClosedAfterConfirm = await page.locator('.ant-modal:visible').count() === 0
     ev.bodyAfter = (await page.locator('body').innerText()).slice(-1000)
   } finally { await browser.close() }
-  fs.writeFileSync(path.join(__dirname, 'evidence', `TC-066-terminate-ui-${taskId}.json`),
+  fs.writeFileSync(path.join(__dirname, 'evidence', `${evidencePrefix}-terminate-ui-${taskId}.json`),
     JSON.stringify(ev, null, 2) + '\n')
   process.stdout.write(JSON.stringify({ taskId, route: ev.route,
     terminateButtonCount: ev.terminateButtonCount, modalVisible: ev.modalVisible,
