@@ -1,0 +1,267 @@
+{
+  "observedAt": "2026-10-27T03:44:05.359159+00:00",
+  "runtimeInput": "V1.5",
+  "isolatedSchema": "tip_stage2_v14",
+  "referencePlanId": 79,
+  "sourceEvidence": "TC-043-risk-rule-subsequent-judgment-20261027T034211Z.json",
+  "request": {
+    "taskGoal": "虚构航班R08Z81登机口由GATE_A05改至F2_TEST_GATE，更新航班信息屏，通知旅客并引导至新登机口。仅为测试。",
+    "taskFamily": "FLIGHT_CHANGE_RESPONSE",
+    "sceneParams": {
+      "flightNumber": "R08Z81",
+      "updateType": "GATE_CHANGE",
+      "updateContent": "测试航班登机口变更至F2_TEST_GATE",
+      "displayDuration": 60,
+      "targetLocation": "F2_TEST_GATE",
+      "routePreference": "BARRIER_FREE",
+      "displayContent": "虚构航班登机口及无障碍路径提示，请前往F2_TEST_GATE。",
+      "contentType": "TEXT",
+      "notificationType": "BOTH",
+      "notificationContent": "虚构航班登机口已变更，请改道至新登机口。",
+      "repeatCount": 1
+    }
+  },
+  "fixtureBefore": {
+    "goal": "success",
+    "planning": "success",
+    "replanning": "success",
+    "delaySeconds": 65
+  },
+  "fixtureDuring": {
+    "goal": "success",
+    "planning": "success",
+    "replanning": "success",
+    "delaySeconds": 65,
+    "initialPlanSteps": [
+      {
+        "stepSeq": 1,
+        "stepGoal": "发布航班登机口变更信息至航班信息屏",
+        "capabilityType": "CAP_FLIGHT_UPDATE",
+        "inputParams": {
+          "flightNumber": "R08Z81",
+          "updateType": "GATE_CHANGE",
+          "updateContent": "测试航班登机口变更至F2_TEST_GATE",
+          "displayDuration": 60
+        },
+        "precondition": "航班信息屏设备在线且空闲，航班号R08Z81及变更内容已确认",
+        "completionCondition": "航班变更信息发布成功，返回publishStatus为成功状态",
+        "failureHandling": "若发布失败，尝试备用航班信息屏SIM_F2_FLIGHT重试；若均失败则返回失败状态",
+        "stepTimeout": 30
+      },
+      {
+        "stepSeq": 2,
+        "stepGoal": "在信息屏显示新登机口位置及无障碍路径指引",
+        "capabilityType": "CAP_INFO_DISPLAY",
+        "inputParams": {
+          "contentType": "TEXT",
+          "contentData": "虚构航班登机口及无障碍路径提示，请前往F2_TEST_GATE。",
+          "displayDuration": 60
+        },
+        "precondition": "步骤1航班变更信息发布成功，信息屏设备可用",
+        "completionCondition": "显示内容成功推送至屏幕，返回displayStatus为成功状态",
+        "failureHandling": "若显示失败，切换至备用显示设备重试",
+        "stepTimeout": 30
+      },
+      {
+        "stepSeq": 3,
+        "stepGoal": "向旅客发送登机口变更通知",
+        "capabilityType": "CAP_NOTIFICATION",
+        "inputParams": {
+          "notificationType": "BOTH",
+          "notificationContent": "虚构航班登机口已变更，请改道至新登机口。",
+          "repeatCount": 1
+        },
+        "precondition": "步骤1航班变更信息已发布，通知设备在线可用",
+        "completionCondition": "通知成功下发，返回notificationStatus为成功状态",
+        "failureHandling": "若通知失败，尝试备用通知设备重试",
+        "stepTimeout": 30
+      },
+      {
+        "stepSeq": 4,
+        "stepGoal": "生成至新登机口的无障碍路径导航",
+        "capabilityType": "CAP_NAVIGATION",
+        "inputParams": {
+          "targetLocation": "F2_TEST_GATE",
+          "routePreference": "BARRIER_FREE"
+        },
+        "precondition": "步骤2显示指引已发布，旅客需物理移动至新登机口",
+        "completionCondition": "无障碍路径生成成功，返回routeGenerated为true",
+        "failureHandling": "若路径生成失败，尝试备用导航设备重试",
+        "stepTimeout": 30
+      }
+    ]
+  },
+  "ruleBefore": {
+    "id": 3,
+    "ruleCode": "RULE_RESOURCE_CRITICAL",
+    "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+    "ruleVersion": "V1.0",
+    "enabled": true,
+    "createdAt": "2026-10-25T15:28:09.286828",
+    "updatedAt": "2026-10-27T11:43:12.296243",
+    "updatedBy": null
+  },
+  "cases": [
+    {
+      "label": "enabled",
+      "ruleAtSubmit": {
+        "id": 3,
+        "ruleCode": "RULE_RESOURCE_CRITICAL",
+        "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+        "ruleVersion": "V1.0",
+        "enabled": true,
+        "createdAt": "2026-10-25T15:28:09.286828",
+        "updatedAt": "2026-10-27T11:43:12.296243",
+        "updatedBy": null
+      },
+      "submitted": {
+        "id": 74,
+        "taskCode": "TASK-20261027-0074",
+        "status": "PLANNING"
+      },
+      "task": {
+        "status": "PLANNING",
+        "downgradeReason": null,
+        "failureReason": null,
+        "currentPlanVersionId": null
+      },
+      "plans": [],
+      "events": [
+        {
+          "id": 1091,
+          "taskId": 74,
+          "eventType": "GOAL_SUBMITTED",
+          "occurredAt": "2026-10-27T11:44:05.413155",
+          "trigger": "OPERATOR",
+          "reasonCode": null,
+          "detailSummary": "运行操作员oprator提交任务目标: 虚构航班R08Z81登机口由GATE_A05改至F2_TEST_GATE，更新航班信息屏，通知旅客并引导至新登机口。仅为测试。"
+        },
+        {
+          "id": 1092,
+          "taskId": 74,
+          "eventType": "GOAL_CLARIFIED",
+          "occurredAt": "2026-10-27T11:44:09.690772",
+          "trigger": "SYSTEM",
+          "reasonCode": "INFO_INCOMPLETE",
+          "detailSummary": "目标理解发现信息缺失，已补充0轮，待补充问题: [该航班变更影响的具体旅客范围或旅客标识未明确，请确认需通知的旅客（如全部旅客、特定旅客列表或当前位于特定区域的旅客）。]"
+        }
+      ],
+      "modelRequests": [],
+      "cleanup": "MANUAL_TERMINATED"
+    },
+    {
+      "label": "disabled",
+      "ruleAtSubmit": {
+        "id": 3,
+        "ruleCode": "RULE_RESOURCE_CRITICAL",
+        "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+        "ruleVersion": "V1.0",
+        "enabled": false,
+        "createdAt": "2026-10-25T15:28:09.286828",
+        "updatedAt": "2026-10-27T11:45:10.739223",
+        "updatedBy": null
+      },
+      "submitted": {
+        "id": 75,
+        "taskCode": "TASK-20261027-0075",
+        "status": "PLANNING"
+      },
+      "task": {
+        "status": "PLANNING",
+        "downgradeReason": null,
+        "failureReason": null,
+        "currentPlanVersionId": null
+      },
+      "plans": [],
+      "events": [
+        {
+          "id": 1094,
+          "taskId": 75,
+          "eventType": "GOAL_SUBMITTED",
+          "occurredAt": "2026-10-27T11:45:10.787532",
+          "trigger": "OPERATOR",
+          "reasonCode": null,
+          "detailSummary": "运行操作员oprator提交任务目标: 虚构航班R08Z81登机口由GATE_A05改至F2_TEST_GATE，更新航班信息屏，通知旅客并引导至新登机口。仅为测试。"
+        },
+        {
+          "id": 1095,
+          "taskId": 75,
+          "eventType": "GOAL_CLARIFIED",
+          "occurredAt": "2026-10-27T11:45:14.273475",
+          "trigger": "SYSTEM",
+          "reasonCode": "INFO_INCOMPLETE",
+          "detailSummary": "目标理解发现信息缺失，已补充0轮，待补充问题: [请提供受影响旅客的标识信息（如旅客名单、座位号或通知范围），否则无法完成'通知旅客'并确认信息已送达]"
+        }
+      ],
+      "modelRequests": [],
+      "cleanup": "MANUAL_TERMINATED"
+    }
+  ],
+  "restore": {
+    "fixtureExact": true,
+    "rule": {
+      "id": 3,
+      "ruleCode": "RULE_RESOURCE_CRITICAL",
+      "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+      "ruleVersion": "V1.0",
+      "enabled": true,
+      "createdAt": "2026-10-25T15:28:09.286828",
+      "updatedAt": "2026-10-27T11:46:14.583787",
+      "updatedBy": null
+    },
+    "agents": [
+      {
+        "deviceCode": "SIM_F2_DISPLAY",
+        "agentStatus": "ENABLED",
+        "onlineStatus": "ONLINE",
+        "workStatus": "IDLE",
+        "currentTaskId": null
+      },
+      {
+        "deviceCode": "SIM_F2_BAGGAGE",
+        "agentStatus": "ENABLED",
+        "onlineStatus": "ONLINE",
+        "workStatus": "IDLE",
+        "currentTaskId": null
+      },
+      {
+        "deviceCode": "SIM_F2_FLIGHT",
+        "agentStatus": "ENABLED",
+        "onlineStatus": "ONLINE",
+        "workStatus": "IDLE",
+        "currentTaskId": null
+      },
+      {
+        "deviceCode": "SIM_F2_ROBOT",
+        "agentStatus": "ENABLED",
+        "onlineStatus": "ONLINE",
+        "workStatus": "IDLE",
+        "currentTaskId": null
+      },
+      {
+        "deviceCode": "SIM_F2_BAGGAGE_B",
+        "agentStatus": "ENABLED",
+        "onlineStatus": "ONLINE",
+        "workStatus": "IDLE",
+        "currentTaskId": null
+      },
+      {
+        "deviceCode": "SIM_F2_ROBOT_B",
+        "agentStatus": "ENABLED",
+        "onlineStatus": "ONLINE",
+        "workStatus": "IDLE",
+        "currentTaskId": null
+      }
+    ]
+  },
+  "disabled": {
+    "id": 3,
+    "ruleCode": "RULE_RESOURCE_CRITICAL",
+    "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+    "ruleVersion": "V1.0",
+    "enabled": false,
+    "createdAt": "2026-10-25T15:28:09.286828",
+    "updatedAt": "2026-10-27T11:45:10.7392234",
+    "updatedBy": null
+  }
+}

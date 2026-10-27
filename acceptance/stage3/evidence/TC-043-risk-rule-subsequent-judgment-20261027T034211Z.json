@@ -1,0 +1,962 @@
+{
+  "observedAt": "2026-10-27T03:42:11.781838+00:00",
+  "runtimeInput": "V1.5",
+  "isolatedSchema": "tip_stage2_v14",
+  "sourceTaskId": 55,
+  "request": {
+    "taskGoal": "虚构航班R08Z81登机口由GATE_A05改至F2_TEST_GATE，更新航班信息屏，通知旅客并引导至新登机口。仅为测试。",
+    "taskFamily": "FLIGHT_CHANGE_RESPONSE",
+    "sceneParams": {
+      "flightNumber": "R08Z81",
+      "updateType": "GATE_CHANGE",
+      "updateContent": "测试航班登机口变更至F2_TEST_GATE",
+      "displayDuration": 60,
+      "targetLocation": "F2_TEST_GATE",
+      "routePreference": "BARRIER_FREE",
+      "displayContent": "虚构航班登机口及无障碍路径提示，请前往F2_TEST_GATE。",
+      "contentType": "TEXT",
+      "notificationType": "BOTH",
+      "notificationContent": "虚构航班登机口已变更，请改道至新登机口。",
+      "repeatCount": 1
+    }
+  },
+  "riskRuleBefore": {
+    "id": 3,
+    "ruleCode": "RULE_RESOURCE_CRITICAL",
+    "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+    "ruleVersion": "V1.0",
+    "enabled": true,
+    "createdAt": "2026-10-25T15:28:09.286828",
+    "updatedAt": "2026-10-25T15:28:09.286828",
+    "updatedBy": null
+  },
+  "cases": [
+    {
+      "label": "enabled_before",
+      "ruleAtSubmit": {
+        "id": 3,
+        "ruleCode": "RULE_RESOURCE_CRITICAL",
+        "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+        "ruleVersion": "V1.0",
+        "enabled": true,
+        "createdAt": "2026-10-25T15:28:09.286828",
+        "updatedAt": "2026-10-25T15:28:09.286828",
+        "updatedBy": null
+      },
+      "submitted": {
+        "id": 72,
+        "taskCode": "TASK-20261027-0072",
+        "status": "PLANNING",
+        "createdAt": "2026-10-27T11:42:11.823361"
+      },
+      "task": {
+        "id": 72,
+        "taskCode": "TASK-20261027-0072",
+        "status": "COMPLETED",
+        "failureReason": null,
+        "downgradeReason": "候选计划三类校验未通过，转基线模板降级",
+        "currentPlanVersionId": 78,
+        "updatedAt": "2026-10-27T11:42:39.372751"
+      },
+      "plans": [
+        {
+          "id": 77,
+          "versionNo": 1,
+          "source": "AUTONOMOUS",
+          "baselineTemplateId": null,
+          "snapshotId": "CTX-20261027-0060",
+          "planSteps": [
+            {
+              "stepSeq": 1,
+              "stepGoal": "发布航班R08Z81登机口变更信息至航班信息屏",
+              "capabilityType": "CAP_FLIGHT_UPDATE",
+              "inputParams": {
+                "flightNumber": "R08Z81",
+                "updateType": "GATE_CHANGE",
+                "updateContent": "测试航班登机口变更至F2_TEST_GATE",
+                "displayDuration": 60
+              },
+              "precondition": "航班变更信息已确认，航班信息屏设备在线且空闲",
+              "completionCondition": "航班信息屏成功发布变更信息并返回发布状态",
+              "failureHandling": "若发布失败，尝试备用航班信息屏SIM_F2_DISPLAY重试",
+              "stepTimeout": 30
+            },
+            {
+              "stepSeq": 2,
+              "stepGoal": "在智能显示屏展示登机口变更及无障碍路径提示信息",
+              "capabilityType": "CAP_INFO_DISPLAY",
+              "inputParams": {
+                "contentType": "TEXT",
+                "contentData": "虚构航班登机口及无障碍路径提示，请前往F2_TEST_GATE。",
+                "displayDuration": 60
+              },
+              "precondition": "步骤1航班变更信息已发布，智能显示屏设备在线且空闲",
+              "completionCondition": "显示屏成功展示引导信息并返回显示状态",
+              "failureHandling": "若显示失败，尝试备用智能显示屏或其他信息展示设备重试",
+              "stepTimeout": 30
+            },
+            {
+              "stepSeq": 3,
+              "stepGoal": "通知旅客登机口变更信息",
+              "capabilityType": "CAP_NOTIFICATION",
+              "inputParams": {
+                "notificationType": "BOTH",
+                "notificationContent": "虚构航班登机口已变更，请改道至新登机口。",
+                "repeatCount": 1
+              },
+              "precondition": "步骤2信息展示完成，通知设备在线且空闲",
+              "completionCondition": "旅客通知成功发送并返回通知状态",
+              "failureHandling": "若通知失败，切换至另一台移动机器人重试通知",
+              "stepTimeout": 30
+            },
+            {
+              "stepSeq": 4,
+              "stepGoal": "生成至新登机口的无障碍路径引导",
+              "capabilityType": "CAP_NAVIGATION",
+              "inputParams": {
+                "targetLocation": "F2_TEST_GATE",
+                "routePreference": "BARRIER_FREE"
+              },
+              "precondition": "步骤3通知已发送，导航设备在线且空闲",
+              "completionCondition": "成功生成无障碍路径并返回路径信息（距离、时长、路径点数量）",
+              "failureHandling": "若路径生成失败，尝试备用导航设备重试",
+              "stepTimeout": 30
+            }
+          ],
+          "structureCheckResult": "PASS",
+          "capabilityCheckResult": "PASS",
+          "constraintCheckResult": "FAIL",
+          "validationErrors": [
+            {
+              "errorType": "CONSTRAINT",
+              "description": "步骤包含运动安全控制字段: [路径点]",
+              "stepSeq": 4,
+              "reasonCode": "ERR_MOTION_SAFETY_FIELD"
+            }
+          ],
+          "riskLevel": null,
+          "riskReasonCode": null,
+          "judgmentBasis": null,
+          "confidence": 0.85,
+          "ruleSetVersion": null,
+          "frozenAt": null,
+          "createdAt": "2026-10-27T11:42:33.798918"
+        },
+        {
+          "id": 78,
+          "versionNo": 2,
+          "source": "BASELINE_TEMPLATE",
+          "baselineTemplateId": 3,
+          "snapshotId": "CTX-20261027-0061",
+          "planSteps": [
+            {
+              "stepSeq": 1,
+              "capabilityType": "CAP_FLIGHT_UPDATE",
+              "paramMapping": [
+                {
+                  "target": "flightNumber",
+                  "source": "TEMPLATE_INPUT.flightNumber"
+                },
+                {
+                  "target": "updateType",
+                  "source": "TEMPLATE_INPUT.updateType"
+                },
+                {
+                  "target": "updateContent",
+                  "source": "TEMPLATE_INPUT.updateContent"
+                },
+                {
+                  "target": "displayDuration",
+                  "source": "TEMPLATE_INPUT.displayDuration"
+                }
+              ],
+              "stepTimeout": 60,
+              "completionCondition": "publishStatus=SUCCESS",
+              "stepGoal": "执行CAP_FLIGHT_UPDATE能力（基线模板步骤）",
+              "precondition": "候选设备在线且空闲",
+              "failureHandling": "重试一次或转人工处理",
+              "inputParams": {}
+            },
+            {
+              "stepSeq": 2,
+              "capabilityType": "CAP_INFO_DISPLAY",
+              "paramMapping": [
+                {
+                  "target": "contentType",
+                  "source": "TEMPLATE_INPUT.contentType"
+                },
+                {
+                  "target": "contentData",
+                  "source": "TEMPLATE_INPUT.displayContent"
+                },
+                {
+                  "target": "displayDuration",
+                  "source": "TEMPLATE_INPUT.displayDuration"
+                }
+              ],
+              "stepTimeout": 60,
+              "completionCondition": "displayStatus=SUCCESS",
+              "stepGoal": "执行CAP_INFO_DISPLAY能力（基线模板步骤）",
+              "precondition": "候选设备在线且空闲",
+              "failureHandling": "重试一次或转人工处理",
+              "inputParams": {}
+            },
+            {
+              "stepSeq": 3,
+              "capabilityType": "CAP_NOTIFICATION",
+              "paramMapping": [
+                {
+                  "target": "notificationType",
+                  "source": "TEMPLATE_INPUT.notificationType"
+                },
+                {
+                  "target": "notificationContent",
+                  "source": "TEMPLATE_INPUT.notificationContent"
+                },
+                {
+                  "target": "repeatCount",
+                  "source": "TEMPLATE_INPUT.repeatCount"
+                }
+              ],
+              "stepTimeout": 60,
+              "completionCondition": "notificationStatus=SUCCESS",
+              "stepGoal": "执行CAP_NOTIFICATION能力（基线模板步骤）",
+              "precondition": "候选设备在线且空闲",
+              "failureHandling": "重试一次或转人工处理",
+              "inputParams": {}
+            },
+            {
+              "stepSeq": 4,
+              "capabilityType": "CAP_NAVIGATION",
+              "paramMapping": [
+                {
+                  "target": "targetLocation",
+                  "source": "TEMPLATE_INPUT.targetLocation"
+                },
+                {
+                  "target": "routePreference",
+                  "source": "TEMPLATE_INPUT.routePreference"
+                }
+              ],
+              "stepTimeout": 60,
+              "completionCondition": "routeGenerated=true",
+              "stepGoal": "执行CAP_NAVIGATION能力（基线模板步骤）",
+              "precondition": "候选设备在线且空闲",
+              "failureHandling": "重试一次或转人工处理",
+              "inputParams": {}
+            }
+          ],
+          "structureCheckResult": "PASS",
+          "capabilityCheckResult": "PASS",
+          "constraintCheckResult": "PASS",
+          "validationErrors": [],
+          "riskLevel": null,
+          "riskReasonCode": null,
+          "judgmentBasis": null,
+          "confidence": null,
+          "ruleSetVersion": null,
+          "frozenAt": "2026-10-27T11:42:33.830814",
+          "createdAt": "2026-10-27T11:42:33.829673"
+        }
+      ],
+      "events": [
+        {
+          "id": 1037,
+          "taskId": 72,
+          "eventType": "GOAL_SUBMITTED",
+          "occurredAt": "2026-10-27T11:42:11.853401",
+          "trigger": "OPERATOR",
+          "reasonCode": null,
+          "detailSummary": "运行操作员oprator提交任务目标: 虚构航班R08Z81登机口由GATE_A05改至F2_TEST_GATE，更新航班信息屏，通知旅客并引导至新登机口。仅为测试。"
+        },
+        {
+          "id": 1038,
+          "taskId": 72,
+          "eventType": "GOAL_CLARIFIED",
+          "occurredAt": "2026-10-27T11:42:15.448239",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+        },
+        {
+          "id": 1039,
+          "taskId": 72,
+          "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+          "occurredAt": "2026-10-27T11:42:15.475085",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "生成规划上下文快照CTX-20261027-0060"
+        },
+        {
+          "id": 1040,
+          "taskId": 72,
+          "eventType": "PLAN_GENERATED",
+          "occurredAt": "2026-10-27T11:42:33.80386",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+        },
+        {
+          "id": 1041,
+          "taskId": 72,
+          "eventType": "PLAN_VALIDATED",
+          "occurredAt": "2026-10-27T11:42:33.81097",
+          "trigger": "SYSTEM",
+          "reasonCode": "ERR_VALIDATION_FAILED",
+          "detailSummary": "候选计划三类校验未通过: 1项错误"
+        },
+        {
+          "id": 1042,
+          "taskId": 72,
+          "eventType": "BASELINE_DOWNGRADED",
+          "occurredAt": "2026-10-27T11:42:33.831955",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "已自动切换至基线模板航班变更应对标准模板(V1.1)，原因: 候选计划三类校验未通过，转基线模板降级"
+        },
+        {
+          "id": 1043,
+          "taskId": 72,
+          "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+          "occurredAt": "2026-10-27T11:42:33.840802",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-F9B433BD(距离0.0,负载0)，向候选AGT-F9B433BD发起承接请求"
+        },
+        {
+          "id": 1044,
+          "taskId": 72,
+          "eventType": "AGENT_ASSIGNED",
+          "occurredAt": "2026-10-27T11:42:33.944334",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "设备代理AGT-F9B433BD接受步骤1承接请求"
+        },
+        {
+          "id": 1045,
+          "taskId": 72,
+          "eventType": "STEP_DISPATCHED",
+          "occurredAt": "2026-10-27T11:42:33.952475",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "指令CMD-20261027114233-E8B26C58已下发至设备代理AGT-F9B433BD，业务意图: 执行CAP_FLIGHT_UPDATE能力（基线模板步骤）"
+        },
+        {
+          "id": 1046,
+          "taskId": 72,
+          "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+          "occurredAt": "2026-10-27T11:42:35.007225",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "指令CMD-20261027114233-E8B26C58收到设备代理AGT-F9B433BD执行反馈: SUCCESS"
+        },
+        {
+          "id": 1047,
+          "taskId": 72,
+          "eventType": "STEP_COMPLETED",
+          "occurredAt": "2026-10-27T11:42:35.009953",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "步骤1完成条件已满足: publishStatus=SUCCESS"
+        },
+        {
+          "id": 1048,
+          "taskId": 72,
+          "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+          "occurredAt": "2026-10-27T11:42:35.014775",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "步骤2候选排序（能力匹配->距离->负载）: AGT-0158A712(距离0.0,负载0)，向候选AGT-0158A712发起承接请求"
+        },
+        {
+          "id": 1049,
+          "taskId": 72,
+          "eventType": "AGENT_ASSIGNED",
+          "occurredAt": "2026-10-27T11:42:35.038669",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "设备代理AGT-0158A712接受步骤2承接请求"
+        },
+        {
+          "id": 1050,
+          "taskId": 72,
+          "eventType": "STEP_DISPATCHED",
+          "occurredAt": "2026-10-27T11:42:35.04142",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "指令CMD-20261027114235-E1F4FE03已下发至设备代理AGT-0158A712，业务意图: 执行CAP_INFO_DISPLAY能力（基线模板步骤）"
+        },
+        {
+          "id": 1051,
+          "taskId": 72,
+          "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+          "occurredAt": "2026-10-27T11:42:36.081119",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "指令CMD-20261027114235-E1F4FE03收到设备代理AGT-0158A712执行反馈: SUCCESS"
+        },
+        {
+          "id": 1052,
+          "taskId": 72,
+          "eventType": "STEP_COMPLETED",
+          "occurredAt": "2026-10-27T11:42:36.085207",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "步骤2完成条件已满足: displayStatus=SUCCESS"
+        },
+        {
+          "id": 1053,
+          "taskId": 72,
+          "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+          "occurredAt": "2026-10-27T11:42:36.091619",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "步骤3候选排序（能力匹配->距离->负载）: AGT-4652EF88(距离0.0,负载0)；AGT-9362B1F4(距离0.0,负载0)，向候选AGT-4652EF88发起承接请求"
+        },
+        {
+          "id": 1054,
+          "taskId": 72,
+          "eventType": "AGENT_ASSIGNED",
+          "occurredAt": "2026-10-27T11:42:36.115544",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "设备代理AGT-4652EF88接受步骤3承接请求"
+        },
+        {
+          "id": 1055,
+          "taskId": 72,
+          "eventType": "STEP_DISPATCHED",
+          "occurredAt": "2026-10-27T11:42:36.117776",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "指令CMD-20261027114236-6F9790A1已下发至设备代理AGT-4652EF88，业务意图: 执行CAP_NOTIFICATION能力（基线模板步骤）"
+        },
+        {
+          "id": 1056,
+          "taskId": 72,
+          "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+          "occurredAt": "2026-10-27T11:42:37.157129",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "指令CMD-20261027114236-6F9790A1收到设备代理AGT-4652EF88执行反馈: SUCCESS"
+        },
+        {
+          "id": 1057,
+          "taskId": 72,
+          "eventType": "STEP_COMPLETED",
+          "occurredAt": "2026-10-27T11:42:37.159756",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "步骤3完成条件已满足: notificationStatus=SUCCESS"
+        },
+        {
+          "id": 1058,
+          "taskId": 72,
+          "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+          "occurredAt": "2026-10-27T11:42:37.165142",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "步骤4候选排序（能力匹配->距离->负载）: AGT-4652EF88(距离0.0,负载0)；AGT-9362B1F4(距离0.0,负载0)，向候选AGT-4652EF88发起承接请求"
+        },
+        {
+          "id": 1059,
+          "taskId": 72,
+          "eventType": "AGENT_ASSIGNED",
+          "occurredAt": "2026-10-27T11:42:37.195471",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "设备代理AGT-4652EF88接受步骤4承接请求"
+        },
+        {
+          "id": 1060,
+          "taskId": 72,
+          "eventType": "STEP_DISPATCHED",
+          "occurredAt": "2026-10-27T11:42:37.195471",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "指令CMD-20261027114237-35798921已下发至设备代理AGT-4652EF88，业务意图: 执行CAP_NAVIGATION能力（基线模板步骤）"
+        },
+        {
+          "id": 1061,
+          "taskId": 72,
+          "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+          "occurredAt": "2026-10-27T11:42:39.365153",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "指令CMD-20261027114237-35798921收到设备代理AGT-4652EF88执行反馈: SUCCESS"
+        },
+        {
+          "id": 1062,
+          "taskId": 72,
+          "eventType": "STEP_COMPLETED",
+          "occurredAt": "2026-10-27T11:42:39.367809",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "步骤4完成条件已满足: routeGenerated=true"
+        },
+        {
+          "id": 1063,
+          "taskId": 72,
+          "eventType": "TASK_COMPLETED",
+          "occurredAt": "2026-10-27T11:42:39.375362",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "航班变更可用渠道执行完成；已覆盖: [CAP_FLIGHT_UPDATE, CAP_INFO_DISPLAY, CAP_NOTIFICATION, CAP_NAVIGATION]；未覆盖: []"
+        }
+      ]
+    },
+    {
+      "label": "disabled",
+      "ruleAtSubmit": {
+        "id": 3,
+        "ruleCode": "RULE_RESOURCE_CRITICAL",
+        "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+        "ruleVersion": "V1.0",
+        "enabled": false,
+        "createdAt": "2026-10-25T15:28:09.286828",
+        "updatedAt": "2026-10-27T11:42:40.111507",
+        "updatedBy": null
+      },
+      "submitted": {
+        "id": 73,
+        "taskCode": "TASK-20261027-0073",
+        "status": "PLANNING",
+        "createdAt": "2026-10-27T11:42:40.1297527"
+      },
+      "task": {
+        "id": 73,
+        "taskCode": "TASK-20261027-0073",
+        "status": "COMPLETED",
+        "failureReason": null,
+        "downgradeReason": null,
+        "currentPlanVersionId": 79,
+        "updatedAt": "2026-10-27T11:43:11.643471"
+      },
+      "plans": [
+        {
+          "id": 79,
+          "versionNo": 1,
+          "source": "AUTONOMOUS",
+          "baselineTemplateId": null,
+          "snapshotId": "CTX-20261027-0062",
+          "planSteps": [
+            {
+              "stepSeq": 1,
+              "stepGoal": "发布航班登机口变更信息至航班信息屏",
+              "capabilityType": "CAP_FLIGHT_UPDATE",
+              "inputParams": {
+                "flightNumber": "R08Z81",
+                "updateType": "GATE_CHANGE",
+                "updateContent": "测试航班登机口变更至F2_TEST_GATE",
+                "displayDuration": 60
+              },
+              "precondition": "航班信息屏设备在线且空闲，航班号R08Z81及变更内容已确认",
+              "completionCondition": "航班变更信息发布成功，返回publishStatus为成功状态",
+              "failureHandling": "若发布失败，尝试备用航班信息屏SIM_F2_FLIGHT重试；若均失败则返回失败状态",
+              "stepTimeout": 30
+            },
+            {
+              "stepSeq": 2,
+              "stepGoal": "在信息屏显示新登机口位置及无障碍路径指引",
+              "capabilityType": "CAP_INFO_DISPLAY",
+              "inputParams": {
+                "contentType": "TEXT",
+                "contentData": "虚构航班登机口及无障碍路径提示，请前往F2_TEST_GATE。",
+                "displayDuration": 60
+              },
+              "precondition": "步骤1航班变更信息发布成功，信息屏设备可用",
+              "completionCondition": "显示内容成功推送至屏幕，返回displayStatus为成功状态",
+              "failureHandling": "若显示失败，切换至备用显示设备重试",
+              "stepTimeout": 30
+            },
+            {
+              "stepSeq": 3,
+              "stepGoal": "向旅客发送登机口变更通知",
+              "capabilityType": "CAP_NOTIFICATION",
+              "inputParams": {
+                "notificationType": "BOTH",
+                "notificationContent": "虚构航班登机口已变更，请改道至新登机口。",
+                "repeatCount": 1
+              },
+              "precondition": "步骤1航班变更信息已发布，通知设备在线可用",
+              "completionCondition": "通知成功下发，返回notificationStatus为成功状态",
+              "failureHandling": "若通知失败，尝试备用通知设备重试",
+              "stepTimeout": 30
+            },
+            {
+              "stepSeq": 4,
+              "stepGoal": "生成至新登机口的无障碍路径导航",
+              "capabilityType": "CAP_NAVIGATION",
+              "inputParams": {
+                "targetLocation": "F2_TEST_GATE",
+                "routePreference": "BARRIER_FREE"
+              },
+              "precondition": "步骤2显示指引已发布，旅客需物理移动至新登机口",
+              "completionCondition": "无障碍路径生成成功，返回routeGenerated为true",
+              "failureHandling": "若路径生成失败，尝试备用导航设备重试",
+              "stepTimeout": 30
+            }
+          ],
+          "structureCheckResult": "PASS",
+          "capabilityCheckResult": "PASS",
+          "constraintCheckResult": "PASS",
+          "validationErrors": [],
+          "riskLevel": "LOW",
+          "riskReasonCode": null,
+          "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+          "confidence": 0.92,
+          "ruleSetVersion": "V1.0",
+          "frozenAt": "2026-10-27T11:43:06.142182",
+          "createdAt": "2026-10-27T11:43:06.131816"
+        }
+      ],
+      "events": [
+        {
+          "id": 1064,
+          "taskId": 73,
+          "eventType": "GOAL_SUBMITTED",
+          "occurredAt": "2026-10-27T11:42:40.13142",
+          "trigger": "OPERATOR",
+          "reasonCode": null,
+          "detailSummary": "运行操作员oprator提交任务目标: 虚构航班R08Z81登机口由GATE_A05改至F2_TEST_GATE，更新航班信息屏，通知旅客并引导至新登机口。仅为测试。"
+        },
+        {
+          "id": 1065,
+          "taskId": 73,
+          "eventType": "GOAL_CLARIFIED",
+          "occurredAt": "2026-10-27T11:42:43.276508",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+        },
+        {
+          "id": 1066,
+          "taskId": 73,
+          "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+          "occurredAt": "2026-10-27T11:42:43.28772",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "生成规划上下文快照CTX-20261027-0062"
+        },
+        {
+          "id": 1067,
+          "taskId": 73,
+          "eventType": "PLAN_GENERATED",
+          "occurredAt": "2026-10-27T11:43:06.135188",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+        },
+        {
+          "id": 1068,
+          "taskId": 73,
+          "eventType": "PLAN_VALIDATED",
+          "occurredAt": "2026-10-27T11:43:06.142182",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+        },
+        {
+          "id": 1069,
+          "taskId": 73,
+          "eventType": "SUPERVISION_JUDGED",
+          "occurredAt": "2026-10-27T11:43:06.152236",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "监督判定: LOW，未命中确定性高风险规则，风险信号数量不足以触发降级"
+        },
+        {
+          "id": 1070,
+          "taskId": 73,
+          "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+          "occurredAt": "2026-10-27T11:43:06.165953",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-F9B433BD(距离0.0,负载0)，向候选AGT-F9B433BD发起承接请求"
+        },
+        {
+          "id": 1071,
+          "taskId": 73,
+          "eventType": "AGENT_ASSIGNED",
+          "occurredAt": "2026-10-27T11:43:06.200423",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "设备代理AGT-F9B433BD接受步骤1承接请求"
+        },
+        {
+          "id": 1072,
+          "taskId": 73,
+          "eventType": "STEP_DISPATCHED",
+          "occurredAt": "2026-10-27T11:43:06.203185",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "指令CMD-20261027114306-4C83B184已下发至设备代理AGT-F9B433BD，业务意图: 发布航班登机口变更信息至航班信息屏"
+        },
+        {
+          "id": 1073,
+          "taskId": 73,
+          "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+          "occurredAt": "2026-10-27T11:43:07.250449",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "指令CMD-20261027114306-4C83B184收到设备代理AGT-F9B433BD执行反馈: SUCCESS"
+        },
+        {
+          "id": 1074,
+          "taskId": 73,
+          "eventType": "STEP_COMPLETED",
+          "occurredAt": "2026-10-27T11:43:07.255774",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "步骤1完成条件已满足: 航班变更信息发布成功，返回publishStatus为成功状态"
+        },
+        {
+          "id": 1075,
+          "taskId": 73,
+          "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+          "occurredAt": "2026-10-27T11:43:07.258529",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "步骤2候选排序（能力匹配->距离->负载）: AGT-0158A712(距离0.0,负载0)，向候选AGT-0158A712发起承接请求"
+        },
+        {
+          "id": 1076,
+          "taskId": 73,
+          "eventType": "AGENT_ASSIGNED",
+          "occurredAt": "2026-10-27T11:43:07.301193",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "设备代理AGT-0158A712接受步骤2承接请求"
+        },
+        {
+          "id": 1077,
+          "taskId": 73,
+          "eventType": "STEP_DISPATCHED",
+          "occurredAt": "2026-10-27T11:43:07.30338",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "指令CMD-20261027114307-14B903F2已下发至设备代理AGT-0158A712，业务意图: 在信息屏显示新登机口位置及无障碍路径指引"
+        },
+        {
+          "id": 1078,
+          "taskId": 73,
+          "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+          "occurredAt": "2026-10-27T11:43:08.36598",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "指令CMD-20261027114307-14B903F2收到设备代理AGT-0158A712执行反馈: SUCCESS"
+        },
+        {
+          "id": 1079,
+          "taskId": 73,
+          "eventType": "STEP_COMPLETED",
+          "occurredAt": "2026-10-27T11:43:08.368259",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "步骤2完成条件已满足: 显示内容成功推送至屏幕，返回displayStatus为成功状态"
+        },
+        {
+          "id": 1080,
+          "taskId": 73,
+          "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+          "occurredAt": "2026-10-27T11:43:08.373686",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "步骤3候选排序（能力匹配->距离->负载）: AGT-4652EF88(距离0.0,负载0)；AGT-9362B1F4(距离0.0,负载0)，向候选AGT-4652EF88发起承接请求"
+        },
+        {
+          "id": 1081,
+          "taskId": 73,
+          "eventType": "AGENT_ASSIGNED",
+          "occurredAt": "2026-10-27T11:43:08.415101",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "设备代理AGT-4652EF88接受步骤3承接请求"
+        },
+        {
+          "id": 1082,
+          "taskId": 73,
+          "eventType": "STEP_DISPATCHED",
+          "occurredAt": "2026-10-27T11:43:08.417797",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "指令CMD-20261027114308-50CB4459已下发至设备代理AGT-4652EF88，业务意图: 向旅客发送登机口变更通知"
+        },
+        {
+          "id": 1083,
+          "taskId": 73,
+          "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+          "occurredAt": "2026-10-27T11:43:09.455155",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "指令CMD-20261027114308-50CB4459收到设备代理AGT-4652EF88执行反馈: SUCCESS"
+        },
+        {
+          "id": 1084,
+          "taskId": 73,
+          "eventType": "STEP_COMPLETED",
+          "occurredAt": "2026-10-27T11:43:09.459523",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "步骤3完成条件已满足: 通知成功下发，返回notificationStatus为成功状态"
+        },
+        {
+          "id": 1085,
+          "taskId": 73,
+          "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+          "occurredAt": "2026-10-27T11:43:09.464424",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "步骤4候选排序（能力匹配->距离->负载）: AGT-4652EF88(距离0.0,负载0)；AGT-9362B1F4(距离0.0,负载0)，向候选AGT-4652EF88发起承接请求"
+        },
+        {
+          "id": 1086,
+          "taskId": 73,
+          "eventType": "AGENT_ASSIGNED",
+          "occurredAt": "2026-10-27T11:43:09.501405",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "设备代理AGT-4652EF88接受步骤4承接请求"
+        },
+        {
+          "id": 1087,
+          "taskId": 73,
+          "eventType": "STEP_DISPATCHED",
+          "occurredAt": "2026-10-27T11:43:09.503759",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "指令CMD-20261027114309-6525A499已下发至设备代理AGT-4652EF88，业务意图: 生成至新登机口的无障碍路径导航"
+        },
+        {
+          "id": 1088,
+          "taskId": 73,
+          "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+          "occurredAt": "2026-10-27T11:43:11.640779",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "指令CMD-20261027114309-6525A499收到设备代理AGT-4652EF88执行反馈: SUCCESS"
+        },
+        {
+          "id": 1089,
+          "taskId": 73,
+          "eventType": "STEP_COMPLETED",
+          "occurredAt": "2026-10-27T11:43:11.643471",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "步骤4完成条件已满足: 无障碍路径生成成功，返回routeGenerated为true"
+        },
+        {
+          "id": 1090,
+          "taskId": 73,
+          "eventType": "TASK_COMPLETED",
+          "occurredAt": "2026-10-27T11:43:11.646174",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "航班变更可用渠道执行完成；已覆盖: [CAP_FLIGHT_UPDATE, CAP_INFO_DISPLAY, CAP_NOTIFICATION, CAP_NAVIGATION]；未覆盖: []"
+        }
+      ]
+    }
+  ],
+  "restore": {
+    "enableResponse": {
+      "id": 3,
+      "ruleCode": "RULE_RESOURCE_CRITICAL",
+      "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+      "ruleVersion": "V1.0",
+      "enabled": true,
+      "createdAt": "2026-10-25T15:28:09.286828",
+      "updatedAt": "2026-10-27T11:43:12.2962434",
+      "updatedBy": null
+    },
+    "rule": {
+      "id": 3,
+      "ruleCode": "RULE_RESOURCE_CRITICAL",
+      "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+      "ruleVersion": "V1.0",
+      "enabled": true,
+      "createdAt": "2026-10-25T15:28:09.286828",
+      "updatedAt": "2026-10-27T11:43:12.296243",
+      "updatedBy": null
+    },
+    "agents": [
+      {
+        "deviceCode": "SIM_F2_DISPLAY",
+        "agentStatus": "ENABLED",
+        "onlineStatus": "ONLINE",
+        "workStatus": "IDLE",
+        "currentTaskId": null
+      },
+      {
+        "deviceCode": "SIM_F2_BAGGAGE",
+        "agentStatus": "ENABLED",
+        "onlineStatus": "ONLINE",
+        "workStatus": "IDLE",
+        "currentTaskId": null
+      },
+      {
+        "deviceCode": "SIM_F2_FLIGHT",
+        "agentStatus": "ENABLED",
+        "onlineStatus": "ONLINE",
+        "workStatus": "IDLE",
+        "currentTaskId": null
+      },
+      {
+        "deviceCode": "SIM_F2_ROBOT",
+        "agentStatus": "ENABLED",
+        "onlineStatus": "ONLINE",
+        "workStatus": "IDLE",
+        "currentTaskId": null
+      },
+      {
+        "deviceCode": "SIM_F2_BAGGAGE_B",
+        "agentStatus": "ENABLED",
+        "onlineStatus": "ONLINE",
+        "workStatus": "IDLE",
+        "currentTaskId": null
+      },
+      {
+        "deviceCode": "SIM_F2_ROBOT_B",
+        "agentStatus": "ENABLED",
+        "onlineStatus": "ONLINE",
+        "workStatus": "IDLE",
+        "currentTaskId": null
+      }
+    ],
+    "audit": [
+      {
+        "id": 1109,
+        "userId": 3,
+        "username": "set",
+        "role": "CONFIG_ADMIN",
+        "operationType": "RISK_RULE_CHANGE",
+        "operationTarget": "RULE_RESOURCE_CRITICAL",
+        "operationResult": "SUCCESS",
+        "sourceIp": "127.0.0.1",
+        "detail": "{\"before\":{\"ruleContent\":\"任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中\",\"enabled\":false},\"action\":\"UPDATE\",\"after\":{\"ruleContent\":\"任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中\",\"enabled\":true}}",
+        "createdAt": "2026-10-27T11:43:12.296243"
+      },
+      {
+        "id": 1107,
+        "userId": 3,
+        "username": "set",
+        "role": "CONFIG_ADMIN",
+        "operationType": "RISK_RULE_CHANGE",
+        "operationTarget": "RULE_RESOURCE_CRITICAL",
+        "operationResult": "SUCCESS",
+        "sourceIp": "127.0.0.1",
+        "detail": "{\"before\":{\"ruleContent\":\"任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中\",\"enabled\":true},\"action\":\"UPDATE\",\"after\":{\"ruleContent\":\"任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中\",\"enabled\":false}}",
+        "createdAt": "2026-10-27T11:42:40.113081"
+      }
+    ]
+  },
+  "disabled": {
+    "id": 3,
+    "ruleCode": "RULE_RESOURCE_CRITICAL",
+    "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+    "ruleVersion": "V1.0",
+    "enabled": false,
+    "createdAt": "2026-10-25T15:28:09.286828",
+    "updatedAt": "2026-10-27T11:42:40.1115069",
+    "updatedBy": null
+  }
+}
