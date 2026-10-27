@@ -1,0 +1,36 @@
+{
+  "observedAt": "2026-10-27T05:45:00.612Z",
+  "runtimeInput": "V1.5",
+  "browser": "Chrome",
+  "taskId": 83,
+  "route": "/tasks/83",
+  "header": "任务编号\tTASK-20261027-0083\t状态\t人工终止\n任务目标\t请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在F2_BAGGAGE_POINT测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。\n任务族\tOVERSIZE_BAGGAGE_HANDLING\t失败/降级原因\t局部重新规划失败：新计划版本三类校验未通过",
+  "cards": [
+    {
+      "title": "目标理解结果",
+      "text": "目标理解结果\n起点\tF2_SERVICE_POINT\n目的地\tF2_TEST_GATE\n约束条件\t不得下发运动安全控制指令\n完成条件\t既定业务完成条件满足"
+    },
+    {
+      "title": "规划依据（上下文快照）",
+      "text": "规划依据（上下文快照）\nCTX-20261027-0068 - 生成时间: 2026-10-27T12:21:36.282826\nCTX-20261027-0067 - 生成时间: 2026-10-27T12:21:31.409852\nCTX-20261027-0066 - 生成时间: 2026-10-27T12:21:31.267862"
+    },
+    {
+      "title": "计划版本与校验/判定结果",
+      "text": "计划版本与校验/判定结果\n版本1（基线模板）\n版本2（自主规划）\n结构校验\t通过\t能力校验\t通过\n约束校验\t通过\t冻结时间\t2026-10-27T12:21:31.475976\n\n候选步骤：\n\n步骤\t步骤目标\t所需能力\t前置条件\t完成条件\t失败处理\n1\t执行CAP_NAVIGATION能力（基线模板步骤）\tCAP_NAVIGATION\t候选设备在线且空闲\trouteGenerated=true\t重试一次或转人工处理\n2\t执行CAP_BAGGAGE_MEASURE能力（基线模板步骤）\tCAP_BAGGAGE_MEASURE\t候选设备在线且空闲\tmeasureStatus=SUCCESS\t重试一次或转人工处理\n3\t执行CAP_OVERSIZE_ALERT能力（基线模板步骤）\tCAP_OVERSIZE_ALERT\t候选设备在线且空闲\treportStatus=SUCCESS\t重试一次或转人工处理\n4\t执行CAP_INFO_DISPLAY能力（基线模板步骤）\tCAP_INFO_DISPLAY\t候选设备在线且空闲\tdisplayStatus=SUCCESS\t重试一次或转人工处理"
+    },
+    {
+      "title": "步骤设备分配与执行情况",
+      "text": "步骤设备分配与执行情况\n步骤\t分配设备\t指令编号\t步骤状态\t重试次数\t执行结果\t下发时间\t反馈时间\n1\t\t\t已冻结\t0\tFAILED\t2026-10-27T12:21:35.155823\t2026-10-27T12:21:36.220174\n2\t\t\t已冻结\t0\t\t\t\n3\t\t\t已冻结\t0\t\t\t\n4\t\t\t已冻结\t0\t\t\t"
+    },
+    {
+      "title": "事件时间线（只读，事件仅可追加不可修改删除，对应5.7.1）",
+      "text": "事件时间线（只读，事件仅可追加不可修改删除，对应5.7.1）\n2026-10-27T12:21:31.000776 - GOAL_SUBMITTED ：运行操作员oprator提交任务目标: 请为虚构旅客P-R08-OVERSIZE的行李R08-OVERSIZE在F2_BAGGAGE_POINT测量，尺寸为80×55×35厘米、重量35千克。按附录F阈值：长宽高之和超过158厘米或重量超过32千克即为超规；超规时上报事件，在智慧航显提示并由机器人引导至唯一目的地F2_TEST_GATE。全部是虚构测试对象。\n2026-10-27T12:21:31.1513 - GOAL_CLARIFIED ：目标理解完成，关键信息已完整，进入规划上下文构建\n2026-10-27T12:21:31.295962 - CONTEXT_SNAPSHOT_GENERATED ：生成规划上下文快照CTX-20261027-0066\n2026-10-27T12:21:31.352721 - PLAN_GENERATED ：候选计划生成调用失败: 规划模型服务调用超时或不可用: Could not extract response: no suitable HttpMessageConverter found for response type [class com.airport.ai.planning.PlanningResponse] and content type [application/octet-stream]\n2026-10-27T12:21:31.506389 - BASELINE_DOWNGRADED ：已自动切换至基线模板超规行李处置标准模板(V1.3)，原因: 候选计划生成失败或模型服务不可用\n2026-10-27T12:21:31.570983 - AGENT_ASSIGNMENT_REQUESTED ：步骤1候选排序（能力匹配->距离->负载）: AGT-4652EF88(距离0.0,负载0)；AGT-9362B1F4(距离0.0,负载0)，向候选AGT-4652EF88发起承接请求\n2026-10-27T12:21:31.759573 - AGENT_ASSIGNED ：设备代理AGT-4652EF88接受步骤1承接请求\n2026-10-27T12:21:31.770041 - STEP_DISPATCHED ：指令CMD-20261027122131-E0783AD5已下发至设备代理AGT-4652EF88，业务意图: 执行CAP_NAVIGATION能力（基线模板步骤）\n2026-10-27T12:21:32.871723 - EXECUTION_FEEDBACK_RECEIVED ：指令CMD-20261027122131-E0783AD5收到设备代理AGT-4652EF88执行反馈: FAILED\n2026-10-27T12:21:32.877161 - STEP_RETRY_DISPATCHED ：步骤1自动重试1次，沿用指令编号CMD-20261027122131-E0783AD5，原因: 执行结果: FAILED，原因: SIMULATED_DEVICE_ERROR\n2026-10-27T12:21:33.94974 - EXECUTION_FEEDBACK_RECEIVED ：指令CMD-20261027122131-E0783AD5收到设备代理AGT-4652EF88执行反馈: FAILED\n2026-10-27T12:21:33.955848 - STEP_FAILED ：步骤1重试后仍失败: 执行结果: FAILED，原因: SIMULATED_DEVICE_ERROR\n2026-10-27T12:21:33.960937 - EXCEPTION_DETECTED ：识别到异常: STEP_FAILED，步骤1，详情: 执行结果: FAILED，原因: SIMULATED_DEVICE_ERROR\n2026-10-27T12:21:33.989248 - AGENT_ASSIGNMENT_REQUESTED ：步骤1候选排序（能力匹配->距离->负载）: AGT-9362B1F4(距离0.0,负载0)，向候选AGT-9362B1F4发起承接请求\n2026-10-27T12:21:34.004978 - EXCEPTION_RECOVERED ：恢复动作: 候选设备切换，结果: 成功，步骤1已重新分配\n2026-10-27T12:21:34.06116 - AGENT_ASSIGNED ：设备代理AGT-9362B1F4接受步骤1承接请求\n2026-10-27T12:21:34.066531 - STEP_DISPATCHED ：指令CMD-20261027122133-42DAFE8D已下发至设备代理AGT-9362B1F4，业务意图: 执行CAP_NAVIGATION能力（基线模板步骤）\n2026-10-27T12:21:35.153059 - EXECUTION_FEEDBACK_RECEIVED ：指令CMD-20261027122133-42DAFE8D收到设备代理AGT-9362B1F4执行反馈: FAILED\n2026-10-27T12:21:35.155823 - STEP_RETRY_DISPATCHED ：步骤1自动重试1次，沿用指令编号CMD-20261027122133-42DAFE8D，原因: 执行结果: FAILED，原因: SIMULATED_DEVICE_ERROR\n2026-10-27T12:21:36.220174 - EXECUTION_FEEDBACK_RECEIVED ：指令CMD-20261027122133-42DAFE8D收到设备代理AGT-9362B1F4执行反馈: FAILED\n2026-10-27T12:21:36.230487 - STEP_FAILED ：步骤1重试后仍失败: 执行结果: FAILED，原因: SIMULATED_DEVICE_ERROR\n2026-10-27T12:21:36.231668 - EXCEPTION_DETECTED ：识别到异常: STEP_FAILED，步骤1，详情: 执行结果: FAILED，原因: SIMULATED_DEVICE_ERROR\n2026-10-27T12:21:36.254538 - STEP_ASSIGNMENT_FAILED ：步骤1无可用候选设备（已尝试2个候选均拒绝或无候选）\n2026-10-27T12:21:36.256688 - EXCEPTION_DETECTED ：识别到异常: CAPABILITY_GAP，步骤1，详情: 步骤1无可用候选设备\n2026-10-27T12:21:36.26105 - EXCEPTION_RECOVERY_FAILED ：恢复动作: 无可用候选设备，恢复动作未执行，结果: 失败，判断计划是否可继续\n2026-10-27T12:21:36.26319 - REPLANNING_TRIGGERED ：步骤1恢复失败且计划不可继续，重新规划机会未用，触发5.5.4局部重新规划\n2026-10-27T12:21:36.282826 - CONTEXT_SNAPSHOT_GENERATED ：局部重新规划重建上下文快照CTX-20261027-0068\n2026-10-27T12:21:36.314541 - REPLAN_FAILED ：重新规划后新计划版本2三类校验未通过: 1项错误\n2026-10-27T12:21:36.317443 - EXCEPTION_RECOVERED ：恢复动作: 候选设备切换，结果: 成功，步骤1已重新分配\n2026-10-27T12:21:37.002614 - MANUAL_TERMINATED ：运行操作员oprator人工终止任务，原因: 阶段3基线执行失败路径已取证，涉及设备: []"
+    }
+  ],
+  "planTabs": [
+    "版本1（基线模板）",
+    "版本2（自主规划）"
+  ],
+  "timelineItemCount": 30,
+  "screenshot": "TC-063-task-detail-fields-task83.png"
+}
