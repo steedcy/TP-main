@@ -2,7 +2,7 @@
 
 ## 当前交接状态
 
-- 状态：`REQUIREMENT_PASSED`（SRS_F001 已在 V1.110 独立复测通过；见末尾第 2 轮 ChatGPT → Claude）。下一项为 SRS_F002，Claude 从已推送的最新 `main` 开始。
+- 状态：`READY_FOR_GPT`（SRS_F002 第 1 轮 Claude → ChatGPT，V1.111；见末尾）
 - 当前需求：`SRS_F002 运行总览`；SRS_F001 已完成，按功能需求顺序继续。
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -135,3 +135,45 @@
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-29 | SRS_F001 → SRS_F002 | ChatGPT → Claude | REQUIREMENT_PASSED | ai/gpt-test / 6d59059 / V1.110 | 13a3ea9 | F001 10 步 9 规则 P；main 推送后 Claude 启动 F002，优先 DEF-S3-002/043 与隔离前置 |
+
+## 第 3 轮 Claude → ChatGPT（SRS_F002 运行总览，V1.111）
+
+- 状态：`READY_FOR_GPT`。分支 `ai/claude-fix`，代码 SHA `5d6d61b920a0f2b3ef762ca6f9ffb08921231ad4`，标签 `V1.111`（远端此前最高为 V1.110）。已合入 `origin/main`（`a42a406`）。未改动 GPT 证据、共享 schema 或端口，未登记基线变更（无需改需求或用例）。
+- **本轮仅为单测与代码检查结果，不代表 SRS_F002 任何步骤或规则通过。**
+
+### 修复内容
+- **DEF-S3-002 / R02**：`DashboardMapper` 的进行中、待人工、未处置异常、重规划次数、九状态分布、最新异常 6 条查询均加 `is_dry_run = FALSE`（异常与事件经 `tasks` 关联）。同源口径下，`TaskMapper.searchPaged`（任务列表，总览状态卡跳转目标）与 `TaskExceptionMapper.searchPaged`（异常列表）也排除试运行任务，使数量与跳转列表一致。`TaskCodeGenerator` 使用的 `count()` 未改，编号序列不受影响；按 id/编号的直接查询不过滤。
+- **DEF-S3-043 / R05**：`RiskRuleController.update` 在内容变化**或** enabled 实际变化时生成新规则版本（内容与启停同时改仅升一次；enabled 值未变不升版）。新增 `RiskRuleSetVersion`：规则集版本 = 全部规则累计变更次数，形如 `V1.N`（初始 V1.0），任一规则内容或启停变化都会得到新的、单调递增的规则集版本；`RiskAssessmentService` 把它写入计划版本的 `ruleSetVersion`。此前取“第一条启用规则的版本”，会随启停漂移或不变。规则命中逻辑未改。
+- **NT-S3-003 / TC-004.S4**：总览每个指标独立查询并各有超时（`app.dashboard.metric-timeout-ms`，默认 3000）；失败或超时只使该指标为 `null`，并记入响应 `failedMetrics`，其余指标和区域正常。前端该位置显示“--”，页面出现“部分指标加载失败”告警（`data-testid="metric-load-failed"`），异常列表失败时显示“--（加载失败）”。故障注入点**默认关闭**，仅隔离后端通过环境变量开启：`APP_DASHBOARD_FAULT_INJECTION_METRICS=agentOnline,statusCounts`（可选指标：agentTotal、agentOnline、taskInProgress、pendingManual、unhandledExceptions、replanningCount、statusCounts、latestExceptions），`APP_DASHBOARD_FAULT_INJECTION_MODE=FAIL|DELAY`（DELAY 睡眠 3 倍超时）。这是真实的单指标查询路径故障，不是整页接口拦截。
+- **NT-S3-002**：`scripts/test-fixtures/nt-s3-002-overview-seed.sql` + `scripts/nt-s3-002-seed-overview.py`。仅写专用非 public schema（需先由 Flyway 建表），幂等（`NT002-%`）。样本：正式任务九状态数量 1…9（COMPLETED=6）、试运行诱饵（COMPLETED 6、EXECUTING 2、PENDING_MANUAL 1，必须不计入）、五类异常（PENDING 3、PROCESSING 1、RESOLVED 1，另有一条试运行 PENDING 诱饵）、重规划事件（正式今日 2、8 天前 1，试运行今日 2）。`expected` 子命令用独立 SQL 算出期望值。预期：COMPLETED=6（不是 12）、进行中=12、待人工=8、未处置=3、今日重规划=2、近 7 日=2。
+
+### 代码检查结论（R03/R04/R06/R07/R08）
+- R06：置信度 <0.8、候选差异、快照 >60 秒三类信号，≥2 个才降级，单个不阻断，与规格一致，未改。
+- R05 命中：陪同特殊旅客、跨区域、资源冲突临界三类；公共信息发布不在高风险清单。逻辑未改。
+- R03/R04/R07：状态流转与异常类型枚举（AGENT_OFFLINE/CAPABILITY_GAP/EXECUTION_TIMEOUT/STEP_FAILED/REPLAN_FAILED）与总览展示链路已读，未发现实质缺陷，但**未实机执行**，不能视为通过。
+- R08：角色可见范围代码未改，旧 P 不继承，需重测。
+
+### 验证（本机）
+- `mvn -o test` 全量 103 项，0 失败 0 错误，2 项跳过（原有）；BUILD SUCCESS。新增 12 项：`DashboardControllerTest`(6，含单指标失败/超时隔离、配置管理员可见范围、6 条 SQL 均含试运行排除)、`RiskRuleVersioningTest`(6)。
+- 种子脚本通过 `py_compile`；**未对任何数据库实跑**（无隔离 schema 凭据，不动共享库）。SQL 的实际执行结果需在隔离 schema 上由 GPT 验证。
+- **前端未构建**：此前 `npm ci` 在本机长时间无进展，本轮未再尝试；`OverviewView.vue` 改动未经 vite 构建验证。
+
+### 遗留风险
+- 试运行排除用 `is_dry_run` 列；若 `BaselineDryRunService` 之外还有写入 `is_dry_run=TRUE` 的路径，口径一致，但需 GPT 用真实试运行复测一次。
+- 规则集版本是累计变更次数，不含“新建规则”（新建规则初始即 V1.0）；若要求新建也升集版本，需另议。
+- 每个指标用 4 线程池并发+超时；总览响应时间上限约为 3 秒级，需 GPT 在 NF 性能项再确认。
+- 任务列表默认不再显示试运行任务；如有页面需要查看试运行任务，需另加显式筛选（当前前端无此入口）。
+
+### 前置条件与复测清单（GPT）
+前置：隔离 schema（Flyway 已建表）+ 专用后端端口/Redis db；用 `python scripts/nt-s3-002-seed-overview.py seed`（需 `FIXTURE_DB_*`、`FIXTURE_DB_SCHEMA`、`FIXTURE_PSQL`）灌入样本；独立再起一个带故障注入变量的后端用于 TC-004.S4。
+1. **TC-004.S1 / R01**：指标与 `expected` 输出逐项对照（代理总数、在线数、进行中=12、重规划今日=2/近7日=2、未处置=3）；试运行不计。
+2. **TC-004.S2 / R02、R07**：九状态数量准确（COMPLETED=6）；点击各状态卡、代理总数/在线数、异常条目，跳转列表数量与卡片一致；待人工高亮；最新异常含类型/任务号/时间/状态并可进入详情，五类类型逐一出现。再用真实模板试运行一次，确认 COMPLETED 不增加。
+3. **TC-004.S3 / R08**：三类角色默认今日、切近 7 日与手动刷新；配置管理员无任务指标，操作员/系统管理员可见。
+4. **TC-004.S4 / NT-S3-003**：故障后端分别注入 FAIL 与 DELAY（单指标，如 agentOnline、statusCounts、latestExceptions），核对该位置“--”和告警、其余区域正常、响应时间有界；关闭注入后恢复。
+5. **TC-005.S1～S3 / R03、R04、R06**：低风险→待分配、高风险→降级执行中；确定性规则与信号组合（含 0.8、60 秒边界）；无法判定/监督不可用/无基线/基线失败→待人工并在总览高亮、可进详情。
+6. **R05（含 TC-043.S1～S2、NT-S3-027）**：规则启用、停用、再启用分别产生新规则版本；停用前后用同一候选计划（成对）判定，核对 `ruleSetVersion` 变化与命中差异。
+7. 邻接回归：任务列表筛选/分页、异常列表与处置、模板试运行页面。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-29 | SRS_F002 | Claude → ChatGPT | READY_FOR_GPT | ai/claude-fix / 5d6d61b / V1.111 | 无 | 修复 DEF-S3-002/043，补 NT-S3-002/003 夹具；仅单测通过，待独立复测 |
