@@ -1,0 +1,125 @@
+{
+  "observedAt": "2026-10-29T02:12:08.359343+08:00",
+  "version": "V1.110",
+  "codeSha": "6d59059fe02dd82bc571a7dd992f525c3bdde21d",
+  "schema": "tip_gpt_f001_v110_20261029",
+  "checks": [
+    {
+      "check": "TC-003.S1.admin_authorized_user_create",
+      "pass": true,
+      "facts": {
+        "httpStatus": 200,
+        "passwordHashFieldPresent": false
+      }
+    },
+    {
+      "check": "TC-003.S2.user_status_denied.CONFIG_ADMIN",
+      "pass": true,
+      "facts": {
+        "httpStatus": 403,
+        "userStillActive": true
+      }
+    },
+    {
+      "check": "TC-003.S2.user_password_reset_denied.CONFIG_ADMIN",
+      "pass": true,
+      "facts": {
+        "httpStatus": 403
+      }
+    },
+    {
+      "check": "TC-003.S2.user_status_denied.OPERATOR",
+      "pass": true,
+      "facts": {
+        "httpStatus": 403,
+        "userStillActive": true
+      }
+    },
+    {
+      "check": "TC-003.S2.user_password_reset_denied.OPERATOR",
+      "pass": true,
+      "facts": {
+        "httpStatus": 403
+      }
+    },
+    {
+      "check": "TC-003.S1.admin_authorized_password_reset",
+      "pass": true,
+      "facts": {
+        "resetHttpStatus": 200,
+        "newPasswordLoginHttpStatus": 200
+      }
+    },
+    {
+      "check": "TC-003.S1.admin_authorized_user_status",
+      "pass": true,
+      "facts": {
+        "httpStatus": 200,
+        "targetInactive": true
+      }
+    },
+    {
+      "check": "TC-003.S2.device_update_denied.SYSTEM_ADMIN",
+      "pass": true,
+      "facts": {
+        "httpStatus": 403,
+        "nameUnchanged": true
+      }
+    },
+    {
+      "check": "TC-003.S2.device_update_denied.OPERATOR",
+      "pass": true,
+      "facts": {
+        "httpStatus": 403,
+        "nameUnchanged": true
+      }
+    },
+    {
+      "check": "TC-003.S1.config_authorized_device_update",
+      "pass": true,
+      "facts": {
+        "httpStatus": 200,
+        "nameUpdated": true
+      }
+    },
+    {
+      "check": "TC-003.S2.manual_handling_denied.SYSTEM_ADMIN",
+      "pass": true,
+      "facts": {
+        "httpStatus": 403
+      }
+    },
+    {
+      "check": "TC-003.S2.manual_handling_denied.CONFIG_ADMIN",
+      "pass": true,
+      "facts": {
+        "httpStatus": 403
+      }
+    },
+    {
+      "check": "SRS_F001.R05.mutation_denial_audit.SYSTEM_ADMIN",
+      "pass": true,
+      "facts": {
+        "accessDeniedCount": 36
+      }
+    },
+    {
+      "check": "SRS_F001.R05.mutation_denial_audit.CONFIG_ADMIN",
+      "pass": true,
+      "facts": {
+        "accessDeniedCount": 17
+      }
+    },
+    {
+      "check": "SRS_F001.R05.mutation_denial_audit.OPERATOR",
+      "pass": true,
+      "facts": {
+        "accessDeniedCount": 39
+      }
+    }
+  ],
+  "summary": {
+    "passed": 15,
+    "failed": 0
+  }
+}

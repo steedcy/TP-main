@@ -59,6 +59,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/device-agents/*/task-response").hasRole("DEVICE_AGENT")
                 .requestMatchers("/api/v1/device-agents/*/execution-feedback").hasRole("DEVICE_AGENT")
                 .requestMatchers("/internal/v1/device-agent/messages").hasRole("SYSTEM_ADMIN")
+                // 账号管理仅系统管理员：在过滤器链先校验角色，避免无权限请求先经请求体校验返回400（DEF-S3-001、TC-003.S2）
+                .requestMatchers("/api/v1/users", "/api/v1/users/**").hasRole("SYSTEM_ADMIN")
                 .anyRequest().authenticated()
             )
             .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

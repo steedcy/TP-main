@@ -1,0 +1,41 @@
+{
+  "observedAt": "2026-10-29T00:58:19.260165+08:00",
+  "step": "TC-002.S4",
+  "backendPort": 18103,
+  "proxyPort": 15503,
+  "schema": "tip_gpt_f001_20261029",
+  "checks": {
+    "baselineLogin": {
+      "httpStatus": 200,
+      "sessionCreated": true
+    },
+    "databaseDown": {
+      "httpStatus": 500,
+      "message": "系统繁忙，请稍后重试",
+      "sessionCreated": false,
+      "pass": true
+    },
+    "afterRecovery": {
+      "httpStatus": 200,
+      "sessionCreated": true,
+      "pass": true
+    }
+  },
+  "version": "V1.109",
+  "codeSha": "afb265c0bbed4aa3b3ec1d31a049ef2eb39acc70",
+  "testMethod": "isolated backend via local TCP proxy; shared PostgreSQL was not stopped",
+  "authServiceExceptionTest": {
+    "suite": "LoginFaultResponseTest",
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "source": "backend/target/surefire-reports/com.airport.ai.auth.LoginFaultResponseTest.txt"
+  },
+  "fixtureCleanup": {
+    "orphanBackendDetected": true,
+    "orphanBackendStopped": true,
+    "note": "Maven shell child survived fixture Popen.terminate(); Claude fixture needs process-tree cleanup."
+  },
+  "scopeLimit": "API and MockMvc checks; no browser UI fault prompt was observed in this round"
+}

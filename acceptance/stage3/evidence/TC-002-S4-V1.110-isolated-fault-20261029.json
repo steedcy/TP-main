@@ -1,0 +1,30 @@
+{
+  "observedAt": "2026-10-29T01:44:56.036551+08:00",
+  "step": "TC-002.S4",
+  "backendPort": 18103,
+  "proxyPort": 15503,
+  "schema": "tip_gpt_f001_v110_20261029",
+  "checks": {
+    "baselineLogin": {
+      "httpStatus": 200,
+      "sessionCreated": true
+    },
+    "databaseDown": {
+      "httpStatus": 500,
+      "message": "系统繁忙，请稍后重试",
+      "sessionCreated": false,
+      "pass": true
+    },
+    "afterRecovery": {
+      "httpStatus": 200,
+      "sessionCreated": true,
+      "pass": true
+    }
+  },
+  "cleanup": {
+    "backendPortFreed": true,
+    "proxyPortFreed": true
+  },
+  "version": "V1.110",
+  "codeSha": "6d59059fe02dd82bc571a7dd992f525c3bdde21d"
+}

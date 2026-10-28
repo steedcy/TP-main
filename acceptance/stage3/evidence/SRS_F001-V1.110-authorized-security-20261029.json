@@ -1,0 +1,68 @@
+{
+  "observedAt": "2026-10-29T01:48:33.905160+08:00",
+  "version": "V1.110",
+  "codeSha": "6d59059fe02dd82bc571a7dd992f525c3bdde21d",
+  "schema": "tip_gpt_f001_v110_20261029",
+  "checks": [
+    {
+      "check": "SRS_F001.passwordHash_absent_from_users",
+      "pass": true,
+      "facts": {
+        "httpStatus": 200,
+        "passwordHashFieldPresent": false
+      }
+    },
+    {
+      "check": "TC-003.S1.config_admin_authorized_device_create",
+      "pass": true,
+      "facts": {
+        "httpStatus": 200,
+        "countBefore": 0,
+        "countAfter": 1
+      }
+    },
+    {
+      "check": "TC-003.S2.valid_device_denied.SYSTEM_ADMIN",
+      "pass": true,
+      "facts": {
+        "httpStatus": 403,
+        "countUnchanged": true
+      }
+    },
+    {
+      "check": "TC-003.S2.valid_device_denied.OPERATOR",
+      "pass": true,
+      "facts": {
+        "httpStatus": 403,
+        "countUnchanged": true
+      }
+    },
+    {
+      "check": "TC-003.S1.device_create_audit",
+      "pass": true,
+      "facts": {
+        "successfulAuditCount": 1
+      }
+    },
+    {
+      "check": "TC-003.S2.valid_task_denied.CONFIG_ADMIN",
+      "pass": true,
+      "facts": {
+        "httpStatus": 403,
+        "countUnchanged": true
+      }
+    },
+    {
+      "check": "TC-003.S2.valid_task_denied.SYSTEM_ADMIN",
+      "pass": true,
+      "facts": {
+        "httpStatus": 403,
+        "countUnchanged": true
+      }
+    }
+  ],
+  "summary": {
+    "passed": 7,
+    "failed": 0
+  }
+}

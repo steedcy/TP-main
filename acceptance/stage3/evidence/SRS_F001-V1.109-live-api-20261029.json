@@ -1,0 +1,273 @@
+{
+  "observedAt": "2026-10-29T00:57:30.965383+08:00",
+  "requirement": "SRS_F001",
+  "version": "V1.109",
+  "codeSha": "afb265c0bbed4aa3b3ec1d31a049ef2eb39acc70",
+  "schema": "tip_gpt_f001_20261029",
+  "backendPort": 18102,
+  "testScope": "independent live API retest; UI and TC-002.S4 separate",
+  "checks": [
+    {
+      "check": "TC-001.S2.login.SYSTEM_ADMIN",
+      "pass": true,
+      "facts": {
+        "httpStatus": 200,
+        "sessionCreated": true
+      }
+    },
+    {
+      "check": "TC-001.S2.login.CONFIG_ADMIN",
+      "pass": true,
+      "facts": {
+        "httpStatus": 200,
+        "sessionCreated": true
+      }
+    },
+    {
+      "check": "TC-001.S2.login.OPERATOR",
+      "pass": true,
+      "facts": {
+        "httpStatus": 200,
+        "sessionCreated": true
+      }
+    },
+    {
+      "check": "setup.create.a",
+      "pass": true,
+      "facts": {
+        "httpStatus": 200,
+        "created": true
+      }
+    },
+    {
+      "check": "setup.create.b",
+      "pass": true,
+      "facts": {
+        "httpStatus": 200,
+        "created": true
+      }
+    },
+    {
+      "check": "setup.create.c",
+      "pass": true,
+      "facts": {
+        "httpStatus": 200,
+        "created": true
+      }
+    },
+    {
+      "check": "SRS_F001.R01.salted_hash",
+      "pass": true,
+      "facts": {
+        "hashFormatBcrypt": true,
+        "hashLength": [
+          60,
+          60
+        ],
+        "distinctForSamePassword": true
+      }
+    },
+    {
+      "check": "TC-002.S1.unknown",
+      "pass": true,
+      "facts": {
+        "httpStatus": 401,
+        "uniformMessage": true,
+        "sessionCreated": false
+      }
+    },
+    {
+      "check": "setup.inactive",
+      "pass": true,
+      "facts": {
+        "httpStatus": 200
+      }
+    },
+    {
+      "check": "TC-002.S1.inactive",
+      "pass": true,
+      "facts": {
+        "httpStatus": 403,
+        "uniformMessage": true,
+        "sessionCreated": false
+      }
+    },
+    {
+      "check": "TC-002.S1.wrong_B_and_A_untouched",
+      "pass": true,
+      "facts": {
+        "httpStatus": 401,
+        "aState": "ACTIVE:0",
+        "uniformMessage": true
+      }
+    },
+    {
+      "check": "TC-002.S2.three_failures_lock",
+      "pass": true,
+      "facts": {
+        "attempts": [
+          {
+            "httpStatus": 401,
+            "state": "ACTIVE:1",
+            "uniformMessage": true,
+            "sessionCreated": false
+          },
+          {
+            "httpStatus": 401,
+            "state": "ACTIVE:2",
+            "uniformMessage": true,
+            "sessionCreated": false
+          },
+          {
+            "httpStatus": 403,
+            "state": "LOCKED:3",
+            "uniformMessage": true,
+            "sessionCreated": false
+          }
+        ],
+        "lockedCorrectHttpStatus": 403,
+        "lockedCorrectUniformMessage": true
+      }
+    },
+    {
+      "check": "SRS_F001.R09.lock_audit",
+      "pass": true,
+      "facts": {
+        "lockRecords": 1,
+        "failedLoginRecords": 4,
+        "lockHasTimeIp": true,
+        "lockHasFailureCount": true,
+        "passwordAbsent": true
+      }
+    },
+    {
+      "check": "TC-002.S3.unlock_and_reset",
+      "pass": true,
+      "facts": {
+        "unlockHttpStatus": 200,
+        "afterUnlock": "ACTIVE:0",
+        "loginAfterTwoFailures": 200,
+        "afterSuccessfulLogin": "ACTIVE:0",
+        "afterOneMoreFailure": "ACTIVE:1",
+        "manualUnlockAuditWithIp": 1
+      }
+    },
+    {
+      "check": "TC-003.S2.invalid_body_authorization_order",
+      "pass": false,
+      "facts": {
+        "responses": [
+          {
+            "role": "OPERATOR",
+            "path": "/users",
+            "httpStatus": 403,
+            "apiCode": 2003
+          },
+          {
+            "role": "CONFIG_ADMIN",
+            "path": "/users",
+            "httpStatus": 403,
+            "apiCode": 2003
+          },
+          {
+            "role": "OPERATOR",
+            "path": "/devices",
+            "httpStatus": 400,
+            "apiCode": 3001
+          },
+          {
+            "role": "SYSTEM_ADMIN",
+            "path": "/devices",
+            "httpStatus": 400,
+            "apiCode": 3001
+          },
+          {
+            "role": "CONFIG_ADMIN",
+            "path": "/tasks",
+            "httpStatus": 400,
+            "apiCode": 3001
+          },
+          {
+            "role": "SYSTEM_ADMIN",
+            "path": "/tasks",
+            "httpStatus": 400,
+            "apiCode": 3001
+          },
+          {
+            "role": "CONFIG_ADMIN",
+            "path": "/tasks/999999/terminate",
+            "httpStatus": 400,
+            "apiCode": 3001
+          }
+        ],
+        "countsBefore": {
+          "users": 9,
+          "devices": 0,
+          "tasks": 0
+        },
+        "countsAfter": {
+          "users": 9,
+          "devices": 0,
+          "tasks": 0
+        }
+      }
+    },
+    {
+      "check": "TC-003.S2.admin_validation_still_400",
+      "pass": true,
+      "facts": {
+        "httpStatus": 400
+      }
+    },
+    {
+      "check": "TC-003.S2.valid_body_operator_denied",
+      "pass": true,
+      "facts": {
+        "httpStatus": 403
+      }
+    },
+    {
+      "check": "SRS_F001.R05.denial_audit",
+      "pass": false,
+      "facts": {
+        "countsByRole": {
+          "OPERATOR": 3,
+          "CONFIG_ADMIN": 2,
+          "SYSTEM_ADMIN": 0
+        }
+      }
+    },
+    {
+      "check": "TC-003.S3.scope.OPERATOR",
+      "pass": true,
+      "facts": {
+        "httpStatus": 200,
+        "rowCount": 7,
+        "ownOnly": true
+      }
+    },
+    {
+      "check": "TC-003.S3.scope.CONFIG_ADMIN",
+      "pass": true,
+      "facts": {
+        "httpStatus": 200,
+        "rowCount": 6,
+        "ownOnly": true
+      }
+    },
+    {
+      "check": "TC-001.S2.S3.logout_and_audit",
+      "pass": true,
+      "facts": {
+        "logoutHttpStatus": 200,
+        "staleTokenHttpStatus": 401,
+        "successfulLoginAuditCount": 4,
+        "logoutAuditCount": 1
+      }
+    }
+  ],
+  "summary": {
+    "passed": 19,
+    "failed": 2
+  }
+}

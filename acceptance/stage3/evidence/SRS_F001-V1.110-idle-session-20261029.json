@@ -1,0 +1,30 @@
+{
+  "observedAt": "2026-10-28T17:57:24.295Z",
+  "version": "V1.110",
+  "codeSha": "6d59059fe02dd82bc571a7dd992f525c3bdde21d",
+  "redisDb": 14,
+  "method": "Read isolated session TTL, delete only the test token key to accelerate idle expiry, then navigate in Edge",
+  "checks": [
+    {
+      "check": "SRS_F001.R02.idle_ttl_30m",
+      "pass": true,
+      "facts": {
+        "ttlSecondsAtRead": 1800,
+        "configuredIdleSeconds": 1800
+      }
+    },
+    {
+      "check": "TC-002.S4.SRS_F001.R02.expired_session_redirect",
+      "pass": true,
+      "facts": {
+        "redirectedToLogin": true,
+        "expiredPrompt": true,
+        "tokenCleared": true
+      }
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 0
+  }
+}

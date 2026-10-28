@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`
-- 当前需求：`SRS_F001 用户登录与预置角色权限`，按功能需求顺序从第 1 项开始。
+- 状态：`REQUIREMENT_PASSED`（SRS_F001 已在 V1.110 独立复测通过；见末尾第 2 轮 ChatGPT → Claude）。下一项为 SRS_F002，Claude 从已推送的最新 `main` 开始。
+- 当前需求：`SRS_F002 运行总览`；SRS_F001 已完成，按功能需求顺序继续。
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
 - 旧阶段 3 任务已暂停；其结果是待修复的原始证据，不是新版本通过证明。
@@ -42,3 +42,96 @@
 - Claude：当前需求涉及的产品代码与必要的修复单测；独立 `ai/claude-fix` worktree。
 - ChatGPT：`acceptance/stage3/` 复测台账、证据和独立测试脚本；独立 `ai/gpt-test` worktree。
 - `docs/HANDOFF.md` 由当前交出方顺序写入。`document/` 中现有未跟踪文件属于用户，不擅自提交、覆盖或删除。
+
+## 第 1 轮 Claude → ChatGPT（SRS_F001）
+
+- 状态：`READY_FOR_GPT`。分支 `ai/claude-fix`，代码 SHA `afb265c0bbed4aa3b3ec1d31a049ef2eb39acc70`，标签 `V1.109`（远端此前最高为 V1.108）。
+- 未合并 main；未改动 `acceptance/stage3` 的 P/F/NT 结果，未改基线（无 BASELINE_CHANGES 登记）。
+
+### 修复内容
+- DEF-S3-001（TC-003.S2 / R04）：`SecurityConfig` 增加 `/api/v1/users`、`/api/v1/users/**` 的 `hasRole("SYSTEM_ADMIN")`，角色校验在过滤器链先于请求体校验；无权限用户不论请求体是否有效均得 403(2003)，由 `AccessDeniedHandlerImpl` 写 `ACCESS_DENIED` 审计。管理员缺字段仍为 400，未登录仍为 401。
+- DEF-S3-056（TC-002.S3 / R09）：第 3 次错密锁定时，在原 `LOGIN/FAILED` 之外新增 `ACCOUNT_LOCKED` 操作记录（主体与目标为被锁账号、含来源 IP，detail 仅含原因和失败次数，不含密码）。解锁仍为 `MANUAL_HANDLING`。
+- NT-S3-001（TC-002.S4）：`LoginFaultResponseTest` 覆盖认证服务/数据库异常时返回“系统繁忙，请稍后重试”、无会话、不泄露内部细节；`scripts/nt-s3-001-fault-fixture.py` 为隔离实机夹具，经本脚本自带 TCP 代理连接 PostgreSQL，以关闭/重开代理模拟数据库故障与恢复，后端使用独立端口(18101)、独立 schema 和 Redis db 13，不触碰共享 PG 及 8080/5173/8091-8096。
+
+### 回归结果（本机，`mvn -o test`）
+- 全量后端单测 84 项，0 失败 0 错误，2 项跳过（原有）；BUILD SUCCESS。
+- 新增：`UserAccessOrderTest`(4)、`AuthServiceLockoutAuditTest`(2)、`LoginFaultResponseTest`(2)。
+
+### 遗留风险
+- 夹具脚本已用 Python 3.14.9 (miniconda) 通过 py_compile 语法检查并能加载，但**未实机运行**；NT-S3-001 的实机证据仍需 ChatGPT 在隔离 schema 上运行（需自行提供 FIXTURE_* 环境变量，见脚本头注释）。已知需关注：隔离 schema 需先由 Flyway 建表并有可登录账号。
+- 未验证“修复前 UserAccessOrderTest 失败”的反向对照（该操作被环境拦截）；修复前行为已由 `TC-003-validation-order.json` 记录。
+- 其他控制器若仅靠方法级 `@PreAuthorize` 且带 `@Valid` 请求体，可能存在同类 400 先于 403 问题；本轮只处理 users，未扩大范围，建议后续需求复测时关注。
+- `TC-002.S3` 台账为 P 而 R09 为 F 的交叉状态由 ChatGPT 按完整预期裁决。
+
+### 待 ChatGPT 独立复测
+1. TC-003（S2 重点）：OPERATOR/CONFIG_ADMIN 对 `POST /api/v1/users` 发缺字段和有效请求均应 403 且有 `ACCESS_DENIED` 记录、用户数不变；管理员缺字段 400、有效创建成功；对 `/users/{id}/unlock|reset-password|status` 的越权同样 403。
+2. TC-002.S3：3 次错密后检查审计含 `LOGIN/FAILED`×3 与 `ACCOUNT_LOCKED`，管理员解锁含 `MANUAL_HANDLING`，无密码明文。
+3. TC-002.S4 / NT-S3-001：运行夹具，核对数据库故障时统一提示、无会话，恢复后可登录；认证服务故障可参考 `LoginFaultResponseTest`。
+4. 邻接回归：TC-001、TC-002 其余步骤，R01–R03、R05–R08 按新版本 V1.109 重测，不沿用旧 P。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-26 | SRS_F001 | Claude → ChatGPT | READY_FOR_GPT | ai/claude-fix / afb265c / V1.109 | 无 | 见上“第 1 轮”，待独立复测 |
+
+## 第 1 轮 ChatGPT → Claude（SRS_F001）
+
+- 状态：`READY_FOR_CLAUDE`。ChatGPT 测试分支 `ai/gpt-test`，已接收 `V1.109` 代码；独立证据与具体裁决见 `acceptance/stage3/SRS_F001-V1.109-独立复测.md`、`acceptance/stage3/evidence/SRS_F001-V1.109-live-api-20261029.json`、`acceptance/stage3/evidence/TC-002-S4-V1.109-isolated-fault-20261029.json`。以远端最新 `ai/gpt-test` 提交 SHA 为交接 SHA。
+- `TC-003.S2`、`SRS_F001.R04/R05` 仍为 **F**（新缺陷 `DEF-S3-072`）：无权角色的 `POST /api/v1/devices`、`/api/v1/tasks`、`/api/v1/tasks/999999/terminate` 缺字段请求返回 400/3001，未优先返回 403，也未完整形成越权审计；`/api/v1/users` 已按 V1.109 修复为 403。七次请求前后用户/设备/任务计数不变。请将相关代表性写接口的角色拒绝前移到请求校验之前，仍保留授权角色的参数 400 校验，定向回归后交回下一版本。
+- `DEF-S3-056` 的锁定审计在 V1.109 隔离 API 子检查通过；`NT-S3-001` 的数据库故障、恢复和认证组件异常单测通过。整步仍需浏览器及完整链路复测，不能据此宣称 SRS_F001 已通过。
+- Claude 的 `nt-s3-001-fault-fixture.py` 在 Windows 上退出后遗留 Java 后端子进程（18103）；本轮已停止该进程。请修复夹具清理。`/api/v1/users` 列表 API 还暴露 `passwordHash` 字段，建议在本需求账号安全修复中移除对外序列化并验证。
+- 本轮没有修改需求基线或 95 项用例。Claude 开工前先 fetch 并将远端 `ai/gpt-test` 合入自己的分支，保留本轮原始 F/NT 证据。修复、定向回归、提交推送下一唯一 `V1.N` 标签后，将本文件状态改为 `READY_FOR_GPT`，附代码 SHA、标签和复测清单。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-29 | SRS_F001 | ChatGPT → Claude | READY_FOR_CLAUDE | ai/gpt-test / afb265c / V1.109 | 见远端 ai/gpt-test HEAD | DEF-S3-072 待修；夹具进程清理；其余整步待完整复测 |
+
+## 第 2 轮 Claude → ChatGPT（SRS_F001，V1.110）
+
+- 状态：`READY_FOR_GPT`。分支 `ai/claude-fix`，代码 SHA `6d59059`（完整 SHA 以 `git rev-parse V1.110^{commit}` 为准），标签 `V1.110`。已合入 `ai/gpt-test` 至 `ade182f`。未合并 main，未改动 GPT 的 P/F/NT 证据、共享 schema 或端口。
+- 本轮**没有**宣称任何整步或整项通过；以下仅为单测与定向检查结果。
+
+### 修复内容
+- DEF-S3-072：新增 `PreAuthorizeInterceptor` + `WebMvcAuthorizationConfig`，在参数绑定/`@Valid` 之前评估控制器上的 `@PreAuthorize`（方法级优先于类级），覆盖所有 `/api/**`、`/internal/**` 控制器，不只 devices/tasks。无权角色缺字段请求先得 403(2003)，由 `GlobalExceptionHandler` 写 `ACCESS_DENIED`（含 SYSTEM_ADMIN 对设备的越权）；有权角色仍得 400。注解仍是唯一权限来源，业务方法处的 `@PreAuthorize` 保留。
+- DEF-S3-073：`MainLayout.vue` 右上角改为“账号（姓名，角色）”，并加 `data-testid="current-user"`。
+- 安全发现：`User.getPasswordHash()` 加 `@JsonIgnore`，`/api/v1/users` 列表不再含 `passwordHash`。已核对：User 不经 Jackson 反序列化（会话仅存 userId，MyBatis 走 UserMapper.xml 映射），认证比对用 getter 不受影响。
+- 夹具：`kill_tree()` 用 `taskkill /T /F`（POSIX 用进程组），退出后校验后端/代理端口已释放并写入证据 `cleanup` 字段。
+
+### 验证（本机）
+- `mvn -o test` 全量 91 项，0 失败 0 错误，2 项跳过（原有）；BUILD SUCCESS。新增：`WriteEndpointAuthorizationOrderTest`(6)、`UserSerializationTest`(1)。
+- `kill_tree` 以“父进程拉起监听子进程”的 25 秒有界模拟验证：调用后端口释放。未跑完整 mvn 夹具。
+- **前端构建未完成**：`npm ci` 长时间无进展，已按指示停止，`vite build` 未执行，DEF-S3-073 的界面效果未验证。
+
+### 遗留与风险
+- 前端构建与 Edge 界面显示需 GPT 在 `ai/gpt-test` 独立构建验证。
+- 拦截器以空参数评估 `@PreAuthorize`；现有注解均只引用角色，若将来表达式引用方法参数（如 `#id`），需调整。
+- `UserAccessOrderTest` 修复前的反向对照仍未取得。
+- 夹具实机运行（NT-S3-001 全链）仍未做。
+
+### 待 ChatGPT 复测
+1. TC-003.S2 / R04、R05：OPERATOR、CONFIG_ADMIN、SYSTEM_ADMIN 对 `POST /devices`、`/tasks`、`/tasks/{id}/terminate`、`/users` 缺字段与有效请求均 403 且各有 `ACCESS_DENIED`；有权角色缺字段 400；数量不变。再抽查其余写接口（baseline-templates、risk-rules、task-definitions、device-types）。
+2. `GET /users` 响应无 `passwordHash`；创建、登录、重置密码、解锁、停用仍正常。
+3. TC-001.S2：三类角色登录后右上角显示账号、姓名与角色；菜单与退出不回归。
+4. 夹具运行后确认 18103 等端口已释放（证据 `cleanup`）。
+5. 其余 TC-001～TC-003 整步仍按 V1.110 全范围重测，不沿用旧 P。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-29 | SRS_F001 | Claude → ChatGPT | READY_FOR_GPT | ai/claude-fix / 6d59059 / V1.110 | ade182f | 修复 DEF-S3-072/073 与 passwordHash；前端构建未验证，待独立复测 |
+
+## 第 2 轮 ChatGPT → Claude（SRS_F001 通过；转入 SRS_F002）
+
+- `SRS_F001` 状态：`REQUIREMENT_PASSED`。ChatGPT 已在 `ai/gpt-test` 接收代码 `6d59059fe02dd82bc571a7dd992f525c3bdde21d`（标签 `V1.110`），接收合并 `2709190`；独立复测及台账提交 `13a3ea9`。`TC-001`～`TC-003` 的 10 个步骤及 `SRS_F001.R01`～`R09` 共 9 条规则在 V1.110 判 P。完整方法、环境、原始证据和诊断更正见 `acceptance/stage3/SRS_F001-V1.110-独立复测与验收裁决.md`。旧版 F/NT 记录与前置条件不足的诊断 JSON 保留。
+- V1.110 前端生产构建通过；独立隔离 API、Edge、授权矩阵、故障/恢复、会话空闲与操作审计复测通过。认证服务异常由 MockMvc 注入加 Edge 响应契约组成，数据库故障另以隔离代理及真实 Edge 链路实测。未修改需求基线和 95 项用例。`DEF-S3-001`、`DEF-S3-056`、`DEF-S3-072`、`DEF-S3-073`、`NT-S3-001` 在台账中标为 V1.110 已复测关闭。
+- 本轮无须移动 `V1.110` 标签；它继续指向 Claude 产品代码提交。GPT 证据提交和后续 main 合并提交不改变标签。`main` 合并/推送后，Claude 须先 fetch、从最新 `origin/main` 同步，再开始 SRS_F002。
+
+### SRS_F002 给 Claude 的首轮修复范围
+
+1. 先读 `AGENTS.md`、本文件、`docs/BASELINE_CHANGES.md`，核对最新 `origin/main`、`acceptance/stage0/` 逐步口径及 `acceptance/stage3/` 原始证据。本需求映射 `TC-004`、`TC-005`，规则 `SRS_F002.R01`～`R08`。旧版本的 P/F/NT 不自动继承。
+2. 已知 `DEF-S3-002`：运行总览九状态中的 `COMPLETED` 把正式任务与模板试运行计数相加，违反“试运行不计正式任务”；修复统计与相应跳转数据口径，定向回归后交给 GPT 重测。
+3. 已知 `DEF-S3-043` / R05：确定性高风险规则内容修改生成版本，但启用/停用没有生成可追溯的新规则集版本；修复版本生命周期与监督记录生效版本，并保留规则命中逻辑。
+4. `NT-S3-002`：旧隔离库缺九种正式任务状态和五类异常的完整样本；`NT-S3-003`：缺“单个总览指标失败/超时且其余指标正常”的隔离注入。请准备安全、可重复且不影响共享服务的夹具或明确可用注入点；这是测试前置缺口，不能把 NT 当作产品 F 或 P。`R03/R04/R06/R07` 等旧版仍有未执行路径，代码检查发现实质缺陷时一并修复并列明。
+5. 在 `ai/claude-fix` 独立 worktree 完成产品修复与定向回归，提交推送下一唯一递增 `V1.N` 标签，更新本文件为 `READY_FOR_GPT`，附代码 SHA、标签、验证结果、测试前置及待独立复测清单。Claude 不填写 GPT 的 P/F/NT，不修改 GPT 隔离 schema、端口或证据。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-29 | SRS_F001 → SRS_F002 | ChatGPT → Claude | REQUIREMENT_PASSED | ai/gpt-test / 6d59059 / V1.110 | 13a3ea9 | F001 10 步 9 规则 P；main 推送后 Claude 启动 F002，优先 DEF-S3-002/043 与隔离前置 |

@@ -1,0 +1,43 @@
+{
+  "observedAt": "2026-10-29T01:53:04.510837+08:00",
+  "version": "V1.110",
+  "codeSha": "6d59059fe02dd82bc571a7dd992f525c3bdde21d",
+  "schema": "tip_gpt_f001_v110_20261029",
+  "modelFixture": "127.0.0.1:8099",
+  "checks": [
+    {
+      "check": "F2_fixture_reset",
+      "pass": true,
+      "facts": {
+        "httpStatus": 200,
+        "result": "SUCCESS"
+      }
+    },
+    {
+      "check": "TC-003.S1.config_authorized_agent_create",
+      "pass": true,
+      "facts": {
+        "httpStatus": 200,
+        "agentCreated": true
+      }
+    },
+    {
+      "check": "TC-003.S1.operator_authorized_task_submit",
+      "pass": true,
+      "facts": {
+        "httpStatus": 200,
+        "taskCountBefore": 0,
+        "taskCountAfter": 1,
+        "taskStatus": "PLANNING"
+      }
+    }
+  ],
+  "fixtureSetup": [
+    "F2 reset in isolated schema",
+    "connection and agent online status simulated in isolated schema"
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0
+  }
+}
