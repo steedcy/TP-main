@@ -2,7 +2,7 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_GPT`（SRS_F002 第 1 轮 Claude → ChatGPT，V1.111；见末尾）
+- 状态：`READY_FOR_CLAUDE`（SRS_F002 的 V1.111 独立复测发现 F/NT；见末尾第 3 轮 ChatGPT → Claude）。SRS_F002 尚未通过，不得转入 F003。
 - 当前需求：`SRS_F002 运行总览`；SRS_F001 已完成，按功能需求顺序继续。
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -177,3 +177,17 @@
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-29 | SRS_F002 | Claude → ChatGPT | READY_FOR_GPT | ai/claude-fix / 5d6d61b / V1.111 | 无 | 修复 DEF-S3-002/043，补 NT-S3-002/003 夹具；仅单测通过，待独立复测 |
+
+## 第 3 轮 ChatGPT → Claude（SRS_F002，V1.111 未通过）
+
+- 状态：`READY_FOR_CLAUDE`。ChatGPT 测试分支 `ai/gpt-test`，已接收 Claude 代码 `5d6d61b920a0f2b3ef762ca6f9ffb08921231ad4`（`V1.111`），接收合并 `281601e62053c8aee127798c4c2b55dee8097301`。独立复测与台账提交 `2ff9f772be47174fb0c3ca4d0efad7bf57a21bec` 已推送。具体环境、P/F/NT 和原始证据见 `acceptance/stage3/SRS_F002-V1.111-独立复测与缺陷交接.md`。本轮未改需求/用例基线，也未合并 main。
+- `TC-004.S1/S3/S4=P`，`TC-004.S2=F`；`TC-005.S1/S2=F`，`TC-005.S3=NT`。规则 `R01/R02/R07/R08=P`、`R03=F`、`R04/R05/R06=NT`。这些是 V1.111 的独立裁决；单测和构建不抵消 F/NT。
+- **DEF-S3-074**：总览代理总数卡=4，点击默认代理列表=5；在线卡=2，点击在线列表=4。隔离正样本包含归档在线及停用在线代理，API 和 Edge 均复现。卡片统计口径与跳转筛选不一致；请统一并核对分页和角色可见范围。
+- **DEF-S3-075**：F2 特殊旅客高风险任务、启用基线、代理/能力和本机模型夹具准备完成后，提交 HTTP 500/API 1000。隔离后端日志根因 `task_step_assignments.step_seq` 为 NULL；特殊旅客及大件行李 F2 模板步骤无 `stepSeq`，`normalizeTemplateSteps` 未补序号，而 `startExecution` 写入非空列。请修复模板步骤序号规范化，验证高风险降级与计划/任务状态。设备端点已隔离到未启用 18108，未访问共享模拟器。
+- **NT-S3-028/029**：无可用基线转人工及总览增加已实测；监督无法判定/不可用、基线执行失败，以及风险信号单项/组合、0.8 和 60 秒边界仍未全测。请提供可重复且不影响共享资源的注入点/夹具，修复后由 GPT 独立复测。`NT-S3-027` 同候选计划启停成对判定仍未完成；启停版本 API 7/7 子检查通过，但 R05 整条未通过。请一并核对新增规则是否应使规则集版本变化。
+- `DEF-S3-002` 的 SQL 诱饵/总览/任务列表排除试运行已通过，`TC-028.S2` 真实模板试运行仍需邻接复测，暂不完全关闭该缺陷。`DEF-S3-043` 的规则启停版本子路径通过，成对候选监督判定未完成。`NT-S3-002/003` 夹具实跑通过。GPT 仅修正 `scripts/nt-s3-002-seed-overview.py` 的 psql 静默选项 `-q`，使 `expected()` 不把 `SET` 输出误当状态行；这是测试夹具修正，不是产品代码修复。
+- Claude 开工前先读 AGENTS/本文件/BASELINE_CHANGES，核对自己的未提交修改，fetch 并合入已推送 `origin/ai/gpt-test`，保留旧 F/NT 证据。只在独立 `ai/claude-fix` worktree 修产品代码和定向测试，使用自己的库、端口和夹具。完成后提交推送下一唯一 `V1.N` 标签，更新本文件为 `READY_FOR_GPT`，列出代码 SHA、标签、验证命令、修复边界及独立复测清单。GPT 不修改产品代码代替你修复。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-29 | SRS_F002 | ChatGPT → Claude | READY_FOR_CLAUDE | ai/gpt-test / 5d6d61b / V1.111 | 2ff9f77 | DEF-S3-074/075 待修，R04/R05/R06 与 TC-028 邻接待复测 |
