@@ -25,14 +25,17 @@ operator = local.API("运行操作员")
 variant = os.environ.get("STAGE3_CAP_VARIANT", "unknown-capability")
 assert variant in ("unknown-capability", "no-online-candidate", "missing-input", "invalid-param",
                    "oversize-no-online-candidate", "motion-safety", "six-steps", "loop-marker",
-                   "unbounded-loop-text")
-source_id = 19 if variant == "oversize-no-online-candidate" else 73
+                   "unbounded-loop-text", "special-no-robot")
+source_id = (19 if variant == "oversize-no-online-candidate" else
+             15 if variant == "special-no-robot" else 73)
 source = operator(f"/tasks/{source_id}")
 source_plan = next(p for p in operator(f"/tasks/{source_id}/plan-versions")
                    if p["source"] == ("BASELINE_TEMPLATE" if source_id == 19 else "AUTONOMOUS"))
 assert source["status"] == "COMPLETED" and len(source_plan["planSteps"]) == 4
 initial_steps = json.loads(json.dumps(source_plan["planSteps"], ensure_ascii=False))
-assert source["taskFamily"] == ("OVERSIZE_BAGGAGE_HANDLING" if source_id == 19 else "FLIGHT_CHANGE_RESPONSE")
+assert source["taskFamily"] == ({19: "OVERSIZE_BAGGAGE_HANDLING",
+                                15: "SPECIAL_PASSENGER_SERVICE",
+                                73: "FLIGHT_CHANGE_RESPONSE"}[source_id])
 if variant == "unknown-capability":
     initial_steps[1]["capabilityType"] = "CAP_S3_UNKNOWN_TEST"
 elif variant == "missing-input":
@@ -164,10 +167,10 @@ try:
     rebind()
     operator = local.API("运行操作员")
     config = local.API("配置管理员")
-    if variant in ("no-online-candidate", "oversize-no-online-candidate"):
-        target_codes = (("SIM_F2_BAGGAGE", "SIM_F2_BAGGAGE_B")
-                        if variant == "oversize-no-online-candidate"
-                        else ("SIM_F2_DISPLAY", "SIM_F2_FLIGHT"))
+    if variant in ("no-online-candidate", "oversize-no-online-candidate", "special-no-robot"):
+        target_codes = ({"oversize-no-online-candidate": ("SIM_F2_BAGGAGE", "SIM_F2_BAGGAGE_B"),
+                         "special-no-robot": ("SIM_F2_ROBOT", "SIM_F2_ROBOT_B"),
+                         "no-online-candidate": ("SIM_F2_DISPLAY", "SIM_F2_FLIGHT")}[variant])
         for code in target_codes:
             agent = next(a for a in config("/device-agents?page=1&size=100")["content"]
                          if a["deviceCode"] == code)

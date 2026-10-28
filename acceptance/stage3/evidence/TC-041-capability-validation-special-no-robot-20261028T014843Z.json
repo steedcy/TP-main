@@ -1,0 +1,1585 @@
+{
+  "observedAt": "2026-10-28T01:48:42.736434+00:00",
+  "runtimeInput": "V1.5",
+  "isolatedSchema": "tip_stage2_v14",
+  "runtimeJarSha256": "7f9541e76409afca5656e616b5c6e1737faa545937374c14166130383f829dfd",
+  "sourceTaskId": 15,
+  "request": {
+    "taskGoal": "为虚构服务编号SP-R08-077安排轮椅协助，从F2_SERVICE_POINT会合并陪同至F2_TEST_GATE，并在智慧航显发布会合提示，由机器人通知现场人员。仅使用虚构服务信息，不记录真实身份。",
+    "taskFamily": "SPECIAL_PASSENGER_SERVICE",
+    "sceneParams": {
+      "serviceId": "SP-R08-077",
+      "assistanceType": "轮椅协助",
+      "originLocation": "F2_SERVICE_POINT",
+      "targetLocation": "F2_TEST_GATE",
+      "notificationType": "BOTH",
+      "repeatCount": 1,
+      "escortMode": "LEAD",
+      "maxDuration": 600,
+      "contentType": "TEXT",
+      "displayDuration": 60,
+      "contentData": "虚构轮椅旅客请在F2_SERVICE_POINT会合并陪同至F2_TEST_GATE"
+    }
+  },
+  "planVariant": "special-no-robot",
+  "sourcePlanSource": "AUTONOMOUS",
+  "initialPlanSteps": [
+    {
+      "stepSeq": 1,
+      "stepGoal": "智慧航显发布轮椅旅客会合提示信息",
+      "capabilityType": "CAP_INFO_DISPLAY",
+      "inputParams": {
+        "contentType": "TEXT",
+        "contentData": "虚构轮椅旅客请在F2_SERVICE_POINT会合并陪同至F2_TEST_GATE",
+        "displayDuration": 60
+      },
+      "precondition": "智慧航显设备在线且空闲，服务编号SP-R08-077已创建",
+      "completionCondition": "航显设备返回displayStatus为成功，提示内容已发布",
+      "failureHandling": "若航显发布失败，记录告警并继续执行机器人会合任务，由机器人语音补充提示",
+      "stepTimeout": 30
+    },
+    {
+      "stepSeq": 2,
+      "stepGoal": "机器人导航至F2_SERVICE_POINT会合点准备陪同",
+      "capabilityType": "CAP_NAVIGATION",
+      "inputParams": {
+        "targetLocation": "F2_SERVICE_POINT",
+        "routePreference": "BARRIER_FREE"
+      },
+      "precondition": "机器人当前在线空闲，航显提示已发布或发布失败已记录",
+      "completionCondition": "机器人到达F2_SERVICE_POINT，routeGenerated为true",
+      "failureHandling": "若导航失败，尝试切换另一台机器人执行；若均失败则返回1002",
+      "stepTimeout": 120
+    },
+    {
+      "stepSeq": 3,
+      "stepGoal": "机器人通知现场人员轮椅旅客协助需求",
+      "capabilityType": "CAP_NOTIFICATION",
+      "inputParams": {
+        "notificationType": "BOTH",
+        "notificationContent": "虚构轮椅旅客请在F2_SERVICE_POINT会合并陪同至F2_TEST_GATE",
+        "repeatCount": 1
+      },
+      "precondition": "机器人已到达F2_SERVICE_POINT，现场人员需接收协助通知",
+      "completionCondition": "通知状态返回成功，现场人员已收到语音及文字提示",
+      "failureHandling": "通知失败时机器人本地重复播报并上报平台告警",
+      "stepTimeout": 30
+    },
+    {
+      "stepSeq": 4,
+      "stepGoal": "机器人陪同轮椅旅客从会合点前往目标登机口",
+      "capabilityType": "CAP_ESCORT",
+      "inputParams": {
+        "targetLocation": "F2_TEST_GATE",
+        "escortMode": "LEAD",
+        "maxDuration": 600
+      },
+      "precondition": "现场人员已确认协助需求，旅客已在F2_SERVICE_POINT就位",
+      "completionCondition": "旅客到达F2_TEST_GATE，arrivalStatus为ARRIVED或成功状态",
+      "failureHandling": "超时或途中异常则上报平台并请求人工介入",
+      "stepTimeout": 600
+    }
+  ],
+  "fixtureBefore": {
+    "goal": "success",
+    "planning": "success",
+    "replanning": "success",
+    "delaySeconds": 65
+  },
+  "journalBeforeLines": 236,
+  "restore": {
+    "fixtureModeExact": true,
+    "cleanup": "MANUAL_TERMINATED",
+    "reenabledAgents": {
+      "SIM_F2_ROBOT": {
+        "agentId": "AGT-9362B1F4",
+        "deviceCode": "SIM_F2_ROBOT",
+        "deviceName": "移动服务机器人仿真体",
+        "agentStatus": "ENABLED",
+        "onlineStatus": "OFFLINE",
+        "workStatus": "IDLE",
+        "currentTaskId": null,
+        "currentStepSeq": null,
+        "lastReportedAt": "2026-10-28T09:49:34.490735"
+      },
+      "SIM_F2_ROBOT_B": {
+        "agentId": "AGT-4652EF88",
+        "deviceCode": "SIM_F2_ROBOT_B",
+        "deviceName": "备用移动机器人仿真体",
+        "agentStatus": "ENABLED",
+        "onlineStatus": "OFFLINE",
+        "workStatus": "IDLE",
+        "currentTaskId": null,
+        "currentStepSeq": null,
+        "lastReportedAt": "2026-10-28T09:49:34.661391"
+      }
+    },
+    "stoppedFixtureBackendPid": 11344,
+    "moonshotExitCode": 0,
+    "moonshotOutput": "{\"evidence\": \"C:\\\\Users\\\\savy\\\\Desktop\\\\TIP-main\\\\tip\\\\acceptance\\\\stage3\\\\evidence\\\\stage3-services-recovered-20261028T015011Z.json\", \"sixOnlineIdle\": true, \"jarSha256\": \"7f9541e76409afca5656e616b5c6e1737faa545937374c14166130383f829dfd\"}",
+    "fixtureStopped": true,
+    "backendHealth": {
+      "status": "UP"
+    },
+    "sixOnlineIdle": true
+  },
+  "originalBackendPid": 8468,
+  "fixtureBackendHealth": {
+    "status": "UP"
+  },
+  "disabledAgents": {
+    "SIM_F2_ROBOT": {
+      "agentId": "AGT-9362B1F4",
+      "deviceCode": "SIM_F2_ROBOT",
+      "deviceName": "移动服务机器人仿真体",
+      "agentStatus": "DISABLED",
+      "onlineStatus": "OFFLINE",
+      "workStatus": "IDLE",
+      "currentTaskId": null,
+      "currentStepSeq": null,
+      "lastReportedAt": "2026-10-28T09:49:34.490735"
+    },
+    "SIM_F2_ROBOT_B": {
+      "agentId": "AGT-4652EF88",
+      "deviceCode": "SIM_F2_ROBOT_B",
+      "deviceName": "备用移动机器人仿真体",
+      "agentStatus": "DISABLED",
+      "onlineStatus": "OFFLINE",
+      "workStatus": "IDLE",
+      "currentTaskId": null,
+      "currentStepSeq": null,
+      "lastReportedAt": "2026-10-28T09:49:34.661391"
+    }
+  },
+  "submitted": {
+    "id": 99,
+    "taskCode": "TASK-20261028-0099",
+    "taskGoal": "为虚构服务编号SP-R08-077安排轮椅协助，从F2_SERVICE_POINT会合并陪同至F2_TEST_GATE，并在智慧航显发布会合提示，由机器人通知现场人员。仅使用虚构服务信息，不记录真实身份。",
+    "taskFamily": "SPECIAL_PASSENGER_SERVICE",
+    "sceneParams": {
+      "serviceId": "SP-R08-077",
+      "assistanceType": "轮椅协助",
+      "originLocation": "F2_SERVICE_POINT",
+      "targetLocation": "F2_TEST_GATE",
+      "notificationType": "BOTH",
+      "repeatCount": 1,
+      "escortMode": "LEAD",
+      "maxDuration": 600,
+      "contentType": "TEXT",
+      "displayDuration": 60,
+      "contentData": "虚构轮椅旅客请在F2_SERVICE_POINT会合并陪同至F2_TEST_GATE"
+    },
+    "goalParsingResult": {
+      "completionCondition": "既定业务完成条件满足",
+      "origin": "F2_SERVICE_POINT",
+      "destination": "F2_TEST_GATE",
+      "originalGoal": "为虚构服务编号SP-R08-077安排轮椅协助，从F2_SERVICE_POINT会合并陪同至F2_TEST_GATE，并在智慧航显发布会合提示，由机器人通知现场人员。仅使用虚构服务信息，不记录真实身份。",
+      "constraints": [
+        "不得下发运动安全控制指令"
+      ]
+    },
+    "status": "PLANNING",
+    "currentPlanVersionId": null,
+    "replanUsed": false,
+    "replanningReason": null,
+    "manualTerminateReason": null,
+    "failureReason": null,
+    "missingInfoQuestions": null,
+    "downgradeReason": null,
+    "isDryRun": false,
+    "createdAt": "2026-10-28T09:49:35.2921441",
+    "updatedAt": "2026-10-28T09:49:35.2921441",
+    "createdBy": "oprator"
+  },
+  "firstReceipt": {
+    "at": "2026-10-28T01:49:35.832158+00:00",
+    "task": {
+      "id": 99,
+      "taskCode": "TASK-20261028-0099",
+      "taskGoal": "为虚构服务编号SP-R08-077安排轮椅协助，从F2_SERVICE_POINT会合并陪同至F2_TEST_GATE，并在智慧航显发布会合提示，由机器人通知现场人员。仅使用虚构服务信息，不记录真实身份。",
+      "taskFamily": "SPECIAL_PASSENGER_SERVICE",
+      "sceneParams": {
+        "serviceId": "SP-R08-077",
+        "assistanceType": "轮椅协助",
+        "originLocation": "F2_SERVICE_POINT",
+        "targetLocation": "F2_TEST_GATE",
+        "notificationType": "BOTH",
+        "repeatCount": 1,
+        "escortMode": "LEAD",
+        "maxDuration": 600,
+        "contentType": "TEXT",
+        "displayDuration": 60,
+        "contentData": "虚构轮椅旅客请在F2_SERVICE_POINT会合并陪同至F2_TEST_GATE"
+      },
+      "goalParsingResult": {
+        "completionCondition": "既定业务完成条件满足",
+        "origin": "F2_SERVICE_POINT",
+        "destination": "F2_TEST_GATE",
+        "originalGoal": "为虚构服务编号SP-R08-077安排轮椅协助，从F2_SERVICE_POINT会合并陪同至F2_TEST_GATE，并在智慧航显发布会合提示，由机器人通知现场人员。仅使用虚构服务信息，不记录真实身份。",
+        "constraints": [
+          "不得下发运动安全控制指令"
+        ]
+      },
+      "status": "PENDING_MANUAL",
+      "currentPlanVersionId": 113,
+      "replanUsed": false,
+      "replanningReason": null,
+      "manualTerminateReason": null,
+      "failureReason": "候选计划三类校验未通过，转基线模板降级；所选基线模板校验失败",
+      "missingInfoQuestions": null,
+      "downgradeReason": null,
+      "isDryRun": false,
+      "createdAt": "2026-10-28T09:49:35.292144",
+      "updatedAt": "2026-10-28T09:49:35.732188",
+      "createdBy": "oprator"
+    },
+    "plans": [
+      {
+        "id": 113,
+        "versionNo": 1,
+        "source": "AUTONOMOUS",
+        "baselineTemplateId": null,
+        "snapshotId": "CTX-20261028-0093",
+        "planSteps": [
+          {
+            "stepSeq": 1,
+            "stepGoal": "智慧航显发布轮椅旅客会合提示信息",
+            "capabilityType": "CAP_INFO_DISPLAY",
+            "inputParams": {
+              "contentType": "TEXT",
+              "contentData": "虚构轮椅旅客请在F2_SERVICE_POINT会合并陪同至F2_TEST_GATE",
+              "displayDuration": 60
+            },
+            "precondition": "智慧航显设备在线且空闲，服务编号SP-R08-077已创建",
+            "completionCondition": "航显设备返回displayStatus为成功，提示内容已发布",
+            "failureHandling": "若航显发布失败，记录告警并继续执行机器人会合任务，由机器人语音补充提示",
+            "stepTimeout": 30
+          },
+          {
+            "stepSeq": 2,
+            "stepGoal": "机器人导航至F2_SERVICE_POINT会合点准备陪同",
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_SERVICE_POINT",
+              "routePreference": "BARRIER_FREE"
+            },
+            "precondition": "机器人当前在线空闲，航显提示已发布或发布失败已记录",
+            "completionCondition": "机器人到达F2_SERVICE_POINT，routeGenerated为true",
+            "failureHandling": "若导航失败，尝试切换另一台机器人执行；若均失败则返回1002",
+            "stepTimeout": 120
+          },
+          {
+            "stepSeq": 3,
+            "stepGoal": "机器人通知现场人员轮椅旅客协助需求",
+            "capabilityType": "CAP_NOTIFICATION",
+            "inputParams": {
+              "notificationType": "BOTH",
+              "notificationContent": "虚构轮椅旅客请在F2_SERVICE_POINT会合并陪同至F2_TEST_GATE",
+              "repeatCount": 1
+            },
+            "precondition": "机器人已到达F2_SERVICE_POINT，现场人员需接收协助通知",
+            "completionCondition": "通知状态返回成功，现场人员已收到语音及文字提示",
+            "failureHandling": "通知失败时机器人本地重复播报并上报平台告警",
+            "stepTimeout": 30
+          },
+          {
+            "stepSeq": 4,
+            "stepGoal": "机器人陪同轮椅旅客从会合点前往目标登机口",
+            "capabilityType": "CAP_ESCORT",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE",
+              "escortMode": "LEAD",
+              "maxDuration": 600
+            },
+            "precondition": "现场人员已确认协助需求，旅客已在F2_SERVICE_POINT就位",
+            "completionCondition": "旅客到达F2_TEST_GATE，arrivalStatus为ARRIVED或成功状态",
+            "failureHandling": "超时或途中异常则上报平台并请求人工介入",
+            "stepTimeout": 600
+          }
+        ],
+        "structureCheckResult": "PASS",
+        "capabilityCheckResult": "FAIL",
+        "constraintCheckResult": "PASS",
+        "validationErrors": [
+          {
+            "errorType": "CAPABILITY",
+            "description": "能力类型CAP_NAVIGATION无在线候选代理（要求渠道MOBILE_ROBOT）",
+            "stepSeq": 2,
+            "reasonCode": "ERR_NO_ONLINE_CANDIDATE"
+          },
+          {
+            "errorType": "CAPABILITY",
+            "description": "能力类型CAP_NOTIFICATION无在线候选代理（要求渠道MOBILE_ROBOT）",
+            "stepSeq": 3,
+            "reasonCode": "ERR_NO_ONLINE_CANDIDATE"
+          },
+          {
+            "errorType": "CAPABILITY",
+            "description": "能力类型CAP_ESCORT无在线候选代理（要求渠道MOBILE_ROBOT）",
+            "stepSeq": 4,
+            "reasonCode": "ERR_NO_ONLINE_CANDIDATE"
+          }
+        ],
+        "riskLevel": null,
+        "riskReasonCode": null,
+        "judgmentBasis": null,
+        "confidence": 0.99,
+        "ruleSetVersion": null,
+        "frozenAt": null,
+        "createdAt": "2026-10-28T09:49:35.571456"
+      },
+      {
+        "id": 114,
+        "versionNo": 2,
+        "source": "BASELINE_TEMPLATE",
+        "baselineTemplateId": 2,
+        "snapshotId": "CTX-20261028-0094",
+        "planSteps": [
+          {
+            "stepSeq": 1,
+            "capabilityType": "CAP_INFO_DISPLAY",
+            "paramMapping": [
+              {
+                "target": "contentType",
+                "source": "TEMPLATE_INPUT.contentType"
+              },
+              {
+                "target": "contentData",
+                "source": "TEMPLATE_INPUT.assistanceType"
+              },
+              {
+                "target": "displayDuration",
+                "source": "TEMPLATE_INPUT.displayDuration"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "displayStatus=SUCCESS",
+            "stepGoal": "执行CAP_INFO_DISPLAY能力（基线模板步骤）",
+            "precondition": "候选设备在线且空闲",
+            "failureHandling": "重试一次或转人工处理",
+            "inputParams": {}
+          },
+          {
+            "stepSeq": 2,
+            "capabilityType": "CAP_NOTIFICATION",
+            "paramMapping": [
+              {
+                "target": "notificationContent",
+                "source": "TEMPLATE_INPUT.assistanceType"
+              },
+              {
+                "target": "notificationType",
+                "source": "TEMPLATE_INPUT.notificationType"
+              },
+              {
+                "target": "repeatCount",
+                "source": "TEMPLATE_INPUT.repeatCount"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "notificationStatus=SUCCESS",
+            "stepGoal": "执行CAP_NOTIFICATION能力（基线模板步骤）",
+            "precondition": "候选设备在线且空闲",
+            "failureHandling": "重试一次或转人工处理",
+            "inputParams": {}
+          },
+          {
+            "stepSeq": 3,
+            "capabilityType": "CAP_ESCORT",
+            "paramMapping": [
+              {
+                "target": "targetLocation",
+                "source": "TEMPLATE_INPUT.targetLocation"
+              },
+              {
+                "target": "escortMode",
+                "source": "TEMPLATE_INPUT.escortMode"
+              },
+              {
+                "target": "maxDuration",
+                "source": "TEMPLATE_INPUT.maxDuration"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "arrivalStatus=ARRIVED",
+            "stepGoal": "执行CAP_ESCORT能力（基线模板步骤）",
+            "precondition": "候选设备在线且空闲",
+            "failureHandling": "重试一次或转人工处理",
+            "inputParams": {}
+          }
+        ],
+        "structureCheckResult": "PASS",
+        "capabilityCheckResult": "FAIL",
+        "constraintCheckResult": "PASS",
+        "validationErrors": [
+          {
+            "errorType": "CAPABILITY",
+            "description": "能力类型CAP_NOTIFICATION无在线候选代理（要求渠道MOBILE_ROBOT）",
+            "stepSeq": 2,
+            "reasonCode": "ERR_NO_ONLINE_CANDIDATE"
+          },
+          {
+            "errorType": "CAPABILITY",
+            "description": "能力类型CAP_ESCORT无在线候选代理（要求渠道MOBILE_ROBOT）",
+            "stepSeq": 3,
+            "reasonCode": "ERR_NO_ONLINE_CANDIDATE"
+          }
+        ],
+        "riskLevel": null,
+        "riskReasonCode": null,
+        "judgmentBasis": null,
+        "confidence": null,
+        "ruleSetVersion": null,
+        "frozenAt": null,
+        "createdAt": "2026-10-28T09:49:35.724108"
+      }
+    ],
+    "assignments": [],
+    "events": [
+      {
+        "id": 1544,
+        "taskId": 99,
+        "eventType": "GOAL_SUBMITTED",
+        "occurredAt": "2026-10-28T09:49:35.315908",
+        "trigger": "OPERATOR",
+        "reasonCode": null,
+        "detailSummary": "运行操作员oprator提交任务目标: 为虚构服务编号SP-R08-077安排轮椅协助，从F2_SERVICE_POINT会合并陪同至F2_TEST_GATE，并在智慧航显发布会合提示，由机器人通知现场人员。仅使用虚构服务信息，不记录真实身份。"
+      },
+      {
+        "id": 1545,
+        "taskId": 99,
+        "eventType": "GOAL_CLARIFIED",
+        "occurredAt": "2026-10-28T09:49:35.445152",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+      },
+      {
+        "id": 1546,
+        "taskId": 99,
+        "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+        "occurredAt": "2026-10-28T09:49:35.540336",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "生成规划上下文快照CTX-20261028-0093"
+      },
+      {
+        "id": 1547,
+        "taskId": 99,
+        "eventType": "PLAN_GENERATED",
+        "occurredAt": "2026-10-28T09:49:35.594088",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+      },
+      {
+        "id": 1548,
+        "taskId": 99,
+        "eventType": "PLAN_VALIDATED",
+        "occurredAt": "2026-10-28T09:49:35.647353",
+        "trigger": "SYSTEM",
+        "reasonCode": "ERR_VALIDATION_FAILED",
+        "detailSummary": "候选计划三类校验未通过: 3项错误"
+      },
+      {
+        "id": 1549,
+        "taskId": 99,
+        "eventType": "BASELINE_DOWNGRADED",
+        "occurredAt": "2026-10-28T09:49:35.730595",
+        "trigger": "SYSTEM",
+        "reasonCode": "ERR_TEMPLATE_VALIDATION_FAILED",
+        "detailSummary": "所选基线模板特殊旅客服务标准模板三类校验未通过"
+      }
+    ]
+  },
+  "secondDispatch": {
+    "at": "2026-10-28T01:49:36.035991+00:00",
+    "task": {
+      "id": 99,
+      "taskCode": "TASK-20261028-0099",
+      "taskGoal": "为虚构服务编号SP-R08-077安排轮椅协助，从F2_SERVICE_POINT会合并陪同至F2_TEST_GATE，并在智慧航显发布会合提示，由机器人通知现场人员。仅使用虚构服务信息，不记录真实身份。",
+      "taskFamily": "SPECIAL_PASSENGER_SERVICE",
+      "sceneParams": {
+        "serviceId": "SP-R08-077",
+        "assistanceType": "轮椅协助",
+        "originLocation": "F2_SERVICE_POINT",
+        "targetLocation": "F2_TEST_GATE",
+        "notificationType": "BOTH",
+        "repeatCount": 1,
+        "escortMode": "LEAD",
+        "maxDuration": 600,
+        "contentType": "TEXT",
+        "displayDuration": 60,
+        "contentData": "虚构轮椅旅客请在F2_SERVICE_POINT会合并陪同至F2_TEST_GATE"
+      },
+      "goalParsingResult": {
+        "completionCondition": "既定业务完成条件满足",
+        "origin": "F2_SERVICE_POINT",
+        "destination": "F2_TEST_GATE",
+        "originalGoal": "为虚构服务编号SP-R08-077安排轮椅协助，从F2_SERVICE_POINT会合并陪同至F2_TEST_GATE，并在智慧航显发布会合提示，由机器人通知现场人员。仅使用虚构服务信息，不记录真实身份。",
+        "constraints": [
+          "不得下发运动安全控制指令"
+        ]
+      },
+      "status": "PENDING_MANUAL",
+      "currentPlanVersionId": 113,
+      "replanUsed": false,
+      "replanningReason": null,
+      "manualTerminateReason": null,
+      "failureReason": "候选计划三类校验未通过，转基线模板降级；所选基线模板校验失败",
+      "missingInfoQuestions": null,
+      "downgradeReason": null,
+      "isDryRun": false,
+      "createdAt": "2026-10-28T09:49:35.292144",
+      "updatedAt": "2026-10-28T09:49:35.732188",
+      "createdBy": "oprator"
+    },
+    "plans": [
+      {
+        "id": 113,
+        "versionNo": 1,
+        "source": "AUTONOMOUS",
+        "baselineTemplateId": null,
+        "snapshotId": "CTX-20261028-0093",
+        "planSteps": [
+          {
+            "stepSeq": 1,
+            "stepGoal": "智慧航显发布轮椅旅客会合提示信息",
+            "capabilityType": "CAP_INFO_DISPLAY",
+            "inputParams": {
+              "contentType": "TEXT",
+              "contentData": "虚构轮椅旅客请在F2_SERVICE_POINT会合并陪同至F2_TEST_GATE",
+              "displayDuration": 60
+            },
+            "precondition": "智慧航显设备在线且空闲，服务编号SP-R08-077已创建",
+            "completionCondition": "航显设备返回displayStatus为成功，提示内容已发布",
+            "failureHandling": "若航显发布失败，记录告警并继续执行机器人会合任务，由机器人语音补充提示",
+            "stepTimeout": 30
+          },
+          {
+            "stepSeq": 2,
+            "stepGoal": "机器人导航至F2_SERVICE_POINT会合点准备陪同",
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_SERVICE_POINT",
+              "routePreference": "BARRIER_FREE"
+            },
+            "precondition": "机器人当前在线空闲，航显提示已发布或发布失败已记录",
+            "completionCondition": "机器人到达F2_SERVICE_POINT，routeGenerated为true",
+            "failureHandling": "若导航失败，尝试切换另一台机器人执行；若均失败则返回1002",
+            "stepTimeout": 120
+          },
+          {
+            "stepSeq": 3,
+            "stepGoal": "机器人通知现场人员轮椅旅客协助需求",
+            "capabilityType": "CAP_NOTIFICATION",
+            "inputParams": {
+              "notificationType": "BOTH",
+              "notificationContent": "虚构轮椅旅客请在F2_SERVICE_POINT会合并陪同至F2_TEST_GATE",
+              "repeatCount": 1
+            },
+            "precondition": "机器人已到达F2_SERVICE_POINT，现场人员需接收协助通知",
+            "completionCondition": "通知状态返回成功，现场人员已收到语音及文字提示",
+            "failureHandling": "通知失败时机器人本地重复播报并上报平台告警",
+            "stepTimeout": 30
+          },
+          {
+            "stepSeq": 4,
+            "stepGoal": "机器人陪同轮椅旅客从会合点前往目标登机口",
+            "capabilityType": "CAP_ESCORT",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE",
+              "escortMode": "LEAD",
+              "maxDuration": 600
+            },
+            "precondition": "现场人员已确认协助需求，旅客已在F2_SERVICE_POINT就位",
+            "completionCondition": "旅客到达F2_TEST_GATE，arrivalStatus为ARRIVED或成功状态",
+            "failureHandling": "超时或途中异常则上报平台并请求人工介入",
+            "stepTimeout": 600
+          }
+        ],
+        "structureCheckResult": "PASS",
+        "capabilityCheckResult": "FAIL",
+        "constraintCheckResult": "PASS",
+        "validationErrors": [
+          {
+            "errorType": "CAPABILITY",
+            "description": "能力类型CAP_NAVIGATION无在线候选代理（要求渠道MOBILE_ROBOT）",
+            "stepSeq": 2,
+            "reasonCode": "ERR_NO_ONLINE_CANDIDATE"
+          },
+          {
+            "errorType": "CAPABILITY",
+            "description": "能力类型CAP_NOTIFICATION无在线候选代理（要求渠道MOBILE_ROBOT）",
+            "stepSeq": 3,
+            "reasonCode": "ERR_NO_ONLINE_CANDIDATE"
+          },
+          {
+            "errorType": "CAPABILITY",
+            "description": "能力类型CAP_ESCORT无在线候选代理（要求渠道MOBILE_ROBOT）",
+            "stepSeq": 4,
+            "reasonCode": "ERR_NO_ONLINE_CANDIDATE"
+          }
+        ],
+        "riskLevel": null,
+        "riskReasonCode": null,
+        "judgmentBasis": null,
+        "confidence": 0.99,
+        "ruleSetVersion": null,
+        "frozenAt": null,
+        "createdAt": "2026-10-28T09:49:35.571456"
+      },
+      {
+        "id": 114,
+        "versionNo": 2,
+        "source": "BASELINE_TEMPLATE",
+        "baselineTemplateId": 2,
+        "snapshotId": "CTX-20261028-0094",
+        "planSteps": [
+          {
+            "stepSeq": 1,
+            "capabilityType": "CAP_INFO_DISPLAY",
+            "paramMapping": [
+              {
+                "target": "contentType",
+                "source": "TEMPLATE_INPUT.contentType"
+              },
+              {
+                "target": "contentData",
+                "source": "TEMPLATE_INPUT.assistanceType"
+              },
+              {
+                "target": "displayDuration",
+                "source": "TEMPLATE_INPUT.displayDuration"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "displayStatus=SUCCESS",
+            "stepGoal": "执行CAP_INFO_DISPLAY能力（基线模板步骤）",
+            "precondition": "候选设备在线且空闲",
+            "failureHandling": "重试一次或转人工处理",
+            "inputParams": {}
+          },
+          {
+            "stepSeq": 2,
+            "capabilityType": "CAP_NOTIFICATION",
+            "paramMapping": [
+              {
+                "target": "notificationContent",
+                "source": "TEMPLATE_INPUT.assistanceType"
+              },
+              {
+                "target": "notificationType",
+                "source": "TEMPLATE_INPUT.notificationType"
+              },
+              {
+                "target": "repeatCount",
+                "source": "TEMPLATE_INPUT.repeatCount"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "notificationStatus=SUCCESS",
+            "stepGoal": "执行CAP_NOTIFICATION能力（基线模板步骤）",
+            "precondition": "候选设备在线且空闲",
+            "failureHandling": "重试一次或转人工处理",
+            "inputParams": {}
+          },
+          {
+            "stepSeq": 3,
+            "capabilityType": "CAP_ESCORT",
+            "paramMapping": [
+              {
+                "target": "targetLocation",
+                "source": "TEMPLATE_INPUT.targetLocation"
+              },
+              {
+                "target": "escortMode",
+                "source": "TEMPLATE_INPUT.escortMode"
+              },
+              {
+                "target": "maxDuration",
+                "source": "TEMPLATE_INPUT.maxDuration"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "arrivalStatus=ARRIVED",
+            "stepGoal": "执行CAP_ESCORT能力（基线模板步骤）",
+            "precondition": "候选设备在线且空闲",
+            "failureHandling": "重试一次或转人工处理",
+            "inputParams": {}
+          }
+        ],
+        "structureCheckResult": "PASS",
+        "capabilityCheckResult": "FAIL",
+        "constraintCheckResult": "PASS",
+        "validationErrors": [
+          {
+            "errorType": "CAPABILITY",
+            "description": "能力类型CAP_NOTIFICATION无在线候选代理（要求渠道MOBILE_ROBOT）",
+            "stepSeq": 2,
+            "reasonCode": "ERR_NO_ONLINE_CANDIDATE"
+          },
+          {
+            "errorType": "CAPABILITY",
+            "description": "能力类型CAP_ESCORT无在线候选代理（要求渠道MOBILE_ROBOT）",
+            "stepSeq": 3,
+            "reasonCode": "ERR_NO_ONLINE_CANDIDATE"
+          }
+        ],
+        "riskLevel": null,
+        "riskReasonCode": null,
+        "judgmentBasis": null,
+        "confidence": null,
+        "ruleSetVersion": null,
+        "frozenAt": null,
+        "createdAt": "2026-10-28T09:49:35.724108"
+      }
+    ],
+    "assignments": [],
+    "events": [
+      {
+        "id": 1544,
+        "taskId": 99,
+        "eventType": "GOAL_SUBMITTED",
+        "occurredAt": "2026-10-28T09:49:35.315908",
+        "trigger": "OPERATOR",
+        "reasonCode": null,
+        "detailSummary": "运行操作员oprator提交任务目标: 为虚构服务编号SP-R08-077安排轮椅协助，从F2_SERVICE_POINT会合并陪同至F2_TEST_GATE，并在智慧航显发布会合提示，由机器人通知现场人员。仅使用虚构服务信息，不记录真实身份。"
+      },
+      {
+        "id": 1545,
+        "taskId": 99,
+        "eventType": "GOAL_CLARIFIED",
+        "occurredAt": "2026-10-28T09:49:35.445152",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+      },
+      {
+        "id": 1546,
+        "taskId": 99,
+        "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+        "occurredAt": "2026-10-28T09:49:35.540336",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "生成规划上下文快照CTX-20261028-0093"
+      },
+      {
+        "id": 1547,
+        "taskId": 99,
+        "eventType": "PLAN_GENERATED",
+        "occurredAt": "2026-10-28T09:49:35.594088",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+      },
+      {
+        "id": 1548,
+        "taskId": 99,
+        "eventType": "PLAN_VALIDATED",
+        "occurredAt": "2026-10-28T09:49:35.647353",
+        "trigger": "SYSTEM",
+        "reasonCode": "ERR_VALIDATION_FAILED",
+        "detailSummary": "候选计划三类校验未通过: 3项错误"
+      },
+      {
+        "id": 1549,
+        "taskId": 99,
+        "eventType": "BASELINE_DOWNGRADED",
+        "occurredAt": "2026-10-28T09:49:35.730595",
+        "trigger": "SYSTEM",
+        "reasonCode": "ERR_TEMPLATE_VALIDATION_FAILED",
+        "detailSummary": "所选基线模板特殊旅客服务标准模板三类校验未通过"
+      }
+    ]
+  },
+  "finished": {
+    "at": "2026-10-28T01:49:36.129612+00:00",
+    "task": {
+      "id": 99,
+      "taskCode": "TASK-20261028-0099",
+      "taskGoal": "为虚构服务编号SP-R08-077安排轮椅协助，从F2_SERVICE_POINT会合并陪同至F2_TEST_GATE，并在智慧航显发布会合提示，由机器人通知现场人员。仅使用虚构服务信息，不记录真实身份。",
+      "taskFamily": "SPECIAL_PASSENGER_SERVICE",
+      "sceneParams": {
+        "serviceId": "SP-R08-077",
+        "assistanceType": "轮椅协助",
+        "originLocation": "F2_SERVICE_POINT",
+        "targetLocation": "F2_TEST_GATE",
+        "notificationType": "BOTH",
+        "repeatCount": 1,
+        "escortMode": "LEAD",
+        "maxDuration": 600,
+        "contentType": "TEXT",
+        "displayDuration": 60,
+        "contentData": "虚构轮椅旅客请在F2_SERVICE_POINT会合并陪同至F2_TEST_GATE"
+      },
+      "goalParsingResult": {
+        "completionCondition": "既定业务完成条件满足",
+        "origin": "F2_SERVICE_POINT",
+        "destination": "F2_TEST_GATE",
+        "originalGoal": "为虚构服务编号SP-R08-077安排轮椅协助，从F2_SERVICE_POINT会合并陪同至F2_TEST_GATE，并在智慧航显发布会合提示，由机器人通知现场人员。仅使用虚构服务信息，不记录真实身份。",
+        "constraints": [
+          "不得下发运动安全控制指令"
+        ]
+      },
+      "status": "PENDING_MANUAL",
+      "currentPlanVersionId": 113,
+      "replanUsed": false,
+      "replanningReason": null,
+      "manualTerminateReason": null,
+      "failureReason": "候选计划三类校验未通过，转基线模板降级；所选基线模板校验失败",
+      "missingInfoQuestions": null,
+      "downgradeReason": null,
+      "isDryRun": false,
+      "createdAt": "2026-10-28T09:49:35.292144",
+      "updatedAt": "2026-10-28T09:49:35.732188",
+      "createdBy": "oprator"
+    },
+    "plans": [
+      {
+        "id": 113,
+        "versionNo": 1,
+        "source": "AUTONOMOUS",
+        "baselineTemplateId": null,
+        "snapshotId": "CTX-20261028-0093",
+        "planSteps": [
+          {
+            "stepSeq": 1,
+            "stepGoal": "智慧航显发布轮椅旅客会合提示信息",
+            "capabilityType": "CAP_INFO_DISPLAY",
+            "inputParams": {
+              "contentType": "TEXT",
+              "contentData": "虚构轮椅旅客请在F2_SERVICE_POINT会合并陪同至F2_TEST_GATE",
+              "displayDuration": 60
+            },
+            "precondition": "智慧航显设备在线且空闲，服务编号SP-R08-077已创建",
+            "completionCondition": "航显设备返回displayStatus为成功，提示内容已发布",
+            "failureHandling": "若航显发布失败，记录告警并继续执行机器人会合任务，由机器人语音补充提示",
+            "stepTimeout": 30
+          },
+          {
+            "stepSeq": 2,
+            "stepGoal": "机器人导航至F2_SERVICE_POINT会合点准备陪同",
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_SERVICE_POINT",
+              "routePreference": "BARRIER_FREE"
+            },
+            "precondition": "机器人当前在线空闲，航显提示已发布或发布失败已记录",
+            "completionCondition": "机器人到达F2_SERVICE_POINT，routeGenerated为true",
+            "failureHandling": "若导航失败，尝试切换另一台机器人执行；若均失败则返回1002",
+            "stepTimeout": 120
+          },
+          {
+            "stepSeq": 3,
+            "stepGoal": "机器人通知现场人员轮椅旅客协助需求",
+            "capabilityType": "CAP_NOTIFICATION",
+            "inputParams": {
+              "notificationType": "BOTH",
+              "notificationContent": "虚构轮椅旅客请在F2_SERVICE_POINT会合并陪同至F2_TEST_GATE",
+              "repeatCount": 1
+            },
+            "precondition": "机器人已到达F2_SERVICE_POINT，现场人员需接收协助通知",
+            "completionCondition": "通知状态返回成功，现场人员已收到语音及文字提示",
+            "failureHandling": "通知失败时机器人本地重复播报并上报平台告警",
+            "stepTimeout": 30
+          },
+          {
+            "stepSeq": 4,
+            "stepGoal": "机器人陪同轮椅旅客从会合点前往目标登机口",
+            "capabilityType": "CAP_ESCORT",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE",
+              "escortMode": "LEAD",
+              "maxDuration": 600
+            },
+            "precondition": "现场人员已确认协助需求，旅客已在F2_SERVICE_POINT就位",
+            "completionCondition": "旅客到达F2_TEST_GATE，arrivalStatus为ARRIVED或成功状态",
+            "failureHandling": "超时或途中异常则上报平台并请求人工介入",
+            "stepTimeout": 600
+          }
+        ],
+        "structureCheckResult": "PASS",
+        "capabilityCheckResult": "FAIL",
+        "constraintCheckResult": "PASS",
+        "validationErrors": [
+          {
+            "errorType": "CAPABILITY",
+            "description": "能力类型CAP_NAVIGATION无在线候选代理（要求渠道MOBILE_ROBOT）",
+            "stepSeq": 2,
+            "reasonCode": "ERR_NO_ONLINE_CANDIDATE"
+          },
+          {
+            "errorType": "CAPABILITY",
+            "description": "能力类型CAP_NOTIFICATION无在线候选代理（要求渠道MOBILE_ROBOT）",
+            "stepSeq": 3,
+            "reasonCode": "ERR_NO_ONLINE_CANDIDATE"
+          },
+          {
+            "errorType": "CAPABILITY",
+            "description": "能力类型CAP_ESCORT无在线候选代理（要求渠道MOBILE_ROBOT）",
+            "stepSeq": 4,
+            "reasonCode": "ERR_NO_ONLINE_CANDIDATE"
+          }
+        ],
+        "riskLevel": null,
+        "riskReasonCode": null,
+        "judgmentBasis": null,
+        "confidence": 0.99,
+        "ruleSetVersion": null,
+        "frozenAt": null,
+        "createdAt": "2026-10-28T09:49:35.571456"
+      },
+      {
+        "id": 114,
+        "versionNo": 2,
+        "source": "BASELINE_TEMPLATE",
+        "baselineTemplateId": 2,
+        "snapshotId": "CTX-20261028-0094",
+        "planSteps": [
+          {
+            "stepSeq": 1,
+            "capabilityType": "CAP_INFO_DISPLAY",
+            "paramMapping": [
+              {
+                "target": "contentType",
+                "source": "TEMPLATE_INPUT.contentType"
+              },
+              {
+                "target": "contentData",
+                "source": "TEMPLATE_INPUT.assistanceType"
+              },
+              {
+                "target": "displayDuration",
+                "source": "TEMPLATE_INPUT.displayDuration"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "displayStatus=SUCCESS",
+            "stepGoal": "执行CAP_INFO_DISPLAY能力（基线模板步骤）",
+            "precondition": "候选设备在线且空闲",
+            "failureHandling": "重试一次或转人工处理",
+            "inputParams": {}
+          },
+          {
+            "stepSeq": 2,
+            "capabilityType": "CAP_NOTIFICATION",
+            "paramMapping": [
+              {
+                "target": "notificationContent",
+                "source": "TEMPLATE_INPUT.assistanceType"
+              },
+              {
+                "target": "notificationType",
+                "source": "TEMPLATE_INPUT.notificationType"
+              },
+              {
+                "target": "repeatCount",
+                "source": "TEMPLATE_INPUT.repeatCount"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "notificationStatus=SUCCESS",
+            "stepGoal": "执行CAP_NOTIFICATION能力（基线模板步骤）",
+            "precondition": "候选设备在线且空闲",
+            "failureHandling": "重试一次或转人工处理",
+            "inputParams": {}
+          },
+          {
+            "stepSeq": 3,
+            "capabilityType": "CAP_ESCORT",
+            "paramMapping": [
+              {
+                "target": "targetLocation",
+                "source": "TEMPLATE_INPUT.targetLocation"
+              },
+              {
+                "target": "escortMode",
+                "source": "TEMPLATE_INPUT.escortMode"
+              },
+              {
+                "target": "maxDuration",
+                "source": "TEMPLATE_INPUT.maxDuration"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "arrivalStatus=ARRIVED",
+            "stepGoal": "执行CAP_ESCORT能力（基线模板步骤）",
+            "precondition": "候选设备在线且空闲",
+            "failureHandling": "重试一次或转人工处理",
+            "inputParams": {}
+          }
+        ],
+        "structureCheckResult": "PASS",
+        "capabilityCheckResult": "FAIL",
+        "constraintCheckResult": "PASS",
+        "validationErrors": [
+          {
+            "errorType": "CAPABILITY",
+            "description": "能力类型CAP_NOTIFICATION无在线候选代理（要求渠道MOBILE_ROBOT）",
+            "stepSeq": 2,
+            "reasonCode": "ERR_NO_ONLINE_CANDIDATE"
+          },
+          {
+            "errorType": "CAPABILITY",
+            "description": "能力类型CAP_ESCORT无在线候选代理（要求渠道MOBILE_ROBOT）",
+            "stepSeq": 3,
+            "reasonCode": "ERR_NO_ONLINE_CANDIDATE"
+          }
+        ],
+        "riskLevel": null,
+        "riskReasonCode": null,
+        "judgmentBasis": null,
+        "confidence": null,
+        "ruleSetVersion": null,
+        "frozenAt": null,
+        "createdAt": "2026-10-28T09:49:35.724108"
+      }
+    ],
+    "assignments": [],
+    "events": [
+      {
+        "id": 1544,
+        "taskId": 99,
+        "eventType": "GOAL_SUBMITTED",
+        "occurredAt": "2026-10-28T09:49:35.315908",
+        "trigger": "OPERATOR",
+        "reasonCode": null,
+        "detailSummary": "运行操作员oprator提交任务目标: 为虚构服务编号SP-R08-077安排轮椅协助，从F2_SERVICE_POINT会合并陪同至F2_TEST_GATE，并在智慧航显发布会合提示，由机器人通知现场人员。仅使用虚构服务信息，不记录真实身份。"
+      },
+      {
+        "id": 1545,
+        "taskId": 99,
+        "eventType": "GOAL_CLARIFIED",
+        "occurredAt": "2026-10-28T09:49:35.445152",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+      },
+      {
+        "id": 1546,
+        "taskId": 99,
+        "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+        "occurredAt": "2026-10-28T09:49:35.540336",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "生成规划上下文快照CTX-20261028-0093"
+      },
+      {
+        "id": 1547,
+        "taskId": 99,
+        "eventType": "PLAN_GENERATED",
+        "occurredAt": "2026-10-28T09:49:35.594088",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+      },
+      {
+        "id": 1548,
+        "taskId": 99,
+        "eventType": "PLAN_VALIDATED",
+        "occurredAt": "2026-10-28T09:49:35.647353",
+        "trigger": "SYSTEM",
+        "reasonCode": "ERR_VALIDATION_FAILED",
+        "detailSummary": "候选计划三类校验未通过: 3项错误"
+      },
+      {
+        "id": 1549,
+        "taskId": 99,
+        "eventType": "BASELINE_DOWNGRADED",
+        "occurredAt": "2026-10-28T09:49:35.730595",
+        "trigger": "SYSTEM",
+        "reasonCode": "ERR_TEMPLATE_VALIDATION_FAILED",
+        "detailSummary": "所选基线模板特殊旅客服务标准模板三类校验未通过"
+      }
+    ]
+  },
+  "newModelRequests": [
+    {
+      "at": "2026-10-28T09:49:35.428161+08:00",
+      "phase": "goal",
+      "mode": "success",
+      "request": {
+        "requestId": "15010a6e-1899-4863-8a02-acf3128aaaa7",
+        "taskGoal": "为虚构服务编号SP-R08-077安排轮椅协助，从F2_SERVICE_POINT会合并陪同至F2_TEST_GATE，并在智慧航显发布会合提示，由机器人通知现场人员。仅使用虚构服务信息，不记录真实身份。",
+        "taskFamily": "SPECIAL_PASSENGER_SERVICE",
+        "sceneParams": {
+          "serviceId": "SP-R08-077",
+          "assistanceType": "轮椅协助",
+          "originLocation": "F2_SERVICE_POINT",
+          "targetLocation": "F2_TEST_GATE",
+          "notificationType": "BOTH",
+          "repeatCount": 1,
+          "escortMode": "LEAD",
+          "maxDuration": 600,
+          "contentType": "TEXT",
+          "displayDuration": 60,
+          "contentData": "虚构轮椅旅客请在F2_SERVICE_POINT会合并陪同至F2_TEST_GATE"
+        },
+        "clarificationAnswers": null
+      }
+    },
+    {
+      "at": "2026-10-28T09:49:35.568103+08:00",
+      "phase": "planning",
+      "mode": "success",
+      "request": {
+        "requestId": "60f8c063-4d01-4611-b04f-e09401757061",
+        "taskGoal": "为虚构服务编号SP-R08-077安排轮椅协助，从F2_SERVICE_POINT会合并陪同至F2_TEST_GATE，并在智慧航显发布会合提示，由机器人通知现场人员。仅使用虚构服务信息，不记录真实身份。",
+        "taskFamily": "SPECIAL_PASSENGER_SERVICE",
+        "sceneParams": {
+          "serviceId": "SP-R08-077",
+          "assistanceType": "轮椅协助",
+          "originLocation": "F2_SERVICE_POINT",
+          "targetLocation": "F2_TEST_GATE",
+          "notificationType": "BOTH",
+          "repeatCount": 1,
+          "escortMode": "LEAD",
+          "maxDuration": 600,
+          "contentType": "TEXT",
+          "displayDuration": 60,
+          "contentData": "虚构轮椅旅客请在F2_SERVICE_POINT会合并陪同至F2_TEST_GATE"
+        },
+        "constraints": [
+          "不得下发运动安全控制指令",
+          "步骤数不超过5"
+        ],
+        "capabilityContext": [
+          {
+            "capabilityType": "CAP_ESCORT",
+            "candidateCount": 0,
+            "candidates": []
+          },
+          {
+            "capabilityType": "CAP_NAVIGATION",
+            "candidateCount": 1,
+            "candidates": [
+              {
+                "agentId": "AGT-0158A712",
+                "deviceCode": "SIM_F2_DISPLAY",
+                "deviceTypeCode": "SIMULATOR",
+                "simulatedDeviceType": "SMART_DISPLAY",
+                "businessStatus": {
+                  "scenarioResult": "SUCCESS",
+                  "simulatedDeviceType": "SMART_DISPLAY"
+                },
+                "capabilities": [
+                  "CAP_NAVIGATION",
+                  "CAP_FLIGHT_UPDATE",
+                  "CAP_INFO_DISPLAY"
+                ],
+                "capabilitySchemas": [
+                  {
+                    "capabilityType": "CAP_NAVIGATION",
+                    "inputParams": [
+                      {
+                        "name": "targetLocation",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "F2_TEST_GATE"
+                      },
+                      {
+                        "name": "routePreference",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "BARRIER_FREE",
+                        "range": "SHORTEST/BARRIER_FREE"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "routeGenerated",
+                        "type": "Boolean",
+                        "required": true
+                      },
+                      {
+                        "name": "estimatedDistance",
+                        "type": "Double",
+                        "required": true
+                      },
+                      {
+                        "name": "estimatedDuration",
+                        "type": "Integer",
+                        "required": true
+                      },
+                      {
+                        "name": "waypointCount",
+                        "type": "Integer",
+                        "required": true
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_FLIGHT_UPDATE",
+                    "inputParams": [
+                      {
+                        "name": "flightNumber",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "TEST1022"
+                      },
+                      {
+                        "name": "updateType",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "GATE_CHANGE",
+                        "range": "DELAY/EARLY/GATE_CHANGE/CANCEL"
+                      },
+                      {
+                        "name": "updateContent",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "测试航班登机口变更至F2_TEST_GATE"
+                      },
+                      {
+                        "name": "displayDuration",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "60",
+                        "range": "10~600"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "publishStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "publishTime",
+                        "type": "String",
+                        "required": true
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_INFO_DISPLAY",
+                    "inputParams": [
+                      {
+                        "name": "contentType",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "TEXT",
+                        "range": "TEXT/IMAGE/VIDEO/HTML"
+                      },
+                      {
+                        "name": "contentData",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "测试信息：请前往F2服务点"
+                      },
+                      {
+                        "name": "displayDuration",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "60",
+                        "range": "5~300"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "displayStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "actualDuration",
+                        "type": "Integer",
+                        "required": true
+                      },
+                      {
+                        "name": "errorMessage",
+                        "type": "String",
+                        "required": false
+                      }
+                    ]
+                  }
+                ],
+                "onlineStatus": "ONLINE",
+                "location": {
+                  "x": 805.0,
+                  "y": 4200.0,
+                  "zone": "F2_TEST"
+                },
+                "workload": "IDLE",
+                "availableUntil": null
+              }
+            ]
+          },
+          {
+            "capabilityType": "CAP_NOTIFICATION",
+            "candidateCount": 0,
+            "candidates": []
+          },
+          {
+            "capabilityType": "CAP_INFO_DISPLAY",
+            "candidateCount": 2,
+            "candidates": [
+              {
+                "agentId": "AGT-0158A712",
+                "deviceCode": "SIM_F2_DISPLAY",
+                "deviceTypeCode": "SIMULATOR",
+                "simulatedDeviceType": "SMART_DISPLAY",
+                "businessStatus": {
+                  "scenarioResult": "SUCCESS",
+                  "simulatedDeviceType": "SMART_DISPLAY"
+                },
+                "capabilities": [
+                  "CAP_NAVIGATION",
+                  "CAP_FLIGHT_UPDATE",
+                  "CAP_INFO_DISPLAY"
+                ],
+                "capabilitySchemas": [
+                  {
+                    "capabilityType": "CAP_NAVIGATION",
+                    "inputParams": [
+                      {
+                        "name": "targetLocation",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "F2_TEST_GATE"
+                      },
+                      {
+                        "name": "routePreference",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "BARRIER_FREE",
+                        "range": "SHORTEST/BARRIER_FREE"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "routeGenerated",
+                        "type": "Boolean",
+                        "required": true
+                      },
+                      {
+                        "name": "estimatedDistance",
+                        "type": "Double",
+                        "required": true
+                      },
+                      {
+                        "name": "estimatedDuration",
+                        "type": "Integer",
+                        "required": true
+                      },
+                      {
+                        "name": "waypointCount",
+                        "type": "Integer",
+                        "required": true
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_FLIGHT_UPDATE",
+                    "inputParams": [
+                      {
+                        "name": "flightNumber",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "TEST1022"
+                      },
+                      {
+                        "name": "updateType",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "GATE_CHANGE",
+                        "range": "DELAY/EARLY/GATE_CHANGE/CANCEL"
+                      },
+                      {
+                        "name": "updateContent",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "测试航班登机口变更至F2_TEST_GATE"
+                      },
+                      {
+                        "name": "displayDuration",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "60",
+                        "range": "10~600"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "publishStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "publishTime",
+                        "type": "String",
+                        "required": true
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_INFO_DISPLAY",
+                    "inputParams": [
+                      {
+                        "name": "contentType",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "TEXT",
+                        "range": "TEXT/IMAGE/VIDEO/HTML"
+                      },
+                      {
+                        "name": "contentData",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "测试信息：请前往F2服务点"
+                      },
+                      {
+                        "name": "displayDuration",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "60",
+                        "range": "5~300"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "displayStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "actualDuration",
+                        "type": "Integer",
+                        "required": true
+                      },
+                      {
+                        "name": "errorMessage",
+                        "type": "String",
+                        "required": false
+                      }
+                    ]
+                  }
+                ],
+                "onlineStatus": "ONLINE",
+                "location": {
+                  "x": 805.0,
+                  "y": 4200.0,
+                  "zone": "F2_TEST"
+                },
+                "workload": "IDLE",
+                "availableUntil": null
+              },
+              {
+                "agentId": "AGT-F9B433BD",
+                "deviceCode": "SIM_F2_FLIGHT",
+                "deviceTypeCode": "SIMULATOR",
+                "simulatedDeviceType": "FLIGHT_DELAY_BOARD",
+                "businessStatus": {
+                  "scenarioResult": "SUCCESS",
+                  "simulatedDeviceType": "FLIGHT_DELAY_BOARD"
+                },
+                "capabilities": [
+                  "CAP_FLIGHT_UPDATE",
+                  "CAP_INFO_DISPLAY"
+                ],
+                "capabilitySchemas": [
+                  {
+                    "capabilityType": "CAP_FLIGHT_UPDATE",
+                    "inputParams": [
+                      {
+                        "name": "flightNumber",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "TEST1022"
+                      },
+                      {
+                        "name": "updateType",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "GATE_CHANGE",
+                        "range": "DELAY/EARLY/GATE_CHANGE/CANCEL"
+                      },
+                      {
+                        "name": "updateContent",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "测试航班登机口变更至F2_TEST_GATE"
+                      },
+                      {
+                        "name": "displayDuration",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "60",
+                        "range": "10~600"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "publishStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "publishTime",
+                        "type": "String",
+                        "required": true
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_INFO_DISPLAY",
+                    "inputParams": [
+                      {
+                        "name": "contentType",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "TEXT",
+                        "range": "TEXT/IMAGE/VIDEO/HTML"
+                      },
+                      {
+                        "name": "contentData",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "测试信息：请前往F2服务点"
+                      },
+                      {
+                        "name": "displayDuration",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "60",
+                        "range": "5~300"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "displayStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "actualDuration",
+                        "type": "Integer",
+                        "required": true
+                      },
+                      {
+                        "name": "errorMessage",
+                        "type": "String",
+                        "required": false
+                      }
+                    ]
+                  }
+                ],
+                "onlineStatus": "ONLINE",
+                "location": {
+                  "x": 815.0,
+                  "y": 4500.0,
+                  "zone": "F2_TEST"
+                },
+                "workload": "IDLE",
+                "availableUntil": null
+              }
+            ]
+          }
+        ],
+        "remainingStepQuota": 5,
+        "completedSteps": []
+      }
+    }
+  ]
+}
