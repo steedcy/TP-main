@@ -66,6 +66,25 @@ class Proxy:
         self.conns = []
 
 
+def kill_tree(proc):
+    """mvn spawns a child JVM that holds the port; terminate() alone leaves it running."""
+    if proc.poll() is not None and os.name != "nt":
+        return
+    if os.name == "nt":
+        subprocess.run(["taskkill", "/PID", str(proc.pid), "/T", "/F"], capture_output=True)
+    else:
+        import signal
+        try: os.killpg(proc.pid, signal.SIGTERM)
+        except OSError: pass
+    try: proc.wait(timeout=20)
+    except subprocess.TimeoutExpired: pass
+
+
+def port_free(port):
+    with socket.socket() as s:
+        return s.connect_ex(("127.0.0.1", port)) != 0
+
+
 def post_login(user, password):
     body = json.dumps({"username": user, "password": password}).encode()
     req = urllib.request.Request(f"http://127.0.0.1:{BACKEND_PORT}/api/v1/auth/login", body,
@@ -113,7 +132,8 @@ def run():
                SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT="3000",
                SPRING_DATA_REDIS_DATABASE=E("FIXTURE_REDIS_DB", "13"))
     backend = subprocess.Popen(["mvn", "-o", "-q", "spring-boot:run"], cwd=ROOT / "backend", env=env,
-                               stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=(os.name == "nt"))
+                               stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=(os.name == "nt"),
+                               start_new_session=(os.name != "nt"))
     evidence = {"observedAt": datetime.datetime.now().astimezone().isoformat(), "step": "TC-002.S4",
                 "backendPort": BACKEND_PORT, "proxyPort": PROXY_PORT, "schema": schema, "checks": {}}
     try:
@@ -134,7 +154,9 @@ def run():
                                                "pass": st == 200 and session_created(p)}
     finally:
         proxy.stop()
-        backend.terminate()
+        kill_tree(backend)
+        time.sleep(1)
+        evidence["cleanup"] = {"backendPortFreed": port_free(BACKEND_PORT), "proxyPortFreed": port_free(PROXY_PORT)}
     out = pathlib.Path(E("FIXTURE_EVIDENCE", ROOT / ".local-test" / "nt-s3-001-fixture-result.json"))
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(evidence, ensure_ascii=False, indent=2), encoding="utf-8")

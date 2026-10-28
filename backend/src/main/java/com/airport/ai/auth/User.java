@@ -29,6 +29,8 @@ public class User {
     public void setId(Long id) { this.id = id; }
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
+    /** 凭据摘要不对外序列化；MyBatis通过setter/字段映射，不受影响 */
+    @com.fasterxml.jackson.annotation.JsonIgnore
     public String getPasswordHash() { return passwordHash; }
     public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
     public String getRealName() { return realName; }
