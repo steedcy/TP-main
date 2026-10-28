@@ -24,7 +24,7 @@ config = local.API("配置管理员")
 operator = local.API("运行操作员")
 variant = os.environ.get("STAGE3_CAP_VARIANT", "unknown-capability")
 assert variant in ("unknown-capability", "no-online-candidate", "missing-input", "invalid-param",
-                   "oversize-no-online-candidate")
+                   "oversize-no-online-candidate", "motion-safety")
 source_id = 19 if variant == "oversize-no-online-candidate" else 73
 source = operator(f"/tasks/{source_id}")
 source_plan = next(p for p in operator(f"/tasks/{source_id}/plan-versions")
@@ -39,6 +39,8 @@ elif variant == "missing-input":
     del initial_steps[1]["inputParams"]["contentData"]
 elif variant == "invalid-param":
     initial_steps[1]["inputParams"]["displayDuration"] = 9999
+elif variant == "motion-safety":
+    initial_steps[3]["inputParams"]["speed"] = 2
 agents = [a for a in config("/device-agents?page=1&size=100")["content"]
           if a["deviceCode"].startswith("SIM_F2_")]
 assert len(agents) == 6 and all(a["agentStatus"] == "ENABLED" and
