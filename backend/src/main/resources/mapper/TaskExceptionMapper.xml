@@ -33,6 +33,7 @@
     <select id="searchPaged" resultMap="ExceptionResult">
         SELECT <include refid="Columns"/> FROM task_exceptions
         <where>
+            task_id NOT IN (SELECT id FROM tasks WHERE is_dry_run = TRUE)
             <if test="exceptionType != null">AND exception_type = #{exceptionType}</if>
             <if test="exceptionStatus != null">AND exception_status = #{exceptionStatus}</if>
         </where>

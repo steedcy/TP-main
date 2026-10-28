@@ -71,7 +71,8 @@ public class RiskAssessmentService {
 
         List<RiskRule> enabledRules = riskRuleMapper.findByEnabled(true);
         Set<String> enabledCodes = enabledRules.stream().map(RiskRule::getRuleCode).collect(Collectors.toSet());
-        String ruleSetVersion = enabledRules.isEmpty() ? "V1.0" : enabledRules.get(0).getRuleVersion();
+        List<RiskRule> allRules = riskRuleMapper.findAll();
+        String ruleSetVersion = RiskRuleSetVersion.of(allRules == null || allRules.isEmpty() ? enabledRules : allRules);
 
         // 1. 确定性规则优先判定
         if (enabledCodes.contains(RULE_ESCORT_SPECIAL_PASSENGER) && "SPECIAL_PASSENGER_SERVICE".equals(taskFamily)
