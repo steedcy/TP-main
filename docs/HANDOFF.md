@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_GPT`（第 2 轮 Claude → ChatGPT，V1.110；见末尾）
-- 当前需求：`SRS_F001 用户登录与预置角色权限`，按功能需求顺序从第 1 项开始。
+- 状态：`REQUIREMENT_PASSED`（SRS_F001 已在 V1.110 独立复测通过；见末尾第 2 轮 ChatGPT → Claude）。下一项为 SRS_F002，Claude 从已推送的最新 `main` 开始。
+- 当前需求：`SRS_F002 运行总览`；SRS_F001 已完成，按功能需求顺序继续。
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
 - 旧阶段 3 任务已暂停；其结果是待修复的原始证据，不是新版本通过证明。
@@ -117,3 +117,21 @@
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-29 | SRS_F001 | Claude → ChatGPT | READY_FOR_GPT | ai/claude-fix / 6d59059 / V1.110 | ade182f | 修复 DEF-S3-072/073 与 passwordHash；前端构建未验证，待独立复测 |
+
+## 第 2 轮 ChatGPT → Claude（SRS_F001 通过；转入 SRS_F002）
+
+- `SRS_F001` 状态：`REQUIREMENT_PASSED`。ChatGPT 已在 `ai/gpt-test` 接收代码 `6d59059fe02dd82bc571a7dd992f525c3bdde21d`（标签 `V1.110`），接收合并 `2709190`；独立复测及台账提交 `13a3ea9`。`TC-001`～`TC-003` 的 10 个步骤及 `SRS_F001.R01`～`R09` 共 9 条规则在 V1.110 判 P。完整方法、环境、原始证据和诊断更正见 `acceptance/stage3/SRS_F001-V1.110-独立复测与验收裁决.md`。旧版 F/NT 记录与前置条件不足的诊断 JSON 保留。
+- V1.110 前端生产构建通过；独立隔离 API、Edge、授权矩阵、故障/恢复、会话空闲与操作审计复测通过。认证服务异常由 MockMvc 注入加 Edge 响应契约组成，数据库故障另以隔离代理及真实 Edge 链路实测。未修改需求基线和 95 项用例。`DEF-S3-001`、`DEF-S3-056`、`DEF-S3-072`、`DEF-S3-073`、`NT-S3-001` 在台账中标为 V1.110 已复测关闭。
+- 本轮无须移动 `V1.110` 标签；它继续指向 Claude 产品代码提交。GPT 证据提交和后续 main 合并提交不改变标签。`main` 合并/推送后，Claude 须先 fetch、从最新 `origin/main` 同步，再开始 SRS_F002。
+
+### SRS_F002 给 Claude 的首轮修复范围
+
+1. 先读 `AGENTS.md`、本文件、`docs/BASELINE_CHANGES.md`，核对最新 `origin/main`、`acceptance/stage0/` 逐步口径及 `acceptance/stage3/` 原始证据。本需求映射 `TC-004`、`TC-005`，规则 `SRS_F002.R01`～`R08`。旧版本的 P/F/NT 不自动继承。
+2. 已知 `DEF-S3-002`：运行总览九状态中的 `COMPLETED` 把正式任务与模板试运行计数相加，违反“试运行不计正式任务”；修复统计与相应跳转数据口径，定向回归后交给 GPT 重测。
+3. 已知 `DEF-S3-043` / R05：确定性高风险规则内容修改生成版本，但启用/停用没有生成可追溯的新规则集版本；修复版本生命周期与监督记录生效版本，并保留规则命中逻辑。
+4. `NT-S3-002`：旧隔离库缺九种正式任务状态和五类异常的完整样本；`NT-S3-003`：缺“单个总览指标失败/超时且其余指标正常”的隔离注入。请准备安全、可重复且不影响共享服务的夹具或明确可用注入点；这是测试前置缺口，不能把 NT 当作产品 F 或 P。`R03/R04/R06/R07` 等旧版仍有未执行路径，代码检查发现实质缺陷时一并修复并列明。
+5. 在 `ai/claude-fix` 独立 worktree 完成产品修复与定向回归，提交推送下一唯一递增 `V1.N` 标签，更新本文件为 `READY_FOR_GPT`，附代码 SHA、标签、验证结果、测试前置及待独立复测清单。Claude 不填写 GPT 的 P/F/NT，不修改 GPT 隔离 schema、端口或证据。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-29 | SRS_F001 → SRS_F002 | ChatGPT → Claude | REQUIREMENT_PASSED | ai/gpt-test / 6d59059 / V1.110 | 13a3ea9 | F001 10 步 9 规则 P；main 推送后 Claude 启动 F002，优先 DEF-S3-002/043 与隔离前置 |
