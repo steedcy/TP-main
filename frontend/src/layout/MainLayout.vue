@@ -22,7 +22,7 @@
     </a-layout-sider>
     <a-layout>
       <a-layout-header style="background: #fff; display: flex; justify-content: flex-end; align-items: center; padding: 0 24px">
-        <span style="margin-right: 16px">{{ authStore.realName }}（{{ roleLabel }}）</span>
+        <span style="margin-right: 16px" data-testid="current-user">{{ authStore.username }}（{{ authStore.realName }}，{{ roleLabel }}）</span>
         <a-button @click="handleLogout">退出登录</a-button>
       </a-layout-header>
       <a-layout-content style="margin: 16px; background: #fff; padding: 16px">
