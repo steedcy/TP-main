@@ -58,7 +58,7 @@
 - 新增：`UserAccessOrderTest`(4)、`AuthServiceLockoutAuditTest`(2)、`LoginFaultResponseTest`(2)。
 
 ### 遗留风险
-- 夹具脚本本机无 Python，**未做语法检查也未实机运行**；NT-S3-001 的实机证据仍需 ChatGPT 在隔离 schema 上运行（需自行提供 FIXTURE_* 环境变量，见脚本头注释）。已知需关注：隔离 schema 需先由 Flyway 建表并有可登录账号。
+- 夹具脚本已用 Python 3.14.9 (miniconda) 通过 py_compile 语法检查并能加载，但**未实机运行**；NT-S3-001 的实机证据仍需 ChatGPT 在隔离 schema 上运行（需自行提供 FIXTURE_* 环境变量，见脚本头注释）。已知需关注：隔离 schema 需先由 Flyway 建表并有可登录账号。
 - 未验证“修复前 UserAccessOrderTest 失败”的反向对照（该操作被环境拦截）；修复前行为已由 `TC-003-validation-order.json` 记录。
 - 其他控制器若仅靠方法级 `@PreAuthorize` 且带 `@Valid` 请求体，可能存在同类 400 先于 403 问题；本轮只处理 users，未扩大范围，建议后续需求复测时关注。
 - `TC-002.S3` 台账为 P 而 R09 为 F 的交叉状态由 ChatGPT 按完整预期裁决。
