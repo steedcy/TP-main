@@ -18,7 +18,7 @@ def psql(sql=None, file=None):
     schema = E("FIXTURE_DB_SCHEMA", "")
     if not schema or schema.lower() == "public":
         raise SystemExit("FIXTURE_DB_SCHEMA must name a dedicated non-public schema")
-    cmd = [E("FIXTURE_PSQL", "psql"), "-X", "-v", "ON_ERROR_STOP=1", "-h", E("FIXTURE_DB_HOST", "localhost"),
+    cmd = [E("FIXTURE_PSQL", "psql"), "-X", "-q", "-v", "ON_ERROR_STOP=1", "-h", E("FIXTURE_DB_HOST", "localhost"),
            "-p", E("FIXTURE_DB_PORT", "5432"), "-U", E("FIXTURE_DB_USER", ""), "-d", E("FIXTURE_DB_NAME", "airport_ai"),
            "-At", "-c", f"SET search_path TO {schema}"]
     cmd += ["-f", str(file)] if file else ["-c", sql]

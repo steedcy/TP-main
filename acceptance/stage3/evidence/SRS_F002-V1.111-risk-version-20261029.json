@@ -1,0 +1,69 @@
+{
+  "observedAt": "2026-10-29T06:47:28.678343+08:00",
+  "version": "V1.111",
+  "codeSha": "5d6d61b920a0f2b3ef762ca6f9ffb08921231ad4",
+  "schema": "tip_gpt_f002_v111_20261029",
+  "scope": "version lifecycle API only; no paired candidate plan",
+  "checks": [
+    {
+      "check": "R05.create_initial_version",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "version": "V1.0"
+      }
+    },
+    {
+      "check": "R05.toggle.V1.1",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "enabled": false,
+        "version": "V1.1"
+      }
+    },
+    {
+      "check": "R05.toggle.V1.2",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "enabled": true,
+        "version": "V1.2"
+      }
+    },
+    {
+      "check": "R05.toggle.V1.3",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "enabled": false,
+        "version": "V1.3"
+      }
+    },
+    {
+      "check": "R05.noop_toggle_keeps_version",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "version": "V1.3"
+      }
+    },
+    {
+      "check": "R05.content_version",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "version": "V1.4"
+      }
+    },
+    {
+      "check": "R05.list_version",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "count": 1,
+        "version": "V1.4"
+      }
+    }
+  ]
+}

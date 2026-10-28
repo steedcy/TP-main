@@ -1,0 +1,35 @@
+{
+  "observedAt": "2026-10-29T06:57:02.610424+08:00",
+  "version": "V1.111",
+  "codeSha": "5d6d61b920a0f2b3ef762ca6f9ffb08921231ad4",
+  "schema": "tip_gpt_f002flow_v111_20261029",
+  "backendPort": 18107,
+  "preconditions": [
+    "F2 reset in dedicated schema",
+    "six synthetic agents enabled/online",
+    "17 F2 capabilities enabled",
+    "three baseline templates enabled",
+    "all device endpoints redirected to unused 127.0.0.1:18108",
+    "local model fixture 127.0.0.1:8099 success"
+  ],
+  "specialPassengerRequest": "valid task family with targetLocation=F2_TEST_GATE; repeated with and without explicit assistanceType",
+  "observedHttp": 500,
+  "observedApiCode": 1000,
+  "persistentTaskCreated": false,
+  "serverRootCause": "null value in column \"step_seq\" of relation \"task_step_assignments\"",
+  "fixtureTemplateStepSeqValues": {
+    "OVERSIZE_BAGGAGE_HANDLING": [
+      null,
+      null,
+      null,
+      null
+    ],
+    "SPECIAL_PASSENGER_SERVICE": [
+      null,
+      null,
+      null
+    ]
+  },
+  "codeInspection": "TaskPlanningOrchestrator.normalizeTemplateSteps does not add stepSeq; TaskExecutionOrchestrator.startExecution inserts parsed stepSeq into NOT NULL task_step_assignments.step_seq",
+  "classification": "product F in TC-005.S1/S2 high-risk baseline execution; exact SQL cause in local log, sanitized here"
+}

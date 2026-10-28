@@ -1,0 +1,37 @@
+{
+  "observedAt": "2026-10-29T06:53:45.881733+08:00",
+  "version": "V1.111",
+  "schema": "tip_gpt_f002flow_v111_20261029",
+  "modelFixture": "127.0.0.1:8099",
+  "deviceAdapter": "127.0.0.1:18108 (unused, isolated)",
+  "checks": [
+    {
+      "check": "TC-005.S1.FLIGHT_CHANGE_RESPONSE",
+      "pass": true,
+      "facts": {
+        "family": "FLIGHT_CHANGE_RESPONSE",
+        "http": 200,
+        "apiCode": 200,
+        "message": "success",
+        "taskId": 5,
+        "responseStatus": "PLANNING",
+        "submitMs": 102,
+        "statusDb": "PENDING_MANUAL",
+        "planRisk": null
+      }
+    },
+    {
+      "check": "TC-005.S1.SPECIAL_PASSENGER_SERVICE",
+      "pass": false,
+      "facts": {
+        "family": "SPECIAL_PASSENGER_SERVICE",
+        "http": 500,
+        "apiCode": 1000,
+        "message": "系统繁忙，请稍后重试",
+        "taskId": null,
+        "responseStatus": null,
+        "submitMs": 96
+      }
+    }
+  ]
+}

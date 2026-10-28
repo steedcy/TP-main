@@ -1,0 +1,295 @@
+{
+  "observedAt": "2026-10-29T06:45:06.736069+08:00",
+  "version": "V1.111",
+  "codeSha": "5d6d61b920a0f2b3ef762ca6f9ffb08921231ad4",
+  "schema": "tip_gpt_f002_v111_20261029",
+  "port": 18105,
+  "checks": [
+    {
+      "check": "precondition.login.SYSTEM_ADMIN",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "session": true,
+        "ms": 118
+      }
+    },
+    {
+      "check": "precondition.login.CONFIG_ADMIN",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "session": true,
+        "ms": 81
+      }
+    },
+    {
+      "check": "precondition.login.OPERATOR",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "session": true,
+        "ms": 96
+      }
+    },
+    {
+      "check": "TC-004.S1.metrics",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "taskInProgress": 12,
+        "pendingManual": 8,
+        "unhandledExceptions": 3,
+        "replanningCount": 2,
+        "agentTotal": 4,
+        "agentOnline": 2,
+        "ms": 38
+      }
+    },
+    {
+      "check": "TC-004.S2.nine_statuses_exclude_dryrun",
+      "pass": true,
+      "facts": {
+        "actual": {
+          "PLANNING": 1,
+          "SUPERVISING": 2,
+          "PENDING_ASSIGNMENT": 3,
+          "DOWNGRADING": 4,
+          "EXECUTING": 5,
+          "COMPLETED": 6,
+          "FAILED": 7,
+          "PENDING_MANUAL": 8,
+          "MANUAL_TERMINATED": 9
+        },
+        "expected": {
+          "PLANNING": 1,
+          "SUPERVISING": 2,
+          "PENDING_ASSIGNMENT": 3,
+          "DOWNGRADING": 4,
+          "EXECUTING": 5,
+          "COMPLETED": 6,
+          "FAILED": 7,
+          "PENDING_MANUAL": 8,
+          "MANUAL_TERMINATED": 9
+        }
+      }
+    },
+    {
+      "check": "TC-004.S2.latest_five_types",
+      "pass": true,
+      "facts": {
+        "count": 5,
+        "types": [
+          "AGENT_OFFLINE",
+          "CAPABILITY_GAP",
+          "EXECUTION_TIMEOUT",
+          "REPLAN_FAILED",
+          "STEP_FAILED"
+        ],
+        "fieldsComplete": true
+      }
+    },
+    {
+      "check": "TC-004.S2.list.PLANNING",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "count": 1,
+        "rowCount": 1,
+        "dryRunRows": 0,
+        "ms": 12
+      }
+    },
+    {
+      "check": "TC-004.S2.list.SUPERVISING",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "count": 2,
+        "rowCount": 2,
+        "dryRunRows": 0,
+        "ms": 13
+      }
+    },
+    {
+      "check": "TC-004.S2.list.PENDING_ASSIGNMENT",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "count": 3,
+        "rowCount": 3,
+        "dryRunRows": 0,
+        "ms": 12
+      }
+    },
+    {
+      "check": "TC-004.S2.list.DOWNGRADING",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "count": 4,
+        "rowCount": 4,
+        "dryRunRows": 0,
+        "ms": 13
+      }
+    },
+    {
+      "check": "TC-004.S2.list.EXECUTING",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "count": 5,
+        "rowCount": 5,
+        "dryRunRows": 0,
+        "ms": 33
+      }
+    },
+    {
+      "check": "TC-004.S2.list.COMPLETED",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "count": 6,
+        "rowCount": 6,
+        "dryRunRows": 0,
+        "ms": 32
+      }
+    },
+    {
+      "check": "TC-004.S2.list.FAILED",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "count": 7,
+        "rowCount": 7,
+        "dryRunRows": 0,
+        "ms": 32
+      }
+    },
+    {
+      "check": "TC-004.S2.list.PENDING_MANUAL",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "count": 8,
+        "rowCount": 8,
+        "dryRunRows": 0,
+        "ms": 35
+      }
+    },
+    {
+      "check": "TC-004.S2.list.MANUAL_TERMINATED",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "count": 9,
+        "rowCount": 9,
+        "dryRunRows": 0,
+        "ms": 31
+      }
+    },
+    {
+      "check": "TC-004.S2.agent_link.total",
+      "pass": false,
+      "facts": {
+        "http": 200,
+        "listTotal": 5,
+        "cardTotal": 4,
+        "rowStatuses": [
+          {
+            "agentStatus": "ENABLED",
+            "onlineStatus": "ONLINE"
+          },
+          {
+            "agentStatus": "ENABLED",
+            "onlineStatus": "ONLINE"
+          },
+          {
+            "agentStatus": "ENABLED",
+            "onlineStatus": "OFFLINE"
+          },
+          {
+            "agentStatus": "DISABLED",
+            "onlineStatus": "ONLINE"
+          },
+          {
+            "agentStatus": "ARCHIVED",
+            "onlineStatus": "ONLINE"
+          }
+        ],
+        "ms": 16
+      }
+    },
+    {
+      "check": "TC-004.S2.agent_link.online",
+      "pass": false,
+      "facts": {
+        "http": 200,
+        "listTotal": 4,
+        "cardTotal": 2,
+        "rowStatuses": [
+          {
+            "agentStatus": "ENABLED",
+            "onlineStatus": "ONLINE"
+          },
+          {
+            "agentStatus": "ENABLED",
+            "onlineStatus": "ONLINE"
+          },
+          {
+            "agentStatus": "DISABLED",
+            "onlineStatus": "ONLINE"
+          },
+          {
+            "agentStatus": "ARCHIVED",
+            "onlineStatus": "ONLINE"
+          }
+        ],
+        "ms": 16
+      }
+    },
+    {
+      "check": "TC-004.S2.pending_exception_link",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "count": 3,
+        "types": [
+          "AGENT_OFFLINE",
+          "CAPABILITY_GAP",
+          "STEP_FAILED"
+        ],
+        "ms": 10
+      }
+    },
+    {
+      "check": "TC-004.S3.period",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "replanningCount": 2,
+        "ms": 34
+      }
+    },
+    {
+      "check": "TC-004.S3.visibility.SYSTEM_ADMIN",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "taskVisible": true,
+        "agentVisible": true,
+        "ms": 16
+      }
+    },
+    {
+      "check": "TC-004.S3.visibility.CONFIG_ADMIN",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "taskVisible": false,
+        "agentVisible": true,
+        "ms": 30
+      }
+    }
+  ]
+}
