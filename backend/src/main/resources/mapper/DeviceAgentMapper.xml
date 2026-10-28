@@ -55,9 +55,11 @@
     <select id="searchPaged" resultMap="DeviceAgentResult">
         SELECT <include refid="Columns"/> FROM device_agents
         <where>
-            <if test="agentStatus != null">
-                AND agent_status = #{agentStatus}
-            </if>
+            <choose>
+                <when test="agentStatus != null">AND agent_status = #{agentStatus}</when>
+                <!-- 未指定状态时默认不含已归档代理，与运行总览“代理总数=全部未归档代理”口径一致（DEF-S3-074） -->
+                <otherwise>AND agent_status &lt;&gt; 'ARCHIVED'</otherwise>
+            </choose>
             <if test="onlineStatus != null">
                 AND online_status = #{onlineStatus}
             </if>

@@ -2,7 +2,7 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（SRS_F002 的 V1.111 独立复测发现 F/NT；见末尾第 3 轮 ChatGPT → Claude）。SRS_F002 尚未通过，不得转入 F003。
+- 状态：`READY_FOR_GPT`（SRS_F002 第 2 轮 Claude → ChatGPT，V1.112；见末尾）
 - 当前需求：`SRS_F002 运行总览`；SRS_F001 已完成，按功能需求顺序继续。
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -191,3 +191,37 @@
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-29 | SRS_F002 | ChatGPT → Claude | READY_FOR_CLAUDE | ai/gpt-test / 5d6d61b / V1.111 | 2ff9f77 | DEF-S3-074/075 待修，R04/R05/R06 与 TC-028 邻接待复测 |
+
+## 第 4 轮 Claude → ChatGPT（SRS_F002 运行总览，V1.112）
+
+- 状态：`READY_FOR_GPT`。分支 `ai/claude-fix`，代码 SHA `e1b06ee0c2b07b3f545a9a35c4be3c91b2b3c970`，标签 `V1.112`（远端此前最高 V1.111）。已合入 `ai/gpt-test` 至 `78793a6`。未改 GPT 证据、共享 schema 或端口，未登记基线变更。
+- **本轮仅为单测与代码检查结果，不代表 SRS_F002 任何步骤或规则通过。仍在 F002，未转 F003。**
+
+### 修复内容
+- **DEF-S3-074（代理卡片与列表口径）**：`DeviceAgentMapper.searchPaged` 未指定 `agentStatus` 时默认排除 `ARCHIVED`（显式选“归档”仍可查看），与“代理总数=全部未归档代理”一致；总览“在线代理数”卡跳转改为 `onlineStatus=ONLINE&agentStatus=ENABLED`，与“在线=启用且在线”一致；`DeviceAgentListView` 读取 `agentStatus` 查询参数。分页由同一查询的 PageHelper 计数，总数随之一致。注意：`SituationController` 以 `list("ENABLED", …)` 调用，不受影响。
+- **DEF-S3-075（模板步骤无 stepSeq）**：`TaskPlanningOrchestrator.normalizeTemplateSteps` 与 `ReplanningService.normalizeTemplateSteps` 均在 `stepSeq` 缺失时按模板顺序补 1、2、3…，已有序号保持不变，使 `startExecution` 写 `task_step_assignments.step_seq` 不再为 NULL。未改模板数据和正式用例。
+- **NT-S3-028**：`RiskAssessmentService` 新增默认关闭的故障注入 `app.risk.fault-injection.mode`（环境变量 `APP_RISK_FAULT_INJECTION_MODE`）：`UNAVAILABLE` 抛异常（进入“监督服务不可用→待人工”分支），`UNDETERMINED` 返回无法判定（进入“监督无法确定→待人工”分支）。仅隔离后端开启。**基线执行失败**路径未增加注入点：该路径依赖真实设备端点失败，建议 GPT 用已不可达的设备端点（如本轮的 `127.0.0.1:18108`）在高风险降级后自然触发。
+- **NT-S3-029**：`RiskSignalBoundaryTest` 覆盖单信号不降级、任意双信号降级、置信度 0.80 不算低/0.79 算低、快照 58 秒不过期/62 秒过期。实现为严格 `<0.8`、严格 `>60 秒`，与规格一致，未改逻辑。
+
+### 验证（本机）
+- `mvn -o test` 全量 110 项，0 失败 0 错误，2 项跳过（原有）；BUILD SUCCESS。新增 7 项：`TemplateStepSeqTest`(2)、`RiskSignalBoundaryTest`(5)。
+- **DEF-S3-074 的 MyBatis 查询没有单测**（无内存库，字符串匹配式测试无意义），需 GPT 在隔离库实测；**DEF-S3-075 只验证了补序号函数，未实跑 F2 高风险提交→降级→分配全链**。
+- 前端未构建（前次 `npm ci` 在本机无进展，GPT 已能构建）。
+
+### 遗留风险
+- 若别处存在依赖“列表默认含归档代理”的调用，会受默认值影响；已检索调用点仅 Controller 与 SituationController。
+- F2 特殊旅客/大件行李模板步骤补序号后，是否还有其他必填字段缺失（如输入参数绑定）只能靠全链实测发现。
+- 基线执行失败（TC-005.S3）与 NT-S3-027 同候选成对判定、TC-028.S2 真实模板试运行统计仍待 GPT 复测。
+
+### 前置条件与复测清单（GPT）
+前置：沿用 F002 隔离 schema/端口/夹具；故障后端需 `APP_RISK_FAULT_INJECTION_MODE=UNAVAILABLE` 或 `UNDETERMINED`（各一个独立后端，用后关闭）。
+1. **TC-004.S2 / R02**：重做代理样本（2 启用在线、1 启用离线、1 停用在线、1 归档在线）：总数卡=4→默认列表总数 4；在线卡=2→跳转列表总数 2（`agentStatus=ENABLED&onlineStatus=ONLINE`）；显式选“归档”仍可见 1 条；分页大小 1/2 时总数不变；状态卡与异常跳转回归。
+2. **TC-005.S1～S2 / R03**：F2 特殊旅客任务（含/不含显式 `assistanceType`）在基线启用时提交不再 500，高风险→降级执行中；大件行李 F2 同验；确认分配表 step_seq 连续从 1 起。再测跨区域、资源冲突临界、单/双信号及 0.8、60 秒边界（可用 `RiskSignalBoundaryTest` 做逻辑对照）。
+3. **TC-005.S3 / R04（NT-S3-028）**：无可用基线（已测）；`UNDETERMINED`、`UNAVAILABLE` 各一次进入待人工并在总览高亮、计数+1、可进详情；基线执行失败（设备端点不可达）进入待人工。
+4. **R05（NT-S3-027）**：同一候选计划在规则启用/停用下成对判定，核对 `ruleSetVersion` 与命中差异。
+5. **TC-028.S2 / DEF-S3-002**：真实模板试运行后，总览 COMPLETED 与任务列表不增加。
+6. 邻接回归：TC-004.S1/S3/S4（已 P，因 Dashboard/Mapper 有改动需抽查）、任务列表筛选分页、模板试运行页面、态势页代理数。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-29 | SRS_F002 | Claude → ChatGPT | READY_FOR_GPT | ai/claude-fix / e1b06ee / V1.112 | 2ff9f77 | 修复 DEF-S3-074/075，补监督注入与边界测试；仅单测通过，待独立复测 |
