@@ -24,7 +24,8 @@ config = local.API("配置管理员")
 operator = local.API("运行操作员")
 variant = os.environ.get("STAGE3_CAP_VARIANT", "unknown-capability")
 assert variant in ("unknown-capability", "no-online-candidate", "missing-input", "invalid-param",
-                   "oversize-no-online-candidate", "motion-safety")
+                   "oversize-no-online-candidate", "motion-safety", "six-steps", "loop-marker",
+                   "unbounded-loop-text")
 source_id = 19 if variant == "oversize-no-online-candidate" else 73
 source = operator(f"/tasks/{source_id}")
 source_plan = next(p for p in operator(f"/tasks/{source_id}/plan-versions")
@@ -41,6 +42,15 @@ elif variant == "invalid-param":
     initial_steps[1]["inputParams"]["displayDuration"] = 9999
 elif variant == "motion-safety":
     initial_steps[3]["inputParams"]["speed"] = 2
+elif variant == "six-steps":
+    for source_step, seq in ((initial_steps[2], 5), (initial_steps[3], 6)):
+        extra = json.loads(json.dumps(source_step, ensure_ascii=False))
+        extra["stepSeq"] = seq
+        initial_steps.append(extra)
+elif variant == "loop-marker":
+    initial_steps[1]["inputParams"]["__loop__"] = True
+elif variant == "unbounded-loop-text":
+    initial_steps[1]["precondition"] = "while(true) { repeat this display step forever; }"
 agents = [a for a in config("/device-agents?page=1&size=100")["content"]
           if a["deviceCode"].startswith("SIM_F2_")]
 assert len(agents) == 6 and all(a["agentStatus"] == "ENABLED" and

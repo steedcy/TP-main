@@ -110,7 +110,7 @@ SRS_F011.R07,SRS_F011,任务族所需能力类型完全缺失时，直接生成�
 SRS_F011.R08,SRS_F011,局部重新规划时须重新构建上下文快照并单独保存,TC-035.S2,NOT_RUN,,,
 SRS_F012.R01,SRS_F012,每个候选计划版本最多包含5个可执行步骤；条件节点不计数，条件分支中的业务动作计数,TC-037.S2,NOT_RUN,,,
 SRS_F012.R02,SRS_F012,任务最终实际执行路径也不得超过5个可执行步骤,TC-037.S2,NOT_RUN,,,
-SRS_F012.R03,SRS_F012,不支持循环、动态代码生成执行和无限轮次协商,TC-037.S2,NOT_RUN,,,
+SRS_F012.R03,SRS_F012,不支持循环、动态代码生成执行和无限轮次协商,TC-037.S2,F,TC-040.S1,acceptance/stage3/evidence/TC-041-capability-validation-six-steps-20261028T014012Z.json;acceptance/stage3/evidence/TC-041-capability-validation-loop-marker-20261028T014201Z.json;acceptance/stage3/evidence/TC-041-capability-validation-unbounded-loop-text-20261028T014330Z.json;acceptance/stage3/evidence/TC-041-plan-ui-task96-20261028T014144Z.json;acceptance/stage3/evidence/TC-041-plan-ui-task98-20261028T014457Z.json,DEF-S3-071
 SRS_F012.R04,SRS_F012,每个步骤须包含步骤目标、所需能力、输入参数、前置条件、完成条件和失败处理六项,TC-037.S1,F,TC-039.S1;TC-039.S2,acceptance/stage3/evidence/TC-039-plan-six-fields-20261026T042149Z.json;acceptance/stage3/evidence/TC-039-plan-six-fields-20261026T042249Z.json;acceptance/stage3/evidence/TC-039-task-definition-coverage-20261026T042427Z.json,DEF-S3-034
 SRS_F012.R05,SRS_F012,步骤只能引用规划上下文中已启用的能力类型，不得虚构能力,TC-037.S2,NOT_RUN,,,
 SRS_F012.R06,SRS_F012,计划只允许包含业务意图，不得包含速度、加速度、姿态、路径点、避障、急停、限速和失联停靠等运动安全控制指令,TC-038.S1,NOT_RUN,,,
@@ -118,11 +118,11 @@ SRS_F012.R07,SRS_F012,规划模型单次请求60秒超时；超时、模型异�
 SRS_F012.R08,SRS_F012,提交给规划模型的任务目标与上下文须脱敏，不得包含旅客真实身份信息,TC-038.S2,NOT_RUN,,,
 SRS_F012.R09,SRS_F012,候选计划在通过三类校验前不得分配设备、不得下发任何指令,TC-038.S1,P,TC-038.S1,acceptance/stage3/evidence/TC-038-planning-faults-20261026T041140Z.json;acceptance/stage3/evidence/TC-038-planning-boundary-followup-20261026T041347Z.json,
 SRS_F012.R10,SRS_F012,局部重新规划生成的新计划版本仍受五步限制，且必须将已完成步骤计入最终执行路径的剩余额度,TC-037.S1,NOT_RUN,,,
-SRS_F013.R01,SRS_F013,结构校验至少覆盖：可执行步骤数不超过5、步骤字段完整、步骤顺序与依赖合法、无循环与动态代码、无无限轮次协商,TC-039.S2,F,TC-039.S2,acceptance/stage3/evidence/TC-039-plan-six-fields-20261026T042149Z.json;acceptance/stage3/evidence/TC-039-plan-six-fields-20261026T042249Z.json;acceptance/stage3/evidence/TC-039-task-definition-coverage-20261026T042427Z.json,DEF-S3-034
+SRS_F013.R01,SRS_F013,结构校验至少覆盖：可执行步骤数不超过5、步骤字段完整、步骤顺序与依赖合法、无循环与动态代码、无无限轮次协商,TC-039.S2,F,TC-039.S2,acceptance/stage3/evidence/TC-039-plan-six-fields-20261026T042149Z.json;acceptance/stage3/evidence/TC-039-plan-six-fields-20261026T042249Z.json;acceptance/stage3/evidence/TC-039-task-definition-coverage-20261026T042427Z.json;acceptance/stage3/evidence/TC-041-capability-validation-six-steps-20261028T014012Z.json;acceptance/stage3/evidence/TC-041-capability-validation-loop-marker-20261028T014201Z.json;acceptance/stage3/evidence/TC-041-capability-validation-unbounded-loop-text-20261028T014330Z.json;acceptance/stage3/evidence/TC-041-plan-ui-task96-20261028T014144Z.json;acceptance/stage3/evidence/TC-041-plan-ui-task98-20261028T014457Z.json,DEF-S3-034;DEF-S3-071
 SRS_F013.R02,SRS_F013,能力校验至少覆盖：每个步骤所需能力存在且已启用、存在可承接该步骤的候选代理、代理在线；能力是否存在的判定同时受5.2.4A设备类型能力边界约束,TC-041.S1,P,TC-041.S1,acceptance/stage3/evidence/TC-041-capability-validation-unknown-capability-20261027T062908Z.json;acceptance/stage3/evidence/TC-041-capability-validation-oversize-no-online-candidate-20261028T013211Z.json;acceptance/stage3/evidence/TC-041-plan-ui-task90-20261028T013509Z.json;acceptance/stage3/evidence/TC-041-no-candidate-plan-ui-20261028T013453Z.json;acceptance/stage3/evidence/TC-020-022-capability-create.json,
 SRS_F013.R03,SRS_F013,约束校验至少覆盖：输入参数完整且取值合法、无资源冲突、不含平台无权执行的运动安全指令、满足任务族约束与完成条件,TC-039.S2,NOT_RUN,,,
 SRS_F013.R04,SRS_F013,任何步骤缺少可承接代理、参数不完整、资源冲突或包含运动安全指令时，计划不得进入执行,TC-039.S2,NOT_RUN,,,
-SRS_F013.R05,SRS_F013,三类校验依次执行；前一类不通过时可继续收集后续错误用于展示，但整体判定为不通过,TC-040.S1,NOT_RUN,,,
+SRS_F013.R05,SRS_F013,三类校验依次执行；前一类不通过时可继续收集后续错误用于展示，但整体判定为不通过,TC-040.S1,P,TC-041.S1;TC-041.S2,acceptance/stage3/evidence/TC-041-capability-validation-unknown-capability-20261027T062908Z.json;acceptance/stage3/evidence/TC-041-capability-validation-invalid-param-20261028T012808Z.json;acceptance/stage3/evidence/TC-041-plan-ui-task90-20261028T013509Z.json,
 SRS_F013.R06,SRS_F013,校验失败时展示错误清单，允许修改目标重试、转模板降级或人工处理,TC-042.S1,NOT_RUN,,,
 SRS_F013.R07,SRS_F013,硬性校验失败不得进入监督判定中，也不得由监督智能体或人工强行放行,TC-040.S2,NOT_RUN,,,
 SRS_F013.R08,SRS_F013,三类校验全部通过后冻结计划版本，冻结后的版本不可修改，仅可由局部重新规划生成新版本,TC-039.S1,NOT_RUN,,,

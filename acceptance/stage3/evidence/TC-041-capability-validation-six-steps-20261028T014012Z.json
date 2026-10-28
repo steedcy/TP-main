@@ -1,0 +1,3148 @@
+{
+  "observedAt": "2026-10-28T01:40:12.379681+00:00",
+  "runtimeInput": "V1.5",
+  "isolatedSchema": "tip_stage2_v14",
+  "runtimeJarSha256": "7f9541e76409afca5656e616b5c6e1737faa545937374c14166130383f829dfd",
+  "sourceTaskId": 73,
+  "request": {
+    "taskGoal": "虚构航班R08Z81登机口由GATE_A05改至F2_TEST_GATE，更新航班信息屏，通知旅客并引导至新登机口。仅为测试。",
+    "taskFamily": "FLIGHT_CHANGE_RESPONSE",
+    "sceneParams": {
+      "flightNumber": "R08Z81",
+      "updateType": "GATE_CHANGE",
+      "updateContent": "测试航班登机口变更至F2_TEST_GATE",
+      "displayDuration": 60,
+      "targetLocation": "F2_TEST_GATE",
+      "routePreference": "BARRIER_FREE",
+      "displayContent": "虚构航班登机口及无障碍路径提示，请前往F2_TEST_GATE。",
+      "contentType": "TEXT",
+      "notificationType": "BOTH",
+      "notificationContent": "虚构航班登机口已变更，请改道至新登机口。",
+      "repeatCount": 1
+    }
+  },
+  "planVariant": "six-steps",
+  "sourcePlanSource": "AUTONOMOUS",
+  "initialPlanSteps": [
+    {
+      "stepSeq": 1,
+      "stepGoal": "发布航班登机口变更信息至航班信息屏",
+      "capabilityType": "CAP_FLIGHT_UPDATE",
+      "inputParams": {
+        "flightNumber": "R08Z81",
+        "updateType": "GATE_CHANGE",
+        "updateContent": "测试航班登机口变更至F2_TEST_GATE",
+        "displayDuration": 60
+      },
+      "precondition": "航班信息屏设备在线且空闲，航班号R08Z81及变更内容已确认",
+      "completionCondition": "航班变更信息发布成功，返回publishStatus为成功状态",
+      "failureHandling": "若发布失败，尝试备用航班信息屏SIM_F2_FLIGHT重试；若均失败则返回失败状态",
+      "stepTimeout": 30
+    },
+    {
+      "stepSeq": 2,
+      "stepGoal": "在信息屏显示新登机口位置及无障碍路径指引",
+      "capabilityType": "CAP_INFO_DISPLAY",
+      "inputParams": {
+        "contentType": "TEXT",
+        "contentData": "虚构航班登机口及无障碍路径提示，请前往F2_TEST_GATE。",
+        "displayDuration": 60
+      },
+      "precondition": "步骤1航班变更信息发布成功，信息屏设备可用",
+      "completionCondition": "显示内容成功推送至屏幕，返回displayStatus为成功状态",
+      "failureHandling": "若显示失败，切换至备用显示设备重试",
+      "stepTimeout": 30
+    },
+    {
+      "stepSeq": 3,
+      "stepGoal": "向旅客发送登机口变更通知",
+      "capabilityType": "CAP_NOTIFICATION",
+      "inputParams": {
+        "notificationType": "BOTH",
+        "notificationContent": "虚构航班登机口已变更，请改道至新登机口。",
+        "repeatCount": 1
+      },
+      "precondition": "步骤1航班变更信息已发布，通知设备在线可用",
+      "completionCondition": "通知成功下发，返回notificationStatus为成功状态",
+      "failureHandling": "若通知失败，尝试备用通知设备重试",
+      "stepTimeout": 30
+    },
+    {
+      "stepSeq": 4,
+      "stepGoal": "生成至新登机口的无障碍路径导航",
+      "capabilityType": "CAP_NAVIGATION",
+      "inputParams": {
+        "targetLocation": "F2_TEST_GATE",
+        "routePreference": "BARRIER_FREE"
+      },
+      "precondition": "步骤2显示指引已发布，旅客需物理移动至新登机口",
+      "completionCondition": "无障碍路径生成成功，返回routeGenerated为true",
+      "failureHandling": "若路径生成失败，尝试备用导航设备重试",
+      "stepTimeout": 30
+    },
+    {
+      "stepSeq": 5,
+      "stepGoal": "向旅客发送登机口变更通知",
+      "capabilityType": "CAP_NOTIFICATION",
+      "inputParams": {
+        "notificationType": "BOTH",
+        "notificationContent": "虚构航班登机口已变更，请改道至新登机口。",
+        "repeatCount": 1
+      },
+      "precondition": "步骤1航班变更信息已发布，通知设备在线可用",
+      "completionCondition": "通知成功下发，返回notificationStatus为成功状态",
+      "failureHandling": "若通知失败，尝试备用通知设备重试",
+      "stepTimeout": 30
+    },
+    {
+      "stepSeq": 6,
+      "stepGoal": "生成至新登机口的无障碍路径导航",
+      "capabilityType": "CAP_NAVIGATION",
+      "inputParams": {
+        "targetLocation": "F2_TEST_GATE",
+        "routePreference": "BARRIER_FREE"
+      },
+      "precondition": "步骤2显示指引已发布，旅客需物理移动至新登机口",
+      "completionCondition": "无障碍路径生成成功，返回routeGenerated为true",
+      "failureHandling": "若路径生成失败，尝试备用导航设备重试",
+      "stepTimeout": 30
+    }
+  ],
+  "fixtureBefore": {
+    "goal": "success",
+    "planning": "success",
+    "replanning": "success",
+    "delaySeconds": 65
+  },
+  "journalBeforeLines": 230,
+  "restore": {
+    "fixtureModeExact": true,
+    "stoppedFixtureBackendPid": 6604,
+    "moonshotExitCode": 0,
+    "moonshotOutput": "{\"evidence\": \"C:\\\\Users\\\\savy\\\\Desktop\\\\TIP-main\\\\tip\\\\acceptance\\\\stage3\\\\evidence\\\\stage3-services-recovered-20261028T014124Z.json\", \"sixOnlineIdle\": true, \"jarSha256\": \"7f9541e76409afca5656e616b5c6e1737faa545937374c14166130383f829dfd\"}",
+    "fixtureStopped": true,
+    "backendHealth": {
+      "status": "UP"
+    },
+    "sixOnlineIdle": true
+  },
+  "originalBackendPid": 5100,
+  "fixtureBackendHealth": {
+    "status": "UP"
+  },
+  "submitted": {
+    "id": 96,
+    "taskCode": "TASK-20261028-0096",
+    "taskGoal": "虚构航班R08Z81登机口由GATE_A05改至F2_TEST_GATE，更新航班信息屏，通知旅客并引导至新登机口。仅为测试。",
+    "taskFamily": "FLIGHT_CHANGE_RESPONSE",
+    "sceneParams": {
+      "flightNumber": "R08Z81",
+      "updateType": "GATE_CHANGE",
+      "updateContent": "测试航班登机口变更至F2_TEST_GATE",
+      "displayDuration": 60,
+      "targetLocation": "F2_TEST_GATE",
+      "routePreference": "BARRIER_FREE",
+      "displayContent": "虚构航班登机口及无障碍路径提示，请前往F2_TEST_GATE。",
+      "contentType": "TEXT",
+      "notificationType": "BOTH",
+      "notificationContent": "虚构航班登机口已变更，请改道至新登机口。",
+      "repeatCount": 1
+    },
+    "goalParsingResult": {
+      "completionCondition": "既定业务完成条件满足",
+      "origin": "F2_SERVICE_POINT",
+      "destination": "F2_TEST_GATE",
+      "originalGoal": "虚构航班R08Z81登机口由GATE_A05改至F2_TEST_GATE，更新航班信息屏，通知旅客并引导至新登机口。仅为测试。",
+      "constraints": [
+        "不得下发运动安全控制指令"
+      ]
+    },
+    "status": "PLANNING",
+    "currentPlanVersionId": null,
+    "replanUsed": false,
+    "replanningReason": null,
+    "manualTerminateReason": null,
+    "failureReason": null,
+    "missingInfoQuestions": null,
+    "downgradeReason": null,
+    "isDryRun": false,
+    "createdAt": "2026-10-28T09:40:42.2696552",
+    "updatedAt": "2026-10-28T09:40:42.2696552",
+    "createdBy": "oprator"
+  },
+  "firstReceipt": {
+    "at": "2026-10-28T01:40:43.299735+00:00",
+    "task": {
+      "id": 96,
+      "taskCode": "TASK-20261028-0096",
+      "taskGoal": "虚构航班R08Z81登机口由GATE_A05改至F2_TEST_GATE，更新航班信息屏，通知旅客并引导至新登机口。仅为测试。",
+      "taskFamily": "FLIGHT_CHANGE_RESPONSE",
+      "sceneParams": {
+        "flightNumber": "R08Z81",
+        "updateType": "GATE_CHANGE",
+        "updateContent": "测试航班登机口变更至F2_TEST_GATE",
+        "displayDuration": 60,
+        "targetLocation": "F2_TEST_GATE",
+        "routePreference": "BARRIER_FREE",
+        "displayContent": "虚构航班登机口及无障碍路径提示，请前往F2_TEST_GATE。",
+        "contentType": "TEXT",
+        "notificationType": "BOTH",
+        "notificationContent": "虚构航班登机口已变更，请改道至新登机口。",
+        "repeatCount": 1
+      },
+      "goalParsingResult": {
+        "completionCondition": "既定业务完成条件满足",
+        "origin": "F2_SERVICE_POINT",
+        "destination": "F2_TEST_GATE",
+        "originalGoal": "虚构航班R08Z81登机口由GATE_A05改至F2_TEST_GATE，更新航班信息屏，通知旅客并引导至新登机口。仅为测试。",
+        "constraints": [
+          "不得下发运动安全控制指令"
+        ]
+      },
+      "status": "EXECUTING",
+      "currentPlanVersionId": 108,
+      "replanUsed": false,
+      "replanningReason": null,
+      "manualTerminateReason": null,
+      "failureReason": null,
+      "missingInfoQuestions": null,
+      "downgradeReason": "候选计划结构校验失败：步骤数超过5或响应为空",
+      "isDryRun": false,
+      "createdAt": "2026-10-28T09:40:42.269655",
+      "updatedAt": "2026-10-28T09:40:43.0408",
+      "createdBy": "oprator"
+    },
+    "plans": [
+      {
+        "id": 108,
+        "versionNo": 1,
+        "source": "BASELINE_TEMPLATE",
+        "baselineTemplateId": 3,
+        "snapshotId": "CTX-20261028-0088",
+        "planSteps": [
+          {
+            "stepSeq": 1,
+            "capabilityType": "CAP_FLIGHT_UPDATE",
+            "paramMapping": [
+              {
+                "target": "flightNumber",
+                "source": "TEMPLATE_INPUT.flightNumber"
+              },
+              {
+                "target": "updateType",
+                "source": "TEMPLATE_INPUT.updateType"
+              },
+              {
+                "target": "updateContent",
+                "source": "TEMPLATE_INPUT.updateContent"
+              },
+              {
+                "target": "displayDuration",
+                "source": "TEMPLATE_INPUT.displayDuration"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "publishStatus=SUCCESS",
+            "stepGoal": "执行CAP_FLIGHT_UPDATE能力（基线模板步骤）",
+            "precondition": "候选设备在线且空闲",
+            "failureHandling": "重试一次或转人工处理",
+            "inputParams": {}
+          },
+          {
+            "stepSeq": 2,
+            "capabilityType": "CAP_INFO_DISPLAY",
+            "paramMapping": [
+              {
+                "target": "contentType",
+                "source": "TEMPLATE_INPUT.contentType"
+              },
+              {
+                "target": "contentData",
+                "source": "TEMPLATE_INPUT.displayContent"
+              },
+              {
+                "target": "displayDuration",
+                "source": "TEMPLATE_INPUT.displayDuration"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "displayStatus=SUCCESS",
+            "stepGoal": "执行CAP_INFO_DISPLAY能力（基线模板步骤）",
+            "precondition": "候选设备在线且空闲",
+            "failureHandling": "重试一次或转人工处理",
+            "inputParams": {}
+          },
+          {
+            "stepSeq": 3,
+            "capabilityType": "CAP_NOTIFICATION",
+            "paramMapping": [
+              {
+                "target": "notificationType",
+                "source": "TEMPLATE_INPUT.notificationType"
+              },
+              {
+                "target": "notificationContent",
+                "source": "TEMPLATE_INPUT.notificationContent"
+              },
+              {
+                "target": "repeatCount",
+                "source": "TEMPLATE_INPUT.repeatCount"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "notificationStatus=SUCCESS",
+            "stepGoal": "执行CAP_NOTIFICATION能力（基线模板步骤）",
+            "precondition": "候选设备在线且空闲",
+            "failureHandling": "重试一次或转人工处理",
+            "inputParams": {}
+          },
+          {
+            "stepSeq": 4,
+            "capabilityType": "CAP_NAVIGATION",
+            "paramMapping": [
+              {
+                "target": "targetLocation",
+                "source": "TEMPLATE_INPUT.targetLocation"
+              },
+              {
+                "target": "routePreference",
+                "source": "TEMPLATE_INPUT.routePreference"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "routeGenerated=true",
+            "stepGoal": "执行CAP_NAVIGATION能力（基线模板步骤）",
+            "precondition": "候选设备在线且空闲",
+            "failureHandling": "重试一次或转人工处理",
+            "inputParams": {}
+          }
+        ],
+        "structureCheckResult": "PASS",
+        "capabilityCheckResult": "PASS",
+        "constraintCheckResult": "PASS",
+        "validationErrors": [],
+        "riskLevel": null,
+        "riskReasonCode": null,
+        "judgmentBasis": null,
+        "confidence": null,
+        "ruleSetVersion": null,
+        "frozenAt": "2026-10-28T09:40:42.748035",
+        "createdAt": "2026-10-28T09:40:42.738151"
+      }
+    ],
+    "assignments": [
+      {
+        "id": 191,
+        "stepSeq": 1,
+        "deviceAgentCode": "AGT-F9B433BD",
+        "commandId": "CMD-20261028094042-66680224",
+        "stepStatus": "EXECUTING",
+        "retryCount": 0,
+        "executionResult": null,
+        "reasonCode": null,
+        "outputParams": null,
+        "dispatchedAt": "2026-10-28T09:40:43.048158",
+        "feedbackAt": null,
+        "rejectedAgentIds": []
+      },
+      {
+        "id": 192,
+        "stepSeq": 2,
+        "deviceAgentCode": null,
+        "commandId": null,
+        "stepStatus": "PENDING_ASSIGNMENT",
+        "retryCount": 0,
+        "executionResult": null,
+        "reasonCode": null,
+        "outputParams": null,
+        "dispatchedAt": null,
+        "feedbackAt": null,
+        "rejectedAgentIds": []
+      },
+      {
+        "id": 193,
+        "stepSeq": 3,
+        "deviceAgentCode": null,
+        "commandId": null,
+        "stepStatus": "PENDING_ASSIGNMENT",
+        "retryCount": 0,
+        "executionResult": null,
+        "reasonCode": null,
+        "outputParams": null,
+        "dispatchedAt": null,
+        "feedbackAt": null,
+        "rejectedAgentIds": []
+      },
+      {
+        "id": 194,
+        "stepSeq": 4,
+        "deviceAgentCode": null,
+        "commandId": null,
+        "stepStatus": "PENDING_ASSIGNMENT",
+        "retryCount": 0,
+        "executionResult": null,
+        "reasonCode": null,
+        "outputParams": null,
+        "dispatchedAt": null,
+        "feedbackAt": null,
+        "rejectedAgentIds": []
+      }
+    ],
+    "events": [
+      {
+        "id": 1463,
+        "taskId": 96,
+        "eventType": "GOAL_SUBMITTED",
+        "occurredAt": "2026-10-28T09:40:42.28997",
+        "trigger": "OPERATOR",
+        "reasonCode": null,
+        "detailSummary": "运行操作员oprator提交任务目标: 虚构航班R08Z81登机口由GATE_A05改至F2_TEST_GATE，更新航班信息屏，通知旅客并引导至新登机口。仅为测试。"
+      },
+      {
+        "id": 1464,
+        "taskId": 96,
+        "eventType": "GOAL_CLARIFIED",
+        "occurredAt": "2026-10-28T09:40:42.482578",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+      },
+      {
+        "id": 1465,
+        "taskId": 96,
+        "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+        "occurredAt": "2026-10-28T09:40:42.613801",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "生成规划上下文快照CTX-20261028-0087"
+      },
+      {
+        "id": 1466,
+        "taskId": 96,
+        "eventType": "PLAN_VALIDATED",
+        "occurredAt": "2026-10-28T09:40:42.667144",
+        "trigger": "SYSTEM",
+        "reasonCode": "ERR_STEP_LIMIT_EXCEEDED",
+        "detailSummary": "候选计划步骤数6超过上限5或为空"
+      },
+      {
+        "id": 1467,
+        "taskId": 96,
+        "eventType": "BASELINE_DOWNGRADED",
+        "occurredAt": "2026-10-28T09:40:42.752618",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "已自动切换至基线模板航班变更应对标准模板(V1.1)，原因: 候选计划结构校验失败：步骤数超过5或响应为空"
+      },
+      {
+        "id": 1468,
+        "taskId": 96,
+        "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+        "occurredAt": "2026-10-28T09:40:42.812932",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-F9B433BD(距离0.0,负载0)，向候选AGT-F9B433BD发起承接请求"
+      },
+      {
+        "id": 1469,
+        "taskId": 96,
+        "eventType": "AGENT_ASSIGNED",
+        "occurredAt": "2026-10-28T09:40:43.029421",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "设备代理AGT-F9B433BD接受步骤1承接请求"
+      },
+      {
+        "id": 1470,
+        "taskId": 96,
+        "eventType": "STEP_DISPATCHED",
+        "occurredAt": "2026-10-28T09:40:43.052776",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "指令CMD-20261028094042-66680224已下发至设备代理AGT-F9B433BD，业务意图: 执行CAP_FLIGHT_UPDATE能力（基线模板步骤）"
+      }
+    ]
+  },
+  "secondDispatch": {
+    "at": "2026-10-28T01:40:44.359009+00:00",
+    "task": {
+      "id": 96,
+      "taskCode": "TASK-20261028-0096",
+      "taskGoal": "虚构航班R08Z81登机口由GATE_A05改至F2_TEST_GATE，更新航班信息屏，通知旅客并引导至新登机口。仅为测试。",
+      "taskFamily": "FLIGHT_CHANGE_RESPONSE",
+      "sceneParams": {
+        "flightNumber": "R08Z81",
+        "updateType": "GATE_CHANGE",
+        "updateContent": "测试航班登机口变更至F2_TEST_GATE",
+        "displayDuration": 60,
+        "targetLocation": "F2_TEST_GATE",
+        "routePreference": "BARRIER_FREE",
+        "displayContent": "虚构航班登机口及无障碍路径提示，请前往F2_TEST_GATE。",
+        "contentType": "TEXT",
+        "notificationType": "BOTH",
+        "notificationContent": "虚构航班登机口已变更，请改道至新登机口。",
+        "repeatCount": 1
+      },
+      "goalParsingResult": {
+        "completionCondition": "既定业务完成条件满足",
+        "origin": "F2_SERVICE_POINT",
+        "destination": "F2_TEST_GATE",
+        "originalGoal": "虚构航班R08Z81登机口由GATE_A05改至F2_TEST_GATE，更新航班信息屏，通知旅客并引导至新登机口。仅为测试。",
+        "constraints": [
+          "不得下发运动安全控制指令"
+        ]
+      },
+      "status": "EXECUTING",
+      "currentPlanVersionId": 108,
+      "replanUsed": false,
+      "replanningReason": null,
+      "manualTerminateReason": null,
+      "failureReason": null,
+      "missingInfoQuestions": null,
+      "downgradeReason": "候选计划结构校验失败：步骤数超过5或响应为空",
+      "isDryRun": false,
+      "createdAt": "2026-10-28T09:40:42.269655",
+      "updatedAt": "2026-10-28T09:40:43.0408",
+      "createdBy": "oprator"
+    },
+    "plans": [
+      {
+        "id": 108,
+        "versionNo": 1,
+        "source": "BASELINE_TEMPLATE",
+        "baselineTemplateId": 3,
+        "snapshotId": "CTX-20261028-0088",
+        "planSteps": [
+          {
+            "stepSeq": 1,
+            "capabilityType": "CAP_FLIGHT_UPDATE",
+            "paramMapping": [
+              {
+                "target": "flightNumber",
+                "source": "TEMPLATE_INPUT.flightNumber"
+              },
+              {
+                "target": "updateType",
+                "source": "TEMPLATE_INPUT.updateType"
+              },
+              {
+                "target": "updateContent",
+                "source": "TEMPLATE_INPUT.updateContent"
+              },
+              {
+                "target": "displayDuration",
+                "source": "TEMPLATE_INPUT.displayDuration"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "publishStatus=SUCCESS",
+            "stepGoal": "执行CAP_FLIGHT_UPDATE能力（基线模板步骤）",
+            "precondition": "候选设备在线且空闲",
+            "failureHandling": "重试一次或转人工处理",
+            "inputParams": {}
+          },
+          {
+            "stepSeq": 2,
+            "capabilityType": "CAP_INFO_DISPLAY",
+            "paramMapping": [
+              {
+                "target": "contentType",
+                "source": "TEMPLATE_INPUT.contentType"
+              },
+              {
+                "target": "contentData",
+                "source": "TEMPLATE_INPUT.displayContent"
+              },
+              {
+                "target": "displayDuration",
+                "source": "TEMPLATE_INPUT.displayDuration"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "displayStatus=SUCCESS",
+            "stepGoal": "执行CAP_INFO_DISPLAY能力（基线模板步骤）",
+            "precondition": "候选设备在线且空闲",
+            "failureHandling": "重试一次或转人工处理",
+            "inputParams": {}
+          },
+          {
+            "stepSeq": 3,
+            "capabilityType": "CAP_NOTIFICATION",
+            "paramMapping": [
+              {
+                "target": "notificationType",
+                "source": "TEMPLATE_INPUT.notificationType"
+              },
+              {
+                "target": "notificationContent",
+                "source": "TEMPLATE_INPUT.notificationContent"
+              },
+              {
+                "target": "repeatCount",
+                "source": "TEMPLATE_INPUT.repeatCount"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "notificationStatus=SUCCESS",
+            "stepGoal": "执行CAP_NOTIFICATION能力（基线模板步骤）",
+            "precondition": "候选设备在线且空闲",
+            "failureHandling": "重试一次或转人工处理",
+            "inputParams": {}
+          },
+          {
+            "stepSeq": 4,
+            "capabilityType": "CAP_NAVIGATION",
+            "paramMapping": [
+              {
+                "target": "targetLocation",
+                "source": "TEMPLATE_INPUT.targetLocation"
+              },
+              {
+                "target": "routePreference",
+                "source": "TEMPLATE_INPUT.routePreference"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "routeGenerated=true",
+            "stepGoal": "执行CAP_NAVIGATION能力（基线模板步骤）",
+            "precondition": "候选设备在线且空闲",
+            "failureHandling": "重试一次或转人工处理",
+            "inputParams": {}
+          }
+        ],
+        "structureCheckResult": "PASS",
+        "capabilityCheckResult": "PASS",
+        "constraintCheckResult": "PASS",
+        "validationErrors": [],
+        "riskLevel": null,
+        "riskReasonCode": null,
+        "judgmentBasis": null,
+        "confidence": null,
+        "ruleSetVersion": null,
+        "frozenAt": "2026-10-28T09:40:42.748035",
+        "createdAt": "2026-10-28T09:40:42.738151"
+      }
+    ],
+    "assignments": [
+      {
+        "id": 191,
+        "stepSeq": 1,
+        "deviceAgentCode": "AGT-F9B433BD",
+        "commandId": "CMD-20261028094042-66680224",
+        "stepStatus": "COMPLETED",
+        "retryCount": 0,
+        "executionResult": "SUCCESS",
+        "reasonCode": null,
+        "outputParams": {
+          "publishStatus": "SUCCESS",
+          "publishTime": "2026-10-28T09:40:44.130201600+08:00"
+        },
+        "dispatchedAt": "2026-10-28T09:40:43.048158",
+        "feedbackAt": "2026-10-28T09:40:44.176143",
+        "rejectedAgentIds": []
+      },
+      {
+        "id": 192,
+        "stepSeq": 2,
+        "deviceAgentCode": "AGT-0158A712",
+        "commandId": "CMD-20261028094044-214BB0E4",
+        "stepStatus": "EXECUTING",
+        "retryCount": 0,
+        "executionResult": null,
+        "reasonCode": null,
+        "outputParams": null,
+        "dispatchedAt": "2026-10-28T09:40:44.296678",
+        "feedbackAt": null,
+        "rejectedAgentIds": []
+      },
+      {
+        "id": 193,
+        "stepSeq": 3,
+        "deviceAgentCode": null,
+        "commandId": null,
+        "stepStatus": "PENDING_ASSIGNMENT",
+        "retryCount": 0,
+        "executionResult": null,
+        "reasonCode": null,
+        "outputParams": null,
+        "dispatchedAt": null,
+        "feedbackAt": null,
+        "rejectedAgentIds": []
+      },
+      {
+        "id": 194,
+        "stepSeq": 4,
+        "deviceAgentCode": null,
+        "commandId": null,
+        "stepStatus": "PENDING_ASSIGNMENT",
+        "retryCount": 0,
+        "executionResult": null,
+        "reasonCode": null,
+        "outputParams": null,
+        "dispatchedAt": null,
+        "feedbackAt": null,
+        "rejectedAgentIds": []
+      }
+    ],
+    "events": [
+      {
+        "id": 1463,
+        "taskId": 96,
+        "eventType": "GOAL_SUBMITTED",
+        "occurredAt": "2026-10-28T09:40:42.28997",
+        "trigger": "OPERATOR",
+        "reasonCode": null,
+        "detailSummary": "运行操作员oprator提交任务目标: 虚构航班R08Z81登机口由GATE_A05改至F2_TEST_GATE，更新航班信息屏，通知旅客并引导至新登机口。仅为测试。"
+      },
+      {
+        "id": 1464,
+        "taskId": 96,
+        "eventType": "GOAL_CLARIFIED",
+        "occurredAt": "2026-10-28T09:40:42.482578",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+      },
+      {
+        "id": 1465,
+        "taskId": 96,
+        "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+        "occurredAt": "2026-10-28T09:40:42.613801",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "生成规划上下文快照CTX-20261028-0087"
+      },
+      {
+        "id": 1466,
+        "taskId": 96,
+        "eventType": "PLAN_VALIDATED",
+        "occurredAt": "2026-10-28T09:40:42.667144",
+        "trigger": "SYSTEM",
+        "reasonCode": "ERR_STEP_LIMIT_EXCEEDED",
+        "detailSummary": "候选计划步骤数6超过上限5或为空"
+      },
+      {
+        "id": 1467,
+        "taskId": 96,
+        "eventType": "BASELINE_DOWNGRADED",
+        "occurredAt": "2026-10-28T09:40:42.752618",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "已自动切换至基线模板航班变更应对标准模板(V1.1)，原因: 候选计划结构校验失败：步骤数超过5或响应为空"
+      },
+      {
+        "id": 1468,
+        "taskId": 96,
+        "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+        "occurredAt": "2026-10-28T09:40:42.812932",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-F9B433BD(距离0.0,负载0)，向候选AGT-F9B433BD发起承接请求"
+      },
+      {
+        "id": 1469,
+        "taskId": 96,
+        "eventType": "AGENT_ASSIGNED",
+        "occurredAt": "2026-10-28T09:40:43.029421",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "设备代理AGT-F9B433BD接受步骤1承接请求"
+      },
+      {
+        "id": 1470,
+        "taskId": 96,
+        "eventType": "STEP_DISPATCHED",
+        "occurredAt": "2026-10-28T09:40:43.052776",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "指令CMD-20261028094042-66680224已下发至设备代理AGT-F9B433BD，业务意图: 执行CAP_FLIGHT_UPDATE能力（基线模板步骤）"
+      },
+      {
+        "id": 1471,
+        "taskId": 96,
+        "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+        "occurredAt": "2026-10-28T09:40:44.178382",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "指令CMD-20261028094042-66680224收到设备代理AGT-F9B433BD执行反馈: SUCCESS"
+      },
+      {
+        "id": 1472,
+        "taskId": 96,
+        "eventType": "STEP_COMPLETED",
+        "occurredAt": "2026-10-28T09:40:44.200803",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "步骤1完成条件已满足: publishStatus=SUCCESS"
+      },
+      {
+        "id": 1473,
+        "taskId": 96,
+        "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+        "occurredAt": "2026-10-28T09:40:44.230156",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "步骤2候选排序（能力匹配->距离->负载）: AGT-0158A712(距离0.0,负载0)，向候选AGT-0158A712发起承接请求"
+      },
+      {
+        "id": 1474,
+        "taskId": 96,
+        "eventType": "AGENT_ASSIGNED",
+        "occurredAt": "2026-10-28T09:40:44.291475",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "设备代理AGT-0158A712接受步骤2承接请求"
+      },
+      {
+        "id": 1475,
+        "taskId": 96,
+        "eventType": "STEP_DISPATCHED",
+        "occurredAt": "2026-10-28T09:40:44.299118",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "指令CMD-20261028094044-214BB0E4已下发至设备代理AGT-0158A712，业务意图: 执行CAP_INFO_DISPLAY能力（基线模板步骤）"
+      }
+    ]
+  },
+  "finished": {
+    "at": "2026-10-28T01:40:49.172281+00:00",
+    "task": {
+      "id": 96,
+      "taskCode": "TASK-20261028-0096",
+      "taskGoal": "虚构航班R08Z81登机口由GATE_A05改至F2_TEST_GATE，更新航班信息屏，通知旅客并引导至新登机口。仅为测试。",
+      "taskFamily": "FLIGHT_CHANGE_RESPONSE",
+      "sceneParams": {
+        "flightNumber": "R08Z81",
+        "updateType": "GATE_CHANGE",
+        "updateContent": "测试航班登机口变更至F2_TEST_GATE",
+        "displayDuration": 60,
+        "targetLocation": "F2_TEST_GATE",
+        "routePreference": "BARRIER_FREE",
+        "displayContent": "虚构航班登机口及无障碍路径提示，请前往F2_TEST_GATE。",
+        "contentType": "TEXT",
+        "notificationType": "BOTH",
+        "notificationContent": "虚构航班登机口已变更，请改道至新登机口。",
+        "repeatCount": 1
+      },
+      "goalParsingResult": {
+        "completionCondition": "既定业务完成条件满足",
+        "origin": "F2_SERVICE_POINT",
+        "destination": "F2_TEST_GATE",
+        "originalGoal": "虚构航班R08Z81登机口由GATE_A05改至F2_TEST_GATE，更新航班信息屏，通知旅客并引导至新登机口。仅为测试。",
+        "constraints": [
+          "不得下发运动安全控制指令"
+        ]
+      },
+      "status": "COMPLETED",
+      "currentPlanVersionId": 108,
+      "replanUsed": false,
+      "replanningReason": null,
+      "manualTerminateReason": null,
+      "failureReason": null,
+      "missingInfoQuestions": null,
+      "downgradeReason": "候选计划结构校验失败：步骤数超过5或响应为空",
+      "isDryRun": false,
+      "createdAt": "2026-10-28T09:40:42.269655",
+      "updatedAt": "2026-10-28T09:40:48.709426",
+      "createdBy": "oprator"
+    },
+    "plans": [
+      {
+        "id": 108,
+        "versionNo": 1,
+        "source": "BASELINE_TEMPLATE",
+        "baselineTemplateId": 3,
+        "snapshotId": "CTX-20261028-0088",
+        "planSteps": [
+          {
+            "stepSeq": 1,
+            "capabilityType": "CAP_FLIGHT_UPDATE",
+            "paramMapping": [
+              {
+                "target": "flightNumber",
+                "source": "TEMPLATE_INPUT.flightNumber"
+              },
+              {
+                "target": "updateType",
+                "source": "TEMPLATE_INPUT.updateType"
+              },
+              {
+                "target": "updateContent",
+                "source": "TEMPLATE_INPUT.updateContent"
+              },
+              {
+                "target": "displayDuration",
+                "source": "TEMPLATE_INPUT.displayDuration"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "publishStatus=SUCCESS",
+            "stepGoal": "执行CAP_FLIGHT_UPDATE能力（基线模板步骤）",
+            "precondition": "候选设备在线且空闲",
+            "failureHandling": "重试一次或转人工处理",
+            "inputParams": {}
+          },
+          {
+            "stepSeq": 2,
+            "capabilityType": "CAP_INFO_DISPLAY",
+            "paramMapping": [
+              {
+                "target": "contentType",
+                "source": "TEMPLATE_INPUT.contentType"
+              },
+              {
+                "target": "contentData",
+                "source": "TEMPLATE_INPUT.displayContent"
+              },
+              {
+                "target": "displayDuration",
+                "source": "TEMPLATE_INPUT.displayDuration"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "displayStatus=SUCCESS",
+            "stepGoal": "执行CAP_INFO_DISPLAY能力（基线模板步骤）",
+            "precondition": "候选设备在线且空闲",
+            "failureHandling": "重试一次或转人工处理",
+            "inputParams": {}
+          },
+          {
+            "stepSeq": 3,
+            "capabilityType": "CAP_NOTIFICATION",
+            "paramMapping": [
+              {
+                "target": "notificationType",
+                "source": "TEMPLATE_INPUT.notificationType"
+              },
+              {
+                "target": "notificationContent",
+                "source": "TEMPLATE_INPUT.notificationContent"
+              },
+              {
+                "target": "repeatCount",
+                "source": "TEMPLATE_INPUT.repeatCount"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "notificationStatus=SUCCESS",
+            "stepGoal": "执行CAP_NOTIFICATION能力（基线模板步骤）",
+            "precondition": "候选设备在线且空闲",
+            "failureHandling": "重试一次或转人工处理",
+            "inputParams": {}
+          },
+          {
+            "stepSeq": 4,
+            "capabilityType": "CAP_NAVIGATION",
+            "paramMapping": [
+              {
+                "target": "targetLocation",
+                "source": "TEMPLATE_INPUT.targetLocation"
+              },
+              {
+                "target": "routePreference",
+                "source": "TEMPLATE_INPUT.routePreference"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "routeGenerated=true",
+            "stepGoal": "执行CAP_NAVIGATION能力（基线模板步骤）",
+            "precondition": "候选设备在线且空闲",
+            "failureHandling": "重试一次或转人工处理",
+            "inputParams": {}
+          }
+        ],
+        "structureCheckResult": "PASS",
+        "capabilityCheckResult": "PASS",
+        "constraintCheckResult": "PASS",
+        "validationErrors": [],
+        "riskLevel": null,
+        "riskReasonCode": null,
+        "judgmentBasis": null,
+        "confidence": null,
+        "ruleSetVersion": null,
+        "frozenAt": "2026-10-28T09:40:42.748035",
+        "createdAt": "2026-10-28T09:40:42.738151"
+      }
+    ],
+    "assignments": [
+      {
+        "id": 191,
+        "stepSeq": 1,
+        "deviceAgentCode": "AGT-F9B433BD",
+        "commandId": "CMD-20261028094042-66680224",
+        "stepStatus": "COMPLETED",
+        "retryCount": 0,
+        "executionResult": "SUCCESS",
+        "reasonCode": null,
+        "outputParams": {
+          "publishStatus": "SUCCESS",
+          "publishTime": "2026-10-28T09:40:44.130201600+08:00"
+        },
+        "dispatchedAt": "2026-10-28T09:40:43.048158",
+        "feedbackAt": "2026-10-28T09:40:44.176143",
+        "rejectedAgentIds": []
+      },
+      {
+        "id": 192,
+        "stepSeq": 2,
+        "deviceAgentCode": "AGT-0158A712",
+        "commandId": "CMD-20261028094044-214BB0E4",
+        "stepStatus": "COMPLETED",
+        "retryCount": 0,
+        "executionResult": "SUCCESS",
+        "reasonCode": null,
+        "outputParams": {
+          "errorMessage": "",
+          "actualDuration": 60,
+          "displayStatus": "SUCCESS"
+        },
+        "dispatchedAt": "2026-10-28T09:40:44.296678",
+        "feedbackAt": "2026-10-28T09:40:45.356633",
+        "rejectedAgentIds": []
+      },
+      {
+        "id": 193,
+        "stepSeq": 3,
+        "deviceAgentCode": "AGT-4652EF88",
+        "commandId": "CMD-20261028094045-01006482",
+        "stepStatus": "COMPLETED",
+        "retryCount": 0,
+        "executionResult": "SUCCESS",
+        "reasonCode": null,
+        "outputParams": {
+          "actualRepeatCount": 1,
+          "notificationStatus": "SUCCESS"
+        },
+        "dispatchedAt": "2026-10-28T09:40:45.407239",
+        "feedbackAt": "2026-10-28T09:40:46.460932",
+        "rejectedAgentIds": []
+      },
+      {
+        "id": 194,
+        "stepSeq": 4,
+        "deviceAgentCode": "AGT-4652EF88",
+        "commandId": "CMD-20261028094046-3A6EB218",
+        "stepStatus": "COMPLETED",
+        "retryCount": 0,
+        "executionResult": "SUCCESS",
+        "reasonCode": null,
+        "outputParams": {
+          "waypointCount": 11,
+          "routeGenerated": true,
+          "estimatedDistance": 238.0,
+          "estimatedDuration": 241
+        },
+        "dispatchedAt": "2026-10-28T09:40:46.512858",
+        "feedbackAt": "2026-10-28T09:40:48.688045",
+        "rejectedAgentIds": []
+      }
+    ],
+    "events": [
+      {
+        "id": 1463,
+        "taskId": 96,
+        "eventType": "GOAL_SUBMITTED",
+        "occurredAt": "2026-10-28T09:40:42.28997",
+        "trigger": "OPERATOR",
+        "reasonCode": null,
+        "detailSummary": "运行操作员oprator提交任务目标: 虚构航班R08Z81登机口由GATE_A05改至F2_TEST_GATE，更新航班信息屏，通知旅客并引导至新登机口。仅为测试。"
+      },
+      {
+        "id": 1464,
+        "taskId": 96,
+        "eventType": "GOAL_CLARIFIED",
+        "occurredAt": "2026-10-28T09:40:42.482578",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+      },
+      {
+        "id": 1465,
+        "taskId": 96,
+        "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+        "occurredAt": "2026-10-28T09:40:42.613801",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "生成规划上下文快照CTX-20261028-0087"
+      },
+      {
+        "id": 1466,
+        "taskId": 96,
+        "eventType": "PLAN_VALIDATED",
+        "occurredAt": "2026-10-28T09:40:42.667144",
+        "trigger": "SYSTEM",
+        "reasonCode": "ERR_STEP_LIMIT_EXCEEDED",
+        "detailSummary": "候选计划步骤数6超过上限5或为空"
+      },
+      {
+        "id": 1467,
+        "taskId": 96,
+        "eventType": "BASELINE_DOWNGRADED",
+        "occurredAt": "2026-10-28T09:40:42.752618",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "已自动切换至基线模板航班变更应对标准模板(V1.1)，原因: 候选计划结构校验失败：步骤数超过5或响应为空"
+      },
+      {
+        "id": 1468,
+        "taskId": 96,
+        "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+        "occurredAt": "2026-10-28T09:40:42.812932",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-F9B433BD(距离0.0,负载0)，向候选AGT-F9B433BD发起承接请求"
+      },
+      {
+        "id": 1469,
+        "taskId": 96,
+        "eventType": "AGENT_ASSIGNED",
+        "occurredAt": "2026-10-28T09:40:43.029421",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "设备代理AGT-F9B433BD接受步骤1承接请求"
+      },
+      {
+        "id": 1470,
+        "taskId": 96,
+        "eventType": "STEP_DISPATCHED",
+        "occurredAt": "2026-10-28T09:40:43.052776",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "指令CMD-20261028094042-66680224已下发至设备代理AGT-F9B433BD，业务意图: 执行CAP_FLIGHT_UPDATE能力（基线模板步骤）"
+      },
+      {
+        "id": 1471,
+        "taskId": 96,
+        "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+        "occurredAt": "2026-10-28T09:40:44.178382",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "指令CMD-20261028094042-66680224收到设备代理AGT-F9B433BD执行反馈: SUCCESS"
+      },
+      {
+        "id": 1472,
+        "taskId": 96,
+        "eventType": "STEP_COMPLETED",
+        "occurredAt": "2026-10-28T09:40:44.200803",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "步骤1完成条件已满足: publishStatus=SUCCESS"
+      },
+      {
+        "id": 1473,
+        "taskId": 96,
+        "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+        "occurredAt": "2026-10-28T09:40:44.230156",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "步骤2候选排序（能力匹配->距离->负载）: AGT-0158A712(距离0.0,负载0)，向候选AGT-0158A712发起承接请求"
+      },
+      {
+        "id": 1474,
+        "taskId": 96,
+        "eventType": "AGENT_ASSIGNED",
+        "occurredAt": "2026-10-28T09:40:44.291475",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "设备代理AGT-0158A712接受步骤2承接请求"
+      },
+      {
+        "id": 1475,
+        "taskId": 96,
+        "eventType": "STEP_DISPATCHED",
+        "occurredAt": "2026-10-28T09:40:44.299118",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "指令CMD-20261028094044-214BB0E4已下发至设备代理AGT-0158A712，业务意图: 执行CAP_INFO_DISPLAY能力（基线模板步骤）"
+      },
+      {
+        "id": 1476,
+        "taskId": 96,
+        "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+        "occurredAt": "2026-10-28T09:40:45.356633",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "指令CMD-20261028094044-214BB0E4收到设备代理AGT-0158A712执行反馈: SUCCESS"
+      },
+      {
+        "id": 1477,
+        "taskId": 96,
+        "eventType": "STEP_COMPLETED",
+        "occurredAt": "2026-10-28T09:40:45.361746",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "步骤2完成条件已满足: displayStatus=SUCCESS"
+      },
+      {
+        "id": 1478,
+        "taskId": 96,
+        "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+        "occurredAt": "2026-10-28T09:40:45.371872",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "步骤3候选排序（能力匹配->距离->负载）: AGT-4652EF88(距离0.0,负载0)；AGT-9362B1F4(距离0.0,负载0)，向候选AGT-4652EF88发起承接请求"
+      },
+      {
+        "id": 1479,
+        "taskId": 96,
+        "eventType": "AGENT_ASSIGNED",
+        "occurredAt": "2026-10-28T09:40:45.404726",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "设备代理AGT-4652EF88接受步骤3承接请求"
+      },
+      {
+        "id": 1480,
+        "taskId": 96,
+        "eventType": "STEP_DISPATCHED",
+        "occurredAt": "2026-10-28T09:40:45.409772",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "指令CMD-20261028094045-01006482已下发至设备代理AGT-4652EF88，业务意图: 执行CAP_NOTIFICATION能力（基线模板步骤）"
+      },
+      {
+        "id": 1481,
+        "taskId": 96,
+        "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+        "occurredAt": "2026-10-28T09:40:46.460932",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "指令CMD-20261028094045-01006482收到设备代理AGT-4652EF88执行反馈: SUCCESS"
+      },
+      {
+        "id": 1482,
+        "taskId": 96,
+        "eventType": "STEP_COMPLETED",
+        "occurredAt": "2026-10-28T09:40:46.46561",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "步骤3完成条件已满足: notificationStatus=SUCCESS"
+      },
+      {
+        "id": 1483,
+        "taskId": 96,
+        "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+        "occurredAt": "2026-10-28T09:40:46.47504",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "步骤4候选排序（能力匹配->距离->负载）: AGT-4652EF88(距离0.0,负载0)；AGT-9362B1F4(距离0.0,负载0)，向候选AGT-4652EF88发起承接请求"
+      },
+      {
+        "id": 1484,
+        "taskId": 96,
+        "eventType": "AGENT_ASSIGNED",
+        "occurredAt": "2026-10-28T09:40:46.510303",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "设备代理AGT-4652EF88接受步骤4承接请求"
+      },
+      {
+        "id": 1485,
+        "taskId": 96,
+        "eventType": "STEP_DISPATCHED",
+        "occurredAt": "2026-10-28T09:40:46.51541",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "指令CMD-20261028094046-3A6EB218已下发至设备代理AGT-4652EF88，业务意图: 执行CAP_NAVIGATION能力（基线模板步骤）"
+      },
+      {
+        "id": 1486,
+        "taskId": 96,
+        "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+        "occurredAt": "2026-10-28T09:40:48.688045",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "指令CMD-20261028094046-3A6EB218收到设备代理AGT-4652EF88执行反馈: SUCCESS"
+      },
+      {
+        "id": 1487,
+        "taskId": 96,
+        "eventType": "STEP_COMPLETED",
+        "occurredAt": "2026-10-28T09:40:48.696843",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "步骤4完成条件已满足: routeGenerated=true"
+      },
+      {
+        "id": 1488,
+        "taskId": 96,
+        "eventType": "TASK_COMPLETED",
+        "occurredAt": "2026-10-28T09:40:48.711081",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "航班变更可用渠道执行完成；已覆盖: [CAP_FLIGHT_UPDATE, CAP_INFO_DISPLAY, CAP_NOTIFICATION, CAP_NAVIGATION]；未覆盖: []"
+      }
+    ]
+  },
+  "newModelRequests": [
+    {
+      "at": "2026-10-28T09:40:42.473407+08:00",
+      "phase": "goal",
+      "mode": "success",
+      "request": {
+        "requestId": "e0059c8f-72c8-4067-820f-91664722530f",
+        "taskGoal": "虚构航班R08Z81登机口由GATE_A05改至F2_TEST_GATE，更新航班信息屏，通知旅客并引导至新登机口。仅为测试。",
+        "taskFamily": "FLIGHT_CHANGE_RESPONSE",
+        "sceneParams": {
+          "flightNumber": "R08Z81",
+          "updateType": "GATE_CHANGE",
+          "updateContent": "测试航班登机口变更至F2_TEST_GATE",
+          "displayDuration": 60,
+          "targetLocation": "F2_TEST_GATE",
+          "routePreference": "BARRIER_FREE",
+          "displayContent": "虚构航班登机口及无障碍路径提示，请前往F2_TEST_GATE。",
+          "contentType": "TEXT",
+          "notificationType": "BOTH",
+          "notificationContent": "虚构航班登机口已变更，请改道至新登机口。",
+          "repeatCount": 1
+        },
+        "clarificationAnswers": null
+      }
+    },
+    {
+      "at": "2026-10-28T09:40:42.660021+08:00",
+      "phase": "planning",
+      "mode": "success",
+      "request": {
+        "requestId": "e9d375cd-2384-487b-ac61-d1e44e7230d7",
+        "taskGoal": "虚构航班R08Z81登机口由GATE_A05改至F2_TEST_GATE，更新航班信息屏，通知旅客并引导至新登机口。仅为测试。",
+        "taskFamily": "FLIGHT_CHANGE_RESPONSE",
+        "sceneParams": {
+          "flightNumber": "R08Z81",
+          "updateType": "GATE_CHANGE",
+          "updateContent": "测试航班登机口变更至F2_TEST_GATE",
+          "displayDuration": 60,
+          "targetLocation": "F2_TEST_GATE",
+          "routePreference": "BARRIER_FREE",
+          "displayContent": "虚构航班登机口及无障碍路径提示，请前往F2_TEST_GATE。",
+          "contentType": "TEXT",
+          "notificationType": "BOTH",
+          "notificationContent": "虚构航班登机口已变更，请改道至新登机口。",
+          "repeatCount": 1
+        },
+        "constraints": [
+          "不得下发运动安全控制指令",
+          "步骤数不超过5"
+        ],
+        "capabilityContext": [
+          {
+            "capabilityType": "CAP_FLIGHT_UPDATE",
+            "candidateCount": 2,
+            "candidates": [
+              {
+                "agentId": "AGT-0158A712",
+                "deviceCode": "SIM_F2_DISPLAY",
+                "deviceTypeCode": "SIMULATOR",
+                "simulatedDeviceType": "SMART_DISPLAY",
+                "businessStatus": {
+                  "scenarioResult": "SUCCESS",
+                  "simulatedDeviceType": "SMART_DISPLAY"
+                },
+                "capabilities": [
+                  "CAP_NAVIGATION",
+                  "CAP_FLIGHT_UPDATE",
+                  "CAP_INFO_DISPLAY"
+                ],
+                "capabilitySchemas": [
+                  {
+                    "capabilityType": "CAP_NAVIGATION",
+                    "inputParams": [
+                      {
+                        "name": "targetLocation",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "F2_TEST_GATE"
+                      },
+                      {
+                        "name": "routePreference",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "BARRIER_FREE",
+                        "range": "SHORTEST/BARRIER_FREE"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "routeGenerated",
+                        "type": "Boolean",
+                        "required": true
+                      },
+                      {
+                        "name": "estimatedDistance",
+                        "type": "Double",
+                        "required": true
+                      },
+                      {
+                        "name": "estimatedDuration",
+                        "type": "Integer",
+                        "required": true
+                      },
+                      {
+                        "name": "waypointCount",
+                        "type": "Integer",
+                        "required": true
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_FLIGHT_UPDATE",
+                    "inputParams": [
+                      {
+                        "name": "flightNumber",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "TEST1022"
+                      },
+                      {
+                        "name": "updateType",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "GATE_CHANGE",
+                        "range": "DELAY/EARLY/GATE_CHANGE/CANCEL"
+                      },
+                      {
+                        "name": "updateContent",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "测试航班登机口变更至F2_TEST_GATE"
+                      },
+                      {
+                        "name": "displayDuration",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "60",
+                        "range": "10~600"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "publishStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "publishTime",
+                        "type": "String",
+                        "required": true
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_INFO_DISPLAY",
+                    "inputParams": [
+                      {
+                        "name": "contentType",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "TEXT",
+                        "range": "TEXT/IMAGE/VIDEO/HTML"
+                      },
+                      {
+                        "name": "contentData",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "测试信息：请前往F2服务点"
+                      },
+                      {
+                        "name": "displayDuration",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "60",
+                        "range": "5~300"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "displayStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "actualDuration",
+                        "type": "Integer",
+                        "required": true
+                      },
+                      {
+                        "name": "errorMessage",
+                        "type": "String",
+                        "required": false
+                      }
+                    ]
+                  }
+                ],
+                "onlineStatus": "ONLINE",
+                "location": {
+                  "x": 805.0,
+                  "y": 4200.0,
+                  "zone": "F2_TEST"
+                },
+                "workload": "IDLE",
+                "availableUntil": null
+              },
+              {
+                "agentId": "AGT-F9B433BD",
+                "deviceCode": "SIM_F2_FLIGHT",
+                "deviceTypeCode": "SIMULATOR",
+                "simulatedDeviceType": "FLIGHT_DELAY_BOARD",
+                "businessStatus": {
+                  "scenarioResult": "SUCCESS",
+                  "simulatedDeviceType": "FLIGHT_DELAY_BOARD"
+                },
+                "capabilities": [
+                  "CAP_FLIGHT_UPDATE",
+                  "CAP_INFO_DISPLAY"
+                ],
+                "capabilitySchemas": [
+                  {
+                    "capabilityType": "CAP_FLIGHT_UPDATE",
+                    "inputParams": [
+                      {
+                        "name": "flightNumber",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "TEST1022"
+                      },
+                      {
+                        "name": "updateType",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "GATE_CHANGE",
+                        "range": "DELAY/EARLY/GATE_CHANGE/CANCEL"
+                      },
+                      {
+                        "name": "updateContent",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "测试航班登机口变更至F2_TEST_GATE"
+                      },
+                      {
+                        "name": "displayDuration",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "60",
+                        "range": "10~600"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "publishStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "publishTime",
+                        "type": "String",
+                        "required": true
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_INFO_DISPLAY",
+                    "inputParams": [
+                      {
+                        "name": "contentType",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "TEXT",
+                        "range": "TEXT/IMAGE/VIDEO/HTML"
+                      },
+                      {
+                        "name": "contentData",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "测试信息：请前往F2服务点"
+                      },
+                      {
+                        "name": "displayDuration",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "60",
+                        "range": "5~300"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "displayStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "actualDuration",
+                        "type": "Integer",
+                        "required": true
+                      },
+                      {
+                        "name": "errorMessage",
+                        "type": "String",
+                        "required": false
+                      }
+                    ]
+                  }
+                ],
+                "onlineStatus": "ONLINE",
+                "location": {
+                  "x": 815.0,
+                  "y": 4500.0,
+                  "zone": "F2_TEST"
+                },
+                "workload": "IDLE",
+                "availableUntil": null
+              }
+            ]
+          },
+          {
+            "capabilityType": "CAP_INFO_DISPLAY",
+            "candidateCount": 4,
+            "candidates": [
+              {
+                "agentId": "AGT-4652EF88",
+                "deviceCode": "SIM_F2_ROBOT_B",
+                "deviceTypeCode": "SIMULATOR",
+                "simulatedDeviceType": "MOBILE_ROBOT",
+                "businessStatus": {
+                  "scenarioResult": "SUCCESS",
+                  "simulatedDeviceType": "MOBILE_ROBOT"
+                },
+                "capabilities": [
+                  "CAP_ESCORT",
+                  "CAP_INFO_DISPLAY",
+                  "CAP_NAVIGATION",
+                  "CAP_NOTIFICATION"
+                ],
+                "capabilitySchemas": [
+                  {
+                    "capabilityType": "CAP_ESCORT",
+                    "inputParams": [
+                      {
+                        "name": "targetLocation",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "F2_TEST_GATE"
+                      },
+                      {
+                        "name": "escortMode",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "LEAD",
+                        "range": "LEAD/FOLLOW"
+                      },
+                      {
+                        "name": "maxDuration",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "600",
+                        "range": "60~1800"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "arrivalStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "actualDistance",
+                        "type": "Double",
+                        "required": true
+                      },
+                      {
+                        "name": "actualDuration",
+                        "type": "Integer",
+                        "required": true
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_INFO_DISPLAY",
+                    "inputParams": [
+                      {
+                        "name": "contentType",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "TEXT",
+                        "range": "TEXT/IMAGE/VIDEO/HTML"
+                      },
+                      {
+                        "name": "contentData",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "测试信息：请前往F2服务点"
+                      },
+                      {
+                        "name": "displayDuration",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "60",
+                        "range": "5~300"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "displayStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "actualDuration",
+                        "type": "Integer",
+                        "required": true
+                      },
+                      {
+                        "name": "errorMessage",
+                        "type": "String",
+                        "required": false
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_NAVIGATION",
+                    "inputParams": [
+                      {
+                        "name": "targetLocation",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "F2_TEST_GATE"
+                      },
+                      {
+                        "name": "routePreference",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "BARRIER_FREE",
+                        "range": "SHORTEST/BARRIER_FREE"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "routeGenerated",
+                        "type": "Boolean",
+                        "required": true
+                      },
+                      {
+                        "name": "estimatedDistance",
+                        "type": "Double",
+                        "required": true
+                      },
+                      {
+                        "name": "estimatedDuration",
+                        "type": "Integer",
+                        "required": true
+                      },
+                      {
+                        "name": "waypointCount",
+                        "type": "Integer",
+                        "required": true
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_NOTIFICATION",
+                    "inputParams": [
+                      {
+                        "name": "notificationType",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "BOTH",
+                        "range": "VOICE/TEXT/BOTH"
+                      },
+                      {
+                        "name": "notificationContent",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "测试旅客需要轮椅陪同，请现场服务人员协助"
+                      },
+                      {
+                        "name": "repeatCount",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "1",
+                        "range": "1~5"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "notificationStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "actualRepeatCount",
+                        "type": "Integer",
+                        "required": true
+                      }
+                    ]
+                  }
+                ],
+                "onlineStatus": "ONLINE",
+                "location": {
+                  "x": 815.0,
+                  "y": 4600.0,
+                  "zone": "F2_TEST"
+                },
+                "workload": "IDLE",
+                "availableUntil": null
+              },
+              {
+                "agentId": "AGT-0158A712",
+                "deviceCode": "SIM_F2_DISPLAY",
+                "deviceTypeCode": "SIMULATOR",
+                "simulatedDeviceType": "SMART_DISPLAY",
+                "businessStatus": {
+                  "scenarioResult": "SUCCESS",
+                  "simulatedDeviceType": "SMART_DISPLAY"
+                },
+                "capabilities": [
+                  "CAP_NAVIGATION",
+                  "CAP_FLIGHT_UPDATE",
+                  "CAP_INFO_DISPLAY"
+                ],
+                "capabilitySchemas": [
+                  {
+                    "capabilityType": "CAP_NAVIGATION",
+                    "inputParams": [
+                      {
+                        "name": "targetLocation",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "F2_TEST_GATE"
+                      },
+                      {
+                        "name": "routePreference",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "BARRIER_FREE",
+                        "range": "SHORTEST/BARRIER_FREE"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "routeGenerated",
+                        "type": "Boolean",
+                        "required": true
+                      },
+                      {
+                        "name": "estimatedDistance",
+                        "type": "Double",
+                        "required": true
+                      },
+                      {
+                        "name": "estimatedDuration",
+                        "type": "Integer",
+                        "required": true
+                      },
+                      {
+                        "name": "waypointCount",
+                        "type": "Integer",
+                        "required": true
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_FLIGHT_UPDATE",
+                    "inputParams": [
+                      {
+                        "name": "flightNumber",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "TEST1022"
+                      },
+                      {
+                        "name": "updateType",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "GATE_CHANGE",
+                        "range": "DELAY/EARLY/GATE_CHANGE/CANCEL"
+                      },
+                      {
+                        "name": "updateContent",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "测试航班登机口变更至F2_TEST_GATE"
+                      },
+                      {
+                        "name": "displayDuration",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "60",
+                        "range": "10~600"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "publishStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "publishTime",
+                        "type": "String",
+                        "required": true
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_INFO_DISPLAY",
+                    "inputParams": [
+                      {
+                        "name": "contentType",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "TEXT",
+                        "range": "TEXT/IMAGE/VIDEO/HTML"
+                      },
+                      {
+                        "name": "contentData",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "测试信息：请前往F2服务点"
+                      },
+                      {
+                        "name": "displayDuration",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "60",
+                        "range": "5~300"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "displayStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "actualDuration",
+                        "type": "Integer",
+                        "required": true
+                      },
+                      {
+                        "name": "errorMessage",
+                        "type": "String",
+                        "required": false
+                      }
+                    ]
+                  }
+                ],
+                "onlineStatus": "ONLINE",
+                "location": {
+                  "x": 805.0,
+                  "y": 4200.0,
+                  "zone": "F2_TEST"
+                },
+                "workload": "IDLE",
+                "availableUntil": null
+              },
+              {
+                "agentId": "AGT-F9B433BD",
+                "deviceCode": "SIM_F2_FLIGHT",
+                "deviceTypeCode": "SIMULATOR",
+                "simulatedDeviceType": "FLIGHT_DELAY_BOARD",
+                "businessStatus": {
+                  "scenarioResult": "SUCCESS",
+                  "simulatedDeviceType": "FLIGHT_DELAY_BOARD"
+                },
+                "capabilities": [
+                  "CAP_FLIGHT_UPDATE",
+                  "CAP_INFO_DISPLAY"
+                ],
+                "capabilitySchemas": [
+                  {
+                    "capabilityType": "CAP_FLIGHT_UPDATE",
+                    "inputParams": [
+                      {
+                        "name": "flightNumber",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "TEST1022"
+                      },
+                      {
+                        "name": "updateType",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "GATE_CHANGE",
+                        "range": "DELAY/EARLY/GATE_CHANGE/CANCEL"
+                      },
+                      {
+                        "name": "updateContent",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "测试航班登机口变更至F2_TEST_GATE"
+                      },
+                      {
+                        "name": "displayDuration",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "60",
+                        "range": "10~600"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "publishStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "publishTime",
+                        "type": "String",
+                        "required": true
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_INFO_DISPLAY",
+                    "inputParams": [
+                      {
+                        "name": "contentType",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "TEXT",
+                        "range": "TEXT/IMAGE/VIDEO/HTML"
+                      },
+                      {
+                        "name": "contentData",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "测试信息：请前往F2服务点"
+                      },
+                      {
+                        "name": "displayDuration",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "60",
+                        "range": "5~300"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "displayStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "actualDuration",
+                        "type": "Integer",
+                        "required": true
+                      },
+                      {
+                        "name": "errorMessage",
+                        "type": "String",
+                        "required": false
+                      }
+                    ]
+                  }
+                ],
+                "onlineStatus": "ONLINE",
+                "location": {
+                  "x": 815.0,
+                  "y": 4500.0,
+                  "zone": "F2_TEST"
+                },
+                "workload": "IDLE",
+                "availableUntil": null
+              },
+              {
+                "agentId": "AGT-9362B1F4",
+                "deviceCode": "SIM_F2_ROBOT",
+                "deviceTypeCode": "SIMULATOR",
+                "simulatedDeviceType": "MOBILE_ROBOT",
+                "businessStatus": {
+                  "scenarioResult": "SUCCESS",
+                  "simulatedDeviceType": "MOBILE_ROBOT"
+                },
+                "capabilities": [
+                  "CAP_ESCORT",
+                  "CAP_INFO_DISPLAY",
+                  "CAP_NAVIGATION",
+                  "CAP_NOTIFICATION"
+                ],
+                "capabilitySchemas": [
+                  {
+                    "capabilityType": "CAP_ESCORT",
+                    "inputParams": [
+                      {
+                        "name": "targetLocation",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "F2_TEST_GATE"
+                      },
+                      {
+                        "name": "escortMode",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "LEAD",
+                        "range": "LEAD/FOLLOW"
+                      },
+                      {
+                        "name": "maxDuration",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "600",
+                        "range": "60~1800"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "arrivalStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "actualDistance",
+                        "type": "Double",
+                        "required": true
+                      },
+                      {
+                        "name": "actualDuration",
+                        "type": "Integer",
+                        "required": true
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_INFO_DISPLAY",
+                    "inputParams": [
+                      {
+                        "name": "contentType",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "TEXT",
+                        "range": "TEXT/IMAGE/VIDEO/HTML"
+                      },
+                      {
+                        "name": "contentData",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "测试信息：请前往F2服务点"
+                      },
+                      {
+                        "name": "displayDuration",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "60",
+                        "range": "5~300"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "displayStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "actualDuration",
+                        "type": "Integer",
+                        "required": true
+                      },
+                      {
+                        "name": "errorMessage",
+                        "type": "String",
+                        "required": false
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_NAVIGATION",
+                    "inputParams": [
+                      {
+                        "name": "targetLocation",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "F2_TEST_GATE"
+                      },
+                      {
+                        "name": "routePreference",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "BARRIER_FREE",
+                        "range": "SHORTEST/BARRIER_FREE"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "routeGenerated",
+                        "type": "Boolean",
+                        "required": true
+                      },
+                      {
+                        "name": "estimatedDistance",
+                        "type": "Double",
+                        "required": true
+                      },
+                      {
+                        "name": "estimatedDuration",
+                        "type": "Integer",
+                        "required": true
+                      },
+                      {
+                        "name": "waypointCount",
+                        "type": "Integer",
+                        "required": true
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_NOTIFICATION",
+                    "inputParams": [
+                      {
+                        "name": "notificationType",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "BOTH",
+                        "range": "VOICE/TEXT/BOTH"
+                      },
+                      {
+                        "name": "notificationContent",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "测试旅客需要轮椅陪同，请现场服务人员协助"
+                      },
+                      {
+                        "name": "repeatCount",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "1",
+                        "range": "1~5"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "notificationStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "actualRepeatCount",
+                        "type": "Integer",
+                        "required": true
+                      }
+                    ]
+                  }
+                ],
+                "onlineStatus": "ONLINE",
+                "location": {
+                  "x": 810.0,
+                  "y": 4180.0,
+                  "zone": "F2_TEST"
+                },
+                "workload": "IDLE",
+                "availableUntil": null
+              }
+            ]
+          },
+          {
+            "capabilityType": "CAP_NOTIFICATION",
+            "candidateCount": 2,
+            "candidates": [
+              {
+                "agentId": "AGT-4652EF88",
+                "deviceCode": "SIM_F2_ROBOT_B",
+                "deviceTypeCode": "SIMULATOR",
+                "simulatedDeviceType": "MOBILE_ROBOT",
+                "businessStatus": {
+                  "scenarioResult": "SUCCESS",
+                  "simulatedDeviceType": "MOBILE_ROBOT"
+                },
+                "capabilities": [
+                  "CAP_ESCORT",
+                  "CAP_INFO_DISPLAY",
+                  "CAP_NAVIGATION",
+                  "CAP_NOTIFICATION"
+                ],
+                "capabilitySchemas": [
+                  {
+                    "capabilityType": "CAP_ESCORT",
+                    "inputParams": [
+                      {
+                        "name": "targetLocation",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "F2_TEST_GATE"
+                      },
+                      {
+                        "name": "escortMode",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "LEAD",
+                        "range": "LEAD/FOLLOW"
+                      },
+                      {
+                        "name": "maxDuration",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "600",
+                        "range": "60~1800"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "arrivalStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "actualDistance",
+                        "type": "Double",
+                        "required": true
+                      },
+                      {
+                        "name": "actualDuration",
+                        "type": "Integer",
+                        "required": true
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_INFO_DISPLAY",
+                    "inputParams": [
+                      {
+                        "name": "contentType",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "TEXT",
+                        "range": "TEXT/IMAGE/VIDEO/HTML"
+                      },
+                      {
+                        "name": "contentData",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "测试信息：请前往F2服务点"
+                      },
+                      {
+                        "name": "displayDuration",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "60",
+                        "range": "5~300"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "displayStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "actualDuration",
+                        "type": "Integer",
+                        "required": true
+                      },
+                      {
+                        "name": "errorMessage",
+                        "type": "String",
+                        "required": false
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_NAVIGATION",
+                    "inputParams": [
+                      {
+                        "name": "targetLocation",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "F2_TEST_GATE"
+                      },
+                      {
+                        "name": "routePreference",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "BARRIER_FREE",
+                        "range": "SHORTEST/BARRIER_FREE"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "routeGenerated",
+                        "type": "Boolean",
+                        "required": true
+                      },
+                      {
+                        "name": "estimatedDistance",
+                        "type": "Double",
+                        "required": true
+                      },
+                      {
+                        "name": "estimatedDuration",
+                        "type": "Integer",
+                        "required": true
+                      },
+                      {
+                        "name": "waypointCount",
+                        "type": "Integer",
+                        "required": true
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_NOTIFICATION",
+                    "inputParams": [
+                      {
+                        "name": "notificationType",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "BOTH",
+                        "range": "VOICE/TEXT/BOTH"
+                      },
+                      {
+                        "name": "notificationContent",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "测试旅客需要轮椅陪同，请现场服务人员协助"
+                      },
+                      {
+                        "name": "repeatCount",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "1",
+                        "range": "1~5"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "notificationStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "actualRepeatCount",
+                        "type": "Integer",
+                        "required": true
+                      }
+                    ]
+                  }
+                ],
+                "onlineStatus": "ONLINE",
+                "location": {
+                  "x": 815.0,
+                  "y": 4600.0,
+                  "zone": "F2_TEST"
+                },
+                "workload": "IDLE",
+                "availableUntil": null
+              },
+              {
+                "agentId": "AGT-9362B1F4",
+                "deviceCode": "SIM_F2_ROBOT",
+                "deviceTypeCode": "SIMULATOR",
+                "simulatedDeviceType": "MOBILE_ROBOT",
+                "businessStatus": {
+                  "scenarioResult": "SUCCESS",
+                  "simulatedDeviceType": "MOBILE_ROBOT"
+                },
+                "capabilities": [
+                  "CAP_ESCORT",
+                  "CAP_INFO_DISPLAY",
+                  "CAP_NAVIGATION",
+                  "CAP_NOTIFICATION"
+                ],
+                "capabilitySchemas": [
+                  {
+                    "capabilityType": "CAP_ESCORT",
+                    "inputParams": [
+                      {
+                        "name": "targetLocation",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "F2_TEST_GATE"
+                      },
+                      {
+                        "name": "escortMode",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "LEAD",
+                        "range": "LEAD/FOLLOW"
+                      },
+                      {
+                        "name": "maxDuration",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "600",
+                        "range": "60~1800"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "arrivalStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "actualDistance",
+                        "type": "Double",
+                        "required": true
+                      },
+                      {
+                        "name": "actualDuration",
+                        "type": "Integer",
+                        "required": true
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_INFO_DISPLAY",
+                    "inputParams": [
+                      {
+                        "name": "contentType",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "TEXT",
+                        "range": "TEXT/IMAGE/VIDEO/HTML"
+                      },
+                      {
+                        "name": "contentData",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "测试信息：请前往F2服务点"
+                      },
+                      {
+                        "name": "displayDuration",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "60",
+                        "range": "5~300"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "displayStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "actualDuration",
+                        "type": "Integer",
+                        "required": true
+                      },
+                      {
+                        "name": "errorMessage",
+                        "type": "String",
+                        "required": false
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_NAVIGATION",
+                    "inputParams": [
+                      {
+                        "name": "targetLocation",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "F2_TEST_GATE"
+                      },
+                      {
+                        "name": "routePreference",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "BARRIER_FREE",
+                        "range": "SHORTEST/BARRIER_FREE"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "routeGenerated",
+                        "type": "Boolean",
+                        "required": true
+                      },
+                      {
+                        "name": "estimatedDistance",
+                        "type": "Double",
+                        "required": true
+                      },
+                      {
+                        "name": "estimatedDuration",
+                        "type": "Integer",
+                        "required": true
+                      },
+                      {
+                        "name": "waypointCount",
+                        "type": "Integer",
+                        "required": true
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_NOTIFICATION",
+                    "inputParams": [
+                      {
+                        "name": "notificationType",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "BOTH",
+                        "range": "VOICE/TEXT/BOTH"
+                      },
+                      {
+                        "name": "notificationContent",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "测试旅客需要轮椅陪同，请现场服务人员协助"
+                      },
+                      {
+                        "name": "repeatCount",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "1",
+                        "range": "1~5"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "notificationStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "actualRepeatCount",
+                        "type": "Integer",
+                        "required": true
+                      }
+                    ]
+                  }
+                ],
+                "onlineStatus": "ONLINE",
+                "location": {
+                  "x": 810.0,
+                  "y": 4180.0,
+                  "zone": "F2_TEST"
+                },
+                "workload": "IDLE",
+                "availableUntil": null
+              }
+            ]
+          },
+          {
+            "capabilityType": "CAP_NAVIGATION",
+            "candidateCount": 3,
+            "candidates": [
+              {
+                "agentId": "AGT-4652EF88",
+                "deviceCode": "SIM_F2_ROBOT_B",
+                "deviceTypeCode": "SIMULATOR",
+                "simulatedDeviceType": "MOBILE_ROBOT",
+                "businessStatus": {
+                  "scenarioResult": "SUCCESS",
+                  "simulatedDeviceType": "MOBILE_ROBOT"
+                },
+                "capabilities": [
+                  "CAP_ESCORT",
+                  "CAP_INFO_DISPLAY",
+                  "CAP_NAVIGATION",
+                  "CAP_NOTIFICATION"
+                ],
+                "capabilitySchemas": [
+                  {
+                    "capabilityType": "CAP_ESCORT",
+                    "inputParams": [
+                      {
+                        "name": "targetLocation",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "F2_TEST_GATE"
+                      },
+                      {
+                        "name": "escortMode",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "LEAD",
+                        "range": "LEAD/FOLLOW"
+                      },
+                      {
+                        "name": "maxDuration",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "600",
+                        "range": "60~1800"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "arrivalStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "actualDistance",
+                        "type": "Double",
+                        "required": true
+                      },
+                      {
+                        "name": "actualDuration",
+                        "type": "Integer",
+                        "required": true
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_INFO_DISPLAY",
+                    "inputParams": [
+                      {
+                        "name": "contentType",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "TEXT",
+                        "range": "TEXT/IMAGE/VIDEO/HTML"
+                      },
+                      {
+                        "name": "contentData",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "测试信息：请前往F2服务点"
+                      },
+                      {
+                        "name": "displayDuration",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "60",
+                        "range": "5~300"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "displayStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "actualDuration",
+                        "type": "Integer",
+                        "required": true
+                      },
+                      {
+                        "name": "errorMessage",
+                        "type": "String",
+                        "required": false
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_NAVIGATION",
+                    "inputParams": [
+                      {
+                        "name": "targetLocation",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "F2_TEST_GATE"
+                      },
+                      {
+                        "name": "routePreference",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "BARRIER_FREE",
+                        "range": "SHORTEST/BARRIER_FREE"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "routeGenerated",
+                        "type": "Boolean",
+                        "required": true
+                      },
+                      {
+                        "name": "estimatedDistance",
+                        "type": "Double",
+                        "required": true
+                      },
+                      {
+                        "name": "estimatedDuration",
+                        "type": "Integer",
+                        "required": true
+                      },
+                      {
+                        "name": "waypointCount",
+                        "type": "Integer",
+                        "required": true
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_NOTIFICATION",
+                    "inputParams": [
+                      {
+                        "name": "notificationType",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "BOTH",
+                        "range": "VOICE/TEXT/BOTH"
+                      },
+                      {
+                        "name": "notificationContent",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "测试旅客需要轮椅陪同，请现场服务人员协助"
+                      },
+                      {
+                        "name": "repeatCount",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "1",
+                        "range": "1~5"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "notificationStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "actualRepeatCount",
+                        "type": "Integer",
+                        "required": true
+                      }
+                    ]
+                  }
+                ],
+                "onlineStatus": "ONLINE",
+                "location": {
+                  "x": 815.0,
+                  "y": 4600.0,
+                  "zone": "F2_TEST"
+                },
+                "workload": "IDLE",
+                "availableUntil": null
+              },
+              {
+                "agentId": "AGT-0158A712",
+                "deviceCode": "SIM_F2_DISPLAY",
+                "deviceTypeCode": "SIMULATOR",
+                "simulatedDeviceType": "SMART_DISPLAY",
+                "businessStatus": {
+                  "scenarioResult": "SUCCESS",
+                  "simulatedDeviceType": "SMART_DISPLAY"
+                },
+                "capabilities": [
+                  "CAP_NAVIGATION",
+                  "CAP_FLIGHT_UPDATE",
+                  "CAP_INFO_DISPLAY"
+                ],
+                "capabilitySchemas": [
+                  {
+                    "capabilityType": "CAP_NAVIGATION",
+                    "inputParams": [
+                      {
+                        "name": "targetLocation",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "F2_TEST_GATE"
+                      },
+                      {
+                        "name": "routePreference",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "BARRIER_FREE",
+                        "range": "SHORTEST/BARRIER_FREE"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "routeGenerated",
+                        "type": "Boolean",
+                        "required": true
+                      },
+                      {
+                        "name": "estimatedDistance",
+                        "type": "Double",
+                        "required": true
+                      },
+                      {
+                        "name": "estimatedDuration",
+                        "type": "Integer",
+                        "required": true
+                      },
+                      {
+                        "name": "waypointCount",
+                        "type": "Integer",
+                        "required": true
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_FLIGHT_UPDATE",
+                    "inputParams": [
+                      {
+                        "name": "flightNumber",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "TEST1022"
+                      },
+                      {
+                        "name": "updateType",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "GATE_CHANGE",
+                        "range": "DELAY/EARLY/GATE_CHANGE/CANCEL"
+                      },
+                      {
+                        "name": "updateContent",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "测试航班登机口变更至F2_TEST_GATE"
+                      },
+                      {
+                        "name": "displayDuration",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "60",
+                        "range": "10~600"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "publishStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "publishTime",
+                        "type": "String",
+                        "required": true
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_INFO_DISPLAY",
+                    "inputParams": [
+                      {
+                        "name": "contentType",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "TEXT",
+                        "range": "TEXT/IMAGE/VIDEO/HTML"
+                      },
+                      {
+                        "name": "contentData",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "测试信息：请前往F2服务点"
+                      },
+                      {
+                        "name": "displayDuration",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "60",
+                        "range": "5~300"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "displayStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "actualDuration",
+                        "type": "Integer",
+                        "required": true
+                      },
+                      {
+                        "name": "errorMessage",
+                        "type": "String",
+                        "required": false
+                      }
+                    ]
+                  }
+                ],
+                "onlineStatus": "ONLINE",
+                "location": {
+                  "x": 805.0,
+                  "y": 4200.0,
+                  "zone": "F2_TEST"
+                },
+                "workload": "IDLE",
+                "availableUntil": null
+              },
+              {
+                "agentId": "AGT-9362B1F4",
+                "deviceCode": "SIM_F2_ROBOT",
+                "deviceTypeCode": "SIMULATOR",
+                "simulatedDeviceType": "MOBILE_ROBOT",
+                "businessStatus": {
+                  "scenarioResult": "SUCCESS",
+                  "simulatedDeviceType": "MOBILE_ROBOT"
+                },
+                "capabilities": [
+                  "CAP_ESCORT",
+                  "CAP_INFO_DISPLAY",
+                  "CAP_NAVIGATION",
+                  "CAP_NOTIFICATION"
+                ],
+                "capabilitySchemas": [
+                  {
+                    "capabilityType": "CAP_ESCORT",
+                    "inputParams": [
+                      {
+                        "name": "targetLocation",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "F2_TEST_GATE"
+                      },
+                      {
+                        "name": "escortMode",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "LEAD",
+                        "range": "LEAD/FOLLOW"
+                      },
+                      {
+                        "name": "maxDuration",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "600",
+                        "range": "60~1800"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "arrivalStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "actualDistance",
+                        "type": "Double",
+                        "required": true
+                      },
+                      {
+                        "name": "actualDuration",
+                        "type": "Integer",
+                        "required": true
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_INFO_DISPLAY",
+                    "inputParams": [
+                      {
+                        "name": "contentType",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "TEXT",
+                        "range": "TEXT/IMAGE/VIDEO/HTML"
+                      },
+                      {
+                        "name": "contentData",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "测试信息：请前往F2服务点"
+                      },
+                      {
+                        "name": "displayDuration",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "60",
+                        "range": "5~300"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "displayStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "actualDuration",
+                        "type": "Integer",
+                        "required": true
+                      },
+                      {
+                        "name": "errorMessage",
+                        "type": "String",
+                        "required": false
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_NAVIGATION",
+                    "inputParams": [
+                      {
+                        "name": "targetLocation",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "F2_TEST_GATE"
+                      },
+                      {
+                        "name": "routePreference",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "BARRIER_FREE",
+                        "range": "SHORTEST/BARRIER_FREE"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "routeGenerated",
+                        "type": "Boolean",
+                        "required": true
+                      },
+                      {
+                        "name": "estimatedDistance",
+                        "type": "Double",
+                        "required": true
+                      },
+                      {
+                        "name": "estimatedDuration",
+                        "type": "Integer",
+                        "required": true
+                      },
+                      {
+                        "name": "waypointCount",
+                        "type": "Integer",
+                        "required": true
+                      }
+                    ]
+                  },
+                  {
+                    "capabilityType": "CAP_NOTIFICATION",
+                    "inputParams": [
+                      {
+                        "name": "notificationType",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "BOTH",
+                        "range": "VOICE/TEXT/BOTH"
+                      },
+                      {
+                        "name": "notificationContent",
+                        "type": "String",
+                        "required": true,
+                        "defaultValue": "测试旅客需要轮椅陪同，请现场服务人员协助"
+                      },
+                      {
+                        "name": "repeatCount",
+                        "type": "Integer",
+                        "required": true,
+                        "defaultValue": "1",
+                        "range": "1~5"
+                      }
+                    ],
+                    "outputParams": [
+                      {
+                        "name": "notificationStatus",
+                        "type": "String",
+                        "required": true
+                      },
+                      {
+                        "name": "actualRepeatCount",
+                        "type": "Integer",
+                        "required": true
+                      }
+                    ]
+                  }
+                ],
+                "onlineStatus": "ONLINE",
+                "location": {
+                  "x": 810.0,
+                  "y": 4180.0,
+                  "zone": "F2_TEST"
+                },
+                "workload": "IDLE",
+                "availableUntil": null
+              }
+            ]
+          }
+        ],
+        "remainingStepQuota": 5,
+        "completedSteps": []
+      }
+    }
+  ]
+}
