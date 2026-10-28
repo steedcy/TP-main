@@ -24,7 +24,7 @@ config = local.API("配置管理员")
 operator = local.API("运行操作员")
 source = operator("/tasks/73")
 variant = os.environ.get("STAGE3_CAP_VARIANT", "unknown-capability")
-assert variant in ("unknown-capability", "no-online-candidate")
+assert variant in ("unknown-capability", "no-online-candidate", "missing-input", "invalid-param")
 source_plan = next(p for p in operator("/tasks/73/plan-versions")
                    if p["source"] == "AUTONOMOUS")
 assert source["status"] == "COMPLETED" and len(source_plan["planSteps"]) == 4
@@ -32,6 +32,11 @@ initial_steps = json.loads(json.dumps(source_plan["planSteps"], ensure_ascii=Fal
 assert source["taskFamily"] == "FLIGHT_CHANGE_RESPONSE"
 if variant == "unknown-capability":
     initial_steps[1]["capabilityType"] = "CAP_S3_UNKNOWN_TEST"
+elif variant == "missing-input":
+    assert "contentData" in initial_steps[1]["inputParams"]
+    del initial_steps[1]["inputParams"]["contentData"]
+elif variant == "invalid-param":
+    initial_steps[1]["inputParams"]["displayDuration"] = 9999
 agents = [a for a in config("/device-agents?page=1&size=100")["content"]
           if a["deviceCode"].startswith("SIM_F2_")]
 assert len(agents) == 6 and all(a["agentStatus"] == "ENABLED" and
@@ -153,7 +158,7 @@ try:
             config("/device-agents/" + agent["agentId"] + "/disable", "POST", {"confirmed": True})
             disabled_codes.append(code)
             ev.setdefault("disabledAgents", {})[code] = config("/device-agents/" + agent["agentId"])
-    else:
+    elif variant == "unknown-capability":
         for code in codes:
             ev.setdefault("delayControls", {})[code] = local.request(
                 endpoints[code] + "/control/delay?milliseconds=9000", "POST", token=secrets[code])
