@@ -1,0 +1,67 @@
+{
+  "observedAt": "2026-10-29T01:55:46.707054+08:00",
+  "version": "V1.110",
+  "codeSha": "6d59059fe02dd82bc571a7dd992f525c3bdde21d",
+  "schema": "tip_gpt_f001_v110_20261029",
+  "checks": [
+    {
+      "check": "TC-001.S3.success_login_audit.SYSTEM_ADMIN",
+      "pass": true,
+      "facts": {
+        "completeLoginAuditCount": 11
+      }
+    },
+    {
+      "check": "TC-001.S3.success_login_audit.CONFIG_ADMIN",
+      "pass": true,
+      "facts": {
+        "completeLoginAuditCount": 7
+      }
+    },
+    {
+      "check": "TC-001.S3.success_login_audit.OPERATOR",
+      "pass": true,
+      "facts": {
+        "completeLoginAuditCount": 7
+      }
+    },
+    {
+      "check": "TC-003.S3.admin_full_audit",
+      "pass": true,
+      "facts": {
+        "httpStatus": 200,
+        "records": 95,
+        "distinctTestRolesVisible": 3
+      }
+    },
+    {
+      "check": "TC-003.S3.own_audit.CONFIG_ADMIN",
+      "pass": true,
+      "facts": {
+        "httpStatus": 200,
+        "records": 15,
+        "ownOnly": true
+      }
+    },
+    {
+      "check": "TC-003.S3.own_audit.OPERATOR",
+      "pass": true,
+      "facts": {
+        "httpStatus": 200,
+        "records": 15,
+        "ownOnly": true
+      }
+    },
+    {
+      "check": "SRS_F001.R01.R09.no_login_password_in_audit",
+      "pass": true,
+      "facts": {
+        "rolePasswordsAbsent": true
+      }
+    }
+  ],
+  "summary": {
+    "passed": 7,
+    "failed": 0
+  }
+}

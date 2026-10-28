@@ -1,0 +1,291 @@
+{
+  "observedAt": "2026-10-28T18:08:15.740Z",
+  "version": "V1.110",
+  "codeSha": "6d59059fe02dd82bc571a7dd992f525c3bdde21d",
+  "scope": "Browser UI checks; isolated backend 18102 and Vite 15173",
+  "checks": [
+    {
+      "check": "TC-001.S1.empty_form_and_mask",
+      "pass": true,
+      "facts": {
+        "usernameMaxLength": "32",
+        "passwordMaxLength": "32",
+        "passwordType": "password",
+        "passwordValueEmpty": true,
+        "authRequestCount": 0,
+        "emptyUsernamePrompt": true,
+        "emptyPasswordPrompt": true
+      }
+    },
+    {
+      "check": "TC-001.S1.username_length_1",
+      "pass": true,
+      "facts": {
+        "requestedLength": 1,
+        "acceptedLength": 1,
+        "maxLength": 32
+      }
+    },
+    {
+      "check": "TC-001.S1.username_length_32",
+      "pass": true,
+      "facts": {
+        "requestedLength": 32,
+        "acceptedLength": 32,
+        "maxLength": 32
+      }
+    },
+    {
+      "check": "TC-001.S1.username_length_33",
+      "pass": true,
+      "facts": {
+        "requestedLength": 33,
+        "acceptedLength": 32,
+        "maxLength": 32
+      }
+    },
+    {
+      "check": "TC-001.S1.password_length_8",
+      "pass": true,
+      "facts": {
+        "requestedLength": 8,
+        "acceptedLength": 8,
+        "maxLength": 32,
+        "masked": true
+      }
+    },
+    {
+      "check": "TC-001.S1.password_length_32",
+      "pass": true,
+      "facts": {
+        "requestedLength": 32,
+        "acceptedLength": 32,
+        "maxLength": 32,
+        "masked": true
+      }
+    },
+    {
+      "check": "TC-001.S1.password_length_33",
+      "pass": true,
+      "facts": {
+        "requestedLength": 33,
+        "acceptedLength": 32,
+        "maxLength": 32,
+        "masked": true
+      }
+    },
+    {
+      "check": "TC-001.S1.no_password_reveal_control",
+      "pass": true,
+      "facts": {
+        "revealControlPresent": false
+      }
+    },
+    {
+      "check": "TC-001.S1.valid_length_submit_1_8",
+      "pass": true,
+      "facts": {
+        "usernameLength": 1,
+        "passwordLength": 8,
+        "authenticationRequests": 1
+      }
+    },
+    {
+      "check": "TC-001.S1.valid_length_submit_32_32",
+      "pass": true,
+      "facts": {
+        "usernameLength": 32,
+        "passwordLength": 32,
+        "authenticationRequests": 1
+      }
+    },
+    {
+      "check": "TC-001.S2.TC-003.S1.menu.SYSTEM_ADMIN",
+      "pass": true,
+      "facts": {
+        "accountVisible": true,
+        "roleLabelVisible": true,
+        "visible": {
+          "users": true,
+          "devices": false,
+          "tasks": false,
+          "operationLogs": true,
+          "overview": true
+        },
+        "expected": {
+          "users": true,
+          "devices": false,
+          "tasks": false
+        }
+      }
+    },
+    {
+      "check": "TC-003.S1.full_menu.SYSTEM_ADMIN",
+      "pass": true,
+      "facts": {
+        "configOnlyVisible": false,
+        "adminOnlyVisible": true,
+        "operatorOnlyVisible": false,
+        "operatorAndAdminVisible": true
+      }
+    },
+    {
+      "check": "TC-001.S2.logout.SYSTEM_ADMIN",
+      "pass": true,
+      "facts": {
+        "redirectedToLogin": true,
+        "staleTokenHttpStatus": 401,
+        "tokenCleared": true
+      }
+    },
+    {
+      "check": "TC-001.S2.TC-003.S1.menu.CONFIG_ADMIN",
+      "pass": true,
+      "facts": {
+        "accountVisible": true,
+        "roleLabelVisible": true,
+        "visible": {
+          "users": false,
+          "devices": true,
+          "tasks": false,
+          "operationLogs": true,
+          "overview": true
+        },
+        "expected": {
+          "users": false,
+          "devices": true,
+          "tasks": false
+        }
+      }
+    },
+    {
+      "check": "TC-003.S1.full_menu.CONFIG_ADMIN",
+      "pass": true,
+      "facts": {
+        "configOnlyVisible": true,
+        "adminOnlyVisible": false,
+        "operatorOnlyVisible": false,
+        "operatorAndAdminVisible": false
+      }
+    },
+    {
+      "check": "TC-001.S2.logout.CONFIG_ADMIN",
+      "pass": true,
+      "facts": {
+        "redirectedToLogin": true,
+        "staleTokenHttpStatus": 401,
+        "tokenCleared": true
+      }
+    },
+    {
+      "check": "TC-001.S2.TC-003.S1.menu.OPERATOR",
+      "pass": true,
+      "facts": {
+        "accountVisible": true,
+        "roleLabelVisible": true,
+        "visible": {
+          "users": false,
+          "devices": false,
+          "tasks": true,
+          "operationLogs": true,
+          "overview": true
+        },
+        "expected": {
+          "users": false,
+          "devices": false,
+          "tasks": true
+        }
+      }
+    },
+    {
+      "check": "TC-003.S1.full_menu.OPERATOR",
+      "pass": true,
+      "facts": {
+        "configOnlyVisible": false,
+        "adminOnlyVisible": false,
+        "operatorOnlyVisible": true,
+        "operatorAndAdminVisible": true
+      }
+    },
+    {
+      "check": "TC-001.S2.logout.OPERATOR",
+      "pass": true,
+      "facts": {
+        "redirectedToLogin": true,
+        "staleTokenHttpStatus": 401,
+        "tokenCleared": true
+      }
+    },
+    {
+      "check": "TC-002.S1.ui.unknown",
+      "pass": true,
+      "facts": {
+        "uniformPrompt": true,
+        "remainedOnLogin": true,
+        "sessionCreated": false
+      }
+    },
+    {
+      "check": "TC-002.S1.ui.inactive",
+      "pass": true,
+      "facts": {
+        "uniformPrompt": true,
+        "remainedOnLogin": true,
+        "sessionCreated": false
+      }
+    },
+    {
+      "check": "TC-002.S1.ui.wrong_B",
+      "pass": true,
+      "facts": {
+        "uniformPrompt": true,
+        "remainedOnLogin": true,
+        "sessionCreated": false
+      }
+    },
+    {
+      "check": "TC-002.S2.ui.wrong_1",
+      "pass": true,
+      "facts": {
+        "uniformPrompt": true,
+        "remainedOnLogin": true
+      }
+    },
+    {
+      "check": "TC-002.S2.ui.wrong_2",
+      "pass": true,
+      "facts": {
+        "uniformPrompt": true,
+        "remainedOnLogin": true
+      }
+    },
+    {
+      "check": "TC-002.S2.ui.wrong_3",
+      "pass": true,
+      "facts": {
+        "uniformPrompt": true,
+        "remainedOnLogin": true
+      }
+    },
+    {
+      "check": "TC-002.S2.ui.locked_correct",
+      "pass": true,
+      "facts": {
+        "uniformPrompt": true,
+        "remainedOnLogin": true
+      }
+    },
+    {
+      "check": "TC-002.S3.ui.unlock_login",
+      "pass": true,
+      "facts": {
+        "unlockHttpStatus": 200,
+        "loginAfterUnlock": true
+      }
+    }
+  ],
+  "summary": {
+    "passed": 27,
+    "failed": 0
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "observedAt": "2026-10-29T02:03:52.411887+08:00",
+  "version": "V1.110",
+  "codeSha": "6d59059fe02dd82bc571a7dd992f525c3bdde21d",
+  "schema": "tip_gpt_f001_v110_20261029",
+  "setup": "Isolated agent IDLE reports and second task PENDING_MANUAL state simulated in isolated schema to exercise authorized handling",
+  "checks": [
+    {
+      "check": "TC-003.S1.operator_monitor_list",
+      "pass": true,
+      "facts": {
+        "httpStatus": 200,
+        "targetTaskVisible": true
+      }
+    },
+    {
+      "check": "TC-003.S1.operator_monitor_events",
+      "pass": true,
+      "facts": {
+        "httpStatus": 200,
+        "eventCount": 5
+      }
+    },
+    {
+      "check": "TC-003.S2.valid_terminate_denied.SYSTEM_ADMIN",
+      "pass": true,
+      "facts": {
+        "httpStatus": 403
+      }
+    },
+    {
+      "check": "TC-003.S2.valid_terminate_denied.CONFIG_ADMIN",
+      "pass": true,
+      "facts": {
+        "httpStatus": 403
+      }
+    },
+    {
+      "check": "TC-003.S1.operator_authorized_terminate",
+      "pass": true,
+      "facts": {
+        "httpStatus": 200,
+        "taskStatus": "MANUAL_TERMINATED"
+      }
+    },
+    {
+      "check": "TC-003.S1.operator_authorized_manual_handling",
+      "pass": true,
+      "facts": {
+        "httpStatus": 200,
+        "taskStatus": "FAILED"
+      }
+    },
+    {
+      "check": "TC-003.S3.operator_action_audit",
+      "pass": true,
+      "facts": {
+        "successfulOperationRecords": 3
+      }
+    }
+  ],
+  "summary": {
+    "passed": 7,
+    "failed": 0
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "observedAt": "2026-10-29T01:58:36.668847+08:00",
+  "version": "V1.110",
+  "codeSha": "6d59059fe02dd82bc571a7dd992f525c3bdde21d",
+  "schema": "tip_gpt_f001_v110_20261029",
+  "backendPort": 18104,
+  "proxyPort": 15504,
+  "checks": [
+    {
+      "check": "TC-002.S4.baseline_login",
+      "pass": true,
+      "facts": {
+        "httpStatus": 200,
+        "sessionCreated": true
+      }
+    },
+    {
+      "check": "TC-002.S4.database_fault_Edge_busy_prompt",
+      "pass": true,
+      "facts": {
+        "mode": "database-down",
+        "httpStatus": 500,
+        "busyPrompt": true,
+        "remainedOnLogin": true,
+        "sessionCreated": false
+      }
+    },
+    {
+      "check": "TC-002.S4.database_recovery_Edge_login",
+      "pass": true,
+      "facts": {
+        "mode": "after-recovery",
+        "httpStatus": 200,
+        "reachedOverview": true,
+        "sessionCreated": true
+      }
+    }
+  ],
+  "cleanup": {
+    "backendPortFreed": true,
+    "proxyPortFreed": true
+  },
+  "summary": {
+    "passed": 3,
+    "failed": 0
+  }
+}
