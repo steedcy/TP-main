@@ -64,6 +64,7 @@ public class AuthService {
             handleFailedLogin(user);
             operationLogService.recordLogin(user.getId(), user.getUsername(), user.getRole(), "FAILED", clientIp);
             if ("LOCKED".equals(user.getStatus())) {
+                operationLogService.recordAccountLocked(user, clientIp, user.getFailedLoginAttempts());
                 throw new BusinessException(ErrorCode.ACCOUNT_JUST_LOCKED);
             }
             throw new BusinessException(ErrorCode.LOGIN_FAILED);

@@ -52,6 +52,20 @@ public class OperationLogService {
         operationLogMapper.insert(log);
     }
 
+    /** 连续密码错误触发锁定的独立审计记录，操作主体为被锁定账号（DEF-S3-056）；不含密码等凭据 */
+    public void recordAccountLocked(User user, String sourceIp, int failedAttempts) {
+        OperationLog log = new OperationLog();
+        log.setUserId(user.getId());
+        log.setUsername(user.getUsername());
+        log.setRole(user.getRole());
+        log.setOperationType("ACCOUNT_LOCKED");
+        log.setOperationTarget(user.getUsername());
+        log.setOperationResult("SUCCESS");
+        log.setSourceIp(sourceIp);
+        log.setDetail(toMaskedJson(Map.of("reason", "连续密码错误", "failedAttempts", failedAttempts)));
+        operationLogMapper.insert(log);
+    }
+
     public void recordLogout(Long userId, String username, String role, String sourceIp) {
         OperationLog log = new OperationLog();
         log.setUserId(userId);
