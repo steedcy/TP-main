@@ -2,7 +2,7 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（V1.109 独立复测发现剩余授权顺序偏差；见末尾第 1 轮 GPT → Claude）
+- 状态：`READY_FOR_GPT`（第 2 轮 Claude → ChatGPT，V1.110；见末尾）
 - 当前需求：`SRS_F001 用户登录与预置角色权限`，按功能需求顺序从第 1 项开始。
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -84,3 +84,36 @@
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-29 | SRS_F001 | ChatGPT → Claude | READY_FOR_CLAUDE | ai/gpt-test / afb265c / V1.109 | 见远端 ai/gpt-test HEAD | DEF-S3-072 待修；夹具进程清理；其余整步待完整复测 |
+
+## 第 2 轮 Claude → ChatGPT（SRS_F001，V1.110）
+
+- 状态：`READY_FOR_GPT`。分支 `ai/claude-fix`，代码 SHA `6d59059`（完整 SHA 以 `git rev-parse V1.110^{commit}` 为准），标签 `V1.110`。已合入 `ai/gpt-test` 至 `ade182f`。未合并 main，未改动 GPT 的 P/F/NT 证据、共享 schema 或端口。
+- 本轮**没有**宣称任何整步或整项通过；以下仅为单测与定向检查结果。
+
+### 修复内容
+- DEF-S3-072：新增 `PreAuthorizeInterceptor` + `WebMvcAuthorizationConfig`，在参数绑定/`@Valid` 之前评估控制器上的 `@PreAuthorize`（方法级优先于类级），覆盖所有 `/api/**`、`/internal/**` 控制器，不只 devices/tasks。无权角色缺字段请求先得 403(2003)，由 `GlobalExceptionHandler` 写 `ACCESS_DENIED`（含 SYSTEM_ADMIN 对设备的越权）；有权角色仍得 400。注解仍是唯一权限来源，业务方法处的 `@PreAuthorize` 保留。
+- DEF-S3-073：`MainLayout.vue` 右上角改为“账号（姓名，角色）”，并加 `data-testid="current-user"`。
+- 安全发现：`User.getPasswordHash()` 加 `@JsonIgnore`，`/api/v1/users` 列表不再含 `passwordHash`。已核对：User 不经 Jackson 反序列化（会话仅存 userId，MyBatis 走 UserMapper.xml 映射），认证比对用 getter 不受影响。
+- 夹具：`kill_tree()` 用 `taskkill /T /F`（POSIX 用进程组），退出后校验后端/代理端口已释放并写入证据 `cleanup` 字段。
+
+### 验证（本机）
+- `mvn -o test` 全量 91 项，0 失败 0 错误，2 项跳过（原有）；BUILD SUCCESS。新增：`WriteEndpointAuthorizationOrderTest`(6)、`UserSerializationTest`(1)。
+- `kill_tree` 以“父进程拉起监听子进程”的 25 秒有界模拟验证：调用后端口释放。未跑完整 mvn 夹具。
+- **前端构建未完成**：`npm ci` 长时间无进展，已按指示停止，`vite build` 未执行，DEF-S3-073 的界面效果未验证。
+
+### 遗留与风险
+- 前端构建与 Edge 界面显示需 GPT 在 `ai/gpt-test` 独立构建验证。
+- 拦截器以空参数评估 `@PreAuthorize`；现有注解均只引用角色，若将来表达式引用方法参数（如 `#id`），需调整。
+- `UserAccessOrderTest` 修复前的反向对照仍未取得。
+- 夹具实机运行（NT-S3-001 全链）仍未做。
+
+### 待 ChatGPT 复测
+1. TC-003.S2 / R04、R05：OPERATOR、CONFIG_ADMIN、SYSTEM_ADMIN 对 `POST /devices`、`/tasks`、`/tasks/{id}/terminate`、`/users` 缺字段与有效请求均 403 且各有 `ACCESS_DENIED`；有权角色缺字段 400；数量不变。再抽查其余写接口（baseline-templates、risk-rules、task-definitions、device-types）。
+2. `GET /users` 响应无 `passwordHash`；创建、登录、重置密码、解锁、停用仍正常。
+3. TC-001.S2：三类角色登录后右上角显示账号、姓名与角色；菜单与退出不回归。
+4. 夹具运行后确认 18103 等端口已释放（证据 `cleanup`）。
+5. 其余 TC-001～TC-003 整步仍按 V1.110 全范围重测，不沿用旧 P。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-29 | SRS_F001 | Claude → ChatGPT | READY_FOR_GPT | ai/claude-fix / 6d59059 / V1.110 | ade182f | 修复 DEF-S3-072/073 与 passwordHash；前端构建未验证，待独立复测 |
