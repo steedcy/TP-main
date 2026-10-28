@@ -15,7 +15,7 @@
 
     <a-row :gutter="16" style="margin-bottom: 16px">
       <a-col :span="isTaskViewer ? 4 : 12"><a-card hoverable @click="goAgents()"><a-statistic title="设备代理总数" :value="display(metrics.agentTotal)" /></a-card></a-col>
-      <a-col :span="isTaskViewer ? 4 : 12"><a-card hoverable @click="goAgents('ONLINE')"><a-statistic title="在线代理数" :value="display(metrics.agentOnline)" /></a-card></a-col>
+      <a-col :span="isTaskViewer ? 4 : 12"><a-card hoverable @click="goAgents('ONLINE', 'ENABLED')"><a-statistic title="在线代理数" :value="display(metrics.agentOnline)" /></a-card></a-col>
       <template v-if="isTaskViewer">
         <a-col :span="4"><a-card hoverable @click="goTasks()"><a-statistic title="进行中任务数" :value="display(metrics.taskInProgress)" /></a-card></a-col>
         <a-col :span="4"><a-card><a-statistic title="重新规划次数" :value="display(metrics.replanningCount)" /></a-card></a-col>
@@ -106,7 +106,8 @@ async function fetchOverview() {
     failedMetrics.value = []
   } finally { loading.value = false }
 }
-function goAgents(onlineStatus) { router.push({ path: '/device-agents', query: onlineStatus ? { onlineStatus } : {} }) }
+// 在线代理数=启用且在线，跳转带同样的筛选条件，使卡片数与列表总数一致（DEF-S3-074）
+function goAgents(onlineStatus, agentStatus) { router.push({ path: '/device-agents', query: { ...(onlineStatus ? { onlineStatus } : {}), ...(agentStatus ? { agentStatus } : {}) } }) }
 function goTasks(status) { router.push({ path: '/tasks', query: status ? { status } : {} }) }
 function goExceptions() { router.push({ path: '/task-exceptions', query: { exceptionStatus: 'PENDING' } }) }
 
