@@ -2,7 +2,7 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_GPT`
+- 状态：`READY_FOR_CLAUDE`（V1.109 独立复测发现剩余授权顺序偏差；见末尾第 1 轮 GPT → Claude）
 - 当前需求：`SRS_F001 用户登录与预置角色权限`，按功能需求顺序从第 1 项开始。
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -72,3 +72,15 @@
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-26 | SRS_F001 | Claude → ChatGPT | READY_FOR_GPT | ai/claude-fix / afb265c / V1.109 | 无 | 见上“第 1 轮”，待独立复测 |
+
+## 第 1 轮 ChatGPT → Claude（SRS_F001）
+
+- 状态：`READY_FOR_CLAUDE`。ChatGPT 测试分支 `ai/gpt-test`，已接收 `V1.109` 代码；独立证据与具体裁决见 `acceptance/stage3/SRS_F001-V1.109-独立复测.md`、`acceptance/stage3/evidence/SRS_F001-V1.109-live-api-20261029.json`、`acceptance/stage3/evidence/TC-002-S4-V1.109-isolated-fault-20261029.json`。以远端最新 `ai/gpt-test` 提交 SHA 为交接 SHA。
+- `TC-003.S2`、`SRS_F001.R04/R05` 仍为 **F**（新缺陷 `DEF-S3-072`）：无权角色的 `POST /api/v1/devices`、`/api/v1/tasks`、`/api/v1/tasks/999999/terminate` 缺字段请求返回 400/3001，未优先返回 403，也未完整形成越权审计；`/api/v1/users` 已按 V1.109 修复为 403。七次请求前后用户/设备/任务计数不变。请将相关代表性写接口的角色拒绝前移到请求校验之前，仍保留授权角色的参数 400 校验，定向回归后交回下一版本。
+- `DEF-S3-056` 的锁定审计在 V1.109 隔离 API 子检查通过；`NT-S3-001` 的数据库故障、恢复和认证组件异常单测通过。整步仍需浏览器及完整链路复测，不能据此宣称 SRS_F001 已通过。
+- Claude 的 `nt-s3-001-fault-fixture.py` 在 Windows 上退出后遗留 Java 后端子进程（18103）；本轮已停止该进程。请修复夹具清理。`/api/v1/users` 列表 API 还暴露 `passwordHash` 字段，建议在本需求账号安全修复中移除对外序列化并验证。
+- 本轮没有修改需求基线或 95 项用例。Claude 开工前先 fetch 并将远端 `ai/gpt-test` 合入自己的分支，保留本轮原始 F/NT 证据。修复、定向回归、提交推送下一唯一 `V1.N` 标签后，将本文件状态改为 `READY_FOR_GPT`，附代码 SHA、标签和复测清单。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-29 | SRS_F001 | ChatGPT → Claude | READY_FOR_CLAUDE | ai/gpt-test / afb265c / V1.109 | 见远端 ai/gpt-test HEAD | DEF-S3-072 待修；夹具进程清理；其余整步待完整复测 |
