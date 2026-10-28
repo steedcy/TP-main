@@ -22,14 +22,16 @@ local = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(local)
 config = local.API("配置管理员")
 operator = local.API("运行操作员")
-source = operator("/tasks/73")
 variant = os.environ.get("STAGE3_CAP_VARIANT", "unknown-capability")
-assert variant in ("unknown-capability", "no-online-candidate", "missing-input", "invalid-param")
-source_plan = next(p for p in operator("/tasks/73/plan-versions")
-                   if p["source"] == "AUTONOMOUS")
+assert variant in ("unknown-capability", "no-online-candidate", "missing-input", "invalid-param",
+                   "oversize-no-online-candidate")
+source_id = 19 if variant == "oversize-no-online-candidate" else 73
+source = operator(f"/tasks/{source_id}")
+source_plan = next(p for p in operator(f"/tasks/{source_id}/plan-versions")
+                   if p["source"] == ("BASELINE_TEMPLATE" if source_id == 19 else "AUTONOMOUS"))
 assert source["status"] == "COMPLETED" and len(source_plan["planSteps"]) == 4
 initial_steps = json.loads(json.dumps(source_plan["planSteps"], ensure_ascii=False))
-assert source["taskFamily"] == "FLIGHT_CHANGE_RESPONSE"
+assert source["taskFamily"] == ("OVERSIZE_BAGGAGE_HANDLING" if source_id == 19 else "FLIGHT_CHANGE_RESPONSE")
 if variant == "unknown-capability":
     initial_steps[1]["capabilityType"] = "CAP_S3_UNKNOWN_TEST"
 elif variant == "missing-input":
@@ -58,7 +60,7 @@ endpoints = {code: config("/devices/" + code)["accessEndpoint"] + "/device-api/v
              for code in codes}
 ev = {"observedAt": datetime.now(timezone.utc).isoformat(), "runtimeInput": "V1.5",
       "isolatedSchema": "tip_stage2_v14", "runtimeJarSha256": hashlib.sha256(runtime.read_bytes()).hexdigest(),
-      "sourceTaskId": 73, "request": {key: source[key] for key in
+      "sourceTaskId": source_id, "request": {key: source[key] for key in
                                      ("taskGoal", "taskFamily", "sceneParams")},
       "planVariant": variant, "sourcePlanSource": source_plan["source"],
       "initialPlanSteps": initial_steps, "fixtureBefore": json.loads(mode_original),
@@ -150,8 +152,11 @@ try:
     rebind()
     operator = local.API("运行操作员")
     config = local.API("配置管理员")
-    if variant == "no-online-candidate":
-        for code in ("SIM_F2_DISPLAY", "SIM_F2_FLIGHT"):
+    if variant in ("no-online-candidate", "oversize-no-online-candidate"):
+        target_codes = (("SIM_F2_BAGGAGE", "SIM_F2_BAGGAGE_B")
+                        if variant == "oversize-no-online-candidate"
+                        else ("SIM_F2_DISPLAY", "SIM_F2_FLIGHT"))
+        for code in target_codes:
             agent = next(a for a in config("/device-agents?page=1&size=100")["content"]
                          if a["deviceCode"] == code)
             assert agent["workStatus"] == "IDLE" and agent["currentTaskId"] is None
