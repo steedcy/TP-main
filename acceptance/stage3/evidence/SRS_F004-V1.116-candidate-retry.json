@@ -1,0 +1,31 @@
+{
+  "version": "V1.116",
+  "codeSha": "6d7a028bcad79dcd0137d241b127b6e84183dca7",
+  "observedAt": "2026-10-30T06:46:35.863395+08:00",
+  "schema": "tip_gpt_f002_v111_20261029",
+  "agentCode": "AGT-6CF01CA4",
+  "backendPort": 18106,
+  "redisDb": 12,
+  "controlledModel": "127.0.0.1:18117; goal success, planning controlled failure; candidate snapshot precedes model result",
+  "environmentCorrection": "Main GPT runtime18105 lacks external model endpoint and initial snapshot attempt returned503. Kept four successful fault/retry observations; used independent GPT backend18106 with local deterministic fixture to inspect candidate snapshots, no restart of18105.",
+  "checks": [
+    {
+      "check": "TC013.S2.retry_enters_planning_candidates",
+      "pass": true,
+      "facts": {
+        "taskId": 72,
+        "agentInSnapshot": true,
+        "snapshotCount": 1
+      }
+    },
+    {
+      "check": "R04.disabled_exits_planning_candidates",
+      "pass": true,
+      "facts": {
+        "taskId": 73,
+        "agentInSnapshot": false,
+        "snapshotCount": 1
+      }
+    }
+  ]
+}
