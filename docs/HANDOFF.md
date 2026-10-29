@@ -2,7 +2,7 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（SRS_F003 V1.113 独立复测发现 F，暂不转 F004；见末尾）
+- 状态：`READY_FOR_GPT`（SRS_F003 第 2 轮 Claude → ChatGPT，V1.114；见末尾）
 - 当前需求：`SRS_F003 设备接入`；SRS_F001、SRS_F002 已完成，按功能需求顺序继续。
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -300,3 +300,40 @@
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-29 | SRS_F003 | ChatGPT → Claude | READY_FOR_CLAUDE | ai/gpt-test / b5f32f8 / V1.113 | e7727c9 | DEF-S3-076/077 待修，TC-008～010 余项 NT 待下版复测；不合并 main |
+
+## 第 6 轮 Claude → ChatGPT（SRS_F003 设备接入，V1.114）
+
+- 状态：`READY_FOR_GPT`。分支 `ai/claude-fix`，代码 SHA `8746e2832865d2a5b29581fe6560c94e46f7364c`，标签 `V1.114`（远端此前最高 V1.113）。已合入 `ai/gpt-test` 至 `323a7f6`。未合并 main，未改 GPT 证据、共享 schema 或端口，未登记基线变更。
+- **本轮仅为单测与代码检查结果，不代表 SRS_F003 任何步骤或规则通过。仍在 F003，未转 F004。**
+
+### 修复内容
+- **DEF-S3-077 / TC-010.S2 / R06**：根因同 GPT 诊断，`releaseAgentOccupation` 只看 `agent.current_task_id`。现改为按 `task_step_assignments.device_agent_id` 查该代理在正式任务（待分配/降级执行中/执行中，排除试运行）中尚未结束（`PENDING_ASSIGNMENT`/`EXECUTING`）的步骤，对每一步走 5.5.3 恢复流程（新增 `TaskExceptionService.handleAgentDisabled`，复用 `handleException`，异常类型 `AGENT_OFFLINE`）；随后清除 `current_task_id/current_step_seq`、置 IDLE，并写 `AGENT_OCCUPATION_RELEASED` 设备事件（只要有关联步骤或原占用就写）。与删除路径（V1.113 已按步骤关联判断）口径一致。
+- **DEF-S3-076 / R04**：核对结论：V1.113 只加载了 `CAP_SIM_STATUS`，确实没有“继承所模拟类型能力”的机制，且库里也没有可继承的标准能力模板（`capability_template` 无种子数据）。现补齐：
+  - 迁移 `V18__simulator_inherited_capability_templates.sql`：为四类被模拟类型种入 11 个标准能力模板（航显 3、测量设备 2、航延屏 2、机器人 4，与需求五类×八能力矩阵一致；参数定义取自 F2 演示夹具），幂等；并对既有仿真体补载缺失能力（`UNTESTED`、关联 `template_id`）并重算模板 `usage_count`。
+  - 新建仿真体：除 `CAP_SIM_STATUS` 外，实例化所模拟类型的全部 `ACTIVE` 模板（`UNTESTED`，模板 `usage_count`+1），仍须逐项能力测试通过才可启用。
+  - 新接口 `POST /api/v1/devices/{deviceCode}/reload-inherited-capabilities`（仅配置管理员，幂等，仅补缺，留 `DEVICE_PROFILE_RELOAD` 操作记录），供既有仿真体可重复补载；真实设备调用被拒。
+- 模板种子里的默认参数值沿用演示夹具（如测试航班号），仅作为模板默认值；配置管理员可在模板管理里修改。
+
+### 需要用户决策的点
+- 预置区域清单仍未提供（默认 `F2_TEST`，可用 `APP_DEVICE_PRESET_AREAS` 配置）；GPT 已说明不阻塞，若需正式清单，请先在 `docs/BASELINE_CHANGES.md` 登记配置决策。
+- 11 个模板的名称与参数是我按演示夹具推出的初始值，不是需求文档给定的字面内容，若有权威模板内容请提供。
+
+### 验证（本机）
+- `mvn -o test` 全量 127 项，0 失败 0 错误，2 项跳过（原有）；BUILD SUCCESS。新增 6 项：`DeviceServiceF003Test` +4（待分配且 current_task_id 为空时停用仍恢复并释放、仿真体继承模板与 CAP_SIM_STATUS、停用模板与已有能力被跳过、重载幂等且拒绝真实设备），`TaskExceptionDisableTest` 2 项（按步骤关联逐步触发恢复、无关联不触发）。
+- **未验证**：`findActiveByAgentId` 的 MyBatis SQL 与 V18 迁移未对任何数据库执行（需 GPT 在隔离库实测，包括 V18 在 GPT 已有隔离库上对既有仿真体的补载是否与现有能力冲突）；停用后的真实恢复链（候选切换/重规划/转人工）仅以 mock 验证调用；前端无改动、未构建。
+
+### 遗留风险
+- 在已有大量手工建立能力的环境里，V18 只补缺不覆盖同编码能力，不会改动已存在的能力；但会让既有仿真体多出若干 `UNTESTED` 能力，需 GPT 注意对 TC-017/TC-093 邻接测试的影响（能力数量增加、`UNTESTED` 不进入规划可用集合）。
+- 停用占用设备的异常类型记为 `AGENT_OFFLINE`，与 V1.113 相同。
+
+### 前置条件与复测清单（GPT）
+前置：隔离 schema（Flyway 自动执行 V18；若沿用已有库，注意 V17/V18 已改变既有仿真体的能力集）、独立后端端口；可复用 V1.113 的 r06 夹具。
+1. **TC-010.S2 / R06（DEF-S3-077）**：用同一夹具（代理有待分配步骤关联且 `current_task_id=NULL`）停用：步骤被恢复处理（重分配或转重规划/待人工）、代理占用清除、`AGENT_OCCUPATION_RELEASED` 事件计数 0→≥1、异常记录与操作记录留痕；再启用须重新连接测试通过。再补降级执行中、执行中两种状态的停用。空闲设备停用不应产生释放事件。
+2. **TC-010.S1 / R06**：删除三种进行中任务的回归（V1.113 为 P，因共用代理字段仍抽查）。
+3. **R04 / DEF-S3-076**：新建四类仿真体（航显/测量/航延屏/机器人）：`/capabilities` 含 `CAP_SIM_STATUS` 与所模拟类型的全部业务能力（数量分别 4/3/3/5，含 SIM_STATUS），均 `UNTESTED`；逐项能力测试通过后可启用；对既有仿真体调用 reload 接口：第一次补缺、第二次 `added=0`；真实设备调用 reload 返回 400；V18 对既有仿真体的补载与 usage_count。
+4. **TC-017.S3 / TC-093.S1 邻接**：能力画像与矩阵、新增同类设备后接入链路。
+5. **未实测范围（沿用 V1.113 的 NT）**：TC-008.S1 边界与编辑、TC-008.S2 组合筛选与分页、TC-009.S1/S3 浏览器耗时与凭据编辑、TC-010.S3 确认/归档/审计、R07、R08 全范围。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-29 | SRS_F003 | Claude → ChatGPT | READY_FOR_GPT | ai/claude-fix / 8746e28 / V1.114 | e7727c9 | 修复 DEF-S3-076/077；仅单测通过，SQL 与迁移未实跑，待独立复测 |
