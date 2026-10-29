@@ -174,7 +174,7 @@ public class SimulatorRuntime {
                 return;
             }
             Map<String, Object> params = command.inputParams() == null ? Map.of() : command.inputParams();
-            Map<String, Object> output = driver.execute(command.capabilityType(), params);
+            Map<String, Object> output = executeCapability(command.capabilityType(), params);
             progressAlong(command.commandId(), driver.routeLocations(command.capabilityType(), params, location(), output));
             if (cancelled.contains(command.commandId())) return;
             reportFeedback(command, "SUCCESS", null, output);
@@ -237,7 +237,7 @@ public class SimulatorRuntime {
                     ? (Map<String, Object>)map : Map.of();
             rejectSafetyFields(params);
             if (!"SUCCESS".equals(properties.getScenarioResult())) throw new IllegalStateException("SIMULATED_" + properties.getScenarioResult());
-            Map<String, Object> output = driver.execute(type, params);
+            Map<String, Object> output = executeCapability(type, params);
             return Map.of("commandId", id, "result", "SUCCESS", "outputParams", output,
                     "durationMs", (System.nanoTime() - started) / 1_000_000);
         } catch (RuntimeException ex) {
@@ -245,6 +245,24 @@ public class SimulatorRuntime {
                     "durationMs", (System.nanoTime() - started) / 1_000_000);
         }
     }
+    /**
+     * CAP_SIM_STATUS是仿真体自身的能力（5.2.4A：仿真体含仿真状态生成），与所模拟设备类型无关，
+     * 由运行时直接返回当前仿真状态快照，不交给设备类型驱动（DEF-S3-079）。
+     */
+    private Map<String, Object> executeCapability(String capabilityType, Map<String, Object> params) {
+        if ("CAP_SIM_STATUS".equals(capabilityType)) {
+            Map<String, Object> snapshot = new LinkedHashMap<>();
+            snapshot.put("simulatedDeviceType", driver.deviceType());
+            snapshot.put("onlineStatus", online.get() ? "ONLINE" : "OFFLINE");
+            snapshot.put("workStatus", busy.get() ? "BUSY" : "IDLE");
+            snapshot.put("scenarioResult", properties.getScenarioResult());
+            snapshot.put("location", Map.of("x", location().x(), "y", location().y(), "zone", location().zone()));
+            snapshot.put("generatedAt", OffsetDateTime.now().toString());
+            return snapshot;
+        }
+        return driver.execute(capabilityType, params);
+    }
+
     public String token() { return properties.getToken(); }
     public Set<String> capabilities() { return driver.capabilities(); }
 

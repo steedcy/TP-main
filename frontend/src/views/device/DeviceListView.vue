@@ -215,6 +215,15 @@ function openEdit(record) {
   formVisible.value = true
 }
 
+function buildUpdatePayload(f) {
+  const payload = {
+    deviceName: f.deviceName, areaCode: f.areaCode, positionX: f.positionX, positionY: f.positionY,
+    accessEndpoint: f.accessEndpoint, statusReportInterval: f.statusReportInterval, remark: f.remark
+  }
+  if (f.accessCredentialRef) payload.accessCredentialRef = f.accessCredentialRef
+  return payload
+}
+
 async function handleSubmit() {
   try {
     await formRef.value.validate()
@@ -238,7 +247,9 @@ async function handleSubmit() {
     if (isEdit.value) {
       // 出于安全考虑系统不回显凭据原值（5.2.1业务规则8），编辑时留空表示不修改凭据，
       // 只有确实需要更换凭据时才填写
-      await updateDevice(form.deviceCode, form)
+      // 仅发送UpdateDeviceRequest允许的字段：deviceCode/类型/虚实/掩码等只读字段不可上送，
+      // 否则后端因未知属性无法解析请求体（DEF-S3-078）。凭据留空即不修改，掩码值不上送。
+      await updateDevice(form.deviceCode, buildUpdatePayload(form))
     } else {
       await createDevice(form)
     }
