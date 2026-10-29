@@ -1,0 +1,97 @@
+{
+  "observedAt": "2026-10-29T15:51:48.428172+08:00",
+  "version": "V1.114",
+  "codeSha": "8746e2832865d2a5b29581fe6560c94e46f7364c",
+  "schema": "tip_gpt_f002_v111_20261029",
+  "checks": [
+    {
+      "check": "TC-008.S1.minimum",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "codeLength": 1,
+        "nameLength": 1,
+        "period": 5,
+        "remarkLength": 0,
+        "positionX": 0,
+        "positionY": -3
+      }
+    },
+    {
+      "check": "TC-008.S1.maximum",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "codeLength": 32,
+        "nameLength": 64,
+        "period": 60,
+        "remarkLength": 200,
+        "positionX": 0,
+        "positionY": -3
+      }
+    },
+    {
+      "check": "TC-008.S1.edit_and_R08_mask",
+      "pass": false,
+      "facts": {
+        "updateHttp": 500,
+        "getHttp": 200,
+        "name": "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM",
+        "period": 60,
+        "maskedFieldPresent": true,
+        "oldSecretExposed": false,
+        "newSecretExposed": false
+      }
+    },
+    {
+      "check": "TC-008.S2.combined_filter",
+      "pass": false,
+      "facts": {
+        "http": 200,
+        "rowCount": 1,
+        "codes": [
+          "G3MAX155148XXXXXXXXXXXXXXXXXXXXX"
+        ],
+        "totalElements": 1
+      }
+    },
+    {
+      "check": "TC-008.S2.name_search",
+      "pass": false,
+      "facts": {
+        "http": 200,
+        "rowCount": 0,
+        "codes": []
+      }
+    },
+    {
+      "check": "TC-008.S2.pagination",
+      "pass": true,
+      "facts": {
+        "http": [
+          200,
+          200
+        ],
+        "page1Codes": [
+          "NT002-DEVICE-1",
+          "NT002-DEVICE-2",
+          "NT002-DEVICE-3",
+          "NT002-DEVICE-4",
+          "NT002-DEVICE-5"
+        ],
+        "page2Codes": [
+          "G3_D_125520",
+          "G3_B_125520",
+          "G3_F_125520",
+          "G3_R_125520",
+          "G3_D_143721"
+        ],
+        "totalElements": 20
+      }
+    }
+  ],
+  "createdCodes": [
+    "A",
+    "G3MAX155148XXXXXXXXXXXXXXXXXXXXX"
+  ]
+}

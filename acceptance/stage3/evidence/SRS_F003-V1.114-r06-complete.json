@@ -1,0 +1,49 @@
+{
+  "observedAt": "2026-10-29T15:36:36.787560+08:00",
+  "version": "V1.114",
+  "codeSha": "8746e2832865d2a5b29581fe6560c94e46f7364c",
+  "schema": "tip_gpt_f002_v111_20261029",
+  "fixture": "GPT-only schema; valid plan version with one plan step; replan_used=true for deterministic manual fallback",
+  "checks": [
+    {
+      "check": "TC-010.S2.disable_occupied.DOWNGRADING",
+      "pass": true,
+      "facts": {
+        "deviceCode": "G3_F_143913",
+        "taskCode": "G3_R06_DOWNGRADING_153636",
+        "http": 200,
+        "taskStatus": "PENDING_MANUAL",
+        "agent": "DISABLED:OFFLINE:IDLE:null",
+        "releaseEventsBefore": 0,
+        "releaseEventsAfter": 1,
+        "offlineExceptionCount": 1,
+        "message": "success"
+      }
+    },
+    {
+      "check": "TC-010.S2.disable_occupied.EXECUTING",
+      "pass": true,
+      "facts": {
+        "deviceCode": "G3_R_143913",
+        "taskCode": "G3_R06_EXECUTING_153636",
+        "http": 200,
+        "taskStatus": "PENDING_MANUAL",
+        "agent": "DISABLED:OFFLINE:IDLE:null",
+        "releaseEventsBefore": 0,
+        "releaseEventsAfter": 1,
+        "offlineExceptionCount": 1,
+        "message": "success"
+      }
+    },
+    {
+      "check": "TC-010.S2.disable_idle_no_release",
+      "pass": true,
+      "facts": {
+        "deviceCode": "G3_IDLE_153636",
+        "http": 200,
+        "releaseEventsBefore": 0,
+        "releaseEventsAfter": 0
+      }
+    }
+  ]
+}
