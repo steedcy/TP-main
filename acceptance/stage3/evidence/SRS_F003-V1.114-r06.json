@@ -1,0 +1,52 @@
+{
+  "observedAt": "2026-10-29T14:41:28.275773+08:00",
+  "version": "V1.114",
+  "schema": "tip_gpt_f002_v111_20261029",
+  "deviceCode": "G3_B_143913",
+  "taskCode": "G3_R06_144126",
+  "agentId": 9,
+  "fixture": "SQL task, plan and step assignment in GPT-only schema; agent.current_task_id=NULL",
+  "checks": [
+    {
+      "check": "TC-010.S1.delete_blocked.PENDING_ASSIGNMENT",
+      "pass": true,
+      "facts": {
+        "http": 409,
+        "message": "设备存在进行中任务，不可删除",
+        "taskStatus": "PENDING_ASSIGNMENT",
+        "deviceStatus": "ACTIVE"
+      }
+    },
+    {
+      "check": "TC-010.S1.delete_blocked.DOWNGRADING",
+      "pass": true,
+      "facts": {
+        "http": 409,
+        "message": "设备存在进行中任务，不可删除",
+        "taskStatus": "DOWNGRADING",
+        "deviceStatus": "ACTIVE"
+      }
+    },
+    {
+      "check": "TC-010.S1.delete_blocked.EXECUTING",
+      "pass": true,
+      "facts": {
+        "http": 409,
+        "message": "设备存在进行中任务，不可删除",
+        "taskStatus": "EXECUTING",
+        "deviceStatus": "ACTIVE"
+      }
+    },
+    {
+      "check": "TC-010.S2.disable_pending_assignment",
+      "pass": false,
+      "facts": {
+        "http": 200,
+        "agent": "DISABLED:OFFLINE:null",
+        "occupationReleaseEventsBefore": 0,
+        "occupationReleaseEventsAfter": 1,
+        "assignmentStatus": "PENDING_ASSIGNMENT"
+      }
+    }
+  ]
+}

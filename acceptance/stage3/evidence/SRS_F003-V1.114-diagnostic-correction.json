@@ -1,0 +1,45 @@
+{
+  "observedAt": "2026-10-29T14:45:43.022854+08:00",
+  "version": "V1.114",
+  "codeSha": "8746e2832865d2a5b29581fe6560c94e46f7364c",
+  "schema": "tip_gpt_f002_v111_20261029",
+  "rawR06Result": "The raw r06 probe reports false because it expects assignment.step_status to change; retain raw result.",
+  "fixtureCorrection": "First two probes omitted current_plan_version_id and plan_steps. Final probe has plan version and step; replan_used=true to exercise the manual fallback.",
+  "taskCode": "G3_R06_144126",
+  "taskStatusAfterDisable": "PENDING_MANUAL",
+  "exceptionAfterDisable": "AGENT_OFFLINE:RESOLVED:FAILED",
+  "r06Observed": {
+    "http": 200,
+    "agent": "DISABLED:OFFLINE:null",
+    "occupationReleaseEventsBefore": 0,
+    "occupationReleaseEventsAfter": 1,
+    "assignmentStatus": "PENDING_ASSIGNMENT"
+  },
+  "r06Interpretation": "R06 recovery path executed: HTTP 200, agent disabled/offline, release event incremented, task transitioned PENDING_MANUAL and AGENT_OFFLINE exception recorded. Assignment row remains PENDING_ASSIGNMENT under terminal manual state; whether row must be marked otherwise requires baseline check.",
+  "v18Applied": true,
+  "newDeviceCodes": [
+    "G3_D_143913",
+    "G3_B_143913",
+    "G3_F_143913",
+    "G3_R_143913"
+  ],
+  "newCapabilityCountsExpected": [
+    4,
+    3,
+    3,
+    5
+  ],
+  "oldDeviceCodes": [
+    "G3_D_125520",
+    "G3_B_125520",
+    "G3_F_125520",
+    "G3_R_125520"
+  ],
+  "reloadObserved": {
+    "firstAdded": 1,
+    "secondAdded": 0,
+    "restoredCapability": "CAP_FLIGHT_UPDATE",
+    "deviceCode": "G3_F_143913"
+  },
+  "remaining": "TC008 S1/S2 boundary/filter, TC009 browser, TC010 S3, R07/R08, adjacent TC017/093 not yet complete."
+}
