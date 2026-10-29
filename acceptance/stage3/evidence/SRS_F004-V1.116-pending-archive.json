@@ -1,0 +1,69 @@
+{
+  "observedAt": "2026-10-30T04:48:11.335322+08:00",
+  "version": "V1.116",
+  "codeSha": "6d7a028bcad79dcd0137d241b127b6e84183dca7",
+  "schema": "tip_gpt_f002_v111_20261029",
+  "fixture": "GPT-only schema; valid plan version with one plan step; replan_used=true for deterministic manual fallback",
+  "checks": [
+    {
+      "check": "TC012.S1.unconfirmed_rejected",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "agentStatus": "ENABLED",
+        "currentTaskId": null
+      }
+    },
+    {
+      "check": "TC012.S1.pending_without_current_id",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "taskCode": "G3_R06_PENDING_ASSIGNMENT_044811",
+        "recovery": "COMPLETED:SUCCESS",
+        "releaseBefore": 1,
+        "releaseAfter": 2,
+        "agentStatus": "DISABLED",
+        "workStatus": "IDLE"
+      }
+    },
+    {
+      "check": "TC012.S2.archive_irreversible",
+      "pass": true,
+      "facts": {
+        "deleteHttp": 200,
+        "archiveStatus": "ARCHIVED",
+        "retryHttp": 409,
+        "statusAfterRetry": "ARCHIVED"
+      }
+    },
+    {
+      "check": "TC012.S3.lifecycle_audit",
+      "pass": true,
+      "facts": {
+        "operationTypes": [
+          "DEVICE_AGENT_CREATE",
+          "DEVICE_AGENT_ENABLE",
+          "DEVICE_AGENT_DISABLE",
+          "DEVICE_AGENT_DISABLE",
+          "DEVICE_AGENT_ARCHIVE"
+        ],
+        "deviceEvents": [
+          "AGENT_CREATED",
+          "AGENT_BOUND_TO_RUNTIME",
+          "AGENT_BOUND_TO_RUNTIME",
+          "AGENT_BOUND_TO_RUNTIME",
+          "AGENT_ONLINE_RECOVERED",
+          "AGENT_DISABLED",
+          "AGENT_ENABLED",
+          "AGENT_ONLINE_RECOVERED",
+          "AGENT_OCCUPATION_RELEASED",
+          "AGENT_DISABLED",
+          "AGENT_OCCUPATION_RELEASED",
+          "AGENT_DISABLED",
+          "AGENT_ARCHIVED"
+        ]
+      }
+    }
+  ]
+}

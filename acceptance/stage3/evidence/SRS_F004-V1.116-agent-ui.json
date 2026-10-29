@@ -1,0 +1,80 @@
+{
+  "version": "V1.116",
+  "codeSha": "6d7a028bcad79dcd0137d241b127b6e84183dca7",
+  "schema": "tip_gpt_f002_v111_20261029",
+  "deviceCode": "G316D_025002",
+  "agentCode": "AGT-B44B3264",
+  "agentDbId": 14,
+  "taskId": 69,
+  "planId": 13,
+  "fixture": "GPT-only synthetic executing task; valid plan and step; operator-owned; simulator paused to keep deterministic BUSY state",
+  "observedAt": "2026-10-29T20:46:52.901Z",
+  "browser": "Edge headless",
+  "checks": [
+    {
+      "check": "TC011.S2.list_fields",
+      "pass": true,
+      "facts": {
+        "headers": [
+          "代理编号",
+          "关联设备",
+          "设备编码",
+          "代理状态",
+          "在线状态",
+          "工作状态",
+          "当前任务",
+          "启用能力",
+          "最后上报时间",
+          "操作"
+        ],
+        "capabilityVisible": true
+      }
+    },
+    {
+      "check": "TC011.S2.config_task_is_text",
+      "pass": true,
+      "facts": {
+        "taskId": 69,
+        "taskLinkCount": 0
+      }
+    },
+    {
+      "check": "TC011.S2.detail_fields",
+      "pass": true,
+      "facts": {
+        "agentVisible": true,
+        "taskVisible": true,
+        "capabilityVisible": true
+      }
+    },
+    {
+      "check": "TC012.S1.cancel_occupied_disable",
+      "pass": true,
+      "facts": {
+        "agentStatus": "ENABLED",
+        "taskId": 69,
+        "workStatus": "BUSY"
+      }
+    },
+    {
+      "check": "TC011.S2.operator_task_link",
+      "pass": true,
+      "facts": {
+        "linkCount": 1,
+        "taskHttp": 200,
+        "taskId": 69
+      }
+    },
+    {
+      "check": "TC012.S1.confirm_occupied_disable",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "agentStatus": "DISABLED",
+        "onlineStatus": "OFFLINE",
+        "workStatus": "IDLE",
+        "currentTaskId": null
+      }
+    }
+  ]
+}
