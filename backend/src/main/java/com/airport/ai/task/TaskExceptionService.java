@@ -119,6 +119,20 @@ public class TaskExceptionService {
     }
 
     /**
+     * 设备停用（SRS_F003.R06）：对该代理在正式任务中尚未结束的每个步骤关联（含待分配、尚未设置
+     * current_task_id的情形）走同一条5.5.3恢复流程。返回处理的步骤数。
+     */
+    @Transactional
+    public int handleAgentDisabled(DeviceAgent agent) {
+        List<TaskStepAssignment> active = assignmentMapper.findActiveByAgentId(agent.getId());
+        for (TaskStepAssignment assignment : active) {
+            handleException(assignment.getTaskId(), assignment.getStepSeq(), "AGENT_OFFLINE",
+                    "设备代理" + agent.getAgentCode() + "因设备停用被释放，正占用该任务步骤");
+        }
+        return active.size();
+    }
+
+    /**
      * 对应异常路径4a/4b、5.5.3业务规则1a（降级任务基线执行失败不再二次自动降级）：
      * 恢复失败且判定计划不可继续，若重规划额度未用则触发5.5.4局部重新规划；
      * 额度已用或任务本身即为降级执行（DOWNGRADING）则直接转人工处理，不再自动降级。

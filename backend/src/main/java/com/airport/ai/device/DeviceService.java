@@ -33,6 +33,7 @@ public class DeviceService {
     private final DeviceCapabilityMapper deviceCapabilityMapper;
     private final com.airport.ai.task.TaskExceptionService taskExceptionService;
     private final java.util.Set<String> presetAreas;
+    private final com.airport.ai.devicetype.CapabilityTemplateMapper capabilityTemplateMapper;
 
     public DeviceService(DeviceMapper deviceMapper,
                           DeviceAgentMapper deviceAgentMapper,
@@ -43,7 +44,9 @@ public class DeviceService {
                           @Value("${app.device.max-access-objects-system:20}") int maxAccessObjectsSystem,
                           DeviceCapabilityMapper deviceCapabilityMapper,
                           @org.springframework.context.annotation.Lazy com.airport.ai.task.TaskExceptionService taskExceptionService,
-                          @Value("${app.device.preset-areas:F2_TEST}") String presetAreas) {
+                          @Value("${app.device.preset-areas:F2_TEST}") String presetAreas,
+                          com.airport.ai.devicetype.CapabilityTemplateMapper capabilityTemplateMapper) {
+        this.capabilityTemplateMapper = capabilityTemplateMapper;
         this.deviceCapabilityMapper = deviceCapabilityMapper;
         this.taskExceptionService = taskExceptionService;
         this.presetAreas = java.util.Arrays.stream(presetAreas.split(",")).map(String::trim)
@@ -102,7 +105,7 @@ public class DeviceService {
         deviceMapper.insert(device);
         Device saved = device;
         if (Boolean.TRUE.equals(saved.getIsSimulator())) {
-            loadSimulatorStatusCapability(saved);
+            loadSimulatorProfile(saved);
         }
 
         java.util.Map<String, Object> detail = new java.util.HashMap<>();
@@ -335,6 +338,50 @@ public class DeviceService {
         return presetAreas;
     }
 
+    /**
+     * 仿真体能力画像加载（SRS_F003.R04、5.2.4A业务规则4）：继承所模拟设备类型的全部启用标准能力模板，
+     * 并加载仿真状态生成能力。均为未测试，须逐项能力测试通过后才可启用。幂等，返回新增能力数。
+     */
+    int loadSimulatorProfile(Device device) {
+        int added = 0;
+        loadSimulatorStatusCapability(device);
+        if (device.getSimulatedDeviceType() == null) return added;
+        for (com.airport.ai.devicetype.CapabilityTemplate t
+                : capabilityTemplateMapper.findByDeviceTypeCode(device.getSimulatedDeviceType())) {
+            if (!"ACTIVE".equals(t.getTemplateStatus())
+                    || deviceCapabilityMapper.existsByDeviceIdAndCapabilityCode(device.getId(), t.getTemplateCode())) {
+                continue;
+            }
+            DeviceCapability c = new DeviceCapability();
+            c.setDeviceId(device.getId());
+            c.setTemplateId(t.getId());
+            c.setCapabilityCode(t.getTemplateCode());
+            c.setCapabilityName(t.getTemplateName());
+            c.setCapabilityType(t.getCapabilityType());
+            c.setInputParams(t.getInputParams());
+            c.setOutputParams(t.getOutputParams());
+            c.setCapabilityDescription(t.getTemplateDescription());
+            deviceCapabilityMapper.insert(c);
+            t.setUsageCount((t.getUsageCount() == null ? 0 : t.getUsageCount()) + 1);
+            capabilityTemplateMapper.update(t);
+            added++;
+        }
+        return added;
+    }
+
+    /** 对既有仿真体重新加载继承能力（可重复，仅补缺），供配置管理员使用并留操作记录 */
+    @Transactional
+    public int reloadSimulatorProfile(String deviceCode, User operator) {
+        Device device = getByCode(deviceCode);
+        if (!Boolean.TRUE.equals(device.getIsSimulator())) {
+            throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, "仅仿真体可加载继承能力画像");
+        }
+        int added = loadSimulatorProfile(device);
+        operationLogService.record(operator.getId(), operator.getUsername(), operator.getRole(),
+                "DEVICE_PROFILE_RELOAD", device.getDeviceCode() + " +" + added, "SUCCESS", null);
+        return added;
+    }
+
     /** 仿真体加载仿真状态生成能力（SRS_F003.R04、DEF-S3-020），初始为未测试，须能力测试通过后才可启用 */
     void loadSimulatorStatusCapability(Device device) {
         if (deviceCapabilityMapper.existsByDeviceIdAndCapabilityCode(device.getId(), "CAP_SIM_STATUS")) {
@@ -362,14 +409,15 @@ public class DeviceService {
             agent.setAgentStatus("DISABLED");
             agent.setOnlineStatus("OFFLINE");
             deviceAgentMapper.update(agent);
-            if (taskId != null) {
-                taskExceptionService.handleAgentOffline(agent);
+            // 占用以步骤关联为准：待分配阶段current_task_id可能仍为空，但关联已存在（DEF-S3-077）
+            int released = taskExceptionService.handleAgentDisabled(agent);
+            if (taskId != null || released > 0) {
                 agent.setCurrentTaskId(null);
                 agent.setCurrentStepSeq(null);
                 agent.setWorkStatus("IDLE");
                 deviceAgentMapper.update(agent);
                 deviceEventService.append(agent.getId(), "AGENT_OCCUPATION_RELEASED", "OPERATOR", null,
-                        "设备" + device.getDeviceCode() + "停用，已按异常恢复流程处理并释放对任务" + taskId + "的占用");
+                        "设备" + device.getDeviceCode() + "停用，已按异常恢复流程处理" + released + "个进行中步骤并释放占用");
             }
         });
     }

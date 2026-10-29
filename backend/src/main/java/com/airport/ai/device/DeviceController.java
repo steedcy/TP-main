@@ -58,6 +58,13 @@ public class DeviceController {
         return ApiResponse.ok(deviceService.presetAreas());
     }
 
+    /** 对仿真体补载所模拟类型的继承能力（幂等，仅补缺；均为未测试） */
+    @PostMapping("/{deviceCode}/reload-inherited-capabilities")
+    public ApiResponse<Map<String, Integer>> reloadInherited(@PathVariable String deviceCode) {
+        int added = deviceService.reloadSimulatorProfile(deviceCode, currentUser.get());
+        return ApiResponse.ok(Map.of("added", added));
+    }
+
     @GetMapping("/{deviceCode}")
     public ApiResponse<DeviceView> get(@PathVariable String deviceCode) {
         return ApiResponse.ok(DeviceView.from(deviceService.getByCode(deviceCode)));

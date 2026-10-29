@@ -27,10 +27,12 @@ class DeviceServiceF003Test {
     private final DeviceAgentMapper agentMapper = mock(DeviceAgentMapper.class);
     private final DeviceCapabilityMapper capabilityMapper = mock(DeviceCapabilityMapper.class);
     private final TaskExceptionService taskExceptionService = mock(TaskExceptionService.class);
+    private final com.airport.ai.devicetype.CapabilityTemplateMapper templateMapper =
+            mock(com.airport.ai.devicetype.CapabilityTemplateMapper.class);
     private final DeviceEventService eventService = mock(DeviceEventService.class);
     private final DeviceService service = new DeviceService(deviceMapper, agentMapper, mock(OperationLogService.class),
             eventService, mock(DeviceAdapterClient.class), mock(ApplicationEventPublisher.class), 20,
-            capabilityMapper, taskExceptionService, "F2_TEST,T2_B");
+            capabilityMapper, taskExceptionService, "F2_TEST,T2_B", templateMapper);
 
     private User operator() {
         User u = new User();
@@ -147,8 +149,9 @@ class DeviceServiceF003Test {
         device("ACTIVE", "PASSED");
         DeviceAgent a = agent(77L);
         a.setCurrentStepSeq(2);
+        when(taskExceptionService.handleAgentDisabled(a)).thenReturn(1);
         service.updateStatus(5L, "INACTIVE", operator());
-        verify(taskExceptionService).handleAgentOffline(a);
+        verify(taskExceptionService).handleAgentDisabled(a);
         assertNull(a.getCurrentTaskId());
         assertNull(a.getCurrentStepSeq());
         assertEquals("DISABLED", a.getAgentStatus());
@@ -173,5 +176,66 @@ class DeviceServiceF003Test {
         assertTrue(connect.contains("连接超时"));
         assertNotEquals(refused, read);
         assertNotEquals(read, connect);
+    }
+
+    @Test
+    void disablingWithPendingAssignmentAndNullCurrentTaskStillRecoversAndReleases() {
+        device("ACTIVE", "PASSED");
+        DeviceAgent a = agent(null);
+        when(taskExceptionService.handleAgentDisabled(a)).thenReturn(1);
+        service.updateStatus(5L, "INACTIVE", operator());
+        verify(taskExceptionService).handleAgentDisabled(a);
+        verify(eventService).append(eq(9L), eq("AGENT_OCCUPATION_RELEASED"), any(), any(), any());
+        assertEquals("DISABLED", a.getAgentStatus());
+    }
+
+    private com.airport.ai.devicetype.CapabilityTemplate template(String deviceType, String code) {
+        com.airport.ai.devicetype.CapabilityTemplate t = new com.airport.ai.devicetype.CapabilityTemplate();
+        t.setId((long) code.hashCode());
+        t.setDeviceTypeCode(deviceType);
+        t.setTemplateCode(code);
+        t.setTemplateName(code);
+        t.setCapabilityType(code);
+        t.setInputParams("[]");
+        t.setOutputParams("[]");
+        return t;
+    }
+
+    @Test
+    void simulatorInheritsSimulatedTypeTemplatesAndSimStatus() {
+        when(templateMapper.findByDeviceTypeCode("SMART_DISPLAY")).thenReturn(java.util.List.of(
+                template("SMART_DISPLAY", "CAP_INFO_DISPLAY"), template("SMART_DISPLAY", "CAP_NAVIGATION")));
+        service.create(request(true), operator());
+        ArgumentCaptor<DeviceCapability> cap = ArgumentCaptor.forClass(DeviceCapability.class);
+        verify(capabilityMapper, times(3)).insert(cap.capture());
+        java.util.List<String> codes = cap.getAllValues().stream().map(DeviceCapability::getCapabilityCode).toList();
+        assertTrue(codes.containsAll(java.util.List.of("CAP_SIM_STATUS", "CAP_INFO_DISPLAY", "CAP_NAVIGATION")));
+        assertTrue(cap.getAllValues().stream().allMatch(c -> "UNTESTED".equals(c.getCapabilityStatus())));
+    }
+
+    @Test
+    void inactiveTemplatesAndExistingCapabilitiesAreSkipped() {
+        com.airport.ai.devicetype.CapabilityTemplate off = template("SMART_DISPLAY", "CAP_INFO_DISPLAY");
+        off.setTemplateStatus("INACTIVE");
+        when(templateMapper.findByDeviceTypeCode("SMART_DISPLAY")).thenReturn(java.util.List.of(off));
+        service.create(request(true), operator());
+        verify(capabilityMapper, times(1)).insert(any());
+    }
+
+    @Test
+    void reloadIsIdempotentAndRejectsRealDevices() {
+        Device d = device("ACTIVE", "PASSED");
+        d.setIsSimulator(true);
+        d.setSimulatedDeviceType("SMART_DISPLAY");
+        d.setDeviceCode("D5");
+        when(deviceMapper.findByDeviceCode("D5")).thenReturn(Optional.of(d));
+        when(templateMapper.findByDeviceTypeCode("SMART_DISPLAY"))
+                .thenReturn(java.util.List.of(template("SMART_DISPLAY", "CAP_INFO_DISPLAY")));
+        when(capabilityMapper.existsByDeviceIdAndCapabilityCode(5L, "CAP_SIM_STATUS")).thenReturn(true);
+        when(capabilityMapper.existsByDeviceIdAndCapabilityCode(5L, "CAP_INFO_DISPLAY")).thenReturn(false, true);
+        assertEquals(1, service.reloadSimulatorProfile("D5", operator()));
+        assertEquals(0, service.reloadSimulatorProfile("D5", operator()));
+        d.setIsSimulator(false);
+        assertThrows(BusinessException.class, () -> service.reloadSimulatorProfile("D5", operator()));
     }
 }

@@ -36,6 +36,17 @@
         WHERE plan_version_id = #{planVersionId} ORDER BY step_seq ASC
     </select>
 
+    <select id="findActiveByAgentId" resultMap="AssignmentResult">
+        SELECT a.id, a.task_id, a.plan_version_id, a.step_seq, a.device_agent_id, a.command_id, a.step_status,
+               a.retry_count, a.execution_result, a.reason_code, a.output_params, a.dispatched_at, a.feedback_at,
+               a.rejected_agent_ids, a.created_at, a.updated_at
+        FROM task_step_assignments a JOIN tasks t ON t.id = a.task_id
+        WHERE a.device_agent_id = #{agentId} AND t.is_dry_run = FALSE
+          AND t.status IN ('PENDING_ASSIGNMENT', 'DOWNGRADING', 'EXECUTING')
+          AND a.step_status IN ('PENDING_ASSIGNMENT', 'EXECUTING')
+        ORDER BY a.task_id, a.step_seq
+    </select>
+
     <select id="findByPlanVersionIdAndStepSeq" resultMap="AssignmentResult">
         SELECT <include refid="Columns"/> FROM task_step_assignments
         WHERE plan_version_id = #{planVersionId} AND step_seq = #{stepSeq}
