@@ -52,6 +52,12 @@
         WHERE agent_status = #{agentStatus} AND online_status = #{onlineStatus}
     </select>
 
+    <select id="countActiveTaskAssignments" resultType="long">
+        SELECT COUNT(*) FROM task_step_assignments a JOIN tasks t ON t.id = a.task_id
+        WHERE a.device_agent_id = #{agentId} AND t.is_dry_run = FALSE
+          AND t.status IN ('PENDING_ASSIGNMENT', 'DOWNGRADING', 'EXECUTING')
+    </select>
+
     <select id="searchPaged" resultMap="DeviceAgentResult">
         SELECT <include refid="Columns"/> FROM device_agents
         <where>

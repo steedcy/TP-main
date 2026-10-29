@@ -4,6 +4,10 @@
       <a-select v-model:value="filters.deviceTypeCode" style="width: 180px" placeholder="按设备类型筛选" allow-clear @change="fetchList">
         <a-select-option v-for="t in deviceTypes" :key="t.value" :value="t.value">{{ t.label }}</a-select-option>
       </a-select>
+      <a-select v-model:value="filters.onlineStatus" style="width: 140px" placeholder="按在线状态筛选" allow-clear @change="fetchList">
+        <a-select-option value="ONLINE">在线</a-select-option>
+        <a-select-option value="OFFLINE">离线</a-select-option>
+      </a-select>
       <a-input v-model:value="filters.keyword" placeholder="按名称/编码检索" style="width: 200px" @pressEnter="fetchList" allow-clear @change="fetchList" />
       <a-button type="primary" @click="openCreate">新增设备</a-button>
     </a-space>
@@ -20,6 +24,12 @@
           <a-tag :color="{ PASSED: 'green', FAILED: 'red', UNTESTED: 'default' }[record.connectionTestStatus]">
             {{ { PASSED: '通过', FAILED: '失败', UNTESTED: '未测试' }[record.connectionTestStatus] }}
           </a-tag>
+        </template>
+        <template v-else-if="column.key === 'agentStatus'">
+          {{ { ENABLED: '启用', DISABLED: '停用', ARCHIVED: '归档' }[record.agentStatus] || '无代理' }}
+        </template>
+        <template v-else-if="column.key === 'onlineStatus'">
+          <a-badge :status="record.onlineStatus === 'ONLINE' ? 'success' : 'default'" :text="record.onlineStatus === 'ONLINE' ? '在线' : '离线'" />
         </template>
         <template v-else-if="column.key === 'deviceStatus'">
           <a-tag :color="record.deviceStatus === 'ACTIVE' ? 'green' : 'default'">
@@ -69,12 +79,12 @@
           <a-input v-model:value="form.deviceName" maxlength="64" />
         </a-form-item>
         <a-form-item label="设备类型" name="deviceTypeCode">
-          <a-select v-model:value="form.deviceTypeCode" :disabled="isEdit">
+          <a-select v-model:value="form.deviceTypeCode" :disabled="isEdit || form.isSimulator" placeholder="请选择设备类型">
             <a-select-option v-for="t in deviceTypes" :key="t.value" :value="t.value">{{ t.label }}</a-select-option>
           </a-select>
         </a-form-item>
         <a-form-item label="虚实属性" name="isSimulator" v-if="!isEdit">
-          <a-radio-group v-model:value="form.isSimulator">
+          <a-radio-group v-model:value="form.isSimulator" @change="onSimulatorChange">
             <a-radio :value="false">真实设备</a-radio>
             <a-radio :value="true">仿真体</a-radio>
           </a-radio-group>
@@ -90,7 +100,9 @@
           </a-select>
         </a-form-item>
         <a-form-item label="所属区域" name="areaCode">
-          <a-input v-model:value="form.areaCode" placeholder="如：T2-B区候机厅" />
+          <a-select v-model:value="form.areaCode" placeholder="请选择预置区域">
+            <a-select-option v-for="a in presetAreas" :key="a" :value="a">{{ a }}</a-select-option>
+          </a-select>
         </a-form-item>
         <a-form-item label="位置坐标">
           <a-space>
@@ -120,12 +132,13 @@ import { onMounted, reactive, ref } from 'vue'
 import { message } from 'ant-design-vue'
 import {
   listDevices, createDevice, updateDevice, testConnection,
-  updateDeviceStatus, deleteDevice, createAgent
+  updateDeviceStatus, deleteDevice, createAgent, listPresetAreas
 } from '../../api/device'
 import { DEVICE_TYPES as deviceTypes, deviceTypeLabel } from '../../constants/capability'
 
 const list = ref([])
-const filters = reactive({ deviceTypeCode: undefined, keyword: '' })
+const filters = reactive({ deviceTypeCode: undefined, onlineStatus: undefined, keyword: '' })
+const presetAreas = ref([])
 const pagination = reactive({ current: 1, pageSize: 20, total: 0 })
 
 const columns = [
@@ -135,6 +148,8 @@ const columns = [
   { title: '虚实属性', key: 'isSimulator' },
   { title: '所属区域', dataIndex: 'areaCode' },
   { title: '连接测试', key: 'connectionTestStatus' },
+  { title: '代理状态', key: 'agentStatus' },
+  { title: '在线状态', key: 'onlineStatus' },
   { title: '设备状态', key: 'deviceStatus' },
   { title: '操作', key: 'action', width: 360 }
 ]
@@ -144,9 +159,9 @@ const submitLoading = ref(false)
 const isEdit = ref(false)
 const formRef = ref(null)
 const emptyForm = () => ({
-  deviceCode: '', deviceName: '', deviceTypeCode: 'SMART_DISPLAY',
-  isSimulator: false, simulatedDeviceType: undefined,
-  areaCode: '', positionX: undefined, positionY: undefined,
+  deviceCode: '', deviceName: '', deviceTypeCode: 'SIMULATOR',
+  isSimulator: true, simulatedDeviceType: undefined,
+  areaCode: undefined, positionX: undefined, positionY: undefined,
   accessEndpoint: '', accessCredentialRef: '', accessCredentialRefMasked: '',
   statusReportInterval: 15, remark: ''
 })
@@ -169,7 +184,7 @@ const formRules = {
 
 async function fetchList() {
   const resp = await listDevices({
-    deviceTypeCode: filters.deviceTypeCode, keyword: filters.keyword,
+    deviceTypeCode: filters.deviceTypeCode, onlineStatus: filters.onlineStatus, keyword: filters.keyword,
     page: pagination.current, size: pagination.pageSize
   })
   list.value = resp.data.content
@@ -238,9 +253,9 @@ async function handleSubmit() {
 async function handleTestConnection(record) {
   const resp = await testConnection(record.deviceCode)
   if (resp.data.result === 'PASSED') {
-    message.success('连接测试通过')
+    message.success(`连接测试通过（耗时${resp.data.durationMs}ms）`)
   } else {
-    message.error('连接测试失败：' + (resp.data.failReason || '未知原因'))
+    message.error(`连接测试失败（耗时${resp.data.durationMs}ms）：` + (resp.data.failReason || '未知原因'))
   }
   fetchList()
 }
@@ -264,5 +279,13 @@ async function handleDelete(record) {
   fetchList()
 }
 
-onMounted(fetchList)
+function onSimulatorChange() {
+  form.deviceTypeCode = form.isSimulator ? 'SIMULATOR' : undefined
+  form.simulatedDeviceType = undefined
+}
+
+onMounted(async () => {
+  fetchList()
+  presetAreas.value = (await listPresetAreas()).data || []
+})
 </script>
