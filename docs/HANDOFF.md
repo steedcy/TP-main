@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_GPT`（SRS_F002 第 2 轮 Claude → ChatGPT，V1.112；见末尾）
-- 当前需求：`SRS_F002 运行总览`；SRS_F001 已完成，按功能需求顺序继续。
+- 状态：`REQUIREMENT_PASSED`（SRS_F002 V1.112 独立复测通过；转 SRS_F003，见末尾）
+- 当前需求：`SRS_F003 设备接入`；SRS_F001、SRS_F002 已完成，按功能需求顺序继续。
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
 - 旧阶段 3 任务已暂停；其结果是待修复的原始证据，不是新版本通过证明。
@@ -225,3 +225,19 @@
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-29 | SRS_F002 | Claude → ChatGPT | READY_FOR_GPT | ai/claude-fix / e1b06ee / V1.112 | 2ff9f77 | 修复 DEF-S3-074/075，补监督注入与边界测试；仅单测通过，待独立复测 |
+
+## 第 4 轮 ChatGPT → Claude（SRS_F002 通过；转入 SRS_F003）
+
+- `SRS_F002` 状态：`REQUIREMENT_PASSED`。代码提交 `e1b06ee0c2b07b3f545a9a35c4be3c91b2b3c970`，标签 `V1.112`；GPT 接收合并 `616ed60`，独立证据及台账提交 `407d23c295d4b5a65118e36997c186a7f292d553`。`TC-004.S1～S4`、`TC-005.S1～S3` 共 7 步与 `SRS_F002.R01～R08` 共 8 条规则在 V1.112 判 P。完整环境、方法、边界和原始证据见 `acceptance/stage3/SRS_F002-V1.112-独立复测与验收裁决.md`。V1.111 的失败和未测证据继续保留；未修改需求及 95 项用例基线。
+- `DEF-S3-074/075` 关闭；`DEF-S3-002` 的试运行排除正式统计子项、`DEF-S3-043` 的规则启停版本及成对判定子项通过。`TC-028.S2`、`TC-043` 的其他要求及原缺陷仍留待后续对应需求整项复测，不在此处转 P。
+- 用户要求减少额度消耗：Claude 修复期间 GPT 不查询 Claude 客户端进度、不重复跑测试；Claude 完成一轮后只通过**已推送 Git 提交和本文件 `READY_FOR_GPT`**交接。交接须列分支、完整代码 SHA、标签、需求 ID、定向验证和待复测范围。GPT 在新的远端交接出现后才接收并独立复测；无需额外状态消息。
+
+### SRS_F003 给 Claude 的首轮范围
+
+1. 从最新已推送 `main` 开始，先读 `AGENTS.md`、本文件、`docs/BASELINE_CHANGES.md`，核对 `acceptance/stage0/` 逐步口径与 `acceptance/stage3/` 旧 F/NT。`SRS_F003` 对应 `TC-008～TC-010`、`R01～R08`；旧 P 不自动继承。
+2. 优先核对 `SRS_F003.R04` 的 `DEF-S3-020`（五类设备/仿真体模拟类型及能力画像）和 `R06` 的进行中设备删除/停用前置缺口；再按步骤核对接入档案、连接测试、上限、凭据掩码、操作审计。发现实质产品偏差时修复并定向回归，不填写 GPT 独立验收 P/F/NT。
+3. 在独立 `ai/claude-fix` worktree 提交推送产品修复及必要单测，创建并推送下一唯一递增 `V1.N` 标签；把本文件状态改为 `READY_FOR_GPT`，附代码 SHA、标签、验证结果、隔离前置和复测清单。不要访问 GPT 独立 schema/端口或 `document/` 用户文件。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-29 | SRS_F002 → SRS_F003 | ChatGPT → Claude | REQUIREMENT_PASSED | ai/gpt-test / e1b06ee / V1.112 | 407d23c | F002 7 步 8 规则 P；main 推送后 Claude 启动 F003，重点 DEF-S3-020/R06 |
