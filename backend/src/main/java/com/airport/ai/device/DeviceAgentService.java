@@ -62,6 +62,15 @@ public class DeviceAgentService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.DEVICE_AGENT_NOT_FOUND));
     }
 
+    @org.springframework.beans.factory.annotation.Autowired private DeviceCapabilityMapper capabilityMapper;
+
+    /** 代理所属设备当前已启用能力的编码+名称摘要 */
+    public java.util.List<java.util.Map<String, String>> enabledCapabilitySummary(DeviceAgent agent) {
+        return capabilityMapper.findByDeviceIdAndCapabilityStatus(agent.getDeviceId(), "ENABLED").stream()
+                .map(c -> java.util.Map.of("capabilityCode", c.getCapabilityCode(), "capabilityName", c.getCapabilityName()))
+                .toList();
+    }
+
     public Device getDeviceOf(DeviceAgent agent) {
         return deviceMapper.findById(agent.getDeviceId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.DEVICE_NOT_FOUND));
@@ -85,13 +94,20 @@ public class DeviceAgentService {
         if ("ARCHIVED".equals(agent.getAgentStatus())) {
             throw new BusinessException(ErrorCode.DEVICE_AGENT_NOT_FOUND, "代理已归档，不可再次停用");
         }
-        if (agent.getCurrentTaskId() != null) {
-            taskEventService.append(agent.getCurrentTaskId(), "AGENT_DISABLED_WITH_OCCUPATION", "OPERATOR",
-                    null, "设备代理" + agent.getAgentCode() + "在占用任务步骤期间被手动停用，待5.5异常恢复流程处理占用释放");
-        }
+        // 先置停用/离线使其立即退出候选，再按5.5.3恢复占用步骤，最后释放占用（SRS_F004.R05、DEF-S3-055）
         agent.setAgentStatus("DISABLED");
         agent.setOnlineStatus("OFFLINE");
         deviceAgentMapper.update(agent);
+        int recovered = taskExceptionService.handleAgentDisabled(agent);
+        if (agent.getCurrentTaskId() != null || recovered > 0) {
+            Long occupied = agent.getCurrentTaskId();
+            agent.setCurrentTaskId(null);
+            agent.setCurrentStepSeq(null);
+            agent.setWorkStatus("IDLE");
+            deviceAgentMapper.update(agent);
+            deviceEventService.append(agent.getId(), "AGENT_OCCUPATION_RELEASED", "OPERATOR", null,
+                    "代理停用，已按异常恢复流程处理" + recovered + "个进行中步骤并释放占用" + (occupied == null ? "" : "（原任务" + occupied + "）"));
+        }
         deviceEventService.append(agent.getId(), "AGENT_DISABLED", "OPERATOR", null,
                 "配置管理员" + operator.getUsername() + "停用了设备代理" + agent.getAgentCode());
         operationLogService.record(operator.getId(), operator.getUsername(), operator.getRole(),

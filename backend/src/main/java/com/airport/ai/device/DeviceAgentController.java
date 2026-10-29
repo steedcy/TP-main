@@ -47,14 +47,16 @@ public class DeviceAgentController {
                                                           @RequestParam(defaultValue = "1") int page,
                                                           @RequestParam(defaultValue = "20") int size) {
         PageResult<DeviceAgent> result = deviceAgentService.list(agentStatus, onlineStatus, page, size);
-        return ApiResponse.ok(result.map(agent -> DeviceAgentView.from(agent, deviceAgentService.getDeviceOf(agent))));
+        return ApiResponse.ok(result.map(agent -> DeviceAgentView.from(agent, deviceAgentService.getDeviceOf(agent))
+                .withEnabledCapabilities(deviceAgentService.enabledCapabilitySummary(agent))));
     }
 
     @GetMapping("/{agentId}")
     @PreAuthorize("hasAnyRole('CONFIG_ADMIN', 'SYSTEM_ADMIN', 'OPERATOR')")
     public ApiResponse<DeviceAgentView> get(@PathVariable String agentId) {
         DeviceAgent agent = deviceAgentService.getByCode(agentId);
-        return ApiResponse.ok(DeviceAgentView.from(agent, deviceAgentService.getDeviceOf(agent)));
+        return ApiResponse.ok(DeviceAgentView.from(agent, deviceAgentService.getDeviceOf(agent))
+                .withEnabledCapabilities(deviceAgentService.enabledCapabilitySummary(agent)));
     }
 
     @PostMapping("/{agentId}/disable")

@@ -52,6 +52,18 @@ public class DeviceController {
         return ApiResponse.ok(result.map(DeviceView::from));
     }
 
+    private boolean autoCreateAgent(Device device) {
+        if (!"ACTIVE".equals(device.getDeviceStatus())) return false;
+        try {
+            deviceService.createAgentByCode(device.getDeviceCode(), currentUser.get());
+            return true;
+        } catch (RuntimeException ex) {
+            org.slf4j.LoggerFactory.getLogger(DeviceController.class)
+                    .warn("连接测试通过后自动创建代理失败，可重试: {}", ex.toString());
+            return false;
+        }
+    }
+
     /** 预置区域清单，供新增/编辑表单下拉选择（DEF-S3-012），服务端同样校验 */
     @GetMapping("/preset-areas")
     public ApiResponse<java.util.Set<String>> presetAreas() {
@@ -83,6 +95,9 @@ public class DeviceController {
         data.put("result", device.getConnectionTestStatus());
         data.put("failReason", passed ? null : device.getConnectionTestResult());
         data.put("durationMs", String.valueOf(device.getConnectionTestDurationMs()));
+        // 连接测试通过且设备启用时自动创建/绑定唯一启用代理；失败不影响已保存的测试结果，
+        // 设备保持“已测试未创建代理”，可重试（TC-011.S1、TC-013.S1）
+        data.put("agentAutoCreated", String.valueOf(passed && autoCreateAgent(device)));
         return ApiResponse.ok(data);
     }
 

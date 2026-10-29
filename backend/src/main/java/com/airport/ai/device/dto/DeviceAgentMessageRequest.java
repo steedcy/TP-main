@@ -6,9 +6,11 @@ import java.util.Map;
 
 public class DeviceAgentMessageRequest {
     @NotBlank
-    @Pattern(regexp = "CAPABILITY_QUERY|STATUS_QUERY|TASK_ACCEPT|TASK_REJECT|EXECUTION_FEEDBACK|TASK_CANCEL")
+    @jakarta.validation.constraints.Size(max = 64)
     private String commandId;
     @NotBlank
+    @Pattern(regexp = "CAPABILITY_QUERY|STATUS_QUERY|TASK_ACCEPT|TASK_REJECT|EXECUTION_FEEDBACK|TASK_CANCEL",
+            message = "messageType须为六类统一消息之一")
     private String messageType;
     @NotBlank
     private String agentId;

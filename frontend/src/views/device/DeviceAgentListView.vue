@@ -26,12 +26,20 @@
           </a-tag>
         </template>
         <template v-else-if="column.key === 'currentTask'">
-          <router-link v-if="record.currentTaskId" :to="`/tasks/${record.currentTaskId}`">
-            任务#{{ record.currentTaskId }}（步骤{{ record.currentStepSeq }}）
-          </router-link>
+          <template v-if="record.currentTaskId">
+            <router-link v-if="canOpenTask" :to="`/tasks/${record.currentTaskId}`">
+              任务#{{ record.currentTaskId }}（步骤{{ record.currentStepSeq }}）
+            </router-link>
+            <span v-else>任务#{{ record.currentTaskId }}（步骤{{ record.currentStepSeq }}）</span>
+          </template>
           <span v-else>—</span>
         </template>
+        <template v-else-if="column.key === 'capabilities'">
+          <a-tag v-for="c in record.enabledCapabilities" :key="c.capabilityCode">{{ c.capabilityCode }} {{ c.capabilityName }}</a-tag>
+          <span v-if="!record.enabledCapabilities?.length">—</span>
+        </template>
         <template v-else-if="column.key === 'action'">
+          <a-button size="small" style="margin-right: 8px" @click="detail = record">详情</a-button>
           <a-popconfirm
             v-if="record.agentStatus === 'ENABLED'"
             title="停用后代理立即退出可用候选集合，确认停用？"
@@ -42,6 +50,25 @@
         </template>
       </template>
     </a-table>
+
+    <a-drawer :open="!!detail" title="设备代理详情" width="480" @close="detail = null">
+      <a-descriptions v-if="detail" bordered :column="1" size="small">
+        <a-descriptions-item label="代理编号">{{ detail.agentId }}</a-descriptions-item>
+        <a-descriptions-item label="设备">{{ detail.deviceName }}（{{ detail.deviceCode }}）</a-descriptions-item>
+        <a-descriptions-item label="代理状态">{{ { ENABLED: '启用', DISABLED: '停用', ARCHIVED: '归档' }[detail.agentStatus] }}</a-descriptions-item>
+        <a-descriptions-item label="在线状态">{{ detail.onlineStatus === 'ONLINE' ? '在线' : '离线' }}</a-descriptions-item>
+        <a-descriptions-item label="工作状态">{{ detail.workStatus === 'BUSY' ? '占用' : '空闲' }}</a-descriptions-item>
+        <a-descriptions-item label="当前任务">
+          <template v-if="detail.currentTaskId">任务#{{ detail.currentTaskId }}（步骤{{ detail.currentStepSeq }}）</template>
+          <template v-else>—</template>
+        </a-descriptions-item>
+        <a-descriptions-item label="最后上报时间">{{ detail.lastReportedAt || '—' }}</a-descriptions-item>
+        <a-descriptions-item label="启用能力">
+          <div v-for="c in detail.enabledCapabilities" :key="c.capabilityCode">{{ c.capabilityCode }}　{{ c.capabilityName }}</div>
+          <span v-if="!detail.enabledCapabilities?.length">无已启用能力</span>
+        </a-descriptions-item>
+      </a-descriptions>
+    </a-drawer>
   </div>
 </template>
 
@@ -50,8 +77,13 @@ import { onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { message } from 'ant-design-vue'
 import { listAgents, disableAgent } from '../../api/device'
+import { useAuthStore } from '../../store/auth'
 
 const list = ref([])
+const detail = ref(null)
+const auth = useAuthStore()
+// 配置管理员无权读取任务详情，当前任务只显示文本，不提供链接
+const canOpenTask = auth.role === 'OPERATOR' || auth.role === 'SYSTEM_ADMIN'
 const route = useRoute()
 const filters = reactive({ agentStatus: route.query.agentStatus || undefined, onlineStatus: route.query.onlineStatus || undefined })
 const pagination = reactive({ current: 1, pageSize: 20, total: 0 })
@@ -64,6 +96,7 @@ const columns = [
   { title: '在线状态', key: 'onlineStatus' },
   { title: '工作状态', key: 'workStatus' },
   { title: '当前任务', key: 'currentTask' },
+  { title: '启用能力', key: 'capabilities' },
   { title: '最后上报时间', dataIndex: 'lastReportedAt' },
   { title: '操作', key: 'action' }
 ]

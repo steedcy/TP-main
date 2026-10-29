@@ -241,8 +241,15 @@ public class DeviceService {
                         throw new BusinessException(ErrorCode.DEVICE_AGENT_ALREADY_EXISTS,
                                 "设备代理已归档，归档后不可恢复");
                     }
+                    boolean wasDisabled = "DISABLED".equals(existing.getAgentStatus());
                     existing.setAgentStatus("ENABLED");
                     deviceAgentMapper.update(existing);
+                    if (wasDisabled) {
+                        deviceEventService.append(existing.getId(), "AGENT_ENABLED", "OPERATOR", null,
+                                "配置管理员" + operator.getUsername() + "重新启用设备代理" + existing.getAgentCode());
+                        operationLogService.record(operator.getId(), operator.getUsername(), operator.getRole(),
+                                "DEVICE_AGENT_ENABLE", existing.getAgentCode(), "SUCCESS", null);
+                    }
                     return existing;
                 })
                 .orElseGet(() -> {
@@ -292,6 +299,19 @@ public class DeviceService {
                 }
             });
         }
+        if ("ACTIVE".equals(status)) {
+            deviceAgentMapper.findByDeviceId(deviceId).ifPresent(agent -> {
+                if ("DISABLED".equals(agent.getAgentStatus())) {
+                    agent.setAgentStatus("ENABLED");
+                    deviceAgentMapper.update(agent);
+                    deviceEventService.append(agent.getId(), "AGENT_ENABLED", "OPERATOR", null,
+                            "设备" + device.getDeviceCode() + "重新启用，代理同步启用并恢复绑定");
+                    operationLogService.record(operator.getId(), operator.getUsername(), operator.getRole(),
+                            "DEVICE_AGENT_ENABLE", agent.getAgentCode(), "SUCCESS", null);
+                    eventPublisher.publishEvent(new DeviceAgentBindingRequestedEvent(agent.getId()));
+                }
+            });
+        }
         operationLogService.record(operator.getId(), operator.getUsername(), operator.getRole(),
                 "DEVICE_STATUS_CHANGE", device.getDeviceCode() + " -> " + status, "SUCCESS", null);
     }
@@ -318,6 +338,8 @@ public class DeviceService {
             deviceAgentMapper.update(agent);
             deviceEventService.append(agent.getId(), "AGENT_ARCHIVED", "OPERATOR", null,
                     "设备" + device.getDeviceCode() + "被删除，代理同步归档，不可恢复");
+            operationLogService.record(operator.getId(), operator.getUsername(), operator.getRole(),
+                    "DEVICE_AGENT_ARCHIVE", agent.getAgentCode(), "SUCCESS", null);
         });
         device.setDeviceStatus("DELETED");
         device.setUpdatedBy(operator.getUsername());

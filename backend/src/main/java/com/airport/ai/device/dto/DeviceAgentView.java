@@ -18,6 +18,8 @@ public class DeviceAgentView {
     private Long currentTaskId;
     private Integer currentStepSeq;
     private LocalDateTime lastReportedAt;
+    /** 启用能力摘要（编码+名称），详情/列表展示用（TC-011.S2、DEF-S3-044） */
+    private java.util.List<java.util.Map<String, String>> enabledCapabilities = java.util.List.of();
 
     public static DeviceAgentView from(DeviceAgent agent, Device device) {
         DeviceAgentView v = new DeviceAgentView();
@@ -42,4 +44,9 @@ public class DeviceAgentView {
     public Long getCurrentTaskId() { return currentTaskId; }
     public Integer getCurrentStepSeq() { return currentStepSeq; }
     public LocalDateTime getLastReportedAt() { return lastReportedAt; }
+    public java.util.List<java.util.Map<String, String>> getEnabledCapabilities() { return enabledCapabilities; }
+    public DeviceAgentView withEnabledCapabilities(java.util.List<java.util.Map<String, String>> caps) {
+        this.enabledCapabilities = caps;
+        return this;
+    }
 }
