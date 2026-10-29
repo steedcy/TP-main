@@ -1,0 +1,241 @@
+{
+  "observedAt": "2026-10-29T12:55:20.317373+08:00",
+  "version": "V1.113",
+  "codeSha": "b5f32f8985c61c2a757864906b87556f7deb6bb6",
+  "schema": "tip_gpt_f002_v111_20261029",
+  "backendPort": 18105,
+  "checks": [
+    {
+      "check": "TC-008.S1.preset_areas",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "areas": [
+          "F2_TEST"
+        ]
+      }
+    },
+    {
+      "check": "TC-008.S1.invalid_code_character",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "code": 3001,
+        "message": "设备编码1~32位，仅允许字母、数字、下划线和短横线"
+      }
+    },
+    {
+      "check": "TC-008.S1.invalid_code_length",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "code": 3001,
+        "message": "设备编码1~32位，仅允许字母、数字、下划线和短横线"
+      }
+    },
+    {
+      "check": "TC-008.S1.blank_name",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "code": 3001,
+        "message": "设备名称长度需为1~64位"
+      }
+    },
+    {
+      "check": "TC-008.S1.long_name",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "code": 3001,
+        "message": "设备名称长度需为1~64位"
+      }
+    },
+    {
+      "check": "TC-008.S1.invalid_type",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "code": 3001,
+        "message": "设备类型不在5类范围内"
+      }
+    },
+    {
+      "check": "TC-008.S1.missing_simulated_type",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "code": 3001,
+        "message": "仿真设备必须指定有效的simulatedDeviceType"
+      }
+    },
+    {
+      "check": "TC-008.S1.invalid_area",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "code": 3001,
+        "message": "所属区域须为预置区域：F2_TEST"
+      }
+    },
+    {
+      "check": "TC-008.S1.period_4",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "code": 3001,
+        "message": "最小不能小于5"
+      }
+    },
+    {
+      "check": "TC-008.S1.period_61",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "code": 3001,
+        "message": "最大不能超过60"
+      }
+    },
+    {
+      "check": "TC-008.S1.remark_201",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "code": 3001,
+        "message": "备注最长200位"
+      }
+    },
+    {
+      "check": "SRS_F003.R04.create_simulator.SMART_DISPLAY",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "deviceCode": "G3_D_125520",
+        "connectionTestStatus": "UNTESTED"
+      }
+    },
+    {
+      "check": "SRS_F003.R04.simulator_status.SMART_DISPLAY",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "capabilityCodes": [
+          "CAP_SIM_STATUS"
+        ],
+        "simStatus": [
+          "UNTESTED"
+        ]
+      }
+    },
+    {
+      "check": "SRS_F003.R04.create_simulator.BAGGAGE_SCANNER",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "deviceCode": "G3_B_125520",
+        "connectionTestStatus": "UNTESTED"
+      }
+    },
+    {
+      "check": "SRS_F003.R04.simulator_status.BAGGAGE_SCANNER",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "capabilityCodes": [
+          "CAP_SIM_STATUS"
+        ],
+        "simStatus": [
+          "UNTESTED"
+        ]
+      }
+    },
+    {
+      "check": "SRS_F003.R04.create_simulator.FLIGHT_DELAY_BOARD",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "deviceCode": "G3_F_125520",
+        "connectionTestStatus": "UNTESTED"
+      }
+    },
+    {
+      "check": "SRS_F003.R04.simulator_status.FLIGHT_DELAY_BOARD",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "capabilityCodes": [
+          "CAP_SIM_STATUS"
+        ],
+        "simStatus": [
+          "UNTESTED"
+        ]
+      }
+    },
+    {
+      "check": "SRS_F003.R04.create_simulator.MOBILE_ROBOT",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "deviceCode": "G3_R_125520",
+        "connectionTestStatus": "UNTESTED"
+      }
+    },
+    {
+      "check": "SRS_F003.R04.simulator_status.MOBILE_ROBOT",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "capabilityCodes": [
+          "CAP_SIM_STATUS"
+        ],
+        "simStatus": [
+          "UNTESTED"
+        ]
+      }
+    },
+    {
+      "check": "SRS_F003.R01.duplicate_code",
+      "pass": true,
+      "facts": {
+        "http": 409,
+        "message": "设备编码已存在：G3_D_125520"
+      }
+    },
+    {
+      "check": "TC-008.S2.list_columns",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "rowCount": 4,
+        "columns": [
+          "accessCredentialRefMasked",
+          "accessEndpoint",
+          "agentStatus",
+          "areaCode",
+          "connectionTestResult",
+          "connectionTestStatus",
+          "createdAt",
+          "deviceCode",
+          "deviceName",
+          "deviceStatus",
+          "deviceTypeCode",
+          "id",
+          "isSimulator",
+          "onlineStatus",
+          "positionX",
+          "positionY",
+          "remark",
+          "simulatedDeviceType",
+          "statusReportInterval",
+          "updatedAt"
+        ]
+      }
+    }
+  ],
+  "createdCodes": [
+    "G3_D_125520",
+    "G3_B_125520",
+    "G3_F_125520",
+    "G3_R_125520"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "observedAt": "2026-10-29T13:10:31.174672+08:00",
+  "version": "V1.113",
+  "codeSha": "b5f32f8985c61c2a757864906b87556f7deb6bb6",
+  "schema": "tip_gpt_f002_v111_20261029",
+  "preserves": [
+    "acceptance/stage3/evidence/SRS_F003-V1.113-connection.json",
+    "acceptance/stage3/evidence/SRS_F003-V1.113-limit.json"
+  ],
+  "connectionAssertionCorrection": {
+    "originalCheck": "TC-009.S2.read_timeout",
+    "originalVerdict": false,
+    "reason": "Malformed-response and read-timeout probes reused the same URL. No access-parameter edit occurred between them, so the saved FAILED result correctly stayed FAILED before the timeout probe. The original assertion incorrectly required UNTESTED.",
+    "observedReason": "设备连接失败: 读取超时（设备未在规定时间内响应）",
+    "savedStatus": "FAILED",
+    "agentCreateHttp": 400,
+    "correctedSubcheckPass": true
+  },
+  "limitCleanupDiagnostic": {
+    "originalFinalCount": 20,
+    "initialCount": 9,
+    "note": "The first cleanup pass recorded 200 responses but an unchanged count; subsequent explicit DELETE calls for the same synthetic codes reduced the active G3L count to zero. The saturation/21st-object rejection was observed before cleanup. TC-010.S3 remains NT pending a separate UI and audit check.",
+    "laterVerifiedActiveG3LCount": 0
+  }
+}
