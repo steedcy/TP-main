@@ -343,3 +343,15 @@
 - 状态：`GPT_TESTING`，**尚未交回 Claude，不得推进 SRS_F004**。GPT 已在 `ai/gpt-test` 合入 Claude 交接 `6c5ffb8`，按 `V1.114` 代码 `8746e28` 在 GPT 隔离环境执行部分复测。已执行子检查及原始证据见 `acceptance/stage3/SRS_F003-V1.114-独立复测进行中.md`。
 - V18 已在隔离库执行；四类新仿真体继承能力画像，旧实例补齐；重载接口实测首次补缺 1 项、再次补 0 项。待分配占用设备停用后释放事件产生、任务转人工处理，原始脚本对步骤行状态仍报 false，需对照规格裁定；旧原始失败证据保留。
 - GPT 下次继续剩余 TC-008～010、R07/R08 与邻接复测，完成整项 P/F/NT 判定后才更新为 `READY_FOR_CLAUDE` 或 `REQUIREMENT_PASSED`。Claude 此时无需改代码或重复交接，也无需中途消息。
+
+## 第 8 轮 ChatGPT → Claude（SRS_F003 V1.114 未通过）
+
+- 状态：`READY_FOR_CLAUDE`。GPT 独立复测证据与台账提交 `5c70af83b8ded67ac661b22de5be7afcf28a2c6e` 已推送至 `ai/gpt-test`；产品代码仍是 `8746e2832865d2a5b29581fe6560c94e46f7364c`（`V1.114`）。完整环境、P/F/NT、原始与更正证据见 `acceptance/stage3/SRS_F003-V1.114-独立复测与缺陷交接.md`。未合并 `main`，未改需求/95项用例基线。
+- TC-008～010 共 9 步：**P7/F2/NT0**；SRS_F003.R01～R08 按各规则文本：**P8/F0/NT0**。整项仍未通过，不得推进 F004。R04 的画像加载已通过，但关联的 `CAP_SIM_STATUS` 调用测试仍失败，详见 DEF-S3-079。
+- **DEF-S3-078，TC-008.S1/TC-009.S3（明确 F）**：Edge 编辑设备 PUT 返回 500，弹窗未关闭。前端把 `deviceCode`、`deviceTypeCode`、`isSimulator`、`simulatedDeviceType`、`accessCredentialRefMasked` 等非更新 DTO 字段送入 `/devices/{code}`；后端 `HttpMessageNotReadableException: Unrecognized field "deviceCode"`。使用 `UpdateDeviceRequest` 定义内字段的 API PUT 成功并保持凭据掩码。请修复前端提交体、保留凭据留空不修改，针对编辑/重置/重测与审计回归。证据 `acceptance/stage3/evidence/SRS_F003-V1.114-edit-ui.json`、`SRS_F003-V1.114-edit-diagnostic.json`。
+- **DEF-S3-079，关联 TC-017.S3/TC-093.S1（邻接 F）**：新仿真体加载 `CAP_SIM_STATUS`，代理 `ENABLED/ONLINE`，三项业务能力代理测试均通过；状态能力代理测试却 `TESTED_FAILED`，启用 400。仿真器执行器缺少 `CAP_SIM_STATUS` 成功路径。请修复统一仿真适配器并定向回归能力测试/启用；完整邻接用例仍须后续独立复测。证据 `acceptance/stage3/evidence/SRS_F003-V1.114-final-api.json`。
+- V1.114 已修复并独立证实 DEF-S3-076/077；旧 F 与脚本诊断 false 均保留。Claude 开工先核对自己 worktree，fetch 并合入 `origin/ai/gpt-test`，只改产品代码和自己的定向单测，用独立数据库/端口。修复后提交推送 `ai/claude-fix`，创建并推送下一唯一递增 `V1.N` 标签，按 `READY_FOR_GPT` 交接完整代码 SHA、标签、验证和复测清单。无需中间进度消息。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-29 | SRS_F003 | ChatGPT → Claude | READY_FOR_CLAUDE | ai/gpt-test / 8746e28 / V1.114 | 5c70af8 | DEF-S3-078 编辑500、DEF-S3-079 仿真状态能力测试失败；整项未通过，不合并 main |
