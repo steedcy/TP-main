@@ -1,0 +1,178 @@
+{
+  "observedAt": "2026-10-30T00:56:05.470456+08:00",
+  "version": "V1.115",
+  "codeSha": "ce93f957cb1cbe291170c624cb8f7b3c224a8035",
+  "schema": "tip_gpt_f002_v111_20261029",
+  "backendPort": 18105,
+  "checks": [
+    {
+      "check": "TC-008.S1.preset_areas",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "areas": [
+          "F2_TEST"
+        ]
+      }
+    },
+    {
+      "check": "TC-008.S1.invalid_code_character",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "code": 3001,
+        "message": "设备编码1~32位，仅允许字母、数字、下划线和短横线"
+      }
+    },
+    {
+      "check": "TC-008.S1.invalid_code_length",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "code": 3001,
+        "message": "设备编码1~32位，仅允许字母、数字、下划线和短横线"
+      }
+    },
+    {
+      "check": "TC-008.S1.blank_name",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "code": 3001,
+        "message": "请输入设备名称"
+      }
+    },
+    {
+      "check": "TC-008.S1.long_name",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "code": 3001,
+        "message": "设备名称长度需为1~64位"
+      }
+    },
+    {
+      "check": "TC-008.S1.invalid_type",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "code": 3001,
+        "message": "设备类型不在5类范围内"
+      }
+    },
+    {
+      "check": "TC-008.S1.missing_simulated_type",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "code": 3001,
+        "message": "仿真设备必须指定有效的simulatedDeviceType"
+      }
+    },
+    {
+      "check": "TC-008.S1.invalid_area",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "code": 3001,
+        "message": "所属区域须为预置区域：F2_TEST"
+      }
+    },
+    {
+      "check": "TC-008.S1.period_4",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "code": 3001,
+        "message": "最小不能小于5"
+      }
+    },
+    {
+      "check": "TC-008.S1.period_61",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "code": 3001,
+        "message": "最大不能超过60"
+      }
+    },
+    {
+      "check": "TC-008.S1.remark_201",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "code": 3001,
+        "message": "备注最长200位"
+      }
+    },
+    {
+      "check": "TC008.create_fill20",
+      "pass": true,
+      "facts": {
+        "http": 200
+      }
+    },
+    {
+      "check": "R01.duplicate",
+      "pass": true,
+      "facts": {
+        "http": 409,
+        "message": "设备编码已存在：G3155_LIMIT_005605"
+      }
+    },
+    {
+      "check": "R05.limit20",
+      "pass": true,
+      "facts": {
+        "http": 409,
+        "message": "接入对象数量已达上限(20)"
+      }
+    },
+    {
+      "check": "TC008.pagination",
+      "pass": true,
+      "facts": {
+        "page1": [
+          "NT002-DEVICE-1",
+          "NT002-DEVICE-2",
+          "NT002-DEVICE-3",
+          "NT002-DEVICE-4",
+          "NT002-DEVICE-5"
+        ],
+        "page2": [
+          "G3_D_125520",
+          "G3_B_125520",
+          "G3_F_125520",
+          "G3_R_125520",
+          "G3_D_143721"
+        ]
+      }
+    },
+    {
+      "check": "TC010.deleted_history",
+      "pass": true,
+      "facts": {
+        "states": "DELETED:ARCHIVED:OFFLINE"
+      }
+    },
+    {
+      "check": "R07.audit",
+      "pass": true,
+      "facts": {
+        "actionCounts": {
+          "DEVICE_CREATE": 3,
+          "DEVICE_UPDATE": 13,
+          "DEVICE_STATUS_CHANGE": 14,
+          "DEVICE_DELETE": 4
+        }
+      }
+    },
+    {
+      "check": "R04.profile",
+      "pass": true,
+      "facts": {
+        "newDeviceCapabilityCount": 4
+      }
+    }
+  ]
+}

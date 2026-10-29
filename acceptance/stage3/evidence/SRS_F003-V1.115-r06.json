@@ -1,0 +1,85 @@
+{
+  "observedAt": "2026-10-30T00:50:42.307453+08:00",
+  "version": "V1.115",
+  "codeSha": "ce93f957cb1cbe291170c624cb8f7b3c224a8035",
+  "schema": "tip_gpt_f002_v111_20261029",
+  "fixture": "GPT-only schema; valid plan version with one plan step; replan_used=true for deterministic manual fallback",
+  "checks": [
+    {
+      "check": "TC-010.S1.delete.PENDING_ASSIGNMENT",
+      "pass": true,
+      "facts": {
+        "http": 409,
+        "taskStatus": "PENDING_ASSIGNMENT",
+        "taskCode": "G3_R06_PENDING_ASSIGNMENT_005042"
+      }
+    },
+    {
+      "check": "TC-010.S2.disable.PENDING_ASSIGNMENT",
+      "pass": false,
+      "facts": {
+        "http": 200,
+        "taskStatus": "EXECUTING",
+        "agent": "DISABLED:OFFLINE:IDLE:null",
+        "releaseEventsBefore": 0,
+        "releaseEventsAfter": 1
+      }
+    },
+    {
+      "check": "TC-010.S1.delete.DOWNGRADING",
+      "pass": true,
+      "facts": {
+        "http": 409,
+        "taskStatus": "DOWNGRADING",
+        "taskCode": "G3_R06_DOWNGRADING_005042"
+      }
+    },
+    {
+      "check": "TC-010.S2.disable.DOWNGRADING",
+      "pass": false,
+      "facts": {
+        "http": 200,
+        "taskStatus": "EXECUTING",
+        "agent": "DISABLED:OFFLINE:IDLE:null",
+        "releaseEventsBefore": 1,
+        "releaseEventsAfter": 2
+      }
+    },
+    {
+      "check": "TC-010.S1.delete.EXECUTING",
+      "pass": true,
+      "facts": {
+        "http": 409,
+        "taskStatus": "EXECUTING",
+        "taskCode": "G3_R06_EXECUTING_005042"
+      }
+    },
+    {
+      "check": "TC-010.S2.disable.EXECUTING",
+      "pass": false,
+      "facts": {
+        "http": 200,
+        "taskStatus": "EXECUTING",
+        "agent": "DISABLED:OFFLINE:IDLE:null",
+        "releaseEventsBefore": 2,
+        "releaseEventsAfter": 3
+      }
+    },
+    {
+      "check": "TC-010.S2.idle_no_release",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "before": 3,
+        "after": 3
+      }
+    },
+    {
+      "check": "R08.audit_no_raw_credential",
+      "pass": true,
+      "facts": {
+        "rawCredentialOccurrences": 0
+      }
+    }
+  ]
+}
