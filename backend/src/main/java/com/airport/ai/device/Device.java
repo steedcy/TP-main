@@ -27,6 +27,11 @@ public class Device {
     /** UNTESTED / PASSED / FAILED */
     private String connectionTestStatus = "UNTESTED";
     private String connectionTestResult;
+    /** 本次连接测试服务端测得的耗时（毫秒），仅用于响应，不持久化（DEF-S3-037） */
+    private transient Long connectionTestDurationMs;
+    /** 列表展示用：所属代理状态与在线状态（来自device_agents，无代理时为null），不持久化（DEF-S3-013） */
+    private transient String agentStatus;
+    private transient String onlineStatus;
     private String remark;
     /** ACTIVE / INACTIVE，对应5.2.1业务规则6设备档案启用/停用，与代理侧agent_status语义不同 */
     private String deviceStatus = "ACTIVE";
@@ -67,6 +72,12 @@ public class Device {
     public void setStatusReportInterval(Integer statusReportInterval) { this.statusReportInterval = statusReportInterval; }
     public String getConnectionTestStatus() { return connectionTestStatus; }
     public void setConnectionTestStatus(String connectionTestStatus) { this.connectionTestStatus = connectionTestStatus; }
+    public String getAgentStatus() { return agentStatus; }
+    public void setAgentStatus(String agentStatus) { this.agentStatus = agentStatus; }
+    public String getOnlineStatus() { return onlineStatus; }
+    public void setOnlineStatus(String onlineStatus) { this.onlineStatus = onlineStatus; }
+    public Long getConnectionTestDurationMs() { return connectionTestDurationMs; }
+    public void setConnectionTestDurationMs(Long v) { this.connectionTestDurationMs = v; }
     public String getConnectionTestResult() { return connectionTestResult; }
     public void setConnectionTestResult(String connectionTestResult) { this.connectionTestResult = connectionTestResult; }
     public String getRemark() { return remark; }

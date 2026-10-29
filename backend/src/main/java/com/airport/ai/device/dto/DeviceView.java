@@ -25,6 +25,8 @@ public class DeviceView {
     private String connectionTestResult;
     private String remark;
     private String deviceStatus;
+    private String agentStatus;
+    private String onlineStatus;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -46,6 +48,8 @@ public class DeviceView {
         v.connectionTestResult = d.getConnectionTestResult();
         v.remark = d.getRemark();
         v.deviceStatus = d.getDeviceStatus();
+        v.agentStatus = d.getAgentStatus();
+        v.onlineStatus = d.getOnlineStatus();
         v.createdAt = d.getCreatedAt();
         v.updatedAt = d.getUpdatedAt();
         return v;
@@ -55,6 +59,8 @@ public class DeviceView {
         return com.airport.ai.common.CredentialMasker.mask(raw);
     }
 
+    public String getAgentStatus() { return agentStatus; }
+    public String getOnlineStatus() { return onlineStatus; }
     public Long getId() { return id; }
     public String getDeviceCode() { return deviceCode; }
     public String getDeviceName() { return deviceName; }

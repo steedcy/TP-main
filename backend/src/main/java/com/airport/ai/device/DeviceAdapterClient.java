@@ -68,8 +68,34 @@ public class DeviceAdapterClient {
             }
             return health;
         } catch (RestClientException ex) {
-            throw new DeviceAdapterException("设备连接失败: " + ex.getClass().getSimpleName(), ex);
+            throw new DeviceAdapterException("设备连接失败: " + describeFailure(ex), ex);
         }
+    }
+
+    /**
+     * 区分连接失败原因（DEF-S3-014、TC-009.S2）：连接被拒/不可达、连接超时、读取超时、HTTP状态异常、响应格式非法。
+     */
+    static String describeFailure(Throwable ex) {
+        for (Throwable t = ex; t != null; t = t.getCause()) {
+            if (t instanceof java.net.SocketTimeoutException) {
+                String m = String.valueOf(t.getMessage()).toLowerCase();
+                return m.contains("connect") ? "连接超时（建立连接超时）" : "读取超时（设备未在规定时间内响应）";
+            }
+            if (t instanceof java.net.ConnectException || t instanceof java.net.NoRouteToHostException) {
+                return "设备不可达（连接被拒绝或无路由）";
+            }
+            if (t instanceof java.net.UnknownHostException) {
+                return "设备不可达（主机名无法解析）";
+            }
+        }
+        if (ex instanceof org.springframework.web.client.RestClientResponseException r) {
+            return "设备接口返回HTTP " + r.getStatusCode().value();
+        }
+        if (ex instanceof org.springframework.web.client.UnknownContentTypeException
+                || (ex.getMessage() != null && ex.getMessage().contains("Error while extracting response"))) {
+            return "响应格式非法（无法解析为状态响应）";
+        }
+        return ex.getClass().getSimpleName();
     }
 
     public void bind(Device device, DeviceAgent agent, int heartbeatTimeoutSeconds) {
@@ -113,7 +139,7 @@ public class DeviceAdapterClient {
             }
             return response.getBody();
         } catch (RestClientException ex) {
-            throw new DeviceAdapterException("设备接口调用失败: " + ex.getClass().getSimpleName(), ex);
+            throw new DeviceAdapterException("设备接口调用失败: " + describeFailure(ex), ex);
         }
     }
 

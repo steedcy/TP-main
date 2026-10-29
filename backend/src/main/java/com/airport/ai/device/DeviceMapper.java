@@ -21,7 +21,8 @@ public interface DeviceMapper {
                           @Param("tokenCiphertext") String tokenCiphertext,
                           @Param("issuedAt") java.time.LocalDateTime issuedAt);
     List<Device> searchPaged(@Param("deviceTypeCode") String deviceTypeCode,
-                              @Param("keyword") String keyword);
+                              @Param("keyword") String keyword,
+                              @Param("onlineStatus") String onlineStatus);
     int insert(Device device);
     int update(Device device);
 }

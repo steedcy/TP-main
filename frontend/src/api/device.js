@@ -44,3 +44,7 @@ export function getAgent(agentId) {
 export function disableAgent(agentId) {
   return request.post(`/device-agents/${agentId}/disable`, { confirmed: true })
 }
+
+export function listPresetAreas() {
+  return request.get('/devices/preset-areas')
+}

@@ -30,6 +30,9 @@ public class DeviceService {
     private final DeviceAdapterClient deviceAdapterClient;
     private final ApplicationEventPublisher eventPublisher;
     private final int maxAccessObjectsSystem;
+    private final DeviceCapabilityMapper deviceCapabilityMapper;
+    private final com.airport.ai.task.TaskExceptionService taskExceptionService;
+    private final java.util.Set<String> presetAreas;
 
     public DeviceService(DeviceMapper deviceMapper,
                           DeviceAgentMapper deviceAgentMapper,
@@ -37,7 +40,14 @@ public class DeviceService {
                           DeviceEventService deviceEventService,
                           DeviceAdapterClient deviceAdapterClient,
                           ApplicationEventPublisher eventPublisher,
-                          @Value("${app.device.max-access-objects-system:20}") int maxAccessObjectsSystem) {
+                          @Value("${app.device.max-access-objects-system:20}") int maxAccessObjectsSystem,
+                          DeviceCapabilityMapper deviceCapabilityMapper,
+                          @org.springframework.context.annotation.Lazy com.airport.ai.task.TaskExceptionService taskExceptionService,
+                          @Value("${app.device.preset-areas:F2_TEST}") String presetAreas) {
+        this.deviceCapabilityMapper = deviceCapabilityMapper;
+        this.taskExceptionService = taskExceptionService;
+        this.presetAreas = java.util.Arrays.stream(presetAreas.split(",")).map(String::trim)
+                .filter(v -> !v.isEmpty()).collect(java.util.stream.Collectors.toCollection(java.util.LinkedHashSet::new));
         this.deviceMapper = deviceMapper;
         this.deviceAgentMapper = deviceAgentMapper;
         this.operationLogService = operationLogService;
@@ -50,8 +60,9 @@ public class DeviceService {
     @Transactional
     public Device create(CreateDeviceRequest request, User operator) {
         if (deviceMapper.existsByDeviceCode(request.getDeviceCode())) {
-            throw new BusinessException(ErrorCode.DEVICE_CODE_TAKEN);
+            throw new BusinessException(ErrorCode.DEVICE_CODE_TAKEN, "设备编码已存在：" + request.getDeviceCode());
         }
+        requirePresetArea(request.getAreaCode());
         // 接入总量上限（对应5.2.1业务规则5、TBD-01拍板结论），按系统性能设计上限校验，可配置，已删除设备不计入
         long currentCount = deviceMapper.countByDeviceStatusNot("DELETED");
         if (currentCount >= maxAccessObjectsSystem) {
@@ -90,6 +101,9 @@ public class DeviceService {
         device.setUpdatedBy(operator.getUsername());
         deviceMapper.insert(device);
         Device saved = device;
+        if (Boolean.TRUE.equals(saved.getIsSimulator())) {
+            loadSimulatorStatusCapability(saved);
+        }
 
         java.util.Map<String, Object> detail = new java.util.HashMap<>();
         detail.put("deviceName", saved.getDeviceName());
@@ -105,7 +119,8 @@ public class DeviceService {
         PageHelper.startPage(page, size);
         java.util.List<Device> result = deviceMapper.searchPaged(
                 (deviceTypeCode == null || deviceTypeCode.isBlank()) ? null : deviceTypeCode,
-                (keyword == null || keyword.isBlank()) ? null : keyword);
+                (keyword == null || keyword.isBlank()) ? null : keyword,
+                (onlineFilter == null || onlineFilter.isBlank()) ? null : onlineFilter);
         return PageResult.of(new PageInfo<>(result));
     }
 
@@ -149,6 +164,9 @@ public class DeviceService {
                 && !device.getAccessCredentialRef().equals(request.getAccessCredentialRef());
         boolean endpointChanged = !device.getAccessEndpoint().equals(request.getAccessEndpoint());
 
+        if (!java.util.Objects.equals(device.getAreaCode(), request.getAreaCode())) {
+            requirePresetArea(request.getAreaCode());
+        }
         device.setDeviceName(request.getDeviceName());
         device.setAreaCode(request.getAreaCode());
         device.setPositionX(request.getPositionX());
@@ -184,9 +202,10 @@ public class DeviceService {
     @Transactional
     public Device testConnection(Long deviceId, User operator) {
         Device device = get(deviceId);
-        if ("INACTIVE".equals(device.getDeviceStatus())) {
-            throw new BusinessException(ErrorCode.DEVICE_NOT_FOUND, "设备已停用，请先启用后再测试");
+        if ("DELETED".equals(device.getDeviceStatus())) {
+            throw new BusinessException(ErrorCode.DEVICE_NOT_FOUND, "设备已删除，不可测试");
         }
+        long startedAt = System.nanoTime();
         try {
             var health = deviceAdapterClient.testConnection(device);
             device.setPositionX(health.getLocation().getX());
@@ -197,6 +216,7 @@ public class DeviceService {
             device.setConnectionTestStatus("FAILED");
             device.setConnectionTestResult(ex.getMessage() == null ? "设备连接测试失败" : ex.getMessage());
         }
+        device.setConnectionTestDurationMs((System.nanoTime() - startedAt) / 1_000_000L);
         deviceMapper.update(device);
         Device saved = device;
         operationLogService.record(operator.getId(), operator.getUsername(), operator.getRole(),
@@ -246,6 +266,13 @@ public class DeviceService {
     @Transactional
     public void updateStatus(Long deviceId, String status, User operator) {
         Device device = get(deviceId);
+        if ("ACTIVE".equals(status) && "INACTIVE".equals(device.getDeviceStatus())
+                && !"PASSED".equals(device.getConnectionTestStatus())) {
+            throw new BusinessException(ErrorCode.DEVICE_CONNECTION_TEST_FAILED, "启用前须连接测试通过");
+        }
+        if ("INACTIVE".equals(status)) {
+            releaseAgentOccupation(device);
+        }
         device.setDeviceStatus(status);
         device.setUpdatedBy(operator.getUsername());
         device.setUpdatedAt(java.time.LocalDateTime.now());
@@ -280,7 +307,7 @@ public class DeviceService {
     public void delete(Long deviceId, User operator) {
         Device device = get(deviceId);
         deviceAgentMapper.findByDeviceId(deviceId).ifPresent(agent -> {
-            if (agent.getCurrentTaskId() != null) {
+            if (agent.getCurrentTaskId() != null || deviceAgentMapper.countActiveTaskAssignments(agent.getId()) > 0) {
                 throw new BusinessException(ErrorCode.DEVICE_HAS_ACTIVE_TASK);
             }
             agent.setAgentStatus("ARCHIVED");
@@ -295,5 +322,55 @@ public class DeviceService {
         deviceMapper.update(device);
         operationLogService.record(operator.getId(), operator.getUsername(), operator.getRole(),
                 "DEVICE_DELETE", device.getDeviceCode(), "SUCCESS", null);
+    }
+
+    private void requirePresetArea(String areaCode) {
+        if (areaCode == null || !presetAreas.contains(areaCode)) {
+            throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR,
+                    "所属区域须为预置区域：" + String.join("、", presetAreas));
+        }
+    }
+
+    public java.util.Set<String> presetAreas() {
+        return presetAreas;
+    }
+
+    /** 仿真体加载仿真状态生成能力（SRS_F003.R04、DEF-S3-020），初始为未测试，须能力测试通过后才可启用 */
+    void loadSimulatorStatusCapability(Device device) {
+        if (deviceCapabilityMapper.existsByDeviceIdAndCapabilityCode(device.getId(), "CAP_SIM_STATUS")) {
+            return;
+        }
+        DeviceCapability capability = new DeviceCapability();
+        capability.setDeviceId(device.getId());
+        capability.setCapabilityCode("CAP_SIM_STATUS");
+        capability.setCapabilityName("仿真状态生成");
+        capability.setCapabilityType("CAP_SIM_STATUS");
+        capability.setInputParams("[]");
+        capability.setOutputParams("[]");
+        capability.setCapabilityDescription("仿真体生成并上报模拟设备状态");
+        deviceCapabilityMapper.insert(capability);
+    }
+
+    /**
+     * 停用设备时先释放代理占用（SRS_F003.R06）：占用中的任务步骤按5.5.3异常恢复流程处理
+     * （候选切换/重新规划/转人工），再清除代理占用并记录设备事件。
+     */
+    private void releaseAgentOccupation(Device device) {
+        deviceAgentMapper.findByDeviceId(device.getId()).ifPresent(agent -> {
+            if ("ARCHIVED".equals(agent.getAgentStatus())) return;
+            Long taskId = agent.getCurrentTaskId();
+            agent.setAgentStatus("DISABLED");
+            agent.setOnlineStatus("OFFLINE");
+            deviceAgentMapper.update(agent);
+            if (taskId != null) {
+                taskExceptionService.handleAgentOffline(agent);
+                agent.setCurrentTaskId(null);
+                agent.setCurrentStepSeq(null);
+                agent.setWorkStatus("IDLE");
+                deviceAgentMapper.update(agent);
+                deviceEventService.append(agent.getId(), "AGENT_OCCUPATION_RELEASED", "OPERATOR", null,
+                        "设备" + device.getDeviceCode() + "停用，已按异常恢复流程处理并释放对任务" + taskId + "的占用");
+            }
+        });
     }
 }

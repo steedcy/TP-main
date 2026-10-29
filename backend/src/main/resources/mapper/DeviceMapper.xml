@@ -28,6 +28,11 @@
         <result column="updated_by" property="updatedBy"/>
     </resultMap>
 
+    <resultMap id="DeviceListResult" type="com.airport.ai.device.Device" extends="DeviceResult">
+        <result column="agent_status_view" property="agentStatus"/>
+        <result column="online_status_view" property="onlineStatus"/>
+    </resultMap>
+
     <sql id="Columns">
         id, device_code, device_name, device_type_code, is_simulator, simulated_device_type, area_code,
         position_x, position_y, access_endpoint, access_credential_ref, device_token_hash,
@@ -74,10 +79,16 @@
         <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>
     </select>
 
-    <select id="searchPaged" resultMap="DeviceResult">
-        SELECT <include refid="Columns"/> FROM devices
+    <select id="searchPaged" resultMap="DeviceListResult">
+        SELECT <include refid="Columns"/>,
+            (SELECT a.agent_status FROM device_agents a WHERE a.device_id = devices.id) AS agent_status_view,
+            (SELECT a.online_status FROM device_agents a WHERE a.device_id = devices.id) AS online_status_view
+        FROM devices
         <where>
             device_status &lt;&gt; 'DELETED'
+            <if test="onlineStatus != null">
+                AND COALESCE((SELECT a.online_status FROM device_agents a WHERE a.device_id = devices.id), 'OFFLINE') = #{onlineStatus}
+            </if>
             <if test="deviceTypeCode != null">
                 AND device_type_code = #{deviceTypeCode}
             </if>

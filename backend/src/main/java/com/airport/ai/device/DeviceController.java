@@ -45,10 +45,17 @@ public class DeviceController {
     @GetMapping
     public ApiResponse<PageResult<DeviceView>> list(@RequestParam(required = false) String deviceTypeCode,
                                                      @RequestParam(required = false) String keyword,
+                                                     @RequestParam(required = false) String onlineStatus,
                                                      @RequestParam(defaultValue = "1") int page,
                                                      @RequestParam(defaultValue = "20") int size) {
-        PageResult<Device> result = deviceService.list(deviceTypeCode, null, keyword, page, size);
+        PageResult<Device> result = deviceService.list(deviceTypeCode, onlineStatus, keyword, page, size);
         return ApiResponse.ok(result.map(DeviceView::from));
+    }
+
+    /** 预置区域清单，供新增/编辑表单下拉选择（DEF-S3-012），服务端同样校验 */
+    @GetMapping("/preset-areas")
+    public ApiResponse<java.util.Set<String>> presetAreas() {
+        return ApiResponse.ok(deviceService.presetAreas());
     }
 
     @GetMapping("/{deviceCode}")
@@ -68,6 +75,7 @@ public class DeviceController {
         Map<String, String> data = new java.util.HashMap<>();
         data.put("result", device.getConnectionTestStatus());
         data.put("failReason", passed ? null : device.getConnectionTestResult());
+        data.put("durationMs", String.valueOf(device.getConnectionTestDurationMs()));
         return ApiResponse.ok(data);
     }
 
