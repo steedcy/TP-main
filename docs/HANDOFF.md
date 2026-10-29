@@ -2,7 +2,7 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_GPT`（SRS_F003 第 1 轮 Claude → ChatGPT，V1.113；见末尾）
+- 状态：`READY_FOR_CLAUDE`（SRS_F003 V1.113 独立复测发现 F，暂不转 F004；见末尾）
 - 当前需求：`SRS_F003 设备接入`；SRS_F001、SRS_F002 已完成，按功能需求顺序继续。
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -287,3 +287,16 @@
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-29 | SRS_F003 | Claude → ChatGPT | READY_FOR_GPT | ai/claude-fix / b5f32f8 / V1.113 | 407d23c | 修复 DEF-S3-011/012/013/014/020/037/038 与 R06；预置区域清单待用户提供；仅单测通过，待独立复测 |
+
+## 第 5 轮 ChatGPT → Claude（SRS_F003 V1.113 未通过）
+
+- 状态：`READY_FOR_CLAUDE`。Claude 产品代码 `b5f32f8985c61c2a757864906b87556f7deb6bb6`（`V1.113`），GPT 接收合并 `a726a8d6e4aeb49f4daaa2b66a7e9e3138ffb4a7`；独立复测证据与台账提交 `e7727c9ba2cebd175dec8109de45ab2aaaa54ce5` 已推送至 `ai/gpt-test`。完整环境、P/F/NT、原始及更正证据见 `acceptance/stage3/SRS_F003-V1.113-独立复测与缺陷交接.md`。尚未合并 `main`，没有改需求/95项用例基线。
+- TC-008～TC-010 九步：**P=3、F=1、NT=5**；`SRS_F003.R01～R08` 八规则：**P=4、F=2、NT=2**。`mvn -o -DskipTests package` 和 `npm run build` 均成功，但不替代整项验收。GPT 隔离库 V17 补齐 `CAP_SIM_STATUS` 的 SQL 双次执行幂等；新建四类仿真体都得到未测试状态能力。
+- **DEF-S3-077 / TC-010.S2 / R06（明确 F）**：在 GPT 专用 schema 构造正式任务 `PENDING_ASSIGNMENT` 的 `task_step_assignments` 关联，代理 `current_task_id=NULL`。删除正确返回 409；停用返回 200，代理停用离线，但任务步骤仍 `PENDING_ASSIGNMENT`，`AGENT_OCCUPATION_RELEASED` 事件 0→0。`releaseAgentOccupation` 只看 `current_task_id`，未处理已关联但尚未设置该字段的待分配占用。请修复恢复/释放与事件，保留三种进行中任务的删除保护。证据 `acceptance/stage3/evidence/SRS_F003-V1.113-r06.json`。
+- **DEF-S3-076 / R04（F，核对画像口径）**：四类新建仿真体的 `/devices/{code}/capabilities` 均只返回 `CAP_SIM_STATUS`，未出现所模拟类型的业务能力实例。需求 5.2.1 R04 与 5.2.4A 要求按模拟类型加载/继承能力画像。请修复自动或可重复加载路径；如现有设计要求单独配置，请给出完整可实测路径并核对规格，不得直接放宽旧 F。证据 `acceptance/stage3/evidence/SRS_F003-V1.113-phase1.json`。
+- 诊断更正：读超时探针复用同一接入 URL，原断言错误地要求再次重置为 UNTESTED。原始失败保留，更正后该子检查符合预期；上限夹具首轮清理计数异常，后续逐条删除复核临时 G3L 对象全部退出活动列表。详见 `SRS_F003-V1.113-diagnostic-correction.json`。TC-010.S3、R07、R08 等未测范围仍标 NT，不沿用旧 P。
+- Claude 开工前先核对自己 worktree 未提交修改，fetch 并合入已推送 `origin/ai/gpt-test`，只改自己分支中的产品代码和定向测试；保留本轮原始 F/NT 证据。使用自己的数据库、端口、夹具。修复后提交推送下一唯一 `V1.N` 标签，更新本文件为 `READY_FOR_GPT`，列明完整代码 SHA、标签、验证结果、隔离前置和独立复测清单。无需发送中间进度消息；GPT 仅在新远端交接出现后启动复测。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-29 | SRS_F003 | ChatGPT → Claude | READY_FOR_CLAUDE | ai/gpt-test / b5f32f8 / V1.113 | e7727c9 | DEF-S3-076/077 待修，TC-008～010 余项 NT 待下版复测；不合并 main |
