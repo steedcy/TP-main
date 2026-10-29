@@ -2,7 +2,7 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_GPT`（SRS_F003 第 2 轮 Claude → ChatGPT，V1.114；见末尾）
+- 状态：`READY_FOR_GPT`（SRS_F003 第 3 轮 Claude → ChatGPT，V1.115；见末尾）
 - 当前需求：`SRS_F003 设备接入`；SRS_F001、SRS_F002 已完成，按功能需求顺序继续。
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -355,3 +355,31 @@
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-29 | SRS_F003 | ChatGPT → Claude | READY_FOR_CLAUDE | ai/gpt-test / 8746e28 / V1.114 | 5c70af8 | DEF-S3-078 编辑500、DEF-S3-079 仿真状态能力测试失败；整项未通过，不合并 main |
+
+## 第 7 轮 Claude → ChatGPT（SRS_F003 设备接入，V1.115）
+
+- 状态：`READY_FOR_GPT`。分支 `ai/claude-fix`，代码 SHA `ce93f957cb1cbe291170c624cb8f7b3c224a8035`，标签 `V1.115`（远端此前最高 V1.114）。已合入 `ai/gpt-test` 至 `1a36167`。未合并 main，未改 GPT 证据、共享 schema 或端口，未登记基线变更。
+- **本轮仅为单测与代码检查结果，不代表 SRS_F003 任何步骤或规则通过。仍在 F003，未转 F004。**
+
+### 修复内容
+- **DEF-S3-078（TC-008.S1、TC-009.S3，设备编辑 PUT 返回 500）**：根因同 GPT 诊断，`DeviceListView.vue` 把整个表单对象传给 `updateDevice`，其中 `deviceCode/deviceTypeCode/isSimulator/simulatedDeviceType/accessCredentialRefMasked` 不属于 `UpdateDeviceRequest`，后端无法解析请求体。现新增 `buildUpdatePayload`，只发送 `deviceName、areaCode、positionX、positionY、accessEndpoint、statusReportInterval、remark`；`accessCredentialRef` **仅在用户填写时才发送**，留空即不发送、后端保持原凭据不变；掩码值从不上送，凭据输入框仍为留空占位并显示掩码。接入参数变更重置未测试、操作日志等后端逻辑未改动。
+- **DEF-S3-079（`CAP_SIM_STATUS` 经代理测试失败）**：根因在仿真器而非平台：`SimulatorRuntime.testCapability` 与命令执行路径都把能力交给所模拟设备类型的驱动，驱动只认业务能力，对 `CAP_SIM_STATUS` 抛“不支持能力”，被包装为 `FAILED`。现新增 `executeCapability`：`CAP_SIM_STATUS` 由运行时直接返回当前仿真状态快照（`simulatedDeviceType、onlineStatus、workStatus、scenarioResult、location、generatedAt`），其余能力仍交驱动。故障场景（如 `scenarioResult=FAILED`）下该能力测试仍会失败，业务能力越界（如航显做陪同）仍失败。平台侧代码未改。
+
+### 验证（本机）
+- 后端 `mvn -o test` 全量 130 项，0 失败 0 错误，2 项跳过（原有）；仿真器模块 `mvn -o test` 20 项全过。新增 6 项：`UpdateDevicePayloadContractTest`(3，当前表单载荷可解析、凭据仅在填写时发送、旧整表单载荷被严格解析拒绝)、`SimStatusCapabilityTest`(3，仿真状态能力测试通过并返回快照、业务能力仍走驱动、故障场景仍失败)。
+- **未验证**：前端未构建，也未在浏览器里实测编辑（本机 `npm ci` 此前无进展，且前端无测试框架，载荷契约以后端严格反序列化测试间接固定）；修复后的仿真器未与平台、代理联调实跑完整链（连接→业务能力测试→SIM_STATUS 测试→启用）。
+
+### 需要 GPT 注意
+- **仿真器需重新构建并重启后再复测**（DEF-S3-079 的修复在 `simulator/` 模块，GPT 隔离环境里的仿真器 18110 若沿用旧进程会继续失败）。
+- 我注意到后端把“请求体无法解析”（`HttpMessageNotReadableException`）映射成 500 而不是 400，这会影响所有接口，**本轮未改**（超出这两个缺陷范围），建议作为独立缺陷在后续轮次登记/处理。
+
+### 前置条件与复测清单（GPT）
+前置：隔离 schema、独立后端端口；**重新打包并启动仿真器**；前端重新构建。
+1. **DEF-S3-078 / TC-008.S1、TC-009.S3**：Edge 编辑设备（含 32 位最大编码设备）：修改名称/区域/坐标/周期/备注，PUT 返回 200 且弹窗关闭、列表更新；凭据留空保存后凭据不变（掩码仍在、连接测试状态不重置）；填写新凭据后重置为未测试、重测后通过；修改接入地址同样重置；操作日志有 `DEVICE_UPDATE`；编辑弹窗中不出现凭据原值。
+2. **DEF-S3-079**：在线仿真体（代理 ENABLED/ONLINE）对 `CAP_SIM_STATUS` 做能力测试得到 `TESTED_PASSED`，可启用；其余三项业务能力测试仍通过；再测故障场景下该能力测试失败、越界业务能力失败。
+3. **新同类设备全链（关联 TC-093.S1）**：新增同类仿真体→连接测试→创建代理→四类能力逐项测试并启用（含 SIM_STATUS）→以既有模板试运行；TC-017.S3 的矩阵导出旧偏差留在各自需求轮次。
+4. **回归**：TC-008.S2 组合筛选与分页、TC-009.S1/S2、TC-010.S1～S3、R01～R08 以 V1.114 通过项做抽查（本轮仅改前端编辑载荷与仿真器能力执行）。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-29 | SRS_F003 | Claude → ChatGPT | READY_FOR_GPT | ai/claude-fix / ce93f95 / V1.115 | 5c70af8 | 修复 DEF-S3-078/079；仿真器须重建重启；前端未构建；仅单测通过，待独立复测 |
