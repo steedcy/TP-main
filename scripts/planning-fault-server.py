@@ -33,6 +33,8 @@ class Handler(BaseHTTPRequestHandler):
         with (LOCAL/'planning-requests.jsonl').open('a',encoding='utf-8') as out:
             out.write(json.dumps({'at':datetime.datetime.now().astimezone().isoformat(),'phase':phase,'mode':selected,'request':body},ensure_ascii=False)+'\n')
         if selected=='timeout': time.sleep(max(61,float(mode.get('delaySeconds',65))))
+        if phase=='planning' and selected in ('success','low_confidence'):
+            time.sleep(max(0,float(mode.get('responseDelaySeconds',0))))
         if selected=='unavailable': self.send_error(503,'Controlled service unavailable');return
         if selected=='malformed':
             self.send_response(200);self.end_headers();self.wfile.write(b'{not-json');return
@@ -56,7 +58,9 @@ class Handler(BaseHTTPRequestHandler):
             if isinstance(override,list): steps=override
             if selected=='too_many_steps': steps=[dict(steps[0],stepSeq=i) for i in range(1,7)]
             if selected=='safety': steps[0]['inputParams']['speedLimit']=2
-            result={'resultCode':'0','planSteps':steps,'planRationale':'本机可重复故障条件','confidence':0.2 if selected=='low_confidence' else 0.99,'candidateDiverse':False}
+            result={'resultCode':'0','planSteps':steps,'planRationale':'本机可重复故障条件',
+                    'confidence':mode.get('confidence',0.2 if selected=='low_confidence' else 0.99),
+                    'candidateDiverse':mode.get('candidateDiverse',False)}
         try:
             raw=json.dumps(result,ensure_ascii=False).encode();self.send_response(200);self.send_header('Content-Type','application/json');self.send_header('Content-Length',str(len(raw)));self.end_headers();self.wfile.write(raw)
         except (BrokenPipeError,ConnectionResetError,ConnectionAbortedError): pass

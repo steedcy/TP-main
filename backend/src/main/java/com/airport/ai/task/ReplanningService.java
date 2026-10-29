@@ -381,8 +381,12 @@ public class ReplanningService {
     }
 
     private List<Map<String, Object>> normalizeTemplateSteps(List<Map<String, Object>> steps) {
+        // 预置F2模板步骤无stepSeq，按模板顺序补稳定序号（从1起），否则分配表step_seq非空约束失败（DEF-S3-075）
+        java.util.concurrent.atomic.AtomicInteger seq = new java.util.concurrent.atomic.AtomicInteger();
         return steps.stream().map(step -> {
             Map<String, Object> normalized = new java.util.LinkedHashMap<>(step);
+            int position = seq.incrementAndGet();
+            if (normalized.get("stepSeq") == null) normalized.put("stepSeq", position);
             normalized.putIfAbsent("stepGoal", "执行" + normalized.get("capabilityType") + "能力（基线模板步骤）");
             normalized.putIfAbsent("precondition", "候选设备在线且空闲");
             normalized.putIfAbsent("failureHandling", "重试一次或转人工处理");

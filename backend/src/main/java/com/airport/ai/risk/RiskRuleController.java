@@ -68,12 +68,19 @@ public class RiskRuleController {
                 .orElseThrow(() -> new BusinessException(ErrorCode.SYSTEM_ERROR, "规则不存在"));
         String beforeContent = rule.getRuleContent();
         Boolean beforeEnabled = rule.getEnabled();
+        boolean versionChanged = false;
         if (body.containsKey("ruleContent")) {
             rule.setRuleContent((String) body.get("ruleContent"));
-            rule.setRuleVersion(bumpVersion(rule.getRuleVersion()));
+            versionChanged = true;
         }
+        // 启用/停用同样改变生效规则集，须生成新版本以便监督判定可追溯（DEF-S3-043）
         if (body.containsKey("enabled")) {
-            rule.setEnabled((Boolean) body.get("enabled"));
+            Boolean newEnabled = (Boolean) body.get("enabled");
+            versionChanged |= !java.util.Objects.equals(beforeEnabled, newEnabled);
+            rule.setEnabled(newEnabled);
+        }
+        if (versionChanged) {
+            rule.setRuleVersion(bumpVersion(rule.getRuleVersion()));
         }
         rule.setUpdatedAt(java.time.LocalDateTime.now());
         riskRuleMapper.update(rule);

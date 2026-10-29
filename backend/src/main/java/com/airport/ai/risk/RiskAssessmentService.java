@@ -42,6 +42,13 @@ public class RiskAssessmentService {
     private final long contextStaleSeconds;
     private final int resourceCriticalCandidateThreshold;
 
+    /**
+     * 隔离测试用故障注入（默认关闭，仅隔离后端通过app.risk.fault-injection.mode开启）：
+     * UNAVAILABLE=监督服务不可用，UNDETERMINED=监督无法判定，用于覆盖TC-005.S3（NT-S3-028）。
+     */
+    @Value("${app.risk.fault-injection.mode:}")
+    private String faultInjectionMode = "";
+
     public RiskAssessmentService(RiskRuleMapper riskRuleMapper,
                                   @Value("${app.risk.low-confidence-threshold:0.8}") double lowConfidenceThreshold,
                                   @Value("${app.risk.context-stale-seconds:60}") long contextStaleSeconds,
@@ -69,9 +76,18 @@ public class RiskAssessmentService {
             throw new BusinessException(ErrorCode.SUPERVISION_ON_UNVALIDATED_PLAN);
         }
 
+        if ("UNAVAILABLE".equalsIgnoreCase(faultInjectionMode)) {
+            throw new IllegalStateException("injected supervision fault: service unavailable");
+        }
+        if ("UNDETERMINED".equalsIgnoreCase(faultInjectionMode)) {
+            return new RiskAssessmentResult("UNDETERMINED", "INJECTED_UNDETERMINED", "注入：监督智能体输出无法确定",
+                    null, "MANUAL_HANDLING", "V1.0");
+        }
+
         List<RiskRule> enabledRules = riskRuleMapper.findByEnabled(true);
         Set<String> enabledCodes = enabledRules.stream().map(RiskRule::getRuleCode).collect(Collectors.toSet());
-        String ruleSetVersion = enabledRules.isEmpty() ? "V1.0" : enabledRules.get(0).getRuleVersion();
+        List<RiskRule> allRules = riskRuleMapper.findAll();
+        String ruleSetVersion = RiskRuleSetVersion.of(allRules == null || allRules.isEmpty() ? enabledRules : allRules);
 
         // 1. 确定性规则优先判定
         if (enabledCodes.contains(RULE_ESCORT_SPECIAL_PASSENGER) && "SPECIAL_PASSENGER_SERVICE".equals(taskFamily)

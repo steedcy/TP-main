@@ -1,0 +1,89 @@
+{
+  "observedAt": "2026-10-29T07:31:24.355088+08:00",
+  "version": "V1.112",
+  "schema": "tip_gpt_f002flow_v112_20261029",
+  "ruleTemporarilyDisabled": "RULE_RESOURCE_CRITICAL",
+  "ruleRestored": true,
+  "checks": [
+    {
+      "case": "0.80-only",
+      "confidence": 0.8,
+      "candidateDiverse": false,
+      "snapshotBackdatedSeconds": null,
+      "http": 200,
+      "apiCode": 200,
+      "taskId": 10,
+      "riskLevel": "LOW",
+      "reasonCode": "",
+      "basis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+      "pass": true
+    },
+    {
+      "case": "0.79-only",
+      "confidence": 0.79,
+      "candidateDiverse": false,
+      "snapshotBackdatedSeconds": null,
+      "http": 200,
+      "apiCode": 200,
+      "taskId": 11,
+      "riskLevel": "LOW",
+      "reasonCode": "",
+      "basis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+      "pass": true
+    },
+    {
+      "case": "diverse-only",
+      "confidence": 0.8,
+      "candidateDiverse": true,
+      "snapshotBackdatedSeconds": null,
+      "http": 200,
+      "apiCode": 200,
+      "taskId": 12,
+      "riskLevel": "LOW",
+      "reasonCode": "",
+      "basis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+      "pass": true
+    },
+    {
+      "case": "0.79+diverse",
+      "confidence": 0.79,
+      "candidateDiverse": true,
+      "snapshotBackdatedSeconds": null,
+      "http": 200,
+      "apiCode": 200,
+      "taskId": 13,
+      "riskLevel": "HIGH",
+      "reasonCode": "RISK_SIGNAL_COMBINATION",
+      "basis": "风险信号组合触发基线降级：模型低置信度(0.79<0.8)；候选差异较大；",
+      "pass": true
+    },
+    {
+      "case": "diverse+fresh-context",
+      "confidence": 0.8,
+      "candidateDiverse": true,
+      "snapshotBackdatedSeconds": 55,
+      "http": 200,
+      "apiCode": 200,
+      "taskId": 14,
+      "riskLevel": "LOW",
+      "reasonCode": "",
+      "basis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+      "pass": true
+    },
+    {
+      "case": "diverse+stale-context",
+      "confidence": 0.8,
+      "candidateDiverse": true,
+      "snapshotBackdatedSeconds": 65,
+      "http": 200,
+      "apiCode": 200,
+      "taskId": 15,
+      "riskLevel": "LOW",
+      "reasonCode": "",
+      "basis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+      "pass": false
+    }
+  ],
+  "pass": false,
+  "codeSha": "e1b06ee0c2b07b3f545a9a35c4be3c91b2b3c970"
+}

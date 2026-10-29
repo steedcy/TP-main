@@ -40,6 +40,7 @@
     <select id="searchPaged" resultMap="TaskResult">
         SELECT <include refid="Columns"/> FROM tasks
         <where>
+            AND is_dry_run = FALSE
             <if test="taskCode != null">AND task_code = #{taskCode}</if>
             <if test="status != null">AND status = #{status}</if>
             <if test="taskFamily != null">AND task_family = #{taskFamily}</if>

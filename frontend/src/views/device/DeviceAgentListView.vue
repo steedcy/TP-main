@@ -53,7 +53,7 @@ import { listAgents, disableAgent } from '../../api/device'
 
 const list = ref([])
 const route = useRoute()
-const filters = reactive({ agentStatus: undefined, onlineStatus: route.query.onlineStatus || undefined })
+const filters = reactive({ agentStatus: route.query.agentStatus || undefined, onlineStatus: route.query.onlineStatus || undefined })
 const pagination = reactive({ current: 1, pageSize: 20, total: 0 })
 
 const columns = [

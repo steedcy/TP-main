@@ -9,10 +9,13 @@
       <span v-if="lastRefreshedAt">更新于 {{ lastRefreshedAt }}</span>
     </a-space>
     <a-alert v-if="loadFailed" type="error" show-icon message="总览加载失败，请重试" style="margin-bottom: 16px" />
+    <a-alert v-else-if="failedMetrics.length" type="warning" show-icon data-testid="metric-load-failed"
+             :message="`部分指标加载失败（显示“--”）：${failedMetrics.map(k => metricLabels[k] || k).join('、')}`"
+             style="margin-bottom: 16px" />
 
     <a-row :gutter="16" style="margin-bottom: 16px">
       <a-col :span="isTaskViewer ? 4 : 12"><a-card hoverable @click="goAgents()"><a-statistic title="设备代理总数" :value="display(metrics.agentTotal)" /></a-card></a-col>
-      <a-col :span="isTaskViewer ? 4 : 12"><a-card hoverable @click="goAgents('ONLINE')"><a-statistic title="在线代理数" :value="display(metrics.agentOnline)" /></a-card></a-col>
+      <a-col :span="isTaskViewer ? 4 : 12"><a-card hoverable @click="goAgents('ONLINE', 'ENABLED')"><a-statistic title="在线代理数" :value="display(metrics.agentOnline)" /></a-card></a-col>
       <template v-if="isTaskViewer">
         <a-col :span="4"><a-card hoverable @click="goTasks()"><a-statistic title="进行中任务数" :value="display(metrics.taskInProgress)" /></a-card></a-col>
         <a-col :span="4"><a-card><a-statistic title="重新规划次数" :value="display(metrics.replanningCount)" /></a-card></a-col>
@@ -33,7 +36,7 @@
       </a-card>
 
       <a-card title="最新异常列表">
-        <a-list :dataSource="latestExceptions" :locale="{ emptyText: '暂无异常' }">
+        <a-list :dataSource="latestExceptions" :locale="{ emptyText: failedMetrics.includes('latestExceptions') ? '--（加载失败）' : '暂无异常' }">
           <template #renderItem="{ item }">
             <a-list-item style="cursor: pointer" @click="selectedException = item">
               <a-tag color="orange">{{ item.exceptionType }}</a-tag>
@@ -72,6 +75,10 @@ const lastRefreshedAt = ref('')
 const metrics = reactive({ agentTotal: null, agentOnline: null, taskInProgress: null,
   unhandledExceptions: null, pendingManual: null, replanningCount: null, statusCounts: {} })
 const latestExceptions = ref([])
+const failedMetrics = ref([])
+const metricLabels = { agentTotal: '设备代理总数', agentOnline: '在线代理数', taskInProgress: '进行中任务数',
+  replanningCount: '重新规划次数', unhandledExceptions: '未处置异常数', pendingManual: '待人工任务数',
+  statusCounts: '任务状态分布', latestExceptions: '最新异常列表' }
 const selectedException = ref(null)
 const taskStatusList = [
   { key: 'PLANNING', label: '待规划' }, { key: 'SUPERVISING', label: '监督判定中' },
@@ -89,15 +96,18 @@ async function fetchOverview() {
     const resp = await request.get('/dashboard/overview', { params: { period: period.value }, silent: true })
     Object.assign(metrics, resp.data.metrics)
     latestExceptions.value = resp.data.latestExceptions || []
+    failedMetrics.value = resp.data.failedMetrics || []
     lastRefreshedAt.value = new Date().toLocaleTimeString('zh-CN')
   } catch {
     loadFailed.value = true
     for (const key of ['agentTotal', 'agentOnline', 'taskInProgress', 'unhandledExceptions', 'pendingManual', 'replanningCount']) metrics[key] = null
     metrics.statusCounts = Object.fromEntries(taskStatusList.map(s => [s.key, null]))
     latestExceptions.value = []
+    failedMetrics.value = []
   } finally { loading.value = false }
 }
-function goAgents(onlineStatus) { router.push({ path: '/device-agents', query: onlineStatus ? { onlineStatus } : {} }) }
+// 在线代理数=启用且在线，跳转带同样的筛选条件，使卡片数与列表总数一致（DEF-S3-074）
+function goAgents(onlineStatus, agentStatus) { router.push({ path: '/device-agents', query: { ...(onlineStatus ? { onlineStatus } : {}), ...(agentStatus ? { agentStatus } : {}) } }) }
 function goTasks(status) { router.push({ path: '/tasks', query: status ? { status } : {} }) }
 function goExceptions() { router.push({ path: '/task-exceptions', query: { exceptionStatus: 'PENDING' } }) }
 
