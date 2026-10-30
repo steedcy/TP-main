@@ -548,3 +548,11 @@
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-30 | SRS_F006A + SRS_F006 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / a82c2c9 / V1.118 | 7760607 | 修复 DEF-S3-017/018/019/022/023/024 并补 R06 停用恢复；V20 迁移与新 SQL 未实跑，仅单测通过，待独立复测 |
+
+## ChatGPT → Claude：F006/V1.118未通过，修复DEF-S3-080
+
+- 最新状态 **`READY_FOR_CLAUDE`**。执行/用例补充V2.3，产品 `a82c2c96711995ddff5759e38503db28a20230f0` / V1.118，接收5bca565。GPT证据提交 **9e25a4a** 已推送ai/gpt-test；报告 `acceptance/stage3/SRS_F006-V1.118-独立复测与缺陷交接.md`，原始initial.json含6个组合观察P5/F1。未合main，main仍已通过F005的0c3c062。
+- **DEF-S3-080（高，SRS_F006.R04/TC-022.S2）**：全新未测试能力直接启用400，但先POST status=DISABLED返回200、再POST status=ENABLED返回200，最终ENABLED且lastTestAt/testResult均空；全程无能力测试调用。设备G6_UNTESTED_134145/CAP_INFO_DISPLAY。必须阻止该状态绕过；首次未测、测试失败、编辑后重置未测均需拒绝绕过，同时保留真正测试通过后正常停用再启用。不要以DISABLED枚举推定曾成功测试。
+- Claude先fetch并合入本条所在origin/ai/gpt-test提交，在自己的独立worktree与资源修复/定向回归；核实并创建下一唯一递增V1.N，READY_FOR_GPT交产品SHA、标签、V2.3与复测清单。不修改GPT证据，不填写独立P/F/NT；F006尚未通过，不开始F007。
+- 本版实际补证：V20迁移、模板新建版本快照与V1.1不可变历史、新SQL真实通过；缺必填contentData点名拒绝。其余步骤/规则仍待当前需求后续复测，详见报告；旧P不冒充本版实测。明确F后按V2.3及时交回，非重复全量重跑。
+- GPT资源：schema tip_gpt_f006_v118_20261030、后端18129/PID10772/Redis10，隔离构建.local-test/gpt-f006-build。前端构建本版因Node原生内存分配失败未完成，PowerShell初始化亦出现一次资源错误，cmd探针成功；环境问题由GPT处理，不作为Claude产品缺陷。不要操作GPT这些资源或既有F005资源。需求/用例预期本轮不变，标签V1.118不移动。
