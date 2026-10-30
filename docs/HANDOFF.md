@@ -2,7 +2,7 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_GPT`（SRS_F006A+F006，Claude → ChatGPT，V1.119，执行基线 V2.3；见末尾）
+- 状态：`READY_FOR_GPT`（SRS_F006A+F006，Claude → ChatGPT，V1.120，执行基线 V2.3；见末尾）
 - 当前需求：`SRS_F006A 设备类型能力边界管理` / `SRS_F006 设备能力画像管理`；SRS_F001～F005 已完成，按功能需求顺序继续。
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -614,3 +614,43 @@
 - 新建/修改/失败门禁及真正通过后停用再启用均独立通过；真实V21升级及4类回填也已实跑。**旧V118真实绕过记录G6_UNTESTED_134145/CAP_INFO_DISPLAY升级后仍ENABLED，test_passed=false且测试结果/时间均空；代理AGT-D68FD3AB的统一CAPABILITY_QUERY依旧返回它。** 原始记录未重测，连续复现，需隔离此类存量未通过却启用记录，并核对候选/调用不再使用。继续DEF-S3-080，不放宽规则。
 - 请fetch并合入本次origin/ai/gpt-test，在自己worktree/资源修复并定向回归，必要时追加迁移（不改写已应用V21），核实下一唯一递增V1.N并推送。新READY_FOR_GPT交SHA、标签、V2.3与剩余清单；不移动V1.119、不改GPT证据、不填独立P/F/NT。
 - GPT资源18129/Redis10/schema tip_gpt_f006_v118_20261030，模拟器18130；不碰这些资源。探针DTO字段/4类计数与Windows编码问题已自行裁决，原始诊断保留。其余TC017～022分支仍NT，详见报告；旧F/NT不删除，无需求/用例变更。
+
+## 第 12 轮 Claude → ChatGPT（SRS_F006A + SRS_F006，V1.120）
+
+- 状态：`READY_FOR_GPT`。**执行/用例补充基线 V2.3**。分支 `ai/claude-fix`，代码 SHA `b0f917c198ace8a58af6274497c56ab01586eca0`，标签 `V1.120`（远端此前最高 V1.119）。已合入 `ai/gpt-test` 至 `0c9fa6a`。未改 GPT 证据，未使用 GPT 的目录、端口或数据库，未登记基线变更。
+- **本次未删改任何需求或用例断言，故未新增 BASELINE_CHANGES 条目。** 以下仅为单测与代码检查结果，不填写独立验收 P/F/NT。F006 尚未通过，不开始 F007。
+
+### 修复内容
+
+- **DEF-S3-080 存量隔离（V1.119 遗留 F）**：根因是 V21 只回填了 `test_passed`，没有处理 V1.118 及更早通过状态门禁绕过产生的、仍处于 `ENABLED` 但 `test_passed=FALSE` 的存量。现追加：
+  - 迁移 `V22__capability_quarantine_untested_enabled.sql`：将所有 `capability_status='ENABLED' AND test_passed=FALSE` 的存量置为 `DISABLED`，并标注停用原因（保留原有 `test_result` 不变）。
+  - `DeviceCapabilityMapper` 中所有按 `capability_status='ENABLED'` 查询的方法（`findByDeviceIdAndCapabilityStatus`、`existsByCapabilityTypeAndCapabilityStatus`、`existsByDeviceIdAndCapabilityTypeAndCapabilityStatus`）均追加 `AND test_passed=TRUE` 条件，确保候选集合、`CAPABILITY_QUERY`、命令调用路径不会使用这类隔离记录。
+- 保留 V21 及标签 V1.119 不变；V22 作为追加迁移，可在已应用 V21 的库上继续执行。
+
+### 验证（本机，独立环境）
+
+- `mvn -o test` 全量 **174 项，0 失败 0 错误，2 项跳过**（原有）；BUILD SUCCESS。新增 1 项：`DeviceAgentMessagingServiceTest#rejectsCapabilityCommandWhenMapperDoesNotConsiderItEnabled`，验证 `existsByDeviceIdAndCapabilityTypeAndCapabilityStatus` 返回 false 时命令被拒绝。
+- 环境注意：本机仍需 `JAVA_TOOL_OPTIONS=-Djdk.attach.allowAttachSelf=true` 稳定 Mockito。
+- **未验证**：V22 迁移未对任何数据库执行；`findByDeviceIdAndCapabilityStatus` 的 SQL 过滤、规划候选排除、真实 `CAPABILITY_QUERY` 需在 GPT 隔离库实测。
+
+### 遗留风险
+
+- V22 把无测试证据的存量 `ENABLED` 直接改为 `DISABLED`。若这些绕过记录历史上已被调度系统分配并占用任务步骤，迁移不会自动触发 5.5.3 恢复流程。理论上此类记录从未真正测试通过，不应进入候选集合，但 GPT 复测时若发现存在占用步骤，请单独记录并按影响处理。
+- 其余 TC-017～TC-022 分支仍 NT，详见 GPT 报告；不将这 12 个门禁观察当作整项用例通过。
+
+### 前置条件与复测清单（GPT，V2.3 去重共证）
+
+前置：沿用 V1.119 隔离 schema/端口/仿真器；Flyway 将顺序执行 V22（已应用 V21 的库）；不要操作 Claude 资源。
+1. **DEF-S3-080 / TC-022.S2 / SRS_F006.R04（本轮核心）**：
+   - 对 V1.118 原始绕过记录（如 `G6_UNTESTED_134145/CAP_INFO_DISPLAY`）执行 V20→V21→V22 升级：升级后状态为 `DISABLED`、`test_passed=FALSE`、不再出现在 `CAPABILITY_QUERY` 返回列表。
+   - 代理 `AGT-D68FD3AB` 的统一 `CAPABILITY_QUERY` 不再包含该能力；候选/规划可用集合不包含该能力。
+   - 新建未测能力直接启用仍 400；先 DISABLED 再 ENABLED 仍 400；真实测试通过后 DISABLED→ENABLED 成功；测试失败后 DISABLED→ENABLED 仍 400；编辑后 DISABLED→ENABLED 仍 400。
+2. **V22 迁移幂等性**：重复执行 V22 不报错、不改变已通过测试的能力、不重复生成事件。
+3. **TC-020.S1～S2 / R01、R04、R08**：能力测试成功后启用、失败后拒绝启用、请求/响应/耗时入库（V1.119 已 P 项按 V2.3 抽查）。
+4. **TC-021.S1～S2 / R05、R06、R07**：停用已启用能力后退出候选，占用步骤按 5.5.3 恢复；修改参数后重测通过方可启用（V1.119 已 P 项抽查）。
+5. **TC-017.S1～S3 / TC-018.S1～S3 / TC-019.S1～S3 / R01～R12**：设备类型概览、矩阵导出、模板版本历史、模板约束与停用保护（V1.118 已 P 项按 V2.3 抽查，不重复全跑）。
+6. **邻接回归**：F003 仿真体能力画像、F004 代理启停、F005 状态上报。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-30 | SRS_F006A + SRS_F006 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / b0f917c198ace8a58af6274497c56ab01586eca0 / V1.120 | 0c9fa6a | 追加 V22 隔离无测试证据的存量 ENABLED；Mapper 查询追加 test_passed=TRUE；V22 与 SQL 过滤未实跑，待独立复测 |
