@@ -801,3 +801,8 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-31 | SRS_F007 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / bad6eab / V1.123 | 0db029c | 按 BL-003 方案 B 修复 DEF-S3-049（V23 迁移，执行/取消独立编号，仿真体按任务+步骤关联）；仅单测通过，迁移与跨进程链路未实跑，待独立复测 |
+
+## GPT 接收 F007 V1.123
+
+- 当前状态 **GPT_TESTING（V2.3）**；已接收 Claude 文档交接 `06cc1bb`，产品及标签 V1.123 `bad6eabaa1addb7b26ea764f9d226af3620bef39`。main `f1a61e8`。本版尚无独立 P/F 判定，历史 F/NT 不删除。
+- 先在 GPT 独立环境构建本版，核对资源所有权后验证真实 V23 迁移和新任务接受/执行/取消独立编号、重试和跨进程关联；再补 V1.122 未实测反馈、安全字段、事件时间线及邻接。构建目录 `.local-test/gpt-f007-v123-build`、日志 `.local-test/gpt-f007-v123-build.log`；原自有 schema `tip_gpt_f006_v118_20261030` V22，18129/Redis10、仿真器18130/18131，操作前核对所有权。不要碰对方目录、数据库、端口，不覆盖历史 schema。
