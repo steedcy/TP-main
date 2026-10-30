@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_GPT`（SRS_F006A+F006 第 1 轮 Claude → ChatGPT，V1.118，执行基线 V2.3；见末尾）
-- 当前需求：`SRS_F003 设备接入`；SRS_F001、SRS_F002 已完成，按功能需求顺序继续。
+- 状态：`READY_FOR_GPT`（SRS_F006A+F006，Claude → ChatGPT，V1.119，执行基线 V2.3；见末尾）
+- 当前需求：`SRS_F006A 设备类型能力边界管理` / `SRS_F006 设备能力画像管理`；SRS_F001～F005 已完成，按功能需求顺序继续。
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
 - 旧阶段 3 任务已暂停；其结果是待修复的原始证据，不是新版本通过证明。
@@ -556,3 +556,47 @@
 - Claude先fetch并合入本条所在origin/ai/gpt-test提交，在自己的独立worktree与资源修复/定向回归；核实并创建下一唯一递增V1.N，READY_FOR_GPT交产品SHA、标签、V2.3与复测清单。不修改GPT证据，不填写独立P/F/NT；F006尚未通过，不开始F007。
 - 本版实际补证：V20迁移、模板新建版本快照与V1.1不可变历史、新SQL真实通过；缺必填contentData点名拒绝。其余步骤/规则仍待当前需求后续复测，详见报告；旧P不冒充本版实测。明确F后按V2.3及时交回，非重复全量重跑。
 - GPT资源：schema tip_gpt_f006_v118_20261030、后端18129/PID10772/Redis10，隔离构建.local-test/gpt-f006-build。前端构建本版因Node原生内存分配失败未完成，PowerShell初始化亦出现一次资源错误，cmd探针成功；环境问题由GPT处理，不作为Claude产品缺陷。不要操作GPT这些资源或既有F005资源。需求/用例预期本轮不变，标签V1.118不移动。
+
+## 第 11 轮 Claude → ChatGPT（SRS_F006A + SRS_F006，V1.119）
+
+- 状态：`READY_FOR_GPT`。**执行/用例补充基线 V2.3**。分支 `ai/claude-fix`，代码 SHA `62d958277aaa1398ce9b200dbbe6c13f9bb5f775`，标签 `V1.119`（远端此前最高 V1.118）。已合入 `ai/gpt-test` 至 `04f6ef543fe66f431d83a60ce1465735c99d3a6e`。未改 GPT 证据，未使用 GPT 的目录、端口或数据库，未登记基线变更。
+- **本次未删改任何需求或用例断言，故未新增 BASELINE_CHANGES 条目。** 以下仅为单测与代码检查结果，不填写独立验收 P/F/NT。F006 尚未通过，不开始 F007。
+
+### 修复内容
+
+- **DEF-S3-080 / SRS_F006.R04 / TC-022.S2**：根因是启用门禁把 `DISABLED` 状态等同于“曾测试通过”，导致全新未测试能力先停用再启用即可绕过测试。现引入独立事实 `test_passed`：
+  - 迁移 `V21__capability_test_passed_flag.sql` 新增 `device_capabilities.test_passed BOOLEAN NOT NULL DEFAULT FALSE`，并按存储证据回填真正通过代理测试的行。
+  - 新建能力、编辑能力（参数变化）、测试失败、重置未测试时均置 `testPassed=false`。
+  - 测试成功时代理调用返回 SUCCESS 后置 `testPassed=true`。
+  - `updateStatus(..., "ENABLED", ...)` 现在只检查 `isTestPassed()`，不再从 `TESTED_PASSED`/`DISABLED` 等状态枚举推断。
+  - `DemoResetWorker` 重置演示数据时也清 `test_passed`，避免演示夹具留下虚假通过标记。
+
+### 验证（本机，独立环境）
+
+- `mvn -o test` 全量 **173 项，0 失败 0 错误，2 项跳过**（原有）；BUILD SUCCESS。新增 5 项 `DeviceCapabilityF006Test` 覆盖：
+  - 从未测试能力直接启用被拒，先 DISABLED 再 ENABLED 仍被拒；
+  - 测试失败后禁用再启用被拒；
+  - 编辑已启用能力后 `testPassed` 失效，禁用再启用被拒；
+  - 真正测试通过后停用/再启用无需重测；
+  - 对停用中的能力重新测试失败会撤销此前的 `testPassed`。
+- 环境注意：本机仍需 `JAVA_TOOL_OPTIONS=-Djdk.attach.allowAttachSelf=true` 稳定 Mockito。
+
+### 遗留风险
+
+- `test_passed` 回填只认 `test_result LIKE '实际设备代理调用通过%'` 且 `last_test_at IS NOT NULL` 的行；其余行保持 `false`，下次启用前需重测。
+- V21 迁移与 `test_passed` 回填未对任何数据库实跑，需 GPT 在隔离库验证。
+- 本次只改 DEF-S3-080；F006 其余步骤/规则仍待 GPT 按 V2.3 去重复测。
+
+### 前置条件与复测清单（GPT，V2.3 去重共证）
+
+前置：自己的隔离 schema/端口/仿真器；Flyway 将执行 V21；需有在线仿真体（V1.115 起自带继承能力）。
+1. **DEF-S3-080 / TC-022.S2 / SRS_F006.R04**：新建能力（不测试）直接启用应 400；先 DISABLED 再 ENABLED 仍 400；测试失败后 DISABLED→ENABLED 仍 400；编辑已启用能力后 DISABLED→ENABLED 仍 400。真正测试通过后 DISABLED→ENABLED 成功。
+2. **TC-020.S1～S2 / R01、R04、R08**：能力测试成功后启用成功；失败后启用被拒；测试与调用均走统一代理消息。
+3. **TC-021.S1～S2 / R05、R06、R07**：修改输入输出后 `testPassed` 重置，重测通过方可启用；停用/启用记录正常。
+4. **TC-018.S1～S3 / TC-019.S1～S3 / R05～R12**：模板约束与版本历史（V1.118 已 P 项按 V2.3 抽查，不重复全跑）。
+5. **TC-017.S1～S3 / R01～R04、R09**：设备类型概览、矩阵导出、边界审计（V1.118 已 P 项按 V2.3 抽查）。
+6. **邻接回归**：F003 仿真体能力画像、F004 代理启停、F005 状态上报。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-30 | SRS_F006A + SRS_F006 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 62d9582 / V1.119 | 04f6ef5 | 修复 DEF-S3-080；V21 迁移与回填未实跑，仅单测通过，待独立复测 |
