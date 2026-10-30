@@ -107,7 +107,7 @@ public class DemoResetWorker {
                     ON CONFLICT (device_id,capability_code) DO UPDATE SET
                         capability_name=EXCLUDED.capability_name,capability_type=EXCLUDED.capability_type,
                         input_params=EXCLUDED.input_params,output_params=EXCLUDED.output_params,
-                        capability_status='UNTESTED',test_result=NULL,last_test_at=NULL,
+                        capability_status='UNTESTED',test_result=NULL,last_test_at=NULL,test_passed=FALSE,
                         capability_description=EXCLUDED.capability_description,template_id=NULL,
                         updated_at=CURRENT_TIMESTAMP
                     """, id, capability.path("capabilityCode").asText(), capability.path("capabilityName").asText(),

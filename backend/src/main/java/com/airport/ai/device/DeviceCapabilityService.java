@@ -109,6 +109,7 @@ public class DeviceCapabilityService {
         capability.setApplicableConditions(request.getApplicableCondition());
         capability.setCapabilityDescription(request.getCapabilityDescription());
         capability.setCapabilityStatus("UNTESTED");
+        capability.setTestPassed(false);
         capability.setTestResult(null);
         capability.setUpdatedAt(LocalDateTime.now());
         deviceCapabilityMapper.update(capability);
@@ -137,9 +138,11 @@ public class DeviceCapabilityService {
             var response = messaging.testCapability(device, agent, capability, params);
             capability.setTestResponse(toJson(response));
             capability.setCapabilityStatus("TESTED_PASSED");
+            capability.setTestPassed(true);
             capability.setTestResult("实际设备代理调用通过，指令 " + response.get("commandId"));
         } catch (RuntimeException ex) {
             capability.setCapabilityStatus("TESTED_FAILED");
+            capability.setTestPassed(false);
             capability.setTestResult("实际设备代理调用失败: " + ex.getMessage());
             capability.setTestResponse(toJson(java.util.Map.of("result", "FAILED", "reason", String.valueOf(ex.getMessage()))));
         }
@@ -162,11 +165,10 @@ public class DeviceCapabilityService {
     @Transactional
     public void updateStatus(Long deviceId, String capabilityCode, String status, User operator) {
         DeviceCapability capability = get(deviceId, capabilityCode);
-        // 仅TESTED_PASSED或DISABLED（曾测试通过后停用，参数未再修改，测试结论仍有效）可启用；
-        // UNTESTED/TESTED_FAILED不得启用（对应业务规则4、异常路径5c）
-        if ("ENABLED".equals(status)
-                && !"TESTED_PASSED".equals(capability.getCapabilityStatus())
-                && !"DISABLED".equals(capability.getCapabilityStatus())) {
+        // 启用资格只看“当前参数下最近一次真实代理测试已通过”这一事实（testPassed），不由状态枚举推断：
+        // 未测试/测试失败/改参数后重置的能力即使被停用，也不能凭DISABLED状态再启用（规则4、异常路径5c、DEF-S3-080）。
+        // 真正测试通过后停用的能力保留测试结论，可直接再次启用。
+        if ("ENABLED".equals(status) && !capability.isTestPassed()) {
             throw new BusinessException(ErrorCode.CAPABILITY_NOT_TESTED);
         }
         boolean wasEnabled = "ENABLED".equals(capability.getCapabilityStatus());

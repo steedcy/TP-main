@@ -27,6 +27,8 @@ public class DeviceCapability {
     private transient String testResponse;
     private transient Long testDurationMs;
     private LocalDateTime lastTestAt;
+    /** 当前参数下最近一次真实代理测试是否通过；修改参数、测试失败、新建均为false。启用资格只看此值（DEF-S3-080） */
+    private boolean testPassed = false;
     private String capabilityDescription;
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime updatedAt = LocalDateTime.now();
@@ -37,6 +39,8 @@ public class DeviceCapability {
     public void setTestResponse(String v) { this.testResponse = v; }
     public Long getTestDurationMs() { return testDurationMs; }
     public void setTestDurationMs(Long v) { this.testDurationMs = v; }
+    public boolean isTestPassed() { return testPassed; }
+    public void setTestPassed(boolean testPassed) { this.testPassed = testPassed; }
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public Long getDeviceId() { return deviceId; }

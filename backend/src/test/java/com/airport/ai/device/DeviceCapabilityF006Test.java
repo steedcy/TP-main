@@ -175,8 +175,84 @@ class DeviceCapabilityF006Test {
     @Test
     void enablingDoesNotRunRecovery() {
         device();
-        capability("C1", "CAP_INFO_DISPLAY", "TESTED_PASSED");
+        capability("C1", "CAP_INFO_DISPLAY", "TESTED_PASSED").setTestPassed(true);
         service.updateStatus(5L, "C1", "ENABLED", operator());
         verifyNoInteractions(exceptions);
+    }
+
+    // ---------- DEF-S3-080：不得经 DISABLED 绕过测试门禁
+    private void assertCannotEnable(String code) {
+        BusinessException ex = assertThrows(BusinessException.class, () -> service.updateStatus(5L, code, "ENABLED", operator()));
+        assertEquals(ErrorCode.CAPABILITY_NOT_TESTED, ex.getErrorCode());
+    }
+
+    @Test
+    void neverTestedCapabilityCannotBeEnabledEvenAfterDisableEnableRoundTrip() {
+        device();
+        DeviceCapability c = capability("C1", "CAP_INFO_DISPLAY", "UNTESTED");
+        assertCannotEnable("C1");
+        service.updateStatus(5L, "C1", "DISABLED", operator());
+        assertEquals("DISABLED", c.getCapabilityStatus());
+        assertCannotEnable("C1");
+        assertEquals("DISABLED", c.getCapabilityStatus(), "被拒绝后状态不变");
+        assertNull(c.getLastTestAt());
+    }
+
+    @Test
+    void failedTestCapabilityCannotBeEnabledViaDisable() {
+        Device d = device();
+        DeviceCapability c = capability("C1", "CAP_INFO_DISPLAY", "UNTESTED");
+        DeviceAgent a = agent(null);
+        when(messaging.testCapability(eq(d), eq(a), eq(c), any()))
+                .thenThrow(new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, "设备能力测试未通过"));
+        service.test(5L, "C1", operator());
+        assertFalse(c.isTestPassed());
+        service.updateStatus(5L, "C1", "DISABLED", operator());
+        assertCannotEnable("C1");
+    }
+
+    @Test
+    void editingAnEnabledCapabilityResetsItAndDisableCannotRestoreTheOldPass() {
+        device();
+        DeviceCapability c = capability("C1", "CAP_INFO_DISPLAY", "ENABLED");
+        c.setTestPassed(true);
+        var req = new com.airport.ai.device.dto.UpdateDeviceCapabilityRequest();
+        req.setCapabilityName("n");
+        req.setInputParams(List.of());
+        req.setOutputParams(List.of());
+        service.update(5L, "C1", req, operator());
+        assertEquals("UNTESTED", c.getCapabilityStatus());
+        assertFalse(c.isTestPassed(), "改参数后原测试结论失效");
+        service.updateStatus(5L, "C1", "DISABLED", operator());
+        assertCannotEnable("C1");
+    }
+
+    @Test
+    void genuinelyPassedCapabilityCanBeDisabledAndReEnabledWithoutRetest() {
+        Device d = device();
+        DeviceCapability c = capability("C1", "CAP_INFO_DISPLAY", "UNTESTED");
+        DeviceAgent a = agent(null);
+        when(messaging.testCapability(eq(d), eq(a), eq(c), any())).thenReturn(Map.of("commandId", "TEST-1", "result", "SUCCESS"));
+        service.test(5L, "C1", operator());
+        assertTrue(c.isTestPassed());
+        service.updateStatus(5L, "C1", "ENABLED", operator());
+        when(capMapper.findByDeviceIdAndCapabilityStatus(5L, "ENABLED")).thenReturn(List.of());
+        service.updateStatus(5L, "C1", "DISABLED", operator());
+        assertEquals("DISABLED", c.getCapabilityStatus());
+        service.updateStatus(5L, "C1", "ENABLED", operator());
+        assertEquals("ENABLED", c.getCapabilityStatus(), "真正测试通过后的停用/再启用按规则保留");
+    }
+
+    @Test
+    void aFailedRetestRevokesAnEarlierPassEvenForADisabledCapability() {
+        Device d = device();
+        DeviceCapability c = capability("C1", "CAP_INFO_DISPLAY", "DISABLED");
+        c.setTestPassed(true);
+        DeviceAgent a = agent(null);
+        when(messaging.testCapability(eq(d), eq(a), eq(c), any()))
+                .thenThrow(new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, "设备能力测试未通过"));
+        service.test(5L, "C1", operator());
+        assertFalse(c.isTestPassed());
+        assertCannotEnable("C1");
     }
 }

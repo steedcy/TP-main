@@ -14,6 +14,7 @@
         <result column="applicable_conditions" property="applicableConditions"/>
         <result column="capability_status" property="capabilityStatus"/>
         <result column="test_result" property="testResult"/>
+        <result column="test_passed" property="testPassed"/>
         <result column="last_test_at" property="lastTestAt"/>
         <result column="capability_description" property="capabilityDescription"/>
         <result column="created_at" property="createdAt"/>
@@ -22,7 +23,7 @@
 
     <sql id="Columns">
         id, device_id, template_id, capability_code, capability_name, capability_type, input_params,
-        output_params, applicable_conditions, capability_status, test_result, last_test_at,
+        output_params, applicable_conditions, capability_status, test_result, last_test_at, test_passed,
         capability_description, created_at, updated_at
     </sql>
 
@@ -64,10 +65,10 @@
     <insert id="insert" parameterType="com.airport.ai.device.DeviceCapability" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO device_capabilities (device_id, template_id, capability_code, capability_name, capability_type,
                                           input_params, output_params, applicable_conditions, capability_status,
-                                          test_result, last_test_at, capability_description, created_at, updated_at)
+                                          test_result, last_test_at, test_passed, capability_description, created_at, updated_at)
         VALUES (#{deviceId}, #{templateId}, #{capabilityCode}, #{capabilityName}, #{capabilityType},
                 #{inputParams}::json, #{outputParams}::json, #{applicableConditions}, #{capabilityStatus},
-                #{testResult}, #{lastTestAt}, #{capabilityDescription}, #{createdAt}, #{updatedAt})
+                #{testResult}, #{lastTestAt}, #{testPassed}, #{capabilityDescription}, #{createdAt}, #{updatedAt})
     </insert>
 
     <update id="update" parameterType="com.airport.ai.device.DeviceCapability">
@@ -80,6 +81,7 @@
             capability_status = #{capabilityStatus},
             test_result = #{testResult},
             last_test_at = #{lastTestAt},
+            test_passed = #{testPassed},
             capability_description = #{capabilityDescription},
             updated_at = #{updatedAt}
         WHERE id = #{id}
