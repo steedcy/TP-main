@@ -313,8 +313,7 @@ public class TaskService {
         for (var agent : affectedAgents) {
             String agentCode = agent.getAgentCode();
             TaskStepAssignment assignment = activeAssignmentsByAgent.get(agent.getId());
-            String cancelCommandId = assignment != null && assignment.getCommandId() != null
-                    ? assignment.getCommandId() : generateCancelCommandId();
+            String cancelCommandId = generateCancelCommandId();
             try {
                 deviceAgentMessagingService.cancelTask(agentCode, cancelCommandId, taskId,
                         assignment == null ? agent.getCurrentStepSeq() : assignment.getStepSeq());
@@ -347,8 +346,7 @@ public class TaskService {
     }
 
     private String generateCancelCommandId() {
-        String datePart = LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-        return "CMD-" + datePart + "-" + UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
+        return com.airport.ai.device.CommandIds.next();
     }
 
     /**

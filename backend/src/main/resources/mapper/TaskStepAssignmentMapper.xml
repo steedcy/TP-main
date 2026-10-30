@@ -9,6 +9,7 @@
         <result column="step_seq" property="stepSeq"/>
         <result column="device_agent_id" property="deviceAgentId"/>
         <result column="command_id" property="commandId"/>
+        <result column="execute_command_id" property="executeCommandId"/>
         <result column="step_status" property="stepStatus"/>
         <result column="retry_count" property="retryCount"/>
         <result column="execution_result" property="executionResult"/>
@@ -22,7 +23,7 @@
     </resultMap>
 
     <sql id="Columns">
-        id, task_id, plan_version_id, step_seq, device_agent_id, command_id, step_status,
+        id, task_id, plan_version_id, step_seq, device_agent_id, command_id, execute_command_id, step_status,
         retry_count, execution_result, reason_code, output_params, dispatched_at, feedback_at,
         rejected_agent_ids, created_at, updated_at
     </sql>
@@ -37,7 +38,7 @@
     </select>
 
     <select id="findActiveByAgentId" resultMap="AssignmentResult">
-        SELECT a.id, a.task_id, a.plan_version_id, a.step_seq, a.device_agent_id, a.command_id, a.step_status,
+        SELECT a.id, a.task_id, a.plan_version_id, a.step_seq, a.device_agent_id, a.command_id, a.execute_command_id, a.step_status,
                a.retry_count, a.execution_result, a.reason_code, a.output_params, a.dispatched_at, a.feedback_at,
                a.rejected_agent_ids, a.created_at, a.updated_at
         FROM task_step_assignments a JOIN tasks t ON t.id = a.task_id
@@ -56,16 +57,20 @@
         SELECT <include refid="Columns"/> FROM task_step_assignments WHERE command_id = #{commandId}
     </select>
 
+    <select id="findByExecuteCommandId" resultMap="AssignmentResult">
+        SELECT <include refid="Columns"/> FROM task_step_assignments WHERE execute_command_id = #{executeCommandId}
+    </select>
+
     <select id="findByStepStatusAndDispatchedAtBefore" resultMap="AssignmentResult">
         SELECT <include refid="Columns"/> FROM task_step_assignments
         WHERE step_status = #{stepStatus} AND dispatched_at &lt; #{threshold}
     </select>
 
     <insert id="insert" parameterType="com.airport.ai.task.TaskStepAssignment" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO task_step_assignments (task_id, plan_version_id, step_seq, device_agent_id, command_id,
+        INSERT INTO task_step_assignments (task_id, plan_version_id, step_seq, device_agent_id, command_id, execute_command_id,
                                             step_status, retry_count, execution_result, reason_code, output_params,
                                             dispatched_at, feedback_at, rejected_agent_ids, created_at, updated_at)
-        VALUES (#{taskId}, #{planVersionId}, #{stepSeq}, #{deviceAgentId}, #{commandId},
+        VALUES (#{taskId}, #{planVersionId}, #{stepSeq}, #{deviceAgentId}, #{commandId}, #{executeCommandId},
                 #{stepStatus}, #{retryCount}, #{executionResult}, #{reasonCode}, #{outputParams}::json,
                 #{dispatchedAt}, #{feedbackAt}, #{rejectedAgentIds}::json, #{createdAt}, #{updatedAt})
     </insert>
@@ -74,6 +79,7 @@
         UPDATE task_step_assignments SET
             device_agent_id = #{deviceAgentId},
             command_id = #{commandId},
+            execute_command_id = #{executeCommandId},
             step_status = #{stepStatus},
             retry_count = #{retryCount},
             execution_result = #{executionResult},

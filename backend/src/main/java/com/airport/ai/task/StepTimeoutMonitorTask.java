@@ -58,7 +58,7 @@ public class StepTimeoutMonitorTask {
 
             taskEventService.append(assignment.getTaskId(), "STEP_TIMEOUT_DETECTED", "SYSTEM",
                     "ERR_EXECUTION_TIMEOUT",
-                    "步骤" + assignment.getStepSeq() + "指令" + assignment.getCommandId() + "下发后超过"
+                    "步骤" + assignment.getStepSeq() + "指令" + executeId(assignment) + "下发后超过"
                             + timeout + "秒未收到执行反馈，判定执行超时");
 
             if (assignment.getDeviceAgentId() != null) {
@@ -71,7 +71,12 @@ public class StepTimeoutMonitorTask {
             }
 
             taskExceptionService.handleException(assignment.getTaskId(), assignment.getStepSeq(),
-                    "EXECUTION_TIMEOUT", "指令" + assignment.getCommandId() + "执行超时未收到反馈");
+                    "EXECUTION_TIMEOUT", "指令" + executeId(assignment) + "执行超时未收到反馈");
         }
+    }
+
+    /** 执行消息自己的指令号；迁移前遗留行没有时回退到承接指令号 */
+    private static String executeId(com.airport.ai.task.TaskStepAssignment a) {
+        return a.getExecuteCommandId() != null ? a.getExecuteCommandId() : a.getCommandId();
     }
 }

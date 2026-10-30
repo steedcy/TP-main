@@ -32,7 +32,7 @@ public class BaselineDryRunLifecycle {
                 if ("COMPLETED".equals(assignment.getStepStatus())) continue;
                 if (assignment.getDeviceAgentId()!=null && assignment.getCommandId()!=null) {
                     agents.findById(assignment.getDeviceAgentId()).ifPresent(agent -> {
-                        try { gateway.cancelTask(agent.getAgentCode(), assignment.getCommandId(), taskId, assignment.getStepSeq()); }
+                        try { gateway.cancelTask(agent.getAgentCode(), com.airport.ai.device.CommandIds.next(), taskId, assignment.getStepSeq()); }
                         catch (RuntimeException ignored) { /* Failure remains visible; do not fabricate a successful run. */ }
                         if (taskId.equals(agent.getCurrentTaskId())) {
                             agent.setWorkStatus("IDLE"); agent.setCurrentTaskId(null); agent.setCurrentStepSeq(null); agents.update(agent);

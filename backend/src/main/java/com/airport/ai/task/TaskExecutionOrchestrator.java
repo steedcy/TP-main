@@ -115,6 +115,7 @@ public class TaskExecutionOrchestrator {
         }
         assignment.setRejectedAgentIds(toJson(rejected));
         assignment.setCommandId(null);
+        assignment.setExecuteCommandId(null);
         assignment.setRetryCount(0);
         assignment.setStepStatus("PENDING_ASSIGNMENT");
         assignment.setDeviceAgentId(null);
@@ -245,6 +246,7 @@ public class TaskExecutionOrchestrator {
             assignment.setRejectedAgentIds(toJson(rejected));
             assignment.setDeviceAgentId(null);
             assignment.setCommandId(null);
+            assignment.setExecuteCommandId(null);
             assignment.setUpdatedAt(LocalDateTime.now());
             assignmentMapper.update(assignment);
 
@@ -272,6 +274,7 @@ public class TaskExecutionOrchestrator {
             return;
         }
 
+        if (assignment.getExecuteCommandId() == null) assignment.setExecuteCommandId(generateCommandId());
         assignment.setStepStatus("EXECUTING");
         assignment.setDispatchedAt(LocalDateTime.now());
         assignment.setUpdatedAt(LocalDateTime.now());
@@ -279,15 +282,15 @@ public class TaskExecutionOrchestrator {
 
         DeviceAgent agent = deviceAgentMapper.findById(assignment.getDeviceAgentId()).orElseThrow();
         taskEventService.append(assignment.getTaskId(), "STEP_DISPATCHED", "SYSTEM", null,
-                "指令" + assignment.getCommandId() + "已下发至设备代理" + agent.getAgentCode()
+                "指令" + assignment.getExecuteCommandId() + "已下发至设备代理" + agent.getAgentCode()
                         + "，业务意图: " + step.get("stepGoal"));
 
         try {
-            deviceAgentMessagingService.executeCapability(agent.getAgentCode(), assignment.getCommandId(),
+            deviceAgentMessagingService.executeCapability(agent.getAgentCode(), assignment.getExecuteCommandId(),
                     assignment.getTaskId(), assignment.getStepSeq(), String.valueOf(step.get("capabilityType")),
                     assignment.getRetryCount(), parameterResolver.resolve(assignment.getTaskId(), assignment.getPlanVersionId(), step));
         } catch (RuntimeException ex) {
-            onExecutionFeedback(agent.getAgentCode(), assignment.getCommandId(), assignment.getRetryCount(),
+            onExecutionFeedback(agent.getAgentCode(), assignment.getExecuteCommandId(), assignment.getRetryCount(),
                     "FAILED", "DEVICE_API_ERROR", Map.of("message", ex.getMessage() == null ? "device call failed" : ex.getMessage()));
         }
     }
@@ -306,7 +309,8 @@ public class TaskExecutionOrchestrator {
     @Transactional
     public void onExecutionFeedback(String agentCode, String commandId, int attemptNo, String executionResult,
                                      String reasonCode, Map<String, Object> outputParams) {
-        TaskStepAssignment assignment = assignmentMapper.findByCommandId(commandId)
+        TaskStepAssignment assignment = assignmentMapper.findByExecuteCommandId(commandId)
+                .or(() -> assignmentMapper.findByCommandId(commandId).filter(a -> a.getExecuteCommandId() == null))
                 .orElseThrow(() -> new BusinessException(ErrorCode.STEP_ASSIGNMENT_NOT_FOUND));
         DeviceAgent reportingAgent = deviceAgentMapper.findByAgentCode(agentCode)
                 .orElseThrow(() -> new BusinessException(ErrorCode.DEVICE_AGENT_NOT_FOUND));
@@ -378,7 +382,7 @@ public class TaskExecutionOrchestrator {
             assignment.setFeedbackAt(null);
             assignmentMapper.update(assignment);
             taskEventService.append(assignment.getTaskId(), "STEP_RETRY_DISPATCHED", "SYSTEM", reasonCode,
-                    "步骤" + assignment.getStepSeq() + "自动重试1次，沿用指令编号" + commandId + "，原因: " + failureDetail);
+                    "步骤" + assignment.getStepSeq() + "自动重试1次，沿用执行指令编号" + commandId + "，尝试序号" + assignment.getRetryCount() + "，原因: " + failureDetail);
 
             try {
                 deviceAgentMessagingService.executeCapability(agentCode, commandId, assignment.getTaskId(),
@@ -586,8 +590,7 @@ public class TaskExecutionOrchestrator {
 
     /** 列宽32（V2迁移），CMD-yyyyMMddHHmmss(14)-8位大写十六进制共27字符，留有余量 */
     private String generateCommandId() {
-        String datePart = LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-        return "CMD-" + datePart + "-" + UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
+        return com.airport.ai.device.CommandIds.next();
     }
 
     @SuppressWarnings("unchecked")

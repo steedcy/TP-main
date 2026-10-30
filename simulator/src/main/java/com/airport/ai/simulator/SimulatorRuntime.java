@@ -129,7 +129,8 @@ public class SimulatorRuntime {
                 reportTaskResponse(command.commandId(), false, "DEVICE_BUSY");
                 return;
             }
-            activeCommand.set(command.commandId());
+            cancelled.remove(stepKey(command)); // 新的承接开启新的逻辑消息链，清除同一步骤此前的取消标记
+            activeCommand.set(stepKey(command));
             commandStates.put(key, "ACCEPTED");
             reportTaskResponse(command.commandId(), true, null);
             return;
@@ -140,15 +141,15 @@ public class SimulatorRuntime {
                 replay(key);
                 return;
             }
-            activeCommand.set(command.commandId());
+            activeCommand.set(stepKey(command));
             busy.set(true);
             java.util.concurrent.CompletableFuture.runAsync(() -> execute(command, key));
             return;
         }
         if ("TASK_CANCEL".equals(commandType)) {
             commandStates.put(command.commandId() + ":cancel", "CANCELLED");
-            cancelled.add(command.commandId());
-            release(command.commandId());
+            cancelled.add(stepKey(command));
+            release(stepKey(command));
             reportStatus();
             return;
         }
@@ -158,7 +159,7 @@ public class SimulatorRuntime {
     private void execute(SimulatorProtocol.Command command, String key) {
         try {
             Thread.sleep(properties.getExecutionDelayMilliseconds());
-            if (cancelled.contains(command.commandId())) return;
+            if (isCancelled(command)) return;
             String configured = properties.getScenarioResult();
             if ("NO_FEEDBACK".equals(configured)) { commandStates.put(key, "NO_FEEDBACK"); return; }
             if (isScenarioApplicable(configured, command.capabilityType())) {
@@ -178,8 +179,8 @@ public class SimulatorRuntime {
             }
             Map<String, Object> params = command.inputParams() == null ? Map.of() : command.inputParams();
             Map<String, Object> output = executeCapability(command.capabilityType(), params);
-            progressAlong(command.commandId(), driver.routeLocations(command.capabilityType(), params, location(), output));
-            if (cancelled.contains(command.commandId())) return;
+            progressAlong(stepKey(command), driver.routeLocations(command.capabilityType(), params, location(), output));
+            if (isCancelled(command)) return;
             reportFeedback(command, "SUCCESS", null, output);
             commandStates.put(key, "SUCCEEDED");
         } catch (InterruptedException ex) {
@@ -190,13 +191,30 @@ public class SimulatorRuntime {
             reportFeedback(command, "FAILED", "INVALID_CAPABILITY_INPUT", Map.of("message", ex.getMessage()));
             commandStates.put(key, "FAILED");
         } finally {
-            if (!"NO_FEEDBACK".equals(commandStates.get(key))) release(command.commandId());
+            if (!"NO_FEEDBACK".equals(commandStates.get(key))) release(stepKey(command));
             reportStatus();
         }
     }
-    private void release(String commandId) {
+    /**
+     * 承接、执行、取消是三条各有独立指令号的逻辑消息（SRS_F007.R02），它们作用于同一业务步骤：
+     * 以“任务编号:步骤序号”关联；缺少任务信息的命令回退为按指令号关联。幂等仍按各自指令号+类型+尝试序号。
+     */
+    private static String stepKey(SimulatorProtocol.Command command) {
+        if (command.taskId() == null || command.taskId().isBlank()) return command.commandId();
+        return command.taskId() + ":" + (command.stepSeq() == null ? "*" : command.stepSeq());
+    }
+
+    /** 取消可针对整个任务（步骤序号缺省）或某一步骤 */
+    private boolean isCancelled(SimulatorProtocol.Command command) {
+        String key = stepKey(command);
+        if (cancelled.contains(key)) return true;
+        return command.taskId() != null && cancelled.contains(command.taskId() + ":*");
+    }
+
+    private void release(String key) {
         String active=activeCommand.get();
-        if (java.util.Objects.equals(active,commandId) && activeCommand.compareAndSet(active, null)) busy.set(false);
+        if (active != null && (active.equals(key) || (key.endsWith(":*") && active.startsWith(key.substring(0, key.length() - 1))))
+                && activeCommand.compareAndSet(active, null)) busy.set(false);
     }
 
     @Scheduled(fixedDelayString = "${simulator.heartbeat-interval-seconds:15}000")
@@ -288,7 +306,7 @@ public class SimulatorRuntime {
     }
 
     private void reportFeedback(SimulatorProtocol.Command command, String result, String reason, Map<String, Object> output) {
-        release(command.commandId());
+        release(stepKey(command));
         Map<String, Object> feedback = new LinkedHashMap<>();
         feedback.put("commandId", command.commandId());
         feedback.put("attemptNo", command.attemptNo() == null ? 0 : command.attemptNo());
@@ -320,11 +338,16 @@ public class SimulatorRuntime {
         return currentLocation.get();
     }
 
+    private boolean cancelledWholeTask(String stepKey) {
+        int colon = stepKey.indexOf(':');
+        return colon > 0 && cancelled.contains(stepKey.substring(0, colon) + ":*");
+    }
+
     private void progressAlong(String commandId, java.util.List<SimulatorProtocol.Location> route) {
         if (route == null || route.isEmpty()) return;
         long delayPerPoint = Math.max(1, properties.getExecutionDelayMilliseconds() / route.size());
         for (SimulatorProtocol.Location waypoint : route) {
-            if (cancelled.contains(commandId)) return;
+            if (cancelled.contains(commandId) || cancelledWholeTask(commandId)) return;
             try { Thread.sleep(delayPerPoint); }
             catch (InterruptedException ex) { Thread.currentThread().interrupt(); return; }
             currentLocation.set(waypoint);

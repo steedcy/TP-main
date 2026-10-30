@@ -16,6 +16,8 @@ public class TaskStepAssignment {
     private Long deviceAgentId;
     /** 全局唯一，重试沿用同一编号（对应5.5.2业务规则2） */
     private String commandId;
+    /** EXECUTE_CAPABILITY 消息自己的指令编号；承接用 commandId，取消另行生成（SRS_F007.R02） */
+    private String executeCommandId;
     /** PENDING_ASSIGNMENT / EXECUTING / COMPLETED / FAILED / FROZEN */
     private String stepStatus = "PENDING_ASSIGNMENT";
     /** 上限1（对应5.5.2业务规则2、5.5.3业务规则6："失败只自动重试一次"） */
@@ -41,6 +43,8 @@ public class TaskStepAssignment {
     public void setStepSeq(Integer stepSeq) { this.stepSeq = stepSeq; }
     public Long getDeviceAgentId() { return deviceAgentId; }
     public void setDeviceAgentId(Long deviceAgentId) { this.deviceAgentId = deviceAgentId; }
+    public String getExecuteCommandId() { return executeCommandId; }
+    public void setExecuteCommandId(String executeCommandId) { this.executeCommandId = executeCommandId; }
     public String getCommandId() { return commandId; }
     public void setCommandId(String commandId) { this.commandId = commandId; }
     public String getStepStatus() { return stepStatus; }
