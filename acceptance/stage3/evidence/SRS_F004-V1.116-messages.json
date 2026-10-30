@@ -1,0 +1,112 @@
+{
+  "version": "V1.116",
+  "codeSha": "6d7a028bcad79dcd0137d241b127b6e84183dca7",
+  "observedAt": "2026-10-30T08:49:13.212622+08:00",
+  "schema": "tip_gpt_f002_v111_20261029",
+  "deviceCode": "G416F_064325",
+  "agentCode": "AGT-6CF01CA4",
+  "checks": [
+    {
+      "check": "TC011.S3.CAPABILITY_QUERY",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "responseKeys": [
+          "capabilities",
+          "commandId"
+        ],
+        "capabilityCount": 1
+      }
+    },
+    {
+      "check": "TC011.S3.STATUS_QUERY",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "responseKeys": [
+          "agentId",
+          "agentStatus",
+          "businessStatus",
+          "capabilities",
+          "commandId",
+          "lastReportedAt",
+          "onlineStatus",
+          "workStatus"
+        ],
+        "capabilityCount": 1
+      }
+    },
+    {
+      "check": "message_type_validation",
+      "pass": true,
+      "facts": {
+        "http": 400
+      }
+    },
+    {
+      "check": "R07.no_motion_command_sent",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "deviceCommandRows": 0,
+        "message": "计划包含运动安全控制字段"
+      }
+    },
+    {
+      "check": "TC011.S3.TASK_ACCEPT",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "taskId": 75,
+        "taskStatus": "COMPLETED"
+      }
+    },
+    {
+      "check": "TC011.S3.TASK_REJECT",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "taskId": 76,
+        "taskStatus": "COMPLETED",
+        "rejectionEvent": "AGENT_REJECTED"
+      }
+    },
+    {
+      "check": "TC011.S3.EXECUTION_FEEDBACK",
+      "pass": false,
+      "facts": {
+        "http": 200,
+        "taskId": 77,
+        "taskStatus": "EXECUTING"
+      }
+    },
+    {
+      "check": "TC011.S3.TASK_CANCEL",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "taskId": 78,
+        "commandLedger": "TASK_CANCEL:SENT"
+      }
+    },
+    {
+      "check": "TC011.S2.single_step_occupation",
+      "pass": true,
+      "facts": {
+        "maxConcurrentExecutingOnAgent": 1,
+        "http": [
+          200,
+          200
+        ],
+        "taskIds": [
+          79,
+          80
+        ],
+        "taskStatuses": [
+          "COMPLETED",
+          "COMPLETED"
+        ]
+      }
+    }
+  ]
+}
