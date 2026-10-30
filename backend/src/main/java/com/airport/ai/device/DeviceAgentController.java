@@ -48,7 +48,8 @@ public class DeviceAgentController {
                                                           @RequestParam(defaultValue = "20") int size) {
         PageResult<DeviceAgent> result = deviceAgentService.list(agentStatus, onlineStatus, page, size);
         return ApiResponse.ok(result.map(agent -> DeviceAgentView.from(agent, deviceAgentService.getDeviceOf(agent))
-                .withEnabledCapabilities(deviceAgentService.enabledCapabilitySummary(agent))));
+                .withEnabledCapabilities(deviceAgentService.enabledCapabilitySummary(agent))
+                .withOfflineInfo(deviceAgentService.offlineInfo(agent))));
     }
 
     @GetMapping("/{agentId}")
@@ -56,7 +57,8 @@ public class DeviceAgentController {
     public ApiResponse<DeviceAgentView> get(@PathVariable String agentId) {
         DeviceAgent agent = deviceAgentService.getByCode(agentId);
         return ApiResponse.ok(DeviceAgentView.from(agent, deviceAgentService.getDeviceOf(agent))
-                .withEnabledCapabilities(deviceAgentService.enabledCapabilitySummary(agent)));
+                .withEnabledCapabilities(deviceAgentService.enabledCapabilitySummary(agent))
+                .withOfflineInfo(deviceAgentService.offlineInfo(agent)));
     }
 
     @PostMapping("/{agentId}/disable")

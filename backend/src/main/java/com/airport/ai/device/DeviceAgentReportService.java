@@ -42,8 +42,9 @@ public class DeviceAgentReportService {
                 var status = request.getStatus();
                 BigDecimal x = status.getLocation() == null ? null : status.getLocation().getX();
                 BigDecimal y = status.getLocation() == null ? null : status.getLocation().getY();
+                String zone = status.getLocation() == null ? null : status.getLocation().getZone();
                 deviceAgentService.reportStatus(agentCode, status.getOnlineStatus(), status.getWorkStatus(), x, y,
-                        status.getBusinessStatus() == null ? null : toJson(status.getBusinessStatus()));
+                        status.getBusinessStatus() == null ? null : toJson(status.getBusinessStatus()), zone);
             }
             case "TASK_RESPONSE" -> {
                 var response = request.getResponse();

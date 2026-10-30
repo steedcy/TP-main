@@ -71,6 +71,22 @@ public class DeviceAgentService {
                 .toList();
     }
 
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private DeviceEventMapper eventMapper;
+
+    /** 离线提示：最近一次离线事件的时间/原因码/说明，及是否影响任务（占用任务步骤即影响） */
+    public java.util.Map<String, Object> offlineInfo(DeviceAgent agent) {
+        if (!"OFFLINE".equals(agent.getOnlineStatus()) || eventMapper == null) return null;
+        DeviceEvent event = eventMapper.findLatestOffline(agent.getId());
+        java.util.Map<String, Object> info = new java.util.LinkedHashMap<>();
+        info.put("agentCode", agent.getAgentCode());
+        info.put("offlineAt", event == null ? null : event.getOccurredAt());
+        info.put("reasonCode", event == null ? null : event.getReasonCode());
+        info.put("detail", event == null ? null : event.getDetailSummary());
+        info.put("affectsTask", agent.getCurrentTaskId() != null);
+        return info;
+    }
+
     public Device getDeviceOf(DeviceAgent agent) {
         return deviceMapper.findById(agent.getDeviceId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.DEVICE_NOT_FOUND));
@@ -138,9 +154,29 @@ public class DeviceAgentService {
     @Transactional
     public void reportStatus(String agentCode, String onlineStatus, String workStatus,
                              java.math.BigDecimal positionX, java.math.BigDecimal positionY, String businessStatus) {
+        reportStatus(agentCode, onlineStatus, workStatus, positionX, positionY, businessStatus, null);
+    }
+
+    /** 带上报区域：合法（预置）区域同步到设备所属区域，非法区域忽略，不影响本次其余状态的保存 */
+    @Transactional
+    public void reportStatus(String agentCode, String onlineStatus, String workStatus,
+                             java.math.BigDecimal positionX, java.math.BigDecimal positionY, String businessStatus,
+                             String zone) {
         DeviceAgent agent = getByCode(agentCode);
         Device device = getDeviceOf(agent);
         reportStatus(agent, device, onlineStatus, workStatus, positionX, positionY, businessStatus);
+        syncReportedZone(device, zone);
+    }
+
+    @org.springframework.beans.factory.annotation.Value("${app.device.preset-areas:F2_TEST}")
+    private String presetAreasConfig = "F2_TEST";
+
+    private void syncReportedZone(Device device, String zone) {
+        if (zone == null || zone.isBlank() || zone.equals(device.getAreaCode())) return;
+        boolean preset = java.util.Arrays.stream(presetAreasConfig.split(",")).map(String::trim).anyMatch(zone::equals);
+        if (!preset) return;
+        device.setAreaCode(zone);
+        deviceMapper.update(device);
     }
 
     private void reportStatus(DeviceAgent agent, Device device, String onlineStatus, String workStatus,

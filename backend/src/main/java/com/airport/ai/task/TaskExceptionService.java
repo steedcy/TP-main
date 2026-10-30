@@ -111,11 +111,19 @@ public class TaskExceptionService {
      */
     @Transactional
     public void handleAgentOffline(DeviceAgent agent) {
-        if (agent.getCurrentTaskId() == null) {
-            return; // 无关设备离线，HeartbeatMonitorTask已记录设备事件，此处不再重复处理
+        if (agent.getCurrentTaskId() != null) {
+            handleException(agent.getCurrentTaskId(), agent.getCurrentStepSeq(), "AGENT_OFFLINE",
+                    "设备代理" + agent.getAgentCode() + "心跳超时离线，正占用该任务步骤");
+            return;
         }
-        handleException(agent.getCurrentTaskId(), agent.getCurrentStepSeq(), "AGENT_OFFLINE",
-                "设备代理" + agent.getAgentCode() + "心跳超时离线，正占用该任务步骤");
+        // 待分配阶段尚未设置current_task_id但已有步骤关联：同样属于关联任务，走恢复流程
+        if (recoverAssignments(agent, "心跳超时离线") > 0) return;
+        // 无关设备离线（SRS_F005.R06）：不冻结、不重规划，判断结果与原因码写入进行中任务的事件时间线
+        for (Task task : taskMapper.findInProgressFormal()) {
+            taskEventService.append(task.getId(), "UNRELATED_AGENT_OFFLINE_JUDGED", "SYSTEM",
+                    "ERR_AGENT_OFFLINE_UNRELATED",
+                    "设备代理" + agent.getAgentCode() + "离线，未占用本任务任何步骤，不影响计划，不触发重新规划");
+        }
     }
 
     /**
@@ -124,10 +132,14 @@ public class TaskExceptionService {
      */
     @Transactional
     public int handleAgentDisabled(DeviceAgent agent) {
+        return recoverAssignments(agent, "因设备停用被释放");
+    }
+
+    private int recoverAssignments(DeviceAgent agent, String cause) {
         List<TaskStepAssignment> active = assignmentMapper.findActiveByAgentId(agent.getId());
         for (TaskStepAssignment assignment : active) {
             handleException(assignment.getTaskId(), assignment.getStepSeq(), "AGENT_OFFLINE",
-                    "设备代理" + agent.getAgentCode() + "因设备停用被释放，正占用该任务步骤");
+                    "设备代理" + agent.getAgentCode() + cause + "，正占用该任务步骤");
         }
         return active.size();
     }

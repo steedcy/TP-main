@@ -12,6 +12,12 @@
       </a-select>
     </a-space>
 
+    <a-space v-if="isConfigAdmin" style="margin-left: 16px">
+      <span>心跳超时阈值（秒，10~120）：</span>
+      <a-input-number v-model:value="heartbeatSeconds" :min="10" :max="120" />
+      <a-button type="primary" @click="saveHeartbeat">保存</a-button>
+    </a-space>
+
     <a-table :dataSource="list" :columns="columns" rowKey="agentId" :pagination="pagination" @change="handleTableChange">
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'onlineStatus'">
@@ -33,6 +39,18 @@
             <span v-else>任务#{{ record.currentTaskId }}（步骤{{ record.currentStepSeq }}）</span>
           </template>
           <span v-else>—</span>
+        </template>
+        <template v-else-if="column.key === 'lastReportedAt'">
+          <a-tooltip v-if="record.offlineInfo">
+            <template #title>
+              <div>代理：{{ record.offlineInfo.agentCode }}</div>
+              <div>离线时间：{{ record.offlineInfo.offlineAt || '—' }}</div>
+              <div>原因码：{{ record.offlineInfo.reasonCode || '—' }}</div>
+              <div>{{ record.offlineInfo.affectsTask ? '影响进行中任务，已进入恢复判断' : '未占用任务，不影响任务' }}</div>
+            </template>
+            <span class="offline-time">{{ record.lastReportedAt || '—' }}</span>
+          </a-tooltip>
+          <span v-else>{{ record.lastReportedAt || '—' }}</span>
         </template>
         <template v-else-if="column.key === 'capabilities'">
           <a-tag v-for="c in record.enabledCapabilities" :key="c.capabilityCode">{{ c.capabilityCode }} {{ c.capabilityName }}</a-tag>
@@ -63,6 +81,11 @@
           <template v-else>—</template>
         </a-descriptions-item>
         <a-descriptions-item label="最后上报时间">{{ detail.lastReportedAt || '—' }}</a-descriptions-item>
+        <a-descriptions-item v-if="detail.offlineInfo" label="离线信息">
+          <div>离线时间：{{ detail.offlineInfo.offlineAt || '—' }}</div>
+          <div>原因码：{{ detail.offlineInfo.reasonCode || '—' }}</div>
+          <div>{{ detail.offlineInfo.affectsTask ? '影响进行中任务' : '不影响任务' }}</div>
+        </a-descriptions-item>
         <a-descriptions-item label="启用能力">
           <div v-for="c in detail.enabledCapabilities" :key="c.capabilityCode">{{ c.capabilityCode }}　{{ c.capabilityName }}</div>
           <span v-if="!detail.enabledCapabilities?.length">无已启用能力</span>
@@ -76,7 +99,7 @@
 import { onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { message } from 'ant-design-vue'
-import { listAgents, disableAgent } from '../../api/device'
+import { listAgents, disableAgent, getHeartbeatTimeout, updateHeartbeatTimeout } from '../../api/device'
 import { useAuthStore } from '../../store/auth'
 
 const list = ref([])
@@ -84,6 +107,8 @@ const detail = ref(null)
 const auth = useAuthStore()
 // 配置管理员无权读取任务详情，当前任务只显示文本，不提供链接
 const canOpenTask = auth.role === 'OPERATOR' || auth.role === 'SYSTEM_ADMIN'
+const isConfigAdmin = auth.role === 'CONFIG_ADMIN'
+const heartbeatSeconds = ref(30)
 const route = useRoute()
 const filters = reactive({ agentStatus: route.query.agentStatus || undefined, onlineStatus: route.query.onlineStatus || undefined })
 const pagination = reactive({ current: 1, pageSize: 20, total: 0 })
@@ -97,7 +122,7 @@ const columns = [
   { title: '工作状态', key: 'workStatus' },
   { title: '当前任务', key: 'currentTask' },
   { title: '启用能力', key: 'capabilities' },
-  { title: '最后上报时间', dataIndex: 'lastReportedAt' },
+  { title: '最后上报时间', key: 'lastReportedAt' },
   { title: '操作', key: 'action' }
 ]
 
@@ -121,5 +146,17 @@ async function handleDisable(record) {
   fetchList()
 }
 
-onMounted(fetchList)
+async function saveHeartbeat() {
+  await updateHeartbeatTimeout(heartbeatSeconds.value)
+  message.success('心跳超时阈值已更新，后续离线判断按新阈值生效')
+}
+
+onMounted(async () => {
+  fetchList()
+  try { heartbeatSeconds.value = (await getHeartbeatTimeout()).data.seconds } catch { /* 无权限时不显示 */ }
+})
 </script>
+
+<style scoped>
+.offline-time { color: #cf1322; font-weight: 600; }
+</style>

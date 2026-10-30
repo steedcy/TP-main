@@ -22,6 +22,13 @@
         ORDER BY occurred_at ASC
     </select>
 
+    <select id="findLatestOffline" resultMap="DeviceEventResult">
+        SELECT <include refid="Columns"/> FROM device_events
+        WHERE device_agent_id = #{deviceAgentId}
+          AND event_type IN ('AGENT_OFFLINE_DETECTED', 'AGENT_OFFLINE_REPORTED')
+        ORDER BY occurred_at DESC, id DESC LIMIT 1
+    </select>
+
     <insert id="insert" parameterType="com.airport.ai.device.DeviceEvent" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO device_events (device_agent_id, event_type, occurred_at, trigger, reason_code, detail_summary)
         VALUES (#{deviceAgentId}, #{eventType}, #{occurredAt}, #{trigger}, #{reasonCode}, #{detailSummary})

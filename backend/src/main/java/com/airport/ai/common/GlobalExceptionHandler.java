@@ -50,8 +50,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(ErrorCode.FORBIDDEN.getHttpStatus()).body(resp);
     }
 
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private com.airport.ai.device.ReportRejectionRecorder rejectionRecorder;
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Void>> handleValidationException(MethodArgumentNotValidException ex, HttpServletRequest req) {
+        if (rejectionRecorder != null) {
+            rejectionRecorder.record(com.airport.ai.device.ReportRejectionRecorder.agentCodeFromPath(req.getRequestURI()),
+                    com.airport.ai.device.ReportRejectionRecorder.INVALID_FORMAT, "上报字段校验未通过");
+        }
         String message = ex.getBindingResult().getFieldErrors().isEmpty()
                 ? "请求参数校验失败"
                 : ex.getBindingResult().getFieldErrors().get(0).getDefaultMessage();

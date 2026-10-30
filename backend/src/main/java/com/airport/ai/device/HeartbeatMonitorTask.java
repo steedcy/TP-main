@@ -23,6 +23,9 @@ public class HeartbeatMonitorTask {
     private final TaskEventService taskEventService;
     private final TaskExceptionService taskExceptionService;
     private final int heartbeatTimeoutSeconds;
+    /** 配置管理员可调的阈值（10~120秒，DEF-S3-015）；未注入时回退到启动配置 */
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private HeartbeatSettingService heartbeatSettingService;
 
     public HeartbeatMonitorTask(DeviceAgentMapper deviceAgentMapper,
                                  DeviceEventService deviceEventService,
@@ -38,7 +41,8 @@ public class HeartbeatMonitorTask {
 
     @Scheduled(fixedRate = 10000)
     public void checkHeartbeatTimeout() {
-        LocalDateTime threshold = LocalDateTime.now().minusSeconds(heartbeatTimeoutSeconds);
+        int timeoutSeconds = heartbeatSettingService == null ? heartbeatTimeoutSeconds : heartbeatSettingService.timeoutSeconds();
+        LocalDateTime threshold = LocalDateTime.now().minusSeconds(timeoutSeconds);
         List<DeviceAgent> timedOut = deviceAgentMapper.findByOnlineStatusAndLastReportedAtBefore("ONLINE", threshold);
         for (DeviceAgent agent : timedOut) {
             agent.setOnlineStatus("OFFLINE");
@@ -46,7 +50,7 @@ public class HeartbeatMonitorTask {
 
             deviceEventService.append(agent.getId(), "AGENT_OFFLINE_DETECTED", "SYSTEM",
                     "ERR_HEARTBEAT_TIMEOUT",
-                    "设备代理" + agent.getAgentCode() + "超过" + heartbeatTimeoutSeconds + "秒未上报，判定离线");
+                    "设备代理" + agent.getAgentCode() + "超过" + timeoutSeconds + "秒未上报，判定离线");
 
             if (agent.getCurrentTaskId() != null) {
                 taskEventService.append(agent.getCurrentTaskId(), "AGENT_OFFLINE_DETECTED", "SYSTEM",

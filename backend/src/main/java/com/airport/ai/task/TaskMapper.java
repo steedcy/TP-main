@@ -10,6 +10,8 @@ import java.util.Optional;
 @Mapper
 public interface TaskMapper {
     Optional<Task> findById(Long id);
+    /** 进行中的正式任务（待分配/降级执行中/执行中，不含试运行），用于无关设备离线的判断记录 */
+    List<Task> findInProgressFormal();
     Optional<Task> findByTaskCode(String taskCode);
     long countByStatus(TaskStatus status);
     long count();

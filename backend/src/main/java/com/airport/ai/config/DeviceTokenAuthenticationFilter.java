@@ -18,6 +18,8 @@ import java.util.List;
 @Component
 public class DeviceTokenAuthenticationFilter extends OncePerRequestFilter {
     private final DeviceCredentialService credentialService;
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private com.airport.ai.device.ReportRejectionRecorder rejectionRecorder;
 
     public DeviceTokenAuthenticationFilter(DeviceCredentialService credentialService) {
         this.credentialService = credentialService;
@@ -44,6 +46,10 @@ public class DeviceTokenAuthenticationFilter extends OncePerRequestFilter {
                 authenticated = credentialService.matchesDeviceCode(segments[5], token);
             } else if (path.startsWith("/api/v1/device-agents/") && segments.length >= 5) {
                 authenticated = credentialService.matchesAgentCode(segments[4], token);
+            }
+            if (!authenticated && rejectionRecorder != null) {
+                rejectionRecorder.record(com.airport.ai.device.ReportRejectionRecorder.agentCodeFromPath(path),
+                        com.airport.ai.device.ReportRejectionRecorder.AUTH_FAILED, "设备身份校验失败");
             }
             if (authenticated) {
                 var authentication = new UsernamePasswordAuthenticationToken(

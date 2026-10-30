@@ -45,6 +45,14 @@ export function disableAgent(agentId) {
   return request.post(`/device-agents/${agentId}/disable`, { confirmed: true })
 }
 
+export function getHeartbeatTimeout() {
+  return request.get('/settings/heartbeat-timeout')
+}
+
+export function updateHeartbeatTimeout(seconds) {
+  return request.put('/settings/heartbeat-timeout', { seconds })
+}
+
 export function listPresetAreas() {
   return request.get('/devices/preset-areas')
 }

@@ -33,6 +33,12 @@
         SELECT <include refid="Columns"/> FROM tasks WHERE id = #{id}
     </select>
 
+    <select id="findInProgressFormal" resultMap="TaskResult">
+        SELECT <include refid="Columns"/> FROM tasks
+        WHERE is_dry_run = FALSE AND status IN ('PENDING_ASSIGNMENT', 'DOWNGRADING', 'EXECUTING')
+        ORDER BY id LIMIT 50
+    </select>
+
     <select id="findByTaskCode" resultMap="TaskResult">
         SELECT <include refid="Columns"/> FROM tasks WHERE task_code = #{taskCode}
     </select>

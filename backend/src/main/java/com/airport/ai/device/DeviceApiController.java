@@ -14,15 +14,26 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/device-api/v1/agents")
 public class DeviceApiController {
     private final DeviceAgentReportService reportService;
+    private final ReportRejectionRecorder rejectionRecorder;
 
-    public DeviceApiController(DeviceAgentReportService reportService) {
+    public DeviceApiController(DeviceAgentReportService reportService, ReportRejectionRecorder rejectionRecorder) {
         this.reportService = reportService;
+        this.rejectionRecorder = rejectionRecorder;
     }
 
     @PostMapping("/{agentCode}/report")
     public ApiResponse<Void> report(@PathVariable String agentCode,
                                     @Valid @RequestBody DeviceAgentReportRequest request) {
-        reportService.accept(agentCode, request);
+        try {
+            reportService.accept(agentCode, request);
+        } catch (com.airport.ai.common.BusinessException ex) {
+            if (ex.getErrorCode() == com.airport.ai.common.ErrorCode.PARAM_FORMAT_ERROR
+                    || ex.getErrorCode() == com.airport.ai.common.ErrorCode.PARAM_MISSING
+                    || ex.getErrorCode() == com.airport.ai.common.ErrorCode.PARAM_OUT_OF_RANGE) {
+                rejectionRecorder.record(agentCode, ReportRejectionRecorder.INVALID_FORMAT, ex.getMessage());
+            }
+            throw ex;
+        }
         return ApiResponse.ok(null);
     }
 }

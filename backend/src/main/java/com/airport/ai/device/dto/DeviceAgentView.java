@@ -20,6 +20,8 @@ public class DeviceAgentView {
     private LocalDateTime lastReportedAt;
     /** 启用能力摘要（编码+名称），详情/列表展示用（TC-011.S2、DEF-S3-044） */
     private java.util.List<java.util.Map<String, String>> enabledCapabilities = java.util.List.of();
+    /** 离线时的提示信息：离线时间、原因码、说明、是否影响任务；在线时为null（TC-014.S2） */
+    private java.util.Map<String, Object> offlineInfo;
 
     public static DeviceAgentView from(DeviceAgent agent, Device device) {
         DeviceAgentView v = new DeviceAgentView();
@@ -45,6 +47,11 @@ public class DeviceAgentView {
     public Integer getCurrentStepSeq() { return currentStepSeq; }
     public LocalDateTime getLastReportedAt() { return lastReportedAt; }
     public java.util.List<java.util.Map<String, String>> getEnabledCapabilities() { return enabledCapabilities; }
+    public java.util.Map<String, Object> getOfflineInfo() { return offlineInfo; }
+    public DeviceAgentView withOfflineInfo(java.util.Map<String, Object> info) {
+        this.offlineInfo = info;
+        return this;
+    }
     public DeviceAgentView withEnabledCapabilities(java.util.List<java.util.Map<String, String>> caps) {
         this.enabledCapabilities = caps;
         return this;
