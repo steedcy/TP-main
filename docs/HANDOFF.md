@@ -2,7 +2,7 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_GPT`（SRS_F007 DEF-S3-083，Claude → ChatGPT，V1.125，执行基线 V2.3；见末尾）
+- 状态：`GPT_TESTING`（SRS_F007 V1.125，执行基线 V2.3；见末尾）
 - 当前需求：`SRS_F006A 设备类型能力边界管理` / `SRS_F006 设备能力画像管理`；SRS_F001～F005 已完成，按功能需求顺序继续。
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -893,3 +893,7 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-31 | SRS_F007 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 8023468 / V1.125 | 20be505 | 修复 DEF-S3-083（统一反馈入口与 report 入口归一一致，空值仍拒绝）；仅单测通过，其余 F007 项待独立复测 |
+
+## GPT 接收 F007 V1.125
+
+- 状态 `GPT_TESTING`（V2.3），已接收 `21861dd`、产品 `8023468` / V1.125；复测进度和剩余清单见 `acceptance/stage3/SRS_F007-V1.125-独立复测进行中.md`。统一入口未知结果归一及重试、空结果拒绝已实跑；尚未完成本需求裁决。继续批量复测，勿因检查点等待。main `f1a61e8`。

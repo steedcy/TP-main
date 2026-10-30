@@ -1,0 +1,96 @@
+{
+  "version": "V1.125",
+  "codeSha": "80234681218bc10613cd9b1400a6a08fc4e065c8",
+  "executionBaseline": "V2.3",
+  "observedAt": "2026-10-31T02:46:57.238909+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "fixture": "Own schema seeded formal one-step pending assignment; actual platform proxy and V123/V124-identical simulator HTTP/callback; not full creation E2E.",
+  "checks": [
+    {
+      "check": "R06.unified_empty_rejected",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "response": {
+          "code": 3000,
+          "message": "executionResult不可为空",
+          "timestamp": "2026-10-31T02:46:58.672464200+08:00",
+          "path": "/internal/v1/device-agent/messages",
+          "method": "POST"
+        }
+      }
+    },
+    {
+      "check": "R06.unified_unknown_normalized_and_retried",
+      "pass": true,
+      "facts": {
+        "request": {
+          "commandId": "CMD-20261031024658-C695A244",
+          "messageType": "EXECUTION_FEEDBACK",
+          "agentId": "AGT-D68FD3AB",
+          "payload": {
+            "executionResult": "UNRECOGNIZED",
+            "attemptNo": 0,
+            "outputParams": {}
+          }
+        },
+        "http": 200,
+        "response": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "status": "PROCESSED",
+            "commandId": "CMD-20261031024658-C695A244"
+          },
+          "timestamp": "2026-10-31T02:46:58.757214700+08:00"
+        },
+        "events": [
+          {
+            "event_type": "AGENT_ASSIGNED",
+            "reason_code": null,
+            "detail_summary": "设备代理AGT-D68FD3AB接受步骤1承接请求"
+          },
+          {
+            "event_type": "STEP_DISPATCHED",
+            "reason_code": null,
+            "detail_summary": "指令CMD-20261031024658-C695A244已下发至设备代理AGT-D68FD3AB，业务意图: Display synthetic notice"
+          },
+          {
+            "event_type": "EXECUTION_FEEDBACK_RECEIVED",
+            "reason_code": "ERR_FEEDBACK_UNRECOGNIZED",
+            "detail_summary": "指令CMD-20261031024658-C695A244收到设备代理AGT-D68FD3AB执行反馈: FAILED"
+          },
+          {
+            "event_type": "STEP_RETRY_DISPATCHED",
+            "reason_code": "ERR_FEEDBACK_UNRECOGNIZED",
+            "detail_summary": "步骤1自动重试1次，沿用执行指令编号CMD-20261031024658-C695A244，尝试序号1，原因: 执行结果: FAILED，原因: ERR_FEEDBACK_UNRECOGNIZED"
+          }
+        ],
+        "commands": [
+          {
+            "id": 38,
+            "command_type": "TASK_ACCEPT",
+            "command_id": "G125_ACCEPT_UFB2",
+            "attempt_no": 0,
+            "command_status": "ACCEPTED"
+          },
+          {
+            "id": 39,
+            "command_type": "EXECUTE_CAPABILITY",
+            "command_id": "CMD-20261031024658-C695A244",
+            "attempt_no": 0,
+            "command_status": "FAILED"
+          },
+          {
+            "id": 40,
+            "command_type": "EXECUTE_CAPABILITY",
+            "command_id": "CMD-20261031024658-C695A244",
+            "attempt_no": 1,
+            "command_status": "SENT"
+          }
+        ]
+      }
+    }
+  ],
+  "taskId": 13
+}

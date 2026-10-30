@@ -1,0 +1,68 @@
+{
+  "version": "V1.125",
+  "codeSha": "80234681218bc10613cd9b1400a6a08fc4e065c8",
+  "taskId": 12,
+  "check": "R06.unified_unknown_normalization_and_retry",
+  "pass": true,
+  "events": [
+    {
+      "event_type": "AGENT_ASSIGNED",
+      "reason_code": null,
+      "detail_summary": "设备代理AGT-D68FD3AB接受步骤1承接请求"
+    },
+    {
+      "event_type": "STEP_DISPATCHED",
+      "reason_code": null,
+      "detail_summary": "指令CMD-20261031024629-4E24A749已下发至设备代理AGT-D68FD3AB，业务意图: Display synthetic notice"
+    },
+    {
+      "event_type": "EXECUTION_FEEDBACK_RECEIVED",
+      "reason_code": "ERR_FEEDBACK_UNRECOGNIZED",
+      "detail_summary": "指令CMD-20261031024629-4E24A749收到设备代理AGT-D68FD3AB执行反馈: FAILED"
+    },
+    {
+      "event_type": "STEP_RETRY_DISPATCHED",
+      "reason_code": "ERR_FEEDBACK_UNRECOGNIZED",
+      "detail_summary": "步骤1自动重试1次，沿用执行指令编号CMD-20261031024629-4E24A749，尝试序号1，原因: 执行结果: FAILED，原因: ERR_FEEDBACK_UNRECOGNIZED"
+    },
+    {
+      "event_type": "EXECUTION_FEEDBACK_RECEIVED",
+      "reason_code": "DEVICE_SUCCESS",
+      "detail_summary": "指令CMD-20261031024629-4E24A749收到设备代理AGT-D68FD3AB执行反馈: SUCCESS"
+    },
+    {
+      "event_type": "STEP_COMPLETED",
+      "reason_code": null,
+      "detail_summary": "步骤1完成条件已满足: displayStatus=SUCCESS"
+    },
+    {
+      "event_type": "TASK_COMPLETED",
+      "reason_code": null,
+      "detail_summary": "全部步骤完成条件均已满足，任务完成"
+    }
+  ],
+  "commands": [
+    {
+      "id": 35,
+      "command_type": "TASK_ACCEPT",
+      "command_id": "G125_ACCEPT_UFB",
+      "attempt_no": 0,
+      "command_status": "ACCEPTED"
+    },
+    {
+      "id": 36,
+      "command_type": "EXECUTE_CAPABILITY",
+      "command_id": "CMD-20261031024629-4E24A749",
+      "attempt_no": 0,
+      "command_status": "FAILED"
+    },
+    {
+      "id": 37,
+      "command_type": "EXECUTE_CAPABILITY",
+      "command_id": "CMD-20261031024629-4E24A749",
+      "attempt_no": 1,
+      "command_status": "SUCCEEDED"
+    }
+  ],
+  "note": "Same request as prior probe; prior read failed from Windows console decoding, recovered persistent event and command evidence without repeating request."
+}
