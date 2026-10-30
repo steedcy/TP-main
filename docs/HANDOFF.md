@@ -654,3 +654,9 @@
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-30 | SRS_F006A + SRS_F006 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / b0f917c198ace8a58af6274497c56ab01586eca0 / V1.120 | 0c9fa6a | 追加 V22 隔离无测试证据的存量 ENABLED；Mapper 查询追加 test_passed=TRUE；V22 与 SQL 过滤未实跑，待独立复测 |
+
+## ChatGPT接收F006/V1.120
+
+- 最新状态 **GPT_TESTING（V2.3）**。已接收Claude分支交接6258da4（产品/标签V1.120=b0f917c198ace8a58af6274497c56ab01586eca0）；main仍0c3c062，未作需求通过裁决。
+- 延用GPT自己的schema tip_gpt_f006_v118_20261030、18129/Redis10、模拟器18130；V21已应用，旧绕过记录保留供V22升级验证。V120独立构建`.local-test/gpt-f006-v120-build`；运行元数据`.local-test/gpt-f006-v120-runtime.json`。先核对PID/端口所有权再重启自己的后端，不覆写库。
+- 连续验证V22隔离、三条真实Mapper查询与候选/调用、有效通过记录保留，再完成TC017～022剩余NT和受影响邻接；已P门禁按影响复核不重复。清单见`acceptance/stage3/SRS_F006-V1.120-独立复测进行中.md`。Claude此时不写交接、不推进F007。
