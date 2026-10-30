@@ -47,6 +47,9 @@
     <select id="findByDeviceIdAndCapabilityStatus" resultMap="DeviceCapabilityResult">
         SELECT <include refid="Columns"/> FROM device_capabilities
         WHERE device_id = #{deviceId} AND capability_status = #{capabilityStatus}
+        <if test='capabilityStatus == "ENABLED"'>
+            AND test_passed = TRUE
+        </if>
     </select>
 
     <select id="countByTemplateId" resultType="long">
@@ -54,12 +57,19 @@
     </select>
 
     <select id="existsByCapabilityTypeAndCapabilityStatus" resultType="boolean">
-        SELECT EXISTS(SELECT 1 FROM device_capabilities WHERE capability_type = #{capabilityType} AND capability_status = #{capabilityStatus})
+        SELECT EXISTS(SELECT 1 FROM device_capabilities
+        WHERE capability_type = #{capabilityType} AND capability_status = #{capabilityStatus}
+        <if test='capabilityStatus == "ENABLED"'>
+            AND test_passed = TRUE
+        </if>)
     </select>
 
     <select id="existsByDeviceIdAndCapabilityTypeAndCapabilityStatus" resultType="boolean">
         SELECT EXISTS(SELECT 1 FROM device_capabilities
-        WHERE device_id = #{deviceId} AND capability_type = #{capabilityType} AND capability_status = #{capabilityStatus})
+        WHERE device_id = #{deviceId} AND capability_type = #{capabilityType} AND capability_status = #{capabilityStatus}
+        <if test='capabilityStatus == "ENABLED"'>
+            AND test_passed = TRUE
+        </if>)
     </select>
 
     <insert id="insert" parameterType="com.airport.ai.device.DeviceCapability" useGeneratedKeys="true" keyProperty="id">

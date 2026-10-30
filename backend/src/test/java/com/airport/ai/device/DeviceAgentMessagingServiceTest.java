@@ -136,4 +136,16 @@ class DeviceAgentMessagingServiceTest {
         verifyNoInteractions(adapter);
         assertTrue(records.isEmpty());
     }
+
+    @Test
+    void rejectsCapabilityCommandWhenMapperDoesNotConsiderItEnabled() {
+        // Mirrors the DEF-S3-080 follow-up: a row may still carry capability_status=ENABLED
+        // but test_passed=FALSE after the bypass. The mapper/exists check must filter it out.
+        when(capabilities.existsByDeviceIdAndCapabilityTypeAndCapabilityStatus(41L, "CAP_INFO_DISPLAY", "ENABLED"))
+                .thenReturn(false);
+        assertThrows(BusinessException.class, () -> service.requestTaskAcceptance("AGT-41", "CMD-50",
+                900L, 1, "CAP_INFO_DISPLAY", Map.of("contentType", "TEXT", "contentData", "Gate A05")));
+        verifyNoInteractions(adapter);
+        assertTrue(records.isEmpty());
+    }
 }
