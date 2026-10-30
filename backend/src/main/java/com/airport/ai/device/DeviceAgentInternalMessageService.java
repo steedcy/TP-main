@@ -71,10 +71,9 @@ public class DeviceAgentInternalMessageService {
             }
             case "EXECUTION_FEEDBACK" -> {
                 ensureEnabled(agent);
+                // 空值仍由requiredString拒绝；非空但不在SUCCESS/FAILED/TIMEOUT内的结果与设备report入口一致，
+                // 由DeviceAgentReportService归一为FAILED并记录ERR_FEEDBACK_UNRECOGNIZED（SRS_F007.R06、DEF-S3-083）
                 String result = requiredString(payload, "executionResult");
-                if (!List.of("SUCCESS", "FAILED", "TIMEOUT").contains(result)) {
-                    throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, "executionResult取值非法");
-                }
                 String reason = optionalString(payload, "reasonCode");
                 Map<String, Object> output = mapValue(payload.get("outputParams"));
                 int attemptNo = optionalInteger(payload, "attemptNo", 0);

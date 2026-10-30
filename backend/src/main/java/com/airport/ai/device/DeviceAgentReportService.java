@@ -109,6 +109,10 @@ public class DeviceAgentReportService {
         if (request.getFeedback() != null) {
             var feedback = request.getFeedback();
             String executionResult = feedback.getExecutionResult();
+            // 空值不归一：缺失的结果仍是参数错误，只有“非空但无法识别”的取值才归一为失败
+            if (executionResult == null || executionResult.isBlank()) {
+                throw new BusinessException(ErrorCode.PARAM_MISSING, "feedback.executionResult不可为空");
+            }
             if (!"SUCCESS".equals(executionResult) && !"FAILED".equals(executionResult)
                     && !"TIMEOUT".equals(executionResult)) {
                 // 无法归一的反馈：保留原值于输出参数，归一为失败并带原因码，进入异常处理（DEF-S3-051）

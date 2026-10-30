@@ -216,6 +216,80 @@ class UnifiedMessagingF007Test {
         assertNull(DeviceAgentTimelineService.reasonOf(null));
     }
 
+    // ---------- DEF-S3-083：统一消息入口与设备report入口对未知结果的处理一致
+    private DeviceAgentInternalMessageService unifiedEntrance(DeviceAgentReportService reports) {
+        DeviceAgentMapper agents = mock(DeviceAgentMapper.class);
+        DeviceAgent agent = new DeviceAgent();
+        agent.setId(9L);
+        agent.setAgentCode("AGT-1");
+        agent.setDeviceId(5L);
+        agent.setAgentStatus("ENABLED");
+        agent.setOnlineStatus("ONLINE");
+        when(agents.findByAgentCode("AGT-1")).thenReturn(Optional.of(agent));
+        return new DeviceAgentInternalMessageService(agents, mock(TaskMapper.class),
+                mock(DeviceAgentMessagingService.class), reports, new ObjectMapper().findAndRegisterModules());
+    }
+
+    private DeviceAgentMessageRequest feedbackMessage(Map<String, Object> payload) {
+        DeviceAgentMessageRequest r = new DeviceAgentMessageRequest();
+        r.setCommandId("CMD-1");
+        r.setMessageType("EXECUTION_FEEDBACK");
+        r.setAgentId("AGT-1");
+        r.setPayload(payload);
+        return r;
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void unifiedEntranceNormalizesAnUnrecognizedResultLikeTheDeviceReportEntrance() {
+        TaskExecutionOrchestrator viaUnified = mock(TaskExecutionOrchestrator.class);
+        var out = unifiedEntrance(reportService(viaUnified)).dispatch(feedbackMessage(Map.of(
+                "executionResult", "UNRECOGNIZED", "attemptNo", 0)));
+        assertEquals("PROCESSED", out.get("status"));
+        ArgumentCaptor<Map<String, Object>> unifiedOut = ArgumentCaptor.forClass(Map.class);
+        verify(viaUnified).onExecutionFeedback(eq("AGT-1"), eq("CMD-1"), eq(0), eq("FAILED"),
+                eq("ERR_FEEDBACK_UNRECOGNIZED"), unifiedOut.capture());
+
+        TaskExecutionOrchestrator viaReport = mock(TaskExecutionOrchestrator.class);
+        reportService(viaReport).accept("AGT-1", feedback("UNRECOGNIZED", null));
+        ArgumentCaptor<Map<String, Object>> reportOut = ArgumentCaptor.forClass(Map.class);
+        verify(viaReport).onExecutionFeedback(eq("AGT-1"), eq("CMD-1"), eq(0), eq("FAILED"),
+                eq("ERR_FEEDBACK_UNRECOGNIZED"), reportOut.capture());
+        assertEquals(reportOut.getValue(), unifiedOut.getValue(), "两个入口归一后的输出一致，且都保留原始取值");
+        assertEquals("UNRECOGNIZED", unifiedOut.getValue().get("rawExecutionResult"));
+    }
+
+    @Test
+    void unifiedEntranceStillRejectsMissingOrBlankResults() {
+        DeviceAgentInternalMessageService service = unifiedEntrance(mock(DeviceAgentReportService.class));
+        for (Map<String, Object> payload : List.<Map<String, Object>>of(Map.of(), Map.of("executionResult", " "))) {
+            var ex = assertThrows(com.airport.ai.common.BusinessException.class,
+                    () -> service.dispatch(feedbackMessage(payload)));
+            assertEquals(com.airport.ai.common.ErrorCode.PARAM_MISSING, ex.getErrorCode());
+        }
+    }
+
+    @Test
+    void reportServiceRejectsABlankResultInsteadOfTurningItIntoFailure() {
+        TaskExecutionOrchestrator orchestrator = mock(TaskExecutionOrchestrator.class);
+        for (String blank : new String[]{null, "", "  "}) {
+            var ex = assertThrows(com.airport.ai.common.BusinessException.class,
+                    () -> reportService(orchestrator).accept("AGT-1", feedback(blank, null)));
+            assertEquals(com.airport.ai.common.ErrorCode.PARAM_MISSING, ex.getErrorCode());
+        }
+        verifyNoInteractions(orchestrator);
+    }
+
+    @Test
+    void unifiedEntranceKeepsRecognizedResultsUnchanged() {
+        for (String result : List.of("SUCCESS", "FAILED", "TIMEOUT")) {
+            TaskExecutionOrchestrator orchestrator = mock(TaskExecutionOrchestrator.class);
+            unifiedEntrance(reportService(orchestrator)).dispatch(feedbackMessage(Map.of(
+                    "executionResult", result, "reasonCode", "R-" + result, "attemptNo", 0)));
+            verify(orchestrator).onExecutionFeedback(eq("AGT-1"), eq("CMD-1"), eq(0), eq(result), eq("R-" + result), any());
+        }
+    }
+
     // ---------- R05：业务模块只经统一消息服务与设备交互
     @Test
     void onlyDeviceManagementClassesTouchTheDeviceAdapterClient() throws IOException {
