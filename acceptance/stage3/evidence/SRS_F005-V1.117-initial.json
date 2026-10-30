@@ -1,0 +1,140 @@
+{
+  "version": "V1.117",
+  "codeSha": "5ef82e8b4de66cc1313b1222821cd2d1d43bc5f0",
+  "observedAt": "2026-10-30T11:14:11.194747+08:00",
+  "schema": "tip_gpt_f005_v117_20261030",
+  "backendPort": 18119,
+  "checks": [
+    {
+      "check": "TC014.S3.default_and_migration",
+      "pass": true,
+      "facts": {
+        "defaultSeconds": 30,
+        "migration": "19"
+      }
+    },
+    {
+      "check": "TC014.S3.valid.10",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "saved": 10
+      }
+    },
+    {
+      "check": "TC014.S3.valid.120",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "saved": 120
+      }
+    },
+    {
+      "check": "TC014.S3.invalid.9",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "savedUnchanged": 120
+      }
+    },
+    {
+      "check": "TC014.S3.invalid.121",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "savedUnchanged": 120
+      }
+    },
+    {
+      "check": "TC014.S3.invalid.None",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "savedUnchanged": 120
+      }
+    },
+    {
+      "check": "TC014.S3.role.系统管理员",
+      "pass": true,
+      "facts": {
+        "putHttp": 403,
+        "getHttp": 200
+      }
+    },
+    {
+      "check": "TC014.S3.role.运行操作员",
+      "pass": true,
+      "facts": {
+        "putHttp": 403,
+        "getHttp": 200
+      }
+    },
+    {
+      "check": "TC014.S1.latest.F2_ZONE_A",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "area": "F2_ZONE_A",
+        "x": 11.0,
+        "y": 22.0,
+        "workStatus": "IDLE",
+        "lastReportedAt": "2026-10-30T11:14:24.675453"
+      }
+    },
+    {
+      "check": "TC014.S1.latest.F2_ZONE_B",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "area": "F2_ZONE_B",
+        "x": 33.0,
+        "y": 44.0,
+        "workStatus": "BUSY",
+        "lastReportedAt": "2026-10-30T11:14:24.744791"
+      }
+    },
+    {
+      "check": "R03.latest_only_no_telemetry_events",
+      "pass": true,
+      "facts": {
+        "eventCountBefore": 3,
+        "eventCountAfter": 3,
+        "reports": 20
+      }
+    },
+    {
+      "check": "TC014.S1.unknown_zone_ignored",
+      "pass": true,
+      "facts": {
+        "area": "F2_ZONE_B",
+        "x": 99.0
+      }
+    },
+    {
+      "check": "TC015.S1.rejection_record_and_throttle",
+      "pass": true,
+      "facts": {
+        "formatHttp": [
+          400,
+          400
+        ],
+        "authHttp": 401,
+        "rejectedEvents": {
+          "ERR_REPORT_INVALID_FORMAT": 1,
+          "ERR_REPORT_AUTH_FAILED": 1
+        },
+        "stateUnchanged": true
+      }
+    },
+    {
+      "check": "TC015.S1.rejection_redacted",
+      "pass": true,
+      "facts": {
+        "leakedTokenOrRawPayloadRows": 0
+      }
+    }
+  ],
+  "deviceCode": "G5STAT_111411",
+  "agentCode": "AGT-F9D46850",
+  "agentDbId": 1
+}
