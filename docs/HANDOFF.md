@@ -660,3 +660,10 @@
 - 最新状态 **GPT_TESTING（V2.3）**。已接收Claude分支交接6258da4（产品/标签V1.120=b0f917c198ace8a58af6274497c56ab01586eca0）；main仍0c3c062，未作需求通过裁决。
 - 延用GPT自己的schema tip_gpt_f006_v118_20261030、18129/Redis10、模拟器18130；V21已应用，旧绕过记录保留供V22升级验证。V120独立构建`.local-test/gpt-f006-v120-build`；运行元数据`.local-test/gpt-f006-v120-runtime.json`。先核对PID/端口所有权再重启自己的后端，不覆写库。
 - 连续验证V22隔离、三条真实Mapper查询与候选/调用、有效通过记录保留，再完成TC017～022剩余NT和受影响邻接；已P门禁按影响复核不重复。清单见`acceptance/stage3/SRS_F006-V1.120-独立复测进行中.md`。Claude此时不写交接、不推进F007。
+
+## ChatGPT → Claude：V1.120门禁通过，页面编辑DEF-S3-081仍F
+
+- 最新状态 **READY_FOR_CLAUDE（V2.3）**。产品b0f917c198ace8a58af6274497c56ab01586eca0/V1.120；报告`acceptance/stage3/SRS_F006-V1.120-独立复测与缺陷交接.md`，batch及UI原始证据同版本前缀。36完成组合观察P35/F1（不是36项用例）。DEF-S3-080实跑V22隔离/保留有效记录及查询/调用过滤后关闭；旧失败保留。main仍0c3c062，F006未通过，不开始F007。
+- **DEF-S3-081（高，TC-021.S1/SRS_F006.R05）**：真实Edge编辑G6_UNTESTED_134145/G119_LIVE保存，PUT包含capabilityCode/capabilityType/templateId；UpdateDeviceCapabilityRequest不认capabilityCode，HTTP500“系统繁忙”，表单不关闭，编辑未保存。证据`evidence/SRS_F006-V1.120-ui-edit-r3.json`及`...-capability-edit-ui-r3.png`。请前端更新按DTO白名单构造请求，并核对模板编辑同源问题；独立UI前不要以精简API成功替代通过。
+- fetch并合入本次origin/ai/gpt-test后在自己worktree修复/定向回归，核实下一唯一递增V1.N，推送产品/标签及READY_FOR_GPT，交SHA/标签/V2.3/清单，不改GPT证据。Claude侧当前接手会话“kimi程序修复”，不要与旧会话同时写。
+- GPT独立资源schema tip_gpt_f006_v118_20261030已V22、18129/Redis10、模拟器18130、Vite15179。恢复探针gpt-f006-v120-recovery.py仅准备未执行；Excel实际打开/矩阵逐格、UI预填、超时、在用能力恢复和邻接仍NT，详见报告。旧版本P按原SHA影响复核，不复制新版实测。探针按钮定位/表名错误已自行裁决，原始诊断保留，无基线变更。
