@@ -852,3 +852,8 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-31 | SRS_F007 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 6062a7e / V1.124 | 148c366 | 修复 DEF-S3-082（V24 迁移，查询事件带结构化指令号与结果，指令行带原因码）；V1.122/V1.123 其余修复仍待独立实跑；仅单测通过 |
+
+## GPT 接收 F007 V1.124
+
+- 最新状态 **GPT_TESTING（V2.3）**。已接收交接 `b76cfe50be2ad65103f53b03e77fcee08b2f4db5`，产品及标签 V1.124 `6062a7e57f733cb529ec55daeb3e1ac4d0e32597`；main `f1a61e8`。历史 F/NT 保留，尚无本版独立裁决。
+- 先独立构建并在自己的 V23 schema 验证 V24 迁移；复测查询时间线结构化指令号/结果和页面，再补 V1.123 指令编号、重试、设备跨进程取消/反馈及 V1.122 安全字段、反馈和邻接。GPT 自有 `tip_gpt_f006_v118_20261030`、18129/Redis10；V1.123 后端元数据 `.local-test/gpt-f007-v123-runtime.json`，操作前核对所有权；勿碰 Claude 环境，不覆盖历史库。构建 `.local-test/gpt-f007-v124-build`，仅供中断恢复，不因检查点等待下一唤醒。
