@@ -1,0 +1,107 @@
+{
+  "version": "V1.123",
+  "codeSha": "bad6eabaa1addb7b26ea764f9d226af3620bef39",
+  "executionBaseline": "V2.3",
+  "observedAt": "2026-10-31T01:33:52.461199+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "checks": [
+    {
+      "check": "CAPABILITY_QUERY_query_success",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "commandId": "G123_CAPABILITY_QUERY",
+        "response": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "commandId": "G123_CAPABILITY_QUERY",
+            "capabilities": [
+              {
+                "id": 12,
+                "capabilityCode": "G120_TEMPLATE",
+                "capabilityName": "GPT V120 live",
+                "capabilityType": "CAP_INFO_DISPLAY",
+                "inputParams": [
+                  {
+                    "name": "contentType",
+                    "type": "String",
+                    "required": true,
+                    "defaultValue": "TEXT",
+                    "range": "TEXT/IMAGE/VIDEO/HTML"
+                  },
+                  {
+                    "name": "contentData",
+                    "type": "String",
+                    "required": true,
+                    "defaultValue": "GPT customized from template",
+                    "range": null
+                  },
+                  {
+                    "name": "displayDuration",
+                    "type": "Integer",
+                    "required": true,
+                    "defaultValue": "5",
+                    "range": "5~300"
+                  }
+                ],
+                "outputParams": [
+                  {
+                    "name": "displayStatus",
+                    "type": "String",
+                    "required": true,
+                    "defaultValue": null,
+                    "range": null
+                  },
+                  {
+                    "name": "actualDuration",
+                    "type": "Integer",
+                    "required": true,
+                    "defaultValue": null,
+                    "range": null
+                  },
+                  {
+                    "name": "errorMessage",
+                    "type": "String",
+                    "required": false,
+                    "defaultValue": null,
+                    "range": null
+                  }
+                ],
+                "applicableConditions": "GPT isolated fixture",
+                "capabilityStatus": "ENABLED",
+                "testResult": "实际设备代理调用通过，指令 TEST-b4e3069e4e264d08a0f2170e9b",
+                "lastTestAt": "2026-10-30T21:16:51.504518",
+                "testRequest": null,
+                "testResponse": null,
+                "testDurationMs": null,
+                "capabilityDescription": "V120 synthetic"
+              }
+            ]
+          },
+          "timestamp": "2026-10-31T01:33:52.907647900+08:00"
+        }
+      }
+    },
+    {
+      "check": "CAPABILITY_QUERY_timeline_id_and_result",
+      "pass": false,
+      "facts": {
+        "http": 200,
+        "commandId": "G123_CAPABILITY_QUERY",
+        "matchingRows": [
+          {
+            "kind": "EVENT",
+            "type": "AGENT_MESSAGE_CAPABILITY_QUERY",
+            "at": "2026-10-31T01:33:52.905073",
+            "commandId": null,
+            "summary": "指令G123_CAPABILITY_QUERY：能力查询返回1项",
+            "result": null,
+            "reasonCode": null
+          }
+        ],
+        "expected": "query interaction timeline exposes commandId and result in structured fields"
+      }
+    }
+  ]
+}

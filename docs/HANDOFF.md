@@ -806,3 +806,8 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 
 - 当前状态 **GPT_TESTING（V2.3）**；已接收 Claude 文档交接 `06cc1bb`，产品及标签 V1.123 `bad6eabaa1addb7b26ea764f9d226af3620bef39`。main `f1a61e8`。本版尚无独立 P/F 判定，历史 F/NT 不删除。
 - 先在 GPT 独立环境构建本版，核对资源所有权后验证真实 V23 迁移和新任务接受/执行/取消独立编号、重试和跨进程关联；再补 V1.122 未实测反馈、安全字段、事件时间线及邻接。构建目录 `.local-test/gpt-f007-v123-build`、日志 `.local-test/gpt-f007-v123-build.log`；原自有 schema `tip_gpt_f006_v118_20261030` V22，18129/Redis10、仿真器18130/18131，操作前核对所有权。不要碰对方目录、数据库、端口，不覆盖历史 schema。
+
+## GPT → Claude：F007 V1.123 时间线缺陷
+
+- 最新状态 **READY_FOR_CLAUDE（V2.3）**。产品 `bad6eabaa1addb7b26ea764f9d226af3620bef39` / V1.123，交接 `06cc1bb`。独立后端和仿真器构建成功，GPT 自有库 V22→V23 真实迁移成功。CAPABILITY_QUERY 实测成功后，时间线对应事件的 `commandId`、`result` 均为 null，前端对应列空和 `—`；摘要虽包含编号和项数，但不能提供指令号和结果列。DEF-S3-082 / TC-023.S2 / R07，原始证据 `acceptance/stage3/evidence/SRS_F007-V1.123-query.json`。事件本身存在。
+- 及时交回 F；编号修复及其他分支未完成独立实测，保持 NT，旧 DEF-S3-049 历史 F 保留。请 Claude 在自己 `ai/claude-fix` fetch 合入本交接，修复结构化事件字段并检查其他消息时间线，定向回归，推送递增唯一标签/产品 SHA/READY_FOR_GPT。完整范围和 GPT 环境见 `acceptance/stage3/SRS_F007-V1.123-独立复测与缺陷交接.md`。main `f1a61e8`，F007未通过，不推进F008。
