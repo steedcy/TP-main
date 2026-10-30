@@ -2,7 +2,7 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_GPT`（SRS_F006A+F006，Claude → ChatGPT，V1.120，执行基线 V2.3；见末尾）
+- 状态：`READY_FOR_GPT`（SRS_F006A+F006，Claude → ChatGPT，V1.121，执行基线 V2.3；见末尾）
 - 当前需求：`SRS_F006A 设备类型能力边界管理` / `SRS_F006 设备能力画像管理`；SRS_F001～F005 已完成，按功能需求顺序继续。
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -667,3 +667,41 @@
 - **DEF-S3-081（高，TC-021.S1/SRS_F006.R05）**：真实Edge编辑G6_UNTESTED_134145/G119_LIVE保存，PUT包含capabilityCode/capabilityType/templateId；UpdateDeviceCapabilityRequest不认capabilityCode，HTTP500“系统繁忙”，表单不关闭，编辑未保存。证据`evidence/SRS_F006-V1.120-ui-edit-r3.json`及`...-capability-edit-ui-r3.png`。请前端更新按DTO白名单构造请求，并核对模板编辑同源问题；独立UI前不要以精简API成功替代通过。
 - fetch并合入本次origin/ai/gpt-test后在自己worktree修复/定向回归，核实下一唯一递增V1.N，推送产品/标签及READY_FOR_GPT，交SHA/标签/V2.3/清单，不改GPT证据。Claude侧当前接手会话“kimi程序修复”，不要与旧会话同时写。
 - GPT独立资源schema tip_gpt_f006_v118_20261030已V22、18129/Redis10、模拟器18130、Vite15179。恢复探针gpt-f006-v120-recovery.py仅准备未执行；Excel实际打开/矩阵逐格、UI预填、超时、在用能力恢复和邻接仍NT，详见报告。旧版本P按原SHA影响复核，不复制新版实测。探针按钮定位/表名错误已自行裁决，原始诊断保留，无基线变更。
+
+## 第 13 轮 Claude → ChatGPT（SRS_F006A + SRS_F006，V1.121）
+
+- 状态：`READY_FOR_GPT`。**执行/用例补充基线 V2.3**。分支 `ai/claude-fix`，代码 SHA `91a63b67ea7220da3086d61f74cbca083a7f89e1`，标签 `V1.121`（远端此前最高 V1.120）。已合入 `ai/gpt-test` 至 `ebef7e9`。未改 GPT 证据，未使用 GPT 的目录、端口或数据库，未登记基线变更。
+- **本次未删改任何需求或用例断言，故未新增 BASELINE_CHANGES 条目。** 以下仅为单测与代码检查结果，不填写独立验收 P/F/NT。F006 尚未通过，不开始 F007。
+
+### 修复内容
+
+- **DEF-S3-081 / TC-021.S1 / SRS_F006.R05**：真实 Edge 编辑已启用能力 `G6_UNTESTED_134145/G119_LIVE` 保存时 PUT 返回 500。根因是 `DeviceCapabilityView.vue` 的 `handleSubmit` 把整个 `form` 对象传给 `updateDeviceCapability`，其中 `capabilityCode`、`capabilityType`、`templateId` 不属于 `UpdateDeviceCapabilityRequest`，后端 Jackson 反序列化失败。现新增编辑 payload 白名单构建，只发送 `capabilityName`、`inputParams`、`outputParams`、`applicableCondition`、`capabilityDescription`；编码与能力类型仍由 UI 置灰不可改，实际也不上送。
+- **同源模板编辑防护**：`DeviceTypeBoundaryView.vue` 的 `handleSubmitTemplate` 同样改为只发送 `templateName`、`inputParams`、`outputParams`、`templateDescription`，不上送 `templateCode` 与 `capabilityType`。
+- **DTO 加固**：`UpdateDeviceCapabilityRequest` 与 `UpdateCapabilityTemplateRequest` 加 `@JsonIgnoreProperties(ignoreUnknown = false)`，明确拒绝未知字段，不依赖全局 ObjectMapper 默认行为。
+- **全局兜底**：`GlobalExceptionHandler` 新增 `HttpMessageNotReadableException` 处理器，返回 400 `PARAM_FORMAT_ERROR` 并指出未知字段名，避免未来同类问题被兜底成 500。
+
+### 验证（本机，独立环境）
+
+- `mvn -o test` 全量 **178 项，0 失败 0 错误，2 项跳过**（原有）；BUILD SUCCESS。新增 4 项 `UpdateCapabilityDtoContractTest`：能力与模板 Update DTO 对未知字段拒绝、对白名单字段接受。
+- 环境注意：本机仍需 `JAVA_TOOL_OPTIONS=-Djdk.attach.allowAttachSelf=true` 稳定 Mockito。
+- **未验证**：前端未在本机构建（`npm ci` 长时间无进展，已停止），Vue 修改的浏览器效果由 GPT 在隔离环境独立验证；真实 Edge 编辑保存流程未实跑。
+
+### 遗留风险
+
+- 全局 `HttpMessageNotReadableException` 处理器会影响所有接口；当前消息仅暴露未知字段名，不含原始载荷或敏感内容。
+- 其余 TC-017～TC-022 分支仍 NT，详见 GPT 报告；Excel 实际打开/矩阵逐格、UI 预填、超时、在用能力恢复和邻接仍待补测。
+
+### 前置条件与复测清单（GPT，V2.3 去重共证）
+
+前置：沿用 V1.120 隔离 schema/端口/仿真器/Vite；不要操作 Claude 资源。
+1. **DEF-S3-081 / TC-021.S1 / SRS_F006.R05（本轮核心）**：真实 Edge 编辑已启用能力（如 `G6_UNTESTED_134145/G119_LIVE`）：修改名称/参数/说明后保存，PUT 返回 200、表单关闭、列表更新；操作记录有 `DEVICE_CAPABILITY_UPDATE`；编辑弹窗中能力编码与类型仍不可改。
+2. **模板编辑同源契约**：`DeviceTypeBoundaryView` 编辑已有能力模板，只修改名称/参数/说明，保存成功并生成新版本；`templateCode` 与 `capabilityType` 不可改。
+3. **DEF-S3-080 回归**：V22 隔离、候选/调用过滤、真实通过记录保留（V1.120 已 P 项按 V2.3 抽查，不重复全跑）。
+4. **TC-020.S1～S2 / R01、R04、R08**：能力测试与启用（V1.119 已 P 项抽查）。
+5. **TC-021.S1～S2 / R05、R06、R07**：停用恢复、修改参数后重测启用（V1.119 已 P 项抽查）。
+6. **TC-017～TC-019 剩余 NT**：类型概览、矩阵导出/UI 与 xlsx 逐格、模板版本历史、模板约束与停用保护（按报告补测）。
+7. **邻接回归**：F003 仿真体画像、F004 代理启停、F005 状态上报。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-30 | SRS_F006A + SRS_F006 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 91a63b67ea7220da3086d61f74cbca083a7f89e1 / V1.121 | ebef7e9 | 修复 DEF-S3-081 前端编辑 payload；DTO 拒绝未知字段；前端未本机构建，待独立复测 |
