@@ -111,7 +111,18 @@ public class DeviceAgentReportService {
             String executionResult = feedback.getExecutionResult();
             if (!"SUCCESS".equals(executionResult) && !"FAILED".equals(executionResult)
                     && !"TIMEOUT".equals(executionResult)) {
-                throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, "feedback.executionResult取值非法");
+                // 无法归一的反馈：保留原值于输出参数，归一为失败并带原因码，进入异常处理（DEF-S3-051）
+                java.util.Map<String, Object> out = new java.util.LinkedHashMap<>();
+                if (feedback.getOutputParams() != null) out.putAll(feedback.getOutputParams());
+                out.put("rawExecutionResult", String.valueOf(executionResult));
+                feedback.setOutputParams(out);
+                feedback.setExecutionResult("FAILED");
+                feedback.setReasonCode("ERR_FEEDBACK_UNRECOGNIZED");
+            }
+            // 成功反馈也带原因码，三类结果均可追溯（DEF-S3-053）
+            if ("SUCCESS".equals(feedback.getExecutionResult())
+                    && (feedback.getReasonCode() == null || feedback.getReasonCode().isBlank())) {
+                feedback.setReasonCode("DEVICE_SUCCESS");
             }
             if (feedback.getAttemptNo() < 0 || feedback.getAttemptNo() > 1) {
                 throw new BusinessException(ErrorCode.PARAM_OUT_OF_RANGE, "feedback.attemptNo必须为0或1");

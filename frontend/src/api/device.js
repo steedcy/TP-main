@@ -45,6 +45,10 @@ export function disableAgent(agentId) {
   return request.post(`/device-agents/${agentId}/disable`, { confirmed: true })
 }
 
+export function getAgentTimeline(agentId) {
+  return request.get(`/device-agents/${agentId}/timeline`)
+}
+
 export function getHeartbeatTimeout() {
   return request.get('/settings/heartbeat-timeout')
 }

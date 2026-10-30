@@ -21,6 +21,12 @@ public final class MotionSafetyGuard {
             "speed limit", "speed_limit", "failsafe", "fail-safe", "dock on disconnect"
     );
 
+    /** 去掉空格/下划线/连字符并小写后的复合词匹配，覆盖pathPoints、emergencyStop、lostConnectionParking等写法（DEF-S3-052） */
+    private static final Set<String> BLOCKED_COMPOUNDS = Set.of(
+            "pathpoint", "routepoint", "emergencystop", "speedlimit", "obstacleavoidance", "lostconnection",
+            "safestop", "failsafe", "dockondisconnect", "waypoint", "attitude", "orientation",
+            "acceleration", "velocity");
+
     private MotionSafetyGuard() {}
 
     /** 返回命中的关键词清单（用于生成4106错误的详细原因），为空表示未命中，即通过 */
@@ -54,6 +60,12 @@ public final class MotionSafetyGuard {
         for (String keyword : BLOCKED_KEYWORDS) {
             if (lower.contains(keyword.toLowerCase())) {
                 hits.add(keyword);
+            }
+        }
+        String squashed = lower.replaceAll("[\\s_\\-]", "");
+        for (String compound : BLOCKED_COMPOUNDS) {
+            if (squashed.contains(compound) && !hits.contains(compound)) {
+                hits.add(compound);
             }
         }
     }

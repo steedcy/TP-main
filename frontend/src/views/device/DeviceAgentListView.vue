@@ -57,7 +57,7 @@
           <span v-if="!record.enabledCapabilities?.length">—</span>
         </template>
         <template v-else-if="column.key === 'action'">
-          <a-button size="small" style="margin-right: 8px" @click="detail = record">详情</a-button>
+          <a-button size="small" style="margin-right: 8px" @click="openDetail(record)">详情</a-button>
           <a-popconfirm
             v-if="record.agentStatus === 'ENABLED'"
             title="停用后代理立即退出可用候选集合，确认停用？"
@@ -91,6 +91,11 @@
           <span v-if="!detail.enabledCapabilities?.length">无已启用能力</span>
         </a-descriptions-item>
       </a-descriptions>
+      <a-divider>消息与事件时间线</a-divider>
+      <a-table :dataSource="timeline" :pagination="{ pageSize: 10 }" size="small" rowKey="rowKey"
+        :columns="[{ title: '时间', dataIndex: 'at', width: 170 }, { title: '类型', dataIndex: 'type' },
+                   { title: '指令号', dataIndex: 'commandId' }, { title: '摘要', dataIndex: 'summary' },
+                   { title: '结果/原因码', customRender: ({ record }) => record.result || record.reasonCode || '—' }]" />
     </a-drawer>
   </div>
 </template>
@@ -99,11 +104,18 @@
 import { onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { message } from 'ant-design-vue'
-import { listAgents, disableAgent, getHeartbeatTimeout, updateHeartbeatTimeout } from '../../api/device'
+import { listAgents, disableAgent, getHeartbeatTimeout, updateHeartbeatTimeout, getAgentTimeline } from '../../api/device'
 import { useAuthStore } from '../../store/auth'
 
 const list = ref([])
 const detail = ref(null)
+const timeline = ref([])
+async function openDetail(record) {
+  detail.value = record
+  timeline.value = []
+  const resp = await getAgentTimeline(record.agentId)
+  timeline.value = resp.data.map((t, i) => ({ ...t, rowKey: i }))
+}
 const auth = useAuthStore()
 // 配置管理员无权读取任务详情，当前任务只显示文本，不提供链接
 const canOpenTask = auth.role === 'OPERATOR' || auth.role === 'SYSTEM_ADMIN'

@@ -19,7 +19,10 @@ import java.util.concurrent.atomic.AtomicReference;
 @Service
 public class SimulatorRuntime {
     private static final Set<String> FORBIDDEN = Set.of("speed", "velocity", "acceleration", "pose", "waypoints",
-            "obstacleAvoidance", "emergencyStop", "speedLimit", "safeStopOnDisconnect");
+            "obstacleAvoidance", "emergencyStop", "speedLimit", "safeStopOnDisconnect",
+            "attitude", "orientation", "pathPoints", "lostConnectionParking");
+    private static final Set<String> FORBIDDEN_NORMALIZED = FORBIDDEN.stream()
+            .map(k -> k.toLowerCase().replaceAll("[\\s_\\-]", "")).collect(java.util.stream.Collectors.toSet());
     private final SimulatorProperties properties;
     private final Map<String, CapabilityDriver> drivers;
     private final CapabilityDriver driver;
@@ -375,7 +378,8 @@ public class SimulatorRuntime {
     private void rejectSafetyFields(Object value) {
         if (value instanceof Map<?, ?> map) for (var entry : map.entrySet()) {
             String key = String.valueOf(entry.getKey());
-            if (FORBIDDEN.contains(key)) throw new IllegalArgumentException("禁止运动安全字段: " + key);
+            if (FORBIDDEN.contains(key) || FORBIDDEN_NORMALIZED.contains(key.toLowerCase().replaceAll("[\\s_\\-]", "")))
+                throw new IllegalArgumentException("禁止运动安全字段: " + key);
             rejectSafetyFields(entry.getValue());
         }
         if (value instanceof Iterable<?> items) items.forEach(this::rejectSafetyFields);

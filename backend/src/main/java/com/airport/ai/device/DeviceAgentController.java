@@ -61,6 +61,16 @@ public class DeviceAgentController {
                 .withOfflineInfo(deviceAgentService.offlineInfo(agent)));
     }
 
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private DeviceAgentTimelineService timelineService;
+
+    /** 代理消息与事件时间线：消息类型、时间、指令号、摘要与结果（SRS_F007.R07） */
+    @GetMapping("/{agentId}/timeline")
+    @PreAuthorize("hasAnyRole('CONFIG_ADMIN', 'SYSTEM_ADMIN', 'OPERATOR')")
+    public ApiResponse<java.util.List<Map<String, Object>>> timeline(@PathVariable String agentId) {
+        return ApiResponse.ok(timelineService.timeline(deviceAgentService.getByCode(agentId)));
+    }
+
     @PostMapping("/{agentId}/disable")
     @PreAuthorize("hasRole('CONFIG_ADMIN')")
     public ApiResponse<Void> disable(@PathVariable String agentId, @RequestBody Map<String, Boolean> body) {

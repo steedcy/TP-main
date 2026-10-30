@@ -3,7 +3,6 @@ package com.airport.ai.task.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Pattern;
 
 import java.util.Map;
 
@@ -18,8 +17,8 @@ public class ExecutionFeedbackRequest {
     @Min(0) @Max(1)
     private Integer attemptNo = 0;
 
+    // 取值不在SUCCESS/FAILED/TIMEOUT内时不在此拒绝，由DeviceAgentReportService归一为FAILED并记录原因码（SRS_F007.R06）
     @NotBlank(message = "executionResult不可为空")
-    @Pattern(regexp = "SUCCESS|FAILED|TIMEOUT", message = "executionResult取值非法")
     private String executionResult;
 
     private String reasonCode;

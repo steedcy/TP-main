@@ -23,6 +23,8 @@ public class DeviceAgentInternalMessageService {
     private final DeviceAgentMessagingService messagingService;
     private final DeviceAgentReportService reportService;
     private final ObjectMapper objectMapper;
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private DeviceEventService deviceEventService;
 
     public DeviceAgentInternalMessageService(DeviceAgentMapper agentMapper, TaskMapper taskMapper,
                                              DeviceAgentMessagingService messagingService,
@@ -101,6 +103,13 @@ public class DeviceAgentInternalMessageService {
         };
     }
 
+    /** 查询类消息成功交互也写设备事件，供过程追溯（SRS_F007.R07） */
+    private void recordQuery(DeviceAgent agent, String messageType, String commandId, String summary) {
+        if (deviceEventService == null) return;
+        deviceEventService.append(agent.getId(), "AGENT_MESSAGE_" + messageType, "SYSTEM", null,
+                "指令" + commandId + "：" + summary);
+    }
+
     private Map<String, Object> capabilityQuery(DeviceAgentMessageRequest request, DeviceAgent agent,
                                                 Map<String, Object> payload) {
         ensureEnabled(agent);
@@ -109,6 +118,7 @@ public class DeviceAgentInternalMessageService {
                 .filter(capability -> filter == null || filter.equals(capability.getCapabilityType()))
                 .map(DeviceCapabilityView::from)
                 .toList();
+        recordQuery(agent, "CAPABILITY_QUERY", request.getCommandId(), "能力查询返回" + capabilities.size() + "项");
         return Map.of("commandId", request.getCommandId(), "capabilities", capabilities);
     }
 
@@ -123,6 +133,7 @@ public class DeviceAgentInternalMessageService {
                 throw new IllegalStateException("代理业务状态快照格式无效", ex);
             }
         }
+        recordQuery(agent, "STATUS_QUERY", request.getCommandId(), "状态查询返回本地最新状态");
         return Map.of("commandId", request.getCommandId(),
                 "agentId", agent.getAgentCode(),
                 "agentStatus", agent.getAgentStatus(),
