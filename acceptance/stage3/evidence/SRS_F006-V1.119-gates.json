@@ -1,0 +1,362 @@
+{
+  "version": "V1.119",
+  "codeSha": "62d958277aaa1398ce9b200dbbe6c13f9bb5f775",
+  "handoff": "875fc70d06430798be3bcf0a440e2f0a0e92ac3a",
+  "executionBaseline": "V2.3",
+  "observedAt": "2026-10-30T16:39:10.553649+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "port": 18129,
+  "checks": [
+    {
+      "check": "V21.applied",
+      "pass": true,
+      "facts": {
+        "migration": "21",
+        "isolatedUpgradeFrom": "V20"
+      }
+    },
+    {
+      "check": "V21.backfill_classes",
+      "pass": true,
+      "facts": {
+        "rows": [
+          {
+            "capabilityCode": "G119_PASS",
+            "capabilityStatus": "DISABLED",
+            "lastTestAt": "2026-10-30T16:36:23.582066",
+            "testResult": "实际设备代理调用通过，指令 TEST-GPT-MIGRATION",
+            "testPassedDatabase": true
+          },
+          {
+            "capabilityCode": "G119_FAIL",
+            "capabilityStatus": "TESTED_FAILED",
+            "lastTestAt": "2026-10-30T16:36:23.781031",
+            "testResult": "实际设备代理调用失败: synthetic",
+            "testPassedDatabase": false
+          },
+          {
+            "capabilityCode": "G119_UNTESTED",
+            "capabilityStatus": "UNTESTED",
+            "lastTestAt": "2026-10-30T16:36:23.92344",
+            "testResult": "实际设备代理调用通过，指令 TEST-STALE",
+            "testPassedDatabase": false
+          },
+          {
+            "capabilityCode": "G119_NO_DATE",
+            "capabilityStatus": "DISABLED",
+            "lastTestAt": null,
+            "testResult": "实际设备代理调用通过，指令 TEST-NO-DATE",
+            "testPassedDatabase": false
+          },
+          {
+            "capabilityCode": "G119_LIVE",
+            "capabilityStatus": "UNTESTED",
+            "lastTestAt": null,
+            "testResult": null,
+            "testPassedDatabase": false
+          }
+        ],
+        "note": "Synthetic migration fixtures; boolean read from DB because public view does not expose it; prior null-field probe diagnostic retained",
+        "adjudication": "Probe correction only: original filter G119_ also included newly created G119_LIVE (5 rows). Four migration equivalence classes all match. No migration/API re-execution. Raw diagnostics retained."
+      }
+    },
+    {
+      "check": "V21.legacy_invalid_enabled_must_be_quarantined",
+      "pass": false,
+      "facts": {
+        "persistedV118Bypass": {
+          "capabilityCode": "CAP_INFO_DISPLAY",
+          "capabilityStatus": "ENABLED",
+          "lastTestAt": null,
+          "testResult": null,
+          "testPassedDatabase": false
+        },
+        "noTestEverCalledForThisCapability": true,
+        "expected": "Previously demonstrated untested ENABLED must no longer be usable after upgrade"
+      }
+    },
+    {
+      "check": "V21.legacy_invalid_enabled_excluded_from_candidates",
+      "pass": false,
+      "facts": {
+        "legacyCapabilityCode": "CAP_INFO_DISPLAY",
+        "returnedCapabilities": [
+          {
+            "id": 3,
+            "capabilityCode": "CAP_INFO_DISPLAY",
+            "capabilityName": "综合信息展示",
+            "capabilityType": "CAP_INFO_DISPLAY",
+            "inputParams": [
+              {
+                "name": "contentType",
+                "type": "String",
+                "required": true,
+                "defaultValue": "TEXT",
+                "range": "TEXT/IMAGE/VIDEO/HTML"
+              },
+              {
+                "name": "contentData",
+                "type": "String",
+                "required": true,
+                "defaultValue": "测试信息：请前往F2服务点",
+                "range": null
+              },
+              {
+                "name": "displayDuration",
+                "type": "Integer",
+                "required": true,
+                "defaultValue": "60",
+                "range": "5~300"
+              }
+            ],
+            "outputParams": [
+              {
+                "name": "displayStatus",
+                "type": "String",
+                "required": true,
+                "defaultValue": null,
+                "range": null
+              },
+              {
+                "name": "actualDuration",
+                "type": "Integer",
+                "required": true,
+                "defaultValue": null,
+                "range": null
+              },
+              {
+                "name": "errorMessage",
+                "type": "String",
+                "required": false,
+                "defaultValue": null,
+                "range": null
+              }
+            ],
+            "applicableConditions": null,
+            "capabilityStatus": "ENABLED",
+            "testResult": null,
+            "lastTestAt": null,
+            "testRequest": null,
+            "testResponse": null,
+            "testDurationMs": null,
+            "capabilityDescription": "标准能力模板：综合信息展示"
+          }
+        ]
+      }
+    },
+    {
+      "check": "TC020.create_untested",
+      "pass": true,
+      "facts": {
+        "saved": {
+          "capabilityCode": "G119_LIVE",
+          "capabilityStatus": "UNTESTED",
+          "lastTestAt": null,
+          "testResult": null,
+          "testPassedDatabase": false
+        },
+        "inputParams": [
+          {
+            "name": "contentType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEXT",
+            "range": "TEXT/IMAGE/VIDEO/HTML"
+          },
+          {
+            "name": "contentData",
+            "type": "String",
+            "required": true,
+            "defaultValue": "GPT V119 synthetic display",
+            "range": null
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "1",
+            "range": "5~300"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "displayStatus",
+            "type": "String",
+            "required": true,
+            "defaultValue": null,
+            "range": null
+          },
+          {
+            "name": "actualDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": null,
+            "range": null
+          },
+          {
+            "name": "errorMessage",
+            "type": "String",
+            "required": false,
+            "defaultValue": null,
+            "range": null
+          }
+        ]
+      }
+    },
+    {
+      "check": "DEF080.new_untested_gate",
+      "pass": true,
+      "facts": {
+        "directEnableHttp": 400,
+        "disableHttp": 200,
+        "reenableHttp": 400,
+        "message": "能力未通过模拟调用测试",
+        "saved": {
+          "capabilityCode": "G119_LIVE",
+          "capabilityStatus": "DISABLED",
+          "lastTestAt": null,
+          "testResult": null,
+          "testPassedDatabase": false
+        }
+      }
+    },
+    {
+      "check": "TC020.live_proxy_test_success",
+      "pass": true,
+      "facts": {
+        "saved": {
+          "capabilityCode": "G119_LIVE",
+          "capabilityStatus": "TESTED_PASSED",
+          "lastTestAt": "2026-10-30T16:39:12.3589796",
+          "testResult": "实际设备代理调用通过，指令 TEST-d1c3b4717791470f92eb06ce24",
+          "testPassedDatabase": true
+        },
+        "testRequest": "{\"inputParams\":{\"contentType\":\"TEXT\",\"contentData\":\"GPT V119 synthetic display\",\"displayDuration\":5},\"capabilityType\":\"CAP_INFO_DISPLAY\"}",
+        "testResponse": "{\"outputParams\":{\"actualDuration\":5,\"displayStatus\":\"SUCCESS\",\"errorMessage\":\"\"},\"commandId\":\"TEST-d1c3b4717791470f92eb06ce24\",\"result\":\"SUCCESS\",\"durationMs\":0}",
+        "durationMs": 46
+      }
+    },
+    {
+      "check": "DEF080.tested_disable_reenable_and_candidates",
+      "pass": true,
+      "facts": {
+        "http": [
+          200,
+          200,
+          200
+        ],
+        "candidateBefore": [
+          "CAP_INFO_DISPLAY",
+          "G119_LIVE"
+        ],
+        "candidateAfter": [
+          "CAP_INFO_DISPLAY"
+        ],
+        "saved": {
+          "capabilityCode": "G119_LIVE",
+          "capabilityStatus": "ENABLED",
+          "lastTestAt": "2026-10-30T16:39:12.35898",
+          "testResult": "实际设备代理调用通过，指令 TEST-d1c3b4717791470f92eb06ce24",
+          "testPassedDatabase": true
+        }
+      }
+    },
+    {
+      "check": "DEF080.edit_revokes_gate",
+      "pass": true,
+      "facts": {
+        "afterEdit": {
+          "capabilityCode": "G119_LIVE",
+          "capabilityStatus": "UNTESTED",
+          "lastTestAt": "2026-10-30T16:39:12.35898",
+          "testResult": null,
+          "testPassedDatabase": false
+        },
+        "reenableHttp": 400
+      }
+    },
+    {
+      "check": "DEF080.failed_retest_revokes_gate",
+      "pass": true,
+      "facts": {
+        "saved": {
+          "capabilityCode": "G119_LIVE",
+          "capabilityStatus": "TESTED_FAILED",
+          "lastTestAt": "2026-10-30T16:39:14.1171926",
+          "testResult": "实际设备代理调用失败: 设备能力测试未通过",
+          "testPassedDatabase": false
+        },
+        "testRequest": "{\"inputParams\":{\"contentType\":\"TEXT\",\"contentData\":\"GPT edited\",\"displayDuration\":5},\"capabilityType\":\"CAP_INFO_DISPLAY\"}",
+        "testResponse": "{\"reason\":\"设备能力测试未通过\",\"result\":\"FAILED\"}",
+        "reenableHttp": 400
+      }
+    },
+    {
+      "check": "TC022.invalid_parameter_failure",
+      "pass": true,
+      "facts": {
+        "saved": {
+          "capabilityCode": "G119_LIVE",
+          "capabilityStatus": "TESTED_FAILED",
+          "lastTestAt": "2026-10-30T16:39:14.7335798",
+          "testResult": "实际设备代理调用失败: 参数类型不合法: displayDuration 应为 Integer",
+          "testPassedDatabase": false
+        },
+        "reenableHttp": 400
+      }
+    },
+    {
+      "check": "R08.proxy_commands_persisted",
+      "pass": true,
+      "facts": {
+        "commandSummary": "CAPABILITY_TEST|FAILED|1\nCAPABILITY_TEST|SUCCEEDED|2",
+        "agentCode": "AGT-D68FD3AB"
+      }
+    }
+  ],
+  "deviceCode": "G6_UNTESTED_134145",
+  "migrationFixtures": [
+    {
+      "capabilityCode": "G119_PASS",
+      "capabilityStatus": "DISABLED",
+      "lastTestAt": "2026-10-30T16:36:23.582066",
+      "testResult": "实际设备代理调用通过，指令 TEST-GPT-MIGRATION",
+      "testPassedDatabase": true
+    },
+    {
+      "capabilityCode": "G119_FAIL",
+      "capabilityStatus": "TESTED_FAILED",
+      "lastTestAt": "2026-10-30T16:36:23.781031",
+      "testResult": "实际设备代理调用失败: synthetic",
+      "testPassedDatabase": false
+    },
+    {
+      "capabilityCode": "G119_UNTESTED",
+      "capabilityStatus": "UNTESTED",
+      "lastTestAt": "2026-10-30T16:36:23.92344",
+      "testResult": "实际设备代理调用通过，指令 TEST-STALE",
+      "testPassedDatabase": false
+    },
+    {
+      "capabilityCode": "G119_NO_DATE",
+      "capabilityStatus": "DISABLED",
+      "lastTestAt": null,
+      "testResult": "实际设备代理调用通过，指令 TEST-NO-DATE",
+      "testPassedDatabase": false
+    },
+    {
+      "capabilityCode": "G119_LIVE",
+      "capabilityStatus": "UNTESTED",
+      "lastTestAt": null,
+      "testResult": null,
+      "testPassedDatabase": false
+    }
+  ],
+  "agentCode": "AGT-D68FD3AB",
+  "probeAdjudication": [
+    "First diagnostic assumed testPassed exposed by capability public DTO; field is internal, so database observation used. API omission is not product F.",
+    "Second diagnostic included G119_LIVE in 4-class migration count; corrected by exact migration fixture codes without rerunning checks.",
+    "Preparation first attempt failed Windows non-UTF8 SQL argument. Changed synthetic Chinese literals to ASCII hex SQL; no product change.",
+    "The previous invalid duration=1 fixture was corrected to valid 5 before the first live capability test."
+  ]
+}

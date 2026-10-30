@@ -1,0 +1,174 @@
+{
+  "version": "V1.119",
+  "codeSha": "62d958277aaa1398ce9b200dbbe6c13f9bb5f775",
+  "handoff": "875fc70d06430798be3bcf0a440e2f0a0e92ac3a",
+  "executionBaseline": "V2.3",
+  "observedAt": "2026-10-30T16:38:03.980664+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "port": 18129,
+  "checks": [
+    {
+      "check": "V21.applied",
+      "pass": true,
+      "facts": {
+        "migration": "21",
+        "isolatedUpgradeFrom": "V20"
+      }
+    },
+    {
+      "check": "V21.backfill_classes",
+      "pass": false,
+      "facts": {
+        "rows": [
+          {
+            "capabilityCode": "G119_PASS",
+            "capabilityStatus": "DISABLED",
+            "testPassed": null,
+            "lastTestAt": "2026-10-30T16:36:23.582066",
+            "testResult": "实际设备代理调用通过，指令 TEST-GPT-MIGRATION"
+          },
+          {
+            "capabilityCode": "G119_FAIL",
+            "capabilityStatus": "TESTED_FAILED",
+            "testPassed": null,
+            "lastTestAt": "2026-10-30T16:36:23.781031",
+            "testResult": "实际设备代理调用失败: synthetic"
+          },
+          {
+            "capabilityCode": "G119_UNTESTED",
+            "capabilityStatus": "UNTESTED",
+            "testPassed": null,
+            "lastTestAt": "2026-10-30T16:36:23.92344",
+            "testResult": "实际设备代理调用通过，指令 TEST-STALE"
+          },
+          {
+            "capabilityCode": "G119_NO_DATE",
+            "capabilityStatus": "DISABLED",
+            "testPassed": null,
+            "lastTestAt": null,
+            "testResult": "实际设备代理调用通过，指令 TEST-NO-DATE"
+          }
+        ],
+        "note": "Explicit synthetic pre-V21 migration fixtures, not live agent test proof"
+      }
+    },
+    {
+      "check": "V21.legacy_invalid_enabled_must_be_quarantined",
+      "pass": false,
+      "facts": {
+        "persistedV118Bypass": {
+          "capabilityCode": "CAP_INFO_DISPLAY",
+          "capabilityStatus": "ENABLED",
+          "testPassed": null,
+          "lastTestAt": null,
+          "testResult": null
+        },
+        "noTestEverCalledForThisCapability": true,
+        "expected": "Previously demonstrated untested ENABLED must no longer be usable after upgrade"
+      }
+    },
+    {
+      "check": "V21.legacy_invalid_enabled_excluded_from_candidates",
+      "pass": false,
+      "facts": {
+        "legacyCapabilityCode": "CAP_INFO_DISPLAY",
+        "returnedCapabilities": [
+          {
+            "id": 3,
+            "capabilityCode": "CAP_INFO_DISPLAY",
+            "capabilityName": "综合信息展示",
+            "capabilityType": "CAP_INFO_DISPLAY",
+            "inputParams": [
+              {
+                "name": "contentType",
+                "type": "String",
+                "required": true,
+                "defaultValue": "TEXT",
+                "range": "TEXT/IMAGE/VIDEO/HTML"
+              },
+              {
+                "name": "contentData",
+                "type": "String",
+                "required": true,
+                "defaultValue": "测试信息：请前往F2服务点",
+                "range": null
+              },
+              {
+                "name": "displayDuration",
+                "type": "Integer",
+                "required": true,
+                "defaultValue": "60",
+                "range": "5~300"
+              }
+            ],
+            "outputParams": [
+              {
+                "name": "displayStatus",
+                "type": "String",
+                "required": true,
+                "defaultValue": null,
+                "range": null
+              },
+              {
+                "name": "actualDuration",
+                "type": "Integer",
+                "required": true,
+                "defaultValue": null,
+                "range": null
+              },
+              {
+                "name": "errorMessage",
+                "type": "String",
+                "required": false,
+                "defaultValue": null,
+                "range": null
+              }
+            ],
+            "applicableConditions": null,
+            "capabilityStatus": "ENABLED",
+            "testResult": null,
+            "lastTestAt": null,
+            "testRequest": null,
+            "testResponse": null,
+            "testDurationMs": null,
+            "capabilityDescription": "标准能力模板：综合信息展示"
+          }
+        ]
+      }
+    }
+  ],
+  "deviceCode": "G6_UNTESTED_134145",
+  "migrationFixtures": [
+    {
+      "capabilityCode": "G119_PASS",
+      "capabilityStatus": "DISABLED",
+      "testPassed": null,
+      "lastTestAt": "2026-10-30T16:36:23.582066",
+      "testResult": "实际设备代理调用通过，指令 TEST-GPT-MIGRATION"
+    },
+    {
+      "capabilityCode": "G119_FAIL",
+      "capabilityStatus": "TESTED_FAILED",
+      "testPassed": null,
+      "lastTestAt": "2026-10-30T16:36:23.781031",
+      "testResult": "实际设备代理调用失败: synthetic"
+    },
+    {
+      "capabilityCode": "G119_UNTESTED",
+      "capabilityStatus": "UNTESTED",
+      "testPassed": null,
+      "lastTestAt": "2026-10-30T16:36:23.92344",
+      "testResult": "实际设备代理调用通过，指令 TEST-STALE"
+    },
+    {
+      "capabilityCode": "G119_NO_DATE",
+      "capabilityStatus": "DISABLED",
+      "testPassed": null,
+      "lastTestAt": null,
+      "testResult": "实际设备代理调用通过，指令 TEST-NO-DATE"
+    }
+  ],
+  "agentCode": "AGT-D68FD3AB",
+  "simulatorPid": 13120,
+  "probeError": "'testPassed'"
+}
