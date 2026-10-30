@@ -128,16 +128,22 @@ public class DeviceCapabilityService {
     public DeviceCapability test(Long deviceId, String capabilityCode, User operator) {
         DeviceCapability capability = get(deviceId, capabilityCode);
         Device device = deviceMapper.findById(deviceId).orElseThrow(() -> new BusinessException(ErrorCode.DEVICE_NOT_FOUND));
+        long startedAt = System.nanoTime();
         try {
             DeviceAgent agent = agentMapper.findByDeviceId(deviceId).orElseThrow();
             var params = ParameterValues.materialize(capability.getInputParams(), java.util.Map.of());
+            capability.setTestRequest(toJson(java.util.Map.of("capabilityType", capability.getCapabilityType(),
+                    "inputParams", params)));
             var response = messaging.testCapability(device, agent, capability, params);
+            capability.setTestResponse(toJson(response));
             capability.setCapabilityStatus("TESTED_PASSED");
             capability.setTestResult("实际设备代理调用通过，指令 " + response.get("commandId"));
         } catch (RuntimeException ex) {
             capability.setCapabilityStatus("TESTED_FAILED");
             capability.setTestResult("实际设备代理调用失败: " + ex.getMessage());
+            capability.setTestResponse(toJson(java.util.Map.of("result", "FAILED", "reason", String.valueOf(ex.getMessage()))));
         }
+        capability.setTestDurationMs((System.nanoTime() - startedAt) / 1_000_000L);
         capability.setLastTestAt(LocalDateTime.now());
         deviceCapabilityMapper.update(capability);
         DeviceCapability saved = capability;
@@ -163,13 +169,58 @@ public class DeviceCapabilityService {
                 && !"DISABLED".equals(capability.getCapabilityStatus())) {
             throw new BusinessException(ErrorCode.CAPABILITY_NOT_TESTED);
         }
+        boolean wasEnabled = "ENABLED".equals(capability.getCapabilityStatus());
         capability.setCapabilityStatus(status);
         capability.setUpdatedAt(LocalDateTime.now());
         deviceCapabilityMapper.update(capability);
+        if (wasEnabled && "DISABLED".equals(status)) {
+            recoverStepsUsing(deviceId, capability);
+        }
 
         Device device = deviceMapper.findById(deviceId).orElseThrow(() -> new BusinessException(ErrorCode.DEVICE_NOT_FOUND));
         operationLogService.record(operator.getId(), operator.getUsername(), operator.getRole(),
                 "DEVICE_CAPABILITY_STATUS_CHANGE", device.getDeviceCode() + "/" + capabilityCode + " -> " + status, "SUCCESS", null);
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    @org.springframework.context.annotation.Lazy
+    private com.airport.ai.task.TaskStepAssignmentMapper assignmentMapper;
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    @org.springframework.context.annotation.Lazy
+    private com.airport.ai.task.TaskExecutionOrchestrator orchestrator;
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    @org.springframework.context.annotation.Lazy
+    private com.airport.ai.task.TaskExceptionService taskExceptionService;
+
+    /**
+     * 停用已启用能力（SRS_F006.R06）：能力立即退出规划可用集合（候选筛选只取ENABLED）；
+     * 该设备代理在进行中的正式任务里正使用同类能力的步骤，按5.5.3恢复流程处理（先候选切换，
+     * 无可切换才判断是否重规划），再释放该代理对步骤的占用。同设备仍有同类已启用能力时不受影响。
+     */
+    private void recoverStepsUsing(Long deviceId, DeviceCapability disabled) {
+        if (assignmentMapper == null || orchestrator == null || taskExceptionService == null) return;
+        boolean stillCovered = deviceCapabilityMapper.findByDeviceIdAndCapabilityStatus(deviceId, "ENABLED").stream()
+                .anyMatch(c -> c.getCapabilityType().equals(disabled.getCapabilityType()));
+        if (stillCovered) return;
+        DeviceAgent agent = agentMapper.findByDeviceId(deviceId).orElse(null);
+        if (agent == null) return;
+        for (com.airport.ai.task.TaskStepAssignment a : assignmentMapper.findActiveByAgentId(agent.getId())) {
+            if (!disabled.getCapabilityType().equals(orchestrator.stepCapabilityType(a.getPlanVersionId(), a.getStepSeq()))) {
+                continue;
+            }
+            taskExceptionService.handleException(a.getTaskId(), a.getStepSeq(), "STEP_FAILED",
+                    "ERR_CAPABILITY_DISABLED: 能力" + disabled.getCapabilityCode() + "被停用，正占用该能力的步骤按异常恢复处理");
+            if (agent.getCurrentTaskId() != null && agent.getCurrentTaskId().equals(a.getTaskId())) {
+                agent.setCurrentTaskId(null);
+                agent.setCurrentStepSeq(null);
+                agent.setWorkStatus("IDLE");
+                agentMapper.update(agent);
+            }
+        }
+    }
+
+    private String toJson(Object value) {
+        try { return MAPPER.writeValueAsString(value); } catch (Exception e) { return String.valueOf(value); }
     }
 
     private String writeParams(List<?> params) {

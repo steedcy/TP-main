@@ -11,6 +11,7 @@
         </a-table>
       </a-tab-pane>
       <a-tab-pane key="matrix" tab="能力约束矩阵">
+        <a-button style="margin-bottom: 12px" @click="handleExportMatrix">导出Excel</a-button>
         <a-table :dataSource="matrix" :columns="matrixColumns" :pagination="false" rowKey="deviceTypeCode" size="small">
           <template #bodyCell="{ column, record }">
             <template v-if="capCodes.includes(column.dataIndex)">
@@ -27,6 +28,8 @@
         <a-descriptions :column="1" bordered size="small" style="margin-bottom: 16px">
           <a-descriptions-item label="设备类型编码">{{ detail.deviceTypeCode }}</a-descriptions-item>
           <a-descriptions-item label="设备类型名称">{{ detail.deviceTypeName }}</a-descriptions-item>
+          <a-descriptions-item label="支持能力数">{{ detail.supportedCapabilityTypes.length }}</a-descriptions-item>
+          <a-descriptions-item label="标准能力模板数">{{ detail.templateCount }}</a-descriptions-item>
           <a-descriptions-item label="已创建实例数">{{ detail.instanceCount }}</a-descriptions-item>
         </a-descriptions>
 
@@ -64,6 +67,7 @@
             <template v-else-if="column.key === 'action'">
               <a-space>
                 <a-button size="small" type="link" @click="openTemplateForm(record)">编辑</a-button>
+                <a-button size="small" type="link" @click="openVersions(record)">版本历史</a-button>
                 <a-button size="small" type="link" @click="handleToggleTemplateStatus(record)">
                   {{ record.templateStatus === 'ACTIVE' ? '停用' : '启用' }}
                 </a-button>
@@ -76,6 +80,12 @@
         </a-table>
       </template>
     </a-drawer>
+
+    <a-modal v-model:open="versionsVisible" title="模板版本历史" :footer="null" width="760px">
+      <a-table :dataSource="versions" :pagination="false" rowKey="templateVersion" size="small"
+        :columns="[{ title: '版本', dataIndex: 'templateVersion' }, { title: '名称', dataIndex: 'templateName' },
+                   { title: '修改人', dataIndex: 'changedBy' }, { title: '时间', dataIndex: 'createdAt' }]" />
+    </a-modal>
 
     <a-modal
       v-model:open="templateFormVisible"
@@ -115,7 +125,7 @@ import { onMounted, reactive, ref } from 'vue'
 import { message } from 'ant-design-vue'
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons-vue'
 import {
-  listDeviceTypes, getCapabilityBoundary, updateCapabilityBoundary,
+  listDeviceTypeOverview, exportCapabilityMatrix, listTemplateVersions, getCapabilityBoundary, updateCapabilityBoundary,
   listCapabilityTemplates, createCapabilityTemplate, updateCapabilityTemplate,
   updateCapabilityTemplateStatus, deleteCapabilityTemplate, getCapabilityMatrix
 } from '../../api/devicetype'
@@ -129,6 +139,9 @@ const capCodes = CAPABILITY_TYPES.map(c => c.value)
 const listColumns = [
   { title: '设备类型编码', dataIndex: 'deviceTypeCode' },
   { title: '设备类型名称', dataIndex: 'deviceTypeName' },
+  { title: '支持能力数', dataIndex: 'supportedCount' },
+  { title: '模板数', dataIndex: 'templateCount' },
+  { title: '实例数', dataIndex: 'instanceCount' },
   { title: '查看详情', key: 'action' }
 ]
 const deviceTypes = ref([])
@@ -136,8 +149,8 @@ const listLoading = ref(false)
 async function fetchDeviceTypes() {
   listLoading.value = true
   try {
-    const resp = await listDeviceTypes()
-    deviceTypes.value = resp.data
+    const resp = await listDeviceTypeOverview()
+    deviceTypes.value = resp.data.map(t => ({ ...t, supportedCount: t.supportedCapabilityTypes.length }))
   } finally {
     listLoading.value = false
   }
@@ -148,6 +161,16 @@ const matrixColumns = [
   ...CAPABILITY_TYPES.map(c => ({ title: c.label, dataIndex: c.value, width: 100 }))
 ]
 const matrix = ref([])
+async function handleExportMatrix() {
+  const blob = await exportCapabilityMatrix()
+  const url = URL.createObjectURL(new Blob([blob]))
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'capability-matrix.xlsx'
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
 async function fetchMatrix() {
   const resp = await getCapabilityMatrix()
   matrix.value = resp.data
@@ -270,6 +293,13 @@ async function handleSubmitTemplate() {
   } finally {
     templateSubmitLoading.value = false
   }
+}
+
+const versionsVisible = ref(false)
+const versions = ref([])
+async function openVersions(record) {
+  versions.value = (await listTemplateVersions(detail.value.deviceTypeCode, record.templateCode)).data
+  versionsVisible.value = true
 }
 
 async function handleToggleTemplateStatus(record) {

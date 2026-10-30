@@ -21,6 +21,9 @@ public class DeviceCapabilityView {
     private String capabilityStatus;
     private String testResult;
     private LocalDateTime lastTestAt;
+    private String testRequest;
+    private String testResponse;
+    private Long testDurationMs;
     private String capabilityDescription;
 
     public static DeviceCapabilityView from(DeviceCapability c) {
@@ -35,6 +38,9 @@ public class DeviceCapabilityView {
         v.capabilityStatus = c.getCapabilityStatus();
         v.testResult = c.getTestResult();
         v.lastTestAt = c.getLastTestAt();
+        v.testRequest = c.getTestRequest();
+        v.testResponse = c.getTestResponse();
+        v.testDurationMs = c.getTestDurationMs();
         v.capabilityDescription = c.getCapabilityDescription();
         return v;
     }
@@ -47,6 +53,9 @@ public class DeviceCapabilityView {
         }
     }
 
+    public String getTestRequest() { return testRequest; }
+    public String getTestResponse() { return testResponse; }
+    public Long getTestDurationMs() { return testDurationMs; }
     public Long getId() { return id; }
     public String getCapabilityCode() { return capabilityCode; }
     public String getCapabilityName() { return capabilityName; }

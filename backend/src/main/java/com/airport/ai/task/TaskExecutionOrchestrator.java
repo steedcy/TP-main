@@ -123,6 +123,11 @@ public class TaskExecutionOrchestrator {
         assignStep(taskId, planVersionId, stepSeq);
     }
 
+    /** 计划步骤要求的能力类型，供设备能力停用时判断是否影响进行中步骤（SRS_F006.R06） */
+    public String stepCapabilityType(Long planVersionId, Integer stepSeq) {
+        return String.valueOf(findStep(planVersionId, stepSeq).get("capabilityType"));
+    }
+
     /** 供TaskExceptionService判断"当前步骤是否还有候选可用"（计划是否可继续的判断依据之一） */
     public boolean hasAvailableCandidate(Long planVersionId, Integer stepSeq, List<String> excludeAgentCodes) {
         Map<String, Object> step = findStep(planVersionId, stepSeq);

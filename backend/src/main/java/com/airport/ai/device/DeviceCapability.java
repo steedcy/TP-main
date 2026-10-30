@@ -22,11 +22,21 @@ public class DeviceCapability {
     /** UNTESTED / TESTED_PASSED / TESTED_FAILED / ENABLED / DISABLED */
     private String capabilityStatus = "UNTESTED";
     private String testResult;
+    /** 本次模拟调用的脱敏请求、设备响应与服务端测得耗时，仅用于响应展示，不持久化（DEF-S3-024） */
+    private transient String testRequest;
+    private transient String testResponse;
+    private transient Long testDurationMs;
     private LocalDateTime lastTestAt;
     private String capabilityDescription;
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime updatedAt = LocalDateTime.now();
 
+    public String getTestRequest() { return testRequest; }
+    public void setTestRequest(String v) { this.testRequest = v; }
+    public String getTestResponse() { return testResponse; }
+    public void setTestResponse(String v) { this.testResponse = v; }
+    public Long getTestDurationMs() { return testDurationMs; }
+    public void setTestDurationMs(Long v) { this.testDurationMs = v; }
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public Long getDeviceId() { return deviceId; }

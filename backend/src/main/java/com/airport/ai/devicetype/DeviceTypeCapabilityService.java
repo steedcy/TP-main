@@ -65,6 +65,7 @@ public class DeviceTypeCapabilityService {
     @Transactional
     public DeviceTypeCapability updateBoundary(String deviceTypeCode, UpdateCapabilityBoundaryRequest request, User operator) {
         DeviceTypeCapability entity = get(deviceTypeCode);
+        java.util.Map<String, Object> before = boundarySummary(entity);
 
         List<String> invalid = request.getSupportedCapabilityTypes().stream()
                 .filter(c -> !CapabilityCatalog.ALL_CODES.contains(c))
@@ -86,8 +87,11 @@ public class DeviceTypeCapabilityService {
         deviceTypeCapabilityMapper.update(entity);
         DeviceTypeCapability saved = entity;
 
+        java.util.Map<String, Object> detail = new java.util.LinkedHashMap<>();
+        detail.put("before", before);
+        detail.put("after", boundarySummary(saved));
         operationLogService.record(operator.getId(), operator.getUsername(), operator.getRole(),
-                "DEVICE_TYPE_BOUNDARY_UPDATE", deviceTypeCode, "SUCCESS", null);
+                "DEVICE_TYPE_BOUNDARY_UPDATE", deviceTypeCode, "SUCCESS", null, detail);
         return saved;
     }
 
@@ -137,6 +141,7 @@ public class DeviceTypeCapabilityService {
         if (capabilityTemplateMapper.existsByDeviceTypeCodeAndTemplateCode(deviceTypeCode, request.getTemplateCode())) {
             throw new BusinessException(ErrorCode.CAPABILITY_CODE_TAKEN, "模板编码在该设备类型下已存在");
         }
+        requireContract(request.getCapabilityType(), request.getInputParams(), request.getOutputParams());
 
         CapabilityTemplate template = new CapabilityTemplate();
         template.setDeviceTypeCode(deviceTypeCode);
@@ -149,6 +154,7 @@ public class DeviceTypeCapabilityService {
         template.setTemplateVersion("V1.0");
         capabilityTemplateMapper.insert(template);
         CapabilityTemplate saved = template;
+        snapshotVersion(saved, operator);
 
         operationLogService.record(operator.getId(), operator.getUsername(), operator.getRole(),
                 "CAPABILITY_TEMPLATE_CREATE", deviceTypeCode + "/" + saved.getTemplateCode(), "SUCCESS", null);
@@ -160,6 +166,7 @@ public class DeviceTypeCapabilityService {
     public CapabilityTemplate updateTemplate(String deviceTypeCode, String templateCode,
                                               UpdateCapabilityTemplateRequest request, User operator) {
         CapabilityTemplate template = getTemplate(deviceTypeCode, templateCode);
+        requireContract(template.getCapabilityType(), request.getInputParams(), request.getOutputParams());
         template.setTemplateName(request.getTemplateName());
         template.setInputParams(writeParams(request.getInputParams()));
         template.setOutputParams(writeParams(request.getOutputParams()));
@@ -168,6 +175,7 @@ public class DeviceTypeCapabilityService {
         template.setUpdatedAt(LocalDateTime.now());
         capabilityTemplateMapper.update(template);
         CapabilityTemplate saved = template;
+        snapshotVersion(saved, operator);
 
         operationLogService.record(operator.getId(), operator.getUsername(), operator.getRole(),
                 "CAPABILITY_TEMPLATE_UPDATE", deviceTypeCode + "/" + templateCode, "SUCCESS", null);
@@ -215,5 +223,67 @@ public class DeviceTypeCapabilityService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private CapabilityTemplateVersionMapper versionMapper;
+
+    /** 模板输入必须覆盖该能力调用所需的全部必填参数、输出必须已定义（R10、R11），缺失时提示参数名 */
+    private void requireContract(String capabilityType,
+                                 List<com.airport.ai.devicetype.dto.ParamDefinition> inputs,
+                                 List<com.airport.ai.devicetype.dto.ParamDefinition> outputs) {
+        List<String> missing = CapabilityContract.missingInputs(capabilityType, inputs);
+        if (!missing.isEmpty()) {
+            throw new BusinessException(ErrorCode.PARAM_MISSING, "输入参数缺少该能力调用所需的必填参数: " + String.join("、", missing));
+        }
+        if (outputs == null || outputs.isEmpty()) {
+            throw new BusinessException(ErrorCode.PARAM_MISSING, "请定义输出参数（用于任务步骤完成条件判定）");
+        }
+    }
+
+    /** 每次保存追加一条不可变版本快照（R12），旧版本可查询追溯 */
+    private void snapshotVersion(CapabilityTemplate t, User operator) {
+        if (versionMapper == null) return;
+        versionMapper.insert(t.getId(), t.getTemplateVersion(), t.getTemplateName(), t.getInputParams(),
+                t.getOutputParams(), t.getTemplateDescription(), operator.getUsername());
+    }
+
+    public List<java.util.Map<String, Object>> listTemplateVersions(String deviceTypeCode, String templateCode) {
+        CapabilityTemplate t = getTemplate(deviceTypeCode, templateCode);
+        return versionMapper == null ? List.of() : versionMapper.findByTemplateId(t.getId());
+    }
+
+    private java.util.Map<String, Object> boundarySummary(DeviceTypeCapability e) {
+        java.util.Map<String, Object> m = new java.util.LinkedHashMap<>();
+        m.put("supportedCapabilityTypes", parseSupportedTypes(e.getDeviceTypeCode()));
+        m.put("typeDescription", abbreviate(e.getTypeDescription()));
+        m.put("typicalScenarios", abbreviate(e.getTypicalScenarios()));
+        m.put("constraintRules", abbreviate(e.getConstraintRules()));
+        return m;
+    }
+
+    private static String abbreviate(String text) {
+        if (text == null) return null;
+        return text.length() > 80 ? text.substring(0, 80) + "…" : text;
+    }
+
+    /** 类型列表概览：每类型的支持能力数、模板数、实例数（DEF-S3-017） */
+    public List<CapabilityBoundaryView> overview() {
+        return listAll().stream().map(t -> getBoundaryView(t.getDeviceTypeCode())).toList();
+    }
+
+    /** 五类型 x 八能力约束矩阵导出为Excel（DEF-S3-018），内容与接口矩阵同源 */
+    public byte[] exportMatrixXlsx() {
+        List<DeviceTypeCapability> types = listAll();
+        List<List<String>> rows = new java.util.ArrayList<>();
+        for (DeviceTypeCapability t : types) {
+            List<String> supported = parseSupportedTypes(t.getDeviceTypeCode());
+            List<String> row = new java.util.ArrayList<>(List.of(t.getDeviceTypeCode(), t.getDeviceTypeName()));
+            for (String cap : CapabilityCatalog.ALL_CODES) {
+                row.add(supported.contains(cap) ? CapabilityMatrixXlsx.SUPPORTED : CapabilityMatrixXlsx.UNSUPPORTED);
+            }
+            rows.add(row);
+        }
+        return CapabilityMatrixXlsx.build(CapabilityCatalog.ALL_CODES, rows);
     }
 }

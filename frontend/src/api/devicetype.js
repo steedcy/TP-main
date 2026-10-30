@@ -17,6 +17,18 @@ export function listCapabilityTemplates(deviceTypeCode) {
   return request.get(`/device-types/${deviceTypeCode}/capability-templates`)
 }
 
+export function listDeviceTypeOverview() {
+  return request.get('/device-types/overview')
+}
+
+export function exportCapabilityMatrix() {
+  return request.get('/device-types/capability-matrix/export', { responseType: 'blob' })
+}
+
+export function listTemplateVersions(deviceTypeCode, templateCode) {
+  return request.get(`/device-types/${deviceTypeCode}/capability-templates/${templateCode}/versions`)
+}
+
 export function createCapabilityTemplate(deviceTypeCode, data) {
   return request.post(`/device-types/${deviceTypeCode}/capability-templates`, data)
 }

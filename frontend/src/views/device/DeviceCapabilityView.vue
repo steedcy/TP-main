@@ -86,6 +86,9 @@
         </a-descriptions-item>
         <a-descriptions-item label="详情">{{ testResultData.testResult }}</a-descriptions-item>
         <a-descriptions-item label="测试时间">{{ testResultData.lastTestAt }}</a-descriptions-item>
+        <a-descriptions-item label="耗时">{{ testResultData.testDurationMs }} ms</a-descriptions-item>
+        <a-descriptions-item label="调用请求"><pre style="white-space: pre-wrap; margin: 0">{{ testResultData.testRequest || '—' }}</pre></a-descriptions-item>
+        <a-descriptions-item label="设备响应"><pre style="white-space: pre-wrap; margin: 0">{{ testResultData.testResponse || '—' }}</pre></a-descriptions-item>
       </a-descriptions>
     </a-modal>
   </div>

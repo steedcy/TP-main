@@ -33,6 +33,27 @@ public class DeviceTypeCapabilityController {
         return ApiResponse.ok(service.listAll());
     }
 
+    /** 带支持能力数/模板数/实例数的类型概览，供列表展示 */
+    @GetMapping("/overview")
+    public ApiResponse<List<CapabilityBoundaryView>> overview() {
+        return ApiResponse.ok(service.overview());
+    }
+
+    @GetMapping("/capability-matrix/export")
+    public org.springframework.http.ResponseEntity<byte[]> exportMatrix() {
+        return org.springframework.http.ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=\"capability-matrix.xlsx\"")
+                .contentType(org.springframework.http.MediaType.parseMediaType(
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(service.exportMatrixXlsx());
+    }
+
+    @GetMapping("/{deviceTypeCode}/capability-templates/{templateCode}/versions")
+    public ApiResponse<List<java.util.Map<String, Object>>> templateVersions(@PathVariable String deviceTypeCode,
+                                                                              @PathVariable String templateCode) {
+        return ApiResponse.ok(service.listTemplateVersions(deviceTypeCode, templateCode));
+    }
+
     @GetMapping("/{deviceTypeCode}/capability-boundary")
     public ApiResponse<CapabilityBoundaryView> getBoundary(@PathVariable String deviceTypeCode) {
         return ApiResponse.ok(service.getBoundaryView(deviceTypeCode));
