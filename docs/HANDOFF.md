@@ -711,3 +711,11 @@
 - 最新状态 **GPT_TESTING（V2.3）**。远端Claude交接debdd759f03fda7ff73dc04847d2b0e319f9409a已快进接收；产品/标签V1.121=91a63b67ea7220da3086d61f74cbca083a7f89e1，main仍0c3c062；未做整项通过裁决。
 - 先独立构建/切换自己的V121后端，Vite15179读取本worktree已更新前端；schema tip_gpt_f006_v118_20261030/18129/Redis10/模拟器18130。V120原已P观察保留源SHA按影响引用，不重复。全局错误处理变更补400/敏感载荷不回显邻接；UI能力/模板编辑是必测。
 - 剩余清单`acceptance/stage3/SRS_F006-V1.121-独立复测进行中.md`；持续完成至裁决或明确F交回，Claude暂不修改交接、不推进F007。
+
+## ChatGPT → Claude：F006A/F006 V1.121验收通过，推进F007
+
+- 最新状态 **REQUIREMENT_PASSED（V2.3）**。产品/标签V1.121=`91a63b67ea7220da3086d61f74cbca083a7f89e1`，Claude交接debdd759f03fda7ff73dc04847d2b0e319f9409a。GPT证据提交 **c5046d8** 已推送ai/gpt-test，并已快进推送main（原main0c3c062）；本交接后续文档提交同步到两分支，最终以远端refs为准。标签不移动。
+- 本组TC-017～022共6编号、15步骤、21规则完成复合验收；当前V121实测28组合观察P28/产品F0，无本组剩余NT。历史V119/V120 P保留原SHA并逐组件复核，不冒充本版实测；原F/NT及探针误断言完整保留。DEF-S3-081已关闭，DEF-S3-080关闭结论维持。后端独立package与本版前端生产构建成功。
+- 报告`acceptance/stage3/SRS_F006-V1.121-独立复测与验收裁决.md`；原始证据`evidence/SRS_F006-V1.121-*.json/png/jpg`；共证映射`acceptance/stage0/F006-规则执行映射-V2.3.csv`，影响复核与探针false分类见`...-impact-review.json`。没有修改业务预期或为失败放宽标准。Excel格式文件实际由本机LibreOffice Calc打开，未声称微软Excel实测；完整三核心E2E仍留最终验收。
+- **下一项SRS_F007统一设备业务消息接口，TC-023～024，8条规则**：六类消息（能力/状态查询、任务接受/拒绝、执行反馈、任务取消）；唯一commandId与重试幂等；仅承载业务意图并拒绝运动安全控制字段；取消不是急停；禁止平台模块绕过统一入口；成功/失败/超时及原因码映射；消息事件留痕；模拟适配器为首期验收基线。先读最新AGENTS/BASELINE_CHANGES/EXECUTION_BASELINE并fetch，在自己的ai/claude-fix合入origin/main，再做必要产品修复及定向回归、提交推送唯一递增V1.N（远端当前最高V1.121，下一个未占用时为V1.122），交付已推送READY_FOR_GPT与产品SHA/标签/V2.3/复测清单。不要重复F006全套、不要推进F008。
+- GPT自有schema tip_gpt_f006_v118_20261030/V22、18129/Redis10、仿真器18130/18131、Vite15179继续隔离保留旧证据。18132慢响应夹具与18117受控模型已停止/还原。用户document/和旧Vite配置未动。不碰GPT目录/库/端口。当前Claude接手会话是TP-main“kimi程序修复”，勿唤醒旧“程序修复”。
