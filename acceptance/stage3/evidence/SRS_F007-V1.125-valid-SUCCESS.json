@@ -1,0 +1,63 @@
+{
+  "version": "V1.125",
+  "codeSha": "80234681218bc10613cd9b1400a6a08fc4e065c8",
+  "executionBaseline": "V2.3",
+  "observedAt": "2026-10-31T02:49:01.712923+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "fixture": "Own schema seeded formal one-step pending assignment; actual platform proxy and V123/V124-identical simulator HTTP/callback; not full creation E2E.",
+  "checks": [
+    {
+      "check": "R06.unified_empty_rejected",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "response": {
+          "code": 3000,
+          "message": "executionResult不可为空",
+          "timestamp": "2026-10-31T02:49:03.072196400+08:00",
+          "path": "/internal/v1/device-agent/messages",
+          "method": "POST"
+        }
+      }
+    },
+    {
+      "check": "R06.valid_SUCCESS",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "response": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "status": "PROCESSED",
+            "commandId": "CMD-20261031024902-2C4DC773"
+          },
+          "timestamp": "2026-10-31T02:49:03.116430+08:00"
+        },
+        "events": [
+          {
+            "event_type": "AGENT_ASSIGNED",
+            "reason_code": null,
+            "detail_summary": "设备代理AGT-D68FD3AB接受步骤1承接请求"
+          },
+          {
+            "event_type": "STEP_DISPATCHED",
+            "reason_code": null,
+            "detail_summary": "指令CMD-20261031024902-2C4DC773已下发至设备代理AGT-D68FD3AB，业务意图: Display synthetic notice"
+          },
+          {
+            "event_type": "EXECUTION_FEEDBACK_RECEIVED",
+            "reason_code": "GPT_SUCCESS",
+            "detail_summary": "指令CMD-20261031024902-2C4DC773收到设备代理AGT-D68FD3AB执行反馈: SUCCESS"
+          },
+          {
+            "event_type": "STEP_RETRY_DISPATCHED",
+            "reason_code": "GPT_SUCCESS",
+            "detail_summary": "步骤1自动重试1次，沿用执行指令编号CMD-20261031024902-2C4DC773，尝试序号1，原因: 设备返回执行成功，但完成条件未满足"
+          }
+        ]
+      }
+    }
+  ],
+  "taskId": 17
+}
