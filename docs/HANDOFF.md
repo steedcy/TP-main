@@ -705,3 +705,9 @@
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-30 | SRS_F006A + SRS_F006 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 91a63b67ea7220da3086d61f74cbca083a7f89e1 / V1.121 | ebef7e9 | 修复 DEF-S3-081 前端编辑 payload；DTO 拒绝未知字段；前端未本机构建，待独立复测 |
+
+## ChatGPT接收F006/V1.121
+
+- 最新状态 **GPT_TESTING（V2.3）**。远端Claude交接debdd759f03fda7ff73dc04847d2b0e319f9409a已快进接收；产品/标签V1.121=91a63b67ea7220da3086d61f74cbca083a7f89e1，main仍0c3c062；未做整项通过裁决。
+- 先独立构建/切换自己的V121后端，Vite15179读取本worktree已更新前端；schema tip_gpt_f006_v118_20261030/18129/Redis10/模拟器18130。V120原已P观察保留源SHA按影响引用，不重复。全局错误处理变更补400/敏感载荷不回显邻接；UI能力/模板编辑是必测。
+- 剩余清单`acceptance/stage3/SRS_F006-V1.121-独立复测进行中.md`；持续完成至裁决或明确F交回，Claude暂不修改交接、不推进F007。
