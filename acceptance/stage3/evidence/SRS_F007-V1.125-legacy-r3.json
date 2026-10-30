@@ -1,0 +1,51 @@
+{
+  "version": "V1.125",
+  "codeSha": "80234681218bc10613cd9b1400a6a08fc4e065c8",
+  "executionBaseline": "V2.3",
+  "observedAt": "2026-10-31T02:53:20.179851+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "fixture": "Own schema seeded formal one-step pending assignment; actual platform proxy and V123/V124-identical simulator HTTP/callback; not full creation E2E.",
+  "checks": [
+    {
+      "check": "R02.legacy_null_execute_id_feedback_fallback",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "response": {
+          "code": 200,
+          "message": "success",
+          "timestamp": "2026-10-31T02:53:21.835464500+08:00"
+        },
+        "events": [
+          {
+            "event_type": "AGENT_ASSIGNED",
+            "reason_code": null,
+            "detail_summary": "设备代理AGT-D68FD3AB接受步骤1承接请求"
+          },
+          {
+            "event_type": "STEP_DISPATCHED",
+            "reason_code": null,
+            "detail_summary": "指令CMD-20261031025321-A6C7250F已下发至设备代理AGT-D68FD3AB，业务意图: Display synthetic notice"
+          },
+          {
+            "event_type": "EXECUTION_FEEDBACK_RECEIVED",
+            "reason_code": "DEVICE_SUCCESS",
+            "detail_summary": "指令G125_ACCEPT_LEGACY3收到设备代理AGT-D68FD3AB执行反馈: SUCCESS"
+          },
+          {
+            "event_type": "STEP_COMPLETED",
+            "reason_code": null,
+            "detail_summary": "步骤1完成条件已满足: displayStatus=SUCCESS"
+          },
+          {
+            "event_type": "TASK_COMPLETED",
+            "reason_code": null,
+            "detail_summary": "全部步骤完成条件均已满足，任务完成"
+          }
+        ],
+        "note": "Synthetic legacy row with null execute_command_id; real V23 migration not rerun."
+      }
+    }
+  ],
+  "taskId": 27
+}

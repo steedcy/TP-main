@@ -1,0 +1,63 @@
+{
+  "version": "V1.125",
+  "codeSha": "80234681218bc10613cd9b1400a6a08fc4e065c8",
+  "executionBaseline": "V2.3",
+  "observedAt": "2026-10-31T02:51:25.665943+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "fixture": "Own schema seeded formal one-step pending assignment; actual platform proxy and V123/V124-identical simulator HTTP/callback; not full creation E2E.",
+  "checks": [
+    {
+      "check": "R03.safety_block_recorded_no_execution",
+      "pass": true,
+      "facts": {
+        "events": [
+          {
+            "event_type": "AGENT_ASSIGNED",
+            "reason_code": null,
+            "detail_summary": "设备代理AGT-D68FD3AB接受步骤1承接请求"
+          },
+          {
+            "event_type": "COMMAND_DISPATCH_BLOCKED",
+            "reason_code": "ERR_MOTION_SAFETY_FIELD",
+            "detail_summary": "步骤1指令内容检出运动安全控制字段: [speed]，已拦截下发"
+          },
+          {
+            "event_type": "EXCEPTION_DETECTED",
+            "reason_code": "STEP_FAILED",
+            "detail_summary": "识别到异常: STEP_FAILED，步骤1，详情: 指令内容检出运动安全控制字段，已拦截"
+          },
+          {
+            "event_type": "EXCEPTION_RECOVERY_FAILED",
+            "reason_code": "STEP_FAILED",
+            "detail_summary": "恢复动作: 无可用候选设备，恢复动作未执行，结果: 失败，判断计划是否可继续"
+          },
+          {
+            "event_type": "REPLANNING_TRIGGERED",
+            "reason_code": null,
+            "detail_summary": "步骤1恢复失败且计划不可继续，重新规划机会未用，触发5.5.4局部重新规划"
+          },
+          {
+            "event_type": "CONTEXT_SNAPSHOT_GENERATED",
+            "reason_code": null,
+            "detail_summary": "局部重新规划重建上下文快照CTX-20261031-0006"
+          },
+          {
+            "event_type": "REPLAN_FAILED",
+            "reason_code": "ERR_REPLANNING_MODEL_FAILED",
+            "detail_summary": "局部重新规划调用模型失败: 规划模型服务调用超时或不可用: I/O error on POST request for \"http://127.0.0.1:18117/v1/planning/generate\": Connection refused: no further information"
+          }
+        ],
+        "commands": [
+          {
+            "id": 70,
+            "command_type": "TASK_ACCEPT",
+            "command_id": "G125_ACCEPT_SAFE_EVENT",
+            "attempt_no": 0,
+            "command_status": "ACCEPTED"
+          }
+        ]
+      }
+    }
+  ],
+  "taskId": 24
+}

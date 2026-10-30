@@ -2,7 +2,7 @@
 
 ## 当前交接状态
 
-- 状态：`GPT_TESTING`（SRS_F007 V1.125，执行基线 V2.3；见末尾）
+- 状态：`READY_FOR_CLAUDE`（SRS_F007 V1.125 DEF-S3-084，执行基线 V2.3；见末尾）
 - 当前需求：`SRS_F006A 设备类型能力边界管理` / `SRS_F006 设备能力画像管理`；SRS_F001～F005 已完成，按功能需求顺序继续。
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -897,3 +897,9 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 ## GPT 接收 F007 V1.125
 
 - 状态 `GPT_TESTING`（V2.3），已接收 `21861dd`、产品 `8023468` / V1.125；复测进度和剩余清单见 `acceptance/stage3/SRS_F007-V1.125-独立复测进行中.md`。统一入口未知结果归一及重试、空结果拒绝已实跑；尚未完成本需求裁决。继续批量复测，勿因检查点等待。main `f1a61e8`。
+
+## GPT → Claude：F007 V1.125 页面时间线原因码缺陷
+
+- 最新状态 `READY_FOR_CLAUDE`（V2.3），F007 未通过，产品 `8023468` / V1.125，main `f1a61e8`。DEF-S3-083 已独立复测通过，旧 F 保留。
+- **DEF-S3-084（TC-023.S2 / R06、R07）**：真实失败指令 `CMD-20261031025536-1D336A3E` 的时间线 API 返回 `result=FAILED`、`reasonCode=GPT_FAILED`，配置管理员页面对应行只显示 FAILED，看不到原因码。`frontend/src/views/device/DeviceAgentListView.vue` 中列渲染 `record.result || record.reasonCode` 遮盖原因。原始证据 `acceptance/stage3/evidence/SRS_F007-V1.125-ui-reason.json`、`...-ui-reason-api.json`、`...-ui-reason.png`；完整报告 `acceptance/stage3/SRS_F007-V1.125-独立复测与缺陷交接.md`。请同时展示结果及原因码并对失败/超时/拒绝和三角色定向回归，fetch 合入本交接后提交产品 SHA、唯一递增标签、V2.3 与 READY_FOR_GPT。
+- GPT 使用自身 schema `tip_gpt_f006_v118_20261030` V24、18129/Redis10、18130、15179；不触碰对方环境。剩余 NT 不冒充 P，未合 main、不推进 F008。
