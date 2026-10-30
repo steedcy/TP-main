@@ -276,15 +276,25 @@ async function handleSubmitTemplate() {
   }
   templateSubmitLoading.value = true
   try {
-    const payload = {
-      ...templateForm,
+    const strippedParams = {
       inputParams: templateForm.inputParams.map(({ __key, ...rest }) => rest),
       outputParams: templateForm.outputParams.map(({ __key, ...rest }) => rest)
     }
     if (isEditTemplate.value) {
-      await updateCapabilityTemplate(detail.value.deviceTypeCode, templateForm.templateCode, payload)
+      // 后端 UpdateCapabilityTemplateRequest 白名单：编码/能力类型不可改
+      await updateCapabilityTemplate(detail.value.deviceTypeCode, templateForm.templateCode, {
+        templateName: templateForm.templateName,
+        templateDescription: templateForm.templateDescription,
+        ...strippedParams
+      })
     } else {
-      await createCapabilityTemplate(detail.value.deviceTypeCode, payload)
+      await createCapabilityTemplate(detail.value.deviceTypeCode, {
+        templateCode: templateForm.templateCode,
+        templateName: templateForm.templateName,
+        capabilityType: templateForm.capabilityType,
+        ...strippedParams,
+        templateDescription: templateForm.templateDescription
+      })
     }
     message.success('保存成功')
     templateFormVisible.value = false

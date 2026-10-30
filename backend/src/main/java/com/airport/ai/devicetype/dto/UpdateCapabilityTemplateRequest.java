@@ -1,5 +1,6 @@
 package com.airport.ai.devicetype.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 
@@ -9,6 +10,7 @@ import java.util.List;
  * 编辑能力模板，不允许修改templateCode（唯一标识）和capabilityType（能力类型变更等同于换了一个模板，
  * 应新建而非编辑）。保存后自动分配新版本号（对应5.2.4A业务规则12）。
  */
+@JsonIgnoreProperties(ignoreUnknown = false)
 public class UpdateCapabilityTemplateRequest {
 
     @NotBlank(message = "请输入模板名称")

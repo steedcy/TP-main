@@ -4,6 +4,7 @@ import com.airport.ai.devicetype.dto.ParamDefinition;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 
 /**
@@ -11,6 +12,7 @@ import java.util.List;
  * （能力类型变更等同于换了一个能力，应删除重建而非编辑）。
  * 已启用能力被修改输入输出参数时，可用状态重置为未测试（对应5.2.4业务规则5）。
  */
+@JsonIgnoreProperties(ignoreUnknown = false)
 public class UpdateDeviceCapabilityRequest {
 
     @NotBlank(message = "请输入能力名称")

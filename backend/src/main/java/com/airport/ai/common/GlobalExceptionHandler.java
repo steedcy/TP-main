@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +63,19 @@ public class GlobalExceptionHandler {
         String message = ex.getBindingResult().getFieldErrors().isEmpty()
                 ? "请求参数校验失败"
                 : ex.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
+        ApiResponse<Void> resp = ApiResponse.error(ErrorCode.PARAM_FORMAT_ERROR.getCode(), message);
+        resp.setPath(req.getRequestURI());
+        resp.setMethod(req.getMethod());
+        return ResponseEntity.status(ErrorCode.PARAM_FORMAT_ERROR.getHttpStatus()).body(resp);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiResponse<Void>> handleUnreadableMessage(HttpMessageNotReadableException ex, HttpServletRequest req) {
+        // 请求体包含未知字段或无法解析时返回400，避免被兜底成500系统错误
+        log.warn("请求体无法解析: {} {} - {}", req.getMethod(), req.getRequestURI(), ex.getMessage());
+        String message = ex.getCause() instanceof com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException upe
+                ? "请求参数不合法: " + upe.getPropertyName()
+                : "请求参数格式错误";
         ApiResponse<Void> resp = ApiResponse.error(ErrorCode.PARAM_FORMAT_ERROR.getCode(), message);
         resp.setPath(req.getRequestURI());
         resp.setMethod(req.getMethod());

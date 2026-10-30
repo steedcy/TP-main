@@ -214,15 +214,28 @@ async function handleSubmit() {
   }
   submitLoading.value = true
   try {
-    const payload = {
-      ...form,
+    const strippedParams = {
       inputParams: form.inputParams.map(({ __key, ...rest }) => rest),
       outputParams: form.outputParams.map(({ __key, ...rest }) => rest)
     }
     if (isEdit.value) {
-      await updateDeviceCapability(deviceCode, form.capabilityCode, payload)
+      // 后端 UpdateDeviceCapabilityRequest 白名单：编码/类型不可改
+      await updateDeviceCapability(deviceCode, form.capabilityCode, {
+        capabilityName: form.capabilityName,
+        applicableCondition: form.applicableCondition,
+        capabilityDescription: form.capabilityDescription,
+        ...strippedParams
+      })
     } else {
-      await createDeviceCapability(deviceCode, payload)
+      await createDeviceCapability(deviceCode, {
+        capabilityCode: form.capabilityCode,
+        capabilityName: form.capabilityName,
+        capabilityType: form.capabilityType,
+        templateId: form.templateId,
+        ...strippedParams,
+        applicableCondition: form.applicableCondition,
+        capabilityDescription: form.capabilityDescription
+      })
     }
     message.success('保存成功')
     formVisible.value = false
