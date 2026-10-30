@@ -1,0 +1,98 @@
+{
+  "version": "V1.118",
+  "codeSha": "a82c2c96711995ddff5759e38503db28a20230f0",
+  "handoff": "5bca56555b70fbf6e25466e16d7809d1b9fcd911",
+  "executionBaseline": "V2.3",
+  "observedAt": "2026-10-30T13:41:42.135480+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "backendPort": 18129,
+  "checks": [
+    {
+      "check": "F006A.V20_and_catalog",
+      "pass": true,
+      "facts": {
+        "migration": "20",
+        "typeCodes": [
+          "SMART_DISPLAY",
+          "BAGGAGE_SCANNER",
+          "FLIGHT_DELAY_BOARD",
+          "MOBILE_ROBOT",
+          "SIMULATOR"
+        ],
+        "matrixRows": 5
+      }
+    },
+    {
+      "check": "TC018.missing_required_named",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "message": "输入参数缺少该能力调用所需的必填参数: contentData"
+      }
+    },
+    {
+      "check": "TC018.create_version_snapshot",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "templateCode": "G6_134143",
+        "version": "V1.0"
+      }
+    },
+    {
+      "check": "TC018.immutable_history",
+      "pass": true,
+      "facts": {
+        "versions": [
+          {
+            "createdAt": "2026-10-30T05:41:45.730+00:00",
+            "templateName": "GPT updated name",
+            "changedBy": "set",
+            "outputParams": "[{\"name\":\"displayStatus\",\"type\":\"String\",\"required\":true,\"defaultValue\":null,\"range\":null},{\"name\":\"actualDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":null,\"range\":null},{\"name\":\"errorMessage\",\"type\":\"String\",\"required\":false,\"defaultValue\":null,\"range\":null}]",
+            "templateDescription": "GPT isolated V118",
+            "inputParams": "[{\"name\":\"contentType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"TEXT\",\"range\":\"TEXT/IMAGE/VIDEO/HTML\"},{\"name\":\"contentData\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试信息：请前往F2服务点\",\"range\":null},{\"name\":\"displayDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"60\",\"range\":\"5~300\"}]",
+            "templateVersion": "V1.1"
+          },
+          {
+            "createdAt": "2026-10-30T05:41:45.582+00:00",
+            "templateName": "GPT synthetic versioned template",
+            "changedBy": "set",
+            "outputParams": "[{\"name\":\"displayStatus\",\"type\":\"String\",\"required\":true,\"defaultValue\":null,\"range\":null},{\"name\":\"actualDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":null,\"range\":null},{\"name\":\"errorMessage\",\"type\":\"String\",\"required\":false,\"defaultValue\":null,\"range\":null}]",
+            "templateDescription": "GPT isolated V118",
+            "inputParams": "[{\"name\":\"contentType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"TEXT\",\"range\":\"TEXT/IMAGE/VIDEO/HTML\"},{\"name\":\"contentData\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试信息：请前往F2服务点\",\"range\":null},{\"name\":\"displayDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"60\",\"range\":\"5~300\"}]",
+            "templateVersion": "V1.0"
+          }
+        ]
+      }
+    },
+    {
+      "check": "TC022.untested_direct_enable_rejected",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "initialStatus": "UNTESTED",
+        "testResult": null
+      }
+    },
+    {
+      "check": "R04.TC022.disable_must_not_bypass_successful_test",
+      "pass": false,
+      "facts": {
+        "sequence": [
+          "UNTESTED",
+          "POST status DISABLED",
+          "POST status ENABLED"
+        ],
+        "disableHttp": 200,
+        "enableHttp": 200,
+        "finalStatus": "ENABLED",
+        "lastTestAt": null,
+        "testResult": null,
+        "expected": "Never-tested capability cannot become ENABLED by toggling DISABLED; successful test prerequisite must persist across state transitions",
+        "noCapabilityTestEndpointCalled": true
+      }
+    }
+  ],
+  "deviceCode": "G6_UNTESTED_134145",
+  "capabilityCode": "CAP_INFO_DISPLAY"
+}
