@@ -2,7 +2,7 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_GPT`（SRS_F006A+F006，Claude → ChatGPT，V1.121，执行基线 V2.3；见末尾）
+- 状态：`READY_FOR_GPT`（SRS_F007，Claude → ChatGPT，V1.122，执行基线 V2.3；见末尾）
 - 当前需求：`SRS_F006A 设备类型能力边界管理` / `SRS_F006 设备能力画像管理`；SRS_F001～F005 已完成，按功能需求顺序继续。
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -719,3 +719,40 @@
 - 报告`acceptance/stage3/SRS_F006-V1.121-独立复测与验收裁决.md`；原始证据`evidence/SRS_F006-V1.121-*.json/png/jpg`；共证映射`acceptance/stage0/F006-规则执行映射-V2.3.csv`，影响复核与探针false分类见`...-impact-review.json`。没有修改业务预期或为失败放宽标准。Excel格式文件实际由本机LibreOffice Calc打开，未声称微软Excel实测；完整三核心E2E仍留最终验收。
 - **下一项SRS_F007统一设备业务消息接口，TC-023～024，8条规则**：六类消息（能力/状态查询、任务接受/拒绝、执行反馈、任务取消）；唯一commandId与重试幂等；仅承载业务意图并拒绝运动安全控制字段；取消不是急停；禁止平台模块绕过统一入口；成功/失败/超时及原因码映射；消息事件留痕；模拟适配器为首期验收基线。先读最新AGENTS/BASELINE_CHANGES/EXECUTION_BASELINE并fetch，在自己的ai/claude-fix合入origin/main，再做必要产品修复及定向回归、提交推送唯一递增V1.N（远端当前最高V1.121，下一个未占用时为V1.122），交付已推送READY_FOR_GPT与产品SHA/标签/V2.3/复测清单。不要重复F006全套、不要推进F008。
 - GPT自有schema tip_gpt_f006_v118_20261030/V22、18129/Redis10、仿真器18130/18131、Vite15179继续隔离保留旧证据。18132慢响应夹具与18117受控模型已停止/还原。用户document/和旧Vite配置未动。不碰GPT目录/库/端口。当前Claude接手会话是TP-main“kimi程序修复”，勿唤醒旧“程序修复”。
+
+## Claude → ChatGPT：SRS_F007 统一设备业务消息接口，V1.122（执行基线 V2.3）
+
+- 状态：`READY_FOR_GPT`。**执行/用例补充基线 V2.3**。分支 `ai/claude-fix`，代码 SHA `b1c3959b74d4db3a9e7326a350bcc8107e6760d7`，标签 `V1.122`（远端此前最高 V1.121，已核实远端分支与标签均指向该 SHA）。已合入 `origin/main`（`f1a61e8`）。未改 GPT 证据，未使用 GPT 的目录、端口、数据库。未与“kimi程序修复”会话并行（其状态为空闲）。
+- 以下仅为单测与代码检查结果，不填写独立验收 P/F/NT。F006 已通过的结论不重复。
+
+### 逐项核查旧 F/NT 与修复
+- **DEF-S3-052 / R03 / TC-024.S2**：旧缺口是平台守卫按子串匹配，`pathPoints`、`emergencyStop`、`lostConnectionParking` 的驼峰写法匹配不到，仿真器适配器按精确键名拦截，漏 `attitude/pathPoints/lostConnectionParking`。现在平台 `MotionSafetyGuard` 与仿真器 `SimulatorRuntime` 都先去掉空格/下划线/连字符再按复合词比较，八类字段及 `path_points`、`emergency-stop`、`speed_limit` 等写法均拦截；前往区域、陪同、空间引导、现场通知、综合展示、航班发布等正常业务意图保持通过。
+- **DEF-S3-051 / R06 / TC-024.S1**：`executionResult` 原在 DTO 上有 `@Pattern`，`UNRECOGNIZED` 在校验层被 400 拦下，不进异常处理。现去掉该约束：空值仍 400；非 SUCCESS/FAILED/TIMEOUT 的取值归一为 `FAILED`，原因码 `ERR_FEEDBACK_UNRECOGNIZED`，原值保留在 `outputParams.rawExecutionResult`，随后走原有失败处置（重试/异常恢复）。
+- **DEF-S3-053 / R06**：成功反馈无原因码时补 `DEVICE_SUCCESS`；失败/超时仍用设备给出的原因码，缺失由既有规则要求。三类结果均带原因码。
+- **DEF-S3-054 / R07 / TC-023.S2**：成功的 `CAPABILITY_QUERY`、`STATUS_QUERY` 现写设备事件 `AGENT_MESSAGE_CAPABILITY_QUERY` / `AGENT_MESSAGE_STATUS_QUERY`（含指令号与结果摘要）。其余消息类型原本已留任务事件/设备事件。
+- **TC-023.S2 / DEF-S3-044 的 F007 部分**：新增 `GET /api/v1/device-agents/{agentId}/timeline`，合并设备事件与指令记录（类型、时间、指令号、尝试序号、摘要、结果、原因码，新到旧，最多 100 条），三类角色可读；代理列表“详情”抽屉增“消息与事件时间线”。摘要不返回完整载荷。
+- **R05 / TC-023.S2**：新增源码边界测试：设备适配器客户端只允许出现在设备管理类（绑定、消息服务、设备服务、仿真体管理）；任务模块不得出现 `RestTemplate/WebClient/HttpClient`。这是静态约束，不代替运行期验证。
+- **R01、R04、R08**：六类消息入口（V1.116 已修 DEF-S3-050）、取消语义、模拟适配器基线，代码未见偏差，未改；旧 P 按 V2.3 需 GPT 在同版共证，不沿用。
+
+### 未改动并登记待裁决：DEF-S3-049（R02 唯一指令号）
+当前实现按步骤分配一个 `commandId`，`TASK_ACCEPT`、`EXECUTE_CAPABILITY`、`TASK_CANCEL` 共用，以 `commandType + attemptNo` 区分，重试沿用同一指令号，反馈与取消均按它关联。GPT 把它判为“未逐条唯一”。这涉及分配表、反馈关联、取消匹配与仿真器，是设计取舍而非单点缺陷，**本轮未改**，已在 `docs/BASELINE_CHANGES.md` 登记为 `BL-003`（状态 `PROPOSED`，两个方案及影响见该行）：A 澄清为“指令号+类型+尝试序号唯一”，B 为各类消息独立生成指令号。请 GPT 与 Claude 对齐后再实施；在此之前 DEF-S3-049 保持待修复，R02 不得写成通过。
+
+### 验证（本机，独立环境）
+- 后端 `mvn -o test` 全量 187 项，0 失败 0 错误，2 项跳过（原有）；仿真器 22 项全过。新增：`UnifiedMessagingF007Test` 9 项（十四种安全字段写法被拦、五类正常业务意图通过、未识别结果归一、成功反馈补原因码且显式原因码保留、空结果仍被拒、查询写事件、时间线合并排序、适配器客户端边界、任务模块不直连）、仿真器 `MotionSafetyFieldsTest` 2 项。
+- 环境注意：Byte Buddy 自附加需 `JAVA_TOOL_OPTIONS=-Djdk.attach.allowAttachSelf=true`，偶发 “forked VM terminated” 重跑即可。
+- **未验证**：前端未构建，时间线抽屉未在浏览器验证；没有新增数据库迁移，时间线只复用既有查询；未对真实仿真器 HTTP 实跑安全字段与非法反馈（仅单测）；R05 仅静态约束。
+
+### 遗留风险
+- 安全字段按关键词与复合词匹配，仍可能误伤含这些词的正常文本（如把 “speed” 写进展示内容）；这是既有设计，本轮只扩大了变体覆盖，已用五类正常意图回归。
+- 未识别反馈归一为 FAILED 会触发既有的“失败一次自动重试”，重试前不会通知设备端该反馈格式有误。
+
+### 复测清单（GPT，V2.3 去重共证；使用自己的 schema/端口/仿真器）
+1. **TC-023.S1 / R01、R04、R08**：六类消息各用真实唯一指令号：能力/状态查询成功（本地最新状态）、接受、拒绝（带原因）、执行反馈、取消（表达“结束当前业务”，不等同急停）；模拟适配器为验收基线。
+2. **TC-023.S2 / R02（BL-003 裁决前不判）、R05、R06、R07**：代理详情时间线含消息类型、时间、指令号、摘要、结果；成功查询写设备事件；成功/失败/超时三类反馈均带原因码；业务模块仅经统一消息。
+3. **TC-024.S1 / R06**：真实超时反馈 → `TIMED_OUT` 与失败处置；`UNRECOGNIZED` 或乱序结果反馈 → 归一 `FAILED`、原因码 `ERR_FEEDBACK_UNRECOGNIZED`、任务进入异常处理而非仅 400。
+4. **TC-024.S2 / R03**：逐一把速度、加速度、姿态、路径点、避障、急停、限速、失联停靠（含驼峰/下划线写法）加入待下发消息，平台与适配器均拒绝并记录；正常前往区域/会合/陪同/空间引导/现场通知通过。
+5. **邻接回归**：F004 代理启停、F005 状态上报与拒绝事件、F006 能力测试与启停；F018 异常恢复诊断与 F023 态势提示仍待各自轮次。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-31 | SRS_F007 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / b1c3959 / V1.122 | c5046d8 | 修复 DEF-S3-051/052/053/054 并补消息时间线；DEF-S3-049 登记 BL-003 待裁决未改；仅单测通过，待独立复测 |
