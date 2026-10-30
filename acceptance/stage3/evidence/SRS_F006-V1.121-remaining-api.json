@@ -1,0 +1,101 @@
+{
+  "version": "V1.121",
+  "codeSha": "91a63b67ea7220da3086d61f74cbca083a7f89e1",
+  "executionBaseline": "V2.3",
+  "observedAt": "2026-10-30T21:09:39.792329+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "checks": [
+    {
+      "check": "TC022.timeout_and_enable_gate",
+      "pass": true,
+      "facts": {
+        "adapter": "Owned deterministic slow HTTP fixture, 5s response versus 3s configured read timeout; production agent/message/transport invoked",
+        "result": {
+          "id": 10,
+          "capabilityCode": "G119_LIVE",
+          "capabilityName": "GPT V121 edited capability",
+          "capabilityType": "CAP_INFO_DISPLAY",
+          "inputParams": [
+            {
+              "name": "contentType",
+              "type": "String",
+              "required": true,
+              "defaultValue": "TEXT",
+              "range": "TEXT/IMAGE/VIDEO/HTML"
+            },
+            {
+              "name": "contentData",
+              "type": "String",
+              "required": true,
+              "defaultValue": "GPT V121 UI changed input",
+              "range": null
+            },
+            {
+              "name": "displayDuration",
+              "type": "Integer",
+              "required": true,
+              "defaultValue": "5",
+              "range": "5~300"
+            }
+          ],
+          "outputParams": [
+            {
+              "name": "displayStatus",
+              "type": "String",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            },
+            {
+              "name": "actualDuration",
+              "type": "Integer",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            },
+            {
+              "name": "errorMessage",
+              "type": "String",
+              "required": false,
+              "defaultValue": null,
+              "range": null
+            }
+          ],
+          "applicableConditions": "GPT isolated fixture",
+          "capabilityStatus": "TESTED_FAILED",
+          "testResult": "实际设备代理调用失败: 设备接口调用失败: 读取超时（设备未在规定时间内响应）",
+          "lastTestAt": "2026-10-30T21:09:43.3952865",
+          "testRequest": "{\"inputParams\":{\"contentType\":\"TEXT\",\"contentData\":\"GPT V121 UI changed input\",\"displayDuration\":5},\"capabilityType\":\"CAP_INFO_DISPLAY\"}",
+          "testResponse": "{\"reason\":\"设备接口调用失败: 读取超时（设备未在规定时间内响应）\",\"result\":\"FAILED\"}",
+          "testDurationMs": 3030,
+          "capabilityDescription": "V120 synthetic"
+        },
+        "enableHttp": 400,
+        "enableResponse": {
+          "code": 4303,
+          "message": "能力未通过模拟调用测试",
+          "timestamp": "2026-10-30T21:09:43.432301500+08:00",
+          "path": "/api/v1/devices/G6_UNTESTED_134145/capabilities/G119_LIVE/status",
+          "method": "POST"
+        },
+        "probeDiagnostic": "First attempt executed timeout but probe expected DTO testPassed (DB-only). Recovery GET also lacks transient duration. This one retry captures missing raw POST evidence; neither probe error is product F."
+      }
+    },
+    {
+      "check": "F006.full_platform_exists_rejects_unproven",
+      "pass": false,
+      "facts": {
+        "http": 400,
+        "response": {
+          "code": 4605,
+          "message": "模板意图不是已存在的任务定义编码: SPECIAL_ASSISTANCE",
+          "timestamp": "2026-10-30T21:09:47.835958400+08:00",
+          "path": "/api/v1/baseline-templates",
+          "method": "POST"
+        },
+        "fixture": "Own-schema raw ENABLED/test_passed=false; no enabled proven instance of this type"
+      }
+    }
+  ],
+  "timeoutAdapterPath": "/device-api/v1/agents/AGT-D68FD3AB/capability-test"
+}

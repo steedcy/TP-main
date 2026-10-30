@@ -1,0 +1,539 @@
+{
+  "recordedAt": "2026-10-30T21:26:58.140796+08:00",
+  "reason": "Preserve pre-V121 F/NT/P register before composite acceptance updates. Raw failures and original version evidence remain immutable.",
+  "steps": [
+    {
+      "stepId": "TC-017.S1",
+      "caseId": "TC-017",
+      "action": "查看类型列表、详情和矩阵；核对各项数量与实际实例/模板。",
+      "expected": "五类型、八能力不可新增删除；五类型编码为SMART_DISPLAY、BAGGAGE_SCANNER、FLIGHT_DELAY_BOARD、MOBILE_ROBOT、SIMULATOR，名称对应且不可改；支持能力数、模板数、实例数准确；至少选1项，未支持灰显。",
+      "status": "F",
+      "observedAt": "2026-10-25",
+      "actual": "列表有五种类型且无新增删除入口；列表无三项计数，详情仅显式列出实例数，支持能力和模板须手数，未直接显示其数量",
+      "evidence": "acceptance/stage3/evidence/TC-017-type-boundary.json;acceptance/stage3/evidence/TC-017-type-matrix-api.json;acceptance/stage3/evidence/TC-017-type-list.png",
+      "issue": "DEF-S3-017"
+    },
+    {
+      "stepId": "TC-017.S2",
+      "caseId": "TC-017",
+      "action": "编辑类型描述、典型场景、约束及支持能力，检查空支持能力和字段边界后保存。",
+      "expected": "类型描述0～500、典型场景及约束各0～1000位；零支持拒绝；合法保存并记录修改人、时间、内容。",
+      "status": "F",
+      "observedAt": "2026-10-25",
+      "actual": "零支持及501/1001越界均400；500/1000边界与空文本保存成功且已恢复原值，修改人时间更新；三条变更审计无detail，缺修改内容",
+      "evidence": "acceptance/stage3/evidence/TC-017-type-edit.json",
+      "issue": "DEF-S3-019"
+    },
+    {
+      "stepId": "TC-017.S3",
+      "caseId": "TC-017",
+      "action": "按5.2.4A正文核对五类型×八能力矩阵并导出Excel；查看仿真体。",
+      "expected": "航显支持综合展示/航班发布/空间引导；测量设备支持尺寸重量/超规上报；航延屏支持综合展示/航班发布；机器人支持综合展示/空间引导/陪同/现场通知；其余不支持。仿真体含仿真状态生成并继承所模拟类型能力；导出与界面一致。",
+      "status": "F",
+      "observedAt": "2026-10-25",
+      "actual": "五类型×八能力 API 矩阵与冻结用例一致；页面无 Excel 导出入口，无法核对导出与页面一致；六个仿真体实例都继承了业务能力但缺CAP_SIM_STATUS",
+      "evidence": "acceptance/stage3/evidence/TC-017-type-boundary.json;acceptance/stage3/evidence/TC-017-type-matrix-api.json;acceptance/stage3/evidence/TC-017-type-matrix.png;acceptance/stage3/evidence/TC-017-simulator-inheritance.json",
+      "issue": "DEF-S3-018;DEF-S3-020"
+    },
+    {
+      "stepId": "TC-018.S1",
+      "caseId": "TC-018",
+      "action": "新增模板，编辑参数默认值并保存；同一表单验证必填、长度/字符、唯一性、类型越界及输入输出完整性。",
+      "expected": "编码同类型唯一1～32位，仅字母数字下划线；名称1～64位、说明0～500位；能力只显示所属类型支持项；输入含参数名/类型/必填/默认值/范围说明及全部必填参数，输出含名称/类型/说明且必须定义。缺输入提示参数名，越界提示“该设备类型不支持此能力类型”，不合法拒绝。",
+      "status": "F",
+      "observedAt": "2026-10-26",
+      "actual": "编码/名称/说明边界、重复、越界能力、空输入输出和缺参数名均拒绝；但CAP_INFO_DISPLAY只含任意输入参数的模板仍保存200，缺能力调用必填参数校验",
+      "evidence": "acceptance/stage3/evidence/TC-018-019-template-crud.json",
+      "issue": "DEF-S3-022"
+    },
+    {
+      "stepId": "TC-018.S2",
+      "caseId": "TC-018",
+      "action": "查看保存及修改后的版本，关联设备实例执行样例模板测试。",
+      "expected": "自动分配V1.0、V1.1等版本，可追溯；模板测试使用关联设备实例和样例参数，有可用性结果；操作留痕。",
+      "status": "F",
+      "observedAt": "2026-10-26",
+      "actual": "新模板V1.0、编辑后V1.1且默认值更新；库中只剩V1.1当前行，旧V1.0无可查询历史版本；关联实例样例测试未执行",
+      "evidence": "acceptance/stage3/evidence/TC-018-019-template-crud.json",
+      "issue": "DEF-S3-023"
+    },
+    {
+      "stepId": "TC-018.S3",
+      "caseId": "TC-018",
+      "action": "创建相应设备实例，查看自动加载模板；选用后在边界内定制默认参数。",
+      "expected": "自动加载对应类型全部有效标准模板供选择启用；输入可预填并允许实例定制，能力仍受类型边界约束。",
+      "status": "P",
+      "observedAt": "2026-10-26",
+      "actual": "新航显实例页面加载唯一有效标准模板并预填默认值；实例引用模板后将contentData定制为instance-custom且状态UNTESTED；仿真航显越界能力创建返回400且数量不变",
+      "evidence": "acceptance/stage3/evidence/TC-018-019-template-used-retry3.json;acceptance/stage3/evidence/TC-018-template-prefill.png;acceptance/stage3/evidence/TC-019-inactive-template-excluded.png;acceptance/stage3/evidence/TC-018-instance-boundary.json",
+      "issue": ""
+    },
+    {
+      "stepId": "TC-019.S1",
+      "caseId": "TC-019",
+      "action": "删除已使用模板，核对提示与使用数量。",
+      "expected": "拒绝，提示“该模板已被X个设备实例使用，不可删除”；X与实际一致，只能停用。",
+      "status": "P",
+      "observedAt": "2026-10-26",
+      "actual": "两台独立设备引用模板后usageCount=2且库中DISTINCT设备数=2；删除返回409及精确的已被2个设备实例使用提示；模板可停用",
+      "evidence": "acceptance/stage3/evidence/TC-018-019-template-used-retry3.json;acceptance/stage3/evidence/TC-018-template-prefill.png;acceptance/stage3/evidence/TC-019-inactive-template-excluded.png",
+      "issue": ""
+    },
+    {
+      "stepId": "TC-019.S2",
+      "caseId": "TC-019",
+      "action": "停用该已使用模板，再创建新同类实例并查询原实例。",
+      "expected": "新实例模板列表不再包含该模板；原已使用实例能力、参数及可用状态不受影响。",
+      "status": "NT",
+      "observedAt": "2026-10-26",
+      "actual": "模板停用后新同类设备页面无该模板；原实例参数与UNTESTED状态均未改变；原实例先启用后的可用性保持尚未实测",
+      "evidence": "acceptance/stage3/evidence/TC-018-019-template-used-retry3.json;acceptance/stage3/evidence/TC-018-template-prefill.png;acceptance/stage3/evidence/TC-019-inactive-template-excluded.png",
+      "issue": "NT-S3-014"
+    },
+    {
+      "stepId": "TC-019.S3",
+      "caseId": "TC-019",
+      "action": "对未使用模板确认删除并核对列表。",
+      "expected": "删除操作可完成，模板列表/数量一致，相关操作留痕。",
+      "status": "P",
+      "observedAt": "2026-10-26",
+      "actual": "未使用模板usageCount=0；浏览器取消删除仍在列表，确认后消失；API不再返回该编码且有成功删除操作审计",
+      "evidence": "acceptance/stage3/evidence/TC-018-019-template-crud.json;acceptance/stage3/evidence/TC-019-unused-delete.json;acceptance/stage3/evidence/TC-019-unused-after-cancel.png;acceptance/stage3/evidence/TC-019-unused-after-delete.png",
+      "issue": ""
+    },
+    {
+      "stepId": "TC-020.S1",
+      "caseId": "TC-020",
+      "action": "从标准模板或新增能力填入编码、名称、类型、输入输出、适用条件及说明并保存。",
+      "expected": "编码同设备唯一1～32位、名称1～64位、说明0～500位；类型候选按所属边界过滤，仿真继承选定类型；保存未测试，列表展示状态和最近测试时间。 输入含参数名、类型、必填及范围说明，输出含名称、类型、说明；适用条件及说明可选，当前状态默认未测试。",
+      "status": "P",
+      "observedAt": "2026-10-26",
+      "actual": "隔离航显能力保存编码/名称/类型/输入输出/条件/说明，列表状态UNTESTED且最近测试时间为空；仿真航显页面仅列仿真状态及继承的三项能力类型并显示状态/最近测试时间列",
+      "evidence": "acceptance/stage3/evidence/TC-020-022-capability-create.json;acceptance/stage3/evidence/TC-020-type-options.json;acceptance/stage3/evidence/TC-020-type-options.png",
+      "issue": ""
+    },
+    {
+      "stepId": "TC-020.S2",
+      "caseId": "TC-020",
+      "action": "通过代理模拟调用，查看请求、响应、耗时；成功后启用。",
+      "expected": "测试成功才可启用并进入规划可用集合；测试、新增、修改、启停均留痕。",
+      "status": "F",
+      "observedAt": "2026-10-26",
+      "actual": "在线航显代理实际能力测试成功，命令表有两条独立成功响应，测试后可启用；浏览器结果弹窗仅有结果、详情、测试时间，缺请求、响应及耗时",
+      "evidence": "acceptance/stage3/evidence/TC-020-021-capability-live.json;acceptance/stage3/evidence/TC-020-capability-test-modal.json;acceptance/stage3/evidence/TC-020-capability-test-modal.png",
+      "issue": "DEF-S3-024"
+    },
+    {
+      "stepId": "TC-021.S1",
+      "caseId": "TC-021",
+      "action": "修改已启用能力输入输出后重测；停用占用中的能力。",
+      "expected": "修改重置未测试，重测通过方可启用；停用立即退出规划集合，进行中步骤按异常恢复处理。",
+      "status": "F",
+      "observedAt": "2026-10-30T19:08:19+08:00",
+      "actual": "V1.120 Edge actual UI edit of G119_LIVE: PUT HTTP500 due to create-only/immutable fields in update payload; modal stays open, update not saved. API-only reset in V119 does not establish UI success. Occupied-disable branch remains NT.",
+      "evidence": "acceptance/stage3/evidence/TC-020-021-capability-live.json;acceptance/stage3/evidence/TC-020-capability-test-modal.json;acceptance/stage3/evidence/TC-020-capability-test-modal.png;acceptance/stage3/evidence/SRS_F006-V1.120-ui-edit-r3.json;acceptance/stage3/SRS_F006-V1.120-独立复测与缺陷交接.md",
+      "issue": "NT-S3-015;DEF-S3-081"
+    },
+    {
+      "stepId": "TC-021.S2",
+      "caseId": "TC-021",
+      "action": "核对能力停用后候选集合和记录。",
+      "expected": "停用立即退出规划集合；新增、修改、测试、启用、停用均留痕；正在使用能力的步骤按5.5.3处理。",
+      "status": "NT",
+      "observedAt": "2026-10-26",
+      "actual": "临时能力新增、修改、测试、启用、停用审计类型齐全，停用状态DISABLED；规划候选集合和进行中步骤切换尚未实测",
+      "evidence": "acceptance/stage3/evidence/TC-020-021-capability-live.json;acceptance/stage3/evidence/TC-020-capability-test-modal.json;acceptance/stage3/evidence/TC-020-capability-test-modal.png",
+      "issue": "NT-S3-016"
+    },
+    {
+      "stepId": "TC-022.S1",
+      "caseId": "TC-022",
+      "action": "提交同设备重复编码、缺必填参数或边界外能力。",
+      "expected": "拒绝保存并提示重复、缺失或越界；不允许自定义新增标准能力类型。",
+      "status": "P",
+      "observedAt": "2026-10-26",
+      "actual": "同设备重复编码409；空输入、空输出、缺参数名、越界能力及未知第九类均400且有对应提示；列表仍仅原合法能力",
+      "evidence": "acceptance/stage3/evidence/TC-020-022-capability-create.json;acceptance/stage3/evidence/TC-020-type-options.json;acceptance/stage3/evidence/TC-020-type-options.png",
+      "issue": ""
+    },
+    {
+      "stepId": "TC-022.S2",
+      "caseId": "TC-022",
+      "action": "让模拟调用超时、参数不合法或设备拒绝；尝试启用未测试及失败能力。",
+      "expected": "保存失败原因，不自动启用；未测试/失败启用被拒绝，提示先测试；测试和调用均通过统一代理消息。",
+      "status": "NT",
+      "observedAt": "2026-10-30T16:39:10.553649+08:00",
+      "actual": "V1.120 DEF-S3-080 gate and legacy quarantine fixed with V119 gate live evidence plus V120 upgrade/query/command evidence. Raw failures retained. Timeout/remaining failure assertions still NT; no whole-step P.",
+      "evidence": "acceptance/stage3/evidence/TC-020-021-capability-live.json;acceptance/stage3/evidence/TC-020-capability-test-modal.json;acceptance/stage3/evidence/TC-020-capability-test-modal.png;acceptance/stage3/evidence/SRS_F006-V1.118-initial.json;acceptance/stage3/SRS_F006-V1.118-独立复测与缺陷交接.md;acceptance/stage3/evidence/SRS_F006-V1.119-gates.json;acceptance/stage3/SRS_F006-V1.119-独立复测与缺陷交接.md;acceptance/stage3/evidence/SRS_F006-V1.120-batch.json",
+      "issue": "NT-S3-017"
+    }
+  ],
+  "rules": [
+    {
+      "ruleId": "SRS_F006A.R01",
+      "requirement": "SRS_F006A",
+      "text": "系统预置五类设备类型（智慧航显、智能行李测量设备、航延屏、移动服务机器人、仿真体），不可新增或删除",
+      "candidateStep": "TC-017.S3",
+      "status": "P",
+      "verifiedBy": "TC-017.S1",
+      "evidence": "acceptance/stage3/evidence/TC-017-type-matrix-api.json;acceptance/stage3/evidence/TC-017-type-boundary.json",
+      "issue": ""
+    },
+    {
+      "ruleId": "SRS_F006A.R02",
+      "requirement": "SRS_F006A",
+      "text": "系统预置八类标准能力类型（综合信息展示、行李尺寸重量测量、超规事件上报、航班变更信息发布、空间引导、陪同服务、现场通知、仿真状态生成），不可新增或删除",
+      "candidateStep": "TC-017.S3",
+      "status": "P",
+      "verifiedBy": "TC-017.S1",
+      "evidence": "acceptance/stage3/evidence/TC-017-type-matrix-api.json;acceptance/stage3/evidence/TC-017-type-boundary.json",
+      "issue": ""
+    },
+    {
+      "ruleId": "SRS_F006A.R03",
+      "requirement": "SRS_F006A",
+      "text": "每类设备类型至少支持1个能力类型",
+      "candidateStep": "TC-017.S2",
+      "status": "P",
+      "verifiedBy": "TC-017.S2",
+      "evidence": "acceptance/stage3/evidence/TC-017-type-edit.json",
+      "issue": ""
+    },
+    {
+      "ruleId": "SRS_F006A.R04",
+      "requirement": "SRS_F006A",
+      "text": "仿真体的能力类型为\"仿真状态生成\"+继承模拟设备类型的能力",
+      "candidateStep": "TC-017.S3",
+      "status": "F",
+      "verifiedBy": "TC-017.S3",
+      "evidence": "acceptance/stage3/evidence/TC-017-simulator-inheritance.json",
+      "issue": "DEF-S3-020"
+    },
+    {
+      "ruleId": "SRS_F006A.R05",
+      "requirement": "SRS_F006A",
+      "text": "设备实例创建时，自动加载其类型的全部标准能力模板（可选择性启用）",
+      "candidateStep": "TC-018.S3",
+      "status": "P",
+      "verifiedBy": "TC-018.S3",
+      "evidence": "acceptance/stage3/evidence/TC-018-019-template-used-retry3.json;acceptance/stage3/evidence/TC-018-template-prefill.png;acceptance/stage3/evidence/TC-019-inactive-template-excluded.png",
+      "issue": ""
+    },
+    {
+      "ruleId": "SRS_F006A.R06",
+      "requirement": "SRS_F006A",
+      "text": "设备实例配置能力时，能力类型必须在其设备类型的支持范围内，否则保存时拒绝并提示越界",
+      "candidateStep": "TC-018.S1",
+      "status": "P",
+      "verifiedBy": "TC-018.S3",
+      "evidence": "acceptance/stage3/evidence/TC-018-instance-boundary.json",
+      "issue": ""
+    },
+    {
+      "ruleId": "SRS_F006A.R07",
+      "requirement": "SRS_F006A",
+      "text": "能力模板的能力类型必须在其所属设备类型的支持范围内",
+      "candidateStep": "TC-018.S1",
+      "status": "P",
+      "verifiedBy": "TC-018.S1",
+      "evidence": "acceptance/stage3/evidence/TC-018-019-template-crud.json",
+      "issue": ""
+    },
+    {
+      "ruleId": "SRS_F006A.R08",
+      "requirement": "SRS_F006A",
+      "text": "已被设备实例使用的能力模板不可删除，只能停用",
+      "candidateStep": "TC-019.S1",
+      "status": "P",
+      "verifiedBy": "TC-019.S1",
+      "evidence": "acceptance/stage3/evidence/TC-018-019-template-used-retry3.json;acceptance/stage3/evidence/TC-018-template-prefill.png;acceptance/stage3/evidence/TC-019-inactive-template-excluded.png",
+      "issue": ""
+    },
+    {
+      "ruleId": "SRS_F006A.R09",
+      "requirement": "SRS_F006A",
+      "text": "设备类型能力边界的修改需记录操作日志（修改人、修改时间、修改内容）",
+      "candidateStep": "TC-017.S2",
+      "status": "P",
+      "verifiedBy": "V1.120 independent API batch",
+      "evidence": "acceptance/stage3/evidence/TC-017-type-edit.json;acceptance/stage3/evidence/SRS_F006-V1.120-batch.json",
+      "issue": ""
+    },
+    {
+      "ruleId": "SRS_F006A.R10",
+      "requirement": "SRS_F006A",
+      "text": "能力模板的输入参数至少包含能力调用所需的全部必填参数",
+      "candidateStep": "TC-018.S3",
+      "status": "P",
+      "verifiedBy": "V1.120 independent API batch",
+      "evidence": "acceptance/stage3/evidence/TC-018-019-template-crud.json;acceptance/stage3/evidence/SRS_F006-V1.120-batch.json",
+      "issue": ""
+    },
+    {
+      "ruleId": "SRS_F006A.R11",
+      "requirement": "SRS_F006A",
+      "text": "能力模板的输出参数用于任务步骤完成条件判定，必须定义",
+      "candidateStep": "TC-018.S1",
+      "status": "P",
+      "verifiedBy": "V1.120 independent API batch",
+      "evidence": "acceptance/stage3/evidence/TC-018-019-template-crud.json;acceptance/stage3/evidence/SRS_F006-V1.120-batch.json",
+      "issue": ""
+    },
+    {
+      "ruleId": "SRS_F006A.R12",
+      "requirement": "SRS_F006A",
+      "text": "能力模板保存后自动分配模板版本号（V1.0、V1.1...），支持版本追溯",
+      "candidateStep": "TC-018.S2",
+      "status": "F",
+      "verifiedBy": "TC-018.S2",
+      "evidence": "acceptance/stage3/evidence/TC-018-019-template-crud.json",
+      "issue": "DEF-S3-023"
+    },
+    {
+      "ruleId": "SRS_F006.R01",
+      "requirement": "SRS_F006",
+      "text": "能力画像必须包含能力编码、名称、类型、输入输出参数、适用条件、当前可用状态和能力说明",
+      "candidateStep": "TC-020.S1",
+      "status": "P",
+      "verifiedBy": "TC-020.S1",
+      "evidence": "acceptance/stage3/evidence/TC-020-022-capability-create.json;acceptance/stage3/evidence/TC-020-type-options.json;acceptance/stage3/evidence/TC-020-type-options.png",
+      "issue": ""
+    },
+    {
+      "ruleId": "SRS_F006.R02",
+      "requirement": "SRS_F006",
+      "text": "首期能力类型限定为预置8类，不支持自定义新增能力类型",
+      "candidateStep": "TC-022.S1",
+      "status": "P",
+      "verifiedBy": "TC-022.S1",
+      "evidence": "acceptance/stage3/evidence/TC-020-022-capability-create.json;acceptance/stage3/evidence/TC-020-type-options.json;acceptance/stage3/evidence/TC-020-type-options.png",
+      "issue": ""
+    },
+    {
+      "ruleId": "SRS_F006.R03",
+      "requirement": "SRS_F006",
+      "text": "仿真体按所选设备类型加载能力画像，不得形成绕过能力约束的全能代理",
+      "candidateStep": "TC-020.S1",
+      "status": "F",
+      "verifiedBy": "TC-017.S3;TC-093.S1",
+      "evidence": "acceptance/stage3/evidence/TC-017-simulator-profile-followup-20261027T062616Z.json",
+      "issue": "DEF-S3-020"
+    },
+    {
+      "ruleId": "SRS_F006.R04",
+      "requirement": "SRS_F006",
+      "text": "能力启用前须执行模拟调用测试；测试成功后才可启用，失败时保存失败原因且不得自动启用",
+      "candidateStep": "TC-022.S2",
+      "status": "NT",
+      "verifiedBy": "TC-022.S2",
+      "evidence": "acceptance/stage3/evidence/TC-020-021-capability-live.json;acceptance/stage3/evidence/TC-020-capability-test-modal.json;acceptance/stage3/evidence/TC-020-capability-test-modal.png;acceptance/stage3/evidence/SRS_F006-V1.118-initial.json;acceptance/stage3/SRS_F006-V1.118-独立复测与缺陷交接.md;acceptance/stage3/evidence/SRS_F006-V1.119-gates.json;acceptance/stage3/SRS_F006-V1.119-独立复测与缺陷交接.md;acceptance/stage3/evidence/SRS_F006-V1.120-batch.json",
+      "issue": "NT-S3-017"
+    },
+    {
+      "ruleId": "SRS_F006.R05",
+      "requirement": "SRS_F006",
+      "text": "已启用能力被修改输入输出参数时，可用状态重置为\"未测试\"，需重新测试后方可继续启用",
+      "candidateStep": "TC-021.S1",
+      "status": "F",
+      "verifiedBy": "TC-021.S1",
+      "evidence": "acceptance/stage3/evidence/TC-020-021-capability-live.json;acceptance/stage3/evidence/TC-020-capability-test-modal.json;acceptance/stage3/evidence/TC-020-capability-test-modal.png;acceptance/stage3/evidence/SRS_F006-V1.120-ui-edit-r3.json;acceptance/stage3/SRS_F006-V1.120-独立复测与缺陷交接.md",
+      "issue": "DEF-S3-081"
+    },
+    {
+      "ruleId": "SRS_F006.R06",
+      "requirement": "SRS_F006",
+      "text": "停用能力立即退出规划可用能力集合；若存在使用该能力的进行中步骤，按5.5.3处理",
+      "candidateStep": "TC-021.S2",
+      "status": "NT",
+      "verifiedBy": "TC-021.S2",
+      "evidence": "acceptance/stage3/evidence/TC-020-021-capability-live.json;acceptance/stage3/evidence/TC-020-capability-test-modal.json;acceptance/stage3/evidence/TC-020-capability-test-modal.png",
+      "issue": "NT-S3-016"
+    },
+    {
+      "ruleId": "SRS_F006.R07",
+      "requirement": "SRS_F006",
+      "text": "能力的新增、修改、测试、启用和停用均写入操作记录",
+      "candidateStep": "TC-021.S2",
+      "status": "P",
+      "verifiedBy": "TC-021.S2",
+      "evidence": "acceptance/stage3/evidence/TC-020-021-capability-live.json;acceptance/stage3/evidence/TC-020-capability-test-modal.json;acceptance/stage3/evidence/TC-020-capability-test-modal.png",
+      "issue": ""
+    },
+    {
+      "ruleId": "SRS_F006.R08",
+      "requirement": "SRS_F006",
+      "text": "能力测试与实际调用均通过统一设备代理消息完成（见5.2.5），不得绕过代理",
+      "candidateStep": "TC-022.S2",
+      "status": "NT",
+      "verifiedBy": "TC-022.S2",
+      "evidence": "acceptance/stage3/evidence/TC-020-021-capability-live.json;acceptance/stage3/evidence/TC-020-capability-test-modal.json;acceptance/stage3/evidence/TC-020-capability-test-modal.png",
+      "issue": "NT-S3-017"
+    },
+    {
+      "ruleId": "SRS_F006.R09",
+      "requirement": "SRS_F006",
+      "text": "设备实例配置能力时，能力类型必须在5.2.4A设备类型能力边界的支持范围内，超出边界的能力类型保存时被系统拒绝并提示越界（本条为V1.3/V1.4新增，落实两级能力管理体系的约束关系）",
+      "candidateStep": "TC-022.S1",
+      "status": "P",
+      "verifiedBy": "TC-022.S1",
+      "evidence": "acceptance/stage3/evidence/TC-020-022-capability-create.json;acceptance/stage3/evidence/TC-020-type-options.json;acceptance/stage3/evidence/TC-020-type-options.png",
+      "issue": ""
+    }
+  ],
+  "issues": [
+    {
+      "编号": "DEF-S3-017",
+      "类型": "缺陷",
+      "级别": "中",
+      "关联用例步骤": "TC-017.S1",
+      "关联需求规则": "SRS_F006A",
+      "状态": "V1.120已修复并独立复测通过",
+      "事实": "设备类型列表不显示支持能力数、模板数、实例数；详情仅显式显示实例数，另外两项只能手数；V1.120独立组合观察通过，旧失败保留。",
+      "证据": "acceptance/stage3/evidence/TC-017-type-boundary.json;acceptance/stage3/evidence/TC-017-type-matrix-api.json;acceptance/stage3/evidence/SRS_F006-V1.120-batch.json",
+      "阶段4动作": "在类型列表或详情显示三项数量并与实例/模板记录对照复测"
+    },
+    {
+      "编号": "DEF-S3-018",
+      "类型": "缺陷",
+      "级别": "中",
+      "关联用例步骤": "TC-017.S3",
+      "关联需求规则": "SRS_F006A",
+      "状态": "待修复",
+      "事实": "五类型八能力矩阵正确，但能力约束矩阵页无Excel导出入口",
+      "证据": "acceptance/stage3/evidence/TC-017-type-boundary.json;acceptance/stage3/evidence/TC-017-type-matrix-api.json",
+      "阶段4动作": "实现矩阵Excel导出并比对单元格；复测仿真体继承"
+    },
+    {
+      "编号": "DEF-S3-019",
+      "类型": "缺陷",
+      "级别": "中",
+      "关联用例步骤": "TC-017.S2",
+      "关联需求规则": "SRS_F006A.R09",
+      "状态": "V1.120已修复并独立复测通过",
+      "事实": "设备类型边界修改已记录操作人和时间，但三条审计的detail均为空，无法追溯修改内容；V1.120独立组合观察通过，旧失败保留。",
+      "证据": "acceptance/stage3/evidence/TC-017-type-edit.json;acceptance/stage3/evidence/SRS_F006-V1.120-batch.json",
+      "阶段4动作": "写入脱敏的前后支持能力及文本字段摘要；复测审计和边界有效性"
+    },
+    {
+      "编号": "DEF-S3-020",
+      "类型": "缺陷",
+      "级别": "中",
+      "关联用例步骤": "TC-017.S3",
+      "关联需求规则": "SRS_F006A.R04;SRS_F003.R04;SRS_F006.R03",
+      "状态": "待修复",
+      "事实": "六个在线仿真体实例继承了所模拟类型业务能力，但实例能力画像均缺CAP_SIM_STATUS 本轮六个在线仿真体再次逐一比对五类矩阵，仍均缺必需的CAP_SIM_STATUS。",
+      "证据": "acceptance/stage3/evidence/TC-017-simulator-inheritance.json;acceptance/stage3/evidence/TC-017-simulator-profile-followup-20261027T062616Z.json",
+      "阶段4动作": "为仿真体加载仿真状态生成能力并复测继承、配置边界及旧实例迁移"
+    },
+    {
+      "编号": "DEF-S3-022",
+      "类型": "缺陷",
+      "级别": "高",
+      "关联用例步骤": "TC-018.S1",
+      "关联需求规则": "SRS_F006A.R10",
+      "状态": "V1.120已修复并独立复测通过",
+      "事实": "CAP_INFO_DISPLAY模板仅有任意输入参数仍可保存，缺该能力调用全部必填参数校验；V1.120独立组合观察通过，旧失败保留。",
+      "证据": "acceptance/stage3/evidence/TC-018-019-template-crud.json;acceptance/stage3/evidence/SRS_F006-V1.120-batch.json",
+      "阶段4动作": "按类型能力契约校验输入定义，再复测缺字段与有效模板"
+    },
+    {
+      "编号": "DEF-S3-023",
+      "类型": "缺陷",
+      "级别": "中",
+      "关联用例步骤": "TC-018.S2",
+      "关联需求规则": "SRS_F006A.R12",
+      "状态": "待修复",
+      "事实": "模板从V1.0编辑成V1.1后仅保留当前行，旧版本不可查询追溯",
+      "证据": "acceptance/stage3/evidence/TC-018-019-template-crud.json",
+      "阶段4动作": "保存不可变历史版本并提供查询与实例引用，复测V1.0/V1.1"
+    },
+    {
+      "编号": "NT-S3-013",
+      "类型": "前置缺口",
+      "级别": "待定",
+      "关联用例步骤": "TC-018.S1",
+      "关联需求规则": "SRS_F006A.R11",
+      "状态": "V1.120已补测通过",
+      "事实": "空输出定义被拒绝，但未以任务步骤验证输出定义用于完成条件；空输出拒绝，完整输出模板及真实关联实例调用通过。",
+      "证据": "acceptance/stage3/evidence/TC-018-019-template-crud.json;acceptance/stage3/evidence/SRS_F006-V1.120-batch.json",
+      "阶段4动作": "以关联设备实例执行样例任务核对输出判定"
+    },
+    {
+      "编号": "NT-S3-014",
+      "类型": "前置缺口",
+      "级别": "待定",
+      "关联用例步骤": "TC-019.S2",
+      "关联需求规则": "SRS_F006A",
+      "状态": "待补启用实例",
+      "事实": "停用模板前原实例处于UNTESTED，仅证明状态不变；尚需对已启用且可调用实例验证停用后仍可用",
+      "证据": "acceptance/stage3/evidence/TC-018-019-template-used-retry3.json;acceptance/stage3/evidence/TC-018-template-prefill.png;acceptance/stage3/evidence/TC-019-inactive-template-excluded.png",
+      "阶段4动作": "创建可连通隔离实例并通过能力测试后启用，停用模板，再验证原实例调用与新实例候选"
+    },
+    {
+      "编号": "DEF-S3-024",
+      "类型": "缺陷",
+      "级别": "中",
+      "关联用例步骤": "TC-020.S2",
+      "关联需求规则": "SRS_F006",
+      "状态": "待修复",
+      "事实": "能力模拟调用结果弹窗只有结果、详情、测试时间，缺调用请求、设备响应和耗时；后端命令记录有响应可追溯",
+      "证据": "acceptance/stage3/evidence/TC-020-021-capability-live.json;acceptance/stage3/evidence/TC-020-capability-test-modal.json;acceptance/stage3/evidence/TC-020-capability-test-modal.png",
+      "阶段4动作": "在结果页显示脱敏请求、响应、耗时并用在线代理重新测试"
+    },
+    {
+      "编号": "NT-S3-015",
+      "类型": "前置缺口",
+      "级别": "待定",
+      "关联用例步骤": "TC-021.S1",
+      "关联需求规则": "SRS_F006.R05",
+      "状态": "待补占用任务",
+      "事实": "参数编辑重置未测试和重测启用已证；占用中能力停用及异常恢复未执行",
+      "证据": "acceptance/stage3/evidence/TC-020-021-capability-live.json;acceptance/stage3/evidence/TC-020-capability-test-modal.json;acceptance/stage3/evidence/TC-020-capability-test-modal.png",
+      "阶段4动作": "用隔离进行中任务占用临时能力后停用，检查5.5.3恢复"
+    },
+    {
+      "编号": "NT-S3-016",
+      "类型": "前置缺口",
+      "级别": "待定",
+      "关联用例步骤": "TC-021.S2",
+      "关联需求规则": "SRS_F006.R06",
+      "状态": "待补候选快照",
+      "事实": "停用状态和五类操作审计已证；规划候选排除与进行中步骤处理未实测",
+      "证据": "acceptance/stage3/evidence/TC-020-021-capability-live.json;acceptance/stage3/evidence/TC-020-capability-test-modal.json;acceptance/stage3/evidence/TC-020-capability-test-modal.png",
+      "阶段4动作": "在停用前后生成候选快照并执行占用中场景"
+    },
+    {
+      "编号": "NT-S3-017",
+      "类型": "前置缺口",
+      "级别": "待定",
+      "关联用例步骤": "TC-022.S2",
+      "关联需求规则": "SRS_F006.R04;SRS_F006.R08",
+      "状态": "待补代理故障注入",
+      "事实": "未测试能力启用拒绝、正常代理测试已证；超时、非法参数、拒绝及失败后启用未执行",
+      "证据": "acceptance/stage3/evidence/TC-020-021-capability-live.json;acceptance/stage3/evidence/TC-020-capability-test-modal.json;acceptance/stage3/evidence/TC-020-capability-test-modal.png",
+      "阶段4动作": "对隔离代理注入三类失败并核对测试结果、启用拒绝及统一消息记录"
+    },
+    {
+      "编号": "DEF-S3-080",
+      "类型": "缺陷",
+      "级别": "高",
+      "关联用例步骤": "TC-022.S2",
+      "关联需求规则": "SRS_F006.R04",
+      "状态": "V1.120已修复并独立复测通过（门禁及存量隔离）",
+      "事实": "未测试能力直接启用400；先置DISABLED再启用200，状态ENABLED且lastTestAt/testResult为空，绕过成功测试前置；V1.119新建/修改/失败门禁及合法停用再启用已通过；但V118原始绕过记录升级后仍ENABLED，test_passed=false、lastTestAt/testResult空，CAPABILITY_QUERY仍返回。；V1.120实跑V22后原始无证ENABLED被停用、CAPABILITY_QUERY排除；有效通过ENABLED保留，受控false/ENABLED故障行查询与命令被拒。",
+      "证据": "acceptance/stage3/evidence/SRS_F006-V1.118-initial.json;acceptance/stage3/SRS_F006-V1.118-独立复测与缺陷交接.md;acceptance/stage3/evidence/SRS_F006-V1.119-gates.json;acceptance/stage3/SRS_F006-V1.119-独立复测与缺陷交接.md;acceptance/stage3/evidence/SRS_F006-V1.120-batch.json;acceptance/stage3/SRS_F006-V1.120-独立复测与缺陷交接.md",
+      "阶段4动作": "按有效测试结果及参数版本校验启用资格；补首次未测/失败/编辑后重置/正常停用重启的状态转换回归；升级时隔离无有效测试的既有ENABLED并确保候选/调用不选取，保留真正有效通过记录。"
+    },
+    {
+      "编号": "DEF-S3-081",
+      "类型": "缺陷",
+      "级别": "高",
+      "关联用例步骤": "TC-021.S1",
+      "关联需求规则": "SRS_F006.R05",
+      "状态": "V1.120独立复测F，待Claude修复",
+      "事实": "Edge真实编辑已启用G119_LIVE保存，PUT包含capabilityCode/capabilityType/templateId；UpdateDeviceCapabilityRequest不接受capabilityCode，HTTP500系统繁忙，表单未关闭且编辑未保存。后端日志确认UnrecognizedPropertyException。",
+      "证据": "acceptance/stage3/evidence/SRS_F006-V1.120-ui-edit-r3.json;acceptance/stage3/evidence/SRS_F006-V1.120-capability-edit-ui-r3.png;acceptance/stage3/SRS_F006-V1.120-独立复测与缺陷交接.md",
+      "阶段4动作": "前端按Update DTO白名单提交，保留不可修改的编码/类型；核对模板编辑类似契约，复测UI修改参数后未测试/重测/启用。"
+    }
+  ]
+}

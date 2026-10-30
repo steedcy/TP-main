@@ -1,0 +1,79 @@
+{
+  "version": "V1.121",
+  "codeSha": "91a63b67ea7220da3086d61f74cbca083a7f89e1",
+  "executionBaseline": "V2.3",
+  "observedAt": "2026-10-30T20:55:07.205161+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "checks": [
+    {
+      "check": "Global400.unknown_field.G119_LIVE",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "response": {
+          "code": 3001,
+          "message": "请求参数不合法: unexpectedField",
+          "timestamp": "2026-10-30T20:55:07.334216600+08:00",
+          "path": "/api/v1/devices/G6_UNTESTED_134145/capabilities/G119_LIVE",
+          "method": "PUT"
+        },
+        "markerNotEchoed": true
+      }
+    },
+    {
+      "check": "Global400.unknown_field.G120_T",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "response": {
+          "code": 3001,
+          "message": "请求参数不合法: unexpectedField",
+          "timestamp": "2026-10-30T20:55:07.359524900+08:00",
+          "path": "/api/v1/device-types/SMART_DISPLAY/capability-templates/G120_T",
+          "method": "PUT"
+        },
+        "markerNotEchoed": true
+      }
+    },
+    {
+      "check": "Global400.malformed_json",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "response": {
+          "code": 3001,
+          "message": "请求参数格式错误",
+          "timestamp": "2026-10-30T20:55:07.392426100+08:00",
+          "path": "/api/v1/devices",
+          "method": "POST"
+        }
+      }
+    },
+    {
+      "check": "F003_F004_F005.read_smoke",
+      "pass": true,
+      "facts": {
+        "deviceCode": "G6_UNTESTED_134145",
+        "agentStatus": "ENABLED",
+        "onlineStatus": "ONLINE",
+        "lastReportedAt": "2026-10-30T20:55:05.835611",
+        "types": [
+          "CAP_FLIGHT_UPDATE",
+          "CAP_INFO_DISPLAY",
+          "CAP_NAVIGATION",
+          "CAP_SIM_STATUS"
+        ],
+        "timeoutSeconds": 30,
+        "note": "Current core read/heartbeat smoke only; original full F003-005 remain attributed to original accepted SHA"
+      }
+    },
+    {
+      "check": "Flyway.no_reapplied_migration",
+      "pass": true,
+      "facts": {
+        "appliedVersions": "21,22",
+        "note": "Real V121 startup after V120; V22 not rerun and verified checksums"
+      }
+    }
+  ]
+}

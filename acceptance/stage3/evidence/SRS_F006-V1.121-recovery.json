@@ -1,0 +1,82 @@
+{
+  "version": "V1.121",
+  "codeSha": "91a63b67ea7220da3086d61f74cbca083a7f89e1",
+  "executionBaseline": "V2.3",
+  "observedAt": "2026-10-30T20:56:09.651610+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "fixture": "Own DB seeds a valid in-progress one-step formal task/plan/assignment; disabling and recovery execute real product service, proxy, simulator and callbacks. This does not replace full task creation E2E.",
+  "checks": [
+    {
+      "check": "TC021.same_device_remaining_capability_no_recovery",
+      "pass": true,
+      "facts": {
+        "taskId": 2,
+        "agentCurrentTaskId": 2,
+        "events": []
+      }
+    },
+    {
+      "check": "TC021.occupied_disable_candidate_recovery",
+      "pass": true,
+      "facts": {
+        "task": "COMPLETED:false",
+        "assignment": "COMPLETED:AGT-9C2FF6F2",
+        "primaryReleased": true,
+        "events": [
+          {
+            "id": 1,
+            "type": "EXCEPTION_DETECTED",
+            "reason": "STEP_FAILED",
+            "detail": "识别到异常: STEP_FAILED，步骤1，详情: ERR_CAPABILITY_DISABLED: 能力G120_TEMPLATE被停用，正占用该能力的步骤按异常恢复处理"
+          },
+          {
+            "id": 2,
+            "type": "AGENT_ASSIGNMENT_REQUESTED",
+            "reason": null,
+            "detail": "步骤1候选排序（能力匹配->距离->负载）: AGT-9C2FF6F2(距离0.0,负载0)，向候选AGT-9C2FF6F2发起承接请求"
+          },
+          {
+            "id": 3,
+            "type": "EXCEPTION_RECOVERED",
+            "reason": null,
+            "detail": "恢复动作: 候选设备切换，结果: 成功，步骤1已重新分配"
+          },
+          {
+            "id": 4,
+            "type": "AGENT_ASSIGNED",
+            "reason": null,
+            "detail": "设备代理AGT-9C2FF6F2接受步骤1承接请求"
+          },
+          {
+            "id": 5,
+            "type": "STEP_DISPATCHED",
+            "reason": null,
+            "detail": "指令CMD-20261030205637-F5E6B5DE已下发至设备代理AGT-9C2FF6F2，业务意图: Display synthetic notice"
+          },
+          {
+            "id": 6,
+            "type": "EXECUTION_FEEDBACK_RECEIVED",
+            "reason": null,
+            "detail": "指令CMD-20261030205637-F5E6B5DE收到设备代理AGT-9C2FF6F2执行反馈: SUCCESS"
+          },
+          {
+            "id": 7,
+            "type": "STEP_COMPLETED",
+            "reason": null,
+            "detail": "步骤1完成条件已满足: displayStatus=SUCCESS"
+          },
+          {
+            "id": 8,
+            "type": "TASK_COMPLETED",
+            "reason": null,
+            "detail": "全部步骤完成条件均已满足，任务完成"
+          }
+        ],
+        "alternateAgent": "AGT-9C2FF6F2"
+      }
+    }
+  ],
+  "alternateSimulatorPid": 13144,
+  "alternateAgent": "AGT-9C2FF6F2",
+  "taskId": 2
+}

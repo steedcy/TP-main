@@ -1,0 +1,372 @@
+{
+  "version": "V1.121",
+  "codeSha": "91a63b67ea7220da3086d61f74cbca083a7f89e1",
+  "executionBaseline": "V2.3",
+  "observedAt": "2026-10-30T21:12:00.853661+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "checks": [
+    {
+      "check": "F006.full_platform_exists_rejects_unproven",
+      "pass": true,
+      "facts": {
+        "http": 400,
+        "response": {
+          "code": 4406,
+          "message": "以下能力类型未存在已启用实例: [CAP_SIM_STATUS]",
+          "timestamp": "2026-10-30T21:12:03.200535+08:00",
+          "path": "/api/v1/baseline-templates",
+          "method": "POST"
+        },
+        "fixture": "Own-schema raw ENABLED/test_passed=false; no enabled proven instance of this type"
+      }
+    },
+    {
+      "check": "F006.full_platform_exists_accepts_proven",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "response": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 4,
+            "templateName": "GPT V121 full-platform filter",
+            "templateIntent": "SPECIAL_PASSENGER_SERVICE",
+            "isPreset": false,
+            "inputParams": [
+              {
+                "name": "nonce",
+                "type": "String",
+                "required": true,
+                "defaultValue": null,
+                "range": null
+              }
+            ],
+            "steps": [
+              {
+                "stepSeq": 1,
+                "capabilityType": "CAP_SIM_STATUS",
+                "paramMapping": [
+                  {
+                    "target": "nonce",
+                    "source": "TEMPLATE_INPUT.nonce"
+                  }
+                ],
+                "stepTimeout": 60,
+                "completionCondition": "status returned"
+              }
+            ],
+            "templateVersion": "V1.0",
+            "templateStatus": "DRAFT",
+            "updatedAt": "2026-10-30T21:12:04.165288",
+            "updatedBy": "set"
+          },
+          "timestamp": "2026-10-30T21:12:04.213198300+08:00"
+        },
+        "provenTestStatus": "TESTED_PASSED"
+      }
+    },
+    {
+      "check": "F006.capability_audit_four_operations",
+      "pass": true,
+      "facts": {
+        "audit": [
+          {
+            "operation_type": "DEVICE_CAPABILITY_STATUS_CHANGE",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T21:12:04.366804",
+            "operation_target": "G6_UNTESTED_134145/G120_POISON -> DISABLED"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_STATUS_CHANGE",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T21:12:04.087059",
+            "operation_target": "G6_UNTESTED_134145/G120_POISON -> ENABLED"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_TEST",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T21:12:04.033325",
+            "operation_target": "G6_UNTESTED_134145/G120_POISON"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_TEST",
+            "operation_result": "FAILED",
+            "username": "set",
+            "created_at": "2026-10-30T21:09:43.398101",
+            "operation_target": "G6_UNTESTED_134145/G119_LIVE"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_TEST",
+            "operation_result": "FAILED",
+            "username": "set",
+            "created_at": "2026-10-30T21:07:27.005463",
+            "operation_target": "G6_UNTESTED_134145/G119_LIVE"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_STATUS_CHANGE",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T21:01:59.410797",
+            "operation_target": "G6_UNTESTED_134145/G119_LIVE -> DISABLED"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_STATUS_CHANGE",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T21:01:55.251515",
+            "operation_target": "G6_UNTESTED_134145/G119_LIVE -> ENABLED"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_TEST",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T21:01:55.20444",
+            "operation_target": "G6_UNTESTED_134145/G119_LIVE"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_STATUS_CHANGE",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T21:01:54.987516",
+            "operation_target": "G120_NEW/CAP_INFO_DISPLAY -> DISABLED"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_STATUS_CHANGE",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T20:56:37.105018",
+            "operation_target": "G6_UNTESTED_134145/G120_TEMPLATE -> DISABLED"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_STATUS_CHANGE",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T20:56:36.567465",
+            "operation_target": "G6_UNTESTED_134145/G119_LIVE -> DISABLED"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_STATUS_CHANGE",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T20:56:35.264984",
+            "operation_target": "G120_NEW/CAP_INFO_DISPLAY -> ENABLED"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_TEST",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T20:56:35.238255",
+            "operation_target": "G120_NEW/CAP_INFO_DISPLAY"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_STATUS_CHANGE",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T20:55:00.717514",
+            "operation_target": "G6_UNTESTED_134145/G119_LIVE -> ENABLED"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_TEST",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T20:54:59.735813",
+            "operation_target": "G6_UNTESTED_134145/G119_LIVE"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_UPDATE",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T20:53:06.106689",
+            "operation_target": "G6_UNTESTED_134145/G119_LIVE"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_STATUS_CHANGE",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T19:02:23.375293",
+            "operation_target": "G6_UNTESTED_134145/G120_TEMPLATE -> ENABLED"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_TEST",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T19:02:23.347619",
+            "operation_target": "G6_UNTESTED_134145/G120_TEMPLATE"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_CREATE",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T19:02:23.201179",
+            "operation_target": "G6_UNTESTED_134145/G120_TEMPLATE"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_CREATE",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T19:01:43.738344",
+            "operation_target": "G6_UNTESTED_134145/G120_POISON"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_STATUS_CHANGE",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T18:59:28.683188",
+            "operation_target": "G6_UNTESTED_134145/G119_LIVE -> ENABLED"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_TEST",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T18:59:28.629088",
+            "operation_target": "G6_UNTESTED_134145/G119_LIVE"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_UPDATE",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T18:59:28.514079",
+            "operation_target": "G6_UNTESTED_134145/G119_LIVE"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_STATUS_CHANGE",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T16:39:14.769287",
+            "operation_target": "G6_UNTESTED_134145/G119_LIVE -> DISABLED"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_TEST",
+            "operation_result": "FAILED",
+            "username": "set",
+            "created_at": "2026-10-30T16:39:14.738053",
+            "operation_target": "G6_UNTESTED_134145/G119_LIVE"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_UPDATE",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T16:39:14.707321",
+            "operation_target": "G6_UNTESTED_134145/G119_LIVE"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_STATUS_CHANGE",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T16:39:14.144869",
+            "operation_target": "G6_UNTESTED_134145/G119_LIVE -> DISABLED"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_TEST",
+            "operation_result": "FAILED",
+            "username": "set",
+            "created_at": "2026-10-30T16:39:14.117193",
+            "operation_target": "G6_UNTESTED_134145/G119_LIVE"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_STATUS_CHANGE",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T16:39:14.010517",
+            "operation_target": "G6_UNTESTED_134145/G119_LIVE -> DISABLED"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_STATUS_CHANGE",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T16:39:13.978987",
+            "operation_target": "G6_UNTESTED_134145/G119_LIVE -> ENABLED"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_TEST",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T16:39:13.606942",
+            "operation_target": "G6_UNTESTED_134145/G119_LIVE"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_STATUS_CHANGE",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T16:39:13.039954",
+            "operation_target": "G6_UNTESTED_134145/G119_LIVE -> DISABLED"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_UPDATE",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T16:39:13.016895",
+            "operation_target": "G6_UNTESTED_134145/G119_LIVE"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_STATUS_CHANGE",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T16:39:12.777683",
+            "operation_target": "G6_UNTESTED_134145/G119_LIVE -> ENABLED"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_STATUS_CHANGE",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T16:39:12.737238",
+            "operation_target": "G6_UNTESTED_134145/G119_LIVE -> DISABLED"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_STATUS_CHANGE",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T16:39:12.673084",
+            "operation_target": "G6_UNTESTED_134145/G119_LIVE -> ENABLED"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_TEST",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T16:39:12.35898",
+            "operation_target": "G6_UNTESTED_134145/G119_LIVE"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_UPDATE",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T16:39:12.298221",
+            "operation_target": "G6_UNTESTED_134145/G119_LIVE"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_STATUS_CHANGE",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T16:39:12.058096",
+            "operation_target": "G6_UNTESTED_134145/G119_LIVE -> DISABLED"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_CREATE",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T16:38:15.787018",
+            "operation_target": "G6_UNTESTED_134145/G119_LIVE"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_STATUS_CHANGE",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T13:41:46.492175",
+            "operation_target": "G6_UNTESTED_134145/CAP_INFO_DISPLAY -> ENABLED"
+          },
+          {
+            "operation_type": "DEVICE_CAPABILITY_STATUS_CHANGE",
+            "operation_result": "SUCCESS",
+            "username": "set",
+            "created_at": "2026-10-30T13:41:46.42491",
+            "operation_target": "G6_UNTESTED_134145/CAP_INFO_DISPLAY -> DISABLED"
+          }
+        ]
+      }
+    }
+  ]
+}

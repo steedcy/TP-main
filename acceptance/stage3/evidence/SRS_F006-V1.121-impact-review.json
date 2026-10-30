@@ -1,0 +1,103 @@
+{
+  "version": "V1.121",
+  "codeSha": "91a63b67ea7220da3086d61f74cbca083a7f89e1",
+  "executionBaseline": "V2.3",
+  "observedAt": "2026-10-30T21:24:14.737396+08:00",
+  "changedProductPathsSinceV120": [
+    "backend/src/main/java/com/airport/ai/common/GlobalExceptionHandler.java",
+    "backend/src/main/java/com/airport/ai/device/dto/UpdateDeviceCapabilityRequest.java",
+    "backend/src/main/java/com/airport/ai/devicetype/dto/UpdateCapabilityTemplateRequest.java",
+    "backend/src/test/java/com/airport/ai/device/UpdateCapabilityDtoContractTest.java",
+    "frontend/src/views/device/DeviceCapabilityView.vue",
+    "frontend/src/views/devicetype/DeviceTypeBoundaryView.vue"
+  ],
+  "unchangedV119GateAndTransport": [
+    {
+      "path": "backend/src/main/java/com/airport/ai/device/DeviceCapabilityService.java",
+      "sourceSha": "62d958277aaa1398ce9b200dbbe6c13f9bb5f775",
+      "currentSha": "91a63b67ea7220da3086d61f74cbca083a7f89e1",
+      "sourceBlob": "690e8604269ea3c9d7b3cad64452830e99a2c871",
+      "currentBlob": "690e8604269ea3c9d7b3cad64452830e99a2c871"
+    },
+    {
+      "path": "backend/src/main/java/com/airport/ai/device/DeviceAdapterClient.java",
+      "sourceSha": "62d958277aaa1398ce9b200dbbe6c13f9bb5f775",
+      "currentSha": "91a63b67ea7220da3086d61f74cbca083a7f89e1",
+      "sourceBlob": "c3bfe0b7684dfa25edcf9392c173ac2d1868c3f1",
+      "currentBlob": "c3bfe0b7684dfa25edcf9392c173ac2d1868c3f1"
+    },
+    {
+      "path": "backend/src/main/java/com/airport/ai/device/DeviceAgentMessagingService.java",
+      "sourceSha": "62d958277aaa1398ce9b200dbbe6c13f9bb5f775",
+      "currentSha": "91a63b67ea7220da3086d61f74cbca083a7f89e1",
+      "sourceBlob": "a6fd0b9bc26e28de82fe286c3f6298b2bf6c3041",
+      "currentBlob": "a6fd0b9bc26e28de82fe286c3f6298b2bf6c3041"
+    },
+    {
+      "path": "backend/src/main/java/com/airport/ai/device/ParameterValues.java",
+      "sourceSha": "62d958277aaa1398ce9b200dbbe6c13f9bb5f775",
+      "currentSha": "91a63b67ea7220da3086d61f74cbca083a7f89e1",
+      "sourceBlob": "1342b13fd879979ffd4835134e5cdfdb7bd08c81",
+      "currentBlob": "1342b13fd879979ffd4835134e5cdfdb7bd08c81"
+    },
+    {
+      "path": "backend/src/main/java/com/airport/ai/device/dto/CreateDeviceCapabilityRequest.java",
+      "sourceSha": "62d958277aaa1398ce9b200dbbe6c13f9bb5f775",
+      "currentSha": "91a63b67ea7220da3086d61f74cbca083a7f89e1",
+      "sourceBlob": "cf1420d78b95c7b0f332e68eef2e8efe8769b957",
+      "currentBlob": "cf1420d78b95c7b0f332e68eef2e8efe8769b957"
+    }
+  ],
+  "historicalCoverage": [
+    {
+      "sourceVersion": "V1.120",
+      "sourceSha": "b0f917c198ace8a58af6274497c56ab01586eca0",
+      "file": "SRS_F006-V1.120-batch.json",
+      "scope": "33 P: V22 upgrade/quarantine/valid survivor, defensive candidate+command, catalog counts, boundary validations/audit, template validation including inputs/outputs, used/unused delete, template inactive existing preservation/new exclusion, simulator bounded inheritance. Unchanged services/mappers/schema/catalog; changed update DTO/UI exercised live and shared global400 malformed/unknown checked V121."
+    },
+    {
+      "sourceVersion": "V1.119",
+      "sourceSha": "62d958277aaa1398ce9b200dbbe6c13f9bb5f775",
+      "file": "SRS_F006-V1.119-gates.json",
+      "scope": "Only positive gate observations (new untested, edit revoked, failed device rejection, invalid parameter, passed disable/reenable and command persistence); original two migration F explicitly NOT reused as P. Gate/parameter/transport blobs exactly unchanged, mapper stricter V120 independently tested plus full-platform exists V121."
+    }
+  ],
+  "currentCoreSmoke": [
+    "SRS_F006-V1.121-ui.json",
+    "SRS_F006-V1.121-ui-rest.json",
+    "SRS_F006-V1.121-neighbor.json",
+    "SRS_F006-V1.121-recovery.json",
+    "SRS_F006-V1.121-no-candidate.json",
+    "SRS_F006-V1.121-fullplatform.json"
+  ],
+  "probeAssessment": [
+    {
+      "file": "SRS_F006-V1.121-remaining-api.json",
+      "check": "F006.full_platform_exists_rejects_unproven",
+      "rawPass": false,
+      "classification": "PROBE_INVALID_PRECONDITION",
+      "reason": "SPECIAL_ASSISTANCE not registered task definition, so endpoint correctly rejected before capability validation. Correct SPECIAL_PASSENGER_SERVICE fixture independently proved reject and accept in fullplatform.json; timeout P in this same raw file remains valid."
+    },
+    {
+      "file": "SRS_F006-V1.121-final-read.json",
+      "check": "TC018.auto_load_all_active_templates",
+      "rawPass": false,
+      "classification": "PROBE_WRONG_TABLE_ASSERTION",
+      "reason": "Controlled TC018.S3 says automatically load active standard templates for selection, not automatically instantiate every physical-device capability. Probe compared instance rows; template-options.json checks all four active dropdown candidates and inactive exclusion, prefill-r2.json proves customization. No requirement change or retroactive relaxation."
+    },
+    {
+      "files": [
+        "SRS_F006-V1.121-ui.json",
+        "SRS_F006-V1.121-ui-final.json",
+        "SRS_F006-V1.121-prefill.json"
+      ],
+      "classification": "PROBE_INTERRUPTION",
+      "reason": "Updated row moved to second page; no SIMULATOR-owned template fixture; placeholder text intercepted by combobox. Resumed only missing observations, successful prior observations retained."
+    }
+  ],
+  "limitations": [
+    "Synthetic in-progress task/plan/assignment fixtures test real disable/recovery services, proxy, alternative simulator and callbacks; not a claim of full goal-to-task E2E. Three core full E2E remain final acceptance work.",
+    "No Microsoft Excel installed: actual xlsx compatibility observed using installed LibreOffice Calc. Baseline TC017 requires Excel-format export and matching content, no mandated vendor.",
+    "Independent backend package succeeded with tests skipped; Claude reported 178 tests/2 skips separately, not counted independent P. UI and API acceptance are independent."
+  ]
+}

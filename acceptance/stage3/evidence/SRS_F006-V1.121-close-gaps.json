@@ -1,0 +1,243 @@
+{
+  "version": "V1.121",
+  "codeSha": "91a63b67ea7220da3086d61f74cbca083a7f89e1",
+  "executionBaseline": "V2.3",
+  "observedAt": "2026-10-30T21:16:50.345880+08:00",
+  "checks": [
+    {
+      "check": "TC020_TC022.instance_validation_classes",
+      "pass": true,
+      "facts": [
+        {
+          "field": "capabilityCode",
+          "input": "",
+          "http": 400,
+          "message": "请输入能力编码",
+          "pass": true
+        },
+        {
+          "field": "capabilityCode",
+          "input": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
+          "http": 400,
+          "message": "能力编码长度需为1~32位",
+          "pass": true
+        },
+        {
+          "field": "capabilityName",
+          "input": "",
+          "http": 400,
+          "message": "能力名称长度需为1~64位",
+          "pass": true
+        },
+        {
+          "field": "capabilityName",
+          "input": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN",
+          "http": 400,
+          "message": "能力名称长度需为1~64位",
+          "pass": true
+        },
+        {
+          "field": "capabilityDescription",
+          "input": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+          "http": 400,
+          "message": "能力说明最长500位",
+          "pass": true
+        },
+        {
+          "field": "inputParams",
+          "input": [],
+          "http": 400,
+          "message": "请定义至少1个输入参数",
+          "pass": true
+        },
+        {
+          "field": "outputParams",
+          "input": [],
+          "http": 400,
+          "message": "请定义至少1个输出参数",
+          "pass": true
+        },
+        {
+          "field": "inputParams",
+          "input": [
+            {
+              "name": "",
+              "type": "String"
+            }
+          ],
+          "http": 400,
+          "message": "参数名不能为空",
+          "pass": true
+        },
+        {
+          "field": "inputParams",
+          "input": [
+            {
+              "name": "ok",
+              "type": ""
+            }
+          ],
+          "http": 400,
+          "message": "参数类型不能为空",
+          "pass": true
+        },
+        {
+          "field": "capabilityType",
+          "input": "CAP_BAGGAGE_MEASURE",
+          "http": 400,
+          "message": "能力类型超出设备类型边界",
+          "pass": true
+        },
+        {
+          "field": "capabilityType",
+          "input": "CAP_CUSTOM",
+          "http": 400,
+          "message": "能力类型超出设备类型边界",
+          "pass": true
+        },
+        {
+          "field": "capabilityCode",
+          "input": "G119_LIVE",
+          "http": 409,
+          "message": "能力编码已存在",
+          "pass": true
+        }
+      ]
+    },
+    {
+      "check": "TC020.instance_maxima_untested",
+      "pass": true,
+      "facts": {
+        "saved": {
+          "id": 19,
+          "capabilityCode": "GMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM",
+          "capabilityName": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN",
+          "capabilityType": "CAP_INFO_DISPLAY",
+          "inputParams": [
+            {
+              "name": "contentType",
+              "type": "String",
+              "required": true,
+              "defaultValue": "TEXT",
+              "range": "TEXT/IMAGE/VIDEO/HTML"
+            },
+            {
+              "name": "contentData",
+              "type": "String",
+              "required": true,
+              "defaultValue": "GPT synthetic",
+              "range": null
+            },
+            {
+              "name": "displayDuration",
+              "type": "Integer",
+              "required": true,
+              "defaultValue": "5",
+              "range": "5~300"
+            }
+          ],
+          "outputParams": [
+            {
+              "name": "displayStatus",
+              "type": "String",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            },
+            {
+              "name": "actualDuration",
+              "type": "Integer",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            },
+            {
+              "name": "errorMessage",
+              "type": "String",
+              "required": false,
+              "defaultValue": null,
+              "range": null
+            }
+          ],
+          "applicableConditions": "GPT isolated fixture",
+          "capabilityStatus": "UNTESTED",
+          "testResult": null,
+          "lastTestAt": null,
+          "testRequest": null,
+          "testResponse": null,
+          "testDurationMs": null,
+          "capabilityDescription": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+        }
+      }
+    },
+    {
+      "check": "TC019.inactive_used_template_call_remains_usable",
+      "pass": true,
+      "facts": {
+        "templateStatus": "INACTIVE",
+        "result": {
+          "id": 12,
+          "capabilityCode": "G120_TEMPLATE",
+          "capabilityName": "GPT V120 live",
+          "capabilityType": "CAP_INFO_DISPLAY",
+          "inputParams": [
+            {
+              "name": "contentType",
+              "type": "String",
+              "required": true,
+              "defaultValue": "TEXT",
+              "range": "TEXT/IMAGE/VIDEO/HTML"
+            },
+            {
+              "name": "contentData",
+              "type": "String",
+              "required": true,
+              "defaultValue": "GPT customized from template",
+              "range": null
+            },
+            {
+              "name": "displayDuration",
+              "type": "Integer",
+              "required": true,
+              "defaultValue": "5",
+              "range": "5~300"
+            }
+          ],
+          "outputParams": [
+            {
+              "name": "displayStatus",
+              "type": "String",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            },
+            {
+              "name": "actualDuration",
+              "type": "Integer",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            },
+            {
+              "name": "errorMessage",
+              "type": "String",
+              "required": false,
+              "defaultValue": null,
+              "range": null
+            }
+          ],
+          "applicableConditions": "GPT isolated fixture",
+          "capabilityStatus": "TESTED_PASSED",
+          "testResult": "实际设备代理调用通过，指令 TEST-b4e3069e4e264d08a0f2170e9b",
+          "lastTestAt": "2026-10-30T21:16:51.5045178",
+          "testRequest": "{\"inputParams\":{\"contentType\":\"TEXT\",\"contentData\":\"GPT customized from template\",\"displayDuration\":5},\"capabilityType\":\"CAP_INFO_DISPLAY\"}",
+          "testResponse": "{\"outputParams\":{\"actualDuration\":5,\"displayStatus\":\"SUCCESS\",\"errorMessage\":\"\"},\"commandId\":\"TEST-b4e3069e4e264d08a0f2170e9b\",\"result\":\"SUCCESS\",\"durationMs\":0}",
+          "testDurationMs": 129,
+          "capabilityDescription": "V120 synthetic"
+        },
+        "statusAfterEnable": "ENABLED",
+        "priorBeforeAfter": "V120 batch records original ENABLED before/after template disabled unchanged; current real proxy call supplements availability assertion"
+      }
+    }
+  ]
+}

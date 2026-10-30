@@ -9,3 +9,6 @@ GPT_TESTING；产品91a63b67ea7220da3086d61f74cbca083a7f89e1/V1.121，Claude交�
 5. Excel实际打开及40格与API/UI一致（本机生成的xlsx，不上传原始Office）；在用能力停用的同设备仍覆盖分支/候选切换/无候选分支、释放占用及日志；超时失败分支；规划全平台exists过滤。恢复探针`.local-test/gpt-f006-v120-recovery.py`此前仅准备未执行，需标V121并检查夹具后使用。
 
 GPT资源：schema tip_gpt_f006_v118_20261030已V22；18129/Redis10，模拟器18130，Vite15179。V120运行PID3820、Vite4864、模拟器13120，操作前核对所有权；V121构建`.local-test/gpt-f006-v121-build`，新运行元数据`.local-test/gpt-f006-v121-runtime.json`。保留旧证据/用户未提交文件；不覆写schema，不碰Claude目录/资源。明确F及时交回，不因保存检查点等待。
+
+
+本检查点已完成：最终复合裁决/证据见`SRS_F006-V1.121-独立复测与验收裁决.md`。以HANDOFF最新状态和远端main为准，不重复本清单。

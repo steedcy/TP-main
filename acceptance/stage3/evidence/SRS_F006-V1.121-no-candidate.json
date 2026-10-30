@@ -1,0 +1,49 @@
+{
+  "version": "V1.121",
+  "codeSha": "91a63b67ea7220da3086d61f74cbca083a7f89e1",
+  "executionBaseline": "V2.3",
+  "observedAt": "2026-10-30T21:01:51.253857+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "fixture": "Own schema valid in-progress task; real disable/exception/replan path with deterministic external-model failure. Does not test external model quality.",
+  "checks": [
+    {
+      "check": "TC021.no_candidate_recovery_before_replan",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "task": "PENDING_MANUAL:true",
+        "events": [
+          {
+            "type": "EXCEPTION_DETECTED",
+            "reason": "STEP_FAILED",
+            "detail": "识别到异常: STEP_FAILED，步骤1，详情: ERR_CAPABILITY_DISABLED: 能力G119_LIVE被停用，正占用该能力的步骤按异常恢复处理"
+          },
+          {
+            "type": "EXCEPTION_RECOVERY_FAILED",
+            "reason": "STEP_FAILED",
+            "detail": "恢复动作: 无可用候选设备，恢复动作未执行，结果: 失败，判断计划是否可继续"
+          },
+          {
+            "type": "REPLANNING_TRIGGERED",
+            "reason": null,
+            "detail": "步骤1恢复失败且计划不可继续，重新规划机会未用，触发5.5.4局部重新规划"
+          },
+          {
+            "type": "CONTEXT_SNAPSHOT_GENERATED",
+            "reason": null,
+            "detail": "局部重新规划重建上下文快照CTX-20261030-0001"
+          },
+          {
+            "type": "REPLAN_FAILED",
+            "reason": "ERR_REPLANNING_MODEL_FAILED",
+            "detail": "局部重新规划调用模型失败: Controlled model failure"
+          }
+        ],
+        "primaryReleased": true,
+        "modelMode": "Controlled failure to terminate replan/fallback in manual handling; no real provider quality claim"
+      }
+    }
+  ],
+  "ownedModelPid": 9604,
+  "taskId": 3
+}
