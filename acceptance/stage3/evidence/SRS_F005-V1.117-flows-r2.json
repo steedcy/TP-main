@@ -1,0 +1,211 @@
+{
+  "version": "V1.117",
+  "executionBaseline": "V2.3",
+  "codeSha": "5ef82e8b4de66cc1313b1222821cd2d1d43bc5f0",
+  "observedAt": "2026-10-30T13:00:44.194909+08:00",
+  "schema": "tip_gpt_f005_v117_20261030",
+  "fixture": "Own schema; valid one-step operator-owned synthetic formal tasks; real scheduled timeout and device protocol recovery; deterministic model failure only for no-candidate branch, not model quality acceptance",
+  "checks": [
+    {
+      "check": "TC014.S1.real_default_period",
+      "pass": true,
+      "facts": {
+        "observations": [
+          {
+            "at": "2026-10-30T13:01:13.618575",
+            "work": "IDLE",
+            "online": "ONLINE"
+          },
+          {
+            "at": "2026-10-30T13:01:28.67111",
+            "work": "IDLE",
+            "online": "ONLINE"
+          },
+          {
+            "at": "2026-10-30T13:01:43.705602",
+            "work": "IDLE",
+            "online": "ONLINE"
+          }
+        ],
+        "intervalSeconds": [
+          15.052535,
+          15.034492
+        ],
+        "businessStatus": {
+          "scenarioResult": "SUCCESS",
+          "simulatedDeviceType": "SMART_DISPLAY"
+        },
+        "note": "Distinct position/work state already observed in initial evidence; this observation adds real default periodic transport and business persistence."
+      }
+    },
+    {
+      "check": "TC016.unrelated_judged_without_replan",
+      "pass": true,
+      "facts": {
+        "taskId": 3,
+        "task": "EXECUTING:false",
+        "events": [
+          {
+            "id": 15,
+            "type": "UNRELATED_AGENT_OFFLINE_JUDGED",
+            "reason": "ERR_AGENT_OFFLINE_UNRELATED"
+          }
+        ]
+      }
+    },
+    {
+      "check": "TC016.executing_offline_candidate_switch",
+      "pass": true,
+      "facts": {
+        "taskId": 4,
+        "task": "COMPLETED:false",
+        "assignment": "3:COMPLETED",
+        "events": [
+          {
+            "id": 16,
+            "type": "AGENT_OFFLINE_DETECTED",
+            "reason": "ERR_HEARTBEAT_TIMEOUT"
+          },
+          {
+            "id": 17,
+            "type": "EXCEPTION_DETECTED",
+            "reason": "AGENT_OFFLINE"
+          },
+          {
+            "id": 18,
+            "type": "AGENT_ASSIGNMENT_REQUESTED",
+            "reason": null
+          },
+          {
+            "id": 19,
+            "type": "EXCEPTION_RECOVERED",
+            "reason": null
+          },
+          {
+            "id": 20,
+            "type": "AGENT_ASSIGNED",
+            "reason": null
+          },
+          {
+            "id": 21,
+            "type": "STEP_DISPATCHED",
+            "reason": null
+          },
+          {
+            "id": 22,
+            "type": "EXECUTION_FEEDBACK_RECEIVED",
+            "reason": null
+          },
+          {
+            "id": 23,
+            "type": "STEP_COMPLETED",
+            "reason": null
+          },
+          {
+            "id": 24,
+            "type": "TASK_COMPLETED",
+            "reason": null
+          }
+        ]
+      }
+    },
+    {
+      "check": "TC016.pending_no_current_id_and_recovered_candidate",
+      "pass": true,
+      "facts": {
+        "taskId": 5,
+        "task": "COMPLETED:false",
+        "assignment": "1:COMPLETED",
+        "events": [
+          {
+            "id": 26,
+            "type": "EXCEPTION_DETECTED",
+            "reason": "AGENT_OFFLINE"
+          },
+          {
+            "id": 27,
+            "type": "AGENT_ASSIGNMENT_REQUESTED",
+            "reason": null
+          },
+          {
+            "id": 28,
+            "type": "EXCEPTION_RECOVERED",
+            "reason": null
+          },
+          {
+            "id": 29,
+            "type": "AGENT_ASSIGNED",
+            "reason": null
+          },
+          {
+            "id": 30,
+            "type": "STEP_DISPATCHED",
+            "reason": null
+          },
+          {
+            "id": 31,
+            "type": "EXECUTION_FEEDBACK_RECEIVED",
+            "reason": null
+          },
+          {
+            "id": 32,
+            "type": "STEP_COMPLETED",
+            "reason": null
+          },
+          {
+            "id": 33,
+            "type": "TASK_COMPLETED",
+            "reason": null
+          }
+        ]
+      }
+    },
+    {
+      "check": "TC016.no_candidate_one_replan_then_manual",
+      "pass": true,
+      "facts": {
+        "taskId": 6,
+        "task": "PENDING_MANUAL:true",
+        "replanTriggerCount": 1,
+        "events": [
+          {
+            "id": 34,
+            "type": "AGENT_OFFLINE_DETECTED",
+            "reason": "ERR_HEARTBEAT_TIMEOUT"
+          },
+          {
+            "id": 35,
+            "type": "EXCEPTION_DETECTED",
+            "reason": "AGENT_OFFLINE"
+          },
+          {
+            "id": 36,
+            "type": "EXCEPTION_RECOVERY_FAILED",
+            "reason": "AGENT_OFFLINE"
+          },
+          {
+            "id": 37,
+            "type": "REPLANNING_TRIGGERED",
+            "reason": null
+          },
+          {
+            "id": 38,
+            "type": "CONTEXT_SNAPSHOT_GENERATED",
+            "reason": null
+          },
+          {
+            "id": 39,
+            "type": "REPLAN_FAILED",
+            "reason": "ERR_REPLANNING_MODEL_FAILED"
+          }
+        ],
+        "model": "Controlled failure, not real model quality test"
+      }
+    }
+  ],
+  "primaryAgent": "AGT-F9D46850",
+  "primaryPid": 2544,
+  "alternateAgent": "AGT-EC2612F5",
+  "alternatePid": 11724,
+  "finishedAt": "2026-10-30T13:02:37.921095+08:00"
+}

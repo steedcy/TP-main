@@ -1,0 +1,62 @@
+{
+  "version": "V1.117",
+  "executionBaseline": "V2.3",
+  "codeSha": "5ef82e8b4de66cc1313b1222821cd2d1d43bc5f0",
+  "observedAt": "2026-10-30T12:18:11.462303+08:00",
+  "schema": "tip_gpt_f005_v117_20261030",
+  "fixture": "Own schema; valid one-step operator-owned synthetic formal tasks; real scheduled timeout and device protocol recovery; deterministic model failure only for no-candidate branch, not model quality acceptance",
+  "checks": [
+    {
+      "check": "TC014.S1.real_default_period",
+      "pass": false,
+      "facts": {
+        "observations": [
+          {
+            "at": "2026-10-30T12:16:12.03814",
+            "work": "IDLE",
+            "online": "OFFLINE"
+          },
+          {
+            "at": "2026-10-30T12:18:37.039938",
+            "work": "IDLE",
+            "online": "ONLINE"
+          },
+          {
+            "at": "2026-10-30T12:18:52.091358",
+            "work": "IDLE",
+            "online": "ONLINE"
+          }
+        ],
+        "intervalSeconds": [
+          145.001798,
+          15.05142
+        ],
+        "businessStatus": {
+          "scenarioResult": "SUCCESS",
+          "simulatedDeviceType": "SMART_DISPLAY"
+        },
+        "note": "Distinct position/work state already observed in initial evidence; this observation adds real default periodic transport and business persistence."
+      }
+    },
+    {
+      "check": "TC016.unrelated_judged_without_replan",
+      "pass": true,
+      "facts": {
+        "taskId": 1,
+        "task": "EXECUTING:false",
+        "events": [
+          {
+            "id": 1,
+            "type": "UNRELATED_AGENT_OFFLINE_JUDGED",
+            "reason": "ERR_AGENT_OFFLINE_UNRELATED"
+          }
+        ]
+      }
+    }
+  ],
+  "primaryAgent": "AGT-F9D46850",
+  "primaryPid": 9280,
+  "alternateAgent": "AGT-C5E63FE7",
+  "alternatePid": 1844,
+  "finishedAt": "2026-10-30T12:19:46.982376+08:00"
+}

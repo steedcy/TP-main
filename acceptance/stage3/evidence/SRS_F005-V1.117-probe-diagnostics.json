@@ -1,0 +1,109 @@
+{
+  "version": "V1.117",
+  "codeSha": "5ef82e8b4de66cc1313b1222821cd2d1d43bc5f0",
+  "observedAt": "2026-10-30T13:06:36.050114+08:00",
+  "diagnostics": [
+    {
+      "source": "flows",
+      "issue": "Stale OFFLINE timestamp included before actual periodic reporting; original false retained; corrected flows-r2 waits ONLINE first."
+    },
+    {
+      "taskId": 2,
+      "issue": "Probe invalid displayDuration=1 outside allowed 5..300; not candidate-success acceptance evidence. Corrected tasks 4/5 use valid capability schema and completion condition. Original events retained. Contradictory recovery-success event after failed handoff retained for future exception-recovery review.",
+      "events": [
+        {
+          "id": 2,
+          "type": "AGENT_OFFLINE_DETECTED",
+          "reason": "ERR_HEARTBEAT_TIMEOUT",
+          "detail": "设备代理AGT-F9D46850心跳超时，判定离线，待5.5异常恢复流程判断是否影响任务"
+        },
+        {
+          "id": 3,
+          "type": "EXCEPTION_DETECTED",
+          "reason": "AGENT_OFFLINE",
+          "detail": "识别到异常: AGENT_OFFLINE，步骤1，详情: 设备代理AGT-F9D46850心跳超时离线，正占用该任务步骤"
+        },
+        {
+          "id": 4,
+          "type": "AGENT_ASSIGNMENT_REQUESTED",
+          "reason": null,
+          "detail": "步骤1候选排序（能力匹配->距离->负载）: AGT-C5E63FE7(距离0.0,负载0)，向候选AGT-C5E63FE7发起承接请求"
+        },
+        {
+          "id": 5,
+          "type": "DEVICE_COMMAND_SEND_FAILED",
+          "reason": "DEVICE_API_ERROR",
+          "detail": "向设备代理AGT-C5E63FE7发送承接请求失败: 参数超出范围: displayDuration"
+        },
+        {
+          "id": 6,
+          "type": "AGENT_REJECTED",
+          "reason": null,
+          "detail": "设备代理AGT-C5E63FE7拒绝步骤1承接请求，原因: DEVICE_API_ERROR"
+        },
+        {
+          "id": 7,
+          "type": "STEP_ASSIGNMENT_FAILED",
+          "reason": "ERR_NO_CANDIDATE_AVAILABLE",
+          "detail": "步骤1无可用候选设备（已尝试2个候选均拒绝或无候选）"
+        },
+        {
+          "id": 8,
+          "type": "EXCEPTION_DETECTED",
+          "reason": "CAPABILITY_GAP",
+          "detail": "识别到异常: CAPABILITY_GAP，步骤1，详情: 步骤1无可用候选设备"
+        },
+        {
+          "id": 9,
+          "type": "EXCEPTION_RECOVERY_FAILED",
+          "reason": "CAPABILITY_GAP",
+          "detail": "恢复动作: 无可用候选设备，恢复动作未执行，结果: 失败，判断计划是否可继续"
+        },
+        {
+          "id": 10,
+          "type": "REPLANNING_TRIGGERED",
+          "reason": null,
+          "detail": "步骤1恢复失败且计划不可继续，重新规划机会未用，触发5.5.4局部重新规划"
+        },
+        {
+          "id": 11,
+          "type": "CONTEXT_SNAPSHOT_GENERATED",
+          "reason": null,
+          "detail": "局部重新规划重建上下文快照CTX-20261030-0001"
+        },
+        {
+          "id": 12,
+          "type": "REPLAN_FAILED",
+          "reason": "ERR_REPLANNING_MODEL_FAILED",
+          "detail": "局部重新规划调用模型失败: Controlled model failure"
+        },
+        {
+          "id": 13,
+          "type": "EXCEPTION_RECOVERED",
+          "reason": null,
+          "detail": "恢复动作: 候选设备切换，结果: 成功，步骤1已重新分配"
+        },
+        {
+          "id": 14,
+          "type": "AGENT_ONLINE_RECOVERED",
+          "reason": null,
+          "detail": "设备代理AGT-F9D46850恢复上报，重新置为在线并纳入候选集合"
+        }
+      ]
+    },
+    {
+      "source": "ui",
+      "issue": "Ant Design Chinese button accessible name includes a space; probe locator corrected, original timeout retained."
+    },
+    {
+      "source": "neighbor",
+      "issue": "Snapshot field is agents, not devices; corrected observation retains original false."
+    },
+    {
+      "source": "build",
+      "issue": "Initial WebAssembly memory growth failure; unchanged product built successfully on retry with Node heap 768MB, 3264 modules, 38.10 seconds."
+    }
+  ],
+  "finalValidCompositeObservationCount": 35,
+  "finalValidPassCount": 35
+}
