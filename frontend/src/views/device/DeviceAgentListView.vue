@@ -95,7 +95,8 @@
       <a-table :dataSource="timeline" :pagination="{ pageSize: 10 }" size="small" rowKey="rowKey"
         :columns="[{ title: '时间', dataIndex: 'at', width: 170 }, { title: '类型', dataIndex: 'type' },
                    { title: '指令号', dataIndex: 'commandId' }, { title: '摘要', dataIndex: 'summary' },
-                   { title: '结果/原因码', customRender: ({ record }) => record.result || record.reasonCode || '—' }]" />
+                   { title: '结果', key: 'result', customRender: ({ record }) => timelineResult(record) },
+                   { title: '原因码', key: 'reasonCode', customRender: ({ record }) => timelineReason(record) }]" />
     </a-drawer>
   </div>
 </template>
@@ -105,6 +106,7 @@ import { onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { message } from 'ant-design-vue'
 import { listAgents, disableAgent, getHeartbeatTimeout, updateHeartbeatTimeout, getAgentTimeline } from '../../api/device'
+import { timelineResult, timelineReason } from '../../utils/timeline'
 import { useAuthStore } from '../../store/auth'
 
 const list = ref([])
