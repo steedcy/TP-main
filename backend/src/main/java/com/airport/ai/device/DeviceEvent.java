@@ -15,6 +15,9 @@ public class DeviceEvent {
     private String trigger = "SYSTEM";
     private String reasonCode;
     private String detailSummary;
+    /** 统一业务消息的指令编号与结果（查询类等设备消息事件使用），其余事件为null（DEF-S3-082） */
+    private String commandId;
+    private String result;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -28,6 +31,10 @@ public class DeviceEvent {
     public void setTrigger(String trigger) { this.trigger = trigger; }
     public String getReasonCode() { return reasonCode; }
     public void setReasonCode(String reasonCode) { this.reasonCode = reasonCode; }
+    public String getCommandId() { return commandId; }
+    public void setCommandId(String commandId) { this.commandId = commandId; }
+    public String getResult() { return result; }
+    public void setResult(String result) { this.result = result; }
     public String getDetailSummary() { return detailSummary; }
     public void setDetailSummary(String detailSummary) { this.detailSummary = detailSummary; }
 }

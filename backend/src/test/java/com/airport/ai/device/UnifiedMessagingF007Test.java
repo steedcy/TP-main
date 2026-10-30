@@ -125,8 +125,11 @@ class UnifiedMessagingF007Test {
         ReflectionTestUtils.setField(service, "deviceEventService", events);
         service.dispatch(query("CAPABILITY_QUERY", "REAL-UNIQUE-1"));
         service.dispatch(query("STATUS_QUERY", "REAL-UNIQUE-2"));
-        verify(events).append(eq(9L), eq("AGENT_MESSAGE_CAPABILITY_QUERY"), any(), any(), org.mockito.ArgumentMatchers.contains("REAL-UNIQUE-1"));
-        verify(events).append(eq(9L), eq("AGENT_MESSAGE_STATUS_QUERY"), any(), any(), org.mockito.ArgumentMatchers.contains("REAL-UNIQUE-2"));
+        // DEF-S3-082：结构化指令号与结果，而不只在摘要文本里
+        verify(events).appendMessage(eq(9L), eq("AGENT_MESSAGE_CAPABILITY_QUERY"), eq("REAL-UNIQUE-1"), eq("SUCCESS"),
+                any(), org.mockito.ArgumentMatchers.contains("REAL-UNIQUE-1"));
+        verify(events).appendMessage(eq(9L), eq("AGENT_MESSAGE_STATUS_QUERY"), eq("REAL-UNIQUE-2"), eq("SUCCESS"),
+                any(), org.mockito.ArgumentMatchers.contains("REAL-UNIQUE-2"));
     }
 
     private DeviceAgentMessageRequest query(String type, String commandId) {
@@ -160,12 +163,57 @@ class UnifiedMessagingF007Test {
         c.setCommandStatus("SUCCEEDED");
         c.setCreatedAt(LocalDateTime.of(2026, 10, 31, 11, 0, 0));
         when(commands.findRecentByAgentCode("AGT-9", DeviceAgentTimelineService.LIMIT)).thenReturn(List.of(c));
+        e.setCommandId("QRY-1");
+        e.setResult("SUCCESS");
         var items = new DeviceAgentTimelineService(events, commands).timeline(agent);
         assertEquals(2, items.size());
+        var query = items.stream().filter(i -> "EVENT".equals(i.get("kind"))).findFirst().orElseThrow();
+        assertEquals("QRY-1", query.get("commandId"), "查询事件的结构化指令号");
+        assertEquals("SUCCESS", query.get("result"), "查询事件的结构化结果");
         assertEquals("COMMAND", items.get(0).get("kind"));
         assertEquals("CMD-7", items.get(0).get("commandId"));
         assertEquals("SUCCEEDED", items.get(0).get("result"));
         assertEquals("EVENT", items.get(1).get("kind"));
+    }
+
+    @Test
+    void everyCommandRowCarriesCommandIdAndResultAndFailureReasonsAreSurfaced() {
+        DeviceEventService events = mock(DeviceEventService.class);
+        DeviceCommandMapper commands = mock(DeviceCommandMapper.class);
+        DeviceAgent agent = new DeviceAgent();
+        agent.setId(9L);
+        agent.setAgentCode("AGT-9");
+        when(events.listByAgent(9L)).thenReturn(List.of());
+        List<DeviceCommandRecord> rows = new java.util.ArrayList<>();
+        String[][] spec = {{"TASK_ACCEPT", "ACCEPTED", null}, {"TASK_ACCEPT", "REJECTED", "{\"rejectReason\":\"DEVICE_BUSY\"}"},
+                {"EXECUTE_CAPABILITY", "SUCCEEDED", "{\"reasonCode\":\"DEVICE_SUCCESS\"}"},
+                {"EXECUTE_CAPABILITY", "FAILED", "{\"reasonCode\":\"SIMULATED_DEVICE_ERROR\"}"},
+                {"EXECUTE_CAPABILITY", "TIMED_OUT", "{\"reasonCode\":\"SIMULATED_TIMEOUT\"}"},
+                {"TASK_CANCEL", "SENT", null}};
+        for (int i = 0; i < spec.length; i++) {
+            DeviceCommandRecord c = new DeviceCommandRecord();
+            c.setCommandId("CMD-" + i);
+            c.setCommandType(spec[i][0]);
+            c.setCommandStatus(spec[i][1]);
+            c.setResponsePayload(spec[i][2]);
+            c.setCreatedAt(LocalDateTime.of(2026, 10, 31, 9, i, 0));
+            rows.add(c);
+        }
+        when(commands.findRecentByAgentCode("AGT-9", DeviceAgentTimelineService.LIMIT)).thenReturn(rows);
+        var items = new DeviceAgentTimelineService(events, commands).timeline(agent);
+        assertEquals(6, items.size());
+        for (var item : items) {
+            assertNotNull(item.get("commandId"), "每条消息行都有指令号");
+            assertNotNull(item.get("result"), "每条消息行都有结果");
+        }
+        var byId = items.stream().collect(java.util.stream.Collectors.toMap(i -> (String) i.get("commandId"), i -> i));
+        assertEquals("DEVICE_BUSY", byId.get("CMD-1").get("reasonCode"));
+        assertEquals("DEVICE_SUCCESS", byId.get("CMD-2").get("reasonCode"));
+        assertEquals("SIMULATED_DEVICE_ERROR", byId.get("CMD-3").get("reasonCode"));
+        assertEquals("SIMULATED_TIMEOUT", byId.get("CMD-4").get("reasonCode"));
+        assertNull(byId.get("CMD-0").get("reasonCode"));
+        assertNull(DeviceAgentTimelineService.reasonOf("not json"));
+        assertNull(DeviceAgentTimelineService.reasonOf(null));
     }
 
     // ---------- R05：业务模块只经统一消息服务与设备交互

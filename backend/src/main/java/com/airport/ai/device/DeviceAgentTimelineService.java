@@ -32,9 +32,9 @@ public class DeviceAgentTimelineService {
             m.put("kind", "EVENT");
             m.put("type", e.getEventType());
             m.put("at", e.getOccurredAt());
-            m.put("commandId", null);
+            m.put("commandId", e.getCommandId());
             m.put("summary", e.getDetailSummary());
-            m.put("result", null);
+            m.put("result", e.getResult());
             m.put("reasonCode", e.getReasonCode());
             items.add(m);
         }
@@ -47,11 +47,28 @@ public class DeviceAgentTimelineService {
             m.put("attemptNo", c.getAttemptNo());
             m.put("summary", "任务" + c.getTaskId() + "步骤" + c.getStepSeq() + " " + c.getCapabilityType());
             m.put("result", c.getCommandStatus());
-            m.put("reasonCode", null);
+            m.put("reasonCode", reasonOf(c.getResponsePayload()));
             items.add(m);
         }
         items.sort(Comparator.comparing((Map<String, Object> m) -> (LocalDateTime) m.get("at"),
                 Comparator.nullsLast(Comparator.naturalOrder())).reversed());
         return items.size() > LIMIT ? items.subList(0, LIMIT) : items;
+    }
+
+    private static final com.fasterxml.jackson.databind.ObjectMapper JSON = new com.fasterxml.jackson.databind.ObjectMapper();
+
+    /** 设备回执载荷里的原因码（失败/超时/拒绝），没有或解析失败返回null；不返回其他载荷内容 */
+    static String reasonOf(String responsePayload) {
+        if (responsePayload == null || responsePayload.isBlank()) return null;
+        try {
+            var node = JSON.readTree(responsePayload);
+            for (String field : new String[]{"reasonCode", "rejectReason"}) {
+                var v = node.get(field);
+                if (v != null && !v.isNull() && !v.asText().isBlank()) return v.asText();
+            }
+        } catch (Exception ignored) {
+            // 载荷不可解析时不影响时间线展示
+        }
+        return null;
     }
 }

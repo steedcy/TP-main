@@ -10,10 +10,12 @@
         <result column="trigger" property="trigger"/>
         <result column="reason_code" property="reasonCode"/>
         <result column="detail_summary" property="detailSummary"/>
+        <result column="command_id" property="commandId"/>
+        <result column="result" property="result"/>
     </resultMap>
 
     <sql id="Columns">
-        id, device_agent_id, event_type, occurred_at, trigger, reason_code, detail_summary
+        id, device_agent_id, event_type, occurred_at, trigger, reason_code, detail_summary, command_id, result
     </sql>
 
     <select id="findByDeviceAgentIdOrderByOccurredAtAsc" resultMap="DeviceEventResult">
@@ -30,8 +32,10 @@
     </select>
 
     <insert id="insert" parameterType="com.airport.ai.device.DeviceEvent" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO device_events (device_agent_id, event_type, occurred_at, trigger, reason_code, detail_summary)
-        VALUES (#{deviceAgentId}, #{eventType}, #{occurredAt}, #{trigger}, #{reasonCode}, #{detailSummary})
+        INSERT INTO device_events (device_agent_id, event_type, occurred_at, trigger, reason_code, detail_summary,
+                                   command_id, result)
+        VALUES (#{deviceAgentId}, #{eventType}, #{occurredAt}, #{trigger}, #{reasonCode}, #{detailSummary},
+                #{commandId}, #{result})
     </insert>
 
 </mapper>

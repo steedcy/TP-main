@@ -106,7 +106,7 @@ public class DeviceAgentInternalMessageService {
     /** 查询类消息成功交互也写设备事件，供过程追溯（SRS_F007.R07） */
     private void recordQuery(DeviceAgent agent, String messageType, String commandId, String summary) {
         if (deviceEventService == null) return;
-        deviceEventService.append(agent.getId(), "AGENT_MESSAGE_" + messageType, "SYSTEM", null,
+        deviceEventService.appendMessage(agent.getId(), "AGENT_MESSAGE_" + messageType, commandId, "SUCCESS", null,
                 "指令" + commandId + "：" + summary);
     }
 
