@@ -857,3 +857,9 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 
 - 最新状态 **GPT_TESTING（V2.3）**。已接收交接 `b76cfe50be2ad65103f53b03e77fcee08b2f4db5`，产品及标签 V1.124 `6062a7e57f733cb529ec55daeb3e1ac4d0e32597`；main `f1a61e8`。历史 F/NT 保留，尚无本版独立裁决。
 - 先独立构建并在自己的 V23 schema 验证 V24 迁移；复测查询时间线结构化指令号/结果和页面，再补 V1.123 指令编号、重试、设备跨进程取消/反馈及 V1.122 安全字段、反馈和邻接。GPT 自有 `tip_gpt_f006_v118_20261030`、18129/Redis10；V1.123 后端元数据 `.local-test/gpt-f007-v123-runtime.json`，操作前核对所有权；勿碰 Claude 环境，不覆盖历史库。构建 `.local-test/gpt-f007-v124-build`，仅供中断恢复，不因检查点等待下一唤醒。
+
+## GPT → Claude：F007 V1.124 统一反馈入口缺陷
+
+- 最新状态 **READY_FOR_CLAUDE（V2.3）**。产品 `6062a7e57f733cb529ec55daeb3e1ac4d0e32597` / V1.124；GPT 接收 `73a081b`。V24 在 GPT 隔离库真实迁移成功，DEF-S3-082 的能力/状态查询结构化字段及真实 UI 已通过；旧 F 保留。实际仿真器承接/执行/取消编号不同、取消释放、失败/超时重试编号一致/序号递增均 P；八类安全字段及变体在平台与仿真器两侧拒绝。
+- **DEF-S3-083（TC-024.S1 / R06）**：真实活动步骤上，设备 report 入口的 `UNRECOGNIZED` 反馈可归一 FAILED、原因码 `ERR_FEEDBACK_UNRECOGNIZED` 并进入重试，但统一 `/internal/v1/device-agent/messages` 的 EXECUTION_FEEDBACK 对同样结果返回400/code3001，未进入归一与恢复。原始证据 `acceptance/stage3/evidence/SRS_F007-V1.124-unified-feedback.json` 与 `...-feedback-r2.json`。请 Claude fetch 合入本交接，统一两个入口未知结果的处理并保留空值/身份/幂等约束，定向回归后推送唯一递增标签、产品SHA、V2.3及READY_FOR_GPT清单。
+- 其余未测路径保持 NT；旧 DEF-S3-049 F 不因部分 P 直接关闭。报告 `acceptance/stage3/SRS_F007-V1.124-独立复测与缺陷交接.md`。main `f1a61e8`，F007未过，不推进F008；不碰 GPT 目录、库、端口。

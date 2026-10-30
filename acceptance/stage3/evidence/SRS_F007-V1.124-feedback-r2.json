@@ -1,0 +1,83 @@
+{
+  "version": "V1.124",
+  "codeSha": "6062a7e57f733cb529ec55daeb3e1ac4d0e32597",
+  "executionBaseline": "V2.3",
+  "observedAt": "2026-10-31T02:13:06.954596+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "fixture": "Own schema seeded formal one-step pending assignment; actual platform proxy and V123/V124-identical simulator HTTP/callback; not full creation E2E.",
+  "checks": [
+    {
+      "check": "R02.acceptance_id_feedback_rejected",
+      "pass": true,
+      "facts": {
+        "http": 404,
+        "response": {
+          "code": 4116,
+          "message": "步骤分配记录不存在",
+          "timestamp": "2026-10-31T02:13:08.498899200+08:00",
+          "path": "/device-api/v1/agents/AGT-D68FD3AB/report",
+          "method": "POST"
+        },
+        "probeCorrection": "Previous attempt received correct 404 but mistakenly expected 400; raw attempt retained."
+      }
+    },
+    {
+      "check": "R06.unknown_feedback_normalized",
+      "pass": true,
+      "facts": {
+        "http": 200,
+        "response": {
+          "code": 200,
+          "message": "success",
+          "timestamp": "2026-10-31T02:13:08.536775400+08:00"
+        },
+        "events": [
+          {
+            "event_type": "AGENT_ASSIGNED",
+            "reason_code": null,
+            "detail_summary": "设备代理AGT-D68FD3AB接受步骤1承接请求"
+          },
+          {
+            "event_type": "STEP_DISPATCHED",
+            "reason_code": null,
+            "detail_summary": "指令CMD-20261031021308-097079B9已下发至设备代理AGT-D68FD3AB，业务意图: Display synthetic notice"
+          },
+          {
+            "event_type": "EXECUTION_FEEDBACK_RECEIVED",
+            "reason_code": "ERR_FEEDBACK_UNRECOGNIZED",
+            "detail_summary": "指令CMD-20261031021308-097079B9收到设备代理AGT-D68FD3AB执行反馈: FAILED"
+          },
+          {
+            "event_type": "STEP_RETRY_DISPATCHED",
+            "reason_code": "ERR_FEEDBACK_UNRECOGNIZED",
+            "detail_summary": "步骤1自动重试1次，沿用执行指令编号CMD-20261031021308-097079B9，尝试序号1，原因: 执行结果: FAILED，原因: ERR_FEEDBACK_UNRECOGNIZED"
+          }
+        ],
+        "commands": [
+          {
+            "id": 25,
+            "command_type": "TASK_ACCEPT",
+            "command_id": "G124_ACCEPT_FB2",
+            "attempt_no": 0,
+            "command_status": "ACCEPTED"
+          },
+          {
+            "id": 26,
+            "command_type": "EXECUTE_CAPABILITY",
+            "command_id": "CMD-20261031021308-097079B9",
+            "attempt_no": 0,
+            "command_status": "FAILED"
+          },
+          {
+            "id": 27,
+            "command_type": "EXECUTE_CAPABILITY",
+            "command_id": "CMD-20261031021308-097079B9",
+            "attempt_no": 1,
+            "command_status": "SENT"
+          }
+        ]
+      }
+    }
+  ],
+  "taskId": 8
+}

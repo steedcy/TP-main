@@ -1,0 +1,37 @@
+{
+  "version": "V1.124",
+  "codeSha": "6062a7e57f733cb529ec55daeb3e1ac4d0e32597",
+  "executionBaseline": "V2.3",
+  "observedAt": "2026-10-31T02:14:28.005464+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "fixture": "Own schema seeded formal one-step pending assignment; actual platform proxy and V123/V124-identical simulator HTTP/callback; not full creation E2E.",
+  "checks": [
+    {
+      "check": "R06.unified_unknown_feedback_normalized",
+      "pass": false,
+      "facts": {
+        "request": {
+          "commandId": "CMD-20261031021429-483D6CFB",
+          "messageType": "EXECUTION_FEEDBACK",
+          "agentId": "AGT-D68FD3AB",
+          "payload": {
+            "executionResult": "UNRECOGNIZED",
+            "attemptNo": 0,
+            "outputParams": {}
+          }
+        },
+        "http": 400,
+        "response": {
+          "code": 3001,
+          "message": "executionResult取值非法",
+          "timestamp": "2026-10-31T02:14:29.609842400+08:00",
+          "path": "/internal/v1/device-agent/messages",
+          "method": "POST"
+        },
+        "note": "Same invalid result previously accepted and normalized via the device report endpoint; here tested through documented unified internal message endpoint for an active assignment."
+      }
+    }
+  ],
+  "taskId": 11,
+  "probeOrProductError": "Product F R06.unified_unknown_feedback_normalized"
+}
