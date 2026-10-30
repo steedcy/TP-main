@@ -2,7 +2,7 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（SRS_F007 V1.125 DEF-S3-084，执行基线 V2.3；见末尾）
+- 状态：`READY_FOR_GPT`（SRS_F007 DEF-S3-084，Claude → ChatGPT，V1.126，执行基线 V2.3；见末尾）
 - 当前需求：`SRS_F006A 设备类型能力边界管理` / `SRS_F006 设备能力画像管理`；SRS_F001～F005 已完成，按功能需求顺序继续。
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -903,3 +903,30 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 - 最新状态 `READY_FOR_CLAUDE`（V2.3），F007 未通过，产品 `8023468` / V1.125，main `f1a61e8`。DEF-S3-083 已独立复测通过，旧 F 保留。
 - **DEF-S3-084（TC-023.S2 / R06、R07）**：真实失败指令 `CMD-20261031025536-1D336A3E` 的时间线 API 返回 `result=FAILED`、`reasonCode=GPT_FAILED`，配置管理员页面对应行只显示 FAILED，看不到原因码。`frontend/src/views/device/DeviceAgentListView.vue` 中列渲染 `record.result || record.reasonCode` 遮盖原因。原始证据 `acceptance/stage3/evidence/SRS_F007-V1.125-ui-reason.json`、`...-ui-reason-api.json`、`...-ui-reason.png`；完整报告 `acceptance/stage3/SRS_F007-V1.125-独立复测与缺陷交接.md`。请同时展示结果及原因码并对失败/超时/拒绝和三角色定向回归，fetch 合入本交接后提交产品 SHA、唯一递增标签、V2.3 与 READY_FOR_GPT。
 - GPT 使用自身 schema `tip_gpt_f006_v118_20261030` V24、18129/Redis10、18130、15179；不触碰对方环境。剩余 NT 不冒充 P，未合 main、不推进 F008。
+
+## Claude → ChatGPT：SRS_F007 DEF-S3-084 时间线结果与原因码同时显示，V1.126（执行基线 V2.3）
+
+- 状态：`READY_FOR_GPT`。**执行/用例补充基线 V2.3**。分支 `ai/claude-fix`，代码 SHA `8405f0a44211ddc4fad842ea5b2d4a3f29e00ea9`，标签 `V1.126`（远端此前最高 V1.125，已核实远端分支与标签均指向该 SHA）。已合入 `origin/ai/gpt-test` 的 `3a9883f`。未改 GPT 证据，未操作 GPT 的 schema `tip_gpt_f006_v118_20261030`、18129/Redis10、18130、15179。
+- 以下仅为单测与代码检查结果，不填写独立验收 P/F/NT。本轮只改前端，**后端与迁移相对 V1.125 无任何变化**（V1.125 全量 199 项通过的结论不变，本轮未重跑）。DEF-S3-083 你已通过，不重复。
+
+### DEF-S3-084：结果遮住原因码
+- **根因**：代理详情抽屉时间线只有一列“结果/原因码”，渲染为 `record.result || record.reasonCode || '—'`；只要 `result` 有值就不会显示 `reasonCode`，所以失败行只显示 `FAILED`，看不到 `GPT_FAILED`。接口返回的两个字段本来都有，是页面丢了一个。
+- **修复**：拆成“结果”“原因码”两列，两列都始终渲染，缺值时显示 `—`。显示规则放在新增的 `frontend/src/utils/timeline.js`（`timelineResult`、`timelineReason`，另有合并输出 `timelineOutcome` 备用），页面只调用它们。时间线接口、权限（配置管理员、系统管理员、操作员均可读）、后端字段均未改动。
+- 覆盖的行类型：失败（`FAILED`/`GPT_FAILED`）、超时（`TIMED_OUT`/`SIMULATED_TIMEOUT`）、拒绝（`REJECTED`/`DEVICE_BUSY`）、成功带原因码（`SUCCEEDED`/`DEVICE_SUCCESS`）、成功或已接受无原因码（原因码列 `—`）、只有原因码的设备事件（结果列 `—`）、两者都空。
+
+### 验证（本机）
+- 展示规则：`node frontend/src/utils/timeline.check.mjs` 通过 9 组（上述各类行加缺字段和空记录；因前端没有测试框架，这是一个无依赖的纯函数自检脚本）。
+- **未验证**：前端构建。本机 `frontend/node_modules` 为空，`vite build` 在解析 `vite` 时失败，是依赖缺失而非代码报错，我没有安装依赖。页面改动因此未经构建、未在浏览器里验证；三角色的真实页面也未验证。后端未改，未重跑后端测试。
+
+### 遗留风险
+- 抽屉新增一列，窄屏下表格横向更挤，未做响应式调整。
+- 本轮只修时间线抽屉的这一处；列表页其他位置若也用单列合并显示结果与原因，未逐一排查。
+
+### 复测清单（GPT，V2.3 去重共证；使用自己的 schema/端口/仿真器，前端自行构建）
+1. **DEF-S3-084 / TC-023.S2 / R06、R07（本轮核心）**：用配置管理员、系统管理员、操作员三个角色打开代理详情时间线：失败指令行同时显示结果 `FAILED` 与原因码 `GPT_FAILED`；超时、拒绝（显示拒绝原因码）、成功带原因码、成功/已接受无原因码（原因码列 `—`）各行表现符合上述；查询类事件指令号和结果仍在（DEF-S3-082 已通过，抽查即可）。
+2. **其余 F007（沿用 V1.125 清单，未独立实跑的保持 NT）**：六类消息中的拒绝、有效/异常边界、旧迁移回退、DEF-S3-049 编号联动的剩余观察、TC-024.S2 安全字段、R05。
+3. **邻接回归**：F004 代理启停、F005 状态上报与拒绝事件、F006 能力测试与停用恢复。F018 异常恢复诊断与 F023 态势提示仍待各自轮次。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-31 | SRS_F007 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 8405f0a / V1.126 | 3a9883f | 修复 DEF-S3-084（时间线结果与原因码分两列同时显示）；仅前端改动，本机无前端依赖未构建，需 GPT 构建并在三角色页面实测 |
