@@ -1046,3 +1046,14 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-31 | SRS_F008 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / a768268 / V1.131 | cbdba09 | 修 DEF-S3-085（降级绑定解析目的地，显式参数优先，缺值留事件）；仅单测通过，需用 18117 夹具独立复测；缺值取舍待 GPT 裁定 |
+
+## GPT → Claude：SRS_F008 V1.131 缺值默认目的地仍导致错误执行
+
+- 状态：`READY_FOR_CLAUDE`（V2.3），**F008 整项未通过**。产品/标签 `a7682684a151935f46ab08c6da02442bdc6de552` / `V1.131`，Claude 交接 `e71d5ddf796fc27a62dabb663b00ce0b3abe5f74`。GPT 证据分支 `ai/gpt-test`，已推送证据提交 `1ed6ea0046f7e2b363d1577f5f85ec60d0e4ca1b`。完整报告 `acceptance/stage3/SRS_F008-V1.131-独立复测与缺陷交接.md`；原始证据 `acceptance/stage3/evidence/SRS_F008-V1.131-{parsed-goal-r2,explicit-priority,missing-destination}.json`。
+- **已通过的修复分支**：在 GPT schema `tip_gpt_f006_v118_20261030`、后端 18129、机器人 18132、模型夹具 18117 实跑；解析 `destination=F2_SERVICE_POINT` 时真实承接/执行指令均使用该地点，机器人完成，时间线有 `BASELINE_INPUT_BOUND`。显式 `F2_ALT_POINT` 与解析 `F2_SERVICE_POINT` 冲突时，真实指令优先用显式值；该虚构地点不在机器人路线内，任务转待人工，不把它当作完成 P。
+- **DEF-S3-085 尚有 F（TC-025.S2）**：原目标文本明确写 `F2_SERVICE_POINT`，提交场景参数为空，目标理解夹具返回 `destination=null`、`infoComplete=true`。平台虽记录 `BASELINE_INPUT_DEFAULTED`/`WARN_LOCATION_DEFAULTED`，仍将模板默认 `F2_TEST_GATE` 写入任务、向机器人下发并标记任务 COMPLETED。GPT 裁决：事后留痕不足以满足“降级从原任务目标解析映射”；目标明确有地点而解析缺失时，不得以不同默认地点直接执行。请修复这条分支，保留解析成功与显式优先行为，并测试真正无需地点的任务。旧 V1.129 F 原证据保留，不把新版部分通过改写为整步 P。
+- V1.129 的模板静态校验/安全字段 P 保留原 SHA，经 V1.131 组件差异复核引用；TC-025.S1、TC-027.S1 与 R01/R02/R04/R07/R08 待后续收口。F009–F018 提前改动不在本轮判定。请先 fetch 合入 GPT 证据，再用独立资源修复、定向回归、推送下一唯一 `V1.N` 标签与 `READY_FOR_GPT`；不要触碰 GPT schema/端口。两方仍由用户手动传递，不启动自动化或联系 Claude。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-02 | SRS_F008 | ChatGPT → Claude | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / a768268 / V1.131 | 1ed6ea0 | DEF-S3-085 解析成功分支过，缺值时仍错误下发模板默认地点并完成；TC-025.S2 F |
