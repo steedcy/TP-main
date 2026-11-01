@@ -24,7 +24,8 @@ class CoreScenarioChannelPolicyTest {
         Map<String, Object> flightBoard = Map.of("deviceTypeCode", "SIMULATOR", "simulatedDeviceType", "FLIGHT_DELAY_BOARD",
                 "capabilities", List.of("CAP_FLIGHT_UPDATE", "CAP_INFO_DISPLAY"));
         Map<String, Object> displayStep = Map.of("stepSeq", 1, "stepGoal", "展示变更", "capabilityType", "CAP_INFO_DISPLAY",
-                "completionCondition", "展示成功", "inputParams", Map.of());
+                "precondition", "候选设备在线且空闲", "completionCondition", "展示成功",
+                "failureHandling", "重试一次或转人工处理", "inputParams", Map.of());
         PlanValidationResult result = validation.validate(List.of(displayStep), List.of(flightBoard), null, "FLIGHT_CHANGE_RESPONSE");
         assertTrue(result.isAllPassed(), "错误物理渠道不能承接展示，但可保留为待标记未覆盖的步骤");
         validation.requireCoreScenarioCoverage(List.of(displayStep), "FLIGHT_CHANGE_RESPONSE", result);
@@ -59,7 +60,8 @@ class CoreScenarioChannelPolicyTest {
 
     private Map<String, Object> flightStep(int seq, String capability) {
         return Map.of("stepSeq", seq, "stepGoal", "发布虚构航班信息", "capabilityType", capability,
-                "completionCondition", "SUCCESS", "inputParams", Map.of());
+                "precondition", "候选设备在线且空闲", "completionCondition", "SUCCESS",
+                "failureHandling", "重试一次或转人工处理", "inputParams", Map.of());
     }
 
     @Test

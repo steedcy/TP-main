@@ -219,6 +219,15 @@ public class TaskService {
             throw new BusinessException(ErrorCode.TASK_STATUS_NOT_ALLOWED, "任务当前状态不是待人工处理，不可执行该操作");
         }
 
+        // 三轮补充后仍缺关键信息进入待人工处理时，关键信息仍未确认：转基线/重试规划会让模板默认值
+        // （如默认轮椅说明、测试登机口）顶替操作员未确认的旅客类型或起终点，须先拒绝，只能置为失败（DEF-S3-063、R04）
+        if (("SWITCH_TO_BASELINE".equals(action) || "RETRY_PLANNING".equals(action))
+                && !fromJsonQuestions(task.getMissingInfoQuestions()).isEmpty()) {
+            throw new BusinessException(ErrorCode.PARAM_MISSING,
+                    "任务仍有未补充的关键信息，不能转基线或重试规划，请先补齐或将任务置为失败: "
+                            + fromJsonQuestions(task.getMissingInfoQuestions()));
+        }
+
         switch (action) {
             case "SWITCH_TO_BASELINE", "RETRY_PLANNING" -> {
                 task.setStatus(TaskStatus.PLANNING);

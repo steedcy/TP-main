@@ -94,7 +94,7 @@ public class ContextSnapshotService {
             location.put("zone", device.getAreaCode());
             agentView.put("location", location);
             agentView.put("workload", agent.getWorkStatus());
-            agentView.put("availableUntil", null);
+            agentView.put("availableUntil", availableAt(agent));
             agentViews.add(agentView);
         }
 
@@ -113,6 +113,47 @@ public class ContextSnapshotService {
         snapshot.setGeneratedAt(LocalDateTime.now());
         contextSnapshotMapper.insert(snapshot);
         return snapshot;
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private TaskStepAssignmentMapper assignmentMapper;
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private PlanVersionMapper planVersionMapper;
+    @org.springframework.beans.factory.annotation.Value("${app.task.step-timeout-default-seconds:60}")
+    private int defaultStepTimeoutSeconds = 60;
+
+    /**
+     * 代理预计可用时间（SRS_F011.R01、DEF-S3-031）：空闲=当前时刻；忙碌=其进行中步骤的下发时刻加该步骤超时，
+     * 即最迟到此时刻未收到反馈会判超时并释放；没有进行中步骤的忙碌代理（占用待核查等）无法预测，返回null。
+     */
+    private String availableAt(DeviceAgent agent) {
+        LocalDateTime now = LocalDateTime.now();
+        if (!"BUSY".equals(agent.getWorkStatus())) return now.toString();
+        if (assignmentMapper == null || agent.getId() == null) return null;
+        LocalDateTime latest = null;
+        for (TaskStepAssignment a : assignmentMapper.findActiveByAgentId(agent.getId())) {
+            if (!"EXECUTING".equals(a.getStepStatus()) || a.getDispatchedAt() == null) continue;
+            LocalDateTime until = a.getDispatchedAt().plusSeconds(stepTimeout(a));
+            if (latest == null || until.isAfter(latest)) latest = until;
+        }
+        if (latest == null) return null;
+        return (latest.isBefore(now) ? now : latest).toString();
+    }
+
+    @SuppressWarnings("unchecked")
+    private int stepTimeout(TaskStepAssignment assignment) {
+        if (planVersionMapper == null || assignment.getPlanVersionId() == null) return defaultStepTimeoutSeconds;
+        try {
+            PlanVersion plan = planVersionMapper.findById(assignment.getPlanVersionId()).orElseThrow();
+            List<Map<String, Object>> steps = new ObjectMapper().readValue(plan.getPlanSteps(), List.class);
+            return steps.stream()
+                    .filter(step -> assignment.getStepSeq() != null
+                            && assignment.getStepSeq().equals(((Number) step.get("stepSeq")).intValue()))
+                    .map(step -> ((Number) step.getOrDefault("stepTimeout", defaultStepTimeoutSeconds)).intValue())
+                    .findFirst().orElse(defaultStepTimeoutSeconds);
+        } catch (Exception e) {
+            return defaultStepTimeoutSeconds;
+        }
     }
 
     /** 统计指定能力类型的在线候选代理数量（供B6监督判定的资源冲突临界规则使用） */

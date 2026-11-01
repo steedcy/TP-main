@@ -76,9 +76,20 @@ public class PlanValidationService {
             if (!seenStepSeq.add(stepSeq)) {
                 result.failStructure("步骤序号重复，可能存在循环引用", stepSeq, "ERR_STEP_DUPLICATE_SEQ");
             }
-            for (String field : List.of("stepGoal", "capabilityType", "completionCondition")) {
+            // 步骤六项（SRS_F012.R04）：目标、能力、输入参数、前置条件、完成条件、失败处理，缺任一项都不得冻结
+            for (String field : List.of("stepGoal", "capabilityType", "precondition", "completionCondition", "failureHandling")) {
                 if (isBlank(step.get(field))) {
                     result.failStructure("步骤字段不完整，缺少: " + field, stepSeq, "ERR_STEP_FIELD_MISSING");
+                }
+            }
+            if (!(step.get("inputParams") instanceof Map<?, ?>)) {
+                result.failStructure("步骤字段不完整，缺少: inputParams（须为对象，可为空对象）", stepSeq, "ERR_STEP_FIELD_MISSING");
+            }
+            // 不支持循环、动态代码生成执行和无限轮次协商（SRS_F012.R03）：文字字段里的循环/动态代码/无限协商也拒绝
+            for (String field : List.of("stepGoal", "precondition", "completionCondition", "failureHandling")) {
+                String hit = unsupportedControlFlow(step.get(field));
+                if (hit != null) {
+                    result.failStructure("步骤" + field + "含不支持的控制流或动态执行内容（" + hit + "）", stepSeq, "ERR_STEP_LOOP_DETECTED");
                 }
             }
             Object paramMapping = step.get("inputParams");
@@ -242,6 +253,27 @@ public class PlanValidationService {
                             String.valueOf(agent.get("deviceTypeCode")), String.valueOf(agent.get("simulatedDeviceType")));
                 })
                 .count();
+    }
+
+    /**
+     * 循环、动态代码执行、无限重试/协商的文字表述。只匹配明确的控制流写法，正常业务描述
+     * （如“重试一次”“等待设备就绪”“展示直到完成”）不命中。
+     */
+    private static final List<java.util.regex.Pattern> CONTROL_FLOW = List.of(
+            java.util.regex.Pattern.compile("\\b(while|for)\\s*\\(", java.util.regex.Pattern.CASE_INSENSITIVE),
+            java.util.regex.Pattern.compile("\\bdo\\s*\\{", java.util.regex.Pattern.CASE_INSENSITIVE),
+            java.util.regex.Pattern.compile("\\b(eval|exec|exec\\w*|system|runtime\\.getruntime|new\\s+function|import\\s+os|subprocess)\\s*\\(", java.util.regex.Pattern.CASE_INSENSITIVE),
+            java.util.regex.Pattern.compile("\\b(forever|infinite(ly)?|endless(ly)?|indefinite(ly)?|unlimited\\s+(retr(y|ies)|rounds?|loops?))\\b", java.util.regex.Pattern.CASE_INSENSITIVE),
+            java.util.regex.Pattern.compile("\\b(loop|repeat)\\s+(until|forever|endlessly)\\b", java.util.regex.Pattern.CASE_INSENSITIVE),
+            java.util.regex.Pattern.compile("(无限|无穷|永远|不断|一直)\\s*(循环|重复|重试|协商|询问|轮次)|循环执行|死循环|无限轮|动态生成代码|生成并执行代码|执行脚本"));
+
+    private String unsupportedControlFlow(Object value) {
+        if (!(value instanceof String text) || text.isBlank()) return null;
+        for (java.util.regex.Pattern pattern : CONTROL_FLOW) {
+            java.util.regex.Matcher m = pattern.matcher(text);
+            if (m.find()) return m.group().trim();
+        }
+        return null;
     }
 
     private boolean isBlank(Object value) {

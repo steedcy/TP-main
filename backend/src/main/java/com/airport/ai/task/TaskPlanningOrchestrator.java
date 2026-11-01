@@ -362,9 +362,8 @@ public class TaskPlanningOrchestrator {
             normalized.putIfAbsent("stepGoal", "执行" + normalized.get("capabilityType") + "能力（基线模板步骤）");
             normalized.putIfAbsent("precondition", "候选设备在线且空闲");
             normalized.putIfAbsent("failureHandling", "重试一次或转人工处理");
-            if (!normalized.containsKey("inputParams") && normalized.get("paramMapping") != null) {
-                normalized.put("inputParams", Map.of());
-            }
+            // 六项字段完整性是结构硬校验（SRS_F012.R04）：无参数映射的基线步骤也要有inputParams（空对象）
+            normalized.putIfAbsent("inputParams", Map.of());
             return normalized;
         }).toList();
     }
