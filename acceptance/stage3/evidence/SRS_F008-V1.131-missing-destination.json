@@ -1,0 +1,205 @@
+{
+  "observedAt": "2026-11-01T23:40:32.512833+00:00",
+  "version": "V1.131",
+  "codeSha": "a7682684a151935f46ab08c6da02442bdc6de552",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "port": 18129,
+  "modelPort": 18117,
+  "marker": "G131_NO_PARSE595921",
+  "expectedDestination": "F2_SERVICE_POINT",
+  "templateDefault": "F2_TEST_GATE",
+  "submittedSceneParams": {},
+  "definition": {
+    "id": 9,
+    "code": "EXT_D96EA887"
+  },
+  "template": {
+    "id": 17,
+    "statusBeforeSeed": "DRAFT",
+    "seededStatus": "ENABLED"
+  },
+  "submit": {
+    "http": 200,
+    "code": 200,
+    "message": "success",
+    "data": {
+      "id": 40,
+      "taskCode": "TASK-20261102-0040",
+      "taskGoal": "Guide virtual passenger to F2_SERVICE_POINT G131_NO_PARSE595921",
+      "taskFamily": "EXT_D96EA887",
+      "sceneParams": {},
+      "goalParsingResult": {
+        "completionCondition": "routeGenerated=true",
+        "origin": "F2_TEST_GATE",
+        "destination": null,
+        "originalGoal": "Guide virtual passenger to F2_SERVICE_POINT G131_NO_PARSE595921",
+        "constraints": []
+      },
+      "status": "PLANNING",
+      "currentPlanVersionId": null,
+      "replanUsed": false,
+      "replanningReason": null,
+      "manualTerminateReason": null,
+      "failureReason": null,
+      "missingInfoQuestions": null,
+      "downgradeReason": null,
+      "isDryRun": false,
+      "createdAt": "2026-11-02T07:40:33.0095304",
+      "updatedAt": "2026-11-02T07:40:33.0095304",
+      "createdBy": "oprator"
+    }
+  },
+  "task": {
+    "id": 40,
+    "status": "COMPLETED",
+    "sceneParams": {
+      "targetLocation": "F2_TEST_GATE"
+    },
+    "goalParsingResult": {
+      "completionCondition": "routeGenerated=true",
+      "origin": "F2_TEST_GATE",
+      "destination": null,
+      "originalGoal": "Guide virtual passenger to F2_SERVICE_POINT G131_NO_PARSE595921",
+      "constraints": []
+    },
+    "downgradeReason": "候选计划生成失败或模型服务不可用",
+    "failureReason": null
+  },
+  "plans": [
+    {
+      "id": 38,
+      "versionNo": 1,
+      "source": "BASELINE_TEMPLATE",
+      "baselineTemplateId": 17,
+      "snapshotId": "CTX-20261102-0019",
+      "planSteps": [
+        {
+          "stepSeq": 1,
+          "capabilityType": "CAP_NAVIGATION",
+          "paramMapping": [
+            {
+              "target": "targetLocation",
+              "source": "TEMPLATE_INPUT.targetLocation"
+            }
+          ],
+          "stepTimeout": 60,
+          "completionCondition": "routeGenerated=true",
+          "stepGoal": "执行CAP_NAVIGATION能力（基线模板步骤）",
+          "precondition": "候选设备在线且空闲",
+          "failureHandling": "重试一次或转人工处理",
+          "inputParams": {}
+        }
+      ],
+      "structureCheckResult": "PASS",
+      "capabilityCheckResult": "PASS",
+      "constraintCheckResult": "PASS",
+      "validationErrors": [],
+      "riskLevel": null,
+      "riskReasonCode": null,
+      "judgmentBasis": null,
+      "confidence": null,
+      "ruleSetVersion": null,
+      "frozenAt": "2026-11-02T07:40:33.093303",
+      "createdAt": "2026-11-02T07:40:33.090721"
+    }
+  ],
+  "assignments": [
+    {
+      "id": 38,
+      "stepSeq": 1,
+      "deviceAgentCode": "AGT-803437A3",
+      "commandId": "CMD-20261102074033-8191EB91",
+      "stepStatus": "COMPLETED",
+      "retryCount": 0,
+      "executionResult": "SUCCESS",
+      "reasonCode": "DEVICE_SUCCESS",
+      "outputParams": {
+        "routeGenerated": true,
+        "waypointCount": 11,
+        "estimatedDuration": 241,
+        "estimatedDistance": 238.0
+      },
+      "dispatchedAt": "2026-11-02T07:40:33.220119",
+      "feedbackAt": "2026-11-02T07:40:34.453008",
+      "rejectedAgentIds": []
+    }
+  ],
+  "events": [
+    {
+      "eventType": "GOAL_SUBMITTED",
+      "reasonCode": null,
+      "eventDetail": null
+    },
+    {
+      "eventType": "GOAL_CLARIFIED",
+      "reasonCode": null,
+      "eventDetail": null
+    },
+    {
+      "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+      "reasonCode": null,
+      "eventDetail": null
+    },
+    {
+      "eventType": "PLAN_GENERATED",
+      "reasonCode": "ERR_PLANNING_MODEL_FAILED",
+      "eventDetail": null
+    },
+    {
+      "eventType": "BASELINE_INPUT_DEFAULTED",
+      "reasonCode": "WARN_LOCATION_DEFAULTED",
+      "eventDetail": null
+    },
+    {
+      "eventType": "BASELINE_DOWNGRADED",
+      "reasonCode": null,
+      "eventDetail": null
+    },
+    {
+      "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+      "reasonCode": null,
+      "eventDetail": null
+    },
+    {
+      "eventType": "AGENT_ASSIGNED",
+      "reasonCode": null,
+      "eventDetail": null
+    },
+    {
+      "eventType": "STEP_DISPATCHED",
+      "reasonCode": null,
+      "eventDetail": null
+    },
+    {
+      "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+      "reasonCode": "DEVICE_SUCCESS",
+      "eventDetail": null
+    },
+    {
+      "eventType": "STEP_COMPLETED",
+      "reasonCode": null,
+      "eventDetail": null
+    },
+    {
+      "eventType": "TASK_COMPLETED",
+      "reasonCode": null,
+      "eventDetail": null
+    }
+  ],
+  "commands": [
+    {
+      "command_type": "TASK_ACCEPT",
+      "command_payload": "{\"commandId\":\"CMD-20261102074033-8191EB91\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261102-0040\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\"},\"issuedAt\":\"2026-11-02T07:40:33.129916+08:00\",\"deadline\":\"2026-11-02T07:41:33.129916+08:00\"}"
+    },
+    {
+      "command_type": "EXECUTE_CAPABILITY",
+      "command_payload": "{\"commandId\":\"CMD-20261102074033-DC55830C\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261102-0040\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\"},\"issuedAt\":\"2026-11-02T07:40:33.2348899+08:00\",\"deadline\":\"2026-11-02T07:41:33.2348899+08:00\"}"
+    }
+  ],
+  "observation": {
+    "goalParsedDestination": null,
+    "boundSceneTarget": "F2_TEST_GATE",
+    "completed": true
+  },
+  "cleanupTemplateStatus": "DISABLED"
+}

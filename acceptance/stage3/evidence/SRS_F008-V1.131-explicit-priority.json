@@ -1,0 +1,225 @@
+{
+  "observedAt": "2026-11-01T23:40:04.617873+00:00",
+  "version": "V1.131",
+  "codeSha": "a7682684a151935f46ab08c6da02442bdc6de552",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "port": 18129,
+  "modelPort": 18117,
+  "marker": "G129PARSE77361d",
+  "expectedDestination": "F2_SERVICE_POINT",
+  "templateDefault": "F2_TEST_GATE",
+  "submittedSceneParams": {
+    "targetLocation": "F2_ALT_POINT"
+  },
+  "definition": {
+    "id": 8,
+    "code": "EXT_4499587C"
+  },
+  "template": {
+    "id": 16,
+    "statusBeforeSeed": "DRAFT",
+    "seededStatus": "ENABLED"
+  },
+  "submit": {
+    "http": 200,
+    "code": 200,
+    "message": "success",
+    "data": {
+      "id": 39,
+      "taskCode": "TASK-20261102-0039",
+      "taskGoal": "Guide virtual passenger to F2_SERVICE_POINT G129PARSE77361d",
+      "taskFamily": "EXT_4499587C",
+      "sceneParams": {
+        "targetLocation": "F2_ALT_POINT"
+      },
+      "goalParsingResult": {
+        "completionCondition": "routeGenerated=true",
+        "origin": "F2_TEST_GATE",
+        "destination": "F2_SERVICE_POINT",
+        "originalGoal": "Guide virtual passenger to F2_SERVICE_POINT G129PARSE77361d",
+        "constraints": []
+      },
+      "status": "PLANNING",
+      "currentPlanVersionId": null,
+      "replanUsed": false,
+      "replanningReason": null,
+      "manualTerminateReason": null,
+      "failureReason": null,
+      "missingInfoQuestions": null,
+      "downgradeReason": null,
+      "isDryRun": false,
+      "createdAt": "2026-11-02T07:40:04.8914526",
+      "updatedAt": "2026-11-02T07:40:04.8914526",
+      "createdBy": "oprator"
+    }
+  },
+  "task": {
+    "id": 39,
+    "status": "PENDING_MANUAL",
+    "sceneParams": {
+      "targetLocation": "F2_ALT_POINT"
+    },
+    "goalParsingResult": {
+      "completionCondition": "routeGenerated=true",
+      "origin": "F2_TEST_GATE",
+      "destination": "F2_SERVICE_POINT",
+      "originalGoal": "Guide virtual passenger to F2_SERVICE_POINT G129PARSE77361d",
+      "constraints": []
+    },
+    "downgradeReason": "候选计划生成失败或模型服务不可用",
+    "failureReason": "基线降级任务执行异常且恢复失败，按业务规则不再二次自动降级"
+  },
+  "plans": [
+    {
+      "id": 37,
+      "versionNo": 1,
+      "source": "BASELINE_TEMPLATE",
+      "baselineTemplateId": 16,
+      "snapshotId": "CTX-20261102-0017",
+      "planSteps": [
+        {
+          "stepSeq": 1,
+          "capabilityType": "CAP_NAVIGATION",
+          "paramMapping": [
+            {
+              "target": "targetLocation",
+              "source": "TEMPLATE_INPUT.targetLocation"
+            }
+          ],
+          "stepTimeout": 60,
+          "completionCondition": "routeGenerated=true",
+          "stepGoal": "执行CAP_NAVIGATION能力（基线模板步骤）",
+          "precondition": "候选设备在线且空闲",
+          "failureHandling": "重试一次或转人工处理",
+          "inputParams": {}
+        }
+      ],
+      "structureCheckResult": "PASS",
+      "capabilityCheckResult": "PASS",
+      "constraintCheckResult": "PASS",
+      "validationErrors": [],
+      "riskLevel": null,
+      "riskReasonCode": null,
+      "judgmentBasis": null,
+      "confidence": null,
+      "ruleSetVersion": null,
+      "frozenAt": "2026-11-02T07:40:04.933496",
+      "createdAt": "2026-11-02T07:40:04.93121"
+    }
+  ],
+  "assignments": [
+    {
+      "id": 37,
+      "stepSeq": 1,
+      "deviceAgentCode": "AGT-803437A3",
+      "commandId": "CMD-20261102074004-E6CD72A8",
+      "stepStatus": "FAILED",
+      "retryCount": 1,
+      "executionResult": "FAILED",
+      "reasonCode": "INVALID_CAPABILITY_INPUT",
+      "outputParams": {
+        "message": "目标位置未标定: F2_ALT_POINT"
+      },
+      "dispatchedAt": "2026-11-02T07:40:05.569038",
+      "feedbackAt": "2026-11-02T07:40:06.154193",
+      "rejectedAgentIds": []
+    }
+  ],
+  "events": [
+    {
+      "eventType": "GOAL_SUBMITTED",
+      "reasonCode": null,
+      "eventDetail": null
+    },
+    {
+      "eventType": "GOAL_CLARIFIED",
+      "reasonCode": null,
+      "eventDetail": null
+    },
+    {
+      "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+      "reasonCode": null,
+      "eventDetail": null
+    },
+    {
+      "eventType": "PLAN_GENERATED",
+      "reasonCode": "ERR_PLANNING_MODEL_FAILED",
+      "eventDetail": null
+    },
+    {
+      "eventType": "BASELINE_DOWNGRADED",
+      "reasonCode": null,
+      "eventDetail": null
+    },
+    {
+      "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+      "reasonCode": null,
+      "eventDetail": null
+    },
+    {
+      "eventType": "AGENT_ASSIGNED",
+      "reasonCode": null,
+      "eventDetail": null
+    },
+    {
+      "eventType": "STEP_DISPATCHED",
+      "reasonCode": null,
+      "eventDetail": null
+    },
+    {
+      "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+      "reasonCode": "INVALID_CAPABILITY_INPUT",
+      "eventDetail": null
+    },
+    {
+      "eventType": "STEP_RETRY_DISPATCHED",
+      "reasonCode": "INVALID_CAPABILITY_INPUT",
+      "eventDetail": null
+    },
+    {
+      "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+      "reasonCode": "INVALID_CAPABILITY_INPUT",
+      "eventDetail": null
+    },
+    {
+      "eventType": "STEP_FAILED",
+      "reasonCode": "INVALID_CAPABILITY_INPUT",
+      "eventDetail": null
+    },
+    {
+      "eventType": "EXCEPTION_DETECTED",
+      "reasonCode": "STEP_FAILED",
+      "eventDetail": null
+    },
+    {
+      "eventType": "EXCEPTION_RECOVERY_FAILED",
+      "reasonCode": "STEP_FAILED",
+      "eventDetail": null
+    },
+    {
+      "eventType": "TASK_PENDING_MANUAL",
+      "reasonCode": "STEP_FAILED",
+      "eventDetail": null
+    }
+  ],
+  "commands": [
+    {
+      "command_type": "TASK_ACCEPT",
+      "command_payload": "{\"commandId\":\"CMD-20261102074004-E6CD72A8\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261102-0039\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_ALT_POINT\",\"routePreference\":\"BARRIER_FREE\"},\"issuedAt\":\"2026-11-02T07:40:04.9532674+08:00\",\"deadline\":\"2026-11-02T07:41:04.9532674+08:00\"}"
+    },
+    {
+      "command_type": "EXECUTE_CAPABILITY",
+      "command_payload": "{\"commandId\":\"CMD-20261102074004-70140E87\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261102-0039\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_ALT_POINT\",\"routePreference\":\"BARRIER_FREE\"},\"issuedAt\":\"2026-11-02T07:40:05.0084435+08:00\",\"deadline\":\"2026-11-02T07:41:05.0084435+08:00\"}"
+    },
+    {
+      "command_type": "EXECUTE_CAPABILITY",
+      "command_payload": "{\"commandId\":\"CMD-20261102074004-70140E87\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":1,\"taskId\":\"TASK-20261102-0039\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_ALT_POINT\",\"routePreference\":\"BARRIER_FREE\"},\"issuedAt\":\"2026-11-02T07:40:05.5804628+08:00\",\"deadline\":\"2026-11-02T07:41:05.5804628+08:00\"}"
+    }
+  ],
+  "observation": {
+    "goalParsedDestination": "F2_SERVICE_POINT",
+    "boundSceneTarget": "F2_ALT_POINT",
+    "completed": false
+  },
+  "cleanupTemplateStatus": "DISABLED"
+}
