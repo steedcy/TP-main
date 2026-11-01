@@ -70,6 +70,28 @@
             </template>
           </a-alert>
 
+          <!-- 基线降级：原计划与所用模板的关联入口，以及目标/能力/五步限制的逐项匹配依据（DEF-S3-067） -->
+          <template v-if="pv.source === 'BASELINE_TEMPLATE'">
+            <a-descriptions bordered :column="2" size="small" style="margin-top: 8px" data-testid="baseline-template-ref">
+              <a-descriptions-item label="所用基线模板">
+                <router-link v-if="authStore.role === 'CONFIG_ADMIN' && pv.baselineTemplateId" to="/baseline-templates">
+                  {{ templateRefOf(pv)?.name || ('模板#' + pv.baselineTemplateId) }}
+                </router-link>
+                <span v-else>{{ templateRefOf(pv)?.name || ('模板#' + pv.baselineTemplateId) }}</span>
+              </a-descriptions-item>
+              <a-descriptions-item label="模板版本（冻结时）">
+                {{ templateRefOf(pv)?.version || '—' }}
+                <span v-if="templateRefOf(pv)?.currentVersion && templateRefOf(pv).currentVersion !== templateRefOf(pv).version"
+                      style="color: #999">（模板当前为 {{ templateRefOf(pv).currentVersion }}）</span>
+              </a-descriptions-item>
+              <a-descriptions-item label="降级原因" :span="2" v-if="task.downgradeReason">{{ task.downgradeReason }}</a-descriptions-item>
+            </a-descriptions>
+            <a-table :dataSource="matchRowsOf(pv)" size="small" :pagination="false" rowKey="item" style="margin-top: 8px"
+                     :columns="[{ title: '匹配项', dataIndex: 'item' }, { title: '任务要求', dataIndex: 'expected' },
+                                { title: '模板/计划', dataIndex: 'actual' }, { title: '结果', dataIndex: 'ok',
+                                  customRender: ({ text }) => text ? '匹配' : '不匹配' }]" />
+          </template>
+
           <p style="margin-top: 8px"><b>候选步骤：</b></p>
           <a-table :dataSource="pv.planSteps" :columns="stepColumns" rowKey="stepSeq" size="small" :pagination="false" />
         </a-tab-pane>
@@ -77,10 +99,18 @@
     </a-card>
 
     <!-- 对应5.5.1步骤设备匹配与任务接受、5.5.2业务指令下发与执行反馈 -->
-    <a-card title="步骤设备分配与执行情况" style="margin-top: 16px" v-if="stepAssignments.length">
+    <a-card title="步骤设备分配与执行情况" id="step-assignments" style="margin-top: 16px" v-if="stepAssignments.length">
+      <div style="margin-bottom: 12px" data-testid="task-progress">
+        <b>执行进度：</b>{{ progressLabel }}
+        <a-progress :percent="progress.percent" size="small" style="max-width: 360px"
+                    :status="progress.failed ? 'exception' : (progress.percent === 100 ? 'success' : 'active')" />
+      </div>
       <a-table :dataSource="stepAssignments" :columns="stepAssignmentColumns" rowKey="id" size="small" :pagination="false">
         <template #bodyCell="{ column, record }">
-          <template v-if="column.dataIndex === 'stepStatus'">
+          <template v-if="column.dataIndex === 'stepSeq'">
+            <span :id="`step-${record.stepSeq}`" :style="highlightStep === record.stepSeq ? 'background:#fffbe6;padding:0 4px' : ''">{{ record.stepSeq }}</span>
+          </template>
+          <template v-else-if="column.dataIndex === 'stepStatus'">
             <a-tag>{{ stepStatusLabel(record.stepStatus) }}</a-tag>
           </template>
         </template>
@@ -149,10 +179,13 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '../../store/auth'
 import { message } from 'ant-design-vue'
+import { taskProgress, progressText } from '../../utils/taskProgress'
+import { templateReference, matchBasis } from '../../utils/downgradeMatch'
+import { getBaselineTemplate } from '../../api/baseline'
 import { getTask, getTaskEvents, getPlanVersions, getContextSnapshots, getStepAssignments, clarifyTask, manualAction, terminateTask } from '../../api/task'
 
 const authStore = useAuthStore()
@@ -165,6 +198,8 @@ const planVersions = ref([])
 const contextSnapshots = ref([])
 const stepAssignments = ref([])
 const currentSteps = computed(() => planVersions.value.find(p => p.id === task.value?.currentPlanVersionId)?.planSteps || [])
+const progress = computed(() => taskProgress(currentSteps.value, stepAssignments.value))
+const progressLabel = computed(() => progressText(progress.value))
 const baggageResult = computed(() => stepAssignments.value
   .find(a => currentSteps.value.find(s => s.stepSeq === a.stepSeq)?.capabilityType === 'CAP_BAGGAGE_MEASURE')?.outputParams || null)
 const flightChannelResults = computed(() => [
@@ -178,6 +213,8 @@ const flightChannelResults = computed(() => [
     ? assignments.map(flightAssignmentSummary).join('；')
     : '未覆盖（计划缺少该渠道）' }
 }))
+// 从异常列表跳转时带?step=n，滚动并高亮对应步骤（DEF-S3-064）
+const highlightStep = ref(route.query.step ? Number(route.query.step) : null)
 const terminateVisible = ref(false)
 const terminateReason = ref('')
 const confirmed = ref(false)
@@ -250,6 +287,30 @@ async function fetchAll() {
   planVersions.value = planResp.data
   contextSnapshots.value = snapResp.data
   stepAssignments.value = stepResp.data
+  await loadTemplates(planResp.data)
+  scrollToHighlightedStep()
+}
+
+// 基线计划版本用到的模板详情（只取一次）；取不到时页面仍显示模板编号，匹配依据标为不匹配而不是默认通过
+const templates = ref({})
+async function loadTemplates(versions) {
+  const ids = [...new Set((versions || []).filter(v => v.source === 'BASELINE_TEMPLATE' && v.baselineTemplateId)
+    .map(v => v.baselineTemplateId))].filter(id => !(id in templates.value))
+  await Promise.all(ids.map(async (id) => {
+    try { templates.value = { ...templates.value, [id]: (await getBaselineTemplate(id)).data } }
+    catch (e) { templates.value = { ...templates.value, [id]: null } }
+  }))
+}
+const templateRefOf = (pv) => templateReference(pv, templates.value[pv.baselineTemplateId])
+const matchRowsOf = (pv) => matchBasis(task.value, pv, templates.value[pv.baselineTemplateId])
+
+let scrolled = false
+function scrollToHighlightedStep() {
+  if (scrolled || highlightStep.value == null) return
+  nextTick(() => {
+    const el = document.getElementById(`step-${highlightStep.value}`)
+    if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); scrolled = true }
+  })
 }
 
 async function handleManualAction(action) {

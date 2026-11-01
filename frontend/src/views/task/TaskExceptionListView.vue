@@ -7,18 +7,36 @@
       <a-select-option value="STEP_FAILED">步骤失败</a-select-option>
       <a-select-option value="REPLAN_FAILED">重新规划失败</a-select-option>
     </a-select>
-    <a-select v-model:value="filterStatus" placeholder="处置状态" style="width: 150px" allow-clear @change="fetchList">
+    <a-select v-model:value="filterStatus" placeholder="处置状态" style="width: 150px" allow-clear @change="onStatusChange">
       <a-select-option value="PENDING">待处置</a-select-option>
       <a-select-option value="PROCESSING">处置中</a-select-option>
       <a-select-option value="RESOLVED">已处置</a-select-option>
       <a-select-option value="IGNORED">已忽略</a-select-option>
     </a-select>
+    <!-- 待处置与历史归档分开看：默认只显示待处置/处置中，已处置、已忽略进入历史（DEF-S3-064） -->
+    <a-radio-group v-model:value="scope" button-style="solid" @change="fetchList" data-testid="exception-scope">
+      <a-radio-button value="active">待处理（{{ counts.active }}）</a-radio-button>
+      <a-radio-button value="history">历史归档（{{ counts.history }}）</a-radio-button>
+      <a-radio-button value="all">全部（{{ counts.all }}）</a-radio-button>
+    </a-radio-group>
   </a-space>
 
   <a-table :dataSource="exceptions" :columns="columns" rowKey="id" size="small">
     <template #bodyCell="{ column, record }">
       <template v-if="column.dataIndex === 'taskId'">
         <router-link :to="`/tasks/${record.taskId}`">任务#{{ record.taskId }}</router-link>
+      </template>
+      <template v-else-if="column.dataIndex === 'stepSeq'">
+        <router-link v-if="record.stepSeq != null" :to="{ path: `/tasks/${record.taskId}`, query: { step: record.stepSeq } }">
+          步骤{{ record.stepSeq }}
+        </router-link>
+        <span v-else>—</span>
+      </template>
+      <template v-else-if="column.dataIndex === 'reasonCode'">
+        <a-tooltip v-if="record.reasonCode" :title="record.reasonCode">
+          <span class="reason-code">{{ record.reasonCode }}</span>
+        </a-tooltip>
+        <span v-else>—</span>
       </template>
       <template v-else-if="column.dataIndex === 'exceptionType'">
         {{ typeLabel(record.exceptionType) }}
@@ -34,15 +52,26 @@
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { listTaskExceptions } from '../../api/task'
+import { inScope, scopeCounts, scopeForStatus } from '../../utils/exceptionScope'
 
 const exceptions = ref([])
 const filterType = ref(undefined)
 const filterStatus = ref(useRoute().query.exceptionStatus || undefined)
+// 默认只看待处理；总览带状态跳转时，范围跟着状态走
+const scope = ref(scopeForStatus(filterStatus.value))
+const counts = ref({ active: 0, history: 0, all: 0 })
+
+function onStatusChange() {
+  // 选了具体处置状态就切到对应范围，避免“选了已处置却因范围为待处理而什么都看不到”
+  if (filterStatus.value) scope.value = scopeForStatus(filterStatus.value)
+  fetchList()
+}
 
 const columns = [
   { title: '任务', dataIndex: 'taskId' },
   { title: '步骤', dataIndex: 'stepSeq' },
   { title: '异常类型', dataIndex: 'exceptionType' },
+  { title: '原因码', dataIndex: 'reasonCode', width: 220, ellipsis: true },
   { title: '发生时间', dataIndex: 'occurredAt' },
   { title: '首次恢复动作', dataIndex: 'recoveryAction' },
   { title: '恢复结果', dataIndex: 'recoveryResult' },
@@ -68,7 +97,9 @@ function statusColor(status) {
 
 async function fetchList() {
   const resp = await listTaskExceptions({ exceptionType: filterType.value, exceptionStatus: filterStatus.value })
-  exceptions.value = resp.data
+  const all = resp.data || []
+  counts.value = scopeCounts(all)
+  exceptions.value = all.filter((r) => inScope(r, scope.value))
 }
 
 onMounted(fetchList)
