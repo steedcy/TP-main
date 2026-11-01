@@ -290,13 +290,15 @@ public class ReplanningService {
         try {
             templateSteps = normalizeTemplateSteps(parseSteps(template.getSteps()));
             @SuppressWarnings("unchecked")
-            List<Map<String, Object>> fields = MAPPER.readValue(template.getInputParams(), List.class);
-            Map<String, Object> supplied = new java.util.LinkedHashMap<>();
-            for (Map<String, Object> field : fields) {
-                String name = String.valueOf(field.get("name"));
-                if (scene.containsKey(name)) supplied.put(name, scene.get(name));
+            Map<String, Object> parsedGoal = task.getGoalParsingResult() == null ? Map.of()
+                    : MAPPER.readValue(task.getGoalParsingResult(), Map.class);
+            // 与首次降级同一规则：显式场景参数 > 目标理解解析值 > 模板默认值（DEF-S3-085）
+            TemplateInputBinder.Result bound = TemplateInputBinder.bind(template.getInputParams(), scene, parsedGoal);
+            scene.putAll(bound.values());
+            if (!bound.defaultedLocations().isEmpty()) {
+                taskEventService.append(task.getId(), "BASELINE_INPUT_DEFAULTED", "SYSTEM", "WARN_LOCATION_DEFAULTED",
+                        "任务未提供也未能解析以下地点，使用了模板默认值: " + bound.defaultedLocations());
             }
-            scene.putAll(ParameterValues.materialize(template.getInputParams(), supplied));
         } catch (Exception ex) {
             baselineUnavailable(task, "基线模板步骤或输入无法绑定: " + ex.getMessage());
             return;

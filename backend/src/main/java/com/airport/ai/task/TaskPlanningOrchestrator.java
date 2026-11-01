@@ -251,11 +251,21 @@ public class TaskPlanningOrchestrator {
         try {
             Map<String,Object> scene = task.getSceneParams()==null ? new java.util.LinkedHashMap<>()
                     : new java.util.LinkedHashMap<>(MAPPER.readValue(task.getSceneParams(),Map.class));
-            List<Map<String,Object>> fields=MAPPER.readValue(template.getInputParams(),List.class);
-            Map<String,Object> supplied=new java.util.LinkedHashMap<>();
-            for (var field:fields) if (scene.containsKey(field.get("name"))) supplied.put(String.valueOf(field.get("name")),scene.get(field.get("name")));
-            scene.putAll(com.airport.ai.device.ParameterValues.materialize(template.getInputParams(),supplied));
+            Map<String,Object> parsedGoal = task.getGoalParsingResult()==null ? Map.of()
+                    : MAPPER.readValue(task.getGoalParsingResult(),Map.class);
+            // 显式场景参数 > 目标理解解析值 > 模板默认值（DEF-S3-085）
+            TemplateInputBinder.Result bound = TemplateInputBinder.bind(template.getInputParams(), scene, parsedGoal);
+            scene.putAll(bound.values());
             task.setSceneParams(toJson(scene)); taskMapper.update(task);
+            if (!bound.fromParsedGoal().isEmpty()) {
+                taskEventService.append(taskId, "BASELINE_INPUT_BOUND", "SYSTEM", null,
+                        "基线模板输入取自目标理解解析结果: " + bound.fromParsedGoal());
+            }
+            if (!bound.defaultedLocations().isEmpty()) {
+                // 没有显式值也没有解析值，地点类输入只能用模板默认值：不静默套用，留下可追溯记录
+                taskEventService.append(taskId, "BASELINE_INPUT_DEFAULTED", "SYSTEM", "WARN_LOCATION_DEFAULTED",
+                        "任务未提供也未能解析以下地点，使用了模板默认值: " + bound.defaultedLocations());
+            }
         } catch (Exception ex) {
             toPendingManual(task,"基线模板输入无法绑定: " + ex.getMessage()); return;
         }
