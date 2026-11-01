@@ -86,14 +86,29 @@ public class TaskExceptionService {
         if (canRetry) {
             taskExecutionOrchestrator.retryAssignmentExcluding(task.getId(), task.getCurrentPlanVersionId(),
                     stepSeq, excludeAgentCode);
+            // 重新分配本身可能立即失败并触发嵌套的异常处理（转人工、重规划等）。恢复结果以重新分配之后的
+            // 任务实际状态为准，不能在任务已待人工/终止时再追加“恢复成功”（DEF-S3-066、F015.R08/F018.R09）
+            Task after = taskMapper.findById(taskId).orElse(task);
+            if (isTerminalOrManual(after.getStatus())) {
+                exception.setRecoveryResult("FAILED");
+                exception.setImpactConclusion("候选设备切换后重新分配仍失败，任务已转入" + after.getStatus() + "，恢复未成功");
+                exception.setExceptionStatus("RESOLVED");
+                exception.setResolvedAt(LocalDateTime.now());
+                exception.setResolvedBy("SYSTEM");
+                taskExceptionMapper.update(exception);
+                taskEventService.append(taskId, "EXCEPTION_RECOVERY_FAILED", "SYSTEM", exceptionType,
+                        "恢复动作: 候选设备切换，结果: 失败（重新分配后任务状态为" + after.getStatus() + "）");
+                return;
+            }
             exception.setRecoveryResult("SUCCESS");
             exception.setImpactConclusion("已切换候选设备重新分配，计划可继续执行，不触发重新规划");
             exception.setExceptionStatus("RESOLVED");
             exception.setResolvedAt(LocalDateTime.now());
             exception.setResolvedBy("SYSTEM");
             taskExceptionMapper.update(exception);
-            taskEventService.append(taskId, "EXCEPTION_RECOVERED", "SYSTEM", null,
-                    "恢复动作: 候选设备切换，结果: 成功，步骤" + stepSeq + "已重新分配");
+            taskEventService.append(taskId, "EXCEPTION_RECOVERED", "SYSTEM", exceptionType,
+                    "恢复动作: 候选设备切换，结果: 成功，步骤" + stepSeq + "已重新分配，异常类型: " + exceptionType
+                            + "，影响结论: 计划可继续执行");
             return;
         }
 
@@ -154,7 +169,9 @@ public class TaskExceptionService {
         exception.setExceptionStatus("PROCESSING");
         taskExceptionMapper.update(exception);
 
-        boolean isDowngradedTask = task.getStatus() == TaskStatus.DOWNGRADING;
+        // 降级任务的判断不能只看状态：基线首步被承接后任务已转EXECUTING，状态不再是DOWNGRADING；
+        // 以当前计划版本的来源为准，基线模板计划执行失败恢复穷尽后直接待人工，不再局部重规划（DEF-S3-065、F015.R08）
+        boolean isDowngradedTask = task.getStatus() == TaskStatus.DOWNGRADING || currentPlanIsBaseline(task);
         if (Boolean.TRUE.equals(task.getReplanUsed()) || isDowngradedTask) {
             String reason = isDowngradedTask
                     ? "基线降级任务执行异常且恢复失败，按业务规则不再二次自动降级"
@@ -170,6 +187,15 @@ public class TaskExceptionService {
         taskEventService.append(task.getId(), "REPLANNING_TRIGGERED", "SYSTEM", null,
                 "步骤" + stepSeq + "恢复失败且计划不可继续，重新规划机会未用，触发5.5.4局部重新规划");
         replanningService.replan(task.getId(), stepSeq, exception.getExceptionType() + ": " + exception.getReasonCode());
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private PlanVersionMapper planVersionMapper;
+
+    private boolean currentPlanIsBaseline(Task task) {
+        if (planVersionMapper == null || task.getCurrentPlanVersionId() == null) return false;
+        return planVersionMapper.findById(task.getCurrentPlanVersionId())
+                .map(plan -> "BASELINE_TEMPLATE".equals(plan.getSource())).orElse(false);
     }
 
     private void markUnresolvable(Task task, TaskException exception, String reason) {

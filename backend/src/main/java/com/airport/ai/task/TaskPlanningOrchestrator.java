@@ -310,6 +310,8 @@ public class TaskPlanningOrchestrator {
         task.setFailureReason(reason);
         task.setUpdatedAt(LocalDateTime.now());
         taskMapper.update(task);
+        // 状态转移须在时间线可见（DEF-S3-066、F020.R01）
+        taskEventService.append(task.getId(), "TASK_PENDING_MANUAL", "SYSTEM", "ERR_PLANNING_FAILED", reason);
     }
 
     private void applyValidationResult(PlanVersion planVersion, PlanValidationResult validation) {

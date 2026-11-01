@@ -400,6 +400,8 @@ public class ReplanningService {
         task.setFailureReason(reason);
         task.setUpdatedAt(LocalDateTime.now());
         taskMapper.update(task);
+        // 状态转移须在时间线可见（DEF-S3-066、F015.R08/F020.R01）
+        taskEventService.append(task.getId(), "TASK_PENDING_MANUAL", "SYSTEM", "ERR_REPLAN_FAILED", reason);
     }
 
     @SuppressWarnings("unchecked")
