@@ -1,0 +1,195 @@
+{
+  "observedAt": "2026-11-01T18:28:24.827231+00:00",
+  "version": "V1.129",
+  "codeSha": "bff5f210b69e418dbcaaaea70af0ff09897ab1e6",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "port": 18129,
+  "fixture": "GPT own definition/template; template status seeded ENABLED in GPT schema to reach real manual switch and execution",
+  "marker": "G129F008e4fb42",
+  "steps": [
+    {
+      "fixtureEnable": "seeded own template status ENABLED; no dry-run result claimed"
+    },
+    {
+      "taskFixture": "set own task to PENDING_MANUAL with no outstanding questions for explicit switch"
+    }
+  ],
+  "agent": {
+    "agentId": "AGT-803437A3",
+    "onlineStatus": "ONLINE",
+    "workStatus": "IDLE"
+  },
+  "definition": {
+    "id": 4,
+    "code": "EXT_2AD8B934"
+  },
+  "template": {
+    "id": 12,
+    "templateVersion": "V1.0",
+    "templateStatus": "DRAFT"
+  },
+  "submit": {
+    "http": 503,
+    "code": 4113,
+    "message": "目标理解服务调用超时或不可用: I/O error on POST request for \"http://127.0.0.1:18117/v1/goal/understand\": Connection refused: no further information",
+    "data": null
+  },
+  "before": {
+    "id": 35,
+    "status": "PLANNING",
+    "sceneParams": {
+      "targetLocation": "F2_SERVICE_POINT"
+    },
+    "missingInfoQuestions": null
+  },
+  "switch": {
+    "http": 200,
+    "code": 200,
+    "message": "success",
+    "data": {
+      "id": 35,
+      "taskCode": "TASK-20261102-0035",
+      "taskGoal": "Synthetic airport guide to F2_SERVICE_POINT G129F008e4fb42",
+      "taskFamily": "EXT_2AD8B934",
+      "sceneParams": {
+        "targetLocation": "F2_SERVICE_POINT"
+      },
+      "goalParsingResult": null,
+      "status": "DOWNGRADING",
+      "currentPlanVersionId": 34,
+      "replanUsed": false,
+      "replanningReason": null,
+      "manualTerminateReason": null,
+      "failureReason": null,
+      "missingInfoQuestions": null,
+      "downgradeReason": "运行操作员选择基线模板",
+      "isDryRun": false,
+      "createdAt": "2026-11-02T02:28:25.169088",
+      "updatedAt": "2026-11-02T02:28:25.852796",
+      "createdBy": "oprator"
+    }
+  },
+  "after": {
+    "id": 35,
+    "status": "COMPLETED",
+    "sceneParams": {
+      "targetLocation": "F2_SERVICE_POINT"
+    },
+    "currentPlanVersionId": 34,
+    "downgradeReason": "运行操作员选择基线模板",
+    "failureReason": null
+  },
+  "planVersions": [
+    {
+      "id": 34,
+      "versionNo": 1,
+      "source": "BASELINE_TEMPLATE",
+      "baselineTemplateId": 12,
+      "snapshotId": "CTX-20261102-0011",
+      "planSteps": [
+        {
+          "stepSeq": 1,
+          "capabilityType": "CAP_NAVIGATION",
+          "paramMapping": [
+            {
+              "target": "targetLocation",
+              "source": "TEMPLATE_INPUT.targetLocation"
+            }
+          ],
+          "stepTimeout": 60,
+          "completionCondition": "routeGenerated=true",
+          "stepGoal": "执行CAP_NAVIGATION能力（基线模板步骤）",
+          "precondition": "候选设备在线且空闲",
+          "failureHandling": "重试一次或转人工处理",
+          "inputParams": {}
+        }
+      ],
+      "structureCheckResult": "PASS",
+      "capabilityCheckResult": "PASS",
+      "constraintCheckResult": "PASS",
+      "validationErrors": [],
+      "riskLevel": null,
+      "riskReasonCode": null,
+      "judgmentBasis": null,
+      "confidence": null,
+      "ruleSetVersion": null,
+      "frozenAt": "2026-11-02T02:28:25.850279",
+      "createdAt": "2026-11-02T02:28:25.843746"
+    }
+  ],
+  "assignments": [
+    {
+      "id": 34,
+      "stepSeq": 1,
+      "deviceAgentCode": "AGT-803437A3",
+      "commandId": "CMD-20261102022825-8EA82411",
+      "stepStatus": "COMPLETED",
+      "retryCount": 0,
+      "executionResult": "SUCCESS",
+      "reasonCode": "DEVICE_SUCCESS",
+      "outputParams": {
+        "routeGenerated": true,
+        "waypointCount": 9,
+        "estimatedDuration": 310,
+        "estimatedDistance": 236.0
+      },
+      "dispatchedAt": "2026-11-02T02:28:26.204668",
+      "feedbackAt": "2026-11-02T02:28:27.436385",
+      "rejectedAgentIds": []
+    }
+  ],
+  "events": [
+    {
+      "eventType": "GOAL_SUBMITTED",
+      "reasonCode": null,
+      "eventDetail": null
+    },
+    {
+      "eventType": "GOAL_UNDERSTANDING_FAILED",
+      "reasonCode": "ERR_GOAL_UNDERSTANDING_TIMEOUT",
+      "eventDetail": null
+    },
+    {
+      "eventType": "BASELINE_SWITCH_REQUESTED",
+      "reasonCode": null,
+      "eventDetail": null
+    },
+    {
+      "eventType": "BASELINE_DOWNGRADED",
+      "reasonCode": null,
+      "eventDetail": null
+    },
+    {
+      "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+      "reasonCode": null,
+      "eventDetail": null
+    },
+    {
+      "eventType": "AGENT_ASSIGNED",
+      "reasonCode": null,
+      "eventDetail": null
+    },
+    {
+      "eventType": "STEP_DISPATCHED",
+      "reasonCode": null,
+      "eventDetail": null
+    },
+    {
+      "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+      "reasonCode": "DEVICE_SUCCESS",
+      "eventDetail": null
+    },
+    {
+      "eventType": "STEP_COMPLETED",
+      "reasonCode": null,
+      "eventDetail": null
+    },
+    {
+      "eventType": "TASK_COMPLETED",
+      "reasonCode": null,
+      "eventDetail": null
+    }
+  ],
+  "pass": true,
+  "cleanupTemplateStatus": "DISABLED"
+}

@@ -1,0 +1,412 @@
+{
+  "observedAt": "2026-11-01T16:27:29.328155+00:00",
+  "version": "V1.129",
+  "codeSha": "bff5f210b69e418dbcaaaea70af0ff09897ab1e6",
+  "baseline": "V2.3",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "port": 18129,
+  "cases": [
+    {
+      "label": "valid",
+      "http": 200,
+      "code": 200,
+      "message": "success",
+      "savedId": 5,
+      "savedStatus": "DRAFT",
+      "expectedHttp": 200,
+      "readback": {
+        "version": "V1.0",
+        "status": "DRAFT",
+        "steps": [
+          [
+            1,
+            "CAP_NAVIGATION"
+          ],
+          [
+            2,
+            "CAP_ESCORT"
+          ]
+        ]
+      }
+    },
+    {
+      "label": "duplicate",
+      "http": 409,
+      "code": 4401,
+      "message": "模板名称已存在",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 409
+    },
+    {
+      "label": "undefinedOutput",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤2参数映射STEP1_OUTPUT.noSuchOutput引用的前序步骤能力CAP_NAVIGATION没有输出参数: noSuchOutput]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "typeMismatch",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤2参数映射STEP1_OUTPUT.routeGenerated类型不匹配: 输出routeGenerated为Boolean，目标输入targetLocation为String]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "selfReference",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤2参数映射引用了非前序步骤的输出: STEP2_OUTPUT.arrivalStatus]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "forwardReference",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射引用了非前序步骤的输出: STEP2_OUTPUT.arrivalStatus]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "zeroReference",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤2参数映射引用了非前序步骤的输出: STEP0_OUTPUT.value]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "invalidSource",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤2参数映射来源格式非法（须为TEMPLATE_INPUT.*或STEP{n}_OUTPUT.*): OTHER.value]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "undefinedTemplateInput",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射引用未定义的模板输入参数: unknown, 必填模板输入参数无步骤映射来源: targetLocation]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "unmappedRequired",
+      "http": 400,
+      "code": 4407,
+      "message": "[必填模板输入参数无步骤映射来源: unused]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "sixSteps",
+      "http": 400,
+      "code": 4403,
+      "message": "模板步骤总数超过5",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "capabilityGap",
+      "http": 400,
+      "code": 4406,
+      "message": "以下能力类型未存在已启用实例: [CAP_G129_NO_CAPABILITY]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "safetyField_speed",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射含运动安全控制字段: [speed]]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "safetyField_velocity",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射含运动安全控制字段: [velocity]]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "safetyField_acceleration",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射含运动安全控制字段: [acceleration]]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "safetyField_attitude",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射含运动安全控制字段: [attitude]]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "safetyField_orientation",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射含运动安全控制字段: [orientation]]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "safetyField_pathPoints",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射含运动安全控制字段: [pathpoint]]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "safetyField_path_points",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射含运动安全控制字段: [pathpoint]]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "safetyField_waypoints",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射含运动安全控制字段: [waypoint]]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "safetyField_obstacleAvoidance",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射含运动安全控制字段: [obstacle, avoidance, obstacleavoidance]]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "safetyField_emergencyStop",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射含运动安全控制字段: [emergencystop]]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "safetyField_emergency-stop",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射含运动安全控制字段: [emergencystop]]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "safetyField_speedLimit",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射含运动安全控制字段: [speed, speedlimit]]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "safetyField_speed_limit",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射含运动安全控制字段: [speed, speed_limit, speedlimit]]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "safetyField_lostConnectionParking",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射含运动安全控制字段: [lostconnection]]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "safetyField_lost_connection_parking",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射含运动安全控制字段: [lostconnection]]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "safetyField_safeStopOnDisconnect",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射含运动安全控制字段: [estop, safestop]]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "safetyField_速度",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射含运动安全控制字段: [速度]]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "safetyField_急停",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射含运动安全控制字段: [急停]]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "safetyField_限速",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射含运动安全控制字段: [限速]]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "safetyField_路径点",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射含运动安全控制字段: [路径点]]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "safetyField_避障",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射含运动安全控制字段: [避障]]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "safetyCondition_0",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射含运动安全控制字段: [emergencystop]]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "safetyCondition_1",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射含运动安全控制字段: [emergency stop, emergencystop]]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "safetyCondition_2",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射含运动安全控制字段: [speed, speedlimit]]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "safetyCondition_3",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射含运动安全控制字段: [pathpoint]]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "safetyCondition_4",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射含运动安全控制字段: [lostconnection]]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "safetyCondition_5",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射含运动安全控制字段: [急停]]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "safetyCondition_6",
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射含运动安全控制字段: [attitude]]",
+      "savedId": null,
+      "savedStatus": null,
+      "expectedHttp": 400
+    },
+    {
+      "label": "waypointCountCondition",
+      "http": 200,
+      "code": 200,
+      "message": "success",
+      "savedId": 6,
+      "savedStatus": "DRAFT",
+      "expectedHttp": 200
+    },
+    {
+      "label": "waypointCountOutput",
+      "http": 200,
+      "code": 200,
+      "message": "success",
+      "savedId": 7,
+      "savedStatus": "DRAFT",
+      "expectedHttp": 200
+    }
+  ],
+  "cleanup": {
+    "7": 200,
+    "6": 200,
+    "5": 200,
+    "sameTemplateIds": true
+  },
+  "summary": {
+    "total": 42,
+    "matchedHttp": 42
+  }
+}
