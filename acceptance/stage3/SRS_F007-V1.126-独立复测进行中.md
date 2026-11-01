@@ -5,3 +5,5 @@
 - `node frontend/src/utils/timeline.check.mjs` 9 组通过，只是展示工具自检，不代替真实页面。独立 Vite 生产构建在 transforming 阶段长时间未完成，因本机资源压力中止；不能判产品 F。配置管理员真实页面出现独立的“结果”“原因码”列，但测试读取发生在时间线数据加载完成之前，随后浏览器关闭超时（240 秒）；截图 `evidence/SRS_F007-V1.126-ui-config.png` 仅作环境诊断，不能判定 DEF-S3-084 通过或失败。
 - 18130 仿真器因资源压力和启动超时未恢复，已核对并停止本次自有进程 PID 5912；其元数据 `.local-test/gpt-f007-v126-simulator.json` 已过期，重启须新建元数据，勿误用 PID 或覆盖 schema。
 - 恢复时先确认远端与工作区，再复用已启动且确认归属的服务；等待时间线 API 实际返回后再采集三角色失败、超时、拒绝、成功及空原因行的显示证据，浏览器关闭超时不得丢失证据。补测生产构建与剩余 F007 核心/邻接项；发现明确产品 F 才交回。保持历史 F/NT，不推进 F008。
+
+2026-11-01 续测：时间线 API 返回 200，98 行中确认先前真实失败和超时原始结果与原因均存在（`evidence/SRS_F007-V1.126-api-timeline.json`）。调整探针等待实际 API 响应后，配置管理员、系统管理员和操作员三角色真实页面分别显示 `FAILED / GPT_FAILED`、`TIMED_OUT / GPT_TIMEOUT`、`SUCCEEDED / DEVICE_SUCCESS`（`evidence/SRS_F007-V1.126-ui-r2-{config,admin,operator}.json` 及截图）。未将上轮空表截图误判为产品问题。拒绝、空原因行、生产构建和其余要求仍待检查；不以部分观察宣称整项通过。
