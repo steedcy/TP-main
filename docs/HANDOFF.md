@@ -999,3 +999,15 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-31 | SRS_F008 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / bff5f21 / V1.129 | d943d5e | 修 DEF-S3-025；DEF-S3-026 由 V1.122 加固覆盖并补测试；F009–F012 同代码但未交接；仅单测通过，待独立复测 |
+
+## GPT → Claude：SRS_F008 V1.129 降级目标映射缺陷
+
+- 最新状态：`READY_FOR_CLAUDE`（V2.3），**F008 整项未通过**。待测产品/标签 `bff5f210b69e418dbcaaaea70af0ff09897ab1e6` / `V1.129`；Claude 正式交接 `5b0336475797719f573f7de3a29f6096599ad634`；GPT 证据分支 `ai/gpt-test`，证据提交 `4c83d69672625548161b4f582f0e61e790b298e9`（已推送）。报告 `acceptance/stage3/SRS_F008-V1.129-独立复测与缺陷交接.md`，原始证据 `acceptance/stage3/evidence/SRS_F008-V1.129-*`。未修改产品代码，不对 F009–F012 判通过。
+- `TC-026.S1/S2`、R03/R05/R06 当前版真实 HTTP 与 Edge 复测 P：42 组合法/无效边界，含不存在前序输出、类型不兼容、21 种运动安全字段和 7 种完成条件；页面完整显示步骤错误，旧 F 证据保留。前端生产构建成功。先前两次页面定位和一次模型夹具分块请求错误保留为探针诊断，不计产品 F。
+- **DEF-S3-085（TC-025.S2，高）**：任务只在自然语言原目标含 `F2_SERVICE_POINT`、`sceneParams={}`；隔离目标理解服务返回 `goalParsingResult.destination=F2_SERVICE_POINT`，规划受控失败触发降级。GPT 自建基线模板 `targetLocation` 默认 `F2_TEST_GATE`；真实任务最终 `sceneParams.targetLocation=F2_TEST_GATE`，`TASK_ACCEPT` 与 `EXECUTE_CAPABILITY` 均向机器人下发 `F2_TEST_GATE`，设备成功、任务 `COMPLETED`。原始请求/任务/指令载荷 `acceptance/stage3/evidence/SRS_F008-V1.129-parsed-goal-r2.json`。显式提交 `sceneParams.targetLocation=F2_SERVICE_POINT` 的对照组能正确映射并完成，见 `...downgrade-mapping.json`。旧 `NT-S3-018` 已补测转为可复现产品 F，原记录保留。
+- 请 Claude 先 fetch 并合入上述 `ai/gpt-test` 证据；修复解析目标到降级模板输入的绑定及显式值优先级，缺少可解析值时避免默认值悄悄改写任务目的地。用独立资源定向回归自然语言解析、显式覆盖、缺值、机器人实际指令与 F010 场景参数校验；提交推送产品分支及下一唯一递增 `V1.N` 标签，记录产品 SHA 和 `READY_FOR_GPT`。`TC-025.S1`、`TC-027.S1` 与 R01/R02/R04/R07/R08 的影响复核/缺失断言，以及 F007 安全字段邻接，留 GPT 下轮继续；不要把旧 P 复制为新版实测 P。
+- 本轮有说明地核对 F003：`issues.csv` 的 DEF-S3-011/012/013/014/038 从遗漏的“待修复”更正为 V1.115 已复测通过，源报告和历史失败证据保留。GPT 资源为 schema `tip_gpt_f006_v118_20261030`、后端 18129/Redis10、移动仿真器 18132、前端 15179、模型夹具 18117；不要触碰 GPT 环境。阶段之间仍由用户手动转交，不启动自动化或联系 Claude。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-02 | SRS_F008 | ChatGPT → Claude | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / bff5f21 / V1.129 | 4c83d69 | DEF-S3-085 目标解析目的地未进入降级映射，实际下发模板默认地点；TC-025.S2 F，待修复与整项收口 |
