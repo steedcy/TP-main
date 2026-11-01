@@ -109,6 +109,56 @@ public class BaselineTemplateService {
         return template;
     }
 
+    /**
+     * 前序步骤引用核对：来源步骤所需能力类型下，已启用能力的输出参数里必须有该名称；
+     * 若来源输出与目标输入的类型都明确且不兼容（Integer可赋给Double）则拒绝。
+     * 来源能力类型暂无已启用实例时不在此判断（能力缺口已由前面的校验给出）。返回null表示通过。
+     */
+    private String checkStepOutputReference(TemplateStep source, String outputName,
+                                            TemplateStep target, ParamMapping mapping) {
+        List<com.airport.ai.device.DeviceCapability> producers =
+                deviceCapabilityMapper.findEnabledByCapabilityType(source.getCapabilityType());
+        if (producers == null || producers.isEmpty()) return null;
+        Set<String> sourceTypes = new HashSet<>();
+        boolean found = false;
+        for (com.airport.ai.device.DeviceCapability c : producers) {
+            for (ParamDefinition out : readParams(c.getOutputParams())) {
+                if (outputName.equals(out.getName())) {
+                    found = true;
+                    if (out.getType() != null) sourceTypes.add(out.getType());
+                }
+            }
+        }
+        if (!found) {
+            return "引用的前序步骤能力" + source.getCapabilityType() + "没有输出参数: " + outputName;
+        }
+        Set<String> targetTypes = new HashSet<>();
+        for (com.airport.ai.device.DeviceCapability c : deviceCapabilityMapper.findEnabledByCapabilityType(target.getCapabilityType())) {
+            for (ParamDefinition in : readParams(c.getInputParams())) {
+                if (mapping.getTarget().equals(in.getName()) && in.getType() != null) targetTypes.add(in.getType());
+            }
+        }
+        if (sourceTypes.size() == 1 && targetTypes.size() == 1) {
+            String from = sourceTypes.iterator().next();
+            String to = targetTypes.iterator().next();
+            boolean compatible = from.equals(to) || ("Integer".equals(from) && "Double".equals(to));
+            if (!compatible) {
+                return "类型不匹配: 输出" + outputName + "为" + from + "，目标输入" + mapping.getTarget() + "为" + to;
+            }
+        }
+        return null;
+    }
+
+    private List<ParamDefinition> readParams(String json) {
+        if (json == null || json.isBlank()) return List.of();
+        try {
+            return MAPPER.readValue(json,
+                    MAPPER.getTypeFactory().constructCollectionType(List.class, ParamDefinition.class));
+        } catch (Exception e) {
+            return List.of();
+        }
+    }
+
     /** 校验步骤所需能力已启用、参数映射来源合法，失败时抛出携带详细缺口清单的异常 */
     private void validateSteps(List<TemplateStep> steps, List<ParamDefinition> inputParams) {
         if (steps.size() > MAX_STEPS) {
@@ -158,8 +208,15 @@ public class BaselineTemplateService {
                     }
                 } else if (source.matches("STEP\\d+_OUTPUT\\..+")) {
                     int refStepSeq = Integer.parseInt(source.substring(4, source.indexOf("_OUTPUT")));
-                    if (refStepSeq >= stepSeq) {
+                    if (refStepSeq >= stepSeq || refStepSeq < 1) {
                         mappingErrors.add("步骤" + stepSeq + "参数映射引用了非前序步骤的输出: " + source);
+                    } else {
+                        // 前序步骤必须真有该输出，且类型与目标输入兼容（DEF-S3-025、R03/R05）
+                        String outputName = source.substring(source.indexOf("_OUTPUT.") + "_OUTPUT.".length());
+                        String problem = checkStepOutputReference(steps.get(refStepSeq - 1), outputName, step, mapping);
+                        if (problem != null) {
+                            mappingErrors.add("步骤" + stepSeq + "参数映射" + source + problem);
+                        }
                     }
                 } else {
                     mappingErrors.add("步骤" + stepSeq + "参数映射来源格式非法（须为TEMPLATE_INPUT.*或STEP{n}_OUTPUT.*): " + source);

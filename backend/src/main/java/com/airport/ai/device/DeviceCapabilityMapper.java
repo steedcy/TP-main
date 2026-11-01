@@ -17,6 +17,8 @@ public interface DeviceCapabilityMapper {
     List<DeviceCapability> findByDeviceIdAndCapabilityStatus(@Param("deviceId") Long deviceId,
                                                               @Param("capabilityStatus") String capabilityStatus);
     long countByTemplateId(Long templateId);
+    /** 某能力类型下全部已通过测试并启用的能力，用于核对基线模板参数映射引用的输出（SRS_F008.R03） */
+    List<DeviceCapability> findEnabledByCapabilityType(@Param("capabilityType") String capabilityType);
 
     /** 全平台是否存在至少一个已启用的该能力类型（对应5.3.1业务规则4：步骤所需能力必须存在于已启用能力类型中） */
     boolean existsByCapabilityTypeAndCapabilityStatus(@Param("capabilityType") String capabilityType,

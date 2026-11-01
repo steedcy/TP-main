@@ -46,7 +46,10 @@ public final class MotionSafetyGuard {
         if (inputParams instanceof Map<?, ?> map) {
             for (Map.Entry<?, ?> entry : map.entrySet()) {
                 checkText(hits, asString(entry.getKey()));
-                checkText(hits, asString(entry.getValue()));
+                // 设备上报的输出指标waypointCount可作为参数映射来源（如STEP1_OUTPUT.waypointCount），与完成条件同口径放行；
+                // 下发路径点（waypoint、waypointList等）仍被拦截
+                String value = asString(entry.getValue());
+                checkText(hits, value == null ? null : value.replaceAll("(?i)(?<![A-Za-z])waypointCount(?![A-Za-z])", ""));
             }
         }
         return hits;

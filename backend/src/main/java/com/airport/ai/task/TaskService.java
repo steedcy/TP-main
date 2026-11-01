@@ -136,6 +136,9 @@ public class TaskService {
                     "任务族不存在或已停用，当前可选: " + taskDefinitionService.listEnabledTaskNames());
         }
         FlightChangeSceneValidator.validate(request.getTaskFamily(), request.getSceneParams());
+        // 扩展任务定义声明的必填场景参数/类型在建任务前核对，不通过则不建任务、不调模型（DEF-S3-029）
+        taskDefinitionService.findByCode(request.getTaskFamily())
+                .ifPresent(def -> SceneParamsValidator.validate(def, request.getSceneParams()));
 
         Task task = new Task();
         task.setTaskCode(taskCodeGenerator.next());

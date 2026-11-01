@@ -39,6 +39,16 @@
             <a-select-option v-for="d in enabledTaskDefinitions" :key="d.definitionCode" :value="d.definitionCode">{{ d.taskName }}</a-select-option>
           </a-select>
         </a-form-item>
+        <template v-if="dynamicFields.length">
+          <a-form-item v-for="f in dynamicFields" :key="f.name"
+                       :label="`${f.name}（${f.type}${f.required ? '，必填' : '，可选'}${f.range ? '；' + f.range : ''}）`"
+                       :validate-status="sceneErrors[f.name] ? 'error' : undefined" :help="sceneErrors[f.name]">
+            <a-select v-if="f.type === 'Boolean'" v-model:value="sceneValues[f.name]" allow-clear>
+              <a-select-option value="true">是</a-select-option><a-select-option value="false">否</a-select-option>
+            </a-select>
+            <a-input v-else v-model:value="sceneValues[f.name]" :maxlength="500" />
+          </a-form-item>
+        </template>
         <template v-if="isFlightChange">
           <a-alert message="请使用虚构或脱敏航班信息；系统将按航延屏、智慧航显和机器人渠道处理。" type="info" show-icon style="margin-bottom: 12px" />
           <a-form-item label="航班号（2~10位，必填）"><a-input v-model:value="flight.flightNumber" :maxlength="10" /></a-form-item>
@@ -83,10 +93,11 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { message } from 'ant-design-vue'
 import { listTasks, submitTask, clarifyTask, cancelTask } from '../../api/task'
+import { dynamicSceneFields, initialSceneValues, validateSceneValues, buildSceneParams } from '../../utils/sceneParams'
 import { listTaskDefinitions } from '../../api/taskDefinition'
 
 const route = useRoute()
@@ -107,12 +118,22 @@ const canSubmit = computed(() => isFlightChange.value
     && (!needsNewTime.value || !!flight.newTime)
     && (flight.changeType !== 'GATE_CHANGE' || !!flight.newGate)
     && !!flight.changeDescription.trim()
-  : !!form.taskGoal.trim() && form.taskGoal.length <= 500)
+  : !!form.taskGoal.trim() && form.taskGoal.length <= 500 && sceneCheck.value.ok)
 
 // 任务族下拉数据源改为动态取任务定义（对应5.6.1），提交表单只展示已启用任务族，
 // 筛选区仍需展示全部任务族（含已停用）以便查询历史任务
 const allTaskDefinitions = ref([])
 const enabledTaskDefinitions = computed(() => allTaskDefinitions.value.filter((d) => d.definitionStatus === 'ENABLED'))
+// 选中扩展任务定义时，按其声明的场景参数动态渲染输入项并校验必填/类型（DEF-S3-028）
+const selectedDefinition = computed(() => allTaskDefinitions.value.find((d) => d.definitionCode === form.taskFamily))
+const dynamicFields = computed(() => dynamicSceneFields(selectedDefinition.value))
+const sceneValues = reactive({})
+const sceneCheck = computed(() => validateSceneValues(dynamicFields.value, sceneValues))
+const sceneErrors = computed(() => Object.fromEntries(sceneCheck.value.errors.map((e) => [e.name, e.message])))
+watch(dynamicFields, (fields) => {
+  Object.keys(sceneValues).forEach((k) => delete sceneValues[k])
+  Object.assign(sceneValues, initialSceneValues(fields))
+})
 async function fetchTaskDefinitions() {
   const resp = await listTaskDefinitions()
   allTaskDefinitions.value = resp.data
@@ -165,6 +186,7 @@ async function handleSubmit() {
   submitting.value = true
   try {
     const payload = isFlightChange.value ? flightPayload() : { taskGoal: form.taskGoal, taskFamily: form.taskFamily }
+    if (!isFlightChange.value && dynamicFields.value.length) payload.sceneParams = buildSceneParams(dynamicFields.value, sceneValues)
     const resp = await submitTask(payload)
     message.success('任务已提交')
     closeSubmitModalAndRefresh()
@@ -176,7 +198,7 @@ async function handleSubmit() {
     // 4111（无在线设备代理）时任务未创建，保留弹窗以便修改后重试；
     // 其余业务异常（如4113目标理解超时、4112任务族无关）任务实例已按业务规则强制创建
     // （对应5.4.1后置条件），需关闭弹窗并刷新列表，否则运行操作员看不到已生成的任务
-    if (e.response?.data?.code !== 4111) {
+    if (![4111, 3000, 3001].includes(e.response?.data?.code)) {
       closeSubmitModalAndRefresh()
     }
   } finally {
@@ -206,6 +228,7 @@ function closeSubmitModalAndRefresh() {
   submitVisible.value = false
   form.taskGoal = ''
   form.taskFamily = undefined
+  Object.keys(sceneValues).forEach((k) => delete sceneValues[k])
   Object.assign(flight, { flightNumber: '', changeType: undefined, originalTime: null, newTime: null,
     originalGate: undefined, newGate: undefined, changeDescription: '' })
   fetchList()

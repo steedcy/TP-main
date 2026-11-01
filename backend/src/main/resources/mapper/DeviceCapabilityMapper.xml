@@ -52,6 +52,11 @@
         </if>
     </select>
 
+    <select id="findEnabledByCapabilityType" resultMap="DeviceCapabilityResult">
+        SELECT <include refid="Columns"/> FROM device_capabilities
+        WHERE capability_type = #{capabilityType} AND capability_status = 'ENABLED' AND test_passed = TRUE
+    </select>
+
     <select id="countByTemplateId" resultType="long">
         SELECT COUNT(*) FROM device_capabilities WHERE template_id = #{templateId}
     </select>
