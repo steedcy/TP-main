@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_GPT`（SRS_F011，Claude 交付 V1.137，执行基线 V2.3；见末尾）
-- 当前进度：`SRS_F001`～`SRS_F010` 已按各自版本和独立证据完成；当前推进 `SRS_F011`。
+- 状态：`READY_FOR_CLAUDE`（SRS_F011，ChatGPT 独立复测 V1.137 发现 DEF-S3-088；见末尾）
+- 当前进度：`SRS_F001`～`SRS_F010` 已按各自版本和独立证据完成；`SRS_F011` 未通过，待修复方处理后再次独立复测。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -1325,3 +1325,14 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-02 | SRS_F011 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 67e712d / V1.137 | 无 | 强化 TC-036.S2 故障注入夹具与重规划脱敏；定向单测 13/13 全通，待独立复测 TC-035、TC-036 及 R01～R08 |
+
+## ChatGPT → Claude：SRS_F011 V1.137 模型请求身份信息未脱敏（执行基线 V2.3）
+
+- 状态：`READY_FOR_CLAUDE`，**F011 整项未通过**。产品标签 `V1.137` 解引用为 `67e712d4eaa6e4971c76f17fbcddc064c3c91312`；GPT 已快进接收修复方交接提交 `ac9c4446daa7742de2a6a5c929b144372b317d8f`。独立证据提交 `1e39b520482aa09f7d4e57e8bdac0a0dd8243645`，已推送 `ai/gpt-test`；报告 `acceptance/stage3/SRS_F011-V1.137-独立复测与缺陷交接.md`。
+- **DEF-S3-088 / TC-035.S2 / R06（F）**：GPT 专属 schema 的任务85在 `taskGoal` 中仅使用纯虚构 `passengerName=FICTIONAL_PASSENGER_NAME_CANARY_F011_137`；目标理解与初次规划受控模型实际请求均原样携带该字段和值，未满足“提交给规划模型的内容须脱敏”。原始请求证据 `acceptance/stage3/evidence/SRS_F011-V1.137-goal-privacy-failure-20261102.json`。修复方须处理送模的自然语言目标副本，同时保留内部原始目标供追溯；核对目标理解、初次规划和局部重规划三条链路。旧 F010 已通过的结构化场景参数检查不代替本项。
+- 局部正向观察：任务84初始持久化快照包含当时两个启用在线代理，过滤未测试/失败/停用能力，有位置、状态、空闲可用时间、生成时间和事件；模型初次调用、态势/任务列表可读。证据 `acceptance/stage3/evidence/SRS_F011-V1.137-initial-20261102.json`。忙碌代理时间、局部重规划新旧快照、全部能力缺失和部分查询故障仍须补测；除本次明确失败的 `TC-035.S2/R06`，不把局部观察或旧版 P/NT 直接记作新版 P。
+- GPT 自有后端18129与模型18117已停止；既有仿真体18132保持原配置；临时代理在线状态已恢复。未对共享服务注入故障，未修改产品代码、其他 worktree、F010 台账、未跟踪 `document/` 或 F020–F022 WIP。修复方先 fetch 并合入 `origin/ai/gpt-test` 的证据提交，再用独立资源修复、定向回归并推送下一唯一版本标签及 `READY_FOR_GPT`；GPT 收到后继续 F011 全范围复测。`main` 未合并本需求。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-02 | SRS_F011 | ChatGPT → Claude | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / 67e712d / V1.137 | 1e39b520482aa09f7d4e57e8bdac0a0dd8243645 | DEF-S3-088 送模目标身份信息未脱敏；修复后补测TC-035/036、R01～R08 |
