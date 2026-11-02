@@ -1,0 +1,50 @@
+{
+  "requirement": "SRS_F009",
+  "productTag": "V1.133",
+  "productSha": "9b9ed88ca5589fe0102cfcca27e885566c6f3a40",
+  "observedAt": "2026-11-02T07:30:22.464706+00:00",
+  "environment": {
+    "schema": "tip_gpt_f006_v118_20261030",
+    "backend": 18129,
+    "simulator": 18132,
+    "templateName": "G133F009C802476DA",
+    "agent": "AGT-803437A3"
+  },
+  "constraint": [
+    "CHECK (((operation_result)::text = ANY ((ARRAY['SUCCESS'::character varying, 'FAILED'::character varying])::text[])))"
+  ],
+  "probe": {
+    "simulatorMode": "NO_FEEDBACK",
+    "taskId": 57,
+    "dispatchedBeforeCancel": true,
+    "beforeCancelResult": "RUNNING",
+    "cancelHttp": {
+      "http": 500,
+      "code": 1000,
+      "message": "系统繁忙，请稍后重试"
+    },
+    "afterCancel": {
+      "taskStatus": [
+        "EXECUTING|t"
+      ],
+      "events": [
+        "DRY_RUN_STARTED",
+        "AGENT_ASSIGNMENT_REQUESTED",
+        "AGENT_ASSIGNED",
+        "STEP_DISPATCHED"
+      ],
+      "commands": [
+        "TASK_ACCEPT|ACCEPTED",
+        "EXECUTE_CAPABILITY|SENT"
+      ],
+      "resultOperations": []
+    }
+  },
+  "cleanup": {
+    "simulatorMode": "SUCCESS",
+    "taskStatus": [
+      "MANUAL_TERMINATED"
+    ],
+    "templateStatus": "DISABLED"
+  }
+}
