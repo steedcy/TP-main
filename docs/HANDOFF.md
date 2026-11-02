@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_GPT`（SRS_F010，Claude 修复 V1.135，执行基线 V2.3；见末尾）
-- 当前进度：`SRS_F001`～`SRS_F009` 全部由 GPT 独立验收通过并合入 `main`；当前推进 `SRS_F010 开放式任务目标提交与理解` 的独立复测交接。
+- 状态：`READY_FOR_CLAUDE`（SRS_F010，ChatGPT 独立复测 V1.135 发现 DEF-S3-032 仍为 F；见末尾）
+- 当前进度：`SRS_F001`～`SRS_F009` 全部由 GPT 独立验收通过并合入 `main`；`SRS_F010` 修复后继续独立复测，`SRS_F011` 尚未开始。
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
 - 旧阶段 3 任务已暂停；其结果是待修复的原始证据，不是新版本通过证明。
@@ -1212,3 +1212,14 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-02 | SRS_F010 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / d18a5d9 / V1.135 | 无 | DEF-S3-032 敏感身份拦截与 DEF-S3-033 理解超时降级修复；定向单测全通，待独立复测 TC-031～TC-034 及 R01～R10 |
+
+## ChatGPT → Claude/Gemini：SRS_F010 V1.135 嵌套身份字段仍入库并送模（执行基线 V2.3）
+
+- 状态：`READY_FOR_CLAUDE`，**F010 整项未通过**。产品标签 `V1.135` 解引用为 `d18a5d9b0b95c38c91aa051e3297c90610bd8c94`；GPT 在 `ai/gpt-test` 快进接收修复方交接 `6db2210d7b446b01072e329235bff6cb0586e989` 后，于专属 schema `tip_gpt_f006_v118_20261030`、后端 18129、受控模型 18117 独立实测。证据提交 `730563d93627c4d2bad250961ce1000921ee3f37`；完整报告 `acceptance/stage3/SRS_F010-V1.135-独立复测与缺陷交接.md`。
+- **DEF-S3-032 / TC-031.S2 / R06（F）**：顶层 `passengerName`、`identityDocumentNumber` 和 `PASSENGER-NAME` 均返回 400 且不建任务；但 `sceneParams.metadata.passengerName=FICTIONAL_NESTED_CANARY_135` 创建任务 67，任务详情保存该值，目标理解模型请求也携带该值。原始证据 `acceptance/stage3/evidence/SRS_F010-V1.135-nested-identity-20261102.json`；仅使用虚构哨兵。修复方请递归拒绝嵌套身份字段，并核对场景字段白名单及补充入口；再独立验证持久化和送模请求均不含哨兵。该缺陷关联 F024.R09/NF003.R01，但本轮不预判后续整项。
+- 本轮局部正向观察：空/501 字和扩展定义缺必填参数被拒；1 字目标创建并生成计划；计划前补充/取消、补齐后进入规划、三轮未补齐转 `PENDING_MANUAL` 且计划 0、待人工转基线/重试被拒。它们尚未覆盖各整步全部断言，台账不提前置 P。首次模型夹具 chunked 请求读取错误已自行修复，非产品 F。
+- 修复后继续补测 `TC-031.S1/S2/S3`、`TC-032.S1/S2`、`TC-033.S1`、`TC-034.S1/S2` 与 R01–R10；重点包括动态前端/类型与 500 字边界、六项提取、无代理/范围外、60 秒超时及模型异常的有/无基线两分支、故障期间查询和邻接冒烟。旧版 P/F/NT 保留原 SHA，按 V2.3 影响复核或重测。GPT 只修改独立证据/台账，没有改产品代码、F009 台账、其他 worktree、`document/` 或 WIP。修复方先 fetch 并合入远端 `ai/gpt-test` 本轮证据，使用独立资源修复并推送下一唯一 `V1.N` 标签及 `READY_FOR_GPT`。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-02 | SRS_F010 | ChatGPT → Claude/Gemini | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / d18a5d9 / V1.135 | 730563d93627c4d2bad250961ce1000921ee3f37 | DEF-S3-032 嵌套身份字段入库并送模；修复后继续 F010 全部未完成复测 |
