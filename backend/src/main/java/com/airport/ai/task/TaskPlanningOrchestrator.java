@@ -361,7 +361,7 @@ public class TaskPlanningOrchestrator {
         request.setRequestId(UUID.randomUUID().toString());
         request.setTaskGoal(task.getTaskGoal());
         request.setTaskFamily(task.getTaskFamily());
-        request.setSceneParams(parseMap(task.getSceneParams()));
+        request.setSceneParams(SceneParamsPrivacyGuard.sanitize(parseMap(task.getSceneParams())));
         request.setConstraints(List.of("不得下发运动安全控制指令", "步骤数不超过5"));
 
         request.setCapabilityContext(contextSnapshotService.capabilityContext(snapshot, requiredCapabilities));

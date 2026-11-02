@@ -145,7 +145,7 @@ public class TaskService {
         task.setTaskCode(taskCodeGenerator.next());
         task.setTaskGoal(request.getTaskGoal());
         task.setTaskFamily(request.getTaskFamily());
-        task.setSceneParams(toJson(request.getSceneParams()));
+        task.setSceneParams(toJson(SceneParamsPrivacyGuard.sanitize(request.getSceneParams())));
         task.setStatus(TaskStatus.PLANNING);
         task.setCreatedBy(operator.getUsername());
         taskMapper.insert(task);
@@ -171,6 +171,7 @@ public class TaskService {
             throw new BusinessException(ErrorCode.TASK_STATUS_NOT_ALLOWED, "任务已离开待规划状态，不可补充信息");
         }
 
+        SceneParamsPrivacyGuard.reject(request.getAnswers());
         List<String> pendingQuestions = fromJsonQuestions(task.getMissingInfoQuestions());
         if (pendingQuestions.isEmpty() || request.getAnswers() == null
                 || pendingQuestions.stream().anyMatch(q -> request.getAnswers().get(q) == null
@@ -195,7 +196,7 @@ public class TaskService {
         rounds.add(Map.of("questions", pendingQuestions, "answers", new HashMap<>(request.getAnswers())));
         mergedSceneParams.put("clarificationAnswers", rounds);
 
-        task.setSceneParams(toJson(mergedSceneParams));
+        task.setSceneParams(toJson(SceneParamsPrivacyGuard.sanitize(mergedSceneParams)));
         taskMapper.update(task);
 
         taskEventService.append(task.getId(), "GOAL_CLARIFIED", "OPERATOR", null,
@@ -375,7 +376,7 @@ public class TaskService {
         request.setRequestId(UUID.randomUUID().toString());
         request.setTaskGoal(task.getTaskGoal());
         request.setTaskFamily(task.getTaskFamily());
-        request.setSceneParams(sceneParams);
+        request.setSceneParams(SceneParamsPrivacyGuard.sanitize(sceneParams));
         if (clarificationAnswers != null) {
             request.setClarificationAnswers(clarificationAnswers);
         }

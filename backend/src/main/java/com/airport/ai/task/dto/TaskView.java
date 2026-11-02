@@ -36,7 +36,7 @@ public class TaskView {
         v.taskCode = t.getTaskCode();
         v.taskGoal = t.getTaskGoal();
         v.taskFamily = t.getTaskFamily();
-        v.sceneParams = parseMap(t.getSceneParams());
+        v.sceneParams = com.airport.ai.task.SceneParamsPrivacyGuard.sanitize(parseMap(t.getSceneParams()));
         v.goalParsingResult = parseMap(t.getGoalParsingResult());
         v.status = t.getStatus() == null ? null : t.getStatus().name();
         v.currentPlanVersionId = t.getCurrentPlanVersionId();
