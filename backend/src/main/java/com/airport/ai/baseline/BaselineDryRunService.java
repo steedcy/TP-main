@@ -187,7 +187,7 @@ public class BaselineDryRunService {
     public DryRunResultView cancel(Long templateId, Long taskId, User operator) {
         result(templateId,taskId);
         taskService.terminate(taskId,"配置管理员取消模板试运行",operator);
-        lifecycle.finish(taskId,false,"配置管理员取消模板试运行");
+        lifecycle.finish(taskId,false,"配置管理员取消模板试运行",true);
         Task task=taskMapper.findById(taskId).orElseThrow();
         task.setStatus(TaskStatus.MANUAL_TERMINATED); taskMapper.update(task);
         return result(templateId,taskId);

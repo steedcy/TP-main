@@ -31,6 +31,26 @@ class BaselineDryRunLifecycleTest {
             assertEquals("V1.2",detail.getValue().get("templateVersion"));
         }
     }
+    // DEF-S3-086：人工取消试运行，结果事件与操作日志均为CANCELLED，任务保持MANUAL_TERMINATED，模板不通过
+    @Test void cancelledTrialIsAuditedAsCancelledNotFailed() {
+        var tasks=mock(TaskMapper.class);var plans=mock(PlanVersionMapper.class);var templates=mock(BaselineTemplateMapper.class);
+        var task=new Task();task.setIsDryRun(true);task.setCurrentPlanVersionId(2L);when(tasks.findById(1L)).thenReturn(Optional.of(task));
+        var plan=new PlanVersion();plan.setBaselineTemplateId(3L);plan.setSnapshotId("V1.2");when(plans.findById(2L)).thenReturn(Optional.of(plan));
+        var template=new BaselineTemplate();template.setTemplateName("tpl-A");template.setTemplateVersion("V1.2");template.setTemplateStatus("DRY_RUN_PASSED");
+        when(templates.findById(3L)).thenReturn(Optional.of(template));
+        var audit=mock(com.airport.ai.auth.OperationLogService.class);var events=mock(TaskEventService.class);
+        var lifecycle=new BaselineDryRunLifecycle(tasks,plans,templates,mock(TaskStepAssignmentMapper.class),mock(DeviceAgentMapper.class),mock(DeviceAgentMessagingService.class),events);
+        org.springframework.test.util.ReflectionTestUtils.setField(lifecycle,"operationLogService",audit);
+        lifecycle.finish(1L,false,"cancelled by admin",true);
+        assertEquals(TaskStatus.MANUAL_TERMINATED,task.getStatus());
+        assertEquals("DRAFT",template.getTemplateStatus());
+        verify(events).append(eq(1L),eq("DRY_RUN_CANCELLED"),eq("SYSTEM"),eq("ERR_DRY_RUN_CANCELLED"),eq("cancelled by admin"));
+        var target=org.mockito.ArgumentCaptor.forClass(String.class);
+        @SuppressWarnings("unchecked") var detail=org.mockito.ArgumentCaptor.forClass(java.util.Map.class);
+        verify(audit).record(isNull(),eq("SYSTEM"),isNull(),eq("BASELINE_TEMPLATE_DRY_RUN_RESULT"),target.capture(),eq("CANCELLED"),isNull(),detail.capture());
+        assertTrue(target.getValue().endsWith("DRY_RUN_CANCELLED"));
+        assertEquals("CANCELLED",detail.getValue().get("result"));
+    }
     @Test void auditIsOptionalSoExistingWiringStillWorks() { verifyVersion("V1.2",true); }
     private void verifyVersion(String version, boolean shouldPass) {
         var tasks=mock(TaskMapper.class);var plans=mock(PlanVersionMapper.class);var templates=mock(BaselineTemplateMapper.class);
