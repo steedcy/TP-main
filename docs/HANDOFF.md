@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_GPT`（SRS_F008 DEF-S3-085，Claude → ChatGPT，V1.132，执行基线 V2.3；见末尾）
-- 当前需求：`SRS_F006A 设备类型能力边界管理` / `SRS_F006 设备能力画像管理`；SRS_F001～F005 已完成，按功能需求顺序继续。
+- 状态：`REQUIREMENT_PASSED`（SRS_F008，ChatGPT 独立复测 V1.132，执行基线 V2.3；见末尾）
+- 当前进度：`SRS_F001`～`SRS_F008` 已按各自交接与独立证据完成；下一需求 `SRS_F009` 应在独立新对话中接续。
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
 - 旧阶段 3 任务已暂停；其结果是待修复的原始证据，不是新版本通过证明。
@@ -1097,3 +1097,14 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-02 | SRS_F008 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 5b9511a / V1.132 | 1ed6ea0 | 修 DEF-S3-085 缺值地点降级拦截（原目标要求地点而未解析出目的地时转 PENDING_MANUAL，不下发模板默认地点）；定向单测 36 项通过，待 GPT 实机独立复测与 F008 整项收口 |
+
+## ChatGPT 独立复测：SRS_F008 V1.132 验收通过（执行基线 V2.3）
+
+- 状态：`REQUIREMENT_PASSED`，仅裁定 **SRS_F008**；`TC-025.S2` 与 `DEF-S3-085` 在 V1.132 通过并关闭。产品 SHA `5b9511a6daeafd9f740dd51a090d83f21a32195d`，标签 `V1.132`；Gemini/Claude 交接 `87db70a692ec64c4e6581161b3a989f6544f9d47`；GPT 证据提交 `33b361525ded6af35f4f8497f63f4be5cd5562c7`（`ai/gpt-test` 已推送）。
+- 独立实机结果：原目标 `F2_SERVICE_POINT`、解析 `destination=null`、场景参数空、模板默认 `F2_TEST_GATE` 时，任务转 `PENDING_MANUAL`，场景参数仍空，无基线计划/设备指令，事件有 `BASELINE_INPUT_DEFAULTED/ERR_LOCATION_UNRESOLVED` 和 `TASK_PENDING_MANUAL`。解析成功时真实 `TASK_ACCEPT`/`EXECUTE_CAPABILITY` 均用 `F2_SERVICE_POINT` 且任务完成；显式参数优先；无地点目标可正常使用默认地点并完成。执行中编辑启用模板生成 V1.1 草稿，任务继续用冻结计划完成；本版创建/修改/停用操作记录存在。GPT 独立定向单测 36/36 通过。
+- `TC-025.S1`、`TC-026.S1/S2`、R01–R06 的 V1.5/V1.129 历史覆盖经组件、依赖及配置影响复核继续引用，**不计为 V1.132 新实测**；`TC-027.S1`、R07/R08 有当前版冻结及审计补证，启用操作记录仍引 V1.5 原证据。F007 运动安全邻接按未改组件与本版正常指令冒烟复核。V1.129/V1.131 的失败证据全部保留。详细原始证据、边界与结论：`acceptance/stage3/SRS_F008-V1.132-独立复测与验收裁决.md`。
+- 本轮仅处理 F008，未对 F009–F018 或 95 项整体验收预先判通过。按协作约定，本轮交接提交推送后将 `ai/gpt-test` 合入并推送 `main`；下一需求另开对话接续。未修改产品代码、Claude/Gemini worktree 或其运行资源。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-02 | SRS_F008 | ChatGPT → main | REQUIREMENT_PASSED（V2.3） | ai/gpt-test / 5b9511a / V1.132 | 33b3615 | DEF-S3-085 修复经真实指令四分支验证；F008 整项通过，下一需求另开对话 |
