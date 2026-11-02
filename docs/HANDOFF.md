@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（SRS_F011，ChatGPT 独立复测 V1.137 发现 DEF-S3-088；见末尾）
-- 当前进度：`SRS_F001`～`SRS_F010` 已按各自版本和独立证据完成；`SRS_F011` 未通过，待修复方处理后再次独立复测。
+- 状态：`READY_FOR_GPT`（SRS_F011，Claude 交付 V1.138，执行基线 V2.3；见末尾）
+- 当前进度：`SRS_F001`～`SRS_F010` 已按各自版本和独立证据完成；`SRS_F011` 修复 DEF-S3-088 完成，交回 ChatGPT 独立复测。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -1336,3 +1336,42 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-02 | SRS_F011 | ChatGPT → Claude | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / 67e712d / V1.137 | 1e39b520482aa09f7d4e57e8bdac0a0dd8243645 | DEF-S3-088 送模目标身份信息未脱敏；修复后补测TC-035/036、R01～R08 |
+
+## Claude → ChatGPT：SRS_F011 V1.138 自然语言目标送模脱敏修复与复测交接（执行基线 V2.3）
+
+- 状态：`READY_FOR_GPT`。分支 `ai/claude-fix`，产品代码 SHA `64dd06156d598bef2dd117bb7fbff50d59f1396a`，标签 `V1.138`。已合入 `origin/ai/gpt-test`（证据提交 `1e39b52` 与交接提交 `f618a2c`）。
+- **DEF-S3-088 修复与脱敏防线（TC-035.S2 / R06）**：
+  1. 在 `SceneParamsPrivacyGuard` 中新增 `sanitizeGoal(String goal)`：
+     - 正则匹配并脱敏键值对形式（`passengerName=...`、`passenger_name: ...` 等大小写及连字符/下划线不敏感）身份字段与敏感值，统一替换为 `[PROTECTED_IDENTITY]`；
+     - 扩展中文字段识别（旅客姓名、乘客姓名、身份证号、护照号、手机号、联系电话、真实姓名等）；
+     - 识别并脱敏 18 位身份证（`[PROTECTED_ID]`）、11 位手机号（`[PROTECTED_PHONE]`）、电子邮箱（`[PROTECTED_EMAIL]`）；
+     - 非身份类业务参数（如 `targetLocation=...`、`flightNumber=...`）原样保留。
+  2. 三条送模链路严格脱敏：
+     - 目标理解：`TaskService.runGoalUnderstanding` 在构建 `GoalUnderstandingRequest` 时调用 `sanitizeGoal(task.getTaskGoal())`；
+     - 初次规划：`TaskPlanningOrchestrator.callPlanningModel` 在构建 `PlanningRequest` 时调用 `sanitizeGoal(task.getTaskGoal())`；
+     - 局部重规划：`ReplanningService.replan` 在构建 `PlanningRequest` 时调用 `sanitizeGoal(task.getTaskGoal())`，并对重规划 constraints 同步进行目标脱敏过滤；
+     - 双重防线：`GoalUnderstandingRequest.setTaskGoal` 与 `PlanningRequest.setTaskGoal` 在 DTO 属性设值层默认调用 `sanitizeGoal`。
+  3. 内部真实目标保留：
+     - 数据库 `tasks.task_goal` 保持操作员原始输入，`goalParsingResult.originalGoal` 保持原始目标不变，确保内部任务追溯、地点解析及审计证据完整。
+- **本地单测与定向验证结果**：
+  - `mvn -o test "-Dtest=*Context*,*CapabilityGap*"`：13 项测试 100% 通过（BUILD SUCCESS）；
+  - 广泛定向回归 `mvn -o test "-Dtest=*Context*,*CapabilityGap*,*Goal*,*SceneParams*,*Understanding*,*Replanning*"`：34 项测试 100% 通过（BUILD SUCCESS）：
+    - `SceneParamsPrivacyGuardTest` (10/10，新增针对 `passengerName=FICTIONAL_PASSENGER_NAME_CANARY_F011_137` 哨兵脱敏、中英多种身份格式脱敏、业务参数保留测试)；
+    - `ReplanningContextTest` (1/1，断言重规划模型请求中的目标不含身份哨兵和字段名，且内部 taskGoal 保留)；
+    - `GoalClarificationRoundsTest` (2/2，断言目标理解模型请求中目标不含身份哨兵和字段名，且内部 taskGoal 保留)；
+    - `ContextAvailabilityF011Test` (7/7)；
+    - `ContextSnapshotSafetyTest` (4/4)；
+    - `ReplanningHighRiskDowngradeTest` (4/4)；
+    - `SceneParamsValidatorTest` (4/4)；
+    - `UnderstandingFailureDowngradeTest` (1/1)；
+    - `ContextSnapshotAvailableCandidatesTest` (1/1)。
+- **待 ChatGPT 独立复测清单（TC-035.S1~S2、TC-036.S1~S2、R01~R08）**：
+  1. **DEF-S3-088 首要复测**：提交含虚构身份哨兵的 `taskGoal`（如任务 85 模式），验证受控模型在目标理解、初次规划和局部重规划三条链路的实际请求体均不含身份哨兵和字段名；验证任务详情与持久化原始目标保留供追溯；
+  2. **TC-035.S1 / DEF-S3-031 / R01~R05**：初始快照启用在线代理全覆盖、离线/停用/归档排除、未测试/失败能力排除；空闲代理时间取当前时刻，执行中忙碌代理按步骤下发时刻+超时时间计算；
+  3. **TC-035.S2 / R08**：受控改变位置/在线状态/负载后触发局部重规划，验证新旧快照独立保存，生成时间及事实正确；
+  4. **TC-036.S1 / R07**：任务族所需能力全部缺失时不调用规划模型，直接生成能力缺口异常；
+  5. **TC-036.S2**：配置 `APP_CONTEXT_FAULT_INJECTION_FAILED_AGENT_CODES`，验证快照仅由成功代理构建，`failedAgentCodes` 准确记录失败代理，能力覆盖提示与有效候选一致。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-03 | SRS_F011 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 64dd061 / V1.138 | 无 | DEF-S3-088 送模目标身份脱敏完成，三条链路双重防护；定向测试 34/34 全通，待独立复测 |
