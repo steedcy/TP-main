@@ -1,0 +1,164 @@
+{
+  "requirement": "SRS_F009",
+  "productTag": "V1.132",
+  "productSha": "5b9511a6daeafd9f740dd51a090d83f21a32195d",
+  "observedAt": "2026-11-02T06:39:44.924716+00:00",
+  "environment": {
+    "schema": "tip_gpt_f006_v118_20261030",
+    "backend": 18129,
+    "simulator": 18132,
+    "template": "G132F009597D64DC",
+    "agent": "AGT-803437A3"
+  },
+  "before": {
+    "formalCompleted": 26,
+    "allCompleted": 26,
+    "formalCount": 46,
+    "dryRunCount": 0,
+    "dashboard": {
+      "PLANNING": 1,
+      "SUPERVISING": 0,
+      "PENDING_ASSIGNMENT": 0,
+      "DOWNGRADING": 0,
+      "EXECUTING": 0,
+      "COMPLETED": 26,
+      "FAILED": 0,
+      "PENDING_MANUAL": 13,
+      "MANUAL_TERMINATED": 6
+    }
+  },
+  "observations": {
+    "created": {
+      "templateId": 24,
+      "version": "V1.0",
+      "status": "DRAFT",
+      "steps": [
+        {
+          "stepSeq": 1,
+          "capabilityType": "CAP_NAVIGATION",
+          "paramMapping": [
+            {
+              "target": "targetLocation",
+              "source": "TEMPLATE_INPUT.targetLocation"
+            }
+          ],
+          "stepTimeout": 60,
+          "completionCondition": "routeGenerated=true and waypointCount reported"
+        }
+      ]
+    },
+    "run": {
+      "taskId": 47,
+      "startedResult": "RUNNING",
+      "result": {
+        "taskId": 47,
+        "taskCode": "TASK-20261102-0047",
+        "result": "SUCCESS",
+        "stepResults": [
+          {
+            "stepSeq": 1,
+            "result": "COMPLETED",
+            "duration": 2,
+            "failureReason": "DEVICE_SUCCESS"
+          }
+        ],
+        "events": [
+          {
+            "eventType": "DRY_RUN_STARTED",
+            "trigger": "OPERATOR",
+            "detailSummary": "配置管理员set对模板G132F009597D64DC(V1.0)发起试运行",
+            "occurredAt": "2026-11-02T14:39:45.895624"
+          },
+          {
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "trigger": "SYSTEM",
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-803437A3(距离0.0,负载0)，向候选AGT-803437A3发起承接请求",
+            "occurredAt": "2026-11-02T14:39:45.944650"
+          },
+          {
+            "eventType": "AGENT_ASSIGNED",
+            "trigger": "SYSTEM",
+            "detailSummary": "设备代理AGT-803437A3接受步骤1承接请求",
+            "occurredAt": "2026-11-02T14:39:46.005065"
+          },
+          {
+            "eventType": "STEP_DISPATCHED",
+            "trigger": "SYSTEM",
+            "detailSummary": "指令CMD-20261102143946-A89DB5D2已下发至设备代理AGT-803437A3，业务意图: null",
+            "occurredAt": "2026-11-02T14:39:46.015353"
+          },
+          {
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "trigger": "SYSTEM",
+            "detailSummary": "指令CMD-20261102143946-A89DB5D2收到设备代理AGT-803437A3执行反馈: SUCCESS",
+            "occurredAt": "2026-11-02T14:39:48.207104"
+          },
+          {
+            "eventType": "STEP_COMPLETED",
+            "trigger": "SYSTEM",
+            "detailSummary": "步骤1完成条件已满足: routeGenerated=true and waypointCount reported",
+            "occurredAt": "2026-11-02T14:39:48.214311"
+          },
+          {
+            "eventType": "TASK_COMPLETED",
+            "trigger": "SYSTEM",
+            "detailSummary": "全部步骤完成条件均已满足，任务完成",
+            "occurredAt": "2026-11-02T14:39:48.219477"
+          },
+          {
+            "eventType": "DRY_RUN_SUCCEEDED",
+            "trigger": "SYSTEM",
+            "detailSummary": "所有步骤均收到实际设备成功反馈",
+            "occurredAt": "2026-11-02T14:39:48.227145"
+          }
+        ],
+        "failureReason": null
+      },
+      "templateStatus": "DRY_RUN_PASSED"
+    },
+    "database": {
+      "taskAndPlan": [
+        "COMPLETED|t|BASELINE_TEMPLATE|V1.0"
+      ],
+      "commandTypesAndStatuses": [
+        "TASK_ACCEPT|ACCEPTED",
+        "EXECUTE_CAPABILITY|SUCCEEDED"
+      ],
+      "assignment": [
+        "1|COMPLETED|CMD-20261102143945-AB89F1C8|CMD-20261102143946-A89DB5D2|DEVICE_SUCCESS"
+      ],
+      "operationLogs": [
+        "BASELINE_TEMPLATE_CREATE|SUCCESS|G132F009597D64DC|",
+        "BASELINE_TEMPLATE_DRY_RUN|SUCCESS|G132F009597D64DC -> RUNNING|",
+        "BASELINE_TEMPLATE_DRY_RUN_RESULT|SUCCESS|G132F009597D64DC(V1.0) 任务47 -> DRY_RUN_PASSED|{\"taskId\":47,\"templateVersion\":\"V1.0\",\"result\":\"SUCCESS\",\"reason\":\"所有步骤均收到实际设备成功反馈\"}"
+      ],
+      "operationLogsAfterEnable": [
+        "BASELINE_TEMPLATE_CREATE|SUCCESS|G132F009597D64DC",
+        "BASELINE_TEMPLATE_DRY_RUN|SUCCESS|G132F009597D64DC -> RUNNING",
+        "BASELINE_TEMPLATE_DRY_RUN_RESULT|SUCCESS|G132F009597D64DC(V1.0) 任务47 -> DRY_RUN_PASSED",
+        "BASELINE_TEMPLATE_ENABLE|SUCCESS|G132F009597D64DC"
+      ]
+    },
+    "enabled": "ENABLED"
+  },
+  "after": {
+    "formalCompleted": 26,
+    "allCompleted": 27,
+    "formalCount": 46,
+    "dryRunCount": 1,
+    "dashboard": {
+      "PLANNING": 1,
+      "SUPERVISING": 0,
+      "PENDING_ASSIGNMENT": 0,
+      "DOWNGRADING": 0,
+      "EXECUTING": 0,
+      "COMPLETED": 26,
+      "FAILED": 0,
+      "PENDING_MANUAL": 13,
+      "MANUAL_TERMINATED": 6
+    }
+  },
+  "cleanup": {
+    "templateStatus": "DISABLED"
+  }
+}

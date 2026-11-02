@@ -1,0 +1,322 @@
+{
+  "requirement": "SRS_F009",
+  "productTag": "V1.132",
+  "productSha": "5b9511a6daeafd9f740dd51a090d83f21a32195d",
+  "observedAt": "2026-11-02T06:42:41.638777+00:00",
+  "environment": {
+    "schema": "tip_gpt_f006_v118_20261030",
+    "backend": 18129,
+    "simulator": 18132,
+    "templatePrefix": "G132F009B37EE334F",
+    "agent": "AGT-803437A3"
+  },
+  "guards": {
+    "sixSteps": {
+      "http": 400,
+      "code": 4403,
+      "message": "模板步骤总数超过5"
+    },
+    "motionSafety": {
+      "http": 400,
+      "code": 4407,
+      "message": "[步骤1参数映射含运动安全控制字段: [speed]]"
+    },
+    "capabilityGap": {
+      "http": 400,
+      "code": 4406,
+      "message": "以下能力类型未存在已启用实例: [CAP_NOT_PRESENT]"
+    },
+    "created": {
+      "id": 25,
+      "version": "V1.0",
+      "status": "DRAFT"
+    },
+    "enableWithoutTrial": {
+      "http": 400,
+      "code": 4402,
+      "message": "模板未试运行或试运行未通过"
+    },
+    "missingInput": {
+      "http": 400,
+      "code": 3001,
+      "message": "缺少必填参数: targetLocation"
+    },
+    "missingDevice": {
+      "http": 400,
+      "code": 3001,
+      "message": "请为每个步骤选择模拟设备"
+    },
+    "wrongAgent": {
+      "http": 400,
+      "code": 4408,
+      "message": "设备代理不存在: AGT-NONEXISTENT"
+    },
+    "taskCountBeforeAfter": [
+      47,
+      47
+    ]
+  },
+  "runs": [
+    {
+      "mode": "FAILED",
+      "taskId": 48,
+      "result": {
+        "taskId": 48,
+        "taskCode": "TASK-20261102-0048",
+        "result": "FAILED",
+        "stepResults": [
+          {
+            "stepSeq": 1,
+            "result": "FAILED",
+            "duration": 1,
+            "failureReason": "SIMULATED_DEVICE_ERROR"
+          }
+        ],
+        "events": [
+          {
+            "eventType": "DRY_RUN_STARTED",
+            "trigger": "OPERATOR",
+            "detailSummary": "配置管理员set对模板G132F009B37EE334F(V1.0)发起试运行",
+            "occurredAt": "2026-11-02T14:42:42.410945"
+          },
+          {
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "trigger": "SYSTEM",
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-803437A3(距离0.0,负载0)，向候选AGT-803437A3发起承接请求",
+            "occurredAt": "2026-11-02T14:42:42.422589"
+          },
+          {
+            "eventType": "AGENT_ASSIGNED",
+            "trigger": "SYSTEM",
+            "detailSummary": "设备代理AGT-803437A3接受步骤1承接请求",
+            "occurredAt": "2026-11-02T14:42:42.477658"
+          },
+          {
+            "eventType": "STEP_DISPATCHED",
+            "trigger": "SYSTEM",
+            "detailSummary": "指令CMD-20261102144242-27AD7374已下发至设备代理AGT-803437A3，业务意图: null",
+            "occurredAt": "2026-11-02T14:42:42.484899"
+          },
+          {
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "trigger": "SYSTEM",
+            "detailSummary": "指令CMD-20261102144242-27AD7374收到设备代理AGT-803437A3执行反馈: FAILED",
+            "occurredAt": "2026-11-02T14:42:43.556367"
+          },
+          {
+            "eventType": "DRY_RUN_FAILED",
+            "trigger": "SYSTEM",
+            "detailSummary": "执行结果: FAILED，原因: SIMULATED_DEVICE_ERROR",
+            "occurredAt": "2026-11-02T14:42:43.581721"
+          }
+        ],
+        "failureReason": "执行结果: FAILED，原因: SIMULATED_DEVICE_ERROR"
+      },
+      "template": "DRAFT",
+      "enable": {
+        "http": 400,
+        "code": 4402,
+        "message": "模板未试运行或试运行未通过"
+      },
+      "task": [
+        "FAILED|t|执行结果: FAILED，原因: SIMULATED_DEVICE_ERROR"
+      ],
+      "operations": [
+        "BASELINE_TEMPLATE_CREATE|SUCCESS|G132F009B37EE334F|",
+        "BASELINE_TEMPLATE_DRY_RUN|SUCCESS|G132F009B37EE334F -> RUNNING|",
+        "BASELINE_TEMPLATE_DRY_RUN_RESULT|FAILED|G132F009B37EE334F(V1.0) 任务48 -> DRY_RUN_FAILED|{\"taskId\":48,\"templateVersion\":\"V1.0\",\"result\":\"FAILED\",\"reason\":\"执行结果: FAILED，原因: SIMULATED_DEVICE_ERROR\"}"
+      ]
+    },
+    {
+      "mode": "TIMEOUT",
+      "taskId": 49,
+      "result": {
+        "taskId": 49,
+        "taskCode": "TASK-20261102-0049",
+        "result": "FAILED",
+        "stepResults": [
+          {
+            "stepSeq": 1,
+            "result": "FAILED",
+            "duration": 1,
+            "failureReason": "SIMULATED_TIMEOUT"
+          }
+        ],
+        "events": [
+          {
+            "eventType": "DRY_RUN_STARTED",
+            "trigger": "OPERATOR",
+            "detailSummary": "配置管理员set对模板G132F009B37EE334F(V1.0)发起试运行",
+            "occurredAt": "2026-11-02T14:42:44.669696"
+          },
+          {
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "trigger": "SYSTEM",
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-803437A3(距离0.0,负载0)，向候选AGT-803437A3发起承接请求",
+            "occurredAt": "2026-11-02T14:42:44.683255"
+          },
+          {
+            "eventType": "AGENT_ASSIGNED",
+            "trigger": "SYSTEM",
+            "detailSummary": "设备代理AGT-803437A3接受步骤1承接请求",
+            "occurredAt": "2026-11-02T14:42:44.729621"
+          },
+          {
+            "eventType": "STEP_DISPATCHED",
+            "trigger": "SYSTEM",
+            "detailSummary": "指令CMD-20261102144244-1A386D15已下发至设备代理AGT-803437A3，业务意图: null",
+            "occurredAt": "2026-11-02T14:42:44.734250"
+          },
+          {
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "trigger": "SYSTEM",
+            "detailSummary": "指令CMD-20261102144244-1A386D15收到设备代理AGT-803437A3执行反馈: TIMEOUT",
+            "occurredAt": "2026-11-02T14:42:45.789937"
+          },
+          {
+            "eventType": "DRY_RUN_FAILED",
+            "trigger": "SYSTEM",
+            "detailSummary": "执行结果: TIMEOUT，原因: SIMULATED_TIMEOUT",
+            "occurredAt": "2026-11-02T14:42:45.805540"
+          }
+        ],
+        "failureReason": "执行结果: TIMEOUT，原因: SIMULATED_TIMEOUT"
+      },
+      "template": "DRAFT",
+      "enable": {
+        "http": 400,
+        "code": 4402,
+        "message": "模板未试运行或试运行未通过"
+      },
+      "task": [
+        "FAILED|t|执行结果: TIMEOUT，原因: SIMULATED_TIMEOUT"
+      ],
+      "operations": [
+        "BASELINE_TEMPLATE_CREATE|SUCCESS|G132F009B37EE334F|",
+        "BASELINE_TEMPLATE_DRY_RUN|SUCCESS|G132F009B37EE334F -> RUNNING|",
+        "BASELINE_TEMPLATE_DRY_RUN_RESULT|FAILED|G132F009B37EE334F(V1.0) 任务48 -> DRY_RUN_FAILED|{\"taskId\":48,\"templateVersion\":\"V1.0\",\"result\":\"FAILED\",\"reason\":\"执行结果: FAILED，原因: SIMULATED_DEVICE_ERROR\"}",
+        "BASELINE_TEMPLATE_DRY_RUN|SUCCESS|G132F009B37EE334F -> RUNNING|",
+        "BASELINE_TEMPLATE_DRY_RUN_RESULT|FAILED|G132F009B37EE334F(V1.0) 任务49 -> DRY_RUN_FAILED|{\"taskId\":49,\"templateVersion\":\"V1.0\",\"result\":\"FAILED\",\"reason\":\"执行结果: TIMEOUT，原因: SIMULATED_TIMEOUT\"}"
+      ]
+    }
+  ],
+  "version": {
+    "edited": [
+      "V1.1",
+      "DRAFT"
+    ],
+    "enableBeforeRetest": {
+      "http": 400,
+      "code": 4402,
+      "message": "模板未试运行或试运行未通过"
+    },
+    "retest": {
+      "taskId": 50,
+      "result": "SUCCESS",
+      "status": "DRY_RUN_PASSED"
+    },
+    "afterEnable": "ENABLED",
+    "operations": [
+      "BASELINE_TEMPLATE_CREATE|SUCCESS|G132F009B37EE334F|",
+      "BASELINE_TEMPLATE_DRY_RUN|SUCCESS|G132F009B37EE334F -> RUNNING|",
+      "BASELINE_TEMPLATE_DRY_RUN_RESULT|FAILED|G132F009B37EE334F(V1.0) 任务48 -> DRY_RUN_FAILED|{\"taskId\":48,\"templateVersion\":\"V1.0\",\"result\":\"FAILED\",\"reason\":\"执行结果: FAILED，原因: SIMULATED_DEVICE_ERROR\"}",
+      "BASELINE_TEMPLATE_DRY_RUN|SUCCESS|G132F009B37EE334F -> RUNNING|",
+      "BASELINE_TEMPLATE_DRY_RUN_RESULT|FAILED|G132F009B37EE334F(V1.0) 任务49 -> DRY_RUN_FAILED|{\"taskId\":49,\"templateVersion\":\"V1.0\",\"result\":\"FAILED\",\"reason\":\"执行结果: TIMEOUT，原因: SIMULATED_TIMEOUT\"}",
+      "BASELINE_TEMPLATE_UPDATE|SUCCESS|G132F009B37EE334F|",
+      "BASELINE_TEMPLATE_DRY_RUN|SUCCESS|G132F009B37EE334F -> RUNNING|",
+      "BASELINE_TEMPLATE_DRY_RUN_RESULT|SUCCESS|G132F009B37EE334F(V1.1) 任务50 -> DRY_RUN_PASSED|{\"taskId\":50,\"templateVersion\":\"V1.1\",\"result\":\"SUCCESS\",\"reason\":\"所有步骤均收到实际设备成功反馈\"}",
+      "BASELINE_TEMPLATE_ENABLE|SUCCESS|G132F009B37EE334F|"
+    ]
+  },
+  "cancel": {
+    "started": {
+      "taskId": 51,
+      "result": "RUNNING"
+    },
+    "result": {
+      "taskId": 51,
+      "taskCode": "TASK-20261102-0051",
+      "result": "CANCELLED",
+      "stepResults": [
+        {
+          "stepSeq": 1,
+          "result": "FROZEN",
+          "duration": 0,
+          "failureReason": null
+        },
+        {
+          "stepSeq": 2,
+          "result": "FROZEN",
+          "duration": 0,
+          "failureReason": null
+        },
+        {
+          "stepSeq": 3,
+          "result": "FROZEN",
+          "duration": 0,
+          "failureReason": null
+        },
+        {
+          "stepSeq": 4,
+          "result": "FROZEN",
+          "duration": 0,
+          "failureReason": null
+        },
+        {
+          "stepSeq": 5,
+          "result": "FROZEN",
+          "duration": 0,
+          "failureReason": null
+        }
+      ],
+      "events": [
+        {
+          "eventType": "DRY_RUN_STARTED",
+          "trigger": "OPERATOR",
+          "detailSummary": "配置管理员set对模板G132F009B37EE334FFIVE(V1.0)发起试运行",
+          "occurredAt": "2026-11-02T14:42:49.726721"
+        },
+        {
+          "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+          "trigger": "SYSTEM",
+          "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-803437A3(距离0.0,负载0)，向候选AGT-803437A3发起承接请求",
+          "occurredAt": "2026-11-02T14:42:49.743421"
+        },
+        {
+          "eventType": "TASK_CANCEL_REQUESTED",
+          "trigger": "OPERATOR",
+          "detailSummary": "已向设备代理AGT-803437A3发送业务任务取消请求",
+          "occurredAt": "2026-11-02T14:42:49.799969"
+        },
+        {
+          "eventType": "MANUAL_TERMINATED",
+          "trigger": "OPERATOR",
+          "detailSummary": "运行操作员set人工终止任务，原因: 配置管理员取消模板试运行，涉及设备: [AGT-803437A3]",
+          "occurredAt": "2026-11-02T14:42:50.807967"
+        },
+        {
+          "eventType": "DRY_RUN_FAILED",
+          "trigger": "SYSTEM",
+          "detailSummary": "配置管理员取消模板试运行",
+          "occurredAt": "2026-11-02T14:42:50.821647"
+        }
+      ],
+      "failureReason": "配置管理员取消模板试运行"
+    },
+    "commands": [
+      "TASK_ACCEPT|PENDING",
+      "TASK_CANCEL|SENT",
+      "TASK_CANCEL|SENT"
+    ],
+    "task": [
+      "MANUAL_TERMINATED|t"
+    ],
+    "templateStatus": "DRAFT"
+  },
+  "cleanup": {
+    "scenario": "SUCCESS",
+    "delayMs": 500,
+    "25": "DISABLED",
+    "26": "DISABLED"
+  }
+}
