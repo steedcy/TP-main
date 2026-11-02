@@ -1,0 +1,111 @@
+{
+  "version": "V1.135",
+  "codeSha": "d18a5d9b0b95c38c91aa051e3297c90610bd8c94",
+  "observedAt": "2026-11-02T20:59:01.768018+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "cases": [
+    {
+      "name": "emptyGoal",
+      "request": {
+        "taskGoal": "",
+        "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+        "sceneParams": {
+          "baggageLocation": "F2_TEST"
+        }
+      },
+      "response": {
+        "http": 400,
+        "body": {
+          "code": 3001,
+          "message": "任务目标长度需为1~500位",
+          "timestamp": "2026-11-02T20:59:01.852960700+08:00",
+          "path": "/api/v1/tasks",
+          "method": "POST"
+        }
+      }
+    },
+    {
+      "name": "tooLongGoal",
+      "request": {
+        "taskGoal": "测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测",
+        "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+        "sceneParams": {
+          "baggageLocation": "F2_TEST"
+        }
+      },
+      "response": {
+        "http": 400,
+        "body": {
+          "code": 3001,
+          "message": "任务目标长度需为1~500位",
+          "timestamp": "2026-11-02T20:59:01.868484500+08:00",
+          "path": "/api/v1/tasks",
+          "method": "POST"
+        }
+      }
+    },
+    {
+      "name": "missingExtendedRequired",
+      "request": {
+        "taskGoal": "扩展定义测试",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {}
+      },
+      "response": {
+        "http": 400,
+        "body": {
+          "code": 3000,
+          "message": "场景参数targetLocation为必填项",
+          "timestamp": "2026-11-02T20:59:01.893667200+08:00",
+          "path": "/api/v1/tasks",
+          "method": "POST"
+        }
+      }
+    },
+    {
+      "name": "identityCamel",
+      "request": {
+        "taskGoal": "虚构行李任务，位置待确认",
+        "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+        "sceneParams": {
+          "baggageLocation": "F2_TEST",
+          "passengerName": "FICTIONAL_CANARY_135",
+          "identityDocumentNumber": "FICTIONAL_ID_135"
+        }
+      },
+      "response": {
+        "http": 400,
+        "body": {
+          "code": 3001,
+          "message": "场景参数不得包含旅客身份信息字段: identityDocumentNumber、passengerName",
+          "timestamp": "2026-11-02T20:59:01.920722400+08:00",
+          "path": "/api/v1/tasks",
+          "method": "POST"
+        }
+      }
+    },
+    {
+      "name": "identityNormalized",
+      "request": {
+        "taskGoal": "虚构行李任务，位置待确认",
+        "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+        "sceneParams": {
+          "baggageLocation": "F2_TEST",
+          "PASSENGER-NAME": "FICTIONAL_CANARY_135"
+        }
+      },
+      "response": {
+        "http": 400,
+        "body": {
+          "code": 3001,
+          "message": "场景参数不得包含旅客身份信息字段: PASSENGER-NAME",
+          "timestamp": "2026-11-02T20:59:01.934368600+08:00",
+          "path": "/api/v1/tasks",
+          "method": "POST"
+        }
+      }
+    }
+  ],
+  "taskCountBefore": 46,
+  "taskCountAfter": 46
+}
