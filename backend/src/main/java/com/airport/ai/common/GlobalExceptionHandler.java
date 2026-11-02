@@ -82,6 +82,34 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(ErrorCode.PARAM_FORMAT_ERROR.getHttpStatus()).body(resp);
     }
 
+    /**
+     * 路径存在但不支持该方法（如对事件、操作记录发 PUT/DELETE）：这是客户端用法问题，不是服务内部故障，
+     * 返回明确的 405 并带 Allow，不被兜底成 500“系统繁忙”（DEF-S3-058、061）。请求没进入业务，数据不会被改动。
+     */
+    @ExceptionHandler(org.springframework.web.HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMethodNotSupported(
+            org.springframework.web.HttpRequestMethodNotSupportedException ex, HttpServletRequest req) {
+        ApiResponse<Void> resp = ApiResponse.error(ErrorCode.METHOD_NOT_ALLOWED.getCode(),
+                "该资源不支持" + req.getMethod() + "方法（记录不可修改或删除）");
+        resp.setPath(req.getRequestURI());
+        resp.setMethod(req.getMethod());
+        ResponseEntity.BodyBuilder builder = ResponseEntity.status(ErrorCode.METHOD_NOT_ALLOWED.getHttpStatus());
+        if (ex.getSupportedHttpMethods() != null && !ex.getSupportedHttpMethods().isEmpty()) {
+            builder.allow(ex.getSupportedHttpMethods().toArray(new org.springframework.http.HttpMethod[0]));
+        }
+        return builder.body(resp);
+    }
+
+    /** 路径不存在：明确的 404，不当作系统故障。 */
+    @ExceptionHandler({org.springframework.web.servlet.resource.NoResourceFoundException.class,
+            org.springframework.web.servlet.NoHandlerFoundException.class})
+    public ResponseEntity<ApiResponse<Void>> handleNoResource(Exception ex, HttpServletRequest req) {
+        ApiResponse<Void> resp = ApiResponse.error(ErrorCode.RESOURCE_NOT_FOUND.getCode(), "请求的资源不存在");
+        resp.setPath(req.getRequestURI());
+        resp.setMethod(req.getMethod());
+        return ResponseEntity.status(ErrorCode.RESOURCE_NOT_FOUND.getHttpStatus()).body(resp);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleUnexpectedException(Exception ex, HttpServletRequest req) {
         // 未预期异常必须打日志，否则根因被"系统繁忙"吞掉，后续排查无从下手

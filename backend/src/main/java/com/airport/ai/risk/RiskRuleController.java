@@ -41,14 +41,16 @@ public class RiskRuleController {
 
     @PostMapping
     public ApiResponse<RiskRule> create(@RequestBody Map<String, Object> body) {
-        String ruleCode = (String) body.get("ruleCode");
+        // 编号与内容必填，缺失或空白返回明确的参数错误，且不写入任何记录（DEF-S3-041）
+        String ruleCode = requiredText(body.get("ruleCode"), "规则编号", 64);
+        String ruleContent = requiredText(body.get("ruleContent"), "规则内容", 1000);
         if (riskRuleMapper.existsByRuleCode(ruleCode)) {
             throw new BusinessException(ErrorCode.RISK_RULE_CODE_TAKEN);
         }
         RiskRule rule = new RiskRule();
         rule.setRuleCode(ruleCode);
-        rule.setRuleContent((String) body.get("ruleContent"));
-        rule.setEnabled((Boolean) body.getOrDefault("enabled", true));
+        rule.setRuleContent(ruleContent);
+        rule.setEnabled(optionalBoolean(body.getOrDefault("enabled", true)));
         riskRuleMapper.insert(rule);
 
         User operator = currentUser.get();
@@ -61,6 +63,23 @@ public class RiskRuleController {
         return ApiResponse.ok(rule);
     }
 
+    static String requiredText(Object value, String label, int maxLength) {
+        if (!(value instanceof String text) || text.isBlank()) {
+            throw new BusinessException(ErrorCode.PARAM_MISSING, label + "不能为空");
+        }
+        String trimmed = text.trim();
+        if (trimmed.length() > maxLength) {
+            throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, label + "不得超过" + maxLength + "字");
+        }
+        return trimmed;
+    }
+
+    static boolean optionalBoolean(Object value) {
+        if (value instanceof Boolean b) return b;
+        if (value instanceof String s && ("true".equals(s) || "false".equals(s))) return Boolean.parseBoolean(s);
+        throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, "启用状态应为true或false");
+    }
+
     /** 修改规则内容/启用状态即生成新版本号（对应5.4.5业务规则10） */
     @PostMapping("/{ruleCode}/update")
     public ApiResponse<RiskRule> update(@PathVariable String ruleCode, @RequestBody Map<String, Object> body) {
@@ -70,12 +89,12 @@ public class RiskRuleController {
         Boolean beforeEnabled = rule.getEnabled();
         boolean versionChanged = false;
         if (body.containsKey("ruleContent")) {
-            rule.setRuleContent((String) body.get("ruleContent"));
+            rule.setRuleContent(requiredText(body.get("ruleContent"), "规则内容", 1000));
             versionChanged = true;
         }
         // 启用/停用同样改变生效规则集，须生成新版本以便监督判定可追溯（DEF-S3-043）
         if (body.containsKey("enabled")) {
-            Boolean newEnabled = (Boolean) body.get("enabled");
+            Boolean newEnabled = optionalBoolean(body.get("enabled"));
             versionChanged |= !java.util.Objects.equals(beforeEnabled, newEnabled);
             rule.setEnabled(newEnabled);
         }

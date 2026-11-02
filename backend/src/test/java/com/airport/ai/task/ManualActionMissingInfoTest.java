@@ -60,7 +60,7 @@ class ManualActionMissingInfoTest {
     @Test
     void markFailedIsStillAllowedWhileInformationIsMissing() {
         Task task = pendingManual("[\"请提供起点\"]");
-        service.manualAction(7L, "MARK_FAILED", operator());
+        service.manualAction(7L, "MARK_FAILED", "关键信息一直无法补齐", operator());
         assertEquals(TaskStatus.FAILED, task.getStatus());
     }
 

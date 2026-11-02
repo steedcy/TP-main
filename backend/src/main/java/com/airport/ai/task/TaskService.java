@@ -214,9 +214,21 @@ public class TaskService {
      * 现已恢复"等场景）；RETRY_PLANNING语义与之相同，两者均是重新走一次advance；
      * MARK_FAILED直接将任务置为失败并记录原因。
      */
-    @Transactional
     public Task manualAction(Long taskId, String action, User operator) {
+        return manualAction(taskId, action, null, operator);
+    }
+
+    @Transactional
+    public Task manualAction(Long taskId, String action, String reason, User operator) {
         Task task = get(taskId);
+        String cleanReason = reason == null || reason.isBlank() ? null : reason.trim();
+        // 置为失败不可逆，必须写明原因；转基线/重试规划的原因可选（DEF-S3-062、F020.R08）
+        if ("MARK_FAILED".equals(action) && cleanReason == null) {
+            throw new BusinessException(ErrorCode.PARAM_MISSING, "置为失败须填写处置原因");
+        }
+        if (cleanReason != null && cleanReason.length() > 200) {
+            throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, "处置原因不得超过200字");
+        }
         if (task.getStatus() != TaskStatus.PENDING_MANUAL) {
             throw new BusinessException(ErrorCode.TASK_STATUS_NOT_ALLOWED, "任务当前状态不是待人工处理，不可执行该操作");
         }
@@ -237,16 +249,17 @@ public class TaskService {
                 taskMapper.update(task);
                 taskEventService.append(taskId, "SWITCH_TO_BASELINE".equals(action)
                                 ? "BASELINE_SWITCH_REQUESTED" : "REPLANNING_TRIGGERED", "OPERATOR", null,
-                        "运行操作员" + operator.getUsername() + "选择" + action);
+                        "运行操作员" + operator.getUsername() + "选择" + action
+                                + (cleanReason == null ? "" : "，原因: " + cleanReason));
                 if ("SWITCH_TO_BASELINE".equals(action)) taskPlanningOrchestrator.switchToBaseline(taskId);
                 else taskPlanningOrchestrator.advance(taskId);
             }
             case "MARK_FAILED" -> {
                 task.setStatus(TaskStatus.FAILED);
-                task.setFailureReason("运行操作员" + operator.getUsername() + "在待人工处理阶段手动置为失败");
+                task.setFailureReason("运行操作员" + operator.getUsername() + "在待人工处理阶段手动置为失败，原因: " + cleanReason);
                 task.setUpdatedAt(LocalDateTime.now());
                 taskMapper.update(task);
-                taskEventService.append(taskId, "TASK_FAILED", "OPERATOR", null, task.getFailureReason());
+                taskEventService.append(taskId, "TASK_FAILED", "OPERATOR", "MANUAL_MARK_FAILED", task.getFailureReason());
             }
             default -> throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, "未知的人工处理动作: " + action);
         }
@@ -255,8 +268,12 @@ public class TaskService {
         boolean failed = result.getStatus() == TaskStatus.PENDING_MANUAL;
         if (failed) taskEventService.append(taskId, "TASK_MANUAL_ACTION_FAILED", "SYSTEM",
                 "ERR_MANUAL_ACTION_FAILED", result.getFailureReason());
+        Map<String, Object> actionDetail = new HashMap<>();
+        actionDetail.put("action", action);
+        actionDetail.put("reason", cleanReason);
+        actionDetail.put("resultStatus", result.getStatus().name());
         operationLogService.record(operator.getId(), operator.getUsername(), operator.getRole(),
-                "TASK_MANUAL_ACTION", task.getTaskCode() + " -> " + action, failed ? "FAILED" : "SUCCESS", null);
+                "TASK_MANUAL_ACTION", task.getTaskCode() + " -> " + action, failed ? "FAILED" : "SUCCESS", null, actionDetail);
         return result;
     }
 
@@ -301,6 +318,7 @@ public class TaskService {
                     "任务当前状态为" + task.getStatus() + "，已处于终态，不可终止");
         }
 
+        TaskStatus previousStatus = task.getStatus();
         List<Map<String, String>> deviceResults = new ArrayList<>();
         Map<Long, TaskStepAssignment> activeAssignmentsByAgent = new HashMap<>();
         if (task.getCurrentPlanVersionId() != null) {
@@ -333,11 +351,11 @@ public class TaskService {
                         assignment == null ? agent.getCurrentStepSeq() : assignment.getStepSeq());
                 taskEventService.append(taskId, "TASK_CANCEL_REQUESTED", "OPERATOR", null,
                         "已向设备代理" + agentCode + "发送业务任务取消请求");
-                deviceResults.add(Map.of("agentId", agentCode, "result", "CANCEL_QUEUED"));
+                deviceResults.add(Map.of("agentId", agentCode, "result", "CANCEL_QUEUED", "cancelCommandId", cancelCommandId));
             } catch (RuntimeException ex) {
                 taskEventService.append(taskId, "TASK_CANCEL_DELIVERY_FAILED", "OPERATOR", "DEVICE_API_ERROR",
                         "向设备代理" + agentCode + "发送业务任务取消请求失败: " + ex.getMessage());
-                deviceResults.add(Map.of("agentId", agentCode, "result", "CANCEL_FAILED"));
+                deviceResults.add(Map.of("agentId", agentCode, "result", "CANCEL_FAILED", "cancelCommandId", cancelCommandId));
             }
             // A queued cancellation does not prove the device stopped. Keep it unavailable
             // until an IDLE status report confirms release (or an operator resolves it).
@@ -354,8 +372,14 @@ public class TaskService {
         taskEventService.append(taskId, "MANUAL_TERMINATED", "OPERATOR", null,
                 "运行操作员" + operator.getUsername() + "人工终止任务，原因: " + reason
                         + "，涉及设备: " + deviceResults.stream().map(m -> m.get("agentId")).toList());
+        // 操作日志也要有终止原因和每个设备的取消结果，与时间线对应（DEF-S3-059、F021.R08）。
+        // 取消请求只表示已排队，设备是否空闲以后续CONFIRMED_IDLE事件为准，这里记录的是“请求结果”。
+        Map<String, Object> terminateDetail = new HashMap<>();
+        terminateDetail.put("reason", reason);
+        terminateDetail.put("previousStatus", previousStatus.name());
+        terminateDetail.put("deviceCancelResults", deviceResults);
         operationLogService.record(operator.getId(), operator.getUsername(), operator.getRole(),
-                "TASK_TERMINATE", task.getTaskCode(), "SUCCESS", null);
+                "TASK_TERMINATE", task.getTaskCode(), "SUCCESS", null, terminateDetail);
         return task;
     }
 
