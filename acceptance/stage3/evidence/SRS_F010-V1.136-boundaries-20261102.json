@@ -1,0 +1,886 @@
+{
+  "version": "V1.136",
+  "codeSha": "b9e9333d153dff71f62c21a8bf3ce0f5b93d21d3",
+  "observedAt": "2026-11-02T21:40:28.378613+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "cases": [
+    {
+      "name": "empty",
+      "request": {
+        "taskGoal": "",
+        "taskFamily": "EXT_2774F80E",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE",
+          "headCount": 2,
+          "riskScore": 0.5,
+          "acknowledged": true
+        }
+      },
+      "response": {
+        "http": 400,
+        "body": {
+          "code": 3001,
+          "message": "任务目标长度需为1~500位",
+          "timestamp": "2026-11-02T21:40:30.201864600+08:00",
+          "path": "/api/v1/tasks",
+          "method": "POST"
+        }
+      },
+      "before": {
+        "tasks": 68,
+        "modelCalls": 3
+      },
+      "after": {
+        "tasks": 68,
+        "modelCalls": 3
+      }
+    },
+    {
+      "name": "tooLong",
+      "request": {
+        "taskGoal": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+        "taskFamily": "EXT_2774F80E",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE",
+          "headCount": 2,
+          "riskScore": 0.5,
+          "acknowledged": true
+        }
+      },
+      "response": {
+        "http": 400,
+        "body": {
+          "code": 3001,
+          "message": "任务目标长度需为1~500位",
+          "timestamp": "2026-11-02T21:40:31.894103800+08:00",
+          "path": "/api/v1/tasks",
+          "method": "POST"
+        }
+      },
+      "before": {
+        "tasks": 68,
+        "modelCalls": 3
+      },
+      "after": {
+        "tasks": 68,
+        "modelCalls": 3
+      }
+    },
+    {
+      "name": "missing",
+      "request": {
+        "taskGoal": "G136_TYPED synthetic navigation",
+        "taskFamily": "EXT_2774F80E",
+        "sceneParams": {
+          "headCount": 2,
+          "riskScore": 0.5,
+          "acknowledged": true
+        }
+      },
+      "response": {
+        "http": 400,
+        "body": {
+          "code": 3000,
+          "message": "场景参数targetLocation为必填项",
+          "timestamp": "2026-11-02T21:40:32.695530100+08:00",
+          "path": "/api/v1/tasks",
+          "method": "POST"
+        }
+      },
+      "before": {
+        "tasks": 68,
+        "modelCalls": 3
+      },
+      "after": {
+        "tasks": 68,
+        "modelCalls": 3
+      }
+    },
+    {
+      "name": "wrongInteger",
+      "request": {
+        "taskGoal": "G136_TYPED synthetic navigation",
+        "taskFamily": "EXT_2774F80E",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE",
+          "headCount": "two",
+          "riskScore": 0.5,
+          "acknowledged": true
+        }
+      },
+      "response": {
+        "http": 400,
+        "body": {
+          "code": 3001,
+          "message": "场景参数headCount类型应为Integer",
+          "timestamp": "2026-11-02T21:40:33.182876700+08:00",
+          "path": "/api/v1/tasks",
+          "method": "POST"
+        }
+      },
+      "before": {
+        "tasks": 68,
+        "modelCalls": 3
+      },
+      "after": {
+        "tasks": 68,
+        "modelCalls": 3
+      }
+    },
+    {
+      "name": "wrongDouble",
+      "request": {
+        "taskGoal": "G136_TYPED synthetic navigation",
+        "taskFamily": "EXT_2774F80E",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE",
+          "headCount": 2,
+          "riskScore": "high",
+          "acknowledged": true
+        }
+      },
+      "response": {
+        "http": 400,
+        "body": {
+          "code": 3001,
+          "message": "场景参数riskScore类型应为Double",
+          "timestamp": "2026-11-02T21:40:33.649755+08:00",
+          "path": "/api/v1/tasks",
+          "method": "POST"
+        }
+      },
+      "before": {
+        "tasks": 68,
+        "modelCalls": 3
+      },
+      "after": {
+        "tasks": 68,
+        "modelCalls": 3
+      }
+    },
+    {
+      "name": "wrongBoolean",
+      "request": {
+        "taskGoal": "G136_TYPED synthetic navigation",
+        "taskFamily": "EXT_2774F80E",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE",
+          "headCount": 2,
+          "riskScore": 0.5,
+          "acknowledged": "maybe"
+        }
+      },
+      "response": {
+        "http": 400,
+        "body": {
+          "code": 3001,
+          "message": "场景参数acknowledged类型应为Boolean",
+          "timestamp": "2026-11-02T21:40:34.145937700+08:00",
+          "path": "/api/v1/tasks",
+          "method": "POST"
+        }
+      },
+      "before": {
+        "tasks": 68,
+        "modelCalls": 3
+      },
+      "after": {
+        "tasks": 68,
+        "modelCalls": 3
+      }
+    },
+    {
+      "name": "overlongString",
+      "request": {
+        "taskGoal": "G136_TYPED synthetic navigation",
+        "taskFamily": "EXT_2774F80E",
+        "sceneParams": {
+          "targetLocation": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+          "headCount": 2,
+          "riskScore": 0.5,
+          "acknowledged": true
+        }
+      },
+      "response": {
+        "http": 400,
+        "body": {
+          "code": 3001,
+          "message": "场景参数targetLocation过长",
+          "timestamp": "2026-11-02T21:40:34.599659400+08:00",
+          "path": "/api/v1/tasks",
+          "method": "POST"
+        }
+      },
+      "before": {
+        "tasks": 68,
+        "modelCalls": 3
+      },
+      "after": {
+        "tasks": 68,
+        "modelCalls": 3
+      }
+    },
+    {
+      "name": "oneCharacter",
+      "request": {
+        "taskGoal": "A",
+        "taskFamily": "EXT_2774F80E",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE",
+          "headCount": 2,
+          "riskScore": 0.5,
+          "acknowledged": true
+        }
+      },
+      "response": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 69,
+            "taskCode": "TASK-20261102-0069",
+            "taskGoal": "A",
+            "taskFamily": "EXT_2774F80E",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE",
+              "headCount": 2,
+              "riskScore": 0.5,
+              "acknowledged": true
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=true",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "A",
+              "constraints": [
+                "virtual test only"
+              ]
+            },
+            "status": "PLANNING",
+            "currentPlanVersionId": null,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": null,
+            "failureReason": null,
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-02T21:40:34.9639371",
+            "updatedAt": "2026-11-02T21:40:34.9639371",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-02T21:40:35.035594400+08:00"
+        }
+      },
+      "before": {
+        "tasks": 68,
+        "modelCalls": 3
+      },
+      "after": {
+        "tasks": 69,
+        "modelCalls": 5
+      },
+      "task": {
+        "id": 69,
+        "taskCode": "TASK-20261102-0069",
+        "taskGoal": "A",
+        "taskFamily": "EXT_2774F80E",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE",
+          "headCount": 2,
+          "riskScore": 0.5,
+          "acknowledged": true
+        },
+        "goalParsingResult": {
+          "completionCondition": "routeGenerated=true",
+          "origin": "F2_SERVICE_POINT",
+          "destination": "F2_TEST_GATE",
+          "originalGoal": "A",
+          "constraints": [
+            "virtual test only"
+          ]
+        },
+        "status": "PENDING_MANUAL",
+        "currentPlanVersionId": 62,
+        "replanUsed": false,
+        "replanningReason": null,
+        "manualTerminateReason": null,
+        "failureReason": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板",
+        "missingInfoQuestions": null,
+        "downgradeReason": null,
+        "isDryRun": false,
+        "createdAt": "2026-11-02T21:40:34.963937",
+        "updatedAt": "2026-11-02T21:40:35.032943",
+        "createdBy": "oprator"
+      },
+      "plans": [
+        {
+          "id": 62,
+          "versionNo": 1,
+          "source": "AUTONOMOUS",
+          "baselineTemplateId": null,
+          "snapshotId": "CTX-20261102-0034",
+          "planSteps": [
+            {
+              "stepSeq": 1,
+              "stepGoal": "Virtual navigation",
+              "capabilityType": "CAP_NAVIGATION",
+              "inputParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "precondition": "device online",
+              "completionCondition": "routeGenerated=true",
+              "failureHandling": "manual",
+              "stepTimeout": 60
+            }
+          ],
+          "structureCheckResult": "PASS",
+          "capabilityCheckResult": "PASS",
+          "constraintCheckResult": "PASS",
+          "validationErrors": [],
+          "riskLevel": "HIGH",
+          "riskReasonCode": "RULE_RESOURCE_CRITICAL",
+          "judgmentBasis": "可用备用候选设备数量(0)低于配置阈值(1)，命中确定性高风险规则",
+          "confidence": 0.99,
+          "ruleSetVersion": "V1.0",
+          "frozenAt": "2026-11-02T21:40:35.010931",
+          "createdAt": "2026-11-02T21:40:34.997095"
+        }
+      ],
+      "events": [
+        {
+          "id": 530,
+          "taskId": 69,
+          "eventType": "GOAL_SUBMITTED",
+          "occurredAt": "2026-11-02T21:40:34.967952",
+          "trigger": "OPERATOR",
+          "reasonCode": null,
+          "detailSummary": "运行操作员oprator提交任务目标: A"
+        },
+        {
+          "id": 531,
+          "taskId": 69,
+          "eventType": "GOAL_CLARIFIED",
+          "occurredAt": "2026-11-02T21:40:34.978615",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+        },
+        {
+          "id": 532,
+          "taskId": 69,
+          "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+          "occurredAt": "2026-11-02T21:40:34.989976",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "生成规划上下文快照CTX-20261102-0034"
+        },
+        {
+          "id": 533,
+          "taskId": 69,
+          "eventType": "PLAN_GENERATED",
+          "occurredAt": "2026-11-02T21:40:35.001488",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+        },
+        {
+          "id": 534,
+          "taskId": 69,
+          "eventType": "PLAN_VALIDATED",
+          "occurredAt": "2026-11-02T21:40:35.010931",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+        },
+        {
+          "id": 535,
+          "taskId": 69,
+          "eventType": "SUPERVISION_JUDGED",
+          "occurredAt": "2026-11-02T21:40:35.029274",
+          "trigger": "SYSTEM",
+          "reasonCode": "RULE_RESOURCE_CRITICAL",
+          "detailSummary": "监督判定: HIGH，可用备用候选设备数量(0)低于配置阈值(1)，命中确定性高风险规则"
+        },
+        {
+          "id": 536,
+          "taskId": 69,
+          "eventType": "BASELINE_DOWNGRADED",
+          "occurredAt": "2026-11-02T21:40:35.029274",
+          "trigger": "SYSTEM",
+          "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+          "detailSummary": "无匹配的已启用基线模板: 监督判定高风险: RULE_RESOURCE_CRITICAL"
+        },
+        {
+          "id": 537,
+          "taskId": 69,
+          "eventType": "TASK_PENDING_MANUAL",
+          "occurredAt": "2026-11-02T21:40:35.032943",
+          "trigger": "SYSTEM",
+          "reasonCode": "ERR_PLANNING_FAILED",
+          "detailSummary": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板"
+        }
+      ]
+    },
+    {
+      "name": "fiveHundredCharacters",
+      "request": {
+        "taskGoal": "G136_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+        "taskFamily": "EXT_2774F80E",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE",
+          "headCount": 2,
+          "riskScore": 0.5,
+          "acknowledged": true
+        }
+      },
+      "response": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 70,
+            "taskCode": "TASK-20261102-0070",
+            "taskGoal": "G136_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+            "taskFamily": "EXT_2774F80E",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE",
+              "headCount": 2,
+              "riskScore": 0.5,
+              "acknowledged": true
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=true",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "G136_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+              "constraints": [
+                "virtual test only"
+              ]
+            },
+            "status": "PLANNING",
+            "currentPlanVersionId": null,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": null,
+            "failureReason": null,
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-02T21:40:35.5236398",
+            "updatedAt": "2026-11-02T21:40:35.5236398",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-02T21:40:35.585787300+08:00"
+        }
+      },
+      "before": {
+        "tasks": 69,
+        "modelCalls": 5
+      },
+      "after": {
+        "tasks": 70,
+        "modelCalls": 7
+      },
+      "task": {
+        "id": 70,
+        "taskCode": "TASK-20261102-0070",
+        "taskGoal": "G136_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+        "taskFamily": "EXT_2774F80E",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE",
+          "headCount": 2,
+          "riskScore": 0.5,
+          "acknowledged": true
+        },
+        "goalParsingResult": {
+          "completionCondition": "routeGenerated=true",
+          "origin": "F2_SERVICE_POINT",
+          "destination": "F2_TEST_GATE",
+          "originalGoal": "G136_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+          "constraints": [
+            "virtual test only"
+          ]
+        },
+        "status": "PENDING_MANUAL",
+        "currentPlanVersionId": 63,
+        "replanUsed": false,
+        "replanningReason": null,
+        "manualTerminateReason": null,
+        "failureReason": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板",
+        "missingInfoQuestions": null,
+        "downgradeReason": null,
+        "isDryRun": false,
+        "createdAt": "2026-11-02T21:40:35.52364",
+        "updatedAt": "2026-11-02T21:40:35.57799",
+        "createdBy": "oprator"
+      },
+      "plans": [
+        {
+          "id": 63,
+          "versionNo": 1,
+          "source": "AUTONOMOUS",
+          "baselineTemplateId": null,
+          "snapshotId": "CTX-20261102-0035",
+          "planSteps": [
+            {
+              "stepSeq": 1,
+              "stepGoal": "Virtual navigation",
+              "capabilityType": "CAP_NAVIGATION",
+              "inputParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "precondition": "device online",
+              "completionCondition": "routeGenerated=true",
+              "failureHandling": "manual",
+              "stepTimeout": 60
+            }
+          ],
+          "structureCheckResult": "PASS",
+          "capabilityCheckResult": "PASS",
+          "constraintCheckResult": "PASS",
+          "validationErrors": [],
+          "riskLevel": "HIGH",
+          "riskReasonCode": "RULE_RESOURCE_CRITICAL",
+          "judgmentBasis": "可用备用候选设备数量(0)低于配置阈值(1)，命中确定性高风险规则",
+          "confidence": 0.99,
+          "ruleSetVersion": "V1.0",
+          "frozenAt": "2026-11-02T21:40:35.56786",
+          "createdAt": "2026-11-02T21:40:35.556112"
+        }
+      ],
+      "events": [
+        {
+          "id": 538,
+          "taskId": 70,
+          "eventType": "GOAL_SUBMITTED",
+          "occurredAt": "2026-11-02T21:40:35.525787",
+          "trigger": "OPERATOR",
+          "reasonCode": null,
+          "detailSummary": "运行操作员oprator提交任务目标: G136_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+        },
+        {
+          "id": 539,
+          "taskId": 70,
+          "eventType": "GOAL_CLARIFIED",
+          "occurredAt": "2026-11-02T21:40:35.536491",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+        },
+        {
+          "id": 540,
+          "taskId": 70,
+          "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+          "occurredAt": "2026-11-02T21:40:35.5489",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "生成规划上下文快照CTX-20261102-0035"
+        },
+        {
+          "id": 541,
+          "taskId": 70,
+          "eventType": "PLAN_GENERATED",
+          "occurredAt": "2026-11-02T21:40:35.560813",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+        },
+        {
+          "id": 542,
+          "taskId": 70,
+          "eventType": "PLAN_VALIDATED",
+          "occurredAt": "2026-11-02T21:40:35.56786",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+        },
+        {
+          "id": 543,
+          "taskId": 70,
+          "eventType": "SUPERVISION_JUDGED",
+          "occurredAt": "2026-11-02T21:40:35.575454",
+          "trigger": "SYSTEM",
+          "reasonCode": "RULE_RESOURCE_CRITICAL",
+          "detailSummary": "监督判定: HIGH，可用备用候选设备数量(0)低于配置阈值(1)，命中确定性高风险规则"
+        },
+        {
+          "id": 544,
+          "taskId": 70,
+          "eventType": "BASELINE_DOWNGRADED",
+          "occurredAt": "2026-11-02T21:40:35.57799",
+          "trigger": "SYSTEM",
+          "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+          "detailSummary": "无匹配的已启用基线模板: 监督判定高风险: RULE_RESOURCE_CRITICAL"
+        },
+        {
+          "id": 545,
+          "taskId": 70,
+          "eventType": "TASK_PENDING_MANUAL",
+          "occurredAt": "2026-11-02T21:40:35.583081",
+          "trigger": "SYSTEM",
+          "reasonCode": "ERR_PLANNING_FAILED",
+          "detailSummary": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板"
+        }
+      ]
+    },
+    {
+      "name": "automaticFamily",
+      "request": {
+        "taskGoal": "G136_AUTO synthetic special assistance from F2_SERVICE_POINT to F2_TEST_GATE",
+        "sceneParams": {
+          "assistanceType": "wheelchair",
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "response": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 71,
+            "taskCode": "TASK-20261102-0071",
+            "taskGoal": "G136_AUTO synthetic special assistance from F2_SERVICE_POINT to F2_TEST_GATE",
+            "taskFamily": "SPECIAL_PASSENGER_SERVICE",
+            "sceneParams": {
+              "assistanceType": "wheelchair",
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=true",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "G136_AUTO synthetic special assistance from F2_SERVICE_POINT to F2_TEST_GATE",
+              "constraints": [
+                "virtual test only"
+              ]
+            },
+            "status": "PLANNING",
+            "currentPlanVersionId": null,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": null,
+            "failureReason": null,
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-02T21:40:36.0718121",
+            "updatedAt": "2026-11-02T21:40:36.0718121",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-02T21:40:36.123162+08:00"
+        }
+      },
+      "before": {
+        "tasks": 70,
+        "modelCalls": 7
+      },
+      "after": {
+        "tasks": 71,
+        "modelCalls": 9
+      },
+      "task": {
+        "id": 71,
+        "taskCode": "TASK-20261102-0071",
+        "taskGoal": "G136_AUTO synthetic special assistance from F2_SERVICE_POINT to F2_TEST_GATE",
+        "taskFamily": "SPECIAL_PASSENGER_SERVICE",
+        "sceneParams": {
+          "assistanceType": "wheelchair",
+          "targetLocation": "F2_TEST_GATE"
+        },
+        "goalParsingResult": {
+          "completionCondition": "routeGenerated=true",
+          "origin": "F2_SERVICE_POINT",
+          "destination": "F2_TEST_GATE",
+          "originalGoal": "G136_AUTO synthetic special assistance from F2_SERVICE_POINT to F2_TEST_GATE",
+          "constraints": [
+            "virtual test only"
+          ]
+        },
+        "status": "PENDING_MANUAL",
+        "currentPlanVersionId": 64,
+        "replanUsed": false,
+        "replanningReason": null,
+        "manualTerminateReason": null,
+        "failureReason": "候选计划三类校验未通过，转基线模板降级；且无匹配的已启用基线模板",
+        "missingInfoQuestions": null,
+        "downgradeReason": null,
+        "isDryRun": false,
+        "createdAt": "2026-11-02T21:40:36.071812",
+        "updatedAt": "2026-11-02T21:40:36.118242",
+        "createdBy": "oprator"
+      },
+      "plans": [
+        {
+          "id": 64,
+          "versionNo": 1,
+          "source": "AUTONOMOUS",
+          "baselineTemplateId": null,
+          "snapshotId": "CTX-20261102-0036",
+          "planSteps": [
+            {
+              "stepSeq": 1,
+              "stepGoal": "Virtual navigation",
+              "capabilityType": "CAP_NAVIGATION",
+              "inputParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "precondition": "device online",
+              "completionCondition": "routeGenerated=true",
+              "failureHandling": "manual",
+              "stepTimeout": 60
+            }
+          ],
+          "structureCheckResult": "PASS",
+          "capabilityCheckResult": "FAIL",
+          "constraintCheckResult": "PASS",
+          "validationErrors": [
+            {
+              "errorType": "CAPABILITY",
+              "description": "核心场景计划缺少必需渠道SMART_DISPLAY的能力CAP_INFO_DISPLAY",
+              "stepSeq": null,
+              "reasonCode": "ERR_REQUIRED_CHANNEL_MISSING"
+            },
+            {
+              "errorType": "CAPABILITY",
+              "description": "核心场景计划缺少必需渠道MOBILE_ROBOT的能力CAP_NOTIFICATION",
+              "stepSeq": null,
+              "reasonCode": "ERR_REQUIRED_CHANNEL_MISSING"
+            },
+            {
+              "errorType": "CAPABILITY",
+              "description": "核心场景计划缺少必需渠道MOBILE_ROBOT的能力CAP_ESCORT",
+              "stepSeq": null,
+              "reasonCode": "ERR_REQUIRED_CHANNEL_MISSING"
+            }
+          ],
+          "riskLevel": null,
+          "riskReasonCode": null,
+          "judgmentBasis": null,
+          "confidence": 0.99,
+          "ruleSetVersion": null,
+          "frozenAt": null,
+          "createdAt": "2026-11-02T21:40:36.104684"
+        }
+      ],
+      "events": [
+        {
+          "id": 546,
+          "taskId": 71,
+          "eventType": "GOAL_SUBMITTED",
+          "occurredAt": "2026-11-02T21:40:36.073862",
+          "trigger": "OPERATOR",
+          "reasonCode": null,
+          "detailSummary": "运行操作员oprator提交任务目标: G136_AUTO synthetic special assistance from F2_SERVICE_POINT to F2_TEST_GATE"
+        },
+        {
+          "id": 547,
+          "taskId": 71,
+          "eventType": "GOAL_CLARIFIED",
+          "occurredAt": "2026-11-02T21:40:36.084622",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+        },
+        {
+          "id": 548,
+          "taskId": 71,
+          "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+          "occurredAt": "2026-11-02T21:40:36.094686",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "生成规划上下文快照CTX-20261102-0036"
+        },
+        {
+          "id": 549,
+          "taskId": 71,
+          "eventType": "PLAN_GENERATED",
+          "occurredAt": "2026-11-02T21:40:36.108393",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+        },
+        {
+          "id": 550,
+          "taskId": 71,
+          "eventType": "PLAN_VALIDATED",
+          "occurredAt": "2026-11-02T21:40:36.115728",
+          "trigger": "SYSTEM",
+          "reasonCode": "ERR_VALIDATION_FAILED",
+          "detailSummary": "候选计划三类校验未通过: 3项错误"
+        },
+        {
+          "id": 551,
+          "taskId": 71,
+          "eventType": "BASELINE_DOWNGRADED",
+          "occurredAt": "2026-11-02T21:40:36.118242",
+          "trigger": "SYSTEM",
+          "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+          "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级"
+        },
+        {
+          "id": 552,
+          "taskId": 71,
+          "eventType": "TASK_PENDING_MANUAL",
+          "occurredAt": "2026-11-02T21:40:36.120773",
+          "trigger": "SYSTEM",
+          "reasonCode": "ERR_PLANNING_FAILED",
+          "detailSummary": "候选计划三类校验未通过，转基线模板降级；且无匹配的已启用基线模板"
+        }
+      ]
+    }
+  ],
+  "definition": {
+    "id": 16,
+    "definitionCode": "EXT_2774F80E",
+    "taskName": "G136 F010 typed scene 214028",
+    "goalTemplate": "Synthetic navigation to selected location",
+    "sceneParams": [
+      {
+        "name": "targetLocation",
+        "type": "String",
+        "required": true,
+        "defaultValue": null,
+        "range": "virtual gate"
+      },
+      {
+        "name": "headCount",
+        "type": "Integer",
+        "required": true,
+        "defaultValue": null,
+        "range": "1-10"
+      },
+      {
+        "name": "riskScore",
+        "type": "Double",
+        "required": true,
+        "defaultValue": null,
+        "range": "0-1"
+      },
+      {
+        "name": "acknowledged",
+        "type": "Boolean",
+        "required": true,
+        "defaultValue": null,
+        "range": "true/false"
+      }
+    ],
+    "availableCapabilityTypes": [
+      "CAP_NAVIGATION"
+    ],
+    "constraintDescription": "Virtual test only",
+    "completionCondition": "routeGenerated=true",
+    "isPreset": false,
+    "definitionStatus": "ENABLED",
+    "updatedAt": "2026-11-02T21:40:29.5375393",
+    "updatedBy": "set"
+  },
+  "assertions": {
+    "invalidRejectedBeforeCreateAndModel": true,
+    "oneAndFiveHundredAccepted": true,
+    "automaticFamilyInferred": true
+  }
+}

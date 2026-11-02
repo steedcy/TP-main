@@ -1,0 +1,495 @@
+{
+  "version": "V1.136",
+  "codeSha": "b9e9333d153dff71f62c21a8bf3ce0f5b93d21d3",
+  "observedAt": "2026-11-02T21:44:42.952539+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "cases": [
+    {
+      "id": 73,
+      "task": {
+        "id": 73,
+        "taskCode": "TASK-20261102-0073",
+        "taskGoal": "G135_MISSING virtual assist, location unknown",
+        "taskFamily": "SPECIAL_PASSENGER_SERVICE",
+        "sceneParams": {
+          "clarificationAnswers": [
+            {
+              "answers": {
+                "targetLocation": "unknown"
+              },
+              "questions": [
+                "targetLocation"
+              ]
+            }
+          ]
+        },
+        "goalParsingResult": {
+          "completionCondition": "routeGenerated=true",
+          "origin": "F2_SERVICE_POINT",
+          "destination": null,
+          "originalGoal": "G135_MISSING virtual assist, location unknown",
+          "constraints": [
+            "virtual test only"
+          ]
+        },
+        "status": "MANUAL_TERMINATED",
+        "currentPlanVersionId": null,
+        "replanUsed": false,
+        "replanningReason": null,
+        "manualTerminateReason": "V1.136 F010 fixture cancellation",
+        "failureReason": null,
+        "missingInfoQuestions": [
+          "targetLocation"
+        ],
+        "downgradeReason": null,
+        "isDryRun": false,
+        "createdAt": "2026-11-02T21:44:26.493358",
+        "updatedAt": "2026-11-02T21:44:26.799147",
+        "createdBy": "oprator"
+      },
+      "plans": [],
+      "events": [
+        {
+          "id": 561,
+          "taskId": 73,
+          "eventType": "GOAL_SUBMITTED",
+          "occurredAt": "2026-11-02T21:44:26.495537",
+          "trigger": "OPERATOR",
+          "reasonCode": null,
+          "detailSummary": "运行操作员oprator提交任务目标: G135_MISSING virtual assist, location unknown"
+        },
+        {
+          "id": 562,
+          "taskId": 73,
+          "eventType": "GOAL_CLARIFIED",
+          "occurredAt": "2026-11-02T21:44:26.514304",
+          "trigger": "SYSTEM",
+          "reasonCode": "INFO_INCOMPLETE",
+          "detailSummary": "目标理解发现信息缺失，已补充0轮，待补充问题: [targetLocation]"
+        },
+        {
+          "id": 563,
+          "taskId": 73,
+          "eventType": "GOAL_CLARIFIED",
+          "occurredAt": "2026-11-02T21:44:26.638293",
+          "trigger": "OPERATOR",
+          "reasonCode": null,
+          "detailSummary": "运行操作员oprator补充信息: {targetLocation=unknown}"
+        },
+        {
+          "id": 564,
+          "taskId": 73,
+          "eventType": "GOAL_CLARIFIED",
+          "occurredAt": "2026-11-02T21:44:26.649497",
+          "trigger": "SYSTEM",
+          "reasonCode": "INFO_INCOMPLETE",
+          "detailSummary": "目标理解发现信息缺失，已补充1轮，待补充问题: [targetLocation]"
+        },
+        {
+          "id": 565,
+          "taskId": 73,
+          "eventType": "MANUAL_TERMINATED",
+          "occurredAt": "2026-11-02T21:44:26.80518",
+          "trigger": "OPERATOR",
+          "reasonCode": null,
+          "detailSummary": "运行操作员oprator在计划生成前取消任务: V1.136 F010 fixture cancellation"
+        }
+      ],
+      "commands": 0,
+      "assignments": []
+    },
+    {
+      "id": 74,
+      "task": {
+        "id": 74,
+        "taskCode": "TASK-20261102-0074",
+        "taskGoal": "G135_MISSING virtual assist, location needs answer",
+        "taskFamily": "SPECIAL_PASSENGER_SERVICE",
+        "sceneParams": {
+          "clarificationAnswers": [
+            {
+              "answers": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "questions": [
+                "targetLocation"
+              ]
+            }
+          ]
+        },
+        "goalParsingResult": {
+          "completionCondition": "routeGenerated=true",
+          "origin": "F2_SERVICE_POINT",
+          "destination": "F2_TEST_GATE",
+          "originalGoal": "G135_MISSING virtual assist, location needs answer",
+          "constraints": [
+            "virtual test only"
+          ]
+        },
+        "status": "PENDING_MANUAL",
+        "currentPlanVersionId": 66,
+        "replanUsed": false,
+        "replanningReason": null,
+        "manualTerminateReason": null,
+        "failureReason": "候选计划三类校验未通过，转基线模板降级；且无匹配的已启用基线模板",
+        "missingInfoQuestions": null,
+        "downgradeReason": null,
+        "isDryRun": false,
+        "createdAt": "2026-11-02T21:44:26.970967",
+        "updatedAt": "2026-11-02T21:44:27.223928",
+        "createdBy": "oprator"
+      },
+      "plans": [
+        {
+          "id": 66,
+          "versionNo": 1,
+          "source": "AUTONOMOUS",
+          "baselineTemplateId": null,
+          "snapshotId": "CTX-20261102-0038",
+          "planSteps": [
+            {
+              "stepSeq": 1,
+              "stepGoal": "Virtual navigation",
+              "capabilityType": "CAP_NAVIGATION",
+              "inputParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "precondition": "device online",
+              "completionCondition": "routeGenerated=true",
+              "failureHandling": "manual",
+              "stepTimeout": 60
+            }
+          ],
+          "structureCheckResult": "PASS",
+          "capabilityCheckResult": "FAIL",
+          "constraintCheckResult": "PASS",
+          "validationErrors": [
+            {
+              "errorType": "CAPABILITY",
+              "description": "核心场景计划缺少必需渠道SMART_DISPLAY的能力CAP_INFO_DISPLAY",
+              "stepSeq": null,
+              "reasonCode": "ERR_REQUIRED_CHANNEL_MISSING"
+            },
+            {
+              "errorType": "CAPABILITY",
+              "description": "核心场景计划缺少必需渠道MOBILE_ROBOT的能力CAP_NOTIFICATION",
+              "stepSeq": null,
+              "reasonCode": "ERR_REQUIRED_CHANNEL_MISSING"
+            },
+            {
+              "errorType": "CAPABILITY",
+              "description": "核心场景计划缺少必需渠道MOBILE_ROBOT的能力CAP_ESCORT",
+              "stepSeq": null,
+              "reasonCode": "ERR_REQUIRED_CHANNEL_MISSING"
+            }
+          ],
+          "riskLevel": null,
+          "riskReasonCode": null,
+          "judgmentBasis": null,
+          "confidence": 0.99,
+          "ruleSetVersion": null,
+          "frozenAt": null,
+          "createdAt": "2026-11-02T21:44:27.199192"
+        }
+      ],
+      "events": [
+        {
+          "id": 566,
+          "taskId": 74,
+          "eventType": "GOAL_SUBMITTED",
+          "occurredAt": "2026-11-02T21:44:26.972923",
+          "trigger": "OPERATOR",
+          "reasonCode": null,
+          "detailSummary": "运行操作员oprator提交任务目标: G135_MISSING virtual assist, location needs answer"
+        },
+        {
+          "id": 567,
+          "taskId": 74,
+          "eventType": "GOAL_CLARIFIED",
+          "occurredAt": "2026-11-02T21:44:27.02236",
+          "trigger": "SYSTEM",
+          "reasonCode": "INFO_INCOMPLETE",
+          "detailSummary": "目标理解发现信息缺失，已补充0轮，待补充问题: [targetLocation]"
+        },
+        {
+          "id": 568,
+          "taskId": 74,
+          "eventType": "GOAL_CLARIFIED",
+          "occurredAt": "2026-11-02T21:44:27.155748",
+          "trigger": "OPERATOR",
+          "reasonCode": null,
+          "detailSummary": "运行操作员oprator补充信息: {targetLocation=F2_TEST_GATE}"
+        },
+        {
+          "id": 569,
+          "taskId": 74,
+          "eventType": "GOAL_CLARIFIED",
+          "occurredAt": "2026-11-02T21:44:27.164512",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+        },
+        {
+          "id": 570,
+          "taskId": 74,
+          "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+          "occurredAt": "2026-11-02T21:44:27.180328",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "生成规划上下文快照CTX-20261102-0038"
+        },
+        {
+          "id": 571,
+          "taskId": 74,
+          "eventType": "PLAN_GENERATED",
+          "occurredAt": "2026-11-02T21:44:27.206301",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+        },
+        {
+          "id": 572,
+          "taskId": 74,
+          "eventType": "PLAN_VALIDATED",
+          "occurredAt": "2026-11-02T21:44:27.219873",
+          "trigger": "SYSTEM",
+          "reasonCode": "ERR_VALIDATION_FAILED",
+          "detailSummary": "候选计划三类校验未通过: 3项错误"
+        },
+        {
+          "id": 573,
+          "taskId": 74,
+          "eventType": "BASELINE_DOWNGRADED",
+          "occurredAt": "2026-11-02T21:44:27.221862",
+          "trigger": "SYSTEM",
+          "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+          "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级"
+        },
+        {
+          "id": 574,
+          "taskId": 74,
+          "eventType": "TASK_PENDING_MANUAL",
+          "occurredAt": "2026-11-02T21:44:27.224955",
+          "trigger": "SYSTEM",
+          "reasonCode": "ERR_PLANNING_FAILED",
+          "detailSummary": "候选计划三类校验未通过，转基线模板降级；且无匹配的已启用基线模板"
+        }
+      ],
+      "commands": 0,
+      "assignments": []
+    },
+    {
+      "id": 75,
+      "task": {
+        "id": 75,
+        "taskCode": "TASK-20261102-0075",
+        "taskGoal": "G135_MISSING virtual assist, location never supplied",
+        "taskFamily": "SPECIAL_PASSENGER_SERVICE",
+        "sceneParams": {
+          "clarificationAnswers": [
+            {
+              "answers": {
+                "targetLocation": "unknown round 1"
+              },
+              "questions": [
+                "targetLocation"
+              ]
+            },
+            {
+              "answers": {
+                "targetLocation": "unknown round 2"
+              },
+              "questions": [
+                "targetLocation"
+              ]
+            },
+            {
+              "answers": {
+                "targetLocation": "unknown round 3"
+              },
+              "questions": [
+                "targetLocation"
+              ]
+            }
+          ]
+        },
+        "goalParsingResult": {
+          "completionCondition": "routeGenerated=true",
+          "origin": "F2_SERVICE_POINT",
+          "destination": null,
+          "originalGoal": "G135_MISSING virtual assist, location never supplied",
+          "constraints": [
+            "virtual test only"
+          ]
+        },
+        "status": "PENDING_MANUAL",
+        "currentPlanVersionId": null,
+        "replanUsed": false,
+        "replanningReason": null,
+        "manualTerminateReason": null,
+        "failureReason": "三轮信息补充后仍缺少关键信息，需人工处理",
+        "missingInfoQuestions": [
+          "targetLocation"
+        ],
+        "downgradeReason": null,
+        "isDryRun": false,
+        "createdAt": "2026-11-02T21:44:27.365714",
+        "updatedAt": "2026-11-02T21:44:27.365714",
+        "createdBy": "oprator"
+      },
+      "plans": [],
+      "events": [
+        {
+          "id": 575,
+          "taskId": 75,
+          "eventType": "GOAL_SUBMITTED",
+          "occurredAt": "2026-11-02T21:44:27.370136",
+          "trigger": "OPERATOR",
+          "reasonCode": null,
+          "detailSummary": "运行操作员oprator提交任务目标: G135_MISSING virtual assist, location never supplied"
+        },
+        {
+          "id": 576,
+          "taskId": 75,
+          "eventType": "GOAL_CLARIFIED",
+          "occurredAt": "2026-11-02T21:44:27.403844",
+          "trigger": "SYSTEM",
+          "reasonCode": "INFO_INCOMPLETE",
+          "detailSummary": "目标理解发现信息缺失，已补充0轮，待补充问题: [targetLocation]"
+        },
+        {
+          "id": 577,
+          "taskId": 75,
+          "eventType": "GOAL_CLARIFIED",
+          "occurredAt": "2026-11-02T21:44:27.515996",
+          "trigger": "OPERATOR",
+          "reasonCode": null,
+          "detailSummary": "运行操作员oprator补充信息: {targetLocation=unknown round 1}"
+        },
+        {
+          "id": 578,
+          "taskId": 75,
+          "eventType": "GOAL_CLARIFIED",
+          "occurredAt": "2026-11-02T21:44:27.541628",
+          "trigger": "SYSTEM",
+          "reasonCode": "INFO_INCOMPLETE",
+          "detailSummary": "目标理解发现信息缺失，已补充1轮，待补充问题: [targetLocation]"
+        },
+        {
+          "id": 579,
+          "taskId": 75,
+          "eventType": "GOAL_CLARIFIED",
+          "occurredAt": "2026-11-02T21:44:27.666915",
+          "trigger": "OPERATOR",
+          "reasonCode": null,
+          "detailSummary": "运行操作员oprator补充信息: {targetLocation=unknown round 2}"
+        },
+        {
+          "id": 580,
+          "taskId": 75,
+          "eventType": "GOAL_CLARIFIED",
+          "occurredAt": "2026-11-02T21:44:27.6864",
+          "trigger": "SYSTEM",
+          "reasonCode": "INFO_INCOMPLETE",
+          "detailSummary": "目标理解发现信息缺失，已补充2轮，待补充问题: [targetLocation]"
+        },
+        {
+          "id": 581,
+          "taskId": 75,
+          "eventType": "GOAL_CLARIFIED",
+          "occurredAt": "2026-11-02T21:44:27.828358",
+          "trigger": "OPERATOR",
+          "reasonCode": null,
+          "detailSummary": "运行操作员oprator补充信息: {targetLocation=unknown round 3}"
+        },
+        {
+          "id": 582,
+          "taskId": 75,
+          "eventType": "GOAL_CLARIFIED",
+          "occurredAt": "2026-11-02T21:44:27.854559",
+          "trigger": "SYSTEM",
+          "reasonCode": "INFO_INCOMPLETE",
+          "detailSummary": "目标理解发现信息缺失，已补充3轮，待补充问题: [targetLocation]"
+        },
+        {
+          "id": 583,
+          "taskId": 75,
+          "eventType": "TASK_MANUAL_REQUIRED",
+          "occurredAt": "2026-11-02T21:44:27.856376",
+          "trigger": "SYSTEM",
+          "reasonCode": "INFO_INCOMPLETE",
+          "detailSummary": "三轮信息补充后仍缺少关键信息，需人工处理"
+        }
+      ],
+      "commands": 0,
+      "assignments": []
+    }
+  ],
+  "SWITCH_TO_BASELINE": {
+    "error": "HTTP 400: 任务仍有未补充的关键信息，不能转基线或重试规划，请先补齐或将任务置为失败: [targetLocation]"
+  },
+  "RETRY_PLANNING": {
+    "error": "HTTP 400: 任务仍有未补充的关键信息，不能转基线或重试规划，请先补齐或将任务置为失败: [targetLocation]"
+  },
+  "afterManualActions": {
+    "task": {
+      "id": 75,
+      "taskCode": "TASK-20261102-0075",
+      "taskGoal": "G135_MISSING virtual assist, location never supplied",
+      "taskFamily": "SPECIAL_PASSENGER_SERVICE",
+      "sceneParams": {
+        "clarificationAnswers": [
+          {
+            "answers": {
+              "targetLocation": "unknown round 1"
+            },
+            "questions": [
+              "targetLocation"
+            ]
+          },
+          {
+            "answers": {
+              "targetLocation": "unknown round 2"
+            },
+            "questions": [
+              "targetLocation"
+            ]
+          },
+          {
+            "answers": {
+              "targetLocation": "unknown round 3"
+            },
+            "questions": [
+              "targetLocation"
+            ]
+          }
+        ]
+      },
+      "goalParsingResult": {
+        "completionCondition": "routeGenerated=true",
+        "origin": "F2_SERVICE_POINT",
+        "destination": null,
+        "originalGoal": "G135_MISSING virtual assist, location never supplied",
+        "constraints": [
+          "virtual test only"
+        ]
+      },
+      "status": "PENDING_MANUAL",
+      "currentPlanVersionId": null,
+      "replanUsed": false,
+      "replanningReason": null,
+      "manualTerminateReason": null,
+      "failureReason": "三轮信息补充后仍缺少关键信息，需人工处理",
+      "missingInfoQuestions": [
+        "targetLocation"
+      ],
+      "downgradeReason": null,
+      "isDryRun": false,
+      "createdAt": "2026-11-02T21:44:27.365714",
+      "updatedAt": "2026-11-02T21:44:27.365714",
+      "createdBy": "oprator"
+    },
+    "plans": [],
+    "commands": 0
+  }
+}

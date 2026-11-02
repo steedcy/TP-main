@@ -1,0 +1,902 @@
+{
+  "version": "V1.136",
+  "codeSha": "b9e9333d153dff71f62c21a8bf3ce0f5b93d21d3",
+  "observedAt": "2026-11-02T21:46:23.069853+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "backendPort": 18129,
+  "modelPort": 18117,
+  "templateBefore": "DISABLED",
+  "cases": [
+    {
+      "name": "modelFailureNoBaseline",
+      "request": {
+        "taskGoal": "G135_ERROR synthetic navigation to F2_TEST_GATE",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "response": {
+        "http": 503,
+        "body": {
+          "code": 4113,
+          "message": "Controlled understanding failure",
+          "timestamp": "2026-11-02T21:46:23.642478400+08:00",
+          "path": "/api/v1/tasks",
+          "method": "POST"
+        },
+        "elapsedSeconds": 0.044117699999333126
+      },
+      "taskIdBefore": 76,
+      "taskIdAfter": 77,
+      "snapshot": {
+        "task": {
+          "id": 77,
+          "taskCode": "TASK-20261102-0077",
+          "taskGoal": "G135_ERROR synthetic navigation to F2_TEST_GATE",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": null,
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": null,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "目标理解超时或异常: Controlled understanding failure；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-02T21:46:23.615625",
+          "updatedAt": "2026-11-02T21:46:23.638182",
+          "createdBy": "oprator"
+        },
+        "events": [
+          {
+            "id": 586,
+            "taskId": 77,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-02T21:46:23.616662",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: G135_ERROR synthetic navigation to F2_TEST_GATE"
+          },
+          {
+            "id": 587,
+            "taskId": 77,
+            "eventType": "GOAL_UNDERSTANDING_FAILED",
+            "occurredAt": "2026-11-02T21:46:23.632766",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_GOAL_UNDERSTANDING_TIMEOUT",
+            "detailSummary": "目标理解调用规划模型服务失败: Controlled understanding failure"
+          },
+          {
+            "id": 588,
+            "taskId": 77,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-02T21:46:23.63714",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 目标理解超时或异常: Controlled understanding failure"
+          },
+          {
+            "id": 589,
+            "taskId": 77,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-02T21:46:23.639886",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "目标理解超时或异常: Controlled understanding failure；且无匹配的已启用基线模板"
+          }
+        ],
+        "plans": [],
+        "contexts": [],
+        "commands": []
+      }
+    },
+    {
+      "name": "modelFailureWithValidatedBaseline",
+      "request": {
+        "taskGoal": "G135_ERROR synthetic navigation to F2_TEST_GATE",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "response": {
+        "http": 503,
+        "body": {
+          "code": 4113,
+          "message": "Controlled understanding failure",
+          "timestamp": "2026-11-02T21:46:25.542128400+08:00",
+          "path": "/api/v1/tasks",
+          "method": "POST"
+        },
+        "elapsedSeconds": 0.23254489999817451
+      },
+      "taskIdBefore": 77,
+      "taskIdAfter": 78,
+      "snapshot": {
+        "task": {
+          "id": 78,
+          "taskCode": "TASK-20261102-0078",
+          "taskGoal": "G135_ERROR synthetic navigation to F2_TEST_GATE",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": null,
+          "status": "EXECUTING",
+          "currentPlanVersionId": 67,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": null,
+          "missingInfoQuestions": null,
+          "downgradeReason": "目标理解超时或异常: Controlled understanding failure",
+          "isDryRun": false,
+          "createdAt": "2026-11-02T21:46:25.328568",
+          "updatedAt": "2026-11-02T21:46:25.617705",
+          "createdBy": "oprator"
+        },
+        "events": [
+          {
+            "id": 590,
+            "taskId": 78,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-02T21:46:25.329979",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: G135_ERROR synthetic navigation to F2_TEST_GATE"
+          },
+          {
+            "id": 591,
+            "taskId": 78,
+            "eventType": "GOAL_UNDERSTANDING_FAILED",
+            "occurredAt": "2026-11-02T21:46:25.342648",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_GOAL_UNDERSTANDING_TIMEOUT",
+            "detailSummary": "目标理解调用规划模型服务失败: Controlled understanding failure"
+          },
+          {
+            "id": 592,
+            "taskId": 78,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-02T21:46:25.386082",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "已自动切换至基线模板G129F008e4fb42(V1.0)，原因: 目标理解超时或异常: Controlled understanding failure"
+          },
+          {
+            "id": 593,
+            "taskId": 78,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-02T21:46:25.437388",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-803437A3(距离0.0,负载0)，向候选AGT-803437A3发起承接请求"
+          },
+          {
+            "id": 594,
+            "taskId": 78,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-02T21:46:25.611803",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-803437A3接受步骤1承接请求"
+          },
+          {
+            "id": 595,
+            "taskId": 78,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-02T21:46:25.625505",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261102214625-EF001245已下发至设备代理AGT-803437A3，业务意图: 执行CAP_NAVIGATION能力（基线模板步骤）"
+          }
+        ],
+        "plans": [
+          {
+            "id": 67,
+            "versionNo": 1,
+            "source": "BASELINE_TEMPLATE",
+            "baselineTemplateId": 12,
+            "snapshotId": "CTX-20261102-0039",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "paramMapping": [
+                  {
+                    "target": "targetLocation",
+                    "source": "TEMPLATE_INPUT.targetLocation"
+                  }
+                ],
+                "stepTimeout": 60,
+                "completionCondition": "routeGenerated=true",
+                "stepGoal": "执行CAP_NAVIGATION能力（基线模板步骤）",
+                "precondition": "候选设备在线且空闲",
+                "failureHandling": "重试一次或转人工处理",
+                "inputParams": {}
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": null,
+            "ruleSetVersion": null,
+            "frozenAt": "2026-11-02T21:46:25.380216",
+            "createdAt": "2026-11-02T21:46:25.372964"
+          }
+        ],
+        "contexts": [
+          {
+            "id": 39,
+            "snapshotCode": "CTX-20261102-0039",
+            "taskId": 78,
+            "agents": "[{\"agentId\":\"AGT-803437A3\",\"deviceCode\":\"G126_ROBOT\",\"deviceTypeCode\":\"SIMULATOR\",\"simulatedDeviceType\":\"MOBILE_ROBOT\",\"businessStatus\":{\"scenarioResult\":\"SUCCESS\",\"simulatedDeviceType\":\"MOBILE_ROBOT\"},\"capabilities\":[\"CAP_NAVIGATION\",\"CAP_ESCORT\",\"CAP_NOTIFICATION\"],\"capabilitySchemas\":[{\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"routePreference\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BARRIER_FREE\",\"range\":\"SHORTEST/BARRIER_FREE\"}],\"outputParams\":[{\"name\":\"routeGenerated\",\"type\":\"Boolean\",\"required\":true},{\"name\":\"estimatedDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"estimatedDuration\",\"type\":\"Integer\",\"required\":true},{\"name\":\"waypointCount\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_ESCORT\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"escortMode\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"LEAD\",\"range\":\"LEAD/FOLLOW\"},{\"name\":\"maxDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"600\",\"range\":\"60~1800\"}],\"outputParams\":[{\"name\":\"arrivalStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"actualDuration\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_NOTIFICATION\",\"inputParams\":[{\"name\":\"notificationType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BOTH\",\"range\":\"VOICE/TEXT/BOTH\"},{\"name\":\"notificationContent\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试旅客需要轮椅陪同，请现场服务人员协助\"},{\"name\":\"repeatCount\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"1\",\"range\":\"1~5\"}],\"outputParams\":[{\"name\":\"notificationStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualRepeatCount\",\"type\":\"Integer\",\"required\":true}]}],\"onlineStatus\":\"ONLINE\",\"location\":{\"x\":815.00,\"y\":4600.00,\"zone\":\"F2_TEST\"},\"workload\":\"IDLE\",\"availableUntil\":\"2026-11-02T21:46:25.367916600\"}]",
+            "capabilityCoverage": "{\"available\":[\"CAP_NAVIGATION\"],\"missing\":[]}",
+            "failedAgentCodes": "[]",
+            "generatedAt": "2026-11-02T21:46:25.367917"
+          }
+        ],
+        "commands": [
+          "170|TASK_ACCEPT|ACCEPTED",
+          "171|EXECUTE_CAPABILITY|SENT"
+        ]
+      },
+      "followup": {
+        "task": {
+          "id": 78,
+          "taskCode": "TASK-20261102-0078",
+          "taskGoal": "G135_ERROR synthetic navigation to F2_TEST_GATE",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": null,
+          "status": "COMPLETED",
+          "currentPlanVersionId": 67,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": null,
+          "missingInfoQuestions": null,
+          "downgradeReason": "目标理解超时或异常: Controlled understanding failure",
+          "isDryRun": false,
+          "createdAt": "2026-11-02T21:46:25.328568",
+          "updatedAt": "2026-11-02T21:46:26.874801",
+          "createdBy": "oprator"
+        },
+        "events": [
+          {
+            "id": 590,
+            "taskId": 78,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-02T21:46:25.329979",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: G135_ERROR synthetic navigation to F2_TEST_GATE"
+          },
+          {
+            "id": 591,
+            "taskId": 78,
+            "eventType": "GOAL_UNDERSTANDING_FAILED",
+            "occurredAt": "2026-11-02T21:46:25.342648",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_GOAL_UNDERSTANDING_TIMEOUT",
+            "detailSummary": "目标理解调用规划模型服务失败: Controlled understanding failure"
+          },
+          {
+            "id": 592,
+            "taskId": 78,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-02T21:46:25.386082",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "已自动切换至基线模板G129F008e4fb42(V1.0)，原因: 目标理解超时或异常: Controlled understanding failure"
+          },
+          {
+            "id": 593,
+            "taskId": 78,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-02T21:46:25.437388",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-803437A3(距离0.0,负载0)，向候选AGT-803437A3发起承接请求"
+          },
+          {
+            "id": 594,
+            "taskId": 78,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-02T21:46:25.611803",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-803437A3接受步骤1承接请求"
+          },
+          {
+            "id": 595,
+            "taskId": 78,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-02T21:46:25.625505",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261102214625-EF001245已下发至设备代理AGT-803437A3，业务意图: 执行CAP_NAVIGATION能力（基线模板步骤）"
+          },
+          {
+            "id": 596,
+            "taskId": 78,
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "occurredAt": "2026-11-02T21:46:26.863539",
+            "trigger": "SYSTEM",
+            "reasonCode": "DEVICE_SUCCESS",
+            "detailSummary": "指令CMD-20261102214625-EF001245收到设备代理AGT-803437A3执行反馈: SUCCESS"
+          },
+          {
+            "id": 597,
+            "taskId": 78,
+            "eventType": "STEP_COMPLETED",
+            "occurredAt": "2026-11-02T21:46:26.871713",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1完成条件已满足: routeGenerated=true"
+          },
+          {
+            "id": 598,
+            "taskId": 78,
+            "eventType": "TASK_COMPLETED",
+            "occurredAt": "2026-11-02T21:46:26.877115",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "全部步骤完成条件均已满足，任务完成"
+          }
+        ],
+        "plans": [
+          {
+            "id": 67,
+            "versionNo": 1,
+            "source": "BASELINE_TEMPLATE",
+            "baselineTemplateId": 12,
+            "snapshotId": "CTX-20261102-0039",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "paramMapping": [
+                  {
+                    "target": "targetLocation",
+                    "source": "TEMPLATE_INPUT.targetLocation"
+                  }
+                ],
+                "stepTimeout": 60,
+                "completionCondition": "routeGenerated=true",
+                "stepGoal": "执行CAP_NAVIGATION能力（基线模板步骤）",
+                "precondition": "候选设备在线且空闲",
+                "failureHandling": "重试一次或转人工处理",
+                "inputParams": {}
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": null,
+            "ruleSetVersion": null,
+            "frozenAt": "2026-11-02T21:46:25.380216",
+            "createdAt": "2026-11-02T21:46:25.372964"
+          }
+        ],
+        "contexts": [
+          {
+            "id": 39,
+            "snapshotCode": "CTX-20261102-0039",
+            "taskId": 78,
+            "agents": "[{\"agentId\":\"AGT-803437A3\",\"deviceCode\":\"G126_ROBOT\",\"deviceTypeCode\":\"SIMULATOR\",\"simulatedDeviceType\":\"MOBILE_ROBOT\",\"businessStatus\":{\"scenarioResult\":\"SUCCESS\",\"simulatedDeviceType\":\"MOBILE_ROBOT\"},\"capabilities\":[\"CAP_NAVIGATION\",\"CAP_ESCORT\",\"CAP_NOTIFICATION\"],\"capabilitySchemas\":[{\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"routePreference\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BARRIER_FREE\",\"range\":\"SHORTEST/BARRIER_FREE\"}],\"outputParams\":[{\"name\":\"routeGenerated\",\"type\":\"Boolean\",\"required\":true},{\"name\":\"estimatedDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"estimatedDuration\",\"type\":\"Integer\",\"required\":true},{\"name\":\"waypointCount\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_ESCORT\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"escortMode\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"LEAD\",\"range\":\"LEAD/FOLLOW\"},{\"name\":\"maxDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"600\",\"range\":\"60~1800\"}],\"outputParams\":[{\"name\":\"arrivalStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"actualDuration\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_NOTIFICATION\",\"inputParams\":[{\"name\":\"notificationType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BOTH\",\"range\":\"VOICE/TEXT/BOTH\"},{\"name\":\"notificationContent\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试旅客需要轮椅陪同，请现场服务人员协助\"},{\"name\":\"repeatCount\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"1\",\"range\":\"1~5\"}],\"outputParams\":[{\"name\":\"notificationStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualRepeatCount\",\"type\":\"Integer\",\"required\":true}]}],\"onlineStatus\":\"ONLINE\",\"location\":{\"x\":815.00,\"y\":4600.00,\"zone\":\"F2_TEST\"},\"workload\":\"IDLE\",\"availableUntil\":\"2026-11-02T21:46:25.367916600\"}]",
+            "capabilityCoverage": "{\"available\":[\"CAP_NAVIGATION\"],\"missing\":[]}",
+            "failedAgentCodes": "[]",
+            "generatedAt": "2026-11-02T21:46:25.367917"
+          }
+        ],
+        "commands": [
+          "170|TASK_ACCEPT|ACCEPTED",
+          "171|EXECUTE_CAPABILITY|SUCCEEDED"
+        ]
+      }
+    },
+    {
+      "name": "modelTimeoutNoBaseline",
+      "request": {
+        "taskGoal": "G135_TIMEOUT synthetic navigation to F2_TEST_GATE",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "response": {
+        "http": 503,
+        "body": {
+          "code": 4113,
+          "message": "目标理解服务调用超时或不可用: I/O error on POST request for \"http://127.0.0.1:18117/v1/goal/understand\": Read timed out",
+          "timestamp": "2026-11-02T21:47:30.429756900+08:00",
+          "path": "/api/v1/tasks",
+          "method": "POST"
+        },
+        "elapsedSeconds": 60.046316100000695
+      },
+      "taskIdBefore": 78,
+      "taskIdAfter": 79,
+      "concurrentReads": {
+        "dashboard": {
+          "ok": true,
+          "elapsedSeconds": 1.1999982234556228e-06,
+          "response": {
+            "metrics": {
+              "agentTotal": 3,
+              "agentOnline": 1,
+              "taskInProgress": 0,
+              "pendingManual": 25,
+              "unhandledExceptions": 0,
+              "replanningCount": 0,
+              "statusCounts": {
+                "PLANNING": 1,
+                "SUPERVISING": 0,
+                "PENDING_ASSIGNMENT": 0,
+                "DOWNGRADING": 0,
+                "EXECUTING": 0,
+                "COMPLETED": 27,
+                "FAILED": 1,
+                "PENDING_MANUAL": 25,
+                "MANUAL_TERMINATED": 9
+              }
+            },
+            "latestExceptions": [
+              {
+                "id": 13,
+                "taskId": 43,
+                "taskCode": "TASK-20261102-0043",
+                "exceptionType": "STEP_FAILED",
+                "occurredAt": "2026-11-02T14:25:21.360924",
+                "exceptionStatus": "RESOLVED",
+                "reasonCode": "执行结果: FAILED，原因: INVALID_CAPABILITY_INPUT",
+                "impactConclusion": "候选设备切换恢复失败，当前计划不可继续执行"
+              },
+              {
+                "id": 12,
+                "taskId": 39,
+                "taskCode": "TASK-20261102-0039",
+                "exceptionType": "STEP_FAILED",
+                "occurredAt": "2026-11-02T07:40:06.163803",
+                "exceptionStatus": "RESOLVED",
+                "reasonCode": "执行结果: FAILED，原因: INVALID_CAPABILITY_INPUT",
+                "impactConclusion": "候选设备切换恢复失败，当前计划不可继续执行"
+              },
+              {
+                "id": 11,
+                "taskId": 29,
+                "taskCode": "G126_REJECT",
+                "exceptionType": "CAPABILITY_GAP",
+                "occurredAt": "2026-11-01T21:28:44.959671",
+                "exceptionStatus": "RESOLVED",
+                "reasonCode": "步骤1无可用候选设备",
+                "impactConclusion": "候选设备切换恢复失败，当前计划不可继续执行"
+              },
+              {
+                "id": 10,
+                "taskId": 26,
+                "taskCode": "G125_LEGACY2",
+                "exceptionType": "AGENT_OFFLINE",
+                "occurredAt": "2026-10-31T02:54:01.561393",
+                "exceptionStatus": "RESOLVED",
+                "reasonCode": "设备代理AGT-D68FD3AB因设备停用被释放，正占用该任务步骤",
+                "impactConclusion": "候选设备切换恢复失败，当前计划不可继续执行"
+              },
+              {
+                "id": 9,
+                "taskId": 25,
+                "taskCode": "G125_LEGACY",
+                "exceptionType": "AGENT_OFFLINE",
+                "occurredAt": "2026-10-31T02:54:01.533992",
+                "exceptionStatus": "RESOLVED",
+                "reasonCode": "设备代理AGT-D68FD3AB因设备停用被释放，正占用该任务步骤",
+                "impactConclusion": "候选设备切换恢复失败，当前计划不可继续执行"
+              }
+            ],
+            "failedMetrics": [],
+            "period": "TODAY"
+          }
+        },
+        "devices": {
+          "ok": true,
+          "elapsedSeconds": 1.5000005078036338e-06,
+          "response": {
+            "content": [
+              {
+                "id": 1,
+                "deviceCode": "G6_UNTESTED_134145",
+                "deviceName": "GPT F006 untested enable fixture",
+                "deviceTypeCode": "SIMULATOR",
+                "isSimulator": true,
+                "simulatedDeviceType": "SMART_DISPLAY",
+                "areaCode": "F2_TEST",
+                "positionX": 3.0,
+                "positionY": 4.0,
+                "accessEndpoint": "http://127.0.0.1:18130",
+                "accessCredentialRefMasked": "sy****06",
+                "statusReportInterval": 15,
+                "connectionTestStatus": "PASSED",
+                "connectionTestResult": "身份、协议版本及状态快照校验通过",
+                "remark": null,
+                "deviceStatus": "ACTIVE",
+                "agentStatus": "ENABLED",
+                "onlineStatus": "OFFLINE",
+                "createdAt": "2026-10-30T13:41:46.051807",
+                "updatedAt": "2026-10-31T02:54:01.659406"
+              }
+            ],
+            "totalElements": 4,
+            "page": 1,
+            "size": 1
+          }
+        },
+        "task": {
+          "ok": true,
+          "elapsedSeconds": 8.999995770864189e-07,
+          "response": {
+            "id": 77,
+            "taskCode": "TASK-20261102-0077",
+            "taskGoal": "G135_ERROR synthetic navigation to F2_TEST_GATE",
+            "taskFamily": "EXT_2AD8B934",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "goalParsingResult": null,
+            "status": "PENDING_MANUAL",
+            "currentPlanVersionId": null,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": null,
+            "failureReason": "目标理解超时或异常: Controlled understanding failure；且无匹配的已启用基线模板",
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-02T21:46:23.615625",
+            "updatedAt": "2026-11-02T21:46:23.638182",
+            "createdBy": "oprator"
+          }
+        }
+      },
+      "snapshot": {
+        "task": {
+          "id": 79,
+          "taskCode": "TASK-20261102-0079",
+          "taskGoal": "G135_TIMEOUT synthetic navigation to F2_TEST_GATE",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": null,
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": null,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "目标理解超时或异常: 目标理解服务调用超时或不可用: I/O error on POST request for \"http://127.0.0.1:18117/v1/goal/understand\": Read timed out；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-02T21:46:30.39758",
+          "updatedAt": "2026-11-02T21:47:30.426741",
+          "createdBy": "oprator"
+        },
+        "events": [
+          {
+            "id": 599,
+            "taskId": 79,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-02T21:46:30.399752",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: G135_TIMEOUT synthetic navigation to F2_TEST_GATE"
+          },
+          {
+            "id": 600,
+            "taskId": 79,
+            "eventType": "GOAL_UNDERSTANDING_FAILED",
+            "occurredAt": "2026-11-02T21:47:30.417537",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_GOAL_UNDERSTANDING_TIMEOUT",
+            "detailSummary": "目标理解调用规划模型服务失败: 目标理解服务调用超时或不可用: I/O error on POST request for \"http://127.0.0.1:18117/v1/goal/understand\": Read timed out"
+          },
+          {
+            "id": 601,
+            "taskId": 79,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-02T21:47:30.425563",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 目标理解超时或异常: 目标理解服务调用超时或不可用: I/O error on POST request for \"http://127.0.0.1:18117/v1/goal/understand\": Read timed out"
+          },
+          {
+            "id": 602,
+            "taskId": 79,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-02T21:47:30.427345",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "目标理解超时或异常: 目标理解服务调用超时或不可用: I/O error on POST request for \"http://127.0.0.1:18117/v1/goal/understand\": Read timed out；且无匹配的已启用基线模板"
+          }
+        ],
+        "plans": [],
+        "contexts": [],
+        "commands": []
+      }
+    }
+  ],
+  "readsAfterModelFailure": {
+    "dashboard": {
+      "metrics": {
+        "agentTotal": 3,
+        "agentOnline": 1,
+        "taskInProgress": 0,
+        "pendingManual": 25,
+        "unhandledExceptions": 0,
+        "replanningCount": 0,
+        "statusCounts": {
+          "PLANNING": 1,
+          "SUPERVISING": 0,
+          "PENDING_ASSIGNMENT": 0,
+          "DOWNGRADING": 0,
+          "EXECUTING": 0,
+          "COMPLETED": 26,
+          "FAILED": 1,
+          "PENDING_MANUAL": 25,
+          "MANUAL_TERMINATED": 9
+        }
+      },
+      "latestExceptions": [
+        {
+          "id": 13,
+          "taskId": 43,
+          "taskCode": "TASK-20261102-0043",
+          "exceptionType": "STEP_FAILED",
+          "occurredAt": "2026-11-02T14:25:21.360924",
+          "exceptionStatus": "RESOLVED",
+          "reasonCode": "执行结果: FAILED，原因: INVALID_CAPABILITY_INPUT",
+          "impactConclusion": "候选设备切换恢复失败，当前计划不可继续执行"
+        },
+        {
+          "id": 12,
+          "taskId": 39,
+          "taskCode": "TASK-20261102-0039",
+          "exceptionType": "STEP_FAILED",
+          "occurredAt": "2026-11-02T07:40:06.163803",
+          "exceptionStatus": "RESOLVED",
+          "reasonCode": "执行结果: FAILED，原因: INVALID_CAPABILITY_INPUT",
+          "impactConclusion": "候选设备切换恢复失败，当前计划不可继续执行"
+        },
+        {
+          "id": 11,
+          "taskId": 29,
+          "taskCode": "G126_REJECT",
+          "exceptionType": "CAPABILITY_GAP",
+          "occurredAt": "2026-11-01T21:28:44.959671",
+          "exceptionStatus": "RESOLVED",
+          "reasonCode": "步骤1无可用候选设备",
+          "impactConclusion": "候选设备切换恢复失败，当前计划不可继续执行"
+        },
+        {
+          "id": 10,
+          "taskId": 26,
+          "taskCode": "G125_LEGACY2",
+          "exceptionType": "AGENT_OFFLINE",
+          "occurredAt": "2026-10-31T02:54:01.561393",
+          "exceptionStatus": "RESOLVED",
+          "reasonCode": "设备代理AGT-D68FD3AB因设备停用被释放，正占用该任务步骤",
+          "impactConclusion": "候选设备切换恢复失败，当前计划不可继续执行"
+        },
+        {
+          "id": 9,
+          "taskId": 25,
+          "taskCode": "G125_LEGACY",
+          "exceptionType": "AGENT_OFFLINE",
+          "occurredAt": "2026-10-31T02:54:01.533992",
+          "exceptionStatus": "RESOLVED",
+          "reasonCode": "设备代理AGT-D68FD3AB因设备停用被释放，正占用该任务步骤",
+          "impactConclusion": "候选设备切换恢复失败，当前计划不可继续执行"
+        }
+      ],
+      "failedMetrics": [],
+      "period": "TODAY"
+    },
+    "devices": {
+      "content": [
+        {
+          "id": 1,
+          "deviceCode": "G6_UNTESTED_134145",
+          "deviceName": "GPT F006 untested enable fixture",
+          "deviceTypeCode": "SIMULATOR",
+          "isSimulator": true,
+          "simulatedDeviceType": "SMART_DISPLAY",
+          "areaCode": "F2_TEST",
+          "positionX": 3.0,
+          "positionY": 4.0,
+          "accessEndpoint": "http://127.0.0.1:18130",
+          "accessCredentialRefMasked": "sy****06",
+          "statusReportInterval": 15,
+          "connectionTestStatus": "PASSED",
+          "connectionTestResult": "身份、协议版本及状态快照校验通过",
+          "remark": null,
+          "deviceStatus": "ACTIVE",
+          "agentStatus": "ENABLED",
+          "onlineStatus": "OFFLINE",
+          "createdAt": "2026-10-30T13:41:46.051807",
+          "updatedAt": "2026-10-31T02:54:01.659406"
+        }
+      ],
+      "totalElements": 4,
+      "page": 1,
+      "size": 1
+    },
+    "task": {
+      "id": 77,
+      "taskCode": "TASK-20261102-0077",
+      "taskGoal": "G135_ERROR synthetic navigation to F2_TEST_GATE",
+      "taskFamily": "EXT_2AD8B934",
+      "sceneParams": {
+        "targetLocation": "F2_TEST_GATE"
+      },
+      "goalParsingResult": null,
+      "status": "PENDING_MANUAL",
+      "currentPlanVersionId": null,
+      "replanUsed": false,
+      "replanningReason": null,
+      "manualTerminateReason": null,
+      "failureReason": "目标理解超时或异常: Controlled understanding failure；且无匹配的已启用基线模板",
+      "missingInfoQuestions": null,
+      "downgradeReason": null,
+      "isDryRun": false,
+      "createdAt": "2026-11-02T21:46:23.615625",
+      "updatedAt": "2026-11-02T21:46:23.638182",
+      "createdBy": "oprator"
+    }
+  },
+  "templateDuring": "ENABLED",
+  "templateAfter": "DISABLED",
+  "followupAt": "2026-11-02T21:48:25.764593+08:00",
+  "validatedBaselineFinal": {
+    "task": {
+      "id": 78,
+      "taskCode": "TASK-20261102-0078",
+      "taskGoal": "G135_ERROR synthetic navigation to F2_TEST_GATE",
+      "taskFamily": "EXT_2AD8B934",
+      "sceneParams": {
+        "targetLocation": "F2_TEST_GATE"
+      },
+      "goalParsingResult": null,
+      "status": "COMPLETED",
+      "currentPlanVersionId": 67,
+      "replanUsed": false,
+      "replanningReason": null,
+      "manualTerminateReason": null,
+      "failureReason": null,
+      "missingInfoQuestions": null,
+      "downgradeReason": "目标理解超时或异常: Controlled understanding failure",
+      "isDryRun": false,
+      "createdAt": "2026-11-02T21:46:25.328568",
+      "updatedAt": "2026-11-02T21:46:26.874801",
+      "createdBy": "oprator"
+    },
+    "events": [
+      {
+        "id": 590,
+        "taskId": 78,
+        "eventType": "GOAL_SUBMITTED",
+        "occurredAt": "2026-11-02T21:46:25.329979",
+        "trigger": "OPERATOR",
+        "reasonCode": null,
+        "detailSummary": "运行操作员oprator提交任务目标: G135_ERROR synthetic navigation to F2_TEST_GATE"
+      },
+      {
+        "id": 591,
+        "taskId": 78,
+        "eventType": "GOAL_UNDERSTANDING_FAILED",
+        "occurredAt": "2026-11-02T21:46:25.342648",
+        "trigger": "SYSTEM",
+        "reasonCode": "ERR_GOAL_UNDERSTANDING_TIMEOUT",
+        "detailSummary": "目标理解调用规划模型服务失败: Controlled understanding failure"
+      },
+      {
+        "id": 592,
+        "taskId": 78,
+        "eventType": "BASELINE_DOWNGRADED",
+        "occurredAt": "2026-11-02T21:46:25.386082",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "已自动切换至基线模板G129F008e4fb42(V1.0)，原因: 目标理解超时或异常: Controlled understanding failure"
+      },
+      {
+        "id": 593,
+        "taskId": 78,
+        "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+        "occurredAt": "2026-11-02T21:46:25.437388",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-803437A3(距离0.0,负载0)，向候选AGT-803437A3发起承接请求"
+      },
+      {
+        "id": 594,
+        "taskId": 78,
+        "eventType": "AGENT_ASSIGNED",
+        "occurredAt": "2026-11-02T21:46:25.611803",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "设备代理AGT-803437A3接受步骤1承接请求"
+      },
+      {
+        "id": 595,
+        "taskId": 78,
+        "eventType": "STEP_DISPATCHED",
+        "occurredAt": "2026-11-02T21:46:25.625505",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "指令CMD-20261102214625-EF001245已下发至设备代理AGT-803437A3，业务意图: 执行CAP_NAVIGATION能力（基线模板步骤）"
+      },
+      {
+        "id": 596,
+        "taskId": 78,
+        "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+        "occurredAt": "2026-11-02T21:46:26.863539",
+        "trigger": "SYSTEM",
+        "reasonCode": "DEVICE_SUCCESS",
+        "detailSummary": "指令CMD-20261102214625-EF001245收到设备代理AGT-803437A3执行反馈: SUCCESS"
+      },
+      {
+        "id": 597,
+        "taskId": 78,
+        "eventType": "STEP_COMPLETED",
+        "occurredAt": "2026-11-02T21:46:26.871713",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "步骤1完成条件已满足: routeGenerated=true"
+      },
+      {
+        "id": 598,
+        "taskId": 78,
+        "eventType": "TASK_COMPLETED",
+        "occurredAt": "2026-11-02T21:46:26.877115",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "全部步骤完成条件均已满足，任务完成"
+      }
+    ],
+    "assignments": [
+      {
+        "id": 75,
+        "stepSeq": 1,
+        "deviceAgentCode": "AGT-803437A3",
+        "commandId": "CMD-20261102214625-F7ACA140",
+        "stepStatus": "COMPLETED",
+        "retryCount": 0,
+        "executionResult": "SUCCESS",
+        "reasonCode": "DEVICE_SUCCESS",
+        "outputParams": {
+          "estimatedDuration": 241,
+          "estimatedDistance": 238.0,
+          "routeGenerated": true,
+          "waypointCount": 11
+        },
+        "dispatchedAt": "2026-11-02T21:46:25.623384",
+        "feedbackAt": "2026-11-02T21:46:26.863119",
+        "rejectedAgentIds": []
+      }
+    ]
+  }
+}
