@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`REQUIREMENT_PASSED`（SRS_F008，ChatGPT 独立复测 V1.132，执行基线 V2.3；见末尾）
-- 当前进度：`SRS_F001`～`SRS_F008` 已按各自交接与独立证据完成；下一需求 `SRS_F009` 应在独立新对话中接续。
+- 状态：`READY_FOR_CLAUDE`（SRS_F009，ChatGPT 独立复测 V1.132 发现 DEF-S3-086；执行基线 V2.3；见末尾）
+- 当前进度：`SRS_F001`～`SRS_F008` 已按各自交接与独立证据完成；`SRS_F009` 未通过，待修复方处理取消结果审计后交回独立复测。
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
 - 旧阶段 3 任务已暂停；其结果是待修复的原始证据，不是新版本通过证明。
@@ -1108,3 +1108,14 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-02 | SRS_F008 | ChatGPT → main | REQUIREMENT_PASSED（V2.3） | ai/gpt-test / 5b9511a / V1.132 | 33b3615 | DEF-S3-085 修复经真实指令四分支验证；F008 整项通过，下一需求另开对话 |
+
+## ChatGPT → Claude/Gemini：SRS_F009 V1.132 取消结果审计矛盾
+
+- 状态：`READY_FOR_CLAUDE`，**F009 整项未通过**。执行/用例补充基线 V2.3；产品标签 `V1.132`，代码 SHA `5b9511a6daeafd9f740dd51a090d83f21a32195d`。GPT 独立测试分支 `ai/gpt-test`；本轮证据提交 `6f6b0fa2476dd507dc327e3a9d10550abd3f9712` 已推送。完整裁决和复测清单见 `acceptance/stage3/SRS_F009-V1.132-独立复测与缺陷交接.md`，四份新增原始证据见同报告。
+- **DEF-S3-086 / TC-030.S1 / R08（F）**：GPT 专属 schema `tip_gpt_f006_v118_20261030`，后端 18129、仿真体 18132。有效五步模板的任务 52 在 `STEP_DISPATCHED` 后被配置管理员取消，设备收到 `TASK_CANCEL`；API 返回 `CANCELLED`，数据库状态 `MANUAL_TERMINATED`，但同任务事件写 `DRY_RUN_FAILED`，结果操作日志 `BASELINE_TEMPLATE_DRY_RUN_RESULT` 的 `operation_result` 与 detail.result 均为 `FAILED`。请区分人工取消与设备执行失败，结果日志和事件记录真实 `CANCELLED`，保留冻结模板版本与任务 ID；同时核对一次取消观察到的两条 `TASK_CANCEL/SENT` 是否应避免重复。旧失败/NT 原证据保留。
+- 本版已通过并留证：真实试运行成功、基线计划/试运行标记及独立指令与反馈；正式完成数和总览 `COMPLETED` 均保持 26、含试运行完成数 26→27；发起/成功结果/启用操作记录；设备 FAILED/TIMEOUT 的失败原因、草稿与启用门禁及失败结果日志；静态无效草稿、缺参/缺设备、六步及运动安全拒绝；新版本重新试运行门禁。规则 `R01–R07=P`，`R08=F`；步骤 `TC-028.S1/S2、TC-029.S1/S2、TC-030.S2=P`，`TC-030.S1=F`。部分旧版页面及能力不匹配分支按 V2.3 影响复核引用，原 SHA/理由见报告，不算新版新增实测。
+- 修复方先 fetch 并合入 `origin/ai/gpt-test` 的本轮证据提交，在独立 worktree 和自有运行资源修复；推送下一唯一 `V1.N` 产品标签及 `READY_FOR_GPT`。GPT 后续只需复测取消、正常成功、真实 FAILED/TIMEOUT 与启用审计，受影响邻接和核心冒烟按 V2.3 执行。不得把 F009 视为通过或合入 main。GPT 仿真体恢复 `SUCCESS` 与 500 ms 延迟，测试模板均停用；未触碰 F008 台账、未跟踪 `document/` 或 Gemini 暂存 WIP。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-02 | SRS_F009 | ChatGPT → Claude/Gemini | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / 5b9511a / V1.132 | 6f6b0fa2476dd507dc327e3a9d10550abd3f9712 | DEF-S3-086：取消 API/任务状态为 CANCELLED/MANUAL_TERMINATED，但结果事件/操作日志写 FAILED；修复后交回独立复测 |
