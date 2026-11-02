@@ -66,4 +66,41 @@ class GoalClarificationRoundsTest {
         assertTrue(task.getSceneParams().contains("虚构位置3"));
         verifyNoInteractions(planning);
     }
+
+    @Test void taskGoalWithIdentityIsSanitizedWhenCallingGoalUnderstanding() {
+        Task task = new Task();
+        task.setId(9L);
+        task.setStatus(TaskStatus.PLANNING);
+        task.setTaskGoal("Synthetic navigation to F2_TEST_GATE; passengerName=FICTIONAL_PASSENGER_NAME_CANARY_F011_137");
+        task.setTaskFamily("SPECIAL_PASSENGER_SERVICE");
+        task.setSceneParams("{}");
+        task.setMissingInfoQuestions("[\"请提供地点\"]");
+        TaskMapper tasks = mock(TaskMapper.class);
+        when(tasks.findById(9L)).thenReturn(Optional.of(task));
+        GoalUnderstandingService model = mock(GoalUnderstandingService.class);
+        GoalUnderstandingResponse incomplete = new GoalUnderstandingResponse();
+        incomplete.setResultCode("0");
+        incomplete.setInfoComplete(false);
+        incomplete.setMissingInfoQuestions(List.of("请提供地点"));
+        when(model.understand(any())).thenReturn(incomplete);
+        TaskService service = new TaskService(tasks, mock(PlanVersionMapper.class),
+                mock(ContextSnapshotMapper.class), mock(DeviceAgentMapper.class), model,
+                mock(TaskCodeGenerator.class), mock(TaskEventService.class), mock(OperationLogService.class),
+                mock(TaskPlanningOrchestrator.class), mock(TaskStepAssignmentMapper.class), mock(TaskDefinitionService.class),
+                mock(DeviceAgentMessagingService.class));
+        User operator = new User();
+        operator.setUsername("operator");
+
+        ClarifyTaskRequest answer = new ClarifyTaskRequest();
+        answer.setAnswers(Map.of("请提供地点", "F2_TEST_GATE"));
+        service.clarify(9L, answer, operator);
+
+        var requestCaptor = org.mockito.ArgumentCaptor.forClass(GoalUnderstandingRequest.class);
+        verify(model).understand(requestCaptor.capture());
+        var captured = requestCaptor.getValue();
+        assertFalse(captured.getTaskGoal().contains("FICTIONAL_PASSENGER_NAME_CANARY_F011_137"), "目标理解送模副本不得包含身份哨兵");
+        assertFalse(captured.getTaskGoal().contains("passengerName"), "目标理解送模副本不得包含身份字段名");
+        assertTrue(captured.getTaskGoal().contains("Synthetic navigation to F2_TEST_GATE"));
+        assertEquals("Synthetic navigation to F2_TEST_GATE; passengerName=FICTIONAL_PASSENGER_NAME_CANARY_F011_137", task.getTaskGoal(), "内部原始目标保留");
+    }
 }

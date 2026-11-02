@@ -16,7 +16,7 @@ class ReplanningContextTest {
         var assignments=mock(TaskStepAssignmentMapper.class); var context=mock(ContextSnapshotService.class);
         var model=mock(PlanningModelService.class);
         var task=new Task(); task.setId(1L); task.setCurrentPlanVersionId(2L);
-        task.setTaskGoal("保留原目标"); task.setTaskFamily("FLIGHT_CHANGE_RESPONSE");
+        task.setTaskGoal("保留原目标; passengerName=FICTIONAL_PASSENGER_NAME_CANARY_F011_137"); task.setTaskFamily("FLIGHT_CHANGE_RESPONSE");
         task.setSceneParams("{\"flightNumber\":\"TEST123\",\"passengerName\":\"CANARY_NAME\"}");
         task.setGoalParsingResult("{\"constraints\":[\"信息发布必须先于旅客引导\"]}");
         when(tasks.findById(1L)).thenReturn(Optional.of(task));
@@ -43,6 +43,10 @@ class ReplanningContextTest {
         service.replan(1L,2,"STEP_FAILED");
         var capture=ArgumentCaptor.forClass(PlanningRequest.class); verify(model).generatePlan(capture.capture());
         var request=capture.getValue();
+        assertFalse(request.getTaskGoal().contains("FICTIONAL_PASSENGER_NAME_CANARY_F011_137"), "重规划模型请求中的目标须脱敏");
+        assertFalse(request.getTaskGoal().contains("passengerName"), "重规划模型请求中的目标不含身份字段名");
+        assertTrue(request.getTaskGoal().contains("保留原目标"));
+        assertEquals("保留原目标; passengerName=FICTIONAL_PASSENGER_NAME_CANARY_F011_137", task.getTaskGoal(), "内部原始目标保留供追溯");
         assertEquals("TEST123",request.getSceneParams().get("flightNumber"));
         assertNull(request.getSceneParams().get("passengerName"), "重规划模型请求中的场景参数须脱敏，不含旅客身份");
         assertTrue(request.getConstraints().contains("信息发布必须先于旅客引导"));

@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 场景参数不得携带旅客真实身份信息（SRS_F010 业务规则6、NF003，DEF-S3-032）。
@@ -27,7 +29,25 @@ public final class SceneParamsPrivacyGuard {
             "phone", "phonenumber", "telephone", "tel", "mobile", "mobilenumber", "cellphone",
             "contactphone", "contactnumber",
             "email", "emailaddress",
-            "realname", "fullname", "travelername", "guestname", "customername", "clientname");
+            "realname", "fullname", "travelername", "guestname", "customername", "clientname",
+            "旅客姓名", "乘客姓名", "旅客身份", "乘客身份", "身份证号", "身份证号码", "身份证",
+            "证件号码", "证件号", "护照号码", "护照号", "护照", "手机号码", "手机号",
+            "联系电话", "联系方式", "电话号码", "电话", "电子邮箱", "邮箱", "真实姓名", "姓名");
+
+    private static final Pattern IDENTITY_KV_PATTERN = Pattern.compile(
+            "(?i)(?<prefix>[;；,，]?\\s*)(?<key>[a-zA-Z_\\u4e00-\\u9fa5][a-zA-Z0-9_\\-\\u4e00-\\u9fa5]*)\\s*(?:[:=＝：]|(?:为|是))\\s*(?<val>\"[^\"]*\"|'[^']*'|[^;；,，\\n\\r\\)）\\]\\}]+)");
+
+    private static final Pattern CHINESE_NAME_PATTERN = Pattern.compile(
+            "(?:旅客姓名|乘客姓名|真实姓名|姓名)\\s*[:：=＝为是\\s]\\s*([\u4e00-\u9fa5]{2,4})");
+
+    private static final Pattern ID_CARD_PATTERN = Pattern.compile(
+            "\\b[1-9]\\d{5}(?:18|19|20)\\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\\d|3[01])\\d{3}[\\dXx]\\b");
+
+    private static final Pattern PHONE_PATTERN = Pattern.compile(
+            "(?<!\\d)1[3-9]\\d{9}(?!\\d)");
+
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(
+            "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}");
 
     private SceneParamsPrivacyGuard() {}
 
@@ -156,6 +176,51 @@ public final class SceneParamsPrivacyGuard {
         if (normalized.contains("identity") && (normalized.contains("number") || normalized.contains("no") || normalized.contains("card") || normalized.contains("doc"))) {
             return true;
         }
+        if (normalized.contains("旅客") && (normalized.contains("名") || normalized.contains("身份") || normalized.contains("号"))) {
+            return true;
+        }
+        if (normalized.contains("身份证") || normalized.contains("护照") || normalized.contains("手机号") || normalized.contains("电话")) {
+            return true;
+        }
         return false;
+    }
+
+    /**
+     * 对送模副本中的自然语言任务目标进行旅客身份信息脱敏（SRS_F011.R06、DEF-S3-088）。
+     * 内部持久化及任务追溯保留原始目标，送外部模型前剥离或替换身份字段与敏感值。
+     */
+    public static String sanitizeGoal(String goal) {
+        if (goal == null || goal.isBlank()) return goal;
+        String text = goal;
+
+        // 1. 结构化/键值对形式的身份字段脱敏（key=val, key: val 等）
+        Matcher m = IDENTITY_KV_PATTERN.matcher(text);
+        StringBuffer sb = new StringBuffer();
+        while (m.find()) {
+            String key = m.group("key");
+            if (isIdentityKey(key)) {
+                String prefix = m.group("prefix");
+                String replacement = (prefix != null && !prefix.isBlank() ? prefix : "") + "[PROTECTED_IDENTITY]";
+                m.appendReplacement(sb, Matcher.quoteReplacement(replacement));
+            } else {
+                m.appendReplacement(sb, Matcher.quoteReplacement(m.group(0)));
+            }
+        }
+        m.appendTail(sb);
+        text = sb.toString();
+
+        // 2. 中文自然语言姓名脱敏
+        text = CHINESE_NAME_PATTERN.matcher(text).replaceAll("[PROTECTED_IDENTITY]");
+
+        // 3. 独立身份证号脱敏（18位身份证）
+        text = ID_CARD_PATTERN.matcher(text).replaceAll("[PROTECTED_ID]");
+
+        // 4. 独立手机号脱敏（11位中国手机号）
+        text = PHONE_PATTERN.matcher(text).replaceAll("[PROTECTED_PHONE]");
+
+        // 5. 独立电子邮箱脱敏
+        text = EMAIL_PATTERN.matcher(text).replaceAll("[PROTECTED_EMAIL]");
+
+        return text;
     }
 }

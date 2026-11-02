@@ -137,7 +137,7 @@ public class ReplanningService {
 
         PlanningRequest request = new PlanningRequest();
         request.setRequestId(UUID.randomUUID().toString());
-        request.setTaskGoal(task.getTaskGoal());
+        request.setTaskGoal(SceneParamsPrivacyGuard.sanitizeGoal(task.getTaskGoal()));
         request.setTaskFamily(task.getTaskFamily());
         request.setSceneParams(SceneParamsPrivacyGuard.sanitize(parseObject(task.getSceneParams())));
         request.setCapabilityContext(contextSnapshotService.capabilityContext(snapshot, contextCapabilities));

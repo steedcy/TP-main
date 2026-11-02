@@ -374,7 +374,7 @@ public class TaskService {
                                       List<Map<String, Object>> clarificationAnswers) {
         GoalUnderstandingRequest request = new GoalUnderstandingRequest();
         request.setRequestId(UUID.randomUUID().toString());
-        request.setTaskGoal(task.getTaskGoal());
+        request.setTaskGoal(SceneParamsPrivacyGuard.sanitizeGoal(task.getTaskGoal()));
         request.setTaskFamily(task.getTaskFamily());
         request.setSceneParams(SceneParamsPrivacyGuard.sanitize(sceneParams));
         if (clarificationAnswers != null) {

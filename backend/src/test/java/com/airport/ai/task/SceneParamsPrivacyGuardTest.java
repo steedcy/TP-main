@@ -74,4 +74,44 @@ class SceneParamsPrivacyGuardTest {
                 Map.of("passengerName", "John Doe")));
         assertTrue(ex.getMessage().contains("passengerName"));
     }
+
+    @Test
+    void sanitizesCanaryInTaskGoal() {
+        // DEF-S3-088: 任务 85 自然语言目标中包含虚构身份哨兵
+        String rawGoal = "Synthetic navigation to F2_TEST_GATE; passengerName=FICTIONAL_PASSENGER_NAME_CANARY_F011_137";
+        String sanitized = SceneParamsPrivacyGuard.sanitizeGoal(rawGoal);
+
+        assertNotNull(sanitized);
+        assertFalse(sanitized.contains("FICTIONAL_PASSENGER_NAME_CANARY_F011_137"), "送模副本目标不得包含旅客身份哨兵");
+        assertFalse(sanitized.contains("passengerName"), "送模副本目标不得包含身份字段名");
+        assertTrue(sanitized.contains("Synthetic navigation to F2_TEST_GATE"), "保留业务目标主体");
+        assertTrue(sanitized.contains("[PROTECTED_IDENTITY]"), "身份信息替换为脱敏标识");
+    }
+
+    @Test
+    void sanitizesVariousIdentityKeyFormatsInGoal() {
+        String colonGoal = "Navigate to Gate; passenger_name: Alice";
+        String cleanColon = SceneParamsPrivacyGuard.sanitizeGoal(colonGoal);
+        assertFalse(cleanColon.contains("Alice"));
+        assertFalse(cleanColon.contains("passenger_name"));
+
+        String chineseGoal = "协助旅客前往F2_TEST_GATE，旅客姓名=张三，身份证号=110101199003072345，联系电话: 13800138000";
+        String cleanChinese = SceneParamsPrivacyGuard.sanitizeGoal(chineseGoal);
+        assertFalse(cleanChinese.contains("张三"));
+        assertFalse(cleanChinese.contains("110101199003072345"));
+        assertFalse(cleanChinese.contains("13800138000"));
+        assertTrue(cleanChinese.contains("协助旅客前往F2_TEST_GATE"));
+
+        String standaloneId = "协助旅客前往登机口 110101199003072345";
+        String cleanStandalone = SceneParamsPrivacyGuard.sanitizeGoal(standaloneId);
+        assertFalse(cleanStandalone.contains("110101199003072345"));
+        assertTrue(cleanStandalone.contains("[PROTECTED_ID]"));
+    }
+
+    @Test
+    void preservesNonIdentityAttributesInGoal() {
+        String businessGoal = "Synthetic navigation to F2_TEST_GATE; targetLocation=F2_TEST_GATE; flightNumber=CA1234";
+        String sanitized = SceneParamsPrivacyGuard.sanitizeGoal(businessGoal);
+        assertEquals(businessGoal, sanitized, "非身份属性原样保留");
+    }
 }

@@ -20,7 +20,9 @@ public class PlanningRequest {
     public String getRequestId() { return requestId; }
     public void setRequestId(String requestId) { this.requestId = requestId; }
     public String getTaskGoal() { return taskGoal; }
-    public void setTaskGoal(String taskGoal) { this.taskGoal = taskGoal; }
+    public void setTaskGoal(String taskGoal) {
+        this.taskGoal = com.airport.ai.task.SceneParamsPrivacyGuard.sanitizeGoal(taskGoal);
+    }
     public String getTaskFamily() { return taskFamily; }
     public void setTaskFamily(String taskFamily) { this.taskFamily = taskFamily; }
     public Map<String, Object> getSceneParams() { return sceneParams; }
