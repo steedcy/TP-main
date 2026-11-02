@@ -455,7 +455,25 @@ public class TaskService {
             task.setTaskFamily(response.getInferredTaskFamily());
         }
 
-        if (response.isInfoComplete()) {
+        // 必要信息由系统按任务族核对，不直接采信模型的追问清单（DEF-S3-003/004/005）：
+        // 已提供的必要信息不再追问，缺失时只问缺的那几项，不问身份、设备、路线等系统自己决定的内容。
+        RequiredInfoGuard.Verdict verdict = RequiredInfoGuard.check(
+                RequiredInfoGuard.requirementsFor(task.getTaskFamily(),
+                        taskDefinitionService.findByCode(task.getTaskFamily()).orElse(null)),
+                sceneParams, parsingResult);
+        boolean infoComplete = response.isInfoComplete();
+        List<String> questions = response.getMissingInfoQuestions();
+        if (verdict != null) {
+            if (verdict.complete() != infoComplete) {
+                taskEventService.append(task.getId(), "GOAL_CLARIFIED", "SYSTEM", "INFO_CHECK_OVERRIDE",
+                        "系统按任务族核对必要信息：" + (verdict.complete() ? "均已提供，忽略模型的追问" : "仍缺 " + verdict.missing())
+                                + "（模型判断" + (infoComplete ? "完整" : "不完整") + "）");
+            }
+            infoComplete = verdict.complete();
+            questions = verdict.questions();
+        }
+
+        if (infoComplete) {
             task.setMissingInfoQuestions(null);
             taskMapper.update(task);
             taskEventService.append(task.getId(), "GOAL_CLARIFIED", "SYSTEM", null,
@@ -463,7 +481,7 @@ public class TaskService {
             taskPlanningOrchestrator.advance(task.getId());
         } else {
             // 业务规则4：信息补充完成前不得进入计划生成，任务停留在PLANNING
-            task.setMissingInfoQuestions(toJson(response.getMissingInfoQuestions()));
+            task.setMissingInfoQuestions(toJson(questions));
             if (clarificationAnswers != null && clarificationAnswers.size() >= 3) {
                 task.setStatus(TaskStatus.PENDING_MANUAL);
                 task.setFailureReason("三轮信息补充后仍缺少关键信息，需人工处理");
@@ -471,7 +489,7 @@ public class TaskService {
             taskMapper.update(task);
             taskEventService.append(task.getId(), "GOAL_CLARIFIED", "SYSTEM", "INFO_INCOMPLETE",
                     "目标理解发现信息缺失，已补充" + (clarificationAnswers == null ? 0 : clarificationAnswers.size())
-                            + "轮，待补充问题: " + response.getMissingInfoQuestions());
+                            + "轮，待补充问题: " + questions);
             if (task.getStatus() == TaskStatus.PENDING_MANUAL) {
                 taskEventService.append(task.getId(), "TASK_MANUAL_REQUIRED", "SYSTEM", "INFO_INCOMPLETE",
                         task.getFailureReason());
