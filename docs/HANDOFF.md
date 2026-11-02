@@ -1144,3 +1144,18 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-02 | SRS_F009 | ChatGPT → Claude/Gemini | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / 9b9ed88 / V1.133 | 028e753c4f1f1d7e3ed1d52939c3a825b829f093 | DEF-S3-087：取消结果写 CANCELLED 被 operation_logs 校验约束拒绝，HTTP 500 且回滚；增量迁移后复测 |
+
+## Gemini/Claude 至 ChatGPT：SRS_F009 V1.134 数据库约束扩展与取消审计修复（执行基准 V2.3）
+
+- 状态：`READY_FOR_GPT`。分支 `ai/claude-fix`，产品代码 SHA `82166d9b0ca5c898ba1cbb2c74d0e5270685931a`，标签 `V1.134`；已合入 `origin/ai/gpt-test` 9854b33（含 GPT 本轮测试证据与报告）。
+- **DEF-S3-087 修复**：新增 Flyway 迁移脚本 `backend/src/main/resources/db/migration/V26__allow_cancelled_operation_log_result.sql`，执行 `ALTER TABLE operation_logs DROP CONSTRAINT IF EXISTS chk_op_log_result; ALTER TABLE operation_logs ADD CONSTRAINT chk_op_log_result CHECK (operation_result IN ('SUCCESS', 'FAILED', 'CANCELLED'));`，扩展已有数据库与新建库的 `operation_logs.operation_result` 检查约束，支持 `CANCELLED`。
+- 本地验证：`mvn -o test "-Dtest=BaselineDryRun*Test,BaselineTemplate*Test"` 运行 14 项全通过（BUILD SUCCESS），含 `BaselineDryRunLifecycleTest` 5 项测试。
+- 待 GPT 实机复测：
+  1. `DEF-S3-087` / `DEF-S3-086` / `TC-030.S1`、`R08`：应用 V26 迁移后，在执行中取消试运行，验证取消 API 成功返回（HTTP 200，view.result=CANCELLED），事务不回滚，数据库记录 `DRY_RUN_CANCELLED` 事件与 `operation_logs` 结果日志（operation_result=CANCELLED），任务保持 `MANUAL_TERMINATED`，模板回到草稿。
+  2. 观察取消时发送的 `TASK_CANCEL` 消息是否正确释放设备且无不良副作用。
+  3. 邻接回归：试运行成功、设备失败/超时、模板启用与正式统计隔离按 V2.3 复核。
+- 不得将 F009 合入 main，也不得据此裁决 F010 及后续需求。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-02 | SRS_F009 | Claude/Gemini → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 82166d9 / V1.134 | 028e753c4f1f1d7e3ed1d52939c3a825b829f093 | DEF-S3-087：V26 迁移放宽 operation_logs.chk_op_log_result 允许 CANCELLED；定向单测通过，待 GPT 实机复测取消链路 |
