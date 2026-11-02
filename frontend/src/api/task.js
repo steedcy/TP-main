@@ -9,12 +9,14 @@ export function listTasks(params) {
   return request.get('/tasks', { params })
 }
 
-export function getTask(taskId) {
-  return request.get(`/tasks/${taskId}`)
+// silent：详情页自己处理404（提示并返回列表），避免全局拦截器和页面各弹一次
+export function getTask(taskId, options = {}) {
+  return request.get(`/tasks/${taskId}`, options)
 }
 
-export function manualAction(taskId, action) {
-  return request.post(`/tasks/${taskId}/manual-actions`, { action })
+// reason：置为失败必填，其余动作可选，后端写入任务事件和操作记录（DEF-S3-062）
+export function manualAction(taskId, action, reason) {
+  return request.post(`/tasks/${taskId}/manual-actions`, { action, reason: reason || undefined })
 }
 
 export function terminateTask(taskId, reason) {

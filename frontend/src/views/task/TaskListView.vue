@@ -3,20 +3,22 @@
     <a-space style="margin-bottom: 16px" wrap>
       <a-button type="primary" @click="submitVisible = true">提交任务</a-button>
       <a-input v-model:value="filterTaskCode" placeholder="任务编号" style="width: 180px" @pressEnter="fetchList" />
+      <a-input v-model:value="filterGoalKeyword" placeholder="目标关键字" style="width: 180px" allow-clear
+               :maxlength="100" data-testid="goal-keyword" @pressEnter="fetchList" />
       <a-select v-model:value="filterStatus" style="width: 160px" placeholder="按状态筛选" allow-clear @change="fetchList">
         <a-select-option v-for="s in statusOptions" :key="s.key" :value="s.key">{{ s.label }}</a-select-option>
       </a-select>
       <a-select v-model:value="filterTaskFamily" style="width: 180px" placeholder="按任务族筛选" allow-clear @change="fetchList">
         <a-select-option v-for="d in allTaskDefinitions" :key="d.definitionCode" :value="d.definitionCode">{{ d.taskName }}</a-select-option>
       </a-select>
-      <a-range-picker v-model:value="filterTimeRange" show-time format="YYYY-MM-DD HH:mm:ss" @change="fetchList" />
+      <a-range-picker v-model:value="filterTimeRange" show-time format="YYYY-MM-DD HH:mm:ss" value-format="YYYY-MM-DDTHH:mm:ss" @change="fetchList" />
       <a-button @click="fetchList">查询</a-button>
     </a-space>
 
-    <a-table :dataSource="list" :columns="columns" rowKey="id">
+    <a-table :dataSource="list" :columns="columns" rowKey="id" :rowClassName="rowClassName">
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'status'">
-          <a-tag>{{ statusLabel(record.status) }}</a-tag>
+          <a-tag :color="statusTagColor(record.status)">{{ statusLabel(record.status) }}</a-tag>
         </template>
         <template v-else-if="column.key === 'action'">
           <a-space>
@@ -97,6 +99,7 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { message } from 'ant-design-vue'
 import { listTasks, submitTask, clarifyTask, cancelTask } from '../../api/task'
+import { todayRange, shouldDefaultToToday, buildListParams, formatLocal, statusTagColor, rowClassName } from '../../utils/taskListView'
 import { dynamicSceneFields, initialSceneValues, validateSceneValues, buildSceneParams } from '../../utils/sceneParams'
 import { listTaskDefinitions } from '../../api/taskDefinition'
 
@@ -106,7 +109,10 @@ const submitVisible = ref(false)
 const filterStatus = ref(route.query.status)
 const filterTaskCode = ref('')
 const filterTaskFamily = ref(undefined)
-const filterTimeRange = ref([])
+const filterGoalKeyword = ref(route.query.goalKeyword || '')
+// 默认只看今日任务；带条件从总览跳转进来时不叠加，否则会过滤掉要看的历史任务（DEF-S3-006）
+// 范围选择器按字符串取值（valueFormat），不引入额外的日期库
+const filterTimeRange = ref(shouldDefaultToToday(route.query) ? todayRange().map(formatLocal) : [])
 const form = reactive({ taskGoal: '', taskFamily: undefined })
 const flight = reactive({ flightNumber: '', changeType: undefined, originalTime: null, newTime: null,
   originalGate: undefined, newGate: undefined, changeDescription: '' })
@@ -172,11 +178,11 @@ function statusLabel(status) {
 }
 
 async function fetchList() {
-  const params = { status: filterStatus.value, taskCode: filterTaskCode.value || undefined, taskFamily: filterTaskFamily.value }
-  if (filterTimeRange.value?.length === 2) {
-    params.createdFrom = filterTimeRange.value[0].format('YYYY-MM-DDTHH:mm:ss')
-    params.createdTo = filterTimeRange.value[1].format('YYYY-MM-DDTHH:mm:ss')
-  }
+  const params = buildListParams({
+    status: filterStatus.value, taskCode: filterTaskCode.value, taskFamily: filterTaskFamily.value,
+    goalKeyword: filterGoalKeyword.value,
+    range: filterTimeRange.value
+  })
   const resp = await listTasks(params)
   list.value = resp.data.content || resp.data
 }
@@ -279,3 +285,13 @@ onMounted(() => {
   fetchTaskDefinitions()
 })
 </script>
+
+<style scoped>
+/* 待人工任务整行底色 + 左侧色条：颜色之外还有状态文字和标签，色弱用户不只靠颜色区分（DEF-S3-060） */
+:deep(.row-pending-manual > td) {
+  background: #fff7e6;
+}
+:deep(.row-pending-manual > td:first-child) {
+  box-shadow: inset 4px 0 0 #fa8c16;
+}
+</style>

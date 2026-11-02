@@ -46,11 +46,12 @@ public class TaskController {
     public ApiResponse<PageResult<TaskView>> list(@RequestParam(required = false) String taskCode,
                                                     @RequestParam(required = false) TaskStatus status,
                                                     @RequestParam(required = false) String taskFamily,
+                                                    @RequestParam(required = false) String goalKeyword,
                                                     @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime createdFrom,
                                                     @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime createdTo,
                                                     @RequestParam(defaultValue = "1") int page,
                                                     @RequestParam(defaultValue = "20") int size) {
-        return ApiResponse.ok(taskService.list(taskCode, status, taskFamily, createdFrom, createdTo, page, size).map(TaskView::from));
+        return ApiResponse.ok(taskService.list(taskCode, status, taskFamily, goalKeyword, createdFrom, createdTo, page, size).map(TaskView::from));
     }
 
     @GetMapping("/{taskId}")

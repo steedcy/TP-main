@@ -106,9 +106,23 @@ public class TaskService {
     /** 对应5.7.1界面元素：任务编号、时间范围、任务族/状态任意组合筛选（同时供5.4任务列表复用） */
     public PageResult<Task> list(String taskCode, TaskStatus status, String taskFamily,
                                   LocalDateTime createdFrom, LocalDateTime createdTo, int page, int size) {
+        return list(taskCode, status, taskFamily, null, createdFrom, createdTo, page, size);
+    }
+
+    /** 增加目标关键字筛选（SRS_F020.R06，DEF-S3-006）：对任务目标做不区分大小写的包含匹配，通配符按字面处理。 */
+    public PageResult<Task> list(String taskCode, TaskStatus status, String taskFamily, String goalKeyword,
+                                  LocalDateTime createdFrom, LocalDateTime createdTo, int page, int size) {
         PageHelper.startPage(page, size);
         return PageResult.of(new PageInfo<>(taskMapper.searchPaged(
-                blankToNull(taskCode), status, blankToNull(taskFamily), createdFrom, createdTo)));
+                blankToNull(taskCode), status, blankToNull(taskFamily), escapeLike(goalKeyword), createdFrom, createdTo)));
+    }
+
+    /** LIKE的通配符（% _ \）转义，避免用户输入被当作模式；空白视为不筛选，并限制长度。 */
+    static String escapeLike(String keyword) {
+        if (keyword == null || keyword.isBlank()) return null;
+        String k = keyword.trim();
+        if (k.length() > 100) k = k.substring(0, 100);
+        return k.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
     }
 
     private String blankToNull(String value) {

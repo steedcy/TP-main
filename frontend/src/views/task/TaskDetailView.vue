@@ -148,7 +148,7 @@
       <a-space>
         <a-button @click="handleManualAction('SWITCH_TO_BASELINE')">转基线执行</a-button>
         <a-button @click="handleManualAction('RETRY_PLANNING')">重试规划</a-button>
-        <a-button @click="handleManualAction('MARK_FAILED')" danger>置为失败</a-button>
+        <a-button @click="markFailedVisible = true" danger data-testid="mark-failed">置为失败</a-button>
         <a-button @click="terminateVisible = true" danger>终止任务</a-button>
       </a-space>
     </a-card>
@@ -158,6 +158,13 @@
     <a-card title="终止任务" v-else-if="isOperator && TERMINABLE_STATUSES.includes(task.status)" style="margin-top: 16px">
       <a-button danger @click="terminateVisible = true">终止任务</a-button>
     </a-card>
+
+    <!-- 置为失败不可逆，必须写明原因；原因会进入任务事件和操作记录（DEF-S3-062） -->
+    <a-modal v-model:open="markFailedVisible" title="将任务置为失败" ok-text="确认置为失败" ok-type="danger"
+             :okButtonProps="{ disabled: !markFailedReason.trim() }" @ok="handleMarkFailed">
+      <p>置为失败后任务进入终态，无法再转基线或重试规划。请写明原因（1～200 字）：</p>
+      <a-textarea v-model:value="markFailedReason" :maxlength="200" :rows="3" show-count data-testid="mark-failed-reason" />
+    </a-modal>
 
     <!-- 对应5.5.6业务规则1/5：原因1~200字+二次确认缺一不可；责任边界固定文案，人工终止不等同于设备安全急停 -->
     <a-modal v-model:open="terminateVisible" title="人工终止任务" @ok="handleTerminate" :okButtonProps="{ disabled: !confirmed || !terminateReason }">
@@ -180,7 +187,7 @@
 
 <script setup>
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../../store/auth'
 import { message } from 'ant-design-vue'
 import { taskProgress, progressText } from '../../utils/taskProgress'
@@ -191,6 +198,7 @@ import { getTask, getTaskEvents, getPlanVersions, getContextSnapshots, getStepAs
 const authStore = useAuthStore()
 const isOperator = computed(() => authStore.role === 'OPERATOR')
 const route = useRoute()
+const router = useRouter()
 const taskId = route.params.taskId
 const task = ref(null)
 const events = ref([])
@@ -278,10 +286,35 @@ function flightAssignmentSummary(assignment) {
     + `${assignment.feedbackAt ? `，完成时间 ${assignment.feedbackAt}${responseTime}` : ''}`
 }
 
+// 详情不存在（404，如已归档或编号错误）时提示并回到任务列表，不停留在空白的缺失记录页（DEF-S3-007）。
+// 只处理404；403等其它错误仍走全局拦截器，不在这里吞掉。
+let leaving = false
+function leaveIfMissing(error) {
+  if (error?.response?.status !== 404 || leaving) return false
+  leaving = true
+  if (pollTimer) clearInterval(pollTimer)
+  message.warning(`任务#${taskId}不存在或已归档，已返回任务列表`)
+  router.replace('/tasks')
+  return true
+}
+
 async function fetchAll() {
-  const [taskResp, eventsResp, planResp, snapResp, stepResp] = await Promise.all([
-    getTask(taskId), getTaskEvents(taskId), getPlanVersions(taskId), getContextSnapshots(taskId), getStepAssignments(taskId)
-  ])
+  let taskResp, eventsResp, planResp, snapResp, stepResp
+  try {
+    [taskResp, eventsResp, planResp, snapResp, stepResp] = await Promise.all([
+      getTask(taskId, { silent: true }), getTaskEvents(taskId), getPlanVersions(taskId), getContextSnapshots(taskId), getStepAssignments(taskId)
+    ])
+  } catch (e) {
+    if (leaveIfMissing(e)) return
+    // getTask 为让404由本页处理而设为静默，其它错误（403、500、网络）要在这里补回提示，不能被一并吞掉。
+    // 403 沿用全局口径的提示文案；其余用后端返回的消息。
+    const status = e?.response?.status
+    if (e?.config?.silent) {
+      if (status === 403) message.error('无权限访问，该操作需要更高权限角色')
+      else if (status !== 401) message.error(e?.response?.data?.message || '请求失败，请稍后重试')
+    }
+    throw e
+  }
   task.value = taskResp.data
   events.value = eventsResp.data
   planVersions.value = planResp.data
@@ -313,8 +346,21 @@ function scrollToHighlightedStep() {
   })
 }
 
-async function handleManualAction(action) {
-  const response = await manualAction(taskId, action)
+const markFailedVisible = ref(false)
+const markFailedReason = ref('')
+
+async function handleMarkFailed() {
+  if (!markFailedReason.value.trim()) {
+    message.warning('请填写置为失败的原因')
+    return
+  }
+  await handleManualAction('MARK_FAILED', markFailedReason.value.trim())
+  markFailedVisible.value = false
+  markFailedReason.value = ''
+}
+
+async function handleManualAction(action, reason) {
+  const response = await manualAction(taskId, action, reason)
   await fetchAll()
   if (response.data.status === 'PENDING_MANUAL') {
     message.warning(response.data.failureReason || '处置未通过校验，任务仍待人工处理')
