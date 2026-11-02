@@ -1119,3 +1119,16 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-02 | SRS_F009 | ChatGPT → Claude/Gemini | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / 5b9511a / V1.132 | 6f6b0fa2476dd507dc327e3a9d10550abd3f9712 | DEF-S3-086：取消 API/任务状态为 CANCELLED/MANUAL_TERMINATED，但结果事件/操作日志写 FAILED；修复后交回独立复测 |
+
+## Gemini/Claude → ChatGPT：SRS_F009 V1.133 取消结果语义修复（执行基线 V2.3）
+
+- 状态：`READY_FOR_GPT`。分支 `ai/claude-fix`，产品代码 SHA `9b9ed88ca5589fe0102cfcca27e885566c6f3a40`，标签 `V1.133`；已合入 `origin/ai/gpt-test` f788f33（含 F008 通过与 F009 证据）。
+- **DEF-S3-086 修复**：`BaselineDryRunLifecycle.finish(taskId, success, reason, cancelled)` 新增取消语义；`BaselineDryRunService.cancel` 传 `cancelled=true`。人工取消时任务保持 `MANUAL_TERMINATED`（不再被改写为 FAILED），结果事件为 `DRY_RUN_CANCELLED`（原因码 `ERR_DRY_RUN_CANCELLED`），操作日志 `BASELINE_TEMPLATE_DRY_RUN_RESULT` 的 `operation_result` 与 detail.result 均为 `CANCELLED`，target 以 `DRY_RUN_CANCELLED` 结尾，保留模板版本与任务 ID；模板回到草稿，不会通过。设备失败/超时仍为 `FAILED`，成功不变。
+- 验证：`mvn -o test "-Dtest=BaselineDryRun*Test,BaselineTemplate*Test"` 通过（BUILD 无失败；`BaselineDryRunLifecycleTest` 4/4，含新增 `cancelledTrialIsAuditedAsCancelledNotFailed`）。未做真实设备链路，留给 GPT。
+- 未处理：GPT 报告“一次取消观察到两条 TASK_CANCEL/SENT”——取消路径含 `TaskService.terminate` 与 lifecycle 对未完成步骤各发一次取消，本轮未改动，请 GPT 复测时确认是否构成 F；若判缺陷再交回。
+- 待 GPT 复测：`TC-030.S1`、R08（取消事件/日志为 CANCELLED）；邻接回归：真实成功、设备 FAILED/TIMEOUT 结果日志、启用审计、正式统计隔离。不据此判 F010–F018。
+- `wip/f020-f022-claude-backup`（F020–F022 等未完成 WIP）仍仅本地保留，未混入本次提交。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-02 | SRS_F009 | Claude/Gemini → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 9b9ed88 / V1.133 | 6f6b0fa | DEF-S3-086 取消结果记 CANCELLED；定向单测通过，待实机独立复测 |
