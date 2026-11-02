@@ -142,4 +142,19 @@ class ReplanningHighRiskDowngradeTest {
         verify(plans, times(1)).insert(any());
         verifyNoInteractions(execution);
     }
+
+    @Test void replannedHighRiskDowngradeBlocksDefaultLocationWhenGoalRequiresDifferentPlace() throws Exception {
+        arrange("CAP_DONE");
+        template.setInputParams("[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"}]");
+        task.setTaskGoal("Guide virtual passenger to F2_SERVICE_POINT G131");
+        task.setGoalParsingResult("{\"originalGoal\":\"Guide virtual passenger to F2_SERVICE_POINT G131\",\"destination\":null}");
+
+        service.replan(1L, 2, "DEVICE_OFFLINE");
+
+        assertEquals(TaskStatus.PENDING_MANUAL, task.getStatus());
+        assertTrue(task.getFailureReason().contains("拒绝以模板默认地点执行"));
+        verify(events).append(eq(1L), eq("BASELINE_INPUT_DEFAULTED"), eq("SYSTEM"), eq("ERR_LOCATION_UNRESOLVED"),
+                contains("targetLocation"));
+        verifyNoInteractions(execution);
+    }
 }

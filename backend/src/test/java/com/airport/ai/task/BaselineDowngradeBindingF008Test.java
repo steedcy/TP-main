@@ -115,4 +115,37 @@ class BaselineDowngradeBindingF008Test {
                 && x.getSceneParams().contains("F2_SERVICE_POINT") && !x.getSceneParams().contains("F2_TEST_GATE")),
                 "任务落库的场景参数里不应再有被默认值替换的地点");
     }
+
+    @Test
+    void goalRequiresSpecificLocationButDestinationIsNullRoutesToPendingManualWithoutDispatchingDefault() throws Exception {
+        Task t = task("{}", "{\"originalGoal\":\"Guide virtual passenger to F2_SERVICE_POINT G131\",\"destination\":null,\"origin\":\"F2_TEST_GATE\"}");
+        t.setTaskGoal("Guide virtual passenger to F2_SERVICE_POINT G131");
+        orchestrator.switchToBaseline(70L);
+        assertEquals(TaskStatus.PENDING_MANUAL, t.getStatus());
+        assertFalse(scene(t).containsKey("targetLocation"), "不得将模板默认地点 F2_TEST_GATE 写入任务场景参数");
+        verify(events).append(eq(70L), eq("BASELINE_INPUT_DEFAULTED"), eq("SYSTEM"), eq("ERR_LOCATION_UNRESOLVED"),
+                contains("targetLocation"));
+        verify(events).append(eq(70L), eq("TASK_PENDING_MANUAL"), eq("SYSTEM"), eq("ERR_PLANNING_FAILED"),
+                contains("targetLocation"));
+        verifyNoInteractions(execution);
+    }
+
+    @Test
+    void taskActuallyNotRequiringLocationStillDowngradesWhenTemplateHasNoLocationInput() throws Exception {
+        BaselineTemplate broadcastTemplate = new BaselineTemplate();
+        broadcastTemplate.setId(2L);
+        broadcastTemplate.setTemplateName("BROADCAST_ONLY");
+        broadcastTemplate.setInputParams("[{\"name\":\"repeatCount\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"1\"}]");
+        broadcastTemplate.setSteps("[{\"capabilityType\":\"CAP_NOTIFICATION\",\"completionCondition\":\"notificationStatus=SUCCESS\","
+                + "\"paramMapping\":[{\"target\":\"repeatCount\",\"source\":\"TEMPLATE_INPUT.repeatCount\"}]}]");
+        when(templates.matchForDowngrade("BROADCAST_FAMILY")).thenReturn(Optional.of(broadcastTemplate));
+
+        Task t = task("{}", "{\"originalGoal\":\"Broadcast notice\",\"destination\":null}");
+        t.setTaskFamily("BROADCAST_FAMILY");
+        t.setTaskGoal("Broadcast notice");
+        orchestrator.switchToBaseline(70L);
+        assertEquals(TaskStatus.DOWNGRADING, t.getStatus());
+        assertEquals(1, scene(t).get("repeatCount"));
+        verify(execution).startExecution(eq(70L), any());
+    }
 }

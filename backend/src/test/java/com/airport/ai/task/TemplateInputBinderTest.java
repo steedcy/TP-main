@@ -91,4 +91,26 @@ class TemplateInputBinderTest {
         String inputs = "[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true}]";
         assertThrows(IllegalArgumentException.class, () -> TemplateInputBinder.bind(inputs, Map.of(), Map.of()));
     }
+
+    @Test
+    void unresolvedGoalLocationIsDetectedWhenGoalMentionsDifferentPlaceOrIntentWithoutParsedDestination() throws Exception {
+        var r = bind(Map.of(), new HashMap<>() {{ put("destination", null); }});
+        // 原目标含 F2_SERVICE_POINT，与默认 F2_TEST_GATE 不同 → 判为存在未解析出的目标地点
+        assertTrue(TemplateInputBinder.hasUnresolvedGoalLocation(
+                "Guide virtual passenger to F2_SERVICE_POINT G131_NO_PARSE595921",
+                Map.of("originalGoal", "Guide virtual passenger to F2_SERVICE_POINT G131_NO_PARSE595921"),
+                r.defaultedLocations(), r.values()));
+        // 原目标含中文引导意图但无解析目的地且未提默认地点 → 判为存在未解析出的目标地点
+        assertTrue(TemplateInputBinder.hasUnresolvedGoalLocation(
+                "请引导轮椅旅客前往服务柜台",
+                Map.of(), r.defaultedLocations(), r.values()));
+        // 原目标明确就是 F2_TEST_GATE（与默认一致） → 不阻塞
+        assertFalse(TemplateInputBinder.hasUnresolvedGoalLocation(
+                "陪同特殊旅客前往 F2_TEST_GATE",
+                Map.of(), r.defaultedLocations(), r.values()));
+        // 真正无需地点要求的任务描述 → 不阻塞
+        assertFalse(TemplateInputBinder.hasUnresolvedGoalLocation(
+                "播放虚构航班延误广播通知",
+                Map.of(), r.defaultedLocations(), r.values()));
+    }
 }

@@ -255,6 +255,15 @@ public class TaskPlanningOrchestrator {
                     : MAPPER.readValue(task.getGoalParsingResult(),Map.class);
             // 显式场景参数 > 目标理解解析值 > 模板默认值（DEF-S3-085）
             TemplateInputBinder.Result bound = TemplateInputBinder.bind(template.getInputParams(), scene, parsedGoal);
+            if (TemplateInputBinder.hasUnresolvedGoalLocation(task.getTaskGoal(), parsedGoal,
+                    bound.defaultedLocations(), bound.values())) {
+                taskEventService.append(taskId, "BASELINE_INPUT_DEFAULTED", "SYSTEM", "ERR_LOCATION_UNRESOLVED",
+                        "原任务目标要求特定地点但目标理解未给出可用目的地且无显式场景参数，拒绝以模板默认地点执行: "
+                                + bound.defaultedLocations());
+                toPendingManual(task, downgradeReason + "；原目标要求地点但未解析出可用目的地且无显式场景参数，需人工确认目标地点: "
+                        + bound.defaultedLocations());
+                return;
+            }
             scene.putAll(bound.values());
             task.setSceneParams(toJson(scene)); taskMapper.update(task);
             if (!bound.fromParsedGoal().isEmpty()) {
@@ -262,7 +271,7 @@ public class TaskPlanningOrchestrator {
                         "基线模板输入取自目标理解解析结果: " + bound.fromParsedGoal());
             }
             if (!bound.defaultedLocations().isEmpty()) {
-                // 没有显式值也没有解析值，地点类输入只能用模板默认值：不静默套用，留下可追溯记录
+                // 没有显式值也没有解析值，且原目标未指向其他地点，留下可追溯记录
                 taskEventService.append(taskId, "BASELINE_INPUT_DEFAULTED", "SYSTEM", "WARN_LOCATION_DEFAULTED",
                         "任务未提供也未能解析以下地点，使用了模板默认值: " + bound.defaultedLocations());
             }

@@ -17,7 +17,7 @@ import java.util.Map;
  * 3. 模板默认值。
  *
  * 第 3 项只有在前两项都没有时才用。对“指向地点”的输入，用默认值会改写任务想去的地方，
- * 所以结果里会列出这类输入，调用方据此写一条可追溯的事件，而不是悄悄套用默认值。
+ * 所以结果里会列出这类输入。调用方在无法确认原目标无需地点或与默认地点一致时，应拦截自动下发并转待人工确认。
  */
 public final class TemplateInputBinder {
     private static final ObjectMapper JSON = new ObjectMapper();
@@ -31,9 +31,58 @@ public final class TemplateInputBinder {
             "origin", "origin",
             "startLocation", "origin");
 
+    private static final java.util.regex.Pattern LOCATION_CODE_PATTERN =
+            java.util.regex.Pattern.compile("(?<![A-Z0-9_])((?:F\\d+_(?!TEST\\b)[A-Z0-9_]+|GATE_[A-Z0-9_]+))(?![A-Z0-9_])");
+
+    private static final List<String> LOCATION_INTENT_KEYWORDS = List.of(
+            "前往", "引导", "陪同", "送往", "送到", "带到", "去往", "到达", "抵达", "登机口", "服务点", "行李点",
+            "guide", "escort", "navigate", "route to", "head to", "take to", "lead to");
+
     private TemplateInputBinder() {}
 
     public record Result(Map<String, Object> values, List<String> fromParsedGoal, List<String> defaultedLocations) {}
+
+    /**
+     * 判断任务原目标是否明确指向了不同于模板默认值的地点，或表达了地点引导/陪同意图但目标理解未能给出目的地。
+     * 若原目标显式包含模板默认地点编码（且未包含其他地点编码），或原目标完全不涉及地点引导，则返回 false。
+     */
+    public static boolean hasUnresolvedGoalLocation(String taskGoal, Map<String, Object> parsedGoal,
+                                                    List<String> defaultedLocations, Map<String, Object> boundValues) {
+        if (defaultedLocations == null || defaultedLocations.isEmpty()) {
+            return false;
+        }
+        String text = taskGoal;
+        if (isBlank(text) && parsedGoal != null && parsedGoal.get("originalGoal") instanceof String og) {
+            text = og;
+        }
+        if (isBlank(text)) {
+            return false;
+        }
+        java.util.Set<String> codesInGoal = new java.util.LinkedHashSet<>();
+        var matcher = LOCATION_CODE_PATTERN.matcher(text);
+        while (matcher.find()) {
+            codesInGoal.add(matcher.group(1));
+        }
+        for (String locParam : defaultedLocations) {
+            Object defVal = boundValues == null ? null : boundValues.get(locParam);
+            String defaultLoc = defVal == null ? "" : String.valueOf(defVal).trim();
+            if (!codesInGoal.isEmpty()) {
+                for (String code : codesInGoal) {
+                    if (!code.equals(defaultLoc)) {
+                        return true;
+                    }
+                }
+            } else if (!defaultLoc.isEmpty() && !text.contains(defaultLoc)) {
+                String lower = text.toLowerCase(java.util.Locale.ROOT);
+                for (String kw : LOCATION_INTENT_KEYWORDS) {
+                    if (lower.contains(kw)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
     @SuppressWarnings("unchecked")
     public static Result bind(String templateInputParamsJson, Map<String, Object> scene, Map<String, Object> parsedGoal)
