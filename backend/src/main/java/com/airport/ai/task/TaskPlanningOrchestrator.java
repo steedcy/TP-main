@@ -101,6 +101,20 @@ public class TaskPlanningOrchestrator {
             toPendingManual(task, "人工切换基线失败: " + ex.getMessage());
         }
     }
+    /** 目标理解超时/异常后的归口（DEF-S3-033）：与人工切换基线共用已校验的降级闸门，不可用转待人工。 */
+    @Transactional
+    public void downgradeAfterUnderstandingFailure(Long taskId, String reason) {
+        Task task = taskMapper.findById(taskId).orElseThrow();
+        if (task.getStatus() != TaskStatus.PLANNING) return;
+        try {
+            downgradeOrManual(task, reason);
+        } catch (RuntimeException ex) {
+            taskEventService.append(taskId, "BASELINE_DOWNGRADED", "SYSTEM", "ERR_TEMPLATE_VALIDATION_FAILED",
+                    "目标理解失败后基线降级异常: " + ex.getMessage());
+            toPendingManual(task, reason + "；基线降级异常: " + ex.getMessage());
+        }
+    }
+
     private void doAdvance(Task task) {
         Long taskId = task.getId();
         List<String> requiredCapabilities = extractRequiredCapabilities(task);

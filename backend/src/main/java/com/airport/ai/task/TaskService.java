@@ -135,6 +135,7 @@ public class TaskService {
             throw new BusinessException(ErrorCode.TASK_FAMILY_INVALID,
                     "任务族不存在或已停用，当前可选: " + taskDefinitionService.listEnabledTaskNames());
         }
+        SceneParamsPrivacyGuard.reject(request.getSceneParams());
         FlightChangeSceneValidator.validate(request.getTaskFamily(), request.getSceneParams());
         // 扩展任务定义声明的必填场景参数/类型在建任务前核对，不通过则不建任务、不调模型（DEF-S3-029）
         taskDefinitionService.findByCode(request.getTaskFamily())
@@ -386,6 +387,8 @@ public class TaskService {
             taskEventService.append(task.getId(), "GOAL_UNDERSTANDING_FAILED", "SYSTEM",
                     "ERR_GOAL_UNDERSTANDING_TIMEOUT",
                     "目标理解调用规划模型服务失败: " + response.getErrorMessage());
+            // DEF-S3-033：超时/异常后不停在PLANNING，进入基线可用性与校验流程，不可用则转待人工
+            taskPlanningOrchestrator.downgradeAfterUnderstandingFailure(task.getId(), "目标理解超时或异常: " + response.getErrorMessage());
             throw new BusinessException(ErrorCode.GOAL_UNDERSTANDING_TIMEOUT, response.getErrorMessage());
         }
 
