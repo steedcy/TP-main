@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`REQUIREMENT_PASSED`（SRS_F009，ChatGPT 独立复测 V1.134，执行基线 V2.3；见末尾）
-- 当前进度：`SRS_F001`～`SRS_F009` 已按各自交接与独立证据完成；下一需求 `SRS_F010` 应在独立新对话接续。
+- 状态：`READY_FOR_GPT`（SRS_F010，Claude 修复 V1.135，执行基线 V2.3；见末尾）
+- 当前进度：`SRS_F001`～`SRS_F009` 全部由 GPT 独立验收通过并合入 `main`；当前推进 `SRS_F010 开放式任务目标提交与理解` 的独立复测交接。
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
 - 旧阶段 3 任务已暂停；其结果是待修复的原始证据，不是新版本通过证明。
@@ -1170,3 +1170,45 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-02 | SRS_F009 | ChatGPT → main | REQUIREMENT_PASSED（V2.3） | ai/gpt-test / 82166d93e4ff / V1.134 | 80e4600b1d4d9a4f747810768e30a18615364a7c | V26 既有库迁移及真实取消/成功/失败/超时审计通过；F009 整项通过，下一需求另开对话 |
+
+## Claude → ChatGPT：SRS_F010 V1.135 场景参数隐私拦截与目标理解异常降级修复（执行基线 V2.3）
+
+- 状态：`READY_FOR_GPT`。分支 `ai/claude-fix`，产品代码 SHA `d18a5d9b0b95c38c91aa051e3297c90610bd8c94`，标签 `V1.135`。
+- **本轮修复内容与关闭缺陷**：
+  1. **DEF-S3-032 / TC-031.S2 / R06（场景参数隐私保护）**：
+     - 实现 `SceneParamsPrivacyGuard.reject(request.getSceneParams())`，在 `TaskService.submit` 任务创建入口前强制检查。
+     - 对旅客真实身份类字段（如 `passengerName`、`identity_document_number`、`phone`、`idCard`、`passport` 等）不区分大小写及下划线/连字符进行拦截拒绝，直接抛出 400（`ErrorCode.PARAM_FORMAT_ERROR`）业务异常。
+     - 确保敏感旅客身份信息不被持久化到数据库、不随任务上下文送至大模型。
+     - 配套单元测试：`SceneParamsPrivacyGuardTest`。
+  2. **DEF-S3-033 / TC-034.S1、TC-034.S2 / R07（目标理解超时/异常降级流转）**：
+     - 在 `TaskPlanningOrchestrator` 实现 `downgradeAfterUnderstandingFailure(taskId, reason)` 并在 `TaskService` 目标理解失败后调用。
+     - 目标理解调用外部模型失败或 60s 超时后，任务不再悬停在 `PLANNING` 状态；与基线降级闸门联动：若存在匹配且已启用的基线模板则触发基线降级，若无可用基线模板或校验失败则记录 `ERR_NO_BASELINE_TEMPLATE` / `ERR_TEMPLATE_VALIDATION_FAILED` 并流转至 `PENDING_MANUAL`（待人工处理），且全程不下发任何设备指令。
+     - 配套单元测试：`UnderstandingFailureDowngradeTest`。
+  3. **DEF-S3-028 / DEF-S3-029 / TC-031.S1 / R01（动态场景参数渲染与必填校验）**：
+     - 前端 `TaskListView.vue` 与 `src/utils/sceneParams.js` 已按扩展任务定义声明动态渲染场景参数输入项，并进行类型与必填校验；
+     - 后端 `SceneParamsValidator` 在提交前执行扩展任务定义必填与类型强校验，非法或缺必填参数拒绝创建任务。
+  4. **DEF-S3-063 / TC-032.S2 / R04、R10**：
+     - 先前轮次已关闭：待人工状态的转基线/重试先核对必需场景值，缺关键信息时阻止规划和设备命令，模板默认值不盲目覆盖缺失参数。
+- **本地定向单测验证结果**：
+  - `mvn -o test "-Dtest=*Goal*,*SceneParams*,*Understanding*,*ManualActionMissingInfo*,*FlightChange*"`：12 项测试 100% 通过（BUILD SUCCESS）：
+    - `FlightChangeSceneValidatorTest` (1/1)
+    - `GoalClarificationRoundsTest` (1/1)
+    - `ManualActionMissingInfoTest` (3/3)
+    - `SceneParamsPrivacyGuardTest` (2/2)
+    - `SceneParamsValidatorTest` (4/4)
+    - `UnderstandingFailureDowngradeTest` (1/1)
+  - 关联单测 `mvn -o test "-Dtest=PresetTaskDefinitionConsistencyTest,TaskAuthorizationTest,TaskExceptionDisableTest"`：8 项测试 100% 通过。
+  - 前端工具检查：`node frontend/src/utils/sceneParams.check.mjs` 通过。
+- **待 ChatGPT 独立复测清单（TC-031～TC-033、TC-034、R01～R10）**：
+  1. **TC-031.S1 / R01**：验证目标 1~500 字符边界校验，未选任务族由模型判定，扩展任务定义场景参数随任务族动态展示且提交时校验必填项与类型（DEF-S3-028/029）。
+  2. **TC-031.S2 / R02、R06**：验证自然语言目标提取 6 项要素；重点复测 DEF-S3-032，提交含旅客身份字段（`passengerName`、`identityDocumentNumber` 等）的 `sceneParams`，验证接口返回 400 且拒绝建任务，无敏感信息持久化。
+  3. **TC-031.S3 / R05、R08**：验证生成计划前取消任务置 `MANUAL_TERMINATED`，原始目标原文保存，事件时间线完整记录提交、补充、取消。
+  4. **TC-032.S1 / R03**：关键信息缺失时追问待补充问题，不臆造地点、能力或身份；补齐后生成计划。
+  5. **TC-032.S2 / R04、R09、R10**：3 轮信息补充计数与上限；第 3 轮仍缺关键信息转 `PENDING_MANUAL`，不进入计划生成、不下发设备指令（DEF-S3-063）。
+  6. **TC-033.S1**：范围外目标返回 400 及支持范围，无可用代理时提示且不建任务。
+  7. **TC-034.S1、TC-034.S2 / R07**：复测 DEF-S3-033，受控延迟/超时 60s 或模型异常后，任务不悬停在 `PLANNING`；有基线降级，无基线转 `PENDING_MANUAL`，不下发设备指令。
+  8. 邻接回归：态势/任务列表、基线降级流程。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-02 | SRS_F010 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / d18a5d9 / V1.135 | 无 | DEF-S3-032 敏感身份拦截与 DEF-S3-033 理解超时降级修复；定向单测全通，待独立复测 TC-031～TC-034 及 R01～R10 |
