@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（SRS_F009，ChatGPT 独立复测 V1.132 发现 DEF-S3-086；执行基线 V2.3；见末尾）
-- 当前进度：`SRS_F001`～`SRS_F008` 已按各自交接与独立证据完成；`SRS_F009` 未通过，待修复方处理取消结果审计后交回独立复测。
+- 状态：`READY_FOR_CLAUDE`（SRS_F009，ChatGPT 独立复测 V1.133 发现 DEF-S3-087；执行基线 V2.3；见末尾）
+- 当前进度：`SRS_F001`～`SRS_F008` 已按各自交接与独立证据完成；`SRS_F009` 未通过，待修复方处理取消结果日志数据库约束后交回独立复测。
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
 - 旧阶段 3 任务已暂停；其结果是待修复的原始证据，不是新版本通过证明。
@@ -1132,3 +1132,15 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-02 | SRS_F009 | Claude/Gemini → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 9b9ed88 / V1.133 | 6f6b0fa | DEF-S3-086 取消结果记 CANCELLED；定向单测通过，待实机独立复测 |
+
+## ChatGPT → Claude/Gemini：SRS_F009 V1.133 取消日志约束失败（执行基线 V2.3）
+
+- 状态：`READY_FOR_CLAUDE`，**F009 整项未通过**。产品标签 `V1.133` 指向 `9b9ed88ca5589fe0102cfcca27e885566c6f3a40`；GPT 在 `ai/gpt-test` 快进合入修复方交接 `8bc56ca9862f84ef0b44f74f8d02958f163fa850`，独立证据提交 `028e753c4f1f1d7e3ed1d52939c3a825b829f093` 已推送。完整报告及三份原始证据见 `acceptance/stage3/SRS_F009-V1.133-独立复测与缺陷交接.md`。
+- **DEF-S3-087（高）/ TC-030.S1 / R08（F）**：GPT schema `tip_gpt_f006_v118_20261030` 中 `operation_logs.chk_op_log_result` 仅允许 `SUCCESS/FAILED`（产品迁移 V2 也如此），V1.133 取消路径尝试写 `CANCELLED` 被 PostgreSQL 拒绝。任务 57 在 `STEP_DISPATCHED` 且 `RUNNING` 时调用取消，API 返回 HTTP 500/API 1000，事务回滚，任务仍 `EXECUTING`，无 `DRY_RUN_CANCELLED` 事件和结果操作记录。修复方须增加适用于现有库的增量迁移，保持取消、失败、成功的真实结果语义并定向回归。`DEF-S3-086` 尚不能在实机关闭，原失败证据保留。
+- V1.133 本轮独立实测：任务 53 真实成功并启用，结果日志 `SUCCESS`；任务 54/55 设备 `FAILED/TIMEOUT` 均记录 `FAILED` 且模板回草稿；总览正式 `COMPLETED` 保持 26，含试运行完成数 28→30。步骤 `TC-028.S1/S2、TC-029.S1/S2、TC-030.S2=P`，`TC-030.S1=F`；规则 `R01–R07=P`，`R08=F`。未改动的静态校验、能力、五步/运动安全和版本重试分支引用 V1.132 原 SHA 的影响复核，未作为新版新增实测。
+- V1.132 曾见两条 `TASK_CANCEL/SENT`；需求未限制取消请求只能发一次，旧版只有一次中止事件且设备释放，本轮不单独判 F。V1.133 取消 API 先遇 HTTP 500，无法确认成功取消路径是否仍有副作用；修复后复测时一起核对。GPT 已终止自身夹具任务、停用三份测试模板，机器人代理空闲，仿真体恢复 `SUCCESS`/500 ms。后端 18129 运行独立 V1.133 构建；未触碰修复方资源、F008 台账或未跟踪的 `document/`。
+- 修复方先 fetch 合入远端 `ai/gpt-test` 的证据提交，在独立资源中修复、提交推送下一唯一 `V1.N` 标签，并以 `READY_FOR_GPT` 交回。不要将 F009 合入 main，也不要据此判 F010 后续需求。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-02 | SRS_F009 | ChatGPT → Claude/Gemini | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / 9b9ed88 / V1.133 | 028e753c4f1f1d7e3ed1d52939c3a825b829f093 | DEF-S3-087：取消结果写 CANCELLED 被 operation_logs 校验约束拒绝，HTTP 500 且回滚；增量迁移后复测 |
