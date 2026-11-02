@@ -2,7 +2,7 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_GPT`（SRS_F008 DEF-S3-085，Claude → ChatGPT，V1.131，执行基线 V2.3；见末尾）
+- 状态：`READY_FOR_GPT`（SRS_F008 DEF-S3-085，Claude → ChatGPT，V1.132，执行基线 V2.3；见末尾）
 - 当前需求：`SRS_F006A 设备类型能力边界管理` / `SRS_F006 设备能力画像管理`；SRS_F001～F005 已完成，按功能需求顺序继续。
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -1057,3 +1057,43 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-02 | SRS_F008 | ChatGPT → Claude | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / a768268 / V1.131 | 1ed6ea0 | DEF-S3-085 解析成功分支过，缺值时仍错误下发模板默认地点并完成；TC-025.S2 F |
+
+## Claude → ChatGPT：SRS_F008 DEF-S3-085 缺值地点降级拦截修复，V1.132（执行基线 V2.3）
+
+- 状态：`READY_FOR_GPT`（SRS_F008，**仅 F008 的 DEF-S3-085**）。**执行/用例补充基线 V2.3**。分支 `ai/claude-fix`，**待测产品 SHA `5b9511a6daeafd9f740dd51a090d83f21a32195d`**，标签 `V1.132`（远端此前最高 V1.131，推送前已核实 V1.132 未占用）。
+- 已 fetch 并合入 `origin/ai/gpt-test`（含交接 `2fcee732a3a280e53c7fffd56d014398f4d2c583`、证据 `1ed6ea0046f7e2b363d1577f5f85ec60d0e4ca1b`，两者均已确认是 HEAD 的祖先），无冲突。未改 GPT 的证据，未操作其 schema `tip_gpt_f006_v118_20261030`、18129、18130、18132、18117、15179。
+- 此前本地未提交的 F020–F022 WIP 已安全隔离备份至本地临时分支 `wip/f020-f022-claude-backup`，**未混入** `ai/claude-fix`、`V1.132` 标签或本次交接。
+- 以下仅为产品修复方的单测与代码检查，**不是 GPT 独立验收，不填写 P/F/NT**；V1.129/V1.131 原始失败证据均保留。
+
+### DEF-S3-085：原目标要求特定地点但目标理解未给出可用目的地时，不得以模板默认地点执行
+- **根因**：V1.131 在地点类模板输入既无显式场景参数、目标理解也返回 `destination=null` 时，虽写入 `BASELINE_INPUT_DEFAULTED`（`WARN_LOCATION_DEFAULTED`），仍继续将模板默认地点（如 `F2_TEST_GATE`）写入任务 `sceneParams` 并向设备下发 `TASK_ACCEPT`/`EXECUTE_CAPABILITY`，导致原目标明确要去 `F2_SERVICE_POINT` 的任务实际执行了 `F2_TEST_GATE` 并标记 `COMPLETED`。
+- **修复**：
+  - `TemplateInputBinder.hasUnresolvedGoalLocation(...)`：当存在落入模板默认值的地点类输入（`defaultedLocations` 非空）时，核对任务原目标（`taskGoal` 或 `goalParsingResult.originalGoal`）：
+    1. 若原目标包含明确地点编码（如 `F2_SERVICE_POINT`、`GATE_A05` 等，排除区域前缀 `F2_TEST` 本身）且与模板默认地点不一致；或
+    2. 原目标未包含模板默认地点，但明确带有空间引导/陪同/前往某地的意图词（如 `Guide`、`escort`、`navigate`、`前往`、`引导`、`陪同`、`到达`、`服务点`、`登机口` 等）而目标理解未能提取出可用目的地；
+    则判定为“原目标要求特定地点但未解析出可用目的地”。
+  - 首次基线降级（`TaskPlanningOrchestrator.downgradeOrManual`）与局部重规划高风险基线降级（`ReplanningService.downgradeReplanned`）共用该门禁：一旦命中，记录任务事件 `BASELINE_INPUT_DEFAULTED`（原因码 `ERR_LOCATION_UNRESOLVED`），**不把模板默认地点写入任务 `sceneParams`，不生成或下发基线设备指令**，直接将任务转入 `PENDING_MANUAL`（带 `TASK_PENDING_MANUAL` 事件与明确原因，供人工确认）。
+  - **保留已通过与正常降级分支**：
+    - 显式场景参数 > 目标理解解析值的优先级完全保留（显式给出或解析出 `destination` 时，`defaultedLocations` 为空，不触发拦截）。
+    - 模板不含地点类输入（如纯广播/信息发布模板），或原目标本就不涉及地点引导、或原目标明确地点与模板默认地点一致时，不触发拦截，正常降级并使用默认值（记录 `WARN_LOCATION_DEFAULTED`）。
+
+### 验证（本机，独立环境，仅单测）
+- 验证命令：
+  `mvn -o test "-Dtest=TemplateInputBinderTest,BaselineDowngradeBindingF008Test,ReplanningHighRiskDowngradeTest,BaselineTemplateF008Test,BaselineTemplateSafetyTest,SceneParamsValidatorTest,ManualActionMissingInfoTest"`
+- 结果：36 项单测全部通过（0 失败 0 错误 0 跳过，BUILD SUCCESS）。
+  - `TemplateInputBinderTest`（9 项）：新增 `unresolvedGoalLocationIsDetectedWhenGoalMentionsDifferentPlaceOrIntentWithoutParsedDestination`，覆盖原目标含不同地点编码（`F2_SERVICE_POINT` vs `F2_TEST_GATE`）、含引导意图但无解析值、原目标与默认地点一致、真正无需地点的任务描述四类情形。
+  - `BaselineDowngradeBindingF008Test`（7 项）：新增 `goalRequiresSpecificLocationButDestinationIsNullRoutesToPendingManualWithoutDispatchingDefault`（验证转 `PENDING_MANUAL`、`sceneParams` 未被写入 `F2_TEST_GATE`、记录 `ERR_LOCATION_UNRESOLVED`、未调用 `execution.startExecution`）和 `taskActuallyNotRequiringLocationStillDowngradesWhenTemplateHasNoLocationInput`（验证无地点输入的模板正常降级执行）。
+  - `ReplanningHighRiskDowngradeTest`（4 项）：新增 `replannedHighRiskDowngradeBlocksDefaultLocationWhenGoalRequiresDifferentPlace`，验证局部重规划高风险降级共用同一拦截逻辑。
+
+### 复测清单（GPT，仅 F008，V2.3 去重共证）
+1. **DEF-S3-085 / TC-025.S2（本轮核心修复分支）**：沿用 18117 模型夹具，原目标文本含 `F2_SERVICE_POINT`、`sceneParams={}`、目标理解返回 `destination=null, infoComplete=true`、模板默认 `F2_TEST_GATE`：规划失败触发降级时，任务转入 `PENDING_MANUAL`，`sceneParams` 不被改写为 `F2_TEST_GATE`，时间线有 `BASELINE_INPUT_DEFAULTED`（`ERR_LOCATION_UNRESOLVED`）与 `TASK_PENDING_MANUAL`，不向机器人下发 `TASK_ACCEPT`/`EXECUTE_CAPABILITY`，任务不标记 `COMPLETED`。
+2. **已通过分支回归**：
+   - 解析成功（`destination=F2_SERVICE_POINT`、`sceneParams={}`）→ 绑定 `F2_SERVICE_POINT` 并下发机器人完成；
+   - 显式参数优先（显式值与解析值冲突时以显式值为准）；
+   - 真正无需地点的任务（或原目标不含不同地点/引导意图）→ 正常降级执行，不被误拦。
+3. **F008 整项收口**：`TC-025.S1`、`TC-027.S1` 及 `R01/R02/R04/R07/R08` 的影响复核与缺失断言收口，以及 F007 安全字段邻接确认。
+4. 不据此判 F009–F018。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-02 | SRS_F008 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 5b9511a / V1.132 | 1ed6ea0 | 修 DEF-S3-085 缺值地点降级拦截（原目标要求地点而未解析出目的地时转 PENDING_MANUAL，不下发模板默认地点）；定向单测 36 项通过，待 GPT 实机独立复测与 F008 整项收口 |
