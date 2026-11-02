@@ -2,8 +2,9 @@
 
 ## 当前交接状态
 
-- 状态：`REQUIREMENT_PASSED`（SRS_F010，ChatGPT 独立复测 V1.136，执行基线 V2.3/BL-004；见末尾）
-- 当前进度：`SRS_F001`～`SRS_F010` 已按各自版本和独立证据完成；下一需求 `SRS_F011` 应在独立新对话接续。
+- 状态：`READY_FOR_GPT`（SRS_F011，Claude 交付 V1.137，执行基线 V2.3；见末尾）
+- 当前进度：`SRS_F001`～`SRS_F010` 已按各自版本和独立证据完成；当前推进 `SRS_F011`。
+
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
 - 旧阶段 3 任务已暂停；其结果是待修复的原始证据，不是新版本通过证明。
@@ -1270,3 +1271,57 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-02 | SRS_F010 | ChatGPT → main | REQUIREMENT_PASSED（V2.3/BL-004） | ai/gpt-test / b9e9333 / V1.136 | 27b1f373016c5675327f8a49c9a919a3a4bb980e | F010 8步骤/10规则通过；下一需求F011独立新对话 |
+
+## Claude → ChatGPT：SRS_F011 V1.137 任务规划环境上下文动态构建与复测交接（执行基线 V2.3）
+
+- 状态：`READY_FOR_GPT`。分支 `ai/claude-fix`，产品代码 SHA `67e712d4eaa6e4971c76f17fbcddc064c3c91312`，标签 `V1.137`。
+- **本轮核对、修复与能力闭环**：
+  1. **DEF-S3-031 / TC-035.S1 / R01（可用时间与候选上下文）**：
+     - `ContextSnapshotService` 构建上下文时包含全部启用且在线代理；
+     - 代理预计可用时间计算：空闲代理 `availableUntil` 为当前时间；忙碌代理根据进行中步骤的下发时间 + 该步骤超时时间（或默认 60s）预测，多个进行中步骤取最晚时间，过期则不倒流且取当前时刻；无进行中步骤的忙碌代理返回 null，不臆造时间；
+     - 单测 `ContextAvailabilityF011Test` 7/7 通过。
+  2. **TC-036.S2（部分代理查询失败隔离夹具与一致性保证）**：
+     - `ContextSnapshotService` 新增隔离故障注入配置 `app.context.fault-injection.failed-agent-codes`（环境变量 `APP_CONTEXT_FAULT_INJECTION_FAILED_AGENT_CODES`，默认关闭）；
+     - 当部分代理关联设备查询失败或命中故障注入时，将其记录在快照 `failedAgentCodes` JSON 数组中；
+     - `agents` 候选列表严格仅纳入状态查询成功的代理；
+     - `capabilityCoverage`（`available` 与 `missing`）严格基于成功代理的能力集合计算，确保能力覆盖提示与有效候选一致；
+     - 配套单测 `ContextSnapshotSafetyTest`（新增部分查询失败与故障注入单测，4/4 通过）。
+  3. **R06 / TC-035.S2（规划模型请求与重规划数据脱敏）**：
+     - `ReplanningService.replan` 在调用局部重规划模型生成计划时，对 `request.setSceneParams` 及已完成步骤的 `outputParams` 深度接入 `SceneParamsPrivacyGuard.sanitize`，彻底剥离任何可能残留的旅客敏感身份信息；
+     - `ContextSnapshot` 本身仅记录设备代理、位置、能力与可用时间，绝不包含旅客身份信息；
+     - 配套单测 `ReplanningContextTest`（验证重规划请求中场景参数与已完成步骤输出脱敏，1/1 通过）。
+  4. **R02 / R03 / R04 / R07**：
+     - 候选严格排除离线、停用、归档代理；能力排除未测试、测试失败或停用能力；
+     - 快照作为不可变事实随任务生成持久化，并在时间线记录 `CONTEXT_SNAPSHOT_GENERATED` 事件；
+     - 必需能力类型完全缺失时短路触发 `ERR_CAPABILITY_GAP_ALL_MISSING`，不再调用规划模型（`TC-036.S1` 已有历史 P 证据）。
+  5. **R05 / R08**：
+     - 快照包含 `generatedAt`，作为监督模型 60s 接近过期风险信号；
+     - 局部重规划时通过 `contextSnapshotService.buildSnapshot` 重新生成独立的上下文快照并单独持久化保存，原快照不可变保留。
+- **本地定向验证结果**：
+  - `mvn -o test "-Dtest=*Context*,*CapabilityGap*"`：13 项测试 100% 通过（BUILD SUCCESS）：
+    - `ContextAvailabilityF011Test` (7/7)
+    - `ContextSnapshotAvailableCandidatesTest` (1/1)
+    - `ContextSnapshotSafetyTest` (4/4，含故障注入与部分查询失败测试)
+    - `ReplanningContextTest` (1/1，含重规划隐私脱敏验证)
+  - 广泛定向回归 `mvn -o test "-Dtest=*Context*,*CapabilityGap*,*Goal*,*SceneParams*,*Understanding*,*Replanning*"`：30 项测试 100% 通过。
+- **待 ChatGPT 独立复测清单（TC-035.S1~S2、TC-036.S1~S2、R01~R08）**：
+  1. **TC-035.S1 / DEF-S3-031 / R01~R05**：
+     - 验证任务规划初始上下文快照包含全部启用且在线代理的能力、在线状态、位置、负载、生成时间及可用时间；
+     - 验证空闲代理可用时间为当前时间，忙碌代理按进行中步骤调度时刻+超时时间计算；
+     - 验证离线、停用、已归档代理排除，未测试、测试失败或已停用能力排除；
+     - 验证快照随任务持久化并在事件流中留痕。
+  2. **TC-035.S2 / R06、R08**：
+     - 改变设备位置/在线状态/负载后触发局部重规划；
+     - 验证原快照不变，重新生成并单独持久化新快照，生成时间与新事实正确；
+     - 验证提交给规划模型（含初次规划与局部重规划）的内容均已脱敏，不含真实旅客身份信息。
+  3. **TC-036.S1 / R07**：
+     - 任务族所需能力类型全部停用/缺失时，验证生成 `ERR_CAPABILITY_GAP_ALL_MISSING` 能力缺口异常，不调用规划模型，转基线降级或待人工。
+  4. **TC-036.S2（部分代理查询失败）**：
+     - 可通过设置环境变量 `APP_CONTEXT_FAULT_INJECTION_FAILED_AGENT_CODES=<agent_code>`（或模拟设备查询异常）触发部分代理状态查询失败；
+     - 验证快照仅由查询成功的代理构建，快照 `failedAgentCodes` 准确标注失败代理清单；
+     - 验证能力覆盖提示与有效候选保持一致。
+  5. 邻接回归：态势/任务列表、规划大模型调用链路。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-02 | SRS_F011 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 67e712d / V1.137 | 无 | 强化 TC-036.S2 故障注入夹具与重规划脱敏；定向单测 13/13 全通，待独立复测 TC-035、TC-036 及 R01～R08 |
