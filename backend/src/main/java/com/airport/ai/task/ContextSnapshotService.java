@@ -43,6 +43,23 @@ public class ContextSnapshotService {
         this.contextSnapshotMapper = contextSnapshotMapper;
     }
 
+    @org.springframework.beans.factory.annotation.Value("${app.context.fault-injection.failed-agent-codes:}")
+    private String faultInjectedFailedAgentCodes = "";
+
+    public void setFaultInjectedFailedAgentCodes(String faultInjectedFailedAgentCodes) {
+        this.faultInjectedFailedAgentCodes = faultInjectedFailedAgentCodes;
+    }
+
+    private Set<String> parseInjectedFailures() {
+        if (faultInjectedFailedAgentCodes == null || faultInjectedFailedAgentCodes.isBlank()) {
+            return Collections.emptySet();
+        }
+        return Arrays.stream(faultInjectedFailedAgentCodes.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isBlank())
+                .collect(Collectors.toSet());
+    }
+
     /**
      * @param requiredCapabilityTypes 任务族所需能力类型清单，用于计算能力覆盖情况（业务规则7：
      *                                完全缺失时调用方应直接生成能力缺口异常，不再调用规划模型，
@@ -58,10 +75,11 @@ public class ContextSnapshotService {
         List<Map<String, Object>> agentViews = new ArrayList<>();
         List<String> failedAgentCodes = new ArrayList<>();
         Set<String> availableCapabilityTypes = new HashSet<>();
+        Set<String> injectedFailures = parseInjectedFailures();
 
         for (DeviceAgent agent : onlineEnabledAgents) {
             Device device = deviceById.get(agent.getDeviceId());
-            if (device == null) {
+            if (device == null || injectedFailures.contains(agent.getAgentCode())) {
                 // 代理存在但关联设备查询失败（对应异常路径2b）
                 failedAgentCodes.add(agent.getAgentCode());
                 continue;

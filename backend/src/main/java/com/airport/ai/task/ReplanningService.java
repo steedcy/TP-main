@@ -108,7 +108,7 @@ public class ReplanningService {
             }
             Map<String, Object> preserved = new java.util.LinkedHashMap<>(original);
             preserved.put("executionResult", completed.getExecutionResult());
-            preserved.put("outputParams", parseObject(completed.getOutputParams()));
+            preserved.put("outputParams", SceneParamsPrivacyGuard.sanitize(parseObject(completed.getOutputParams())));
             preserved.put("originalCommandId", completed.getCommandId());
             completedSteps.add(preserved);
         }
@@ -139,7 +139,7 @@ public class ReplanningService {
         request.setRequestId(UUID.randomUUID().toString());
         request.setTaskGoal(task.getTaskGoal());
         request.setTaskFamily(task.getTaskFamily());
-        request.setSceneParams(parseObject(task.getSceneParams()));
+        request.setSceneParams(SceneParamsPrivacyGuard.sanitize(parseObject(task.getSceneParams())));
         request.setCapabilityContext(contextSnapshotService.capabilityContext(snapshot, contextCapabilities));
         List<String> constraints=new ArrayList<>(List.of("不得下发运动安全控制指令", "保留已完成步骤不变", "仅替换步骤" + failedStepSeq + "及其后续步骤", "本次异常: " + reason));
         Object originalConstraints=parseObject(task.getGoalParsingResult()).get("constraints");

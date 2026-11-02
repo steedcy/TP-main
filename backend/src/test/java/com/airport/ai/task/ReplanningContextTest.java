@@ -17,14 +17,14 @@ class ReplanningContextTest {
         var model=mock(PlanningModelService.class);
         var task=new Task(); task.setId(1L); task.setCurrentPlanVersionId(2L);
         task.setTaskGoal("保留原目标"); task.setTaskFamily("FLIGHT_CHANGE_RESPONSE");
-        task.setSceneParams("{\"flightNumber\":\"TEST123\"}");
+        task.setSceneParams("{\"flightNumber\":\"TEST123\",\"passengerName\":\"CANARY_NAME\"}");
         task.setGoalParsingResult("{\"constraints\":[\"信息发布必须先于旅客引导\"]}");
         when(tasks.findById(1L)).thenReturn(Optional.of(task));
         when(tasks.claimReplan(1L,"STEP_FAILED")).thenReturn(1);
         var plan=new PlanVersion(); plan.setPlanSteps("[{\"stepSeq\":1,\"capabilityType\":\"CAP_INFO_DISPLAY\"},{\"stepSeq\":2,\"capabilityType\":\"CAP_FLIGHT_UPDATE\"}]");
         when(plans.findById(2L)).thenReturn(Optional.of(plan));
         var completed=new TaskStepAssignment(); completed.setStepSeq(1); completed.setStepStatus("COMPLETED");
-        completed.setExecutionResult("SUCCESS"); completed.setOutputParams("{\"displayStatus\":\"SUCCESS\"}"); completed.setCommandId("CMD-REAL");
+        completed.setExecutionResult("SUCCESS"); completed.setOutputParams("{\"displayStatus\":\"SUCCESS\",\"idCard\":\"CANARY_ID\"}"); completed.setCommandId("CMD-REAL");
         when(assignments.findByPlanVersionIdOrderByStepSeqAsc(2L)).thenReturn(List.of(completed));
         var snapshot=new ContextSnapshot(); snapshot.setSnapshotCode("CTX-NEW");
         when(context.buildSnapshot(eq(1L),anyList())).thenReturn(snapshot);
@@ -44,6 +44,7 @@ class ReplanningContextTest {
         var capture=ArgumentCaptor.forClass(PlanningRequest.class); verify(model).generatePlan(capture.capture());
         var request=capture.getValue();
         assertEquals("TEST123",request.getSceneParams().get("flightNumber"));
+        assertNull(request.getSceneParams().get("passengerName"), "重规划模型请求中的场景参数须脱敏，不含旅客身份");
         assertTrue(request.getConstraints().contains("信息发布必须先于旅客引导"));
         assertTrue(request.getConstraints().contains("本次异常: STEP_FAILED"));
         verify(context).buildSnapshot(1L,List.of("CAP_FLIGHT_UPDATE","CAP_NOTIFICATION"));
