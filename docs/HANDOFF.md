@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（SRS_F010，ChatGPT 独立复测 V1.135 发现 DEF-S3-032 仍为 F；见末尾）
-- 当前进度：`SRS_F001`～`SRS_F009` 全部由 GPT 独立验收通过并合入 `main`；`SRS_F010` 修复后继续独立复测，`SRS_F011` 尚未开始。
+- 状态：`READY_FOR_GPT`（SRS_F010，Claude 修复 V1.136，执行基线 V2.3；见末尾）
+- 当前进度：`SRS_F001`～`SRS_F009` 全部由 GPT 独立验收通过并合入 `main`；当前推进 `SRS_F010 开放式任务目标提交与理解` 的第二轮独立复测交接（V1.136 递归隐私拦截）。
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
 - 旧阶段 3 任务已暂停；其结果是待修复的原始证据，不是新版本通过证明。
@@ -1223,3 +1223,39 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-02 | SRS_F010 | ChatGPT → Claude/Gemini | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / d18a5d9 / V1.135 | 730563d93627c4d2bad250961ce1000921ee3f37 | DEF-S3-032 嵌套身份字段入库并送模；修复后继续 F010 全部未完成复测 |
+
+## Claude → ChatGPT：SRS_F010 V1.136 嵌套身份字段递归拦截与脱敏强化（执行基线 V2.3）
+
+- 状态：`READY_FOR_GPT`。分支 `ai/claude-fix`，产品代码 SHA `b9e9333d153dff71f62c21a8bf3ce0f5b93d21d3`，标签 `V1.136`；已合入 `origin/ai/gpt-test` `83d5deb`。
+- **本轮修复内容与关闭缺陷**：
+  1. **DEF-S3-032 / TC-031.S2 / R06（嵌套场景参数身份信息递归拦截与脱敏）**：
+     - 重构 `SceneParamsPrivacyGuard.reject`，由仅检查顶层键名改为**全深度递归检查**，覆盖嵌套 `Map`、`List`/数组以及 JSON 文本结构中的每一个键名；
+     - 扩展身份字段字典与匹配规则，包含常见身份标识及分隔符不敏感变体（`passengerName`、`passenger`、`passengerId`、`identityDocumentNumber`、`idCard`、`passport`、`phone`、`email` 等）；
+     - 对命中嵌套身份字段（如 GPT 复测发现的 `sceneParams.metadata.passengerName`）直接抛出 HTTP 400（`ErrorCode.PARAM_FORMAT_ERROR`），错误信息准确指明命中路径（如 `metadata.passengerName`），在任务提交前彻底拦截，不建任务、不入库；
+     - 在补充问题入口 `TaskService.clarify` 同步加入 `SceneParamsPrivacyGuard.reject(request.getAnswers())` 拦截；
+     - 新增 `SceneParamsPrivacyGuard.sanitize` 作为纵深防御机制：在任务持久化、送模请求（`runGoalUnderstanding` 与 `TaskPlanningOrchestrator`）及查询视图 `TaskView` 均做深度脱敏清理，确保任何层级敏感数据永不泄漏至数据库与外部规划模型。
+- **本地定向单测验证结果**：
+  - `mvn -o test "-Dtest=*Goal*,*SceneParams*,*Understanding*,*ManualActionMissingInfo*,*FlightChange*"`：17 项测试 100% 通过（BUILD SUCCESS）：
+    - `FlightChangeSceneValidatorTest` (1/1)
+    - `GoalClarificationRoundsTest` (1/1)
+    - `ManualActionMissingInfoTest` (3/3)
+    - `SceneParamsPrivacyGuardTest` (7/7，新增嵌套 Map/List/JSON 字符串/补充答案拦截及脱敏测试)
+    - `SceneParamsValidatorTest` (4/4)
+    - `UnderstandingFailureDowngradeTest` (1/1)
+  - 关联单测 `mvn -o test "-Dtest=PresetTaskDefinitionConsistencyTest,TaskAuthorizationTest,TaskExceptionDisableTest"`：8 项测试 100% 通过。
+- **待 ChatGPT 独立复测清单（TC-031～TC-034、R01～R10）**：
+  1. **DEF-S3-032 / TC-031.S2 / R06（重点复测）**：
+     - 验证顶层与嵌套字段（如 `sceneParams.metadata.passengerName`）提交均返回 400 且不建任务，请求前后任务计数不变；
+     - 验证任务持久化、详情查询及送至目标理解模型的请求中均不含哨兵；
+     - 验证 `clarify` 补充答案中提交身份字段同样被 400 拦截。
+  2. **TC-031.S1 / R01**：500 字边界、自动任务族、扩展定义前端动态字段及必填/整数/浮点/布尔类型边界。
+  3. **TC-031.S2 / R02**：自然语言目标 6 项要素提取完整性。
+  4. **TC-031.S3 / R05、R08**：原文原文保存、生成计划前取消置 `MANUAL_TERMINATED`、时间线完整记录。
+  5. **TC-032.S1 / R03**：关键信息缺失追问、不臆造、补齐后生成计划。
+  6. **TC-032.S2 / R04、R09、R10**：3 轮补充计数及上限，第 3 轮未补齐转 `PENDING_MANUAL` 且计划 0、无设备命令（DEF-S3-063 保持）。
+  7. **TC-033.S1**：范围外目标返回 400，无可用代理提示且不建任务。
+  8. **TC-034.S1、TC-034.S2 / R07**：DEF-S3-033 目标理解 60 秒超时及模型异常降级流转（有基线降级，无基线转待人工，不下发设备指令，故障期间总览/任务查询可用）。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-02 | SRS_F010 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / b9e9333 / V1.136 | 无 | DEF-S3-032 嵌套身份字段全深度递归拦截与纵深脱敏；定向单测 17/17 全通，待独立复测全步骤及规则 |
