@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（SRS_F009，ChatGPT 独立复测 V1.133 发现 DEF-S3-087；执行基线 V2.3；见末尾）
-- 当前进度：`SRS_F001`～`SRS_F008` 已按各自交接与独立证据完成；`SRS_F009` 未通过，待修复方处理取消结果日志数据库约束后交回独立复测。
+- 状态：`REQUIREMENT_PASSED`（SRS_F009，ChatGPT 独立复测 V1.134，执行基线 V2.3；见末尾）
+- 当前进度：`SRS_F001`～`SRS_F009` 已按各自交接与独立证据完成；下一需求 `SRS_F010` 应在独立新对话接续。
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
 - 旧阶段 3 任务已暂停；其结果是待修复的原始证据，不是新版本通过证明。
@@ -1159,3 +1159,14 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-02 | SRS_F009 | Claude/Gemini → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 82166d9 / V1.134 | 028e753c4f1f1d7e3ed1d52939c3a825b829f093 | DEF-S3-087：V26 迁移放宽 operation_logs.chk_op_log_result 允许 CANCELLED；定向单测通过，待 GPT 实机复测取消链路 |
+
+## ChatGPT 独立复测：SRS_F009 V1.134 验收通过（执行基线 V2.3）
+
+- 状态：`REQUIREMENT_PASSED`，仅裁定 **SRS_F009**；`DEF-S3-086/087` 在 V1.134 关闭。注解标签 `V1.134` 实际指向产品提交 **`82166d93e4ff72b325d7f6565edf1bb498b8d132`**；上一节修复方交接所写完整 SHA `82166d9b0ca5c898ba1cbb2c74d0e5270685931a` 是笔误，短 SHA `82166d9` 正确。GPT 独立证据提交 `80e4600b1d4d9a4f747810768e30a18615364a7c` 已推送到 `ai/gpt-test`，报告 `acceptance/stage3/SRS_F009-V1.134-独立复测与验收裁决.md`。
+- GPT 自有既有 schema `tip_gpt_f006_v118_20261030` 在独立 V1.134 后端启动时完成 Flyway V26；约束已允许 `CANCELLED`。五步模板的任务 61 在 `STEP_DISPATCHED` 后取消：API 返回 `CANCELLED`，数据库 `MANUAL_TERMINATED`，事件 `DRY_RUN_CANCELLED/ERR_DRY_RUN_CANCELLED`，操作日志 `operation_result` 与 detail.result 均为 `CANCELLED`，含冻结 V1.0 与任务 ID；延迟核对无状态反转，代理空闲。真实成功任务 58 的结果及启用审计 `SUCCESS`；设备失败/超时任务 59/60 的结果审计 `FAILED` 且模板回草稿。正式完成数和总览 `COMPLETED` 保持 26，含试运行完成数 30→31。原始记录在 `acceptance/stage3/evidence/SRS_F009-V1.134-results-20261102T113719Z.json` 与 `SRS_F009-V1.134-migration-followup-20261102T113822Z.json`。
+- `TC-028.S1/S2`、`TC-029.S1/S2`、`TC-030.S1/S2` 和 `SRS_F009.R01–R08` 均为 **P**。静态校验、能力选择、五步/运动安全、版本重新试运行与页面展示的未受影响历史 P 保留原 SHA，经组件/依赖/配置影响复核引用，**不计为 V1.134 新实测**。V1.132 的错误失败审计与 V1.133 的 HTTP 500 原证据保留。一次取消仍发两条不同指令号的 `TASK_CANCEL/SENT`，但只有一次中止和取消结果、设备释放且无晚到成功；现有业务规则不要求只发一条，故不单独判 F。
+- 本轮仅更新测试脚本、证据、台账和交接，未修改产品代码、F008 台账、Claude/Gemini worktree、未跟踪 `document/` 或 F020–F022 WIP。GPT 测试模板已停用，仿真体恢复 `SUCCESS`/500 ms。此交接推送后将 `ai/gpt-test` 合入并推送 `main`；下一需求 `SRS_F010` 另开对话，不在本轮预判。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-02 | SRS_F009 | ChatGPT → main | REQUIREMENT_PASSED（V2.3） | ai/gpt-test / 82166d93e4ff / V1.134 | 80e4600b1d4d9a4f747810768e30a18615364a7c | V26 既有库迁移及真实取消/成功/失败/超时审计通过；F009 整项通过，下一需求另开对话 |
