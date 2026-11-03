@@ -161,7 +161,7 @@
     <a-card title="待人工处理" v-if="isOperator && task.status === 'PENDING_MANUAL'" style="margin-top: 16px">
       <a-space>
         <a-button @click="handleManualAction('SWITCH_TO_BASELINE')">转基线执行</a-button>
-        <a-button @click="handleManualAction('RETRY_PLANNING')">重试规划</a-button>
+        <a-button id="btn-retry-planning" type="primary" @click="openRetryModal">重试规划</a-button>
         <a-button @click="handleManualAction('MARK_FAILED')" danger>置为失败</a-button>
         <a-button @click="terminateVisible = true" danger>终止任务</a-button>
       </a-space>
@@ -172,6 +172,21 @@
     <a-card title="终止任务" v-else-if="isOperator && TERMINABLE_STATUSES.includes(task.status)" style="margin-top: 16px">
       <a-button danger @click="terminateVisible = true">终止任务</a-button>
     </a-card>
+
+    <!-- 对应5.4.5异常路径4a与DEF-S3-091：待人工处理阶段允许操作员修改任务目标后重试规划 -->
+    <a-modal v-model:open="retryModalVisible" title="重试规划" @ok="handleConfirmRetry" okText="确定" cancelText="取消" :okButtonProps="{ id: 'btn-confirm-retry', loading: retryLoading, disabled: !retryGoal || !retryGoal.trim() }">
+      <a-alert type="info" show-icon style="margin-bottom: 12px"
+               message="修改目标并重试规划"
+               description="可在重试前修改任务目标，系统将基于新目标重新进行目标理解与候选计划生成；原计划版本将完整保留在历史列表中。" />
+      <a-form layout="vertical">
+        <a-form-item label="任务目标（1~500字，必填）" required>
+          <a-textarea id="retry-task-goal" v-model:value="retryGoal" :maxlength="500" :auto-size="{ minRows: 3, maxRows: 6 }" show-count placeholder="请输入修改后的任务目标" />
+        </a-form-item>
+        <a-form-item label="处置原因（选填，不超过200字）">
+          <a-input id="retry-reason" v-model:value="retryReason" :maxlength="200" placeholder="请输入处置原因" />
+        </a-form-item>
+      </a-form>
+    </a-modal>
 
     <!-- 对应5.5.6业务规则1/5：原因1~200字+二次确认缺一不可；责任边界固定文案，人工终止不等同于设备安全急停 -->
     <a-modal v-model:open="terminateVisible" title="人工终止任务" @ok="handleTerminate" :okButtonProps="{ disabled: !confirmed || !terminateReason }">
@@ -229,6 +244,10 @@ const flightChannelResults = computed(() => [
 }))
 // 从异常列表跳转时带?step=n，滚动并高亮对应步骤（DEF-S3-064）
 const highlightStep = ref(route.query.step ? Number(route.query.step) : null)
+const retryModalVisible = ref(false)
+const retryGoal = ref('')
+const retryReason = ref('')
+const retryLoading = ref(false)
 const terminateVisible = ref(false)
 const terminateReason = ref('')
 const confirmed = ref(false)
@@ -357,7 +376,41 @@ function scrollToHighlightedStep() {
   })
 }
 
+function openRetryModal() {
+  retryGoal.value = task.value?.taskGoal || ''
+  retryReason.value = ''
+  retryModalVisible.value = true
+}
+
+async function handleConfirmRetry() {
+  if (!retryGoal.value || !retryGoal.value.trim()) {
+    message.warning('任务目标不能为空')
+    return
+  }
+  retryLoading.value = true
+  try {
+    const cleanGoal = retryGoal.value.trim()
+    const cleanReason = retryReason.value?.trim() || null
+    const response = await manualAction(taskId, 'RETRY_PLANNING', cleanReason, cleanGoal)
+    retryModalVisible.value = false
+    await fetchAll()
+    if (response.data.status === 'PENDING_MANUAL') {
+      message.warning(response.data.failureReason || '重试规划未通过校验，任务仍待人工处理')
+    } else {
+      message.success('重试规划已提交')
+    }
+  } catch (err) {
+    // 错误在全局提示
+  } finally {
+    retryLoading.value = false
+  }
+}
+
 async function handleManualAction(action) {
+  if (action === 'RETRY_PLANNING') {
+    openRetryModal()
+    return
+  }
   const response = await manualAction(taskId, action)
   await fetchAll()
   if (response.data.status === 'PENDING_MANUAL') {
