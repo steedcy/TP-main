@@ -1,0 +1,1023 @@
+{
+  "version": "V1.142",
+  "codeSha": "28bfb28eef45af0c058bf675e62d2d45b6424102",
+  "observedAt": "2026-11-03T15:44:32.175065+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "cases": [
+    {
+      "taskId": 118,
+      "before": {
+        "task": {
+          "id": 118,
+          "taskCode": "TASK-20261103-0118",
+          "taskGoal": "F012_MISSING_PRE F013 independent hard-gate test",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F012_MISSING_PRE F013 independent hard-gate test",
+            "constraints": [
+              "synthetic test only"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 98,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-03T13:55:11.7544",
+          "updatedAt": "2026-11-03T13:55:12.111294",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 98,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261103-0078",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic navigation action 1",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "FAIL",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [
+              {
+                "errorType": "STRUCTURE",
+                "description": "步骤字段不完整，缺少: precondition",
+                "stepSeq": 1,
+                "reasonCode": "ERR_STEP_FIELD_MISSING"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-03T13:55:12.01655"
+          }
+        ],
+        "events": [
+          {
+            "id": 922,
+            "taskId": 118,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-03T13:55:11.783513",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F012_MISSING_PRE F013 independent hard-gate test"
+          },
+          {
+            "id": 923,
+            "taskId": 118,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-03T13:55:11.899934",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 924,
+            "taskId": 118,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-03T13:55:11.96723",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261103-0078"
+          },
+          {
+            "id": 925,
+            "taskId": 118,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-03T13:55:12.061607",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 926,
+            "taskId": 118,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-03T13:55:12.073143",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_STEP_FIELD_MISSING",
+            "detailSummary": "候选计划三类校验未通过: 1项错误 [STRUCTURE 步骤1: 步骤字段不完整，缺少: precondition(ERR_STEP_FIELD_MISSING)]"
+          },
+          {
+            "id": 927,
+            "taskId": 118,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-03T13:55:12.108566",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING"
+          },
+          {
+            "id": 928,
+            "taskId": 118,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-03T13:55:12.114089",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      },
+      "attempts": [
+        {
+          "request": {
+            "action": "FORCE_RELEASE",
+            "reason": "F013 V141 synthetic persistence retest"
+          },
+          "response": {
+            "http": 400,
+            "body": {
+              "code": 4110,
+              "message": "硬性校验失败的计划严禁进入监督判定或强行放行",
+              "timestamp": "2026-11-03T15:44:34.297689200+08:00",
+              "path": "/api/v1/tasks/118/manual-actions",
+              "method": "POST"
+            }
+          },
+          "after": {
+            "task": {
+              "id": 118,
+              "taskCode": "TASK-20261103-0118",
+              "taskGoal": "F012_MISSING_PRE F013 independent hard-gate test",
+              "taskFamily": "EXT_2AD8B934",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F012_MISSING_PRE F013 independent hard-gate test",
+                "constraints": [
+                  "synthetic test only"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": 98,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-03T13:55:11.7544",
+              "updatedAt": "2026-11-03T13:55:12.111294",
+              "createdBy": "oprator"
+            },
+            "plans": [
+              {
+                "id": 98,
+                "versionNo": 1,
+                "source": "AUTONOMOUS",
+                "baselineTemplateId": null,
+                "snapshotId": "CTX-20261103-0078",
+                "planSteps": [
+                  {
+                    "stepSeq": 1,
+                    "stepGoal": "Synthetic navigation action 1",
+                    "capabilityType": "CAP_NAVIGATION",
+                    "inputParams": {
+                      "targetLocation": "F2_TEST_GATE"
+                    },
+                    "completionCondition": "routeGenerated=true",
+                    "failureHandling": "manual",
+                    "stepTimeout": 60
+                  }
+                ],
+                "structureCheckResult": "FAIL",
+                "capabilityCheckResult": "PASS",
+                "constraintCheckResult": "PASS",
+                "validationErrors": [
+                  {
+                    "errorType": "STRUCTURE",
+                    "description": "步骤字段不完整，缺少: precondition",
+                    "stepSeq": 1,
+                    "reasonCode": "ERR_STEP_FIELD_MISSING"
+                  }
+                ],
+                "riskLevel": null,
+                "riskReasonCode": null,
+                "judgmentBasis": null,
+                "confidence": 0.99,
+                "ruleSetVersion": null,
+                "frozenAt": null,
+                "createdAt": "2026-11-03T13:55:12.01655"
+              }
+            ],
+            "events": [
+              {
+                "id": 922,
+                "taskId": 118,
+                "eventType": "GOAL_SUBMITTED",
+                "occurredAt": "2026-11-03T13:55:11.783513",
+                "trigger": "OPERATOR",
+                "reasonCode": null,
+                "detailSummary": "运行操作员oprator提交任务目标: F012_MISSING_PRE F013 independent hard-gate test"
+              },
+              {
+                "id": 923,
+                "taskId": 118,
+                "eventType": "GOAL_CLARIFIED",
+                "occurredAt": "2026-11-03T13:55:11.899934",
+                "trigger": "SYSTEM",
+                "reasonCode": null,
+                "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+              },
+              {
+                "id": 924,
+                "taskId": 118,
+                "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+                "occurredAt": "2026-11-03T13:55:11.96723",
+                "trigger": "SYSTEM",
+                "reasonCode": null,
+                "detailSummary": "生成规划上下文快照CTX-20261103-0078"
+              },
+              {
+                "id": 925,
+                "taskId": 118,
+                "eventType": "PLAN_GENERATED",
+                "occurredAt": "2026-11-03T13:55:12.061607",
+                "trigger": "SYSTEM",
+                "reasonCode": null,
+                "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+              },
+              {
+                "id": 926,
+                "taskId": 118,
+                "eventType": "PLAN_VALIDATED",
+                "occurredAt": "2026-11-03T13:55:12.073143",
+                "trigger": "SYSTEM",
+                "reasonCode": "ERR_STEP_FIELD_MISSING",
+                "detailSummary": "候选计划三类校验未通过: 1项错误 [STRUCTURE 步骤1: 步骤字段不完整，缺少: precondition(ERR_STEP_FIELD_MISSING)]"
+              },
+              {
+                "id": 927,
+                "taskId": 118,
+                "eventType": "BASELINE_DOWNGRADED",
+                "occurredAt": "2026-11-03T13:55:12.108566",
+                "trigger": "SYSTEM",
+                "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+                "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING"
+              },
+              {
+                "id": 928,
+                "taskId": 118,
+                "eventType": "TASK_PENDING_MANUAL",
+                "occurredAt": "2026-11-03T13:55:12.114089",
+                "trigger": "SYSTEM",
+                "reasonCode": "ERR_PLANNING_FAILED",
+                "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING；且无匹配的已启用基线模板"
+              },
+              {
+                "id": 940,
+                "taskId": 118,
+                "eventType": "FORCE_BYPASS_INTERCEPTED",
+                "occurredAt": "2026-11-03T15:44:34.245693",
+                "trigger": "OPERATOR",
+                "reasonCode": "ERR_FORCE_BYPASS_REJECTED",
+                "detailSummary": "操作员试图强行放行硬性校验失败的计划，系统已拦截并拒绝（操作: FORCE_RELEASE）"
+              }
+            ],
+            "assignments": [],
+            "commands": [],
+            "bypassAuditRows": [
+              "688|FORCE_BYPASS_ATTEMPT|TASK-20261103-0118 -> FORCE_RELEASE|INTERCEPTED"
+            ]
+          },
+          "checks": {
+            "http400And4110": true,
+            "pendingManual": true,
+            "zeroAssignmentsAndCommands": true,
+            "newInterceptionEvent": true,
+            "newInterceptionAudit": true,
+            "plansUnchanged": true
+          }
+        },
+        {
+          "request": {
+            "action": "REQUEST_SUPERVISION",
+            "reason": "F013 V141 synthetic persistence retest"
+          },
+          "response": {
+            "http": 400,
+            "body": {
+              "code": 4110,
+              "message": "硬性校验失败的计划严禁进入监督判定或强行放行",
+              "timestamp": "2026-11-03T15:44:35.352391+08:00",
+              "path": "/api/v1/tasks/118/manual-actions",
+              "method": "POST"
+            }
+          },
+          "after": {
+            "task": {
+              "id": 118,
+              "taskCode": "TASK-20261103-0118",
+              "taskGoal": "F012_MISSING_PRE F013 independent hard-gate test",
+              "taskFamily": "EXT_2AD8B934",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F012_MISSING_PRE F013 independent hard-gate test",
+                "constraints": [
+                  "synthetic test only"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": 98,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-03T13:55:11.7544",
+              "updatedAt": "2026-11-03T13:55:12.111294",
+              "createdBy": "oprator"
+            },
+            "plans": [
+              {
+                "id": 98,
+                "versionNo": 1,
+                "source": "AUTONOMOUS",
+                "baselineTemplateId": null,
+                "snapshotId": "CTX-20261103-0078",
+                "planSteps": [
+                  {
+                    "stepSeq": 1,
+                    "stepGoal": "Synthetic navigation action 1",
+                    "capabilityType": "CAP_NAVIGATION",
+                    "inputParams": {
+                      "targetLocation": "F2_TEST_GATE"
+                    },
+                    "completionCondition": "routeGenerated=true",
+                    "failureHandling": "manual",
+                    "stepTimeout": 60
+                  }
+                ],
+                "structureCheckResult": "FAIL",
+                "capabilityCheckResult": "PASS",
+                "constraintCheckResult": "PASS",
+                "validationErrors": [
+                  {
+                    "errorType": "STRUCTURE",
+                    "description": "步骤字段不完整，缺少: precondition",
+                    "stepSeq": 1,
+                    "reasonCode": "ERR_STEP_FIELD_MISSING"
+                  }
+                ],
+                "riskLevel": null,
+                "riskReasonCode": null,
+                "judgmentBasis": null,
+                "confidence": 0.99,
+                "ruleSetVersion": null,
+                "frozenAt": null,
+                "createdAt": "2026-11-03T13:55:12.01655"
+              }
+            ],
+            "events": [
+              {
+                "id": 922,
+                "taskId": 118,
+                "eventType": "GOAL_SUBMITTED",
+                "occurredAt": "2026-11-03T13:55:11.783513",
+                "trigger": "OPERATOR",
+                "reasonCode": null,
+                "detailSummary": "运行操作员oprator提交任务目标: F012_MISSING_PRE F013 independent hard-gate test"
+              },
+              {
+                "id": 923,
+                "taskId": 118,
+                "eventType": "GOAL_CLARIFIED",
+                "occurredAt": "2026-11-03T13:55:11.899934",
+                "trigger": "SYSTEM",
+                "reasonCode": null,
+                "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+              },
+              {
+                "id": 924,
+                "taskId": 118,
+                "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+                "occurredAt": "2026-11-03T13:55:11.96723",
+                "trigger": "SYSTEM",
+                "reasonCode": null,
+                "detailSummary": "生成规划上下文快照CTX-20261103-0078"
+              },
+              {
+                "id": 925,
+                "taskId": 118,
+                "eventType": "PLAN_GENERATED",
+                "occurredAt": "2026-11-03T13:55:12.061607",
+                "trigger": "SYSTEM",
+                "reasonCode": null,
+                "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+              },
+              {
+                "id": 926,
+                "taskId": 118,
+                "eventType": "PLAN_VALIDATED",
+                "occurredAt": "2026-11-03T13:55:12.073143",
+                "trigger": "SYSTEM",
+                "reasonCode": "ERR_STEP_FIELD_MISSING",
+                "detailSummary": "候选计划三类校验未通过: 1项错误 [STRUCTURE 步骤1: 步骤字段不完整，缺少: precondition(ERR_STEP_FIELD_MISSING)]"
+              },
+              {
+                "id": 927,
+                "taskId": 118,
+                "eventType": "BASELINE_DOWNGRADED",
+                "occurredAt": "2026-11-03T13:55:12.108566",
+                "trigger": "SYSTEM",
+                "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+                "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING"
+              },
+              {
+                "id": 928,
+                "taskId": 118,
+                "eventType": "TASK_PENDING_MANUAL",
+                "occurredAt": "2026-11-03T13:55:12.114089",
+                "trigger": "SYSTEM",
+                "reasonCode": "ERR_PLANNING_FAILED",
+                "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING；且无匹配的已启用基线模板"
+              },
+              {
+                "id": 940,
+                "taskId": 118,
+                "eventType": "FORCE_BYPASS_INTERCEPTED",
+                "occurredAt": "2026-11-03T15:44:34.245693",
+                "trigger": "OPERATOR",
+                "reasonCode": "ERR_FORCE_BYPASS_REJECTED",
+                "detailSummary": "操作员试图强行放行硬性校验失败的计划，系统已拦截并拒绝（操作: FORCE_RELEASE）"
+              },
+              {
+                "id": 941,
+                "taskId": 118,
+                "eventType": "FORCE_BYPASS_INTERCEPTED",
+                "occurredAt": "2026-11-03T15:44:35.346197",
+                "trigger": "OPERATOR",
+                "reasonCode": "ERR_FORCE_BYPASS_REJECTED",
+                "detailSummary": "操作员试图强行放行硬性校验失败的计划，系统已拦截并拒绝（操作: REQUEST_SUPERVISION）"
+              }
+            ],
+            "assignments": [],
+            "commands": [],
+            "bypassAuditRows": [
+              "688|FORCE_BYPASS_ATTEMPT|TASK-20261103-0118 -> FORCE_RELEASE|INTERCEPTED",
+              "689|FORCE_BYPASS_ATTEMPT|TASK-20261103-0118 -> REQUEST_SUPERVISION|INTERCEPTED"
+            ]
+          },
+          "checks": {
+            "http400And4110": true,
+            "pendingManual": true,
+            "zeroAssignmentsAndCommands": true,
+            "newInterceptionEvent": true,
+            "newInterceptionAudit": true,
+            "plansUnchanged": true
+          }
+        }
+      ]
+    },
+    {
+      "taskId": 119,
+      "before": {
+        "task": {
+          "id": 119,
+          "taskCode": "TASK-20261103-0119",
+          "taskGoal": "F012_LOOP_PRE F013 independent hard-gate test",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F012_LOOP_PRE F013 independent hard-gate test",
+            "constraints": [
+              "synthetic test only"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 99,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_LOOP_DETECTED；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-03T13:55:14.678328",
+          "updatedAt": "2026-11-03T13:55:14.732516",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 99,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261103-0079",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic navigation action 1",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "while(true) { repeat this display step forever; }",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "FAIL",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [
+              {
+                "errorType": "STRUCTURE",
+                "description": "步骤precondition含不支持的控制流或动态执行内容（while(）",
+                "stepSeq": 1,
+                "reasonCode": "ERR_STEP_LOOP_DETECTED"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-03T13:55:14.717145"
+          }
+        ],
+        "events": [
+          {
+            "id": 931,
+            "taskId": 119,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-03T13:55:14.679894",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F012_LOOP_PRE F013 independent hard-gate test"
+          },
+          {
+            "id": 932,
+            "taskId": 119,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-03T13:55:14.690344",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 933,
+            "taskId": 119,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-03T13:55:14.705385",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261103-0079"
+          },
+          {
+            "id": 934,
+            "taskId": 119,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-03T13:55:14.724287",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 935,
+            "taskId": 119,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-03T13:55:14.727639",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_STEP_LOOP_DETECTED",
+            "detailSummary": "候选计划三类校验未通过: 1项错误 [STRUCTURE 步骤1: 步骤precondition含不支持的控制流或动态执行内容（while(）(ERR_STEP_LOOP_DETECTED)]"
+          },
+          {
+            "id": 936,
+            "taskId": 119,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-03T13:55:14.730516",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_STEP_LOOP_DETECTED"
+          },
+          {
+            "id": 937,
+            "taskId": 119,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-03T13:55:14.734293",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_LOOP_DETECTED；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      },
+      "attempts": [
+        {
+          "request": {
+            "action": "FORCE_RELEASE",
+            "reason": "F013 V141 synthetic persistence retest"
+          },
+          "response": {
+            "http": 400,
+            "body": {
+              "code": 4110,
+              "message": "硬性校验失败的计划严禁进入监督判定或强行放行",
+              "timestamp": "2026-11-03T15:44:36.796881+08:00",
+              "path": "/api/v1/tasks/119/manual-actions",
+              "method": "POST"
+            }
+          },
+          "after": {
+            "task": {
+              "id": 119,
+              "taskCode": "TASK-20261103-0119",
+              "taskGoal": "F012_LOOP_PRE F013 independent hard-gate test",
+              "taskFamily": "EXT_2AD8B934",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F012_LOOP_PRE F013 independent hard-gate test",
+                "constraints": [
+                  "synthetic test only"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": 99,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_LOOP_DETECTED；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-03T13:55:14.678328",
+              "updatedAt": "2026-11-03T13:55:14.732516",
+              "createdBy": "oprator"
+            },
+            "plans": [
+              {
+                "id": 99,
+                "versionNo": 1,
+                "source": "AUTONOMOUS",
+                "baselineTemplateId": null,
+                "snapshotId": "CTX-20261103-0079",
+                "planSteps": [
+                  {
+                    "stepSeq": 1,
+                    "stepGoal": "Synthetic navigation action 1",
+                    "capabilityType": "CAP_NAVIGATION",
+                    "inputParams": {
+                      "targetLocation": "F2_TEST_GATE"
+                    },
+                    "precondition": "while(true) { repeat this display step forever; }",
+                    "completionCondition": "routeGenerated=true",
+                    "failureHandling": "manual",
+                    "stepTimeout": 60
+                  }
+                ],
+                "structureCheckResult": "FAIL",
+                "capabilityCheckResult": "PASS",
+                "constraintCheckResult": "PASS",
+                "validationErrors": [
+                  {
+                    "errorType": "STRUCTURE",
+                    "description": "步骤precondition含不支持的控制流或动态执行内容（while(）",
+                    "stepSeq": 1,
+                    "reasonCode": "ERR_STEP_LOOP_DETECTED"
+                  }
+                ],
+                "riskLevel": null,
+                "riskReasonCode": null,
+                "judgmentBasis": null,
+                "confidence": 0.99,
+                "ruleSetVersion": null,
+                "frozenAt": null,
+                "createdAt": "2026-11-03T13:55:14.717145"
+              }
+            ],
+            "events": [
+              {
+                "id": 931,
+                "taskId": 119,
+                "eventType": "GOAL_SUBMITTED",
+                "occurredAt": "2026-11-03T13:55:14.679894",
+                "trigger": "OPERATOR",
+                "reasonCode": null,
+                "detailSummary": "运行操作员oprator提交任务目标: F012_LOOP_PRE F013 independent hard-gate test"
+              },
+              {
+                "id": 932,
+                "taskId": 119,
+                "eventType": "GOAL_CLARIFIED",
+                "occurredAt": "2026-11-03T13:55:14.690344",
+                "trigger": "SYSTEM",
+                "reasonCode": null,
+                "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+              },
+              {
+                "id": 933,
+                "taskId": 119,
+                "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+                "occurredAt": "2026-11-03T13:55:14.705385",
+                "trigger": "SYSTEM",
+                "reasonCode": null,
+                "detailSummary": "生成规划上下文快照CTX-20261103-0079"
+              },
+              {
+                "id": 934,
+                "taskId": 119,
+                "eventType": "PLAN_GENERATED",
+                "occurredAt": "2026-11-03T13:55:14.724287",
+                "trigger": "SYSTEM",
+                "reasonCode": null,
+                "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+              },
+              {
+                "id": 935,
+                "taskId": 119,
+                "eventType": "PLAN_VALIDATED",
+                "occurredAt": "2026-11-03T13:55:14.727639",
+                "trigger": "SYSTEM",
+                "reasonCode": "ERR_STEP_LOOP_DETECTED",
+                "detailSummary": "候选计划三类校验未通过: 1项错误 [STRUCTURE 步骤1: 步骤precondition含不支持的控制流或动态执行内容（while(）(ERR_STEP_LOOP_DETECTED)]"
+              },
+              {
+                "id": 936,
+                "taskId": 119,
+                "eventType": "BASELINE_DOWNGRADED",
+                "occurredAt": "2026-11-03T13:55:14.730516",
+                "trigger": "SYSTEM",
+                "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+                "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_STEP_LOOP_DETECTED"
+              },
+              {
+                "id": 937,
+                "taskId": 119,
+                "eventType": "TASK_PENDING_MANUAL",
+                "occurredAt": "2026-11-03T13:55:14.734293",
+                "trigger": "SYSTEM",
+                "reasonCode": "ERR_PLANNING_FAILED",
+                "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_LOOP_DETECTED；且无匹配的已启用基线模板"
+              },
+              {
+                "id": 942,
+                "taskId": 119,
+                "eventType": "FORCE_BYPASS_INTERCEPTED",
+                "occurredAt": "2026-11-03T15:44:36.791745",
+                "trigger": "OPERATOR",
+                "reasonCode": "ERR_FORCE_BYPASS_REJECTED",
+                "detailSummary": "操作员试图强行放行硬性校验失败的计划，系统已拦截并拒绝（操作: FORCE_RELEASE）"
+              }
+            ],
+            "assignments": [],
+            "commands": [],
+            "bypassAuditRows": [
+              "690|FORCE_BYPASS_ATTEMPT|TASK-20261103-0119 -> FORCE_RELEASE|INTERCEPTED"
+            ]
+          },
+          "checks": {
+            "http400And4110": true,
+            "pendingManual": true,
+            "zeroAssignmentsAndCommands": true,
+            "newInterceptionEvent": true,
+            "newInterceptionAudit": true,
+            "plansUnchanged": true
+          }
+        },
+        {
+          "request": {
+            "action": "REQUEST_SUPERVISION",
+            "reason": "F013 V141 synthetic persistence retest"
+          },
+          "response": {
+            "http": 400,
+            "body": {
+              "code": 4110,
+              "message": "硬性校验失败的计划严禁进入监督判定或强行放行",
+              "timestamp": "2026-11-03T15:44:37.871252800+08:00",
+              "path": "/api/v1/tasks/119/manual-actions",
+              "method": "POST"
+            }
+          },
+          "after": {
+            "task": {
+              "id": 119,
+              "taskCode": "TASK-20261103-0119",
+              "taskGoal": "F012_LOOP_PRE F013 independent hard-gate test",
+              "taskFamily": "EXT_2AD8B934",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F012_LOOP_PRE F013 independent hard-gate test",
+                "constraints": [
+                  "synthetic test only"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": 99,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_LOOP_DETECTED；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-03T13:55:14.678328",
+              "updatedAt": "2026-11-03T13:55:14.732516",
+              "createdBy": "oprator"
+            },
+            "plans": [
+              {
+                "id": 99,
+                "versionNo": 1,
+                "source": "AUTONOMOUS",
+                "baselineTemplateId": null,
+                "snapshotId": "CTX-20261103-0079",
+                "planSteps": [
+                  {
+                    "stepSeq": 1,
+                    "stepGoal": "Synthetic navigation action 1",
+                    "capabilityType": "CAP_NAVIGATION",
+                    "inputParams": {
+                      "targetLocation": "F2_TEST_GATE"
+                    },
+                    "precondition": "while(true) { repeat this display step forever; }",
+                    "completionCondition": "routeGenerated=true",
+                    "failureHandling": "manual",
+                    "stepTimeout": 60
+                  }
+                ],
+                "structureCheckResult": "FAIL",
+                "capabilityCheckResult": "PASS",
+                "constraintCheckResult": "PASS",
+                "validationErrors": [
+                  {
+                    "errorType": "STRUCTURE",
+                    "description": "步骤precondition含不支持的控制流或动态执行内容（while(）",
+                    "stepSeq": 1,
+                    "reasonCode": "ERR_STEP_LOOP_DETECTED"
+                  }
+                ],
+                "riskLevel": null,
+                "riskReasonCode": null,
+                "judgmentBasis": null,
+                "confidence": 0.99,
+                "ruleSetVersion": null,
+                "frozenAt": null,
+                "createdAt": "2026-11-03T13:55:14.717145"
+              }
+            ],
+            "events": [
+              {
+                "id": 931,
+                "taskId": 119,
+                "eventType": "GOAL_SUBMITTED",
+                "occurredAt": "2026-11-03T13:55:14.679894",
+                "trigger": "OPERATOR",
+                "reasonCode": null,
+                "detailSummary": "运行操作员oprator提交任务目标: F012_LOOP_PRE F013 independent hard-gate test"
+              },
+              {
+                "id": 932,
+                "taskId": 119,
+                "eventType": "GOAL_CLARIFIED",
+                "occurredAt": "2026-11-03T13:55:14.690344",
+                "trigger": "SYSTEM",
+                "reasonCode": null,
+                "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+              },
+              {
+                "id": 933,
+                "taskId": 119,
+                "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+                "occurredAt": "2026-11-03T13:55:14.705385",
+                "trigger": "SYSTEM",
+                "reasonCode": null,
+                "detailSummary": "生成规划上下文快照CTX-20261103-0079"
+              },
+              {
+                "id": 934,
+                "taskId": 119,
+                "eventType": "PLAN_GENERATED",
+                "occurredAt": "2026-11-03T13:55:14.724287",
+                "trigger": "SYSTEM",
+                "reasonCode": null,
+                "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+              },
+              {
+                "id": 935,
+                "taskId": 119,
+                "eventType": "PLAN_VALIDATED",
+                "occurredAt": "2026-11-03T13:55:14.727639",
+                "trigger": "SYSTEM",
+                "reasonCode": "ERR_STEP_LOOP_DETECTED",
+                "detailSummary": "候选计划三类校验未通过: 1项错误 [STRUCTURE 步骤1: 步骤precondition含不支持的控制流或动态执行内容（while(）(ERR_STEP_LOOP_DETECTED)]"
+              },
+              {
+                "id": 936,
+                "taskId": 119,
+                "eventType": "BASELINE_DOWNGRADED",
+                "occurredAt": "2026-11-03T13:55:14.730516",
+                "trigger": "SYSTEM",
+                "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+                "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_STEP_LOOP_DETECTED"
+              },
+              {
+                "id": 937,
+                "taskId": 119,
+                "eventType": "TASK_PENDING_MANUAL",
+                "occurredAt": "2026-11-03T13:55:14.734293",
+                "trigger": "SYSTEM",
+                "reasonCode": "ERR_PLANNING_FAILED",
+                "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_LOOP_DETECTED；且无匹配的已启用基线模板"
+              },
+              {
+                "id": 942,
+                "taskId": 119,
+                "eventType": "FORCE_BYPASS_INTERCEPTED",
+                "occurredAt": "2026-11-03T15:44:36.791745",
+                "trigger": "OPERATOR",
+                "reasonCode": "ERR_FORCE_BYPASS_REJECTED",
+                "detailSummary": "操作员试图强行放行硬性校验失败的计划，系统已拦截并拒绝（操作: FORCE_RELEASE）"
+              },
+              {
+                "id": 943,
+                "taskId": 119,
+                "eventType": "FORCE_BYPASS_INTERCEPTED",
+                "occurredAt": "2026-11-03T15:44:37.866323",
+                "trigger": "OPERATOR",
+                "reasonCode": "ERR_FORCE_BYPASS_REJECTED",
+                "detailSummary": "操作员试图强行放行硬性校验失败的计划，系统已拦截并拒绝（操作: REQUEST_SUPERVISION）"
+              }
+            ],
+            "assignments": [],
+            "commands": [],
+            "bypassAuditRows": [
+              "690|FORCE_BYPASS_ATTEMPT|TASK-20261103-0119 -> FORCE_RELEASE|INTERCEPTED",
+              "691|FORCE_BYPASS_ATTEMPT|TASK-20261103-0119 -> REQUEST_SUPERVISION|INTERCEPTED"
+            ]
+          },
+          "checks": {
+            "http400And4110": true,
+            "pendingManual": true,
+            "zeroAssignmentsAndCommands": true,
+            "newInterceptionEvent": true,
+            "newInterceptionAudit": true,
+            "plansUnchanged": true
+          }
+        }
+      ]
+    }
+  ],
+  "constraint": "CHECK (((operation_result)::text = ANY ((ARRAY['SUCCESS'::character varying, 'FAILED'::character varying, 'CANCELLED'::character varying, 'INTERCEPTED'::character varying])::text[])))",
+  "migration27": "27|t"
+}

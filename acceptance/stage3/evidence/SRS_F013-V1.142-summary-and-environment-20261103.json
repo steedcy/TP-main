@@ -1,0 +1,810 @@
+{
+  "version": "V1.142",
+  "codeSha": "28bfb28eef45af0c058bf675e62d2d45b6424102",
+  "observedAt": "2026-11-03T15:56:40.861780+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "additionalBypassBranches": [
+    {
+      "tid": 135,
+      "action": "FORCE_RELEASE",
+      "response": {
+        "http": 400,
+        "body": {
+          "code": 4110,
+          "message": "硬性校验失败的计划严禁进入监督判定或强行放行",
+          "timestamp": "2026-11-03T15:56:41.279832300+08:00",
+          "path": "/api/v1/tasks/135/manual-actions",
+          "method": "POST"
+        }
+      },
+      "after": {
+        "task": {
+          "id": 135,
+          "taskCode": "TASK-20261103-0135",
+          "taskGoal": "F013_NO_CANDIDATE synthetic navigation",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F013_NO_CANDIDATE synthetic navigation",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 114,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_NO_ONLINE_CANDIDATE；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-03T15:50:41.058095",
+          "updatedAt": "2026-11-03T15:50:41.206995",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 114,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261103-0095",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic navigation 1",
+                "capabilityType": "CAP_INFO_DISPLAY",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "FAIL",
+            "constraintCheckResult": "FAIL",
+            "validationErrors": [
+              {
+                "errorType": "CAPABILITY",
+                "description": "能力类型CAP_INFO_DISPLAY无在线候选代理",
+                "stepSeq": 1,
+                "reasonCode": "ERR_NO_ONLINE_CANDIDATE"
+              },
+              {
+                "errorType": "CONSTRAINT",
+                "description": "步骤所需能力CAP_INFO_DISPLAY超出任务定义声明的可用能力类型范围: [CAP_NAVIGATION]",
+                "stepSeq": 1,
+                "reasonCode": "ERR_CAPABILITY_NOT_IN_TASK_DEFINITION"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-03T15:50:41.191869"
+          }
+        ],
+        "events": [
+          {
+            "id": 1048,
+            "taskId": 135,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-03T15:50:41.06316",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F013_NO_CANDIDATE synthetic navigation"
+          },
+          {
+            "id": 1049,
+            "taskId": 135,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-03T15:50:41.09845",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1050,
+            "taskId": 135,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-03T15:50:41.114398",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261103-0095"
+          },
+          {
+            "id": 1051,
+            "taskId": 135,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-03T15:50:41.19708",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1052,
+            "taskId": 135,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-03T15:50:41.201301",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_ONLINE_CANDIDATE",
+            "detailSummary": "候选计划三类校验未通过: 2项错误 [CAPABILITY 步骤1: 能力类型CAP_INFO_DISPLAY无在线候选代理(ERR_NO_ONLINE_CANDIDATE); CONSTRAINT 步骤1: 步骤所需能力CAP_INFO_DISPLAY超出任务定义声明的可用能力类型范围: [CAP_NAVIGATION](ERR_CAPABILITY_NOT_IN_TASK_DEFINITION)]"
+          },
+          {
+            "id": 1053,
+            "taskId": 135,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-03T15:50:41.205272",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_NO_ONLINE_CANDIDATE"
+          },
+          {
+            "id": 1054,
+            "taskId": 135,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-03T15:50:41.208989",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_NO_ONLINE_CANDIDATE；且无匹配的已启用基线模板"
+          },
+          {
+            "id": 1125,
+            "taskId": 135,
+            "eventType": "FORCE_BYPASS_INTERCEPTED",
+            "occurredAt": "2026-11-03T15:56:41.275137",
+            "trigger": "OPERATOR",
+            "reasonCode": "ERR_FORCE_BYPASS_REJECTED",
+            "detailSummary": "操作员试图强行放行硬性校验失败的计划，系统已拦截并拒绝（操作: FORCE_RELEASE）"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": [
+          "729|FORCE_BYPASS_ATTEMPT|TASK-20261103-0135 -> FORCE_RELEASE|INTERCEPTED"
+        ]
+      },
+      "checks": {
+        "http400And4110": true,
+        "pendingManualNoAssignmentsOrCommands": true,
+        "newEventAndAudit": true,
+        "plansUnchanged": true
+      }
+    },
+    {
+      "tid": 135,
+      "action": "REQUEST_SUPERVISION",
+      "response": {
+        "http": 400,
+        "body": {
+          "code": 4110,
+          "message": "硬性校验失败的计划严禁进入监督判定或强行放行",
+          "timestamp": "2026-11-03T15:56:42.063788700+08:00",
+          "path": "/api/v1/tasks/135/manual-actions",
+          "method": "POST"
+        }
+      },
+      "after": {
+        "task": {
+          "id": 135,
+          "taskCode": "TASK-20261103-0135",
+          "taskGoal": "F013_NO_CANDIDATE synthetic navigation",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F013_NO_CANDIDATE synthetic navigation",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 114,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_NO_ONLINE_CANDIDATE；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-03T15:50:41.058095",
+          "updatedAt": "2026-11-03T15:50:41.206995",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 114,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261103-0095",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic navigation 1",
+                "capabilityType": "CAP_INFO_DISPLAY",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "FAIL",
+            "constraintCheckResult": "FAIL",
+            "validationErrors": [
+              {
+                "errorType": "CAPABILITY",
+                "description": "能力类型CAP_INFO_DISPLAY无在线候选代理",
+                "stepSeq": 1,
+                "reasonCode": "ERR_NO_ONLINE_CANDIDATE"
+              },
+              {
+                "errorType": "CONSTRAINT",
+                "description": "步骤所需能力CAP_INFO_DISPLAY超出任务定义声明的可用能力类型范围: [CAP_NAVIGATION]",
+                "stepSeq": 1,
+                "reasonCode": "ERR_CAPABILITY_NOT_IN_TASK_DEFINITION"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-03T15:50:41.191869"
+          }
+        ],
+        "events": [
+          {
+            "id": 1048,
+            "taskId": 135,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-03T15:50:41.06316",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F013_NO_CANDIDATE synthetic navigation"
+          },
+          {
+            "id": 1049,
+            "taskId": 135,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-03T15:50:41.09845",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1050,
+            "taskId": 135,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-03T15:50:41.114398",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261103-0095"
+          },
+          {
+            "id": 1051,
+            "taskId": 135,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-03T15:50:41.19708",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1052,
+            "taskId": 135,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-03T15:50:41.201301",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_ONLINE_CANDIDATE",
+            "detailSummary": "候选计划三类校验未通过: 2项错误 [CAPABILITY 步骤1: 能力类型CAP_INFO_DISPLAY无在线候选代理(ERR_NO_ONLINE_CANDIDATE); CONSTRAINT 步骤1: 步骤所需能力CAP_INFO_DISPLAY超出任务定义声明的可用能力类型范围: [CAP_NAVIGATION](ERR_CAPABILITY_NOT_IN_TASK_DEFINITION)]"
+          },
+          {
+            "id": 1053,
+            "taskId": 135,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-03T15:50:41.205272",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_NO_ONLINE_CANDIDATE"
+          },
+          {
+            "id": 1054,
+            "taskId": 135,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-03T15:50:41.208989",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_NO_ONLINE_CANDIDATE；且无匹配的已启用基线模板"
+          },
+          {
+            "id": 1125,
+            "taskId": 135,
+            "eventType": "FORCE_BYPASS_INTERCEPTED",
+            "occurredAt": "2026-11-03T15:56:41.275137",
+            "trigger": "OPERATOR",
+            "reasonCode": "ERR_FORCE_BYPASS_REJECTED",
+            "detailSummary": "操作员试图强行放行硬性校验失败的计划，系统已拦截并拒绝（操作: FORCE_RELEASE）"
+          },
+          {
+            "id": 1126,
+            "taskId": 135,
+            "eventType": "FORCE_BYPASS_INTERCEPTED",
+            "occurredAt": "2026-11-03T15:56:42.061283",
+            "trigger": "OPERATOR",
+            "reasonCode": "ERR_FORCE_BYPASS_REJECTED",
+            "detailSummary": "操作员试图强行放行硬性校验失败的计划，系统已拦截并拒绝（操作: REQUEST_SUPERVISION）"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": [
+          "729|FORCE_BYPASS_ATTEMPT|TASK-20261103-0135 -> FORCE_RELEASE|INTERCEPTED",
+          "730|FORCE_BYPASS_ATTEMPT|TASK-20261103-0135 -> REQUEST_SUPERVISION|INTERCEPTED"
+        ]
+      },
+      "checks": {
+        "http400And4110": true,
+        "pendingManualNoAssignmentsOrCommands": true,
+        "newEventAndAudit": true,
+        "plansUnchanged": true
+      }
+    },
+    {
+      "tid": 137,
+      "action": "FORCE_RELEASE",
+      "response": {
+        "http": 400,
+        "body": {
+          "code": 4110,
+          "message": "硬性校验失败的计划严禁进入监督判定或强行放行",
+          "timestamp": "2026-11-03T15:56:42.840112100+08:00",
+          "path": "/api/v1/tasks/137/manual-actions",
+          "method": "POST"
+        }
+      },
+      "after": {
+        "task": {
+          "id": 137,
+          "taskCode": "TASK-20261103-0137",
+          "taskGoal": "F013_MOTION synthetic navigation",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F013_MOTION synthetic navigation",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 116,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_MOTION_SAFETY_FIELD；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-03T15:50:46.677745",
+          "updatedAt": "2026-11-03T15:50:46.747096",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 116,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261103-0097",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic navigation 1",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "speed": 2
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "FAIL",
+            "validationErrors": [
+              {
+                "errorType": "CONSTRAINT",
+                "description": "步骤包含运动安全控制字段: [speed]",
+                "stepSeq": 1,
+                "reasonCode": "ERR_MOTION_SAFETY_FIELD"
+              },
+              {
+                "errorType": "CONSTRAINT",
+                "description": "输入参数与当前能力定义不匹配",
+                "stepSeq": 1,
+                "reasonCode": "ERR_CAPABILITY_PARAMETER_INVALID"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-03T15:50:46.732562"
+          }
+        ],
+        "events": [
+          {
+            "id": 1062,
+            "taskId": 137,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-03T15:50:46.677745",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F013_MOTION synthetic navigation"
+          },
+          {
+            "id": 1063,
+            "taskId": 137,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-03T15:50:46.698603",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1064,
+            "taskId": 137,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-03T15:50:46.707973",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261103-0097"
+          },
+          {
+            "id": 1065,
+            "taskId": 137,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-03T15:50:46.73883",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1066,
+            "taskId": 137,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-03T15:50:46.743728",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_MOTION_SAFETY_FIELD",
+            "detailSummary": "候选计划三类校验未通过: 2项错误 [CONSTRAINT 步骤1: 步骤包含运动安全控制字段: [speed](ERR_MOTION_SAFETY_FIELD); CONSTRAINT 步骤1: 输入参数与当前能力定义不匹配(ERR_CAPABILITY_PARAMETER_INVALID)]"
+          },
+          {
+            "id": 1067,
+            "taskId": 137,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-03T15:50:46.744815",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_MOTION_SAFETY_FIELD"
+          },
+          {
+            "id": 1068,
+            "taskId": 137,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-03T15:50:46.74767",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_MOTION_SAFETY_FIELD；且无匹配的已启用基线模板"
+          },
+          {
+            "id": 1127,
+            "taskId": 137,
+            "eventType": "FORCE_BYPASS_INTERCEPTED",
+            "occurredAt": "2026-11-03T15:56:42.83583",
+            "trigger": "OPERATOR",
+            "reasonCode": "ERR_FORCE_BYPASS_REJECTED",
+            "detailSummary": "操作员试图强行放行硬性校验失败的计划，系统已拦截并拒绝（操作: FORCE_RELEASE）"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": [
+          "731|FORCE_BYPASS_ATTEMPT|TASK-20261103-0137 -> FORCE_RELEASE|INTERCEPTED"
+        ]
+      },
+      "checks": {
+        "http400And4110": true,
+        "pendingManualNoAssignmentsOrCommands": true,
+        "newEventAndAudit": true,
+        "plansUnchanged": true
+      }
+    },
+    {
+      "tid": 137,
+      "action": "REQUEST_SUPERVISION",
+      "response": {
+        "http": 400,
+        "body": {
+          "code": 4110,
+          "message": "硬性校验失败的计划严禁进入监督判定或强行放行",
+          "timestamp": "2026-11-03T15:56:43.604536800+08:00",
+          "path": "/api/v1/tasks/137/manual-actions",
+          "method": "POST"
+        }
+      },
+      "after": {
+        "task": {
+          "id": 137,
+          "taskCode": "TASK-20261103-0137",
+          "taskGoal": "F013_MOTION synthetic navigation",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F013_MOTION synthetic navigation",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 116,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_MOTION_SAFETY_FIELD；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-03T15:50:46.677745",
+          "updatedAt": "2026-11-03T15:50:46.747096",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 116,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261103-0097",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic navigation 1",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "speed": 2
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "FAIL",
+            "validationErrors": [
+              {
+                "errorType": "CONSTRAINT",
+                "description": "步骤包含运动安全控制字段: [speed]",
+                "stepSeq": 1,
+                "reasonCode": "ERR_MOTION_SAFETY_FIELD"
+              },
+              {
+                "errorType": "CONSTRAINT",
+                "description": "输入参数与当前能力定义不匹配",
+                "stepSeq": 1,
+                "reasonCode": "ERR_CAPABILITY_PARAMETER_INVALID"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-03T15:50:46.732562"
+          }
+        ],
+        "events": [
+          {
+            "id": 1062,
+            "taskId": 137,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-03T15:50:46.677745",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F013_MOTION synthetic navigation"
+          },
+          {
+            "id": 1063,
+            "taskId": 137,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-03T15:50:46.698603",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1064,
+            "taskId": 137,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-03T15:50:46.707973",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261103-0097"
+          },
+          {
+            "id": 1065,
+            "taskId": 137,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-03T15:50:46.73883",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1066,
+            "taskId": 137,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-03T15:50:46.743728",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_MOTION_SAFETY_FIELD",
+            "detailSummary": "候选计划三类校验未通过: 2项错误 [CONSTRAINT 步骤1: 步骤包含运动安全控制字段: [speed](ERR_MOTION_SAFETY_FIELD); CONSTRAINT 步骤1: 输入参数与当前能力定义不匹配(ERR_CAPABILITY_PARAMETER_INVALID)]"
+          },
+          {
+            "id": 1067,
+            "taskId": 137,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-03T15:50:46.744815",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_MOTION_SAFETY_FIELD"
+          },
+          {
+            "id": 1068,
+            "taskId": 137,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-03T15:50:46.74767",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_MOTION_SAFETY_FIELD；且无匹配的已启用基线模板"
+          },
+          {
+            "id": 1127,
+            "taskId": 137,
+            "eventType": "FORCE_BYPASS_INTERCEPTED",
+            "occurredAt": "2026-11-03T15:56:42.83583",
+            "trigger": "OPERATOR",
+            "reasonCode": "ERR_FORCE_BYPASS_REJECTED",
+            "detailSummary": "操作员试图强行放行硬性校验失败的计划，系统已拦截并拒绝（操作: FORCE_RELEASE）"
+          },
+          {
+            "id": 1128,
+            "taskId": 137,
+            "eventType": "FORCE_BYPASS_INTERCEPTED",
+            "occurredAt": "2026-11-03T15:56:43.601403",
+            "trigger": "OPERATOR",
+            "reasonCode": "ERR_FORCE_BYPASS_REJECTED",
+            "detailSummary": "操作员试图强行放行硬性校验失败的计划，系统已拦截并拒绝（操作: REQUEST_SUPERVISION）"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": [
+          "731|FORCE_BYPASS_ATTEMPT|TASK-20261103-0137 -> FORCE_RELEASE|INTERCEPTED",
+          "732|FORCE_BYPASS_ATTEMPT|TASK-20261103-0137 -> REQUEST_SUPERVISION|INTERCEPTED"
+        ]
+      },
+      "checks": {
+        "http400And4110": true,
+        "pendingManualNoAssignmentsOrCommands": true,
+        "newEventAndAudit": true,
+        "plansUnchanged": true
+      }
+    }
+  ],
+  "health": {
+    "status": "UP"
+  },
+  "jarSha256": "0f13956c7828e4f0782afc1482cfcefea81f7df1a7adb1400e42c5c60416ff1b",
+  "startupLog": "\n  .   ____          _            __ _ _\n /\\\\ / ___'_ __ _ _(_)_ __  __ _ \\ \\ \\ \\\n( ( )\\___ | '_ | '_| | '_ \\/ _` | \\ \\ \\ \\\n \\\\/  ___)| |_)| | | | | || (_| |  ) ) ) )\n  '  |____| .__|_| |_|_| |_\\__, | / / / /\n =========|_|==============|___/=/_/_/_/\n :: Spring Boot ::                (v3.2.5)\n\n2026-11-03T15:43:36.277+08:00  INFO 7600 --- [airport-ai-app] [           main] com.airport.ai.AirportAiApplication      : Starting AirportAiApplication v1.0.0 using Java 17.0.12 with PID 7600 (C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\backend\\target\\airport-ai-app-1.0.0.jar started by savy in C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013)\n2026-11-03T15:43:36.295+08:00  INFO 7600 --- [airport-ai-app] [           main] com.airport.ai.AirportAiApplication      : No active profile set, falling back to 1 default profile: \"default\"\n2026-11-03T15:43:39.729+08:00  INFO 7600 --- [airport-ai-app] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode\n2026-11-03T15:43:39.736+08:00  INFO 7600 --- [airport-ai-app] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.\n2026-11-03T15:43:39.806+08:00  INFO 7600 --- [airport-ai-app] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 38 ms. Found 0 Redis repository interfaces.\n2026-11-03T15:43:42.110+08:00  INFO 7600 --- [airport-ai-app] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 18129 (http)\n2026-11-03T15:43:42.152+08:00  INFO 7600 --- [airport-ai-app] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]\n2026-11-03T15:43:42.152+08:00  INFO 7600 --- [airport-ai-app] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.20]\n2026-11-03T15:43:42.297+08:00  INFO 7600 --- [airport-ai-app] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext\n2026-11-03T15:43:42.299+08:00  INFO 7600 --- [airport-ai-app] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 5734 ms\n2026-11-03T15:43:42.678+08:00  INFO 7600 --- [airport-ai-app] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...\n2026-11-03T15:43:43.249+08:00  INFO 7600 --- [airport-ai-app] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@5df64b2a\n2026-11-03T15:43:43.252+08:00  INFO 7600 --- [airport-ai-app] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.\n2026-11-03T15:43:43.375+08:00  INFO 7600 --- [airport-ai-app] [           main] o.f.c.internal.license.VersionPrinter    : Flyway Community Edition 9.22.3 by Redgate\n2026-11-03T15:43:43.375+08:00  INFO 7600 --- [airport-ai-app] [           main] o.f.c.internal.license.VersionPrinter    : See release notes here: https://rd.gt/416ObMi\n2026-11-03T15:43:43.375+08:00  INFO 7600 --- [airport-ai-app] [           main] o.f.c.internal.license.VersionPrinter    : \n2026-11-03T15:43:43.411+08:00  INFO 7600 --- [airport-ai-app] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://localhost:5432/airport_ai (PostgreSQL 15.19)\n2026-11-03T15:43:43.537+08:00  INFO 7600 --- [airport-ai-app] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 27 migrations (execution time 00:00.094s)\n2026-11-03T15:43:43.554+08:00  INFO 7600 --- [airport-ai-app] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema \"tip_gpt_f006_v118_20261030\": 27\n2026-11-03T15:43:43.559+08:00  INFO 7600 --- [airport-ai-app] [           main] o.f.core.internal.command.DbMigrate      : Schema \"tip_gpt_f006_v118_20261030\" is up to date. No migration necessary.\n2026-11-03T15:43:46.422+08:00  WARN 7600 --- [airport-ai-app] [           main] .s.s.UserDetailsServiceAutoConfiguration : \n\nUsing generated security password: d7cc27da-e909-413a-8780-b371c0549684\n\nThis generated password is for development use only. Your security configuration must be updated before running your application in production.\n\n2026-11-03T15:43:47.189+08:00  INFO 7600 --- [airport-ai-app] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 2 endpoint(s) beneath base path '/actuator'\n2026-11-03T15:43:47.335+08:00  INFO 7600 --- [airport-ai-app] [           main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@4b86a656, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@1117cc7c, org.springframework.security.web.context.SecurityContextHolderFilter@758d0555, org.springframework.security.web.header.HeaderWriterFilter@50a095cb, org.springframework.web.filter.CorsFilter@4797023d, org.springframework.security.web.authentication.logout.LogoutFilter@129e45eb, com.airport.ai.config.DeviceTokenAuthenticationFilter@51869ad6, com.airport.ai.config.TokenAuthenticationFilter@77cf329d, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@4ac77269, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@638d624a, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@55cc4c61, org.springframework.security.web.session.SessionManagementFilter@2093bb6c, org.springframework.security.web.access.ExceptionTranslationFilter@361c4981, org.springframework.security.web.access.intercept.AuthorizationFilter@3b0c38f2]\n2026-11-03T15:43:48.534+08:00  INFO 7600 --- [airport-ai-app] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 18129 (http) with context path ''\n2026-11-03T15:43:48.568+08:00  INFO 7600 --- [airport-ai-app] [           main] com.airport.ai.AirportAiApplication      : Started AirportAiApplication",
+  "buildLog": "[INFO] Scanning for projects...\n[INFO] Loaded 24230 auto-discovered prefixes for remote repository central (prefixes-central.txt)\n[INFO] \n[INFO] -------------------< com.airport.ai:airport-ai-app >--------------------\n[INFO] Building airport-ai-app 1.0.0\n[INFO]   from pom.xml\n[INFO] --------------------------------[ jar ]---------------------------------\n[INFO] Loaded 74 auto-discovered prefixes for remote repository apache.snapshots (prefixes-apache.snapshots.txt)\n[INFO] Loaded 24230 auto-discovered prefixes for remote repository maven-central (prefixes-maven-central.txt)\n[INFO] \n[INFO] --- resources:3.3.1:resources (default-resources) @ airport-ai-app ---\n[INFO] Copying 1 resource from src\\main\\resources to target\\classes\n[INFO] Copying 50 resources from src\\main\\resources to target\\classes\n[INFO] \n[INFO] --- compiler:3.11.0:compile (default-compile) @ airport-ai-app ---\n[INFO] Changes detected - recompiling the module! :source\n[INFO] Compiling 196 source files with javac [debug release 17] to target\\classes\n[INFO] /C:/Users/savy/Desktop/TIP-main/tip-gpt-f013/backend/src/main/java/com/airport/ai/task/TaskExecutionOrchestrator.java: 某些输入文件使用了未经检查或不安全的操作。\n[INFO] /C:/Users/savy/Desktop/TIP-main/tip-gpt-f013/backend/src/main/java/com/airport/ai/task/TaskExecutionOrchestrator.java: 有关详细信息, 请使用 -Xlint:unchecked 重新编译。\n[INFO] \n[INFO] --- resources:3.3.1:testResources (default-testResources) @ airport-ai-app ---\n[INFO] skip non existing resourceDirectory C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\backend\\src\\test\\resources\n[INFO] \n[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ airport-ai-app ---\n[INFO] Changes detected - recompiling the module! :dependency\n[INFO] Compiling 74 source files with javac [debug release 17] to target\\test-classes\n[INFO] /C:/Users/savy/Desktop/TIP-main/tip-gpt-f013/backend/src/test/java/com/airport/ai/device/UnifiedMessagingF007Test.java: 某些输入文件使用了未经检查或不安全的操作。\n[INFO] /C:/Users/savy/Desktop/TIP-main/tip-gpt-f013/backend/src/test/java/com/airport/ai/device/UnifiedMessagingF007Test.java: 有关详细信息, 请使用 -Xlint:unchecked 重新编译。\n[INFO] \n[INFO] --- surefire:3.1.2:test (default-test) @ airport-ai-app ---\n[INFO] Tests are skipped.\n[INFO] \n[INFO] --- jar:3.3.0:jar (default-jar) @ airport-ai-app ---\n[INFO] Building jar: C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\backend\\target\\airport-ai-app-1.0.0.jar\n[INFO] \n[INFO] --- spring-boot:3.2.5:repackage (repackage) @ airport-ai-app ---\n[INFO] Loaded 50 auto-discovered prefixes for remote repository ow2-snapshot (prefixes-ow2-snapshot.txt)\n[INFO] Replacing main artifact C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\backend\\target\\airport-ai-app-1.0.0.jar with repackaged archive, adding nested dependencies in BOOT-INF/.\n[INFO] The original artifact has been renamed to C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\backend\\target\\airport-ai-app-1.0.0.jar.original\n[INFO] ------------------------------------------------------------------------\n[INFO] BUILD SUCCESS\n[INFO] ------------------------------------------------------------------------\n[INFO] Total time:  01:35 min\n[INFO] Finished at: 2026-11-03T15:43:17+08:00\n[INFO] ------------------------------------------------------------------------\n",
+  "targetedTestLog": "[INFO] Scanning for projects...\n[INFO] Loaded 24230 auto-discovered prefixes for remote repository central (prefixes-central.txt)\n[INFO] \n[INFO] -------------------< com.airport.ai:airport-ai-app >--------------------\n[INFO] Building airport-ai-app 1.0.0\n[INFO]   from pom.xml\n[INFO] --------------------------------[ jar ]---------------------------------\n[INFO] Loaded 74 auto-discovered prefixes for remote repository apache.snapshots (prefixes-apache.snapshots.txt)\n[INFO] Loaded 24230 auto-discovered prefixes for remote repository maven-central (prefixes-maven-central.txt)\n[INFO] \n[INFO] --- resources:3.3.1:resources (default-resources) @ airport-ai-app ---\n[INFO] Copying 1 resource from src\\main\\resources to target\\classes\n[INFO] Copying 50 resources from src\\main\\resources to target\\classes\n[INFO] \n[INFO] --- compiler:3.11.0:compile (default-compile) @ airport-ai-app ---\n[INFO] Nothing to compile - all classes are up to date\n[INFO] \n[INFO] --- resources:3.3.1:testResources (default-testResources) @ airport-ai-app ---\n[INFO] skip non existing resourceDirectory C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\backend\\src\\test\\resources\n[INFO] \n[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ airport-ai-app ---\n[INFO] Nothing to compile - all classes are up to date\n[INFO] \n[INFO] --- surefire:3.1.2:test (default-test) @ airport-ai-app ---\n[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider\n[INFO] \n[INFO] -------------------------------------------------------\n[INFO]  T E S T S\n[INFO] -------------------------------------------------------\n[INFO] Running com.airport.ai.task.PlanThreeCheckAndFreezeF013Test\nJava HotSpot(TM) 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended\n[INFO] Tests run: 15, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.582 s -- in com.airport.ai.task.PlanThreeCheckAndFreezeF013Test\n[INFO] Running com.airport.ai.task.TaskServiceSpringContextTest\n[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.933 s -- in com.airport.ai.task.TaskServiceSpringContextTest\n[INFO] \n[INFO] Results:\n[INFO] \n[INFO] Tests run: 16, Failures: 0, Errors: 0, Skipped: 0\n[INFO] \n[INFO] ------------------------------------------------------------------------\n[INFO] BUILD SUCCESS\n[INFO] ------------------------------------------------------------------------\n[INFO] Total time:  21.938 s\n[INFO] Finished at: 2026-11-03T15:55:19+08:00\n[INFO] ------------------------------------------------------------------------\n",
+  "disabledCapabilityInstances": [],
+  "batchChecks": {
+    "twentyCases": true,
+    "allInvalidPendingAndNoCommandsOrAssignments": true,
+    "allInvalidPlansUnfrozen": true,
+    "multiAllThreeFail": true
+  },
+  "syntheticUiAccountDisabled": true,
+  "riskRuleEnabled": "t",
+  "activeAssignments": "0",
+  "commandCount": "0",
+  "stoppedProcesses": [
+    {
+      "pid": 7600,
+      "port": 18129,
+      "returnCode": 0
+    },
+    {
+      "pid": 9040,
+      "port": 18132,
+      "returnCode": 0
+    },
+    {
+      "pid": 11880,
+      "port": 18117,
+      "returnCode": 0
+    },
+    {
+      "pid": 11680,
+      "port": 15179,
+      "returnCode": 0
+    }
+  ],
+  "portsReleased": {
+    "18129": true,
+    "18117": true,
+    "18132": true,
+    "15179": true
+  },
+  "expectedReasonCodeChecks": {
+    "MISSING_stepGoal": true,
+    "MISSING_capabilityType": true,
+    "MISSING_inputParams": true,
+    "MISSING_precondition": true,
+    "MISSING_completionCondition": true,
+    "MISSING_failureHandling": true,
+    "SIX": true,
+    "SELF": true,
+    "FORWARD": true,
+    "DEPENDENCY_MISSING": true,
+    "LOOP": true,
+    "DYNAMIC": true,
+    "NEGOTIATION": true,
+    "FAKE_CAP": true,
+    "DISABLED_CAP": true,
+    "NO_CANDIDATE": true,
+    "OUTSIDE_TASK": true,
+    "MOTION": true,
+    "BAD_PARAM": true,
+    "MULTI": true
+  }
+}

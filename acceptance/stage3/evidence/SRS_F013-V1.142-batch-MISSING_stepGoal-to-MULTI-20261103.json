@@ -1,0 +1,3036 @@
+{
+  "version": "V1.142",
+  "codeSha": "28bfb28eef45af0c058bf675e62d2d45b6424102",
+  "observedAt": "2026-11-03T15:50:13.382170+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "cases": [
+    {
+      "name": "MISSING_stepGoal",
+      "request": {
+        "taskGoal": "F013_MISSING_stepGoal synthetic navigation",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "observed": {
+        "task": {
+          "id": 120,
+          "taskCode": "TASK-20261103-0120",
+          "taskGoal": "F013_MISSING_stepGoal synthetic navigation",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F013_MISSING_stepGoal synthetic navigation",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 100,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-03T15:50:13.584108",
+          "updatedAt": "2026-11-03T15:50:14.570734",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 100,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261103-0080",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "FAIL",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [
+              {
+                "errorType": "STRUCTURE",
+                "description": "步骤字段不完整，缺少: stepGoal",
+                "stepSeq": 1,
+                "reasonCode": "ERR_STEP_FIELD_MISSING"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-03T15:50:14.286641"
+          }
+        ],
+        "events": [
+          {
+            "id": 944,
+            "taskId": 120,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-03T15:50:13.621068",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F013_MISSING_stepGoal synthetic navigation"
+          },
+          {
+            "id": 945,
+            "taskId": 120,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-03T15:50:13.979866",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 946,
+            "taskId": 120,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-03T15:50:14.070812",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261103-0080"
+          },
+          {
+            "id": 947,
+            "taskId": 120,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-03T15:50:14.332417",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 948,
+            "taskId": 120,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-03T15:50:14.346636",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_STEP_FIELD_MISSING",
+            "detailSummary": "候选计划三类校验未通过: 1项错误 [STRUCTURE 步骤1: 步骤字段不完整，缺少: stepGoal(ERR_STEP_FIELD_MISSING)]"
+          },
+          {
+            "id": 949,
+            "taskId": 120,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-03T15:50:14.511229",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING"
+          },
+          {
+            "id": 950,
+            "taskId": 120,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-03T15:50:14.581403",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      }
+    },
+    {
+      "name": "MISSING_capabilityType",
+      "request": {
+        "taskGoal": "F013_MISSING_capabilityType synthetic navigation",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "observed": {
+        "task": {
+          "id": 121,
+          "taskCode": "TASK-20261103-0121",
+          "taskGoal": "F013_MISSING_capabilityType synthetic navigation",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F013_MISSING_capabilityType synthetic navigation",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 101,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-03T15:50:18.174971",
+          "updatedAt": "2026-11-03T15:50:18.391714",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 101,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261103-0081",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic navigation 1",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "FAIL",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [
+              {
+                "errorType": "STRUCTURE",
+                "description": "步骤字段不完整，缺少: capabilityType",
+                "stepSeq": 1,
+                "reasonCode": "ERR_STEP_FIELD_MISSING"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-03T15:50:18.334844"
+          }
+        ],
+        "events": [
+          {
+            "id": 951,
+            "taskId": 121,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-03T15:50:18.177495",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F013_MISSING_capabilityType synthetic navigation"
+          },
+          {
+            "id": 952,
+            "taskId": 121,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-03T15:50:18.220367",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 953,
+            "taskId": 121,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-03T15:50:18.27326",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261103-0081"
+          },
+          {
+            "id": 954,
+            "taskId": 121,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-03T15:50:18.360759",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 955,
+            "taskId": 121,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-03T15:50:18.364933",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_STEP_FIELD_MISSING",
+            "detailSummary": "候选计划三类校验未通过: 1项错误 [STRUCTURE 步骤1: 步骤字段不完整，缺少: capabilityType(ERR_STEP_FIELD_MISSING)]"
+          },
+          {
+            "id": 956,
+            "taskId": 121,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-03T15:50:18.387059",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING"
+          },
+          {
+            "id": 957,
+            "taskId": 121,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-03T15:50:18.391714",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      }
+    },
+    {
+      "name": "MISSING_inputParams",
+      "request": {
+        "taskGoal": "F013_MISSING_inputParams synthetic navigation",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "observed": {
+        "task": {
+          "id": 122,
+          "taskCode": "TASK-20261103-0122",
+          "taskGoal": "F013_MISSING_inputParams synthetic navigation",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F013_MISSING_inputParams synthetic navigation",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 102,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-03T15:50:21.527929",
+          "updatedAt": "2026-11-03T15:50:21.789183",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 102,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261103-0082",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic navigation 1",
+                "capabilityType": "CAP_NAVIGATION",
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "FAIL",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [
+              {
+                "errorType": "STRUCTURE",
+                "description": "步骤字段不完整，缺少: inputParams（须为对象，可为空对象）",
+                "stepSeq": 1,
+                "reasonCode": "ERR_STEP_FIELD_MISSING"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-03T15:50:21.760741"
+          }
+        ],
+        "events": [
+          {
+            "id": 958,
+            "taskId": 122,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-03T15:50:21.530391",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F013_MISSING_inputParams synthetic navigation"
+          },
+          {
+            "id": 959,
+            "taskId": 122,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-03T15:50:21.639349",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 960,
+            "taskId": 122,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-03T15:50:21.659715",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261103-0082"
+          },
+          {
+            "id": 961,
+            "taskId": 122,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-03T15:50:21.769119",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 962,
+            "taskId": 122,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-03T15:50:21.773553",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_STEP_FIELD_MISSING",
+            "detailSummary": "候选计划三类校验未通过: 1项错误 [STRUCTURE 步骤1: 步骤字段不完整，缺少: inputParams（须为对象，可为空对象）(ERR_STEP_FIELD_MISSING)]"
+          },
+          {
+            "id": 963,
+            "taskId": 122,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-03T15:50:21.789183",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING"
+          },
+          {
+            "id": 964,
+            "taskId": 122,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-03T15:50:21.789183",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      }
+    },
+    {
+      "name": "MISSING_precondition",
+      "request": {
+        "taskGoal": "F013_MISSING_precondition synthetic navigation",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "observed": {
+        "task": {
+          "id": 123,
+          "taskCode": "TASK-20261103-0123",
+          "taskGoal": "F013_MISSING_precondition synthetic navigation",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F013_MISSING_precondition synthetic navigation",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 103,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-03T15:50:24.071395",
+          "updatedAt": "2026-11-03T15:50:24.219903",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 103,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261103-0083",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic navigation 1",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "FAIL",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [
+              {
+                "errorType": "STRUCTURE",
+                "description": "步骤字段不完整，缺少: precondition",
+                "stepSeq": 1,
+                "reasonCode": "ERR_STEP_FIELD_MISSING"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-03T15:50:24.190752"
+          }
+        ],
+        "events": [
+          {
+            "id": 965,
+            "taskId": 123,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-03T15:50:24.076427",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F013_MISSING_precondition synthetic navigation"
+          },
+          {
+            "id": 966,
+            "taskId": 123,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-03T15:50:24.114881",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 967,
+            "taskId": 123,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-03T15:50:24.142021",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261103-0083"
+          },
+          {
+            "id": 968,
+            "taskId": 123,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-03T15:50:24.195748",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 969,
+            "taskId": 123,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-03T15:50:24.202513",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_STEP_FIELD_MISSING",
+            "detailSummary": "候选计划三类校验未通过: 1项错误 [STRUCTURE 步骤1: 步骤字段不完整，缺少: precondition(ERR_STEP_FIELD_MISSING)]"
+          },
+          {
+            "id": 970,
+            "taskId": 123,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-03T15:50:24.206939",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING"
+          },
+          {
+            "id": 971,
+            "taskId": 123,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-03T15:50:24.226463",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      }
+    },
+    {
+      "name": "MISSING_completionCondition",
+      "request": {
+        "taskGoal": "F013_MISSING_completionCondition synthetic navigation",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "observed": {
+        "task": {
+          "id": 124,
+          "taskCode": "TASK-20261103-0124",
+          "taskGoal": "F013_MISSING_completionCondition synthetic navigation",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F013_MISSING_completionCondition synthetic navigation",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 104,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-03T15:50:26.006742",
+          "updatedAt": "2026-11-03T15:50:26.236871",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 104,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261103-0084",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic navigation 1",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "FAIL",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [
+              {
+                "errorType": "STRUCTURE",
+                "description": "步骤字段不完整，缺少: completionCondition",
+                "stepSeq": 1,
+                "reasonCode": "ERR_STEP_FIELD_MISSING"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-03T15:50:26.203447"
+          }
+        ],
+        "events": [
+          {
+            "id": 972,
+            "taskId": 124,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-03T15:50:26.01117",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F013_MISSING_completionCondition synthetic navigation"
+          },
+          {
+            "id": 973,
+            "taskId": 124,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-03T15:50:26.062063",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 974,
+            "taskId": 124,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-03T15:50:26.080414",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261103-0084"
+          },
+          {
+            "id": 975,
+            "taskId": 124,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-03T15:50:26.221291",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 976,
+            "taskId": 124,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-03T15:50:26.228289",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_STEP_FIELD_MISSING",
+            "detailSummary": "候选计划三类校验未通过: 1项错误 [STRUCTURE 步骤1: 步骤字段不完整，缺少: completionCondition(ERR_STEP_FIELD_MISSING)]"
+          },
+          {
+            "id": 977,
+            "taskId": 124,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-03T15:50:26.234563",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING"
+          },
+          {
+            "id": 978,
+            "taskId": 124,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-03T15:50:26.239083",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      }
+    },
+    {
+      "name": "MISSING_failureHandling",
+      "request": {
+        "taskGoal": "F013_MISSING_failureHandling synthetic navigation",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "observed": {
+        "task": {
+          "id": 125,
+          "taskCode": "TASK-20261103-0125",
+          "taskGoal": "F013_MISSING_failureHandling synthetic navigation",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F013_MISSING_failureHandling synthetic navigation",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 105,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-03T15:50:29.121577",
+          "updatedAt": "2026-11-03T15:50:29.274345",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 105,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261103-0085",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic navigation 1",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "FAIL",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [
+              {
+                "errorType": "STRUCTURE",
+                "description": "步骤字段不完整，缺少: failureHandling",
+                "stepSeq": 1,
+                "reasonCode": "ERR_STEP_FIELD_MISSING"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-03T15:50:29.258455"
+          }
+        ],
+        "events": [
+          {
+            "id": 979,
+            "taskId": 125,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-03T15:50:29.125241",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F013_MISSING_failureHandling synthetic navigation"
+          },
+          {
+            "id": 980,
+            "taskId": 125,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-03T15:50:29.176765",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 981,
+            "taskId": 125,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-03T15:50:29.194372",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261103-0085"
+          },
+          {
+            "id": 982,
+            "taskId": 125,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-03T15:50:29.26537",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 983,
+            "taskId": 125,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-03T15:50:29.270257",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_STEP_FIELD_MISSING",
+            "detailSummary": "候选计划三类校验未通过: 1项错误 [STRUCTURE 步骤1: 步骤字段不完整，缺少: failureHandling(ERR_STEP_FIELD_MISSING)]"
+          },
+          {
+            "id": 984,
+            "taskId": 125,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-03T15:50:29.274345",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING"
+          },
+          {
+            "id": 985,
+            "taskId": 125,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-03T15:50:29.274345",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      }
+    },
+    {
+      "name": "SIX",
+      "request": {
+        "taskGoal": "F013_SIX synthetic navigation",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "observed": {
+        "task": {
+          "id": 126,
+          "taskCode": "TASK-20261103-0126",
+          "taskGoal": "F013_SIX synthetic navigation",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F013_SIX synthetic navigation",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": null,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划结构校验失败：步骤数超过5或响应为空；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-03T15:50:31.113627",
+          "updatedAt": "2026-11-03T15:50:31.378974",
+          "createdBy": "oprator"
+        },
+        "plans": [],
+        "events": [
+          {
+            "id": 986,
+            "taskId": 126,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-03T15:50:31.115846",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F013_SIX synthetic navigation"
+          },
+          {
+            "id": 987,
+            "taskId": 126,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-03T15:50:31.255624",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 988,
+            "taskId": 126,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-03T15:50:31.269235",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261103-0086"
+          },
+          {
+            "id": 989,
+            "taskId": 126,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-03T15:50:31.36879",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_STEP_LIMIT_EXCEEDED",
+            "detailSummary": "候选计划可执行步骤数6超过上限5或为空"
+          },
+          {
+            "id": 990,
+            "taskId": 126,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-03T15:50:31.36879",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划结构校验失败：步骤数超过5或响应为空"
+          },
+          {
+            "id": 991,
+            "taskId": 126,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-03T15:50:31.381204",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划结构校验失败：步骤数超过5或响应为空；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      }
+    },
+    {
+      "name": "SELF",
+      "request": {
+        "taskGoal": "F013_SELF synthetic navigation",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "observed": {
+        "task": {
+          "id": 127,
+          "taskCode": "TASK-20261103-0127",
+          "taskGoal": "F013_SELF synthetic navigation",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F013_SELF synthetic navigation",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 106,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_DEPENDENCY_ORDER；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-03T15:50:34.504726",
+          "updatedAt": "2026-11-03T15:50:34.571507",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 106,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261103-0087",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic navigation 1",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "依赖步骤1完成",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "FAIL",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [
+              {
+                "errorType": "STRUCTURE",
+                "description": "步骤1依赖不存在或尚未完成的步骤1",
+                "stepSeq": 1,
+                "reasonCode": "ERR_STEP_DEPENDENCY_ORDER"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-03T15:50:34.55966"
+          }
+        ],
+        "events": [
+          {
+            "id": 992,
+            "taskId": 127,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-03T15:50:34.506436",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F013_SELF synthetic navigation"
+          },
+          {
+            "id": 993,
+            "taskId": 127,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-03T15:50:34.527277",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 994,
+            "taskId": 127,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-03T15:50:34.540331",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261103-0087"
+          },
+          {
+            "id": 995,
+            "taskId": 127,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-03T15:50:34.564267",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 996,
+            "taskId": 127,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-03T15:50:34.566315",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_STEP_DEPENDENCY_ORDER",
+            "detailSummary": "候选计划三类校验未通过: 1项错误 [STRUCTURE 步骤1: 步骤1依赖不存在或尚未完成的步骤1(ERR_STEP_DEPENDENCY_ORDER)]"
+          },
+          {
+            "id": 997,
+            "taskId": 127,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-03T15:50:34.569536",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_STEP_DEPENDENCY_ORDER"
+          },
+          {
+            "id": 998,
+            "taskId": 127,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-03T15:50:34.572857",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_DEPENDENCY_ORDER；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      }
+    },
+    {
+      "name": "FORWARD",
+      "request": {
+        "taskGoal": "F013_FORWARD synthetic navigation",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "observed": {
+        "task": {
+          "id": 128,
+          "taskCode": "TASK-20261103-0128",
+          "taskGoal": "F013_FORWARD synthetic navigation",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F013_FORWARD synthetic navigation",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 107,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_DEPENDENCY_ORDER；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-03T15:50:35.463396",
+          "updatedAt": "2026-11-03T15:50:35.512567",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 107,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261103-0088",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic navigation 1",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "after step 2",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              },
+              {
+                "stepSeq": 2,
+                "stepGoal": "Synthetic navigation 2",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "FAIL",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [
+              {
+                "errorType": "STRUCTURE",
+                "description": "步骤1依赖不存在或尚未完成的步骤2",
+                "stepSeq": 1,
+                "reasonCode": "ERR_STEP_DEPENDENCY_ORDER"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-03T15:50:35.500897"
+          }
+        ],
+        "events": [
+          {
+            "id": 999,
+            "taskId": 128,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-03T15:50:35.465505",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F013_FORWARD synthetic navigation"
+          },
+          {
+            "id": 1000,
+            "taskId": 128,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-03T15:50:35.478128",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1001,
+            "taskId": 128,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-03T15:50:35.484123",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261103-0088"
+          },
+          {
+            "id": 1002,
+            "taskId": 128,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-03T15:50:35.503986",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1003,
+            "taskId": 128,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-03T15:50:35.509667",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_STEP_DEPENDENCY_ORDER",
+            "detailSummary": "候选计划三类校验未通过: 1项错误 [STRUCTURE 步骤1: 步骤1依赖不存在或尚未完成的步骤2(ERR_STEP_DEPENDENCY_ORDER)]"
+          },
+          {
+            "id": 1004,
+            "taskId": 128,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-03T15:50:35.511408",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_STEP_DEPENDENCY_ORDER"
+          },
+          {
+            "id": 1005,
+            "taskId": 128,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-03T15:50:35.513724",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_DEPENDENCY_ORDER；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      }
+    },
+    {
+      "name": "DEPENDENCY_MISSING",
+      "request": {
+        "taskGoal": "F013_DEPENDENCY_MISSING synthetic navigation",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "observed": {
+        "task": {
+          "id": 129,
+          "taskCode": "TASK-20261103-0129",
+          "taskGoal": "F013_DEPENDENCY_MISSING synthetic navigation",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F013_DEPENDENCY_MISSING synthetic navigation",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 108,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_DEPENDENCY_ORDER；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-03T15:50:36.304398",
+          "updatedAt": "2026-11-03T15:50:36.37043",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 108,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261103-0089",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic navigation 1",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "depends on step 99",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "FAIL",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [
+              {
+                "errorType": "STRUCTURE",
+                "description": "步骤1依赖不存在或尚未完成的步骤99",
+                "stepSeq": 1,
+                "reasonCode": "ERR_STEP_DEPENDENCY_ORDER"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-03T15:50:36.360246"
+          }
+        ],
+        "events": [
+          {
+            "id": 1006,
+            "taskId": 129,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-03T15:50:36.305938",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F013_DEPENDENCY_MISSING synthetic navigation"
+          },
+          {
+            "id": 1007,
+            "taskId": 129,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-03T15:50:36.317684",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1008,
+            "taskId": 129,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-03T15:50:36.33989",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261103-0089"
+          },
+          {
+            "id": 1009,
+            "taskId": 129,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-03T15:50:36.363566",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1010,
+            "taskId": 129,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-03T15:50:36.366693",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_STEP_DEPENDENCY_ORDER",
+            "detailSummary": "候选计划三类校验未通过: 1项错误 [STRUCTURE 步骤1: 步骤1依赖不存在或尚未完成的步骤99(ERR_STEP_DEPENDENCY_ORDER)]"
+          },
+          {
+            "id": 1011,
+            "taskId": 129,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-03T15:50:36.368891",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_STEP_DEPENDENCY_ORDER"
+          },
+          {
+            "id": 1012,
+            "taskId": 129,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-03T15:50:36.37149",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_DEPENDENCY_ORDER；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      }
+    },
+    {
+      "name": "LOOP",
+      "request": {
+        "taskGoal": "F013_LOOP synthetic navigation",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "observed": {
+        "task": {
+          "id": 130,
+          "taskCode": "TASK-20261103-0130",
+          "taskGoal": "F013_LOOP synthetic navigation",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F013_LOOP synthetic navigation",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 109,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_LOOP_DETECTED；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-03T15:50:37.117285",
+          "updatedAt": "2026-11-03T15:50:37.171925",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 109,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261103-0090",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic navigation 1",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "while(true) { repeat forever; }",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "FAIL",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [
+              {
+                "errorType": "STRUCTURE",
+                "description": "步骤precondition含不支持的控制流或动态执行内容（while(）",
+                "stepSeq": 1,
+                "reasonCode": "ERR_STEP_LOOP_DETECTED"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-03T15:50:37.160791"
+          }
+        ],
+        "events": [
+          {
+            "id": 1013,
+            "taskId": 130,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-03T15:50:37.119496",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F013_LOOP synthetic navigation"
+          },
+          {
+            "id": 1014,
+            "taskId": 130,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-03T15:50:37.135599",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1015,
+            "taskId": 130,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-03T15:50:37.144656",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261103-0090"
+          },
+          {
+            "id": 1016,
+            "taskId": 130,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-03T15:50:37.163728",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1017,
+            "taskId": 130,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-03T15:50:37.1666",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_STEP_LOOP_DETECTED",
+            "detailSummary": "候选计划三类校验未通过: 1项错误 [STRUCTURE 步骤1: 步骤precondition含不支持的控制流或动态执行内容（while(）(ERR_STEP_LOOP_DETECTED)]"
+          },
+          {
+            "id": 1018,
+            "taskId": 130,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-03T15:50:37.17085",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_STEP_LOOP_DETECTED"
+          },
+          {
+            "id": 1019,
+            "taskId": 130,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-03T15:50:37.171925",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_LOOP_DETECTED；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      }
+    },
+    {
+      "name": "DYNAMIC",
+      "request": {
+        "taskGoal": "F013_DYNAMIC synthetic navigation",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "observed": {
+        "task": {
+          "id": 131,
+          "taskCode": "TASK-20261103-0131",
+          "taskGoal": "F013_DYNAMIC synthetic navigation",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F013_DYNAMIC synthetic navigation",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 110,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_LOOP_DETECTED；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-03T15:50:37.878273",
+          "updatedAt": "2026-11-03T15:50:37.937826",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 110,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261103-0091",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic navigation 1",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "nested": {
+                    "code": "eval(nextAction())"
+                  }
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "FAIL",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "FAIL",
+            "validationErrors": [
+              {
+                "errorType": "STRUCTURE",
+                "description": "步骤inputParams含不支持的控制流或动态执行内容（eval(）",
+                "stepSeq": 1,
+                "reasonCode": "ERR_STEP_LOOP_DETECTED"
+              },
+              {
+                "errorType": "CONSTRAINT",
+                "description": "输入参数与当前能力定义不匹配",
+                "stepSeq": 1,
+                "reasonCode": "ERR_CAPABILITY_PARAMETER_INVALID"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-03T15:50:37.927021"
+          }
+        ],
+        "events": [
+          {
+            "id": 1020,
+            "taskId": 131,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-03T15:50:37.881133",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F013_DYNAMIC synthetic navigation"
+          },
+          {
+            "id": 1021,
+            "taskId": 131,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-03T15:50:37.896866",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1022,
+            "taskId": 131,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-03T15:50:37.905525",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261103-0091"
+          },
+          {
+            "id": 1023,
+            "taskId": 131,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-03T15:50:37.930887",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1024,
+            "taskId": 131,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-03T15:50:37.933995",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_STEP_LOOP_DETECTED",
+            "detailSummary": "候选计划三类校验未通过: 2项错误 [STRUCTURE 步骤1: 步骤inputParams含不支持的控制流或动态执行内容（eval(）(ERR_STEP_LOOP_DETECTED); CONSTRAINT 步骤1: 输入参数与当前能力定义不匹配(ERR_CAPABILITY_PARAMETER_INVALID)]"
+          },
+          {
+            "id": 1025,
+            "taskId": 131,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-03T15:50:37.935713",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_STEP_LOOP_DETECTED"
+          },
+          {
+            "id": 1026,
+            "taskId": 131,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-03T15:50:37.940762",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_LOOP_DETECTED；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      }
+    },
+    {
+      "name": "NEGOTIATION",
+      "request": {
+        "taskGoal": "F013_NEGOTIATION synthetic navigation",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "observed": {
+        "task": {
+          "id": 132,
+          "taskCode": "TASK-20261103-0132",
+          "taskGoal": "F013_NEGOTIATION synthetic navigation",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F013_NEGOTIATION synthetic navigation",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 111,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_LOOP_DETECTED；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-03T15:50:38.624506",
+          "updatedAt": "2026-11-03T15:50:38.67749",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 111,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261103-0092",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic navigation 1",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "unlimited rounds of negotiation",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "FAIL",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [
+              {
+                "errorType": "STRUCTURE",
+                "description": "步骤failureHandling含不支持的控制流或动态执行内容（unlimited rounds）",
+                "stepSeq": 1,
+                "reasonCode": "ERR_STEP_LOOP_DETECTED"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-03T15:50:38.667418"
+          }
+        ],
+        "events": [
+          {
+            "id": 1027,
+            "taskId": 132,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-03T15:50:38.627258",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F013_NEGOTIATION synthetic navigation"
+          },
+          {
+            "id": 1028,
+            "taskId": 132,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-03T15:50:38.639291",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1029,
+            "taskId": 132,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-03T15:50:38.645399",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261103-0092"
+          },
+          {
+            "id": 1030,
+            "taskId": 132,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-03T15:50:38.670153",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1031,
+            "taskId": 132,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-03T15:50:38.672384",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_STEP_LOOP_DETECTED",
+            "detailSummary": "候选计划三类校验未通过: 1项错误 [STRUCTURE 步骤1: 步骤failureHandling含不支持的控制流或动态执行内容（unlimited rounds）(ERR_STEP_LOOP_DETECTED)]"
+          },
+          {
+            "id": 1032,
+            "taskId": 132,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-03T15:50:38.67622",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_STEP_LOOP_DETECTED"
+          },
+          {
+            "id": 1033,
+            "taskId": 132,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-03T15:50:38.678546",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_LOOP_DETECTED；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      }
+    },
+    {
+      "name": "FAKE_CAP",
+      "request": {
+        "taskGoal": "F013_FAKE_CAP synthetic navigation",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "observed": {
+        "task": {
+          "id": 133,
+          "taskCode": "TASK-20261103-0133",
+          "taskGoal": "F013_FAKE_CAP synthetic navigation",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F013_FAKE_CAP synthetic navigation",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 112,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_CAPABILITY_GAP；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-03T15:50:39.314748",
+          "updatedAt": "2026-11-03T15:50:39.360696",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 112,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261103-0093",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic navigation 1",
+                "capabilityType": "CAP_F013_FICTIONAL",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "FAIL",
+            "constraintCheckResult": "FAIL",
+            "validationErrors": [
+              {
+                "errorType": "CAPABILITY",
+                "description": "能力类型CAP_F013_FICTIONAL不存在已启用实例",
+                "stepSeq": 1,
+                "reasonCode": "ERR_CAPABILITY_GAP"
+              },
+              {
+                "errorType": "CONSTRAINT",
+                "description": "步骤所需能力CAP_F013_FICTIONAL超出任务定义声明的可用能力类型范围: [CAP_NAVIGATION]",
+                "stepSeq": 1,
+                "reasonCode": "ERR_CAPABILITY_NOT_IN_TASK_DEFINITION"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-03T15:50:39.352504"
+          }
+        ],
+        "events": [
+          {
+            "id": 1034,
+            "taskId": 133,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-03T15:50:39.316806",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F013_FAKE_CAP synthetic navigation"
+          },
+          {
+            "id": 1035,
+            "taskId": 133,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-03T15:50:39.329632",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1036,
+            "taskId": 133,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-03T15:50:39.337968",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261103-0093"
+          },
+          {
+            "id": 1037,
+            "taskId": 133,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-03T15:50:39.355835",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1038,
+            "taskId": 133,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-03T15:50:39.358505",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_CAPABILITY_GAP",
+            "detailSummary": "候选计划三类校验未通过: 2项错误 [CAPABILITY 步骤1: 能力类型CAP_F013_FICTIONAL不存在已启用实例(ERR_CAPABILITY_GAP); CONSTRAINT 步骤1: 步骤所需能力CAP_F013_FICTIONAL超出任务定义声明的可用能力类型范围: [CAP_NAVIGATION](ERR_CAPABILITY_NOT_IN_TASK_DEFINITION)]"
+          },
+          {
+            "id": 1039,
+            "taskId": 133,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-03T15:50:39.359583",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_CAPABILITY_GAP"
+          },
+          {
+            "id": 1040,
+            "taskId": 133,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-03T15:50:39.361723",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_CAPABILITY_GAP；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      }
+    },
+    {
+      "name": "DISABLED_CAP",
+      "request": {
+        "taskGoal": "F013_DISABLED_CAP synthetic navigation",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "observed": {
+        "task": {
+          "id": 134,
+          "taskCode": "TASK-20261103-0134",
+          "taskGoal": "F013_DISABLED_CAP synthetic navigation",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F013_DISABLED_CAP synthetic navigation",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 113,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_CAPABILITY_GAP；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-03T15:50:40.035546",
+          "updatedAt": "2026-11-03T15:50:40.084041",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 113,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261103-0094",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic navigation 1",
+                "capabilityType": "CAP_BAGGAGE_MEASURE",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "FAIL",
+            "constraintCheckResult": "FAIL",
+            "validationErrors": [
+              {
+                "errorType": "CAPABILITY",
+                "description": "能力类型CAP_BAGGAGE_MEASURE不存在已启用实例",
+                "stepSeq": 1,
+                "reasonCode": "ERR_CAPABILITY_GAP"
+              },
+              {
+                "errorType": "CONSTRAINT",
+                "description": "步骤所需能力CAP_BAGGAGE_MEASURE超出任务定义声明的可用能力类型范围: [CAP_NAVIGATION]",
+                "stepSeq": 1,
+                "reasonCode": "ERR_CAPABILITY_NOT_IN_TASK_DEFINITION"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-03T15:50:40.071962"
+          }
+        ],
+        "events": [
+          {
+            "id": 1041,
+            "taskId": 134,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-03T15:50:40.037202",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F013_DISABLED_CAP synthetic navigation"
+          },
+          {
+            "id": 1042,
+            "taskId": 134,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-03T15:50:40.050812",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1043,
+            "taskId": 134,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-03T15:50:40.058574",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261103-0094"
+          },
+          {
+            "id": 1044,
+            "taskId": 134,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-03T15:50:40.076976",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1045,
+            "taskId": 134,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-03T15:50:40.080736",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_CAPABILITY_GAP",
+            "detailSummary": "候选计划三类校验未通过: 2项错误 [CAPABILITY 步骤1: 能力类型CAP_BAGGAGE_MEASURE不存在已启用实例(ERR_CAPABILITY_GAP); CONSTRAINT 步骤1: 步骤所需能力CAP_BAGGAGE_MEASURE超出任务定义声明的可用能力类型范围: [CAP_NAVIGATION](ERR_CAPABILITY_NOT_IN_TASK_DEFINITION)]"
+          },
+          {
+            "id": 1046,
+            "taskId": 134,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-03T15:50:40.082913",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_CAPABILITY_GAP"
+          },
+          {
+            "id": 1047,
+            "taskId": 134,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-03T15:50:40.085135",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_CAPABILITY_GAP；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      }
+    },
+    {
+      "name": "NO_CANDIDATE",
+      "request": {
+        "taskGoal": "F013_NO_CANDIDATE synthetic navigation",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "observed": {
+        "task": {
+          "id": 135,
+          "taskCode": "TASK-20261103-0135",
+          "taskGoal": "F013_NO_CANDIDATE synthetic navigation",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F013_NO_CANDIDATE synthetic navigation",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 114,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_NO_ONLINE_CANDIDATE；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-03T15:50:41.058095",
+          "updatedAt": "2026-11-03T15:50:41.206995",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 114,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261103-0095",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic navigation 1",
+                "capabilityType": "CAP_INFO_DISPLAY",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "FAIL",
+            "constraintCheckResult": "FAIL",
+            "validationErrors": [
+              {
+                "errorType": "CAPABILITY",
+                "description": "能力类型CAP_INFO_DISPLAY无在线候选代理",
+                "stepSeq": 1,
+                "reasonCode": "ERR_NO_ONLINE_CANDIDATE"
+              },
+              {
+                "errorType": "CONSTRAINT",
+                "description": "步骤所需能力CAP_INFO_DISPLAY超出任务定义声明的可用能力类型范围: [CAP_NAVIGATION]",
+                "stepSeq": 1,
+                "reasonCode": "ERR_CAPABILITY_NOT_IN_TASK_DEFINITION"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-03T15:50:41.191869"
+          }
+        ],
+        "events": [
+          {
+            "id": 1048,
+            "taskId": 135,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-03T15:50:41.06316",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F013_NO_CANDIDATE synthetic navigation"
+          },
+          {
+            "id": 1049,
+            "taskId": 135,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-03T15:50:41.09845",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1050,
+            "taskId": 135,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-03T15:50:41.114398",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261103-0095"
+          },
+          {
+            "id": 1051,
+            "taskId": 135,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-03T15:50:41.19708",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1052,
+            "taskId": 135,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-03T15:50:41.201301",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_ONLINE_CANDIDATE",
+            "detailSummary": "候选计划三类校验未通过: 2项错误 [CAPABILITY 步骤1: 能力类型CAP_INFO_DISPLAY无在线候选代理(ERR_NO_ONLINE_CANDIDATE); CONSTRAINT 步骤1: 步骤所需能力CAP_INFO_DISPLAY超出任务定义声明的可用能力类型范围: [CAP_NAVIGATION](ERR_CAPABILITY_NOT_IN_TASK_DEFINITION)]"
+          },
+          {
+            "id": 1053,
+            "taskId": 135,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-03T15:50:41.205272",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_NO_ONLINE_CANDIDATE"
+          },
+          {
+            "id": 1054,
+            "taskId": 135,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-03T15:50:41.208989",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_NO_ONLINE_CANDIDATE；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      }
+    },
+    {
+      "name": "OUTSIDE_TASK",
+      "request": {
+        "taskGoal": "F013_OUTSIDE_TASK synthetic navigation",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "observed": {
+        "task": {
+          "id": 136,
+          "taskCode": "TASK-20261103-0136",
+          "taskGoal": "F013_OUTSIDE_TASK synthetic navigation",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F013_OUTSIDE_TASK synthetic navigation",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 115,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_CAPABILITY_NOT_IN_TASK_DEFINITION；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-03T15:50:44.133899",
+          "updatedAt": "2026-11-03T15:50:44.492098",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 115,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261103-0096",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic navigation 1",
+                "capabilityType": "CAP_ESCORT",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "FAIL",
+            "validationErrors": [
+              {
+                "errorType": "CONSTRAINT",
+                "description": "步骤所需能力CAP_ESCORT超出任务定义声明的可用能力类型范围: [CAP_NAVIGATION]",
+                "stepSeq": 1,
+                "reasonCode": "ERR_CAPABILITY_NOT_IN_TASK_DEFINITION"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-03T15:50:44.476608"
+          }
+        ],
+        "events": [
+          {
+            "id": 1055,
+            "taskId": 136,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-03T15:50:44.137414",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F013_OUTSIDE_TASK synthetic navigation"
+          },
+          {
+            "id": 1056,
+            "taskId": 136,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-03T15:50:44.188714",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1057,
+            "taskId": 136,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-03T15:50:44.205311",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261103-0096"
+          },
+          {
+            "id": 1058,
+            "taskId": 136,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-03T15:50:44.485448",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1059,
+            "taskId": 136,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-03T15:50:44.488439",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_CAPABILITY_NOT_IN_TASK_DEFINITION",
+            "detailSummary": "候选计划三类校验未通过: 1项错误 [CONSTRAINT 步骤1: 步骤所需能力CAP_ESCORT超出任务定义声明的可用能力类型范围: [CAP_NAVIGATION](ERR_CAPABILITY_NOT_IN_TASK_DEFINITION)]"
+          },
+          {
+            "id": 1060,
+            "taskId": 136,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-03T15:50:44.491193",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_CAPABILITY_NOT_IN_TASK_DEFINITION"
+          },
+          {
+            "id": 1061,
+            "taskId": 136,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-03T15:50:44.495291",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_CAPABILITY_NOT_IN_TASK_DEFINITION；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      }
+    },
+    {
+      "name": "MOTION",
+      "request": {
+        "taskGoal": "F013_MOTION synthetic navigation",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "observed": {
+        "task": {
+          "id": 137,
+          "taskCode": "TASK-20261103-0137",
+          "taskGoal": "F013_MOTION synthetic navigation",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F013_MOTION synthetic navigation",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 116,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_MOTION_SAFETY_FIELD；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-03T15:50:46.677745",
+          "updatedAt": "2026-11-03T15:50:46.747096",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 116,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261103-0097",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic navigation 1",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "speed": 2
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "FAIL",
+            "validationErrors": [
+              {
+                "errorType": "CONSTRAINT",
+                "description": "步骤包含运动安全控制字段: [speed]",
+                "stepSeq": 1,
+                "reasonCode": "ERR_MOTION_SAFETY_FIELD"
+              },
+              {
+                "errorType": "CONSTRAINT",
+                "description": "输入参数与当前能力定义不匹配",
+                "stepSeq": 1,
+                "reasonCode": "ERR_CAPABILITY_PARAMETER_INVALID"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-03T15:50:46.732562"
+          }
+        ],
+        "events": [
+          {
+            "id": 1062,
+            "taskId": 137,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-03T15:50:46.677745",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F013_MOTION synthetic navigation"
+          },
+          {
+            "id": 1063,
+            "taskId": 137,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-03T15:50:46.698603",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1064,
+            "taskId": 137,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-03T15:50:46.707973",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261103-0097"
+          },
+          {
+            "id": 1065,
+            "taskId": 137,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-03T15:50:46.73883",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1066,
+            "taskId": 137,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-03T15:50:46.743728",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_MOTION_SAFETY_FIELD",
+            "detailSummary": "候选计划三类校验未通过: 2项错误 [CONSTRAINT 步骤1: 步骤包含运动安全控制字段: [speed](ERR_MOTION_SAFETY_FIELD); CONSTRAINT 步骤1: 输入参数与当前能力定义不匹配(ERR_CAPABILITY_PARAMETER_INVALID)]"
+          },
+          {
+            "id": 1067,
+            "taskId": 137,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-03T15:50:46.744815",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_MOTION_SAFETY_FIELD"
+          },
+          {
+            "id": 1068,
+            "taskId": 137,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-03T15:50:46.74767",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_MOTION_SAFETY_FIELD；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      }
+    },
+    {
+      "name": "BAD_PARAM",
+      "request": {
+        "taskGoal": "F013_BAD_PARAM synthetic navigation",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "observed": {
+        "task": {
+          "id": 138,
+          "taskCode": "TASK-20261103-0138",
+          "taskGoal": "F013_BAD_PARAM synthetic navigation",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F013_BAD_PARAM synthetic navigation",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 117,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_CAPABILITY_PARAMETER_INVALID；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-03T15:50:47.469792",
+          "updatedAt": "2026-11-03T15:50:47.526689",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 117,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261103-0098",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic navigation 1",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "INVALID_ROUTE_F013"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "FAIL",
+            "validationErrors": [
+              {
+                "errorType": "CONSTRAINT",
+                "description": "输入参数与当前能力定义不匹配",
+                "stepSeq": 1,
+                "reasonCode": "ERR_CAPABILITY_PARAMETER_INVALID"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-03T15:50:47.509896"
+          }
+        ],
+        "events": [
+          {
+            "id": 1069,
+            "taskId": 138,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-03T15:50:47.471944",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F013_BAD_PARAM synthetic navigation"
+          },
+          {
+            "id": 1070,
+            "taskId": 138,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-03T15:50:47.482478",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1071,
+            "taskId": 138,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-03T15:50:47.493521",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261103-0098"
+          },
+          {
+            "id": 1072,
+            "taskId": 138,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-03T15:50:47.51709",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1073,
+            "taskId": 138,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-03T15:50:47.52096",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_CAPABILITY_PARAMETER_INVALID",
+            "detailSummary": "候选计划三类校验未通过: 1项错误 [CONSTRAINT 步骤1: 输入参数与当前能力定义不匹配(ERR_CAPABILITY_PARAMETER_INVALID)]"
+          },
+          {
+            "id": 1074,
+            "taskId": 138,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-03T15:50:47.524926",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_CAPABILITY_PARAMETER_INVALID"
+          },
+          {
+            "id": 1075,
+            "taskId": 138,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-03T15:50:47.528626",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_CAPABILITY_PARAMETER_INVALID；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      }
+    },
+    {
+      "name": "MULTI",
+      "request": {
+        "taskGoal": "F013_MULTI synthetic navigation",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "observed": {
+        "task": {
+          "id": 139,
+          "taskCode": "TASK-20261103-0139",
+          "taskGoal": "F013_MULTI synthetic navigation",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F013_MULTI synthetic navigation",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 118,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-03T15:50:48.346401",
+          "updatedAt": "2026-11-03T15:50:48.390033",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 118,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261103-0099",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic navigation 1",
+                "capabilityType": "CAP_F013_FICTIONAL",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "speed": 2
+                },
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "FAIL",
+            "capabilityCheckResult": "FAIL",
+            "constraintCheckResult": "FAIL",
+            "validationErrors": [
+              {
+                "errorType": "STRUCTURE",
+                "description": "步骤字段不完整，缺少: precondition",
+                "stepSeq": 1,
+                "reasonCode": "ERR_STEP_FIELD_MISSING"
+              },
+              {
+                "errorType": "CAPABILITY",
+                "description": "能力类型CAP_F013_FICTIONAL不存在已启用实例",
+                "stepSeq": 1,
+                "reasonCode": "ERR_CAPABILITY_GAP"
+              },
+              {
+                "errorType": "CONSTRAINT",
+                "description": "步骤包含运动安全控制字段: [speed]",
+                "stepSeq": 1,
+                "reasonCode": "ERR_MOTION_SAFETY_FIELD"
+              },
+              {
+                "errorType": "CONSTRAINT",
+                "description": "步骤所需能力CAP_F013_FICTIONAL超出任务定义声明的可用能力类型范围: [CAP_NAVIGATION]",
+                "stepSeq": 1,
+                "reasonCode": "ERR_CAPABILITY_NOT_IN_TASK_DEFINITION"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-03T15:50:48.378802"
+          }
+        ],
+        "events": [
+          {
+            "id": 1076,
+            "taskId": 139,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-03T15:50:48.348141",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F013_MULTI synthetic navigation"
+          },
+          {
+            "id": 1077,
+            "taskId": 139,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-03T15:50:48.359359",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1078,
+            "taskId": 139,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-03T15:50:48.367203",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261103-0099"
+          },
+          {
+            "id": 1079,
+            "taskId": 139,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-03T15:50:48.383236",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1080,
+            "taskId": 139,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-03T15:50:48.385407",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_STEP_FIELD_MISSING",
+            "detailSummary": "候选计划三类校验未通过: 4项错误 [STRUCTURE 步骤1: 步骤字段不完整，缺少: precondition(ERR_STEP_FIELD_MISSING); CAPABILITY 步骤1: 能力类型CAP_F013_FICTIONAL不存在已启用实例(ERR_CAPABILITY_GAP); CONSTRAINT 步骤1: 步骤包含运动安全控制字段: [speed](ERR_MOTION_SAFETY_FIELD); CONSTRAINT 步骤1: 步骤所需能力CAP_F013_FICTIONAL超出任务定义声明的可用能力类型范围: [CAP_NAVIGATION](ERR_CAPABILITY_NOT_IN_TASK_DEFINITION)]"
+          },
+          {
+            "id": 1081,
+            "taskId": 139,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-03T15:50:48.38834",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING"
+          },
+          {
+            "id": 1082,
+            "taskId": 139,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-03T15:50:48.392506",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      }
+    }
+  ]
+}

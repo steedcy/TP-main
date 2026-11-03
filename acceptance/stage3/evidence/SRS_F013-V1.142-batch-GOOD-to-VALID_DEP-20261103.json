@@ -1,0 +1,527 @@
+{
+  "version": "V1.142",
+  "codeSha": "28bfb28eef45af0c058bf675e62d2d45b6424102",
+  "observedAt": "2026-11-03T15:52:58.200380+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "cases": [
+    {
+      "name": "GOOD",
+      "request": {
+        "taskGoal": "F013_GOOD synthetic navigation",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "observed": {
+        "task": {
+          "id": 140,
+          "taskCode": "TASK-20261103-0140",
+          "taskGoal": "F013_GOOD synthetic navigation",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F013_GOOD synthetic navigation",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 119,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-03T15:52:58.223931",
+          "updatedAt": "2026-11-03T15:52:58.309576",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 119,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261103-0100",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic navigation 1",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "HIGH",
+            "riskReasonCode": "RULE_RESOURCE_CRITICAL",
+            "judgmentBasis": "可用备用候选设备数量(0)低于配置阈值(1)，命中确定性高风险规则",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.2",
+            "frozenAt": "2026-11-03T15:52:58.27737",
+            "createdAt": "2026-11-03T15:52:58.26996"
+          }
+        ],
+        "events": [
+          {
+            "id": 1084,
+            "taskId": 140,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-03T15:52:58.226035",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F013_GOOD synthetic navigation"
+          },
+          {
+            "id": 1085,
+            "taskId": 140,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-03T15:52:58.237951",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1086,
+            "taskId": 140,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-03T15:52:58.257938",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261103-0100"
+          },
+          {
+            "id": 1087,
+            "taskId": 140,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-03T15:52:58.275775",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1088,
+            "taskId": 140,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-03T15:52:58.278492",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 1089,
+            "taskId": 140,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-03T15:52:58.297947",
+            "trigger": "SYSTEM",
+            "reasonCode": "RULE_RESOURCE_CRITICAL",
+            "detailSummary": "监督判定: HIGH，可用备用候选设备数量(0)低于配置阈值(1)，命中确定性高风险规则"
+          },
+          {
+            "id": 1090,
+            "taskId": 140,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-03T15:52:58.308442",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 监督判定高风险: RULE_RESOURCE_CRITICAL"
+          },
+          {
+            "id": 1091,
+            "taskId": 140,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-03T15:52:58.311316",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      }
+    },
+    {
+      "name": "FIVE",
+      "request": {
+        "taskGoal": "F013_FIVE synthetic navigation",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "observed": {
+        "task": {
+          "id": 141,
+          "taskCode": "TASK-20261103-0141",
+          "taskGoal": "F013_FIVE synthetic navigation",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F013_FIVE synthetic navigation",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 120,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-03T15:52:58.85741",
+          "updatedAt": "2026-11-03T15:52:58.936998",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 120,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261103-0101",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic navigation 1",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              },
+              {
+                "stepSeq": 2,
+                "stepGoal": "Synthetic navigation 2",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              },
+              {
+                "stepSeq": 3,
+                "stepGoal": "Synthetic navigation 3",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              },
+              {
+                "stepSeq": 4,
+                "stepGoal": "Synthetic navigation 4",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              },
+              {
+                "stepSeq": 5,
+                "stepGoal": "Synthetic navigation 5",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "HIGH",
+            "riskReasonCode": "RULE_RESOURCE_CRITICAL",
+            "judgmentBasis": "可用备用候选设备数量(0)低于配置阈值(1)，命中确定性高风险规则",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.2",
+            "frozenAt": "2026-11-03T15:52:58.914283",
+            "createdAt": "2026-11-03T15:52:58.907169"
+          }
+        ],
+        "events": [
+          {
+            "id": 1092,
+            "taskId": 141,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-03T15:52:58.86011",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F013_FIVE synthetic navigation"
+          },
+          {
+            "id": 1093,
+            "taskId": 141,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-03T15:52:58.873162",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1094,
+            "taskId": 141,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-03T15:52:58.892003",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261103-0101"
+          },
+          {
+            "id": 1095,
+            "taskId": 141,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-03T15:52:58.910975",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1096,
+            "taskId": 141,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-03T15:52:58.915346",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 1097,
+            "taskId": 141,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-03T15:52:58.92674",
+            "trigger": "SYSTEM",
+            "reasonCode": "RULE_RESOURCE_CRITICAL",
+            "detailSummary": "监督判定: HIGH，可用备用候选设备数量(0)低于配置阈值(1)，命中确定性高风险规则"
+          },
+          {
+            "id": 1098,
+            "taskId": 141,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-03T15:52:58.93456",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 监督判定高风险: RULE_RESOURCE_CRITICAL"
+          },
+          {
+            "id": 1099,
+            "taskId": 141,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-03T15:52:58.936998",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      }
+    },
+    {
+      "name": "VALID_DEP",
+      "request": {
+        "taskGoal": "F013_VALID_DEP synthetic navigation",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "observed": {
+        "task": {
+          "id": 142,
+          "taskCode": "TASK-20261103-0142",
+          "taskGoal": "F013_VALID_DEP synthetic navigation",
+          "taskFamily": "EXT_2AD8B934",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F013_VALID_DEP synthetic navigation",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 121,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-03T15:52:59.442733",
+          "updatedAt": "2026-11-03T15:52:59.487509",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 121,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261103-0102",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic navigation 1",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              },
+              {
+                "stepSeq": 2,
+                "stepGoal": "Synthetic navigation 2",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "步骤1完成后执行",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "HIGH",
+            "riskReasonCode": "RULE_RESOURCE_CRITICAL",
+            "judgmentBasis": "可用备用候选设备数量(0)低于配置阈值(1)，命中确定性高风险规则",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.2",
+            "frozenAt": "2026-11-03T15:52:59.476085",
+            "createdAt": "2026-11-03T15:52:59.470703"
+          }
+        ],
+        "events": [
+          {
+            "id": 1100,
+            "taskId": 142,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-03T15:52:59.444455",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F013_VALID_DEP synthetic navigation"
+          },
+          {
+            "id": 1101,
+            "taskId": 142,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-03T15:52:59.451659",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1102,
+            "taskId": 142,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-03T15:52:59.459526",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261103-0102"
+          },
+          {
+            "id": 1103,
+            "taskId": 142,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-03T15:52:59.474988",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1104,
+            "taskId": 142,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-03T15:52:59.477292",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 1105,
+            "taskId": 142,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-03T15:52:59.482444",
+            "trigger": "SYSTEM",
+            "reasonCode": "RULE_RESOURCE_CRITICAL",
+            "detailSummary": "监督判定: HIGH，可用备用候选设备数量(0)低于配置阈值(1)，命中确定性高风险规则"
+          },
+          {
+            "id": 1106,
+            "taskId": 142,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-03T15:52:59.485835",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 监督判定高风险: RULE_RESOURCE_CRITICAL"
+          },
+          {
+            "id": 1107,
+            "taskId": 142,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-03T15:52:59.488629",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      }
+    }
+  ]
+}
