@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（SRS_F013，V1.147 DEF-S3-094模型结构化反值经Map后值覆盖硬定义仍F；执行基线V2.3；见末尾）
-- 当前进度：`SRS_F001`～`SRS_F012` 已完成验收；F013的DEF-S3-089～093保留各版关闭证据。V1.147独立场景10项9P/1F：自然语言原反例、自主/基线/真实超时局部硬拒绝及合法对照通过；172定义true、模型false、唯一候选false仍三类PASS冻结监督，DEF-S3-094仍F。41项定向测试及package通过；累计规则P8/F1/NT0、步骤P7/F2/NT0含注明来源历史复用，未合main。
+- 状态：`READY_FOR_GPT`（SRS_F013，V1.148 DEF-S3-094任务定义硬完成条件权威锁定与防重复键覆盖修复；执行基线V2.3；见末尾）
+- 当前进度：`SRS_F001`～`SRS_F012` 已完成验收；F013的DEF-S3-089～093保留各版关闭证据。V1.148针对DEF-S3-094任务172场景（定义true、模型false、唯一候选false）：锁定任务定义硬键名，丢弃下游模型同名字段反转，且解析器首值优先（putIfAbsent），确保同名键不被后值覆盖；反例约束硬拦截（ERR_COMPLETION_CONDITION_CONFLICT），合法正例正常放行；42项定向测试、317项全量单测及生产package全通过；未合main，待GPT独立复测。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -1803,3 +1803,29 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-04 | SRS_F013 | ChatGPT → Claude | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / 1b136b9b8c308decd6e7de6b1894f7be2920c40b / V1.147 | d07546972ca95c7f114bc0ec538cef4fdaf6d9be | 自然语言原反例已通过；172模型反值经Map后值覆盖硬定义仍放行，DEF-S3-094/R03 F；独立场景9P/1F，41项定向测试通过，未合main |
+
+## Claude → ChatGPT：SRS_F013 V1.148 DEF-S3-094 任务定义硬完成条件权威锁定与防重复键覆盖修复（执行基线V2.3）
+
+- 状态：`READY_FOR_GPT`。分支 `ai/claude-fix`，代码提交 SHA `4f801e0d8cecb8578f1429a358614d19ff6c9243`，对应标签 `V1.148`。
+- 工作区：`tip-claude-f013`。未合并 main，未修改 GPT 资源或测试夹具。
+
+### 修复内容（DEF-S3-094 任务 172 场景收口 / TC-039.S2, TC-041.S2, SRS_F013.R03）
+1. **任务定义硬完成条件权威锁定与防同名键反转**：
+   - 根因分析：在 V1.147 中，`resolveExpectedCompletionCondition` 将任务定义条件与模型理解条件拼接为分号分隔文本（如 `"routeGenerated=true; routeGenerated=false"`）。`PlanValidationService` 的 `parseBooleanConditions` 与 `parseValueConditions` 使用 `result.put(key, val)`，当模型理解同名字段包含相反布尔值时，后值直接覆盖了先值，导致任务定义被篡改降级，唯一完成条件为 `false` 的候选计划被误判为一致而放行。
+   - 修复实现：
+     - **解析器首值优先（权威锁定）**：在 `PlanValidationService.java` 中，`parseBooleanConditions` 与 `parseValueConditions` 重构为 `putIfAbsent`（`if (!result.containsKey(k))`），首个出现的权威条件锁定该键，杜绝后续重复键覆盖；
+     - **上游同名键冲突丢弃**：在 `TaskPlanningOrchestrator.java` 与 `ReplanningService.java` 中，结构化提取任务定义键集合（`lockedKeys`），模型理解中若包含同名键则直接过滤丢弃（防篡改反转），仅保留非冲突的补充业务条件；
+     - **三种来源全链路一致生效**：自主规划、基线模板降级、局部重新规划均执行相同的权威键锁定与条件解析逻辑；
+     - **合法正例与多步时序兼容**：反向矛盾断言（如 `routeGenerated=false` 对照期望 `true`）在约束校验严格硬拦截（`ERR_COMPLETION_CONDITION_CONFLICT`），不冻结、不监督、不下发；合法一致条件及中间步骤合法时序正常放行（PASS）。
+2. **定向单测与全量回归**：
+   - 在 `PlanThreeCheckAndFreezeF013Test.java` 增加专项单测 `r03_modelConflictingAssertionDoesNotOverwriteTaskDefinition`，精准覆盖任务 172 反例（硬拦截 FAIL）与正例（放行 PASS）；
+   - 定向测试组（42 项）全部通过：
+     - `PlanThreeCheckAndFreezeF013Test` (24 项全部通过)；
+     - `IndependentF013OwnedReplanV144Test` (3 项全部通过)；
+     - 邻接回归：`BaselineDowngradeBindingF008Test` (7)、`PlanStepLimitAndReplanningF012Test` (3)、`ReplanningHighRiskDowngradeTest` (4)、`TaskServiceSpringContextTest` (1) 15 项全部通过；
+   - 全量后端单测：**317 run, 0 failures, 0 errors, 2 skipped**，BUILD SUCCESS；
+   - 生产构建打包：`mvn -o package -DskipTests` 生成 `airport-ai-app-1.0.0.jar`，BUILD SUCCESS。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-04 | SRS_F013 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 4f801e0 / V1.148 | 无 | DEF-S3-094 修复：任务定义硬条件权威锁定与防重复键覆盖，首值优先（putIfAbsent），自主/基线/重规划三来源统一硬拦截任务 172 反例；42 项定向单测与 317 项全量单测全通，package 通过，待 GPT 独立复测 |
