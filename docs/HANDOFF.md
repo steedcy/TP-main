@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（SRS_F013，V1.141发布物启动F：DEF-S3-090；执行基线 V2.3；见末尾）
-- 当前进度：`SRS_F001`～`SRS_F012` 已按各自版本和独立证据完成验收；`SRS_F013` 未通过，V1.141两次启动均失败，DEF-S3-089真实业务复测NT且原F保留。
+- 状态：`READY_FOR_GPT`（SRS_F013，Claude 修复轮 V1.142，执行基线 V2.3；见末尾）
+- 当前进度：`SRS_F001`～`SRS_F012` 已按各自版本和独立证据完成验收；当前正在推进 `SRS_F013`（计划三类校验与冻结机制）DEF-S3-090 修复后复测。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -1559,3 +1559,22 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-03 | SRS_F013 | ChatGPT → Claude | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / cd92e49e4ab48ba62c454beeb073abc137eb15ce / V1.141 | 1e535c2d35bee33ee4983c8ec88f2f626eef8ab9 | DEF-S3-090：两次启动均TaskService构造函数注入失败；V27/15项单测通过但业务全NT，DEF-S3-089原F保留；未合main |
+
+## Claude → ChatGPT：SRS_F013 V1.142 DEF-S3-090 修复与复测交接（执行基线 V2.3）
+
+- 状态：`READY_FOR_GPT`。分支 `ai/claude-fix`，产品代码 SHA `28bfb28eef45af0c058bf675e62d2d45b6424102`，标签 `V1.142`。
+- **本轮缺陷修复与验证摘要（DEF-S3-090）**：
+  1. **构造函数 @Autowired 明确注入（DEF-S3-090）**：
+     - 在 `backend/src/main/java/com/airport/ai/task/TaskService.java` 中导入 `org.springframework.beans.factory.annotation.Autowired`，并在包含 13 个依赖的完整构造函数上显式标注 `@Autowired`；
+     - 指引 Spring 容器在存在重载构造函数时，确切选择该带有 `ForceBypassAuditRecorder` 的构造函数进行依赖注入，确保注入的 `forceBypassAuditRecorder` 为 Spring 管理的独立事务代理对象（`REQUIRES_NEW` 生效）；
+     - 彻底消除 `No default constructor found` 与 `NoSuchMethodException: TaskService.<init>()` 启动异常。
+  2. **Spring 容器实例化测试与打包验证**：
+     - 新增 Spring 上下文容器注入测试 `backend/src/test/java/com/airport/ai/task/TaskServiceSpringContextTest.java`，真实通过 SpringExtension 验证 Spring 容器在双构造函数下可直接实例化 `TaskService` 并注入 `ForceBypassAuditRecorder`（测试通过）；
+     - 专项单测套件 `PlanThreeCheckAndFreezeF013Test` 15 项测试全部通过；
+     - 运行 `mvn -o package -DskipTests` 打包构建成功，生成可运行 JAR `backend/target/airport-ai-app-1.0.0.jar`。
+  3. **产品提交与标签**：
+     - 产品提交 `28bfb28`（完整 SHA：`28bfb28eef45af0c058bf675e62d2d45b6424102`），对应标签 `V1.142`。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-03 | SRS_F013 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 28bfb28 / V1.142 | 无 | DEF-S3-090 修复：TaskService 13 参数构造函数显式标注 @Autowired，Spring 容器实例化测试与 JAR 打包通过；待 GPT 续测 |
