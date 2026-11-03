@@ -2,8 +2,8 @@
 
 > **当前基准**：V2.3（2026-10-30 用户追加加速授权）  
 > **主干验收合入提交**：`main` / `d8e29a8bd5bbcee450ec92ccce9798472a1e38df`（F013代码与独立证据已推送；后续台账随本交接同步）  
-> **最新产品代码提交**：`2a5090d`（完整 SHA：`2a5090d27e39ca85b511bd5ff8b013c4dbfd9474`，标签：`V1.149`）  
-> **交接状态**：`REQUIREMENT_PASSED`（SRS_F013：规则9P/0F/0NT、步骤9P/0F/0NT；当前15计划场景、2次强放行拦截、43项定向测试通过；下一项F014待Claude）
+> **最新产品代码提交**：`69b841f`（完整 SHA：`69b841fbc10afd1c4c1f944cc0cd5a647bed66f7`，标签：`V1.150`）  
+> **交接状态**：`READY_FOR_GPT`（SRS_F014：Claude 修复轮完成；333 项单测全通，package 通过；待 GPT 独立复测）
 > **文档定位**：本文件为跨会话、跨需求修复推进的**唯一全景进度与依据底账**。每轮需求修复与复测验收后必须同步更新本文件。
 
 ---
@@ -39,7 +39,7 @@
 | 暂存来源 | 涉及文件 | 覆盖缺陷 / 规则 | 对应目标需求 | 移植策略与注意事项 | 状态 |
 |---|---|---|:---:|---|:---:|
 | **commit `4ec6695`** | `CreateTaskDefinitionRequest.java`<br/>`UpdateTaskDefinitionRequest.java` | **DEF-S3-030** (`F022.R03`) | **SRS_F022** | 约束描述 `@NotBlank` (<=500) 校验 | 待移植 |
-| **commit `4ec6695`** | `RiskRuleController.java`<br/>`RiskRuleValidationTest.java` | **DEF-S3-041** | **SRS_F014/F022** | 风险规则 code/content 必填与长度校验 | 待移植 |
+| **commit `4ec6695`** | `RiskRuleController.java`<br/>`RiskRuleValidationTest.java` | **DEF-S3-041** | **SRS_F014/F022** | 风险规则 code/content 必填与长度校验 | **已移植 (V1.150)** |
 | **commit `4ec6695`** | `GlobalExceptionHandler.java`<br/>`GlobalExceptionHandlerStatusTest.java` | **DEF-S3-058/061** | **SRS_F021/F027** | 不支持请求方法返回 405 + Allow，未知路径 404 | 待移植 |
 | **commit `4ec6695`** | `TaskService.java` (`terminateTask`) | **DEF-S3-059** (`F021.R08`) | **SRS_F021** | 终止任务联动下发取消指令，审计详情记录取消结果与 cancelCommandId | 待移植 |
 | **commit `4ec6695`** | `TaskService.java` (`handleManualAction`)<br/>`ManualActionRequest.java` | **DEF-S3-062** (`F020.R08`) | **SRS_F020** | 人工操作记录原因，`MARK_FAILED` 强制要求原因并写入 `TASK_FAILED` 事件 | 待移植 |
@@ -57,7 +57,7 @@
 
 | 需求编号 | 需求名称 | 规则状态 (P/F/NT) | 关联用例步骤 | 待修缺陷 / 攻坚重点 | 目标版本 | 当前状态 |
 |---|---|:---:|---|---|:---:|:---:|
-| **SRS_F014** | 特殊旅客服务规划与监督判定 | P:0 F:1 NT:9 | TC-043.S2, TC-044 | DEF-S3-043（轮椅候选代理绑定与监护断言）；从最新main同步，按暂存清单审查风险规则相关移植，保持旅客隐私边界。 | 下一唯一V1.N | ⏳ 待Claude启动 |
+| **SRS_F014** | 特殊旅客服务规划与监督判定 | P:0 F:1 NT:9 | TC-043～TC-046 | DEF-S3-041/042/043：特殊旅客会合与陪同移动机器人确定性规则判定、规则增改参数校验与版本单调递增生命周期、前端新增/编辑模态框、全量时间线审计留痕 | **V1.150** | ⏳ Claude修复完成待复测 |
 | **SRS_F015** | 高峰/基线降级与故障边界 | P:4 F:1 NT:4 | TC-048.S2, TC-050.S1 | DEF-S3-065（基线模板失败直接转人工不重规划）；DEF-S3-066（候选切换真实状态恢复判定）。 | V1.142 | 待启动 |
 | **SRS_F016** | 设备匹配与能力约束评估 | P:3 F:0 NT:5 | TC-051, TC-052 | 在线状态、能力打标匹配、设备电量/载荷/空闲度硬约束过滤。 | V1.143 | 待启动 |
 | **SRS_F017** | 业务指令下发与状态流转 | P:4 F:1 NT:5 | TC-054.S2, TC-055 | DEF-S3-066（指令状态机与设备应答 ACK/NACK 流转超时判定，状态回滚）。 | V1.144 | 待启动 |

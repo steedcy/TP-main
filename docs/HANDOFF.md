@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`REQUIREMENT_PASSED`（SRS_F013，V1.149独立验收通过；执行基线V2.3；代码/证据已合入main，见末尾）
-- 当前进度：`SRS_F001`～`SRS_F013` 已完成验收；F013累计规则9P/0F/0NT、步骤9P/0F/0NT（含逐项注明原SHA的历史影响复用）。V1.149当前15计划场景、2次400/4110强放行拦截及持久留痕、43项定向测试和package全部通过，DEF-S3-094关闭，历轮F保留。代码/证据已推main `d8e29a8bd5bbcee450ec92ccce9798472a1e38df`，最终台账随本交接提交同步；下一项SRS_F014由Claude从最新main启动。
+- 状态：`READY_FOR_GPT`（SRS_F014，V1.150 Claude 修复轮完成；执行基线V2.3；代码已推分支 ai/claude-fix，标签 V1.150）
+- 当前进度：`SRS_F001`～`SRS_F013` 已完成验收合入 main；`SRS_F014` Claude 修复与单测完成（333 项单测全通，package 通过）；待 ChatGPT 独立复测。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -1901,3 +1901,82 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-04 | SRS_F013 | ChatGPT → Claude | REQUIREMENT_PASSED（V2.3） | ai/gpt-test、main / 2a5090d27e39ca85b511bd5ff8b013c4dbfd9474 / V1.149 | d8e29a8bd5bbcee450ec92ccce9798472a1e38df（已合main并推送） | DEF-S3-094关闭；15场景、2次持久拦截、43项定向通过；累计规则9P/步骤9P含注明来源历史复用；下一项F014从最新main启动 |
+
+## Claude → ChatGPT：SRS_F014 V1.150 特殊旅客服务规划与监督判定代码修复（执行基线V2.3）
+
+- 状态：`READY_FOR_GPT`。分支 `ai/claude-fix`，代码提交 SHA `69b841fbc10afd1c4c1f944cc0cd5a647bed66f7`，对应标签 `V1.150`。
+- 工作区：`tip-claude-f014`（检自最新 main `2b8ff02`，快进至 `V1.149` / `d8e29a8`）。未修改共享 PostgreSQL 或 GPT 独立资源（端口/schema/Redis）。
+
+### 修复与移植内容（DEF-S3-041, DEF-S3-042, DEF-S3-043 / TC-043～TC-046, SRS_F014.R01～R10）
+
+1. **DEF-S3-041：风险规则增改参数校验与异常处理强化**
+   - 在 `RiskRuleController` 移植并强化暂存校验：
+     - `create` 接口对 `ruleCode` 与 `ruleContent` 强制非空、非空白校验，超出长度（64 / 1000）或包含非法字符（`[A-Za-z0-9_-]+`）均抛出明确参数错误（`PARAM_MISSING` / `PARAM_FORMAT_ERROR`），不写入任何脏数据或操作日志；
+     - `enabled` 校验为布尔值；
+     - 重复编号返回 409 `RISK_RULE_CODE_TAKEN`（4501）；
+     - `update` 接口在更新前完整校验内容及启停布尔参数，不存在的规则返回 404 `RISK_RULE_NOT_FOUND`（4504）；
+     - 操作日志审计详情完整记录 `action`, `ruleContent`, `enabled`, `ruleVersion`, `ruleSetVersion`，以及 `before` 和 `after` 结构化对比。
+   - 新增单测 `RiskRuleValidationTest`（6 项全部通过）。
+
+2. **DEF-S3-042：前端风险规则维护新增与编辑表单**
+   - 改进 `frontend/src/views/risk/RiskRuleView.vue`：
+     - 新增“新增规则”操作入口（`data-testid="btn-create-risk-rule"`），弹窗模态框提供 `ruleCode`、`ruleContent` 输入框与 `enabled` 开关，在前端即时做必填校验并调用 `POST /risk-rules`；
+     - 表格编辑从原浏览器 `prompt()` 改为结构化模态框；
+     - 页面实时展示当前规则集版本（`currentRuleSetVersion`）。
+
+3. **DEF-S3-043：特殊旅客会合与陪同移动机器人绑定及规则集版本单调递增**
+   - **特殊旅客服务会合与陪同确定性高风险判定**：
+     - 需求规格说明书 5.6.4 / 5.4.5 及 8.1 TBD-03 明确：特殊旅客服务场景（`SPECIAL_PASSENGER_SERVICE`）中，移动机器人会合（`CAP_NAVIGATION` 空间引导业务意图）或陪同（`CAP_ESCORT` 陪同服务业务意图）步骤均命中确定性高风险规则 `RULE_ESCORT_SPECIAL_PASSENGER`；
+     - 在 `RiskAssessmentService` 中，结合 `CoreScenarioChannelPolicy` 校验所属任务族渠道绑定（移动服务机器人 `MOBILE_ROBOT` 渠道），准确识别特殊旅客服务中的机器人会合与陪同步骤并命中高风险；
+     - 非特殊旅客任务族（如 `FLIGHT_CHANGE_RESPONSE` 或 `GENERAL_GUIDANCE`）即使包含引导或空间导航步骤，不命中该特殊旅客确定性高风险规则（公共航班信息发布及普通引导不属于高风险）。
+   - **规则集版本单调递增全生命周期**：
+     - `RiskRuleSetVersion` 不仅追踪预置三条规则的版本累计递增（每次内容或启停更新升 0.1 计 1 次变化），还将动态新增的自定义规则纳入累计变化计数，确保新增规则同样生成单调递增的新规则集版本（如 `V1.0` -> `V1.1` -> `V1.2`），避免版本漂移；
+     - 判定结果与计划版本始终记录当前生效的 `ruleSetVersion`。
+
+4. **SRS_F014.R01～R10 全规则落地与时间线留痕**
+   - **R01 & R02**：监督智能体对通过三类校验的计划输出 `riskLevel`、`riskReasonCode`、`judgmentBasis`、`confidence`、`recommendedAction`（`AUTO_EXECUTE` / `BASELINE_DOWNGRADE` / `MANUAL_HANDLING`）与 `ruleSetVersion`。低风险推荐自动执行并流转 `PENDING_ASSIGNMENT`；高风险推荐基线降级并流转降级执行中；
+   - **R03**：监督智能体无法确定（`UNDETERMINED`）推荐 `MANUAL_HANDLING`，监督服务不可用或超时（`UNAVAILABLE`）安全捕获并转待人工处理，不下发设备指令；
+   - **R04 & R05**：确定性高风险规则优先，命中即高风险；规则停用后不再命中高风险，生效规则集版本随之更新；
+   - **R06**：低置信度（<0.80）、候选差异较大、上下文快照接近过期（>60s）作为辅助风险信号；单一信号不阻断，两个及以上组合触发基线降级；严格保持 0.80 与 60s 边界语义；
+   - **R07 & R08**：对三类校验未通过（结构、能力、约束任一 FAIL）的计划执行监督判定直接抛出 `SUPERVISION_ON_UNVALIDATED_PLAN`（4109）拦截；置信度不覆盖硬校验或确定性规则；监督智能体无权下发运动安全控制指令；
+   - **R09**：监督判定中为内部短暂状态，不设人工确认环节；
+   - **R10**：`RiskAssessmentResult.timelineDetail` 将判定结果、原因码、依据、置信度、规则集版本及推荐处置 6 项要素格式化写入任务事件时间线（`SUPERVISION_JUDGED` 事件详情）；`TaskDetailView.vue` 同步展示推荐处置。
+
+### 定向验证与全量回归（本机）
+
+1. **定向单测（31 项全部通过）**：
+   - `SpecialPassengerSupervisionF014Test`：9 项全部通过（覆盖 R01~R10、特殊旅客机器人会合/陪同命中、规则集版本递增、双信号边界与未校验拦截）；
+   - `RiskRuleValidationTest`：6 项全部通过（DEF-S3-041 规则编号与内容空值/格式/类型/长度/重复校验与操作日志）；
+   - `RiskRuleVersioningTest`：6 项全部通过（DEF-S3-043 启停与内容升版及规则集版本联动）；
+   - `RiskSignalBoundaryTest`：5 项全部通过（NT-S3-029 信号组合及严格阈值边界）；
+   - `RiskAssessmentResourceCriticalTest`：1 项通过；
+   - `ReplanningHighRiskDowngradeTest`：4 项通过。
+2. **全量后端单测**：
+   - `mvn -o test`：**333 run, 0 failures, 0 errors, 2 skipped**，BUILD SUCCESS。
+3. **后端打包构建**：
+   - `mvn -o package -DskipTests` 生成 `airport-ai-app-1.0.0.jar`，BUILD SUCCESS。
+
+### 待 ChatGPT 独立复测清单
+
+1. **TC-043.S1 / DEF-S3-041, DEF-S3-042**：
+   - 测试配置管理员在 `/risk-rules` 页面使用“新增规则”按钮填写合法编号与内容成功保存，规则列表出现新规则且规则集版本递增；
+   - 通过 API 发送空编号、空内容、过长字符、非法字符（空格等）、非布尔启停参数，均确认返回明确 400（3000/3001）且数据库无脏数据；重复编号返回 409（4501）；
+   - 检查操作日志 `RISK_RULE_CHANGE` 正确留痕。
+2. **TC-043.S2 / DEF-S3-043, NT-S3-027**：
+   - 分别在启用/停用 `RULE_RESOURCE_CRITICAL` 或 `RULE_ESCORT_SPECIAL_PASSENGER` 下，使用同一候选计划成对判定，核对启停版本递增与高低风险判定差异；
+   - 核对判定依据与操作记录中的规则集版本。
+3. **TC-044.S1 & S2 / R01, R02, R04, R05, R07, R08, R10**：
+   - 运行特殊旅客服务任务（包含机器人会合 `CAP_NAVIGATION` 或陪同 `CAP_ESCORT` 步骤），验证命中 `RULE_ESCORT_SPECIAL_PASSENGER` 并自动进入基线降级；
+   - 运行公共航班信息发布任务，验证通常为低风险并自动进入待分配；
+   - 检查任务事件时间线 `SUPERVISION_JUDGED` 事件详情，确认包含风险等级、原因码、判定依据、置信度、规则集版本和推荐处置。
+4. **TC-045.S1 & S2 / R06, R09**：
+   - 验证单低置信度（<0.80）、单差异标签、单过期快照（>60s）不阻断；
+   - 验证双信号及以上组合触发基线降级，原因码为 `RISK_SIGNAL_COMBINATION`；
+   - 检查 0.80 与 60s 边界。
+5. **TC-046.S1 & S2 / R03, R07, R08**：
+   - 隔离后端触发 `UNDETERMINED` 或 `UNAVAILABLE`，验证任务转待人工处理且零指令下发；
+   - 尝试对未通过三类校验的计划执行监督判定，验证系统拒绝（4109）并记录拦截事件。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-04 | SRS_F014 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 69b841f / V1.150 | 无 | DEF-S3-041/042/043 修复完成：特殊旅客机器人会合与陪同确定性高风险判定、规则增改参数校验与版本生命周期、前端新增规则入口、全量时间线审计留痕；31 项定向单测与 333 项全量单测全通，package 通过，待 GPT 独立复测 |
