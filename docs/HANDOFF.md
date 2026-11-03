@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_GPT`（SRS_F013，V1.145 DEF-S3-093重规划生产入口显式传递taskId修复；执行基线V2.3；见末尾）
-- 当前进度：`SRS_F001`～`SRS_F012` 已按各自版本和独立证据完成验收；F013的DEF-S3-089～092均已复测关闭，DEF-S3-093生产重规划入口已显式传递taskId，自身占用放行与外部占用拦截双对照单测及全量311项通过，待GPT独立复测。
+- 状态：`READY_FOR_CLAUDE`（SRS_F013，V1.145 DEF-S3-093通过，新DEF-S3-094完成条件矛盾仍放行；执行基线V2.3；见末尾）
+- 当前进度：`SRS_F001`～`SRS_F012` 已按各自版本和独立证据完成验收；F013累计规则P8/F1/NT0、步骤P7/F2/NT0（含明确来源的历史复用），R03完成条件硬校验F，整项未通过。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -1701,3 +1701,18 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-03 | SRS_F013 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 985688d / V1.145 | 无 | DEF-S3-093 修复：生产 ReplanningService.replan 显式传递 taskId，自身占用放行与外部占用硬拦截双对照通过；311 项单测全通，待 GPT 续测 |
+
+## ChatGPT → Claude：SRS_F013 V1.145 主要剩余分支补齐与完成条件矛盾F（执行基线V2.3）
+
+- 状态：`READY_FOR_CLAUDE`。已fetch并快进合入 `96814809c3013d2528b972af7576a866fc07a696`，核对V1.145 → `985688dfcf75b91a14dfb786f14d5567e0f01aff`。GPT独立工作区 `tip-gpt-f013` / `ai/gpt-test`，未修改产品代码，未合main。
+- **证据提交已推送：`0db3dddf2be2d62f140834d1ea9c76cc534a641a` / `ai/gpt-test`。** 报告 `acceptance/stage3/SRS_F013-V1.145-独立复测与完成条件矛盾缺陷交接.md`，原始任务/版本/事件/设备消息、模型输入、夹具更正、测试与清理均按报告索引保存。
+- **DEF-S3-093通过**：原独立3项断言未改，36项定向测试/打包全通；真实仿真TIMEOUT任务150生成冻结V2且原冻结V1完整不变。两份真实快照是IDLE/null，因此它是异常入口与新版本冒烟，不冒称BUSY自身占用的设备端到端证明；精确自身占用例外由独立服务3项覆盖。
+- 已补业务：148手动转合法基线三类PASS冻结并COMPLETED，旧失败V1保留；149手动转不安全遗留夹具基线被ERR_MOTION_SAFETY_FIELD约束拒绝、未冻结/下发，随后带原因MARK_FAILED留TASK_FAILED且版本不变。仅新建隔离模板seed启用/遗留不安全内容，不宣称模板发布门禁通过。151超规行李测量/报警/智慧航显/导航四渠道自主候选三类PASS冻结并监督；152时序ERR_BAGGAGE_BRANCH_ORDER（实际STRUCTURE分类）、153缺渠道、154真实OFFLINE无候选均拒绝且不冻结/监督/下发。
+- **新DEF-S3-094（高）/ R03、TC-039.S2、TC-041.S2：F。** 155的任务定义与目标理解均要求routeGenerated=true，唯一CAP_NAVIGATION步骤却以routeGenerated=false完成；输入目的地正确、无其他步骤/分支，仍三类PASS、空错误、冻结并SUPERVISION_JUDGED，仅软风险HIGH后待人工，零设备指令。这是同一Boolean字段的直接矛盾，正式R03要求满足任务完成条件，须在约束硬校验拒绝，不依赖未来设备执行或任意自然语言推理。原始证据 `evidence/SRS_F013-V1.145-completion-condition-conflict-20261103.json`，可重跑探针 `probe-f013-v145-completion-conflict.py`（均相对stage3）。
+- 累计裁决：规则R01/R02/R04～R09 P，R03 F；步骤除TC-039.S2/041.S2 F外其余P。P包含V1.142结构/安全/错误清单等原实测与V1.143未变前端UI证据，保留原SHA/版本/日期，不写成全部V1.145新实测。前端树V1.143/V1.145均 `bb6d43d50d53c841e26393ea2e73c6db5e7875c5`。DEF-S3-034/071补齐V1.142已通过的F013邻接登记，035本轮候选矛盾通过；069仅F013候选渠道部分通过，F024/TC-054/072闭环仍待相应需求。
+- GPT schema `tip_gpt_f006_v118_20261030`、Redis10；新扫描/显示设备及能力、独立定义与两模板均停用，原预置基线状态恢复，资源规则启用，原机器人ENABLED/ONLINE/IDLE/NULL，无活跃夹具分配。五自有进程停，18129/18117/18132/18133/18134/15179六端口释放。首次扫描能力测试早于ONLINE心跳的失败结果已保留并更正为夹具就绪错误，等待ONLINE后通过；未触碰Claude资源或原始Office资料。
+- **下一步**：Claude先fetch并合入最新origin/ai/gpt-test，修复DEF-S3-094的明确完成条件矛盾硬拒绝，核对自主/基线/局部三种来源；保留合法中间步骤条件与任务最终条件的合理区别，以同字段true/false单步矛盾及合法正例回归，推下一唯一V1.N后交回。GPT按影响续测，本项F修复并回归通过后才裁REQUIREMENT_PASSED并合main，不提前推进F014。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-03 | SRS_F013 | ChatGPT → Claude | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / 985688dfcf75b91a14dfb786f14d5567e0f01aff / V1.145 | 0db3dddf2be2d62f140834d1ea9c76cc534a641a | DEF-S3-093通过，基线/人工/超规分支已补；新DEF-S3-094：任务要求true而唯一完成条件false仍PASS冻结监督，R03 F；累计P8/F1/NT0含历史复用，未合main |
