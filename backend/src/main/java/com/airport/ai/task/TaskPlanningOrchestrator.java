@@ -481,29 +481,32 @@ public class TaskPlanningOrchestrator {
     private String resolveExpectedCompletionCondition(Task task) {
         if (task == null) return null;
         List<String> conditions = new ArrayList<>();
+        java.util.Set<String> lockedKeys = new java.util.HashSet<>();
 
-        // 1. 结构化任务定义硬约束（基础来源，绝不允许被自然语言理解覆盖丢失，DEF-S3-094）
+        // 1. 结构化任务定义硬约束（最高权威基线，已声明字段锁定，绝不接受下游覆盖与篡改，DEF-S3-094）
         if (task.getTaskFamily() != null) {
             var def = taskDefinitionService.findByCode(task.getTaskFamily());
             if (def.isPresent() && def.get().getCompletionCondition() != null && !def.get().getCompletionCondition().isBlank()) {
-                conditions.add(def.get().getCompletionCondition().trim());
+                String defCond = def.get().getCompletionCondition().trim();
+                conditions.add(defCond);
+                extractConditionKeys(defCond, lockedKeys);
             }
         }
 
-        // 2. 目标理解结果中的完成条件（补充来源，合并保留）
+        // 2. 目标理解结果中的完成条件（补充来源：任务定义未声明的字段予以补充；若与定义冲突以定义为准）
         if (task.getGoalParsingResult() != null && !task.getGoalParsingResult().isBlank()) {
             try {
                 Map<?, ?> parsed = MAPPER.readValue(task.getGoalParsingResult(), Map.class);
                 Object cond = parsed.get("completionCondition");
                 if (cond != null && !String.valueOf(cond).isBlank() && !"null".equalsIgnoreCase(String.valueOf(cond))) {
-                    conditions.add(String.valueOf(cond).trim());
+                    filterAndAppendGoalCondition(String.valueOf(cond).trim(), lockedKeys, conditions);
                 }
             } catch (Exception ignored) {}
         }
 
         // 3. 用户原始任务目标文本中若显式携带 key=val 格式断言（如 required routeGenerated=true）
         if (task.getTaskGoal() != null && !task.getTaskGoal().isBlank()) {
-            extractExplicitConditionClauses(task.getTaskGoal(), conditions);
+            extractExplicitConditionClauses(task.getTaskGoal(), lockedKeys, conditions);
         }
 
         if (conditions.isEmpty()) return null;
@@ -513,14 +516,58 @@ public class TaskPlanningOrchestrator {
     private static final java.util.regex.Pattern EXPLICIT_COND_PATTERN = java.util.regex.Pattern.compile(
             "(?i)\\b([a-zA-Z][a-zA-Z0-9_]*)\\s*(?:==|=|:)\\s*(true|false|1|0)\\b");
 
-    private void extractExplicitConditionClauses(String text, List<String> conditions) {
+    private void extractExplicitConditionClauses(String text, java.util.Set<String> lockedKeys, List<String> conditions) {
         if (text == null || text.isBlank()) return;
         java.util.regex.Matcher m = EXPLICIT_COND_PATTERN.matcher(text);
         while (m.find()) {
-            String key = m.group(1);
-            String val = m.group(2);
-            conditions.add(key + "=" + val.toLowerCase());
+            String rawKey = m.group(1);
+            String normKey = rawKey.toLowerCase().replaceAll("[_\\-\\s]", "");
+            if (!lockedKeys.contains(normKey)) {
+                String val = m.group(2);
+                conditions.add(rawKey + "=" + val.toLowerCase());
+            }
         }
+    }
+
+    private void extractConditionKeys(String conditionText, java.util.Set<String> keys) {
+        if (conditionText == null || conditionText.isBlank()) return;
+        String[] tokens = conditionText.split("[,;\\n]|(?i)\\s+and\\s+|&&");
+        for (String token : tokens) {
+            String trimmed = token.trim();
+            int sepIdx = findSep(trimmed);
+            if (sepIdx > 0) {
+                keys.add(trimmed.substring(0, sepIdx).trim().toLowerCase().replaceAll("[_\\-\\s]", ""));
+            }
+        }
+    }
+
+    private void filterAndAppendGoalCondition(String goalCondition, java.util.Set<String> lockedKeys, List<String> conditions) {
+        if (goalCondition == null || goalCondition.isBlank()) return;
+        String[] tokens = goalCondition.split("[,;\\n]|(?i)\\s+and\\s+|&&");
+        List<String> validTokens = new ArrayList<>();
+        for (String token : tokens) {
+            String trimmed = token.trim();
+            if (trimmed.isEmpty()) continue;
+            int sepIdx = findSep(trimmed);
+            if (sepIdx > 0) {
+                String key = trimmed.substring(0, sepIdx).trim().toLowerCase().replaceAll("[_\\-\\s]", "");
+                if (!lockedKeys.contains(key)) {
+                    validTokens.add(trimmed);
+                }
+            } else {
+                validTokens.add(trimmed);
+            }
+        }
+        if (!validTokens.isEmpty()) {
+            conditions.add(String.join("; ", validTokens));
+        }
+    }
+
+    private int findSep(String text) {
+        if (text.contains("==")) return text.indexOf("==");
+        if (text.contains("=")) return text.indexOf("=");
+        if (text.contains(":")) return text.indexOf(":");
+        return -1;
     }
 
     @SuppressWarnings("unchecked")

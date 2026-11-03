@@ -415,6 +415,34 @@ class PlanThreeCheckAndFreezeF013Test {
     }
 
     @Test
+    void r03_modelConflictingAssertionDoesNotOverwriteTaskDefinition() {
+        // DEF-S3-094 (V1.147任务172实机复现):
+        // 任务定义要求 routeGenerated=true，模型理解返回相反的结构化断言 routeGenerated=false。
+        // 即使模型企图反转同名字段，任务定义硬条件依然权威锁定并生效，
+        // 唯一候选步骤声明 routeGenerated=false 必须在约束校验硬拒绝，绝不得因同名键覆盖而放行！
+        String multiSourceConditions = "routeGenerated=true; routeGenerated=false";
+        Map<String, Object> stepContradict = standardStep(1, "CAP_NAVIGATION");
+        stepContradict.put("completionCondition", "routeGenerated=false");
+
+        PlanValidationResult resultFail = validationService.validate(List.of(stepContradict), standardAgents(),
+                List.of("CAP_NAVIGATION"), "EXT_FAMILY", 172L, multiSourceConditions);
+
+        assertFalse(resultFail.isAllPassed(), "模型返回相反断言绝不能覆盖任务定义中的权威true");
+        assertEquals("FAIL", resultFail.getConstraintCheckResult());
+        assertTrue(resultFail.getErrors().stream().anyMatch(e -> "ERR_COMPLETION_CONDITION_CONFLICT".equals(e.getReasonCode())));
+
+        // 正例：候选步骤满足任务定义的 routeGenerated=true，正常放行
+        Map<String, Object> stepPass = standardStep(1, "CAP_NAVIGATION");
+        stepPass.put("completionCondition", "routeGenerated=true");
+
+        PlanValidationResult resultPass = validationService.validate(List.of(stepPass), standardAgents(),
+                List.of("CAP_NAVIGATION"), "EXT_FAMILY", 172L, multiSourceConditions);
+
+        assertTrue(resultPass.isAllPassed(), "候选步骤满足任务定义期望条件应正常通过");
+        assertEquals("PASS", resultPass.getConstraintCheckResult());
+    }
+
+    @Test
     void r03_sameTaskCanReuseItsOwnOccupiedAgentDuringReplanning() {
         // 当前任务自身（taskId=143）占用的代理，在重规划时不属于外部资源冲突
         List<Map<String, Object>> selfOccupiedAgents = List.of(

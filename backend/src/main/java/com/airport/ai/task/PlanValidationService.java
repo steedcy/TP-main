@@ -483,6 +483,7 @@ public class PlanValidationService {
         if (expectedCompletionCondition == null || expectedCompletionCondition.isBlank() || steps == null) {
             return;
         }
+        // 解析期望完成条件，首出现的权威任务定义条件拥有优先权（putIfAbsent），绝不接受后续重复键覆盖（DEF-S3-094）
         Map<String, Boolean> expectedBools = parseBooleanConditions(expectedCompletionCondition);
         Map<String, String> expectedVals = parseValueConditions(expectedCompletionCondition);
 
@@ -503,7 +504,7 @@ public class PlanValidationService {
                     Boolean actB = stepBools.get(k);
                     if (!expB.equals(actB)) {
                         result.failConstraint("步骤" + stepSeq + "完成条件(" + stepCond + ")与任务目标完成条件("
-                                + expectedCompletionCondition + ")直接矛盾（字段" + k + "期望为" + expB + "，步骤声明为" + actB + "）",
+                                + expectedCompletionCondition + ")直接矛盾（字段" + k + "期望要求" + expB + "，步骤声明为" + actB + "）",
                                 stepSeq, "ERR_COMPLETION_CONDITION_CONFLICT");
                     }
                 }
@@ -519,7 +520,7 @@ public class PlanValidationService {
                     if (!expV.equalsIgnoreCase(actV)) {
                         if (!expectedBools.containsKey(k)) {
                             result.failConstraint("步骤" + stepSeq + "完成条件(" + stepCond + ")与任务目标完成条件("
-                                    + expectedCompletionCondition + ")直接矛盾（字段" + k + "期望为" + expV + "，步骤声明为" + actV + "）",
+                                    + expectedCompletionCondition + ")直接矛盾（字段" + k + "期望要求" + expV + "，步骤声明为" + actV + "）",
                                     stepSeq, "ERR_COMPLETION_CONDITION_CONFLICT");
                         }
                     }
@@ -531,27 +532,18 @@ public class PlanValidationService {
     private static Map<String, Boolean> parseBooleanConditions(String conditionText) {
         Map<String, Boolean> result = new LinkedHashMap<>();
         if (conditionText == null || conditionText.isBlank()) return result;
-        String[] tokens = conditionText.split("[,;\n]|(?i)\s+and\s+|&&");
+        String[] tokens = conditionText.split("[,;\\n]|(?i)\\s+and\\s+|&&");
         for (String token : tokens) {
             String trimmed = token.trim();
             if (trimmed.isEmpty()) continue;
-            int sepIdx = -1;
-            int sepLen = 1;
-            if (trimmed.contains("==")) {
-                sepIdx = trimmed.indexOf("==");
-                sepLen = 2;
-            } else if (trimmed.contains("=")) {
-                sepIdx = trimmed.indexOf("=");
-                sepLen = 1;
-            } else if (trimmed.contains(":")) {
-                sepIdx = trimmed.indexOf(":");
-                sepLen = 1;
-            }
+            int sepIdx = findConditionSeparator(trimmed);
+            int sepLen = findSeparatorLength(trimmed, sepIdx);
             if (sepIdx > 0) {
                 String key = normalizeConditionKey(trimmed.substring(0, sepIdx));
                 String val = trimmed.substring(sepIdx + sepLen).trim();
                 Boolean b = parseBooleanValue(val);
-                if (b != null && !key.isEmpty()) {
+                // 首值优先：首个声明（如任务定义硬约束）锁定该键，后续重复键不能覆盖（DEF-S3-094）
+                if (b != null && !key.isEmpty() && !result.containsKey(key)) {
                     result.put(key, b);
                 }
             }
@@ -562,36 +554,45 @@ public class PlanValidationService {
     private static Map<String, String> parseValueConditions(String conditionText) {
         Map<String, String> result = new LinkedHashMap<>();
         if (conditionText == null || conditionText.isBlank()) return result;
-        String[] tokens = conditionText.split("[,;\n]|(?i)\s+and\s+|&&");
+        String[] tokens = conditionText.split("[,;\\n]|(?i)\\s+and\\s+|&&");
         for (String token : tokens) {
             String trimmed = token.trim();
             if (trimmed.isEmpty()) continue;
-            int sepIdx = -1;
-            int sepLen = 1;
-            if (trimmed.contains("==")) {
-                sepIdx = trimmed.indexOf("==");
-                sepLen = 2;
-            } else if (trimmed.contains("=")) {
-                sepIdx = trimmed.indexOf("=");
-                sepLen = 1;
-            } else if (trimmed.contains(":")) {
-                sepIdx = trimmed.indexOf(":");
-                sepLen = 1;
-            }
+            int sepIdx = findConditionSeparator(trimmed);
+            int sepLen = findSeparatorLength(trimmed, sepIdx);
             if (sepIdx > 0) {
                 String key = normalizeConditionKey(trimmed.substring(0, sepIdx));
-                String val = trimmed.substring(sepIdx + sepLen).trim();
-                if (val.startsWith("\"") && val.endsWith("\"") && val.length() >= 2) {
-                    val = val.substring(1, val.length() - 1).trim();
-                } else if (val.startsWith("'") && val.endsWith("'") && val.length() >= 2) {
-                    val = val.substring(1, val.length() - 1).trim();
-                }
-                if (!key.isEmpty() && !val.isEmpty()) {
+                String val = cleanQuotes(trimmed.substring(sepIdx + sepLen).trim());
+                // 首值优先：首个声明锁定该键，后续重复键不能覆盖（DEF-S3-094）
+                if (!key.isEmpty() && !val.isEmpty() && !result.containsKey(key)) {
                     result.put(key, val);
                 }
             }
         }
         return result;
+    }
+
+    private static int findConditionSeparator(String token) {
+        if (token.contains("==")) return token.indexOf("==");
+        if (token.contains("=")) return token.indexOf("=");
+        if (token.contains(":")) return token.indexOf(":");
+        return -1;
+    }
+
+    private static int findSeparatorLength(String token, int sepIdx) {
+        if (sepIdx < 0) return 0;
+        if (token.startsWith("==", sepIdx)) return 2;
+        return 1;
+    }
+
+    private static String cleanQuotes(String val) {
+        if (val == null) return "";
+        if (val.startsWith("\"") && val.endsWith("\"") && val.length() >= 2) {
+            return val.substring(1, val.length() - 1).trim();
+        } else if (val.startsWith("'") && val.endsWith("'") && val.length() >= 2) {
+            return val.substring(1, val.length() - 1).trim();
+        }
+        return val;
     }
 
     private static String normalizeConditionKey(String key) {
