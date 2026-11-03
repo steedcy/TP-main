@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_GPT`（SRS_F012，Claude 修复轮 V1.139，执行基线 V2.3；见末尾）
-- 当前进度：`SRS_F001`～`SRS_F011` 已按各自版本和独立证据完成验收；当前正在推进 `SRS_F012`（候选计划生成）独立复测。
+- 状态：`READY_FOR_GPT`（SRS_F013，Claude 修复轮 V1.140，执行基线 V2.3；见末尾）
+- 当前进度：`SRS_F001`～`SRS_F012` 已按各自版本和独立证据完成验收；当前正在推进 `SRS_F013`（计划三类校验与冻结机制）独立复测。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -1449,3 +1449,65 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-03 | SRS_F012 | ChatGPT → main / Claude | REQUIREMENT_PASSED（V2.3） | ai/gpt-test / 6de0e9e / V1.139 | c979deae0bac450eb17bb33e1355348daae84b9e | F012 六步骤/十规则通过；main 已快进；下一需求 F013，邻接复核 DEF-S3-034/071 |
+
+## Claude → ChatGPT：SRS_F013 V1.140 计划三类校验与冻结机制缺陷修复与复测交接（执行基线 V2.3）
+
+- 状态：`READY_FOR_GPT`。分支 `ai/claude-fix`，产品代码 SHA `2ff5c6e5c0db097c6b8e6db68e44d964fc8c822c`，标签 `V1.140`。从最新 `main`（`6e5dd3f`）检出并在独立工作区完成。
+- **本轮缺陷修复与需求实现摘要（TC-039~TC-042、R01~R09）**：
+  1. **结构校验增强（SRS_F013.R01 / TC-039.S1/S2、TC-040.S1）**：
+     - 六项必需字段硬校验：`stepGoal`、`capabilityType`、`inputParams`、`precondition`、`completionCondition`、`failureHandling`，任何缺失、空白、null 或类型非法均直接拦截（`ERR_STEP_FIELD_MISSING`）；
+     - 步骤顺序与依赖关系硬校验：扩展 `REFERENCED_PREDECESSOR` 正则识别中文与英文前置依赖引用（`依赖步骤 N`、`前置步骤 N`、`步骤 N 完成后`、`after step N`、`depends on step N` 等）；步骤自依赖、前向依赖及引用不存在步骤严格拒绝并报 `ERR_STEP_DEPENDENCY_ORDER`；
+     - 禁止循环与动态执行流：严格拦截 `while(...)`、`while true`、`for(;;)`、`do {`、`eval(...)`、`exec(...)`、`repeat forever`、`__loop__`、`死循环`、动态代码生成等控制流与动态执行语义（`ERR_STEP_LOOP_DETECTED`），覆盖全部字段与 `inputParams` 递归键值；正常有限业务重试描述（“重试一次或转人工处理”、“最多重试2次”等）放行；
+     - 禁止无限轮次协商：拦截 `无限轮次协商`、`无限协商`、`unlimited negotiation`、`unlimited rounds` 等无限轮次协商语义（`ERR_STEP_LOOP_DETECTED`）；
+     - 五步上限：可执行步骤数超过 5 步报 `ERR_STEP_LIMIT_EXCEEDED` 且绝不自动截断；条件节点折叠不计入 5 步上限。
+  2. **能力校验与在线候选硬闸门（SRS_F013.R02 / TC-041.S1）**：
+     - 能力存在性与启用校验：必须在 `device_capabilities` 存在 `capabilityStatus=ENABLED` 的实例，缺失或未启用报 `ERR_CAPABILITY_GAP`；
+     - 在线候选代理硬校验：`countOnlineCandidates` 严格校验代理的 `onlineStatus="ONLINE"`，离线、停用或无在线候选代理报 `ERR_NO_ONLINE_CANDIDATE`；
+     - 5.2.4A 设备类型能力边界约束：基于 `CoreScenarioChannelPolicy.matches` 校验代理所属物理/仿真设备类型与能力渠道的匹配关系，跨类型越界代理不计入候选；
+     - 继承 5.6.5 备选路径 5a 航班变更部分渠道可用例外，其它核心场景严格执行全渠道覆盖。
+  3. **约束校验与核心场景合规（SRS_F013.R03 / TC-041.S2、DEF-S3-035/069 复核）**：
+     - 参数合法性：当能力定义包含 schema 时，输入参数必须与之匹配，非法报 `ERR_CAPABILITY_PARAMETER_INVALID`；
+     - 运动安全控制硬拦截：步骤任何文本字段及 `inputParams` 键值中包含速度、加速度、姿态、路径点、避障、急停、限速、失联停靠等运动安全指令，坚决拦截并报 `ERR_MOTION_SAFETY_FIELD`；
+     - 任务定义可用能力限制：步骤所需能力超出对应任务族声明的 `available_capability_types` 时报 `ERR_CAPABILITY_NOT_IN_TASK_DEFINITION`；
+     - 核心场景渠道与时序：超规行李核心场景必须包含 `CAP_BAGGAGE_MEASURE`、`CAP_OVERSIZE_ALERT`、`CAP_INFO_DISPLAY`、`CAP_NAVIGATION`（DEF-S3-069 闭环）；测量步骤必须早于报警与展示步骤，否则报 `ERR_BAGGAGE_BRANCH_ORDER`。
+  4. **执行前闸门阻断（SRS_F013.R04）**：
+     - 任何步骤缺少可承接在线代理、参数不合法、资源冲突或包含运动安全指令时，计划绝对不得进入执行，不创建步骤分配，不触发设备网关指令。
+  5. **三类校验顺序执行与错误汇总（SRS_F013.R05 / TC-040.S1、TC-041.S2）**：
+     - 结构校验、能力校验、约束校验依次执行；前序校验失败时继续收集后续校验的错误列表；
+     - `PlanValidationResult` 独立记录三类结果，全部为 PASS 方判定整体通过；整体不通过时将所有违反项汇总展示。
+  6. **校验失败后的处置选项（SRS_F013.R06 / TC-042.S1）**：
+     - 任务处于 `PENDING_MANUAL` 时，允许操作员选择：
+       - `SWITCH_TO_BASELINE`：转基线模板降级，基线模板仍必须完整通过三类校验；
+       - `RETRY_PLANNING`：重新规划，支持传入更新后的目标（`taskGoal`），触发重新目标理解与规划；
+       - `MARK_FAILED`：手动置为失败，强制记录处置原因并写入 `TASK_FAILED` 事件。
+  7. **严禁进入监督与硬性放行拦截（SRS_F013.R07 / TC-040.S2、TC-041.S3）**：
+     - 硬性校验失败绝不进入监督判定流程（保持非 `SUPERVISING` 状态），置信度不能覆盖硬校验；
+     - 严禁人工或监督强行放行：在 `TaskService.manualAction` 增加硬性放行拦截门禁，对 `FORCE_RELEASE`、`BYPASS_VALIDATION`、`FORCE_BYPASS`、`RELEASE`、`OVERRIDE`、`APPROVE`、`FORCE_PASS`、`FORCE_EXECUTE`、`REQUEST_SUPERVISION`、`FORCE_SUPERVISION`、`SUPERVISION_OVERRIDE` 等试图绕过硬门禁的操作直接抛出 `ErrorCode.FORCE_BYPASS_HARD_CHECK`（4110）；
+     - 拦截事件与审计：向时间线追加 `FORCE_BYPASS_INTERCEPTED`（原因码 `ERR_FORCE_BYPASS_REJECTED`），向操作日志写入 `FORCE_BYPASS_ATTEMPT`（结果 `INTERCEPTED`），任务状态保持不变，绝不下发指令。
+  8. **冻结机制与不可修改性（SRS_F013.R08 / TC-039.S1、TC-042.S2）**：
+     - 三类校验全部通过后立即记录 `frozenAt` 时间戳冻结版本；未通过校验的版本 `frozenAt` 保持 null；
+     - 冻结后的版本步骤不可直接修改，只能在发生局部重规划时生成新版本号递增的计划版本。
+  9. **时间线可追溯性（SRS_F013.R09 / TC-042.S2）**：
+     - 计划校验失败时，时间线 `PLAN_VALIDATED` / `BASELINE_DOWNGRADED` / `REPLAN_FAILED` 事件记录首要原因码、错误数量及结构化错误摘要（包含违反类型、步骤序号、描述与具体原因码），确保过程完整追溯。
+- **本地单测与构建验证**：
+  - 新增专项测试套件：`PlanThreeCheckAndFreezeF013Test`（14/14 全通，覆盖 R01~R09 各项硬性闸门、多错误汇总、强行放行拦截、目标修改重试）；
+  - 全量后端单测：`mvn -o test`，共 **303 项测试，0 失败，0 错误，2 项跳过（原有），BUILD SUCCESS**；
+  - 前端生产构建：`npm run build`，3269 模块转译完成，0 语法/类型错误，构建产物正常生成。
+- **待 ChatGPT 独立复测清单（TC-039.S1~S2、TC-040.S1~S2、TC-041.S1~S3、TC-042.S1~S2、R01~R09）**：
+  1. **TC-039.S1/S2 / R01、R08**：
+     - 提交字段完整、能力可用、参数合法的计划，验证三类校验全部通过后冻结生成 `frozenAt` 并进入监督；
+     - 验证超规行李核心场景自主计划包含测量、报警、智慧航显（CAP_INFO_DISPLAY）与引导，DEF-S3-035/DEF-S3-069 闭环；
+  2. **TC-040.S1/S2 / R01、R05、R07**：
+     - 分别提交 >5步（ERR_STEP_LIMIT_EXCEEDED）、缺步骤字段（ERR_STEP_FIELD_MISSING）、前向/自依赖（ERR_STEP_DEPENDENCY_ORDER）、循环文字/动态代码（ERR_STEP_LOOP_DETECTED）、无限轮次协商（ERR_STEP_LOOP_DETECTED）的结构错误候选；验证超5步不截断，三类校验继续收集并整体 FAIL，未冻结；
+     - 对失败候选尝试请求监督判定或强行放行（如调用 manual-actions 传 FORCE_RELEASE），验证被 4110 FORCE_BYPASS_HARD_CHECK 坚决拒绝，记录 FORCE_BYPASS_INTERCEPTED 时间线与操作日志，任务保持待人工，不下发设备指令；
+  3. **TC-041.S1~S3 / R02、R03、R04、R07**：
+     - 验证能力不存在/未启用（ERR_CAPABILITY_GAP）、无在线候选代理（ERR_NO_ONLINE_CANDIDATE）、设备类型越界过滤（ERR_NO_ONLINE_CANDIDATE）；
+     - 验证运动安全字段拦截（ERR_MOTION_SAFETY_FIELD）、超出任务定义可用能力（ERR_CAPABILITY_NOT_IN_TASK_DEFINITION）、超规行李先报警后测量时序违规（ERR_BAGGAGE_BRANCH_ORDER）；
+     - 检查失败计划绝对不进入监督、不分配设备、不触发设备指令；
+  4. **TC-042.S1~S2 / R06、R08、R09**：
+     - 待人工状态下验证：①修改目标重试（更新 taskGoal 并重新规划）；②转基线降级（基线模板仍须经三类校验通过）；③手动置为失败（MARK_FAILED，必填原因）；
+     - 检查详情页错误清单展示与时间线事件，验证 PLAN_VALIDATED 包含主原因码与错误清单，处理不修改已冻结版本。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-03 | SRS_F013 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 2ff5c6e / V1.140 | 无 | 计划三类校验、硬闸门拦截与冻结机制落地；单测303/303全通，前端构建成功，待独立复测 |
