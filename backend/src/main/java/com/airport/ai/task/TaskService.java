@@ -51,6 +51,35 @@ public class TaskService {
     private final TaskStepAssignmentMapper assignmentMapper;
     private final TaskDefinitionService taskDefinitionService;
     private final DeviceAgentMessagingService deviceAgentMessagingService;
+    private final ForceBypassAuditRecorder forceBypassAuditRecorder;
+
+    public TaskService(TaskMapper taskMapper,
+                        PlanVersionMapper planVersionMapper,
+                        ContextSnapshotMapper contextSnapshotMapper,
+                        DeviceAgentMapper deviceAgentMapper,
+                        GoalUnderstandingService goalUnderstandingService,
+                        TaskCodeGenerator taskCodeGenerator,
+                        TaskEventService taskEventService,
+                        OperationLogService operationLogService,
+                        TaskPlanningOrchestrator taskPlanningOrchestrator,
+                        TaskStepAssignmentMapper assignmentMapper,
+                        TaskDefinitionService taskDefinitionService,
+                        DeviceAgentMessagingService deviceAgentMessagingService,
+                        ForceBypassAuditRecorder forceBypassAuditRecorder) {
+        this.taskMapper = taskMapper;
+        this.planVersionMapper = planVersionMapper;
+        this.contextSnapshotMapper = contextSnapshotMapper;
+        this.deviceAgentMapper = deviceAgentMapper;
+        this.goalUnderstandingService = goalUnderstandingService;
+        this.taskCodeGenerator = taskCodeGenerator;
+        this.taskEventService = taskEventService;
+        this.operationLogService = operationLogService;
+        this.taskPlanningOrchestrator = taskPlanningOrchestrator;
+        this.assignmentMapper = assignmentMapper;
+        this.taskDefinitionService = taskDefinitionService;
+        this.deviceAgentMessagingService = deviceAgentMessagingService;
+        this.forceBypassAuditRecorder = forceBypassAuditRecorder;
+    }
 
     public TaskService(TaskMapper taskMapper,
                         PlanVersionMapper planVersionMapper,
@@ -64,18 +93,11 @@ public class TaskService {
                         TaskStepAssignmentMapper assignmentMapper,
                         TaskDefinitionService taskDefinitionService,
                         DeviceAgentMessagingService deviceAgentMessagingService) {
-        this.taskMapper = taskMapper;
-        this.planVersionMapper = planVersionMapper;
-        this.contextSnapshotMapper = contextSnapshotMapper;
-        this.deviceAgentMapper = deviceAgentMapper;
-        this.goalUnderstandingService = goalUnderstandingService;
-        this.taskCodeGenerator = taskCodeGenerator;
-        this.taskEventService = taskEventService;
-        this.operationLogService = operationLogService;
-        this.taskPlanningOrchestrator = taskPlanningOrchestrator;
-        this.assignmentMapper = assignmentMapper;
-        this.taskDefinitionService = taskDefinitionService;
-        this.deviceAgentMessagingService = deviceAgentMessagingService;
+        this(taskMapper, planVersionMapper, contextSnapshotMapper, deviceAgentMapper,
+                goalUnderstandingService, taskCodeGenerator, taskEventService,
+                operationLogService, taskPlanningOrchestrator, assignmentMapper,
+                taskDefinitionService, deviceAgentMessagingService,
+                new ForceBypassAuditRecorder(taskEventService, operationLogService));
     }
 
     public Task get(Long taskId) {
@@ -237,10 +259,7 @@ public class TaskService {
                 "REQUEST_SUPERVISION", "FORCE_SUPERVISION", "SUPERVISION_OVERRIDE"
         );
         if (forceBypassActions.contains(upperAction)) {
-            taskEventService.append(taskId, "FORCE_BYPASS_INTERCEPTED", "OPERATOR", "ERR_FORCE_BYPASS_REJECTED",
-                    "操作员试图强行放行硬性校验失败的计划，系统已拦截并拒绝（操作: " + action + "）");
-            operationLogService.record(operator.getId(), operator.getUsername(), operator.getRole(),
-                    "FORCE_BYPASS_ATTEMPT", task.getTaskCode() + " -> " + action, "INTERCEPTED", null);
+            forceBypassAuditRecorder.recordInterception(taskId, task.getTaskCode(), action, operator);
             throw new BusinessException(ErrorCode.FORCE_BYPASS_HARD_CHECK, "硬性校验失败的计划严禁进入监督判定或强行放行");
         }
 

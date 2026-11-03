@@ -358,6 +358,29 @@ class PlanThreeCheckAndFreezeF013Test {
     }
 
     @Test
+    void def_s3_089_forceBypassAuditRecorderPersistsInterceptionAndAudit() {
+        TaskEventService taskEventService = mock(TaskEventService.class);
+        OperationLogService operationLogService = mock(OperationLogService.class);
+        ForceBypassAuditRecorder recorder = new ForceBypassAuditRecorder(taskEventService, operationLogService);
+
+        User operator = new User();
+        operator.setId(88L);
+        operator.setUsername("audit_op");
+        operator.setRole("OPERATOR");
+
+        recorder.recordInterception(118L, "TASK-F013-118", "FORCE_RELEASE", operator);
+        verify(taskEventService).append(eq(118L), eq("FORCE_BYPASS_INTERCEPTED"), eq("OPERATOR"),
+                eq("ERR_FORCE_BYPASS_REJECTED"), contains("FORCE_RELEASE"));
+        verify(operationLogService).record(eq(88L), eq("audit_op"), eq("OPERATOR"),
+                eq("FORCE_BYPASS_ATTEMPT"), eq("TASK-F013-118 -> FORCE_RELEASE"), eq("INTERCEPTED"), isNull());
+
+        // Null operator fallback check
+        recorder.recordInterception(119L, "TASK-F013-119", "REQUEST_SUPERVISION", null);
+        verify(operationLogService).record(isNull(), eq("OPERATOR"), eq("OPERATOR"),
+                eq("FORCE_BYPASS_ATTEMPT"), eq("TASK-F013-119 -> REQUEST_SUPERVISION"), eq("INTERCEPTED"), isNull());
+    }
+
+    @Test
     void r06_retryPlanningSupportsUpdatedGoal() {
         TaskMapper taskMapper = mock(TaskMapper.class);
         TaskEventService taskEventService = mock(TaskEventService.class);
