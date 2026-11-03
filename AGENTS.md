@@ -1,6 +1,6 @@
 # 双 AI 协同工作约定
 
-本仓库由 Claude AI 与 ChatGPT/Codex 协同完成修复和独立复测。每次开工先读本文件、`docs/HANDOFF.md`、`docs/BASELINE_CHANGES.md`，再执行 `git status`、`git log -5`、`git fetch origin`。本约定不代替用户最新指令。
+本仓库由 Claude AI 与 ChatGPT/Codex 协同完成修复和独立复测。每次开工先读本文件、`docs/HANDOFF.md`、`docs/BASELINE_CHANGES.md`、`docs/ROADMAP.md`，再执行 `git status`、`git log -5`、`git fetch origin`。本约定不代替用户最新指令。
 
 当前执行策略为 **V2.3（2026-10-30用户追加加速授权）**，版本对齐入口 `docs/EXECUTION_BASELINE.md`。需求/用例可由两AI直接裁决优化并记录后实施，无需逐项向用户确认；保持核心流程、主要功能及关键业务规则。
 
