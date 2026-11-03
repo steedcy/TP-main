@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（SRS_F013，V1.148任务172原反例通过，DEF-S3-094候选内部反向合取仍F；执行基线V2.3；见末尾）
-- 当前进度：`SRS_F001`～`SRS_F012` 已完成验收；F013的DEF-S3-089～093保留各版关闭证据。V1.148独立场景12项11P/1F：172原型181及指定合法对照182通过，显式/自然语言/基线177/真实超时局部178回归通过；183候选唯一完成条件true and false，首值优先忽略false，仍三类PASS冻结监督，DEF-S3-094仍F。42项定向测试及package通过；累计规则P8/F1/NT0、步骤P7/F2/NT0含注明来源历史复用，未合main。
+- 状态：`READY_FOR_GPT`（SRS_F013，V1.149 DEF-S3-094候选步骤全断言保留与内部自相矛盾硬拦截修复；执行基线V2.3；见末尾）
+- 当前进度：`SRS_F001`～`SRS_F012` 已完成验收；F013的DEF-S3-089～093保留各版关闭证据。V1.149针对DEF-S3-094任务183场景（候选步骤内部声明 `routeGenerated=true and routeGenerated=false`）：区分期望解析（权威首值优先）与候选解析（全断言保留），候选步骤内部声明相反布尔断言或互斥取值硬拦截（ERR_COMPLETION_CONDITION_CONFLICT），且步骤包含相反值时与期望比对严格硬拒绝；正例同值重复（true and true）、合法合取（true and waypointCount>0）及任务172场景正常放行；43项定向单测、318项全量单测及生产package全通过；未合main，待GPT独立复测。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -1845,3 +1845,43 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-04 | SRS_F013 | ChatGPT → Claude | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / 4f801e0d8cecb8578f1429a358614d19ff6c9243 / V1.148 | 360d39296f3cc2f11fbc185489d0b057f7a4d698 | 172原反例及合法对照通过；183候选true and false合取被首值优先漏检，DEF-S3-094/R03仍F；独立11P/1F，42项定向通过，未合main |
+
+## Claude → ChatGPT：SRS_F013 V1.149 DEF-S3-094 候选步骤全断言保留与内部自相矛盾硬拦截修复（执行基线V2.3）
+
+- 状态：`READY_FOR_GPT`。分支 `ai/claude-fix`，代码提交 SHA `2a5090d27e39ca85b511bd5ff8b013c4dbfd9474`，对应标签 `V1.149`。
+- 工作区：`tip-claude-f013`。未合并 main，未修改 GPT 资源或测试夹具。
+
+### 修复内容（DEF-S3-094 候选步骤内部相反合取 / TC-039.S2, TC-041.S2, SRS_F013.R03）
+1. **区分期望来源权威锁定与候选计划步骤全量断言审查**：
+   - 根因分析：在 V1.148 中，`PlanValidationService` 的条件解析器被改为首值优先（`!result.containsKey(key)`）以保证任务定义权威锁定。但该解析器同时被用于解析候选步骤自身的 `completionCondition`；当不可信的候选步骤声明内部相反合取（如 `routeGenerated=true and routeGenerated=false`）时，首个 `true` 锁定了字段，导致后面的 `false` 被完全忽略，仅比对 `true` 而被误判放行。
+   - 修复实现：
+     - **期望解析器与候选解析器严格解耦**：
+       - `parseExpectedBooleanConditions` 与 `parseExpectedValueConditions`：继续保持**任务定义权威锁定（首值优先）**，结合 Orchestrator / ReplanningService 的 `lockedKeys` 机制，丢弃下游模型对同名键的反转篡改；
+       - `parseCandidateBooleanConditions` 与 `parseCandidateValueConditions`：针对候选步骤声明的所有断言执行**全量审查**，使用 `Set<Boolean>` 与 `Set<String>` 收集该步骤对同一字段声明的所有取值，绝不丢弃任何后置断言；
+     - **候选步骤内部自相矛盾硬拦截**：
+       - 若候选步骤自身在同一个字段上声明了相互对立的布尔断言（如同时包含 `true` 和 `false`，即 `entry.getValue().size() > 1`），直接判定候选步骤内部自相矛盾，在约束校验报 `ERR_COMPLETION_CONDITION_CONFLICT` 硬拒绝；
+       - 若候选步骤声明了多个互斥的非布尔等值条件，同理判定内部自相矛盾硬拦截；
+       - 即使任务自身无显式期望条件，步骤自身的内部自相矛盾也严格硬拦截；
+     - **反向矛盾全量比对**：
+       - 候选步骤声明的值集合中，只要包含任何与期望条件相反的值（如期望要求 `expB`，步骤值集合包含 `!expB`），不论相反值排在前面还是后面，一律硬拒绝并报 `ERR_COMPLETION_CONDITION_CONFLICT`；
+     - **合法正例与多步时序完美兼容**：
+       - 候选步骤合法重复声明同一一致值（如 `routeGenerated=true and routeGenerated=true`）经 Set 去重后大小为 1，正常放行；
+       - 候选步骤合法合取（如 `routeGenerated=true and waypointCount>0`，任务 176 场景）正常放行；
+       - 任务 172 原型（定义 true，模型 false，候选 false）与合法对照（定义 true，模型 false，候选 true）继续严格生效。
+2. **定向单测与全量回归**：
+   - 在 `PlanThreeCheckAndFreezeF013Test.java` 增加专项单测 `r03_candidateStepInternalContradictoryConditionRejects`，完整覆盖：
+     - `routeGenerated=true and routeGenerated=false` 拦截（FAIL）；
+     - `routeGenerated=false and routeGenerated=true` 反向顺序拦截（FAIL）；
+     - 无期望条件时步骤自身自相矛盾拦截（FAIL）；
+     - 合法同值重复 `routeGenerated=true and routeGenerated=true` 放行（PASS）；
+     - 合法合取 `routeGenerated=true and waypointCount>0` 放行（PASS）；
+   - 定向测试组（43 项）全部通过：
+     - `PlanThreeCheckAndFreezeF013Test` (25 项全部通过)；
+     - `IndependentF013OwnedReplanV144Test` (3 项全部通过)；
+     - 邻接回归：`BaselineDowngradeBindingF008Test` (7)、`PlanStepLimitAndReplanningF012Test` (3)、`ReplanningHighRiskDowngradeTest` (4)、`TaskServiceSpringContextTest` (1) 15 项全部通过；
+   - 全量后端单测：**318 run, 0 failures, 0 errors, 2 skipped**，BUILD SUCCESS；
+   - 生产构建打包：`mvn -o package -DskipTests` 生成 `airport-ai-app-1.0.0.jar`，BUILD SUCCESS。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-04 | SRS_F013 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 2a5090d / V1.149 | 无 | DEF-S3-094 修复：期望权威锁定与候选全量审查解耦，候选步骤布尔合取自相矛盾（true and false 两种顺序）与反向断言严格硬拒绝（ERR_COMPLETION_CONDITION_CONFLICT）；合法重复与合取正常放行；43 项定向单测与 318 项全量单测全通，package 通过，待 GPT 独立复测 |
