@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`REQUIREMENT_PASSED`（SRS_F011，ChatGPT 独立复测 V1.138，执行基线 V2.3；见末尾）
-- 当前进度：`SRS_F001`～`SRS_F011` 已按各自版本和独立证据完成；下一需求 `SRS_F012` 应在独立新对话接续。
+- 状态：`READY_FOR_GPT`（SRS_F012，Claude 修复轮 V1.139，执行基线 V2.3；见末尾）
+- 当前进度：`SRS_F001`～`SRS_F011` 已按各自版本和独立证据完成验收；当前正在推进 `SRS_F012`（候选计划生成）独立复测。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -1387,3 +1387,52 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-03 | SRS_F011 | ChatGPT → main | REQUIREMENT_PASSED（V2.3） | ai/gpt-test / 64dd061 / V1.138 | d6f50ccd308704357244cabb71cc2f6db9fbc109 | F011 4步骤/8规则通过；下一需求F012独立新对话 |
+
+
+## Claude → ChatGPT：SRS_F012 V1.139 候选计划生成缺陷修复与复测交接（执行基线 V2.3）
+
+- 状态：`READY_FOR_GPT`。分支 `ai/claude-fix`，产品代码 SHA `6de0e9e8395cca9c22e3d24e0d36dac3ee7866f5`，标签 `V1.139`。已从 `origin/main`（`9054f01`）同步。
+- **本轮缺陷修复与需求实现摘要**：
+  1. **DEF-S3-034 / SRS_F012.R04（步骤六项完整性硬校验）**：
+     - 每个步骤必须包含六项：步骤目标（stepGoal）、所需能力（capabilityType）、输入参数（inputParams）、前置条件（precondition）、完成条件（completionCondition）和失败处理（failureHandling）。
+     - 覆盖空串、空白字符、null、字段缺失及非文本类型异常；缺任一项结构硬校验直接判定 FAIL，reasonCode 为 `ERR_STEP_FIELD_MISSING`，版本不得冻结、监督判定或下发分配设备。
+     - 覆盖所有计划来源：自主规划（AUTONOMOUS）、基线模板（BASELINE_TEMPLATE）、局部重规划（REPLANNING）。基线模板仅在字段完全缺省时补充默认语义，显式填空/null/空白时严格保留原值交由硬校验拒绝。
+  2. **DEF-S3-071 / SRS_F012.R03（循环与无限控制流硬拦截）**：
+     - 检测字段完整覆盖：`stepGoal`、`precondition`、`completionCondition`、`failureHandling`、`inputParams`（含递归嵌套键及字符串值）、`branchCondition` 及参数映射。
+     - 识别控制流语法：`while(...)`、`for(...)`、`do {...}`、`eval(...)`、`exec(...)`、`repeat forever`、`repeat indefinitely`、`loop until`、死循环、无限循环、无限期、直到成功为止、`__loop__` 标记、动态代码生成执行等。
+     - 命中时报告 `ERR_STEP_LOOP_DETECTED`，结构校验判定 FAIL 且不冻结。
+     - 严格避免误伤正常业务文字：“重试一次或转人工处理”、“最多重试2次”、“重试2次”、“等待设备就绪后展示”、“展示直到完成条件满足”、“wait for (30 seconds)”等均正常放行。
+  3. **DEF-S3-036 / TC-037.S1（任务详情候选计划展示补全）**：
+     - 移植并优化 `TaskDetailView.vue` 候选计划摘要与表格：
+       - 展示每步 `inputParams` 格式化 JSON 及为空时的说明；
+       - 展示每步参数来源（`paramSource`）：自主规划来源标注“规划模型依据任务目标与场景参数生成”，基线来源标注“基线模板参数映射/任务场景参数”；
+       - 展示每步候选设备（`candidates`）：关联上下文快照中的在线候选代理；
+       - 展示规划说明（`planNote`）：呈现模型依据快照生成的步数及置信度说明；
+       - 展示本版本可执行步骤数及剩余步骤额度（初始上限 5，排除条件节点）。
+  4. **SRS_F012.R01/R02/R10（五步上限、条件节点计数与重规划剩余额度）**：
+     - 新增 `PlanStepRules`：每版本最多 5 个可执行步骤；条件节点（`conditionNode: true` 或 `nodeType: "CONDITION"`）仅表达判断逻辑，不计入步数、不下发设备；条件分支中的业务动作（`branchOf`）正常计数。
+     - 超限直接报错 `ERR_STEP_LIMIT_EXCEEDED`，系统不做自动截断。
+     - 实际执行路径步骤数不超过 5 步；冻结版本将条件节点折叠至分支动作的 `branchCondition` 中保留。
+     - 局部重规划新版本将已完成步骤计入剩余额度（`remainingStepQuota = 5 - completedCount`）；已完成 5 步时无剩余额度直接报 `ERR_STEP_QUOTA_EXHAUSTED`。
+  5. **SRS_F012.R05/R06/R08 核对与继承**：
+     - R05：能力类型存在性与已启用状态经由 `DeviceCapabilityMapper` 严格校验，杜绝虚构能力；
+     - R06：`MotionSafetyGuard` 拦截速度/加速度/姿态/路径点/避障/急停等运动安全指令，同时保留合法导航字段（如 `waypointCount` 作为输出或完成条件放行，`waypointList` 阻断）；
+     - R08：送模目标与上下文继承 F011 的 `SceneParamsPrivacyGuard.sanitizeGoal` 及场景参数脱敏，覆盖初次规划和重规划两条链路，内部原始目标保留供追溯。
+     - R07/R09：规划超时（60s）/异常自动基线降级或待人工、未通过三类校验不下发指令等核心安全逻辑保持稳定。
+- **本地构建与测试验证**：
+  - 后端全量测试：`mvn -o test`，共 **289 项测试，0 失败，0 错误，2 跳过（原有），BUILD SUCCESS**；
+  - 核心套件定向测试：`mvn -o test "-Dtest=*Plan*,*Step*,*Structure*,*Validation*,*Replanning*,*Context*,*Goal*"`，**48 项测试 100% 通过**；
+  - 新增/增强单测：
+    - `PlanStepFieldsF012Test`（15项）：六项缺失矩阵、非文本类型拒绝、inputParams空/非对象/循环文字检测、循环控制流与动态代码检测、合规业务重试文字不误伤、5步通过、6步超额失败、条件节点不计入5步上限、分支动作计数与依赖校验；
+    - `PlanStepLimitAndReplanningF012Test`（3项）：重规划仅前序已完成动作计入额度、超额拒绝报 ERR_STEP_LIMIT_EXCEEDED、5步全完成时0额度直接拒绝报 ERR_STEP_QUOTA_EXHAUSTED；
+  - 前端构建验证：`npm run build`（Vite 生产打包），**3269 个模块转译完成，0 语法/类型错误，构建产物正常生成**。
+- **待 ChatGPT 独立复测清单（TC-037.S1/S2、TC-038.S1/S2、R01～R10）**：
+  1. **TC-037.S1 / DEF-S3-036 / R04**：发起自主规划任务，验证任务详情候选计划完整展示目标、序号、能力、inputParams、参数来源、候选设备、前置条件、完成条件、失败处理、规划说明、本版本可执行步骤数和剩余步骤额度（初始上限 5）；缺 precondition 或 failureHandling 的候选计划结构校验 FAIL 且不冻结、不分配设备；
+  2. **TC-037.S2 / DEF-S3-071 / R01~R03、R05**：受控规划模型返回 5 个可执行步骤 + 条件节点，验证条件节点不计入 5 步上限、分支动作计数且校验通过后冻结；若可执行步骤达到 6 步则报 ERR_STEP_LIMIT_EXCEEDED 且不自动截断；返回循环/动态代码文字（含 inputParams 字段）报 ERR_STEP_LOOP_DETECTED；返回未启用/虚构能力报 ERR_CAPABILITY_GAP；
+  3. **TC-038.S1 / R06、R09**：计划含运动控制安全字段被 ERR_MOTION_SAFETY_FIELD 拦截；合法导航字段不误伤；三类校验未全部通过前绝对不下发设备指令；
+  4. **TC-038.S2 / R07、R08**：规划模型 60s 超时或返回不可解析结构时转基线降级或待人工，不下发设备指令；送模的任务目标与上下文经脱敏且不泄露真实旅客身份（初次规划与局部重规划均核对）；
+  5. **TC-061 / R10**：局部重规划生成的新计划版本仍受五步限制，已完成步骤正确扣减剩余额度，实际执行路径总步骤不超过 5 步。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-03 | SRS_F012 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 6de0e9e / V1.139 | 无 | DEF-S3-034/071/036 修复完成，五步与条件节点规则落地；单测48/48全通，全量289/289全通，前端构建成功，待独立复测 |
