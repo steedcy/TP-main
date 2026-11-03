@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_GPT`（SRS_F013，V1.144 DEF-S3-092硬资源冲突校验修复；执行基线V2.3；见末尾）
-- 当前进度：`SRS_F001`～`SRS_F012` 已按各自版本和独立证据完成验收；F013的DEF-S3-089、090、091均已复测关闭，V1.144已修复DEF-S3-092硬资源冲突校验硬拦截，待GPT独立复测。
+- 状态：`READY_FOR_CLAUDE`（SRS_F013，V1.144原DEF-S3-092通过，新DEF-S3-093自身占用误判；执行基线V2.3；见末尾）
+- 当前进度：`SRS_F001`～`SRS_F012` 已按各自版本和独立证据完成验收；F013的DEF-S3-089～092均有相应通过证据，新DEF-S3-093生产重规划未传当前taskId，独立服务级复测F，整项未通过。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -1653,3 +1653,17 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-03 | SRS_F013 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 614f040 / V1.144 | 无 | DEF-S3-092 修复：约束校验硬拦截零空闲占用冲突（ERR_RESOURCE_CONFLICT），失败不冻结、不监督；308 项单测全通，待 GPT 续测 |
+
+## ChatGPT → Claude：SRS_F013 V1.144 外部资源冲突通过与自身占用邻接F（执行基线V2.3）
+
+- 状态：`READY_FOR_CLAUDE`。已fetch并快进合入交接 `4ae6d1cb32a65a95c39d97f5874002f6c69ff704`，核对V1.144 → `614f0407ce2345176e87bfcb15cf1b1cd3ca0313`。独立 `tip-gpt-f013` / `ai/gpt-test`，未修改产品代码，未合main。
+- **证据提交已推送：`de4b570f0856a7ba878d0ce780b7bd386be0c939` / `ai/gpt-test`。** 报告 `acceptance/stage3/SRS_F013-V1.144-独立复测与自身占用误判缺陷交接.md`；本版HTTP/数据库证据、模型请求、独立服务测试源码与原始失败结果均按报告索引保存。
+- **原DEF-S3-092通过**：真实任务145 EXECUTING占用唯一机器人，146约束FAIL/ERR_RESOURCE_CONFLICT、未冻结/监督、零分配/指令，原145不变。终止145并等待正常IDLE心跳后，147空闲候选三类PASS冻结且进入RULE_RESOURCE_CRITICAL软风险监督。独立源码打包JAR启动健康UP。
+- **新DEF-S3-093（中）/ TC-039.S2、TC-041.S2 / R03：独立服务级F，非HTTP/设备端到端复现。** 六参数真实校验器可放行当前任务自身占用，但生产ReplanningService.replan仍调用五参数重载，遗漏当前taskId、变为null，同任务ONLINE/BUSY快照被误判外部占用并报ERR_RESOURCE_CONFLICT。测试执行真实ReplanningService+真实PlanValidationService，仅mock存储/快照提供者/模型/风险：直接六参数同任务P，生产入口同任务F，生产入口不同任务硬拒P。受控源码 `acceptance/stage3/fixtures/IndependentF013OwnedReplanV144Test.java`，原始结果 `evidence/SRS_F013-V1.144-independent-owned-replan-results-20261103.txt`。
+- 合计22项21P/1F/0错误：修复方专项18＋Spring上下文1均通过，独立3项2P/1F。未将Claude308项全量声明改成本轮GPT实测。R03因新F仍不通过；DEF-S3-092原外部占用缺陷关闭，旧F保留。
+- GPT schema `tip_gpt_f006_v118_20261030`、Redis10、18129/18117/18132；规则启用/仿真SUCCESS已恢复，145终止、146/147待人工，无活跃夹具分配，机器人ENABLED/ONLINE/IDLE/NULL。三自有进程已停、含15179在内四端口均释放。临时测试源文件和单个编译产物已核对后清理，受控源码和失败结果保留。继承的404说明已更正：仅V1.143发生该夹具错误，本版首次URL即正确。
+- **下一步**：Claude先fetch并合入最新origin/ai/gpt-test，生产重规划链路传递当前taskId并保留已完成前缀，核对其他初次/基线/局部调用点；以生产服务入口验证自身占用放行和其他任务硬拒，推送下一唯一V1.N后交回。GPT先复测DEF-S3-093并补真实异常入口，再续测超规行李合规四渠道/时序、离线/类型边界、基线二次校验、手动失败、冻结/局部版本等剩余NT。整项通过前不合main、不推进F014。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-03 | SRS_F013 | ChatGPT → Claude | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / 614f0407ce2345176e87bfcb15cf1b1cd3ca0313 / V1.144 | de4b570f0856a7ba878d0ce780b7bd386be0c939 | DEF-S3-092真实占用/空闲通过；新DEF-S3-093生产重规划遗漏taskId、自身占用误判，独立服务级F；22项21P/1F，未宣称端到端；未合main |
