@@ -1,0 +1,240 @@
+{
+  "version": "V1.147",
+  "codeSha": "1b136b9b8c308decd6e7de6b1894f7be2920c40b",
+  "observedAt": "2026-11-04T00:04:33.311551+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "definition": {
+    "id": 17,
+    "definitionCode": "EXT_0FA30230",
+    "taskName": "G145 F013 baseline fixtures",
+    "goalTemplate": "Synthetic navigation to selected destination",
+    "sceneParams": [
+      {
+        "name": "targetLocation",
+        "type": "String",
+        "required": true,
+        "defaultValue": "F2_TEST_GATE",
+        "range": null
+      }
+    ],
+    "availableCapabilityTypes": [
+      "CAP_NAVIGATION"
+    ],
+    "constraintDescription": "Synthetic isolated F013 runtime baseline gate",
+    "completionCondition": "routeGenerated=true",
+    "isPreset": false,
+    "definitionStatus": "ENABLED",
+    "updatedAt": "2026-11-04T00:03:49.847598",
+    "updatedBy": "set"
+  },
+  "controlledCase": {
+    "goalCompletion": "The navigation route has been generated.",
+    "steps": [
+      {
+        "stepSeq": 1,
+        "stepGoal": "Generate route to F2_TEST_GATE",
+        "capabilityType": "CAP_NAVIGATION",
+        "inputParams": {
+          "targetLocation": "F2_TEST_GATE"
+        },
+        "precondition": "device online",
+        "completionCondition": "routeGenerated=false",
+        "failureHandling": "manual handling",
+        "stepTimeout": 60
+      }
+    ]
+  },
+  "request": {
+    "taskGoal": "F147_NATURAL_GOAL synthetic navigation to F2_TEST_GATE; required routeGenerated=true",
+    "taskFamily": "EXT_0FA30230",
+    "sceneParams": {
+      "targetLocation": "F2_TEST_GATE"
+    }
+  },
+  "taskId": 169,
+  "after": {
+    "task": {
+      "id": 169,
+      "taskCode": "TASK-20261104-0169",
+      "taskGoal": "F147_NATURAL_GOAL synthetic navigation to F2_TEST_GATE; required routeGenerated=true",
+      "taskFamily": "EXT_0FA30230",
+      "sceneParams": {
+        "targetLocation": "F2_TEST_GATE"
+      },
+      "goalParsingResult": {
+        "completionCondition": "The navigation route has been generated.",
+        "origin": "F2_SERVICE_POINT",
+        "destination": "F2_TEST_GATE",
+        "originalGoal": "F147_NATURAL_GOAL synthetic navigation to F2_TEST_GATE; required routeGenerated=true",
+        "constraints": [
+          "synthetic test"
+        ]
+      },
+      "status": "PENDING_MANUAL",
+      "currentPlanVersionId": 160,
+      "replanUsed": false,
+      "replanningReason": null,
+      "manualTerminateReason": null,
+      "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT；且无匹配的已启用基线模板",
+      "missingInfoQuestions": null,
+      "downgradeReason": null,
+      "isDryRun": false,
+      "createdAt": "2026-11-04T00:04:33.353974",
+      "updatedAt": "2026-11-04T00:04:33.402778",
+      "createdBy": "oprator"
+    },
+    "plans": [
+      {
+        "id": 160,
+        "versionNo": 1,
+        "source": "AUTONOMOUS",
+        "baselineTemplateId": null,
+        "snapshotId": "CTX-20261104-0141",
+        "planSteps": [
+          {
+            "stepSeq": 1,
+            "stepGoal": "Generate route to F2_TEST_GATE",
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "precondition": "device online",
+            "completionCondition": "routeGenerated=false",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          }
+        ],
+        "structureCheckResult": "PASS",
+        "capabilityCheckResult": "PASS",
+        "constraintCheckResult": "FAIL",
+        "validationErrors": [
+          {
+            "errorType": "CONSTRAINT",
+            "description": "步骤1完成条件(routeGenerated=false)与任务目标完成条件(routeGenerated=true; The navigation route has been generated.)直接矛盾（字段routegenerated期望为true，步骤声明为false）",
+            "stepSeq": 1,
+            "reasonCode": "ERR_COMPLETION_CONDITION_CONFLICT"
+          }
+        ],
+        "riskLevel": null,
+        "riskReasonCode": null,
+        "judgmentBasis": null,
+        "confidence": 0.99,
+        "ruleSetVersion": null,
+        "frozenAt": null,
+        "createdAt": "2026-11-04T00:04:33.386712"
+      }
+    ],
+    "events": [
+      {
+        "id": 1426,
+        "taskId": 169,
+        "eventType": "GOAL_SUBMITTED",
+        "occurredAt": "2026-11-04T00:04:33.35572",
+        "trigger": "OPERATOR",
+        "reasonCode": null,
+        "detailSummary": "运行操作员oprator提交任务目标: F147_NATURAL_GOAL synthetic navigation to F2_TEST_GATE; required routeGenerated=true"
+      },
+      {
+        "id": 1427,
+        "taskId": 169,
+        "eventType": "GOAL_CLARIFIED",
+        "occurredAt": "2026-11-04T00:04:33.3669",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+      },
+      {
+        "id": 1428,
+        "taskId": 169,
+        "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+        "occurredAt": "2026-11-04T00:04:33.37427",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "生成规划上下文快照CTX-20261104-0141"
+      },
+      {
+        "id": 1429,
+        "taskId": 169,
+        "eventType": "PLAN_GENERATED",
+        "occurredAt": "2026-11-04T00:04:33.391295",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+      },
+      {
+        "id": 1430,
+        "taskId": 169,
+        "eventType": "PLAN_VALIDATED",
+        "occurredAt": "2026-11-04T00:04:33.394874",
+        "trigger": "SYSTEM",
+        "reasonCode": "ERR_COMPLETION_CONDITION_CONFLICT",
+        "detailSummary": "候选计划三类校验未通过: 1项错误 [CONSTRAINT 步骤1: 步骤1完成条件(routeGenerated=false)与任务目标完成条件(routeGenerated=true; The navigation route has been generated.)直接矛盾（字段routegenerated期望为true，步骤声明为false）(ERR_COMPLETION_CONDITION_CONFLICT)]"
+      },
+      {
+        "id": 1431,
+        "taskId": 169,
+        "eventType": "BASELINE_DOWNGRADED",
+        "occurredAt": "2026-11-04T00:04:33.400058",
+        "trigger": "SYSTEM",
+        "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+        "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT"
+      },
+      {
+        "id": 1432,
+        "taskId": 169,
+        "eventType": "TASK_PENDING_MANUAL",
+        "occurredAt": "2026-11-04T00:04:33.403846",
+        "trigger": "SYSTEM",
+        "reasonCode": "ERR_PLANNING_FAILED",
+        "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT；且无匹配的已启用基线模板"
+      }
+    ],
+    "assignments": [],
+    "commands": [],
+    "bypassAuditRows": []
+  },
+  "checks": {
+    "constraintRejected": true,
+    "conflictCode": true,
+    "notFrozen": true,
+    "notSupervisedOrDispatched": true
+  },
+  "cleanupTerminate": {
+    "http": 200,
+    "body": {
+      "code": 200,
+      "message": "success",
+      "data": {
+        "id": 169,
+        "taskCode": "TASK-20261104-0169",
+        "taskGoal": "F147_NATURAL_GOAL synthetic navigation to F2_TEST_GATE; required routeGenerated=true",
+        "taskFamily": "EXT_0FA30230",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        },
+        "goalParsingResult": {
+          "completionCondition": "The navigation route has been generated.",
+          "origin": "F2_SERVICE_POINT",
+          "destination": "F2_TEST_GATE",
+          "originalGoal": "F147_NATURAL_GOAL synthetic navigation to F2_TEST_GATE; required routeGenerated=true",
+          "constraints": [
+            "synthetic test"
+          ]
+        },
+        "status": "MANUAL_TERMINATED",
+        "currentPlanVersionId": 160,
+        "replanUsed": false,
+        "replanningReason": null,
+        "manualTerminateReason": "F013 V147 natural-completion fixture cleanup",
+        "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT；且无匹配的已启用基线模板",
+        "missingInfoQuestions": null,
+        "downgradeReason": null,
+        "isDryRun": false,
+        "createdAt": "2026-11-04T00:04:33.353974",
+        "updatedAt": "2026-11-04T00:04:33.9902821",
+        "createdBy": "oprator"
+      },
+      "timestamp": "2026-11-04T00:04:33.995420600+08:00"
+    }
+  }
+}
