@@ -17,6 +17,7 @@ import com.airport.ai.taskdef.TaskDefinitionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,6 +54,7 @@ public class TaskService {
     private final DeviceAgentMessagingService deviceAgentMessagingService;
     private final ForceBypassAuditRecorder forceBypassAuditRecorder;
 
+    @Autowired
     public TaskService(TaskMapper taskMapper,
                         PlanVersionMapper planVersionMapper,
                         ContextSnapshotMapper contextSnapshotMapper,
