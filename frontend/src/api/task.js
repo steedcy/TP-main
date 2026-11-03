@@ -13,8 +13,8 @@ export function getTask(taskId) {
   return request.get(`/tasks/${taskId}`)
 }
 
-export function manualAction(taskId, action) {
-  return request.post(`/tasks/${taskId}/manual-actions`, { action })
+export function manualAction(taskId, action, reason, taskGoal) {
+  return request.post(`/tasks/${taskId}/manual-actions`, { action, reason, taskGoal })
 }
 
 export function terminateTask(taskId, reason) {

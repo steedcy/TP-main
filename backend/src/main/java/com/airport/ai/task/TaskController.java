@@ -89,7 +89,7 @@ public class TaskController {
     @PostMapping("/{taskId}/manual-actions")
     @PreAuthorize("hasRole('OPERATOR')")
     public ApiResponse<TaskView> manualAction(@PathVariable Long taskId, @Valid @RequestBody ManualActionRequest request) {
-        return ApiResponse.ok(TaskView.from(taskService.manualAction(taskId, request.getAction(), currentUser.get())));
+        return ApiResponse.ok(TaskView.from(taskService.manualAction(taskId, request.getAction(), request.getReason(), request.getTaskGoal(), currentUser.get())));
     }
 
     @GetMapping("/{taskId}/plan-versions")

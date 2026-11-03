@@ -233,9 +233,21 @@ public class ReplanningService {
 
         // 异常路径5b：新版本三类校验不通过
         if (!validation.isAllPassed()) {
-            taskEventService.append(taskId, "REPLAN_FAILED", "SYSTEM", "ERR_VALIDATION_FAILED",
-                    "重新规划后新计划版本" + newVersion.getVersionNo() + "三类校验未通过: " + validation.getErrors().size() + "项错误");
-            toPendingManual(task, "局部重新规划失败：新计划版本三类校验未通过");
+            String primaryReason = validation.getErrors().isEmpty() ? "ERR_VALIDATION_FAILED" : validation.getErrors().get(0).getReasonCode();
+            StringBuilder summary = new StringBuilder("重新规划后新计划版本").append(newVersion.getVersionNo())
+                    .append("三类校验未通过: ").append(validation.getErrors().size()).append("项错误");
+            if (!validation.getErrors().isEmpty()) {
+                summary.append(" [");
+                for (int i = 0; i < validation.getErrors().size(); i++) {
+                    var err = validation.getErrors().get(i);
+                    if (i > 0) summary.append("; ");
+                    summary.append(err.getErrorType()).append(" 步骤").append(err.getStepSeq() == null ? "-" : err.getStepSeq())
+                           .append(": ").append(err.getDescription()).append("(").append(err.getReasonCode()).append(")");
+                }
+                summary.append("]");
+            }
+            taskEventService.append(taskId, "REPLAN_FAILED", "SYSTEM", primaryReason, summary.toString());
+            toPendingManual(task, "局部重新规划失败：新计划版本三类校验未通过: " + primaryReason);
             return;
         }
 
@@ -386,7 +398,8 @@ public class ReplanningService {
         baselineVersion.setValidationErrors(toJson(validation.getErrors()));
         if (!validation.isAllPassed()) {
             planVersionMapper.insert(baselineVersion);
-            baselineUnavailable(task, "基线模板三类校验未通过");
+            String primaryReason = validation.getErrors().isEmpty() ? "ERR_TEMPLATE_VALIDATION_FAILED" : validation.getErrors().get(0).getReasonCode();
+            baselineUnavailable(task, "基线模板三类校验未通过: " + primaryReason);
             return;
         }
         baselineVersion.setFrozenAt(LocalDateTime.now());

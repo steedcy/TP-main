@@ -18,7 +18,7 @@ public class PlanValidationService {
 
     private static final int MAX_STEPS = 5;
     private static final java.util.regex.Pattern REFERENCED_PREDECESSOR = java.util.regex.Pattern.compile(
-            "(?:步骤\\s*(\\d+)\\s*完成后|依赖步骤\\s*(\\d+)|after\\s+step\\s*(\\d+)|depends\\s+on\\s+step\\s*(\\d+))",
+            "(?:(?:前置步骤|依赖步骤|依赖第?|前置)\\s*(\\d+)(?:步)?|(?:第?\\s*(\\d+)\\s*步|步骤\\s*(\\d+))\\s*(?:完成后?|之后|后)|after\\s+step\\s*(\\d+)|depends\\s+on\\s+(?:step\\s*)?(\\d+))",
             java.util.regex.Pattern.CASE_INSENSITIVE);
 
     private final DeviceCapabilityMapper deviceCapabilityMapper;
@@ -146,7 +146,7 @@ public class PlanValidationService {
             if (PlanStepRules.isConditionNode(step)) continue;
             Integer seq = asInteger(step.get("stepSeq"));
             if (seq == null) seq = i + 1;
-            for (String field : List.of("precondition", "completionCondition")) {
+            for (String field : List.of("precondition", "completionCondition", "stepGoal")) {
                 Object raw = step.get(field);
                 if (!(raw instanceof String text)) continue;
                 java.util.regex.Matcher references = REFERENCED_PREDECESSOR.matcher(text);
@@ -180,7 +180,7 @@ public class PlanValidationService {
             if (stepSeq == null) stepSeq = i + 1;
             if (PlanStepRules.isConditionNode(step)) continue;
             String capabilityType = asString(step.get("capabilityType"));
-            if (capabilityType == null) {
+            if (capabilityType == null || capabilityType.isBlank()) {
                 continue; // 结构校验已报告字段缺失，避免重复报错
             }
             boolean existsEnabledInstance = deviceCapabilityMapper.existsByCapabilityTypeAndCapabilityStatus(
@@ -294,6 +294,10 @@ public class PlanValidationService {
         }
         return snapshotAgents.stream()
                 .filter(agent -> {
+                    Object online = agent.get("onlineStatus");
+                    if (online != null && !"ONLINE".equals(String.valueOf(online))) {
+                        return false;
+                    }
                     Object caps = agent.get("capabilities");
                     return caps instanceof List<?> list && list.contains(capabilityType)
                             && CoreScenarioChannelPolicy.matches(taskFamily, capabilityType,
@@ -309,7 +313,7 @@ public class PlanValidationService {
     private static final String BOUNDED_REPEAT_TAIL = "(?!.{0,24}(once|twice|one\\s+time|\\d+\\s*(times|x)\\b|一次|两次|二次|\\d+\\s*次))";
 
     private static final List<java.util.regex.Pattern> CONTROL_FLOW = List.of(
-            java.util.regex.Pattern.compile("\\bwhile\\s*\\(", java.util.regex.Pattern.CASE_INSENSITIVE),
+            java.util.regex.Pattern.compile("\\bwhile\\s*(\\(|true\\b|1\\b|\\w+\\s*:)", java.util.regex.Pattern.CASE_INSENSITIVE),
             // for(;;) / for (int i=0;;i++)：三段式循环头；不误伤"wait for (30 seconds)"这类普通文字
             java.util.regex.Pattern.compile("\\bfor\\s*\\([^)]*;[^)]*;[^)]*\\)", java.util.regex.Pattern.CASE_INSENSITIVE),
             java.util.regex.Pattern.compile("\\b(goto\\s+step|go\\s+back\\s+to\\s+step|jump\\s+back\\s+to\\s+step)", java.util.regex.Pattern.CASE_INSENSITIVE),
@@ -321,9 +325,9 @@ public class PlanValidationService {
             java.util.regex.Pattern.compile("__loop__", java.util.regex.Pattern.CASE_INSENSITIVE),
             java.util.regex.Pattern.compile("\\bdo\\s*\\{", java.util.regex.Pattern.CASE_INSENSITIVE),
             java.util.regex.Pattern.compile("\\b(eval|exec|exec\\w*|system|runtime\\.getruntime|new\\s+function|import\\s+os|subprocess)\\s*\\(", java.util.regex.Pattern.CASE_INSENSITIVE),
-            java.util.regex.Pattern.compile("\\b(forever|infinite(ly)?|endless(ly)?|indefinite(ly)?|unlimited\\s+(retr(y|ies)|rounds?|loops?))\\b", java.util.regex.Pattern.CASE_INSENSITIVE),
-            java.util.regex.Pattern.compile("\\b(loop|repeat)\\s+(until|forever|endlessly)\\b", java.util.regex.Pattern.CASE_INSENSITIVE),
-            java.util.regex.Pattern.compile("(无限|无穷|永远|不断|一直)\\s*(循环|重复|重试|协商|询问|轮次)|循环执行|死循环|无限轮|动态生成代码|生成并执行代码|执行脚本"));
+            java.util.regex.Pattern.compile("\\b(forever|infinite(ly)?|endless(ly)?|indefinite(ly)?|unlimited\\s+(negotiat\\w+|rounds?|loops?|retr(y|ies)))\\b", java.util.regex.Pattern.CASE_INSENSITIVE),
+            java.util.regex.Pattern.compile("\\b(loop|repeat)\\s+(until|forever|endlessly|while)\\b", java.util.regex.Pattern.CASE_INSENSITIVE),
+            java.util.regex.Pattern.compile("(无限|无穷|永远|不断|一直|无上限)\\s*(循环|重复|重试|协商|询问|轮次)|无限协商|循环执行|死循环|无限轮|动态生成代码|生成并执行代码|执行脚本"));
 
     private String unsupportedControlFlow(Object value) {
         if (!(value instanceof String text) || text.isBlank()) return null;

@@ -173,9 +173,21 @@ public class TaskPlanningOrchestrator {
         applyValidationResult(planVersion, validation);
 
         if (!validation.isAllPassed()) {
-            taskEventService.append(taskId, "PLAN_VALIDATED", "SYSTEM", "ERR_VALIDATION_FAILED",
-                    "候选计划三类校验未通过: " + validation.getErrors().size() + "项错误");
-            downgradeOrManual(task, "候选计划三类校验未通过，转基线模板降级");
+            String primaryReason = validation.getErrors().isEmpty() ? "ERR_VALIDATION_FAILED" : validation.getErrors().get(0).getReasonCode();
+            StringBuilder summary = new StringBuilder("候选计划三类校验未通过: ");
+            summary.append(validation.getErrors().size()).append("项错误");
+            if (!validation.getErrors().isEmpty()) {
+                summary.append(" [");
+                for (int i = 0; i < validation.getErrors().size(); i++) {
+                    var err = validation.getErrors().get(i);
+                    if (i > 0) summary.append("; ");
+                    summary.append(err.getErrorType()).append(" 步骤").append(err.getStepSeq() == null ? "-" : err.getStepSeq())
+                           .append(": ").append(err.getDescription()).append("(").append(err.getReasonCode()).append(")");
+                }
+                summary.append("]");
+            }
+            taskEventService.append(taskId, "PLAN_VALIDATED", "SYSTEM", primaryReason, summary.toString());
+            downgradeOrManual(task, "候选计划三类校验未通过，转基线模板降级: " + primaryReason);
             return;
         }
 
@@ -315,11 +327,22 @@ public class TaskPlanningOrchestrator {
         applyValidationResult(downgradedVersion, validation);
 
         if (!validation.isAllPassed()) {
-            downgradedVersion.setValidationErrors(toJson(validation.getErrors()));
             planVersionMapper.insert(downgradedVersion);
-            taskEventService.append(taskId, "BASELINE_DOWNGRADED", "SYSTEM", "ERR_TEMPLATE_VALIDATION_FAILED",
-                    "所选基线模板" + template.getTemplateName() + "三类校验未通过");
-            toPendingManual(task, downgradeReason + "；所选基线模板校验失败");
+            String primaryReason = validation.getErrors().isEmpty() ? "ERR_TEMPLATE_VALIDATION_FAILED" : validation.getErrors().get(0).getReasonCode();
+            StringBuilder summary = new StringBuilder("所选基线模板").append(template.getTemplateName()).append("三类校验未通过: ");
+            summary.append(validation.getErrors().size()).append("项错误");
+            if (!validation.getErrors().isEmpty()) {
+                summary.append(" [");
+                for (int i = 0; i < validation.getErrors().size(); i++) {
+                    var err = validation.getErrors().get(i);
+                    if (i > 0) summary.append("; ");
+                    summary.append(err.getErrorType()).append(" 步骤").append(err.getStepSeq() == null ? "-" : err.getStepSeq())
+                           .append(": ").append(err.getDescription()).append("(").append(err.getReasonCode()).append(")");
+                }
+                summary.append("]");
+            }
+            taskEventService.append(taskId, "BASELINE_DOWNGRADED", "SYSTEM", primaryReason, summary.toString());
+            toPendingManual(task, downgradeReason + "；所选基线模板校验失败: " + primaryReason);
             return;
         }
 
@@ -354,7 +377,9 @@ public class TaskPlanningOrchestrator {
         planVersion.setCapabilityCheckResult(validation.getCapabilityCheckResult());
         planVersion.setConstraintCheckResult(validation.getConstraintCheckResult());
         planVersion.setValidationErrors(toJson(validation.getErrors()));
-        planVersionMapper.update(planVersion);
+        if (planVersion.getId() != null) {
+            planVersionMapper.update(planVersion);
+        }
     }
 
     @SuppressWarnings("unchecked")

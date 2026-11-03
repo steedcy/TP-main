@@ -214,39 +214,92 @@ public class TaskService {
      * 现已恢复"等场景）；RETRY_PLANNING语义与之相同，两者均是重新走一次advance；
      * MARK_FAILED直接将任务置为失败并记录原因。
      */
-    @Transactional
     public Task manualAction(Long taskId, String action, User operator) {
+        return manualAction(taskId, action, null, null, operator);
+    }
+
+    public Task manualAction(Long taskId, String action, String reason, User operator) {
+        return manualAction(taskId, action, reason, null, operator);
+    }
+
+    @Transactional
+    public Task manualAction(Long taskId, String action, String reason, String taskGoal, User operator) {
         Task task = get(taskId);
+        String cleanReason = reason == null || reason.isBlank() ? null : reason.trim();
+        String cleanGoal = taskGoal == null || taskGoal.isBlank() ? null : taskGoal.trim();
+        String upperAction = action == null ? "" : action.trim().toUpperCase();
+
+        // 对应5.4.4硬性闸门与业务规则7（SRS_F013.R07）：硬性校验失败严禁进入监督判定中，
+        // 也不得由监督智能体或人工强行放行。试图强行放行必须坚决拦截，记录时间线与审计留痕。
+        Set<String> forceBypassActions = Set.of(
+                "FORCE_RELEASE", "BYPASS_VALIDATION", "FORCE_BYPASS", "RELEASE",
+                "OVERRIDE", "APPROVE", "FORCE_PASS", "FORCE_EXECUTE",
+                "REQUEST_SUPERVISION", "FORCE_SUPERVISION", "SUPERVISION_OVERRIDE"
+        );
+        if (forceBypassActions.contains(upperAction)) {
+            taskEventService.append(taskId, "FORCE_BYPASS_INTERCEPTED", "OPERATOR", "ERR_FORCE_BYPASS_REJECTED",
+                    "操作员试图强行放行硬性校验失败的计划，系统已拦截并拒绝（操作: " + action + "）");
+            operationLogService.record(operator.getId(), operator.getUsername(), operator.getRole(),
+                    "FORCE_BYPASS_ATTEMPT", task.getTaskCode() + " -> " + action, "INTERCEPTED", null);
+            throw new BusinessException(ErrorCode.FORCE_BYPASS_HARD_CHECK, "硬性校验失败的计划严禁进入监督判定或强行放行");
+        }
+
+        if (cleanReason != null && cleanReason.length() > 200) {
+            throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, "处置原因不得超过200字");
+        }
+        if (cleanGoal != null && cleanGoal.length() > 500) {
+            throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, "修改后的目标不得超过500字");
+        }
+
         if (task.getStatus() != TaskStatus.PENDING_MANUAL) {
             throw new BusinessException(ErrorCode.TASK_STATUS_NOT_ALLOWED, "任务当前状态不是待人工处理，不可执行该操作");
         }
 
         // 三轮补充后仍缺关键信息进入待人工处理时，关键信息仍未确认：转基线/重试规划会让模板默认值
         // （如默认轮椅说明、测试登机口）顶替操作员未确认的旅客类型或起终点，须先拒绝，只能置为失败（DEF-S3-063、R04）
-        if (("SWITCH_TO_BASELINE".equals(action) || "RETRY_PLANNING".equals(action))
+        if (("SWITCH_TO_BASELINE".equals(upperAction) || "RETRY_PLANNING".equals(upperAction))
                 && !fromJsonQuestions(task.getMissingInfoQuestions()).isEmpty()) {
             throw new BusinessException(ErrorCode.PARAM_MISSING,
                     "任务仍有未补充的关键信息，不能转基线或重试规划，请先补齐或将任务置为失败: "
                             + fromJsonQuestions(task.getMissingInfoQuestions()));
         }
 
-        switch (action) {
-            case "SWITCH_TO_BASELINE", "RETRY_PLANNING" -> {
+        switch (upperAction) {
+            case "SWITCH_TO_BASELINE" -> {
                 task.setStatus(TaskStatus.PLANNING);
                 task.setUpdatedAt(LocalDateTime.now());
                 taskMapper.update(task);
-                taskEventService.append(taskId, "SWITCH_TO_BASELINE".equals(action)
-                                ? "BASELINE_SWITCH_REQUESTED" : "REPLANNING_TRIGGERED", "OPERATOR", null,
-                        "运行操作员" + operator.getUsername() + "选择" + action);
-                if ("SWITCH_TO_BASELINE".equals(action)) taskPlanningOrchestrator.switchToBaseline(taskId);
-                else taskPlanningOrchestrator.advance(taskId);
+                taskEventService.append(taskId, "BASELINE_SWITCH_REQUESTED", "OPERATOR", null,
+                        "运行操作员" + operator.getUsername() + "选择SWITCH_TO_BASELINE"
+                                + (cleanReason == null ? "" : "，原因: " + cleanReason));
+                taskPlanningOrchestrator.switchToBaseline(taskId);
+            }
+            case "RETRY_PLANNING" -> {
+                task.setStatus(TaskStatus.PLANNING);
+                if (cleanGoal != null) {
+                    task.setTaskGoal(cleanGoal);
+                    task.setGoalParsingResult(null);
+                    taskEventService.append(taskId, "TASK_GOAL_UPDATED", "OPERATOR", null,
+                            "运行操作员" + operator.getUsername() + "修改任务目标为: " + cleanGoal);
+                }
+                task.setUpdatedAt(LocalDateTime.now());
+                taskMapper.update(task);
+                taskEventService.append(taskId, "REPLANNING_TRIGGERED", "OPERATOR", null,
+                        "运行操作员" + operator.getUsername() + "选择RETRY_PLANNING"
+                                + (cleanReason == null ? "" : "，原因: " + cleanReason));
+                if (cleanGoal != null) {
+                    runGoalUnderstanding(task, fromJsonMap(task.getSceneParams()), null);
+                } else {
+                    taskPlanningOrchestrator.advance(taskId);
+                }
             }
             case "MARK_FAILED" -> {
                 task.setStatus(TaskStatus.FAILED);
-                task.setFailureReason("运行操作员" + operator.getUsername() + "在待人工处理阶段手动置为失败");
+                task.setFailureReason("运行操作员" + operator.getUsername() + "在待人工处理阶段手动置为失败"
+                        + (cleanReason == null ? "" : "，原因: " + cleanReason));
                 task.setUpdatedAt(LocalDateTime.now());
                 taskMapper.update(task);
-                taskEventService.append(taskId, "TASK_FAILED", "OPERATOR", null, task.getFailureReason());
+                taskEventService.append(taskId, "TASK_FAILED", "OPERATOR", "MANUAL_MARK_FAILED", task.getFailureReason());
             }
             default -> throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, "未知的人工处理动作: " + action);
         }
