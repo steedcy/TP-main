@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（SRS_F013，V1.140 独立复测发现 DEF-S3-089，执行基线 V2.3；见末尾）
-- 当前进度：`SRS_F001`～`SRS_F012` 已按各自版本和独立证据完成验收；`SRS_F013` 未通过，强行放行拦截的错误响应及持久留痕待修。
+- 状态：`READY_FOR_GPT`（SRS_F013，Claude 修复轮 V1.141，执行基线 V2.3；见末尾）
+- 当前进度：`SRS_F001`～`SRS_F012` 已按各自版本和独立证据完成验收；当前正在推进 `SRS_F013`（计划三类校验与冻结机制）DEF-S3-089 修复后复测。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -1525,3 +1525,24 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-03 | SRS_F013 | ChatGPT → Claude | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / 2ff5c6e / V1.140 | 95a539232e81987e583147545a69c5218895e9f0 | DEF-S3-089：两失败候选×两放行动作均500且无拦截留痕；修复数据库结果约束与事务持久化，再续测F013剩余范围；未合main |
+
+## Claude → ChatGPT：SRS_F013 V1.141 DEF-S3-089 修复与复测交接（执行基线 V2.3）
+
+- 状态：`READY_FOR_GPT`。分支 `ai/claude-fix`，产品代码 SHA `cd92e49c7198bb602447aa72793740fa18536109`，标签 `V1.141`。
+- **本轮缺陷修复与需求实现摘要（DEF-S3-089、TC-040.S2、TC-041.S3、R07）**：
+  1. **数据库约束扩展（DEF-S3-089 / Flyway V27）**：
+     - 新增增量迁移脚本 `backend/src/main/resources/db/migration/V27__allow_intercepted_operation_log_result.sql`，执行 `ALTER TABLE operation_logs DROP CONSTRAINT IF EXISTS chk_op_log_result; ALTER TABLE operation_logs ADD CONSTRAINT chk_op_log_result CHECK (operation_result IN ('SUCCESS', 'FAILED', 'CANCELLED', 'INTERCEPTED'));`；
+     - 允许操作审计表记录 `INTERCEPTED` 结果，解决真实 PostgreSQL 约束拒绝导致的 500/1000 报错。
+  2. **独立物理事务留痕（DEF-S3-089 / REQUIRES_NEW 机制）**：
+     - 引入专用服务 `ForceBypassAuditRecorder`，其核心记录方法 `recordInterception` 声明 `@Transactional(propagation = Propagation.REQUIRES_NEW)`；
+     - 在 `TaskService.manualAction` 识别到强行放行动作（如 `FORCE_RELEASE`、`REQUEST_SUPERVISION` 等）时，由 `forceBypassAuditRecorder` 在挂起外层事务的全新事务中写入 `FORCE_BYPASS_INTERCEPTED` 时间线事件与 `FORCE_BYPASS_ATTEMPT`（结果 `INTERCEPTED`）操作审计日志并立即提交；
+     - 随后抛出 `BusinessException(ErrorCode.FORCE_BYPASS_HARD_CHECK, 4110)`。外层事务回滚时，拦截事件与审计记录由于已在独立物理事务中完成提交，落库持久化不受回滚影响，全局异常处理器正常返回 HTTP 400 Bad Request（API 业务码 4110）；
+     - 任务状态保持 `PENDING_MANUAL`，步骤分配与下发设备指令均为 0。
+  3. **单元测试与回归验证**：
+     - `PlanThreeCheckAndFreezeF013Test` 增加 `def_s3_089_forceBypassAuditRecorderPersistsInterceptionAndAudit` 测试（15/15 全部通过）；
+     - 后端全量测试 304 项全部通过（304 run, 0 failures, 0 errors, 2 skipped）；
+     - 产品提交 `cd92e49` 已创建标签 `V1.141`。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-03 | SRS_F013 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / cd92e49 / V1.141 | 无 | DEF-S3-089 修复：Flyway V27 允许 INTERCEPTED，REQUIRES_NEW 保证 4110 拦截时事件与审计持久化；单测 304/304 全通，待 GPT 续测 |
