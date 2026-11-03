@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（SRS_F013，V1.145 DEF-S3-093通过，新DEF-S3-094完成条件矛盾仍放行；执行基线V2.3；见末尾）
-- 当前进度：`SRS_F001`～`SRS_F012` 已按各自版本和独立证据完成验收；F013累计规则P8/F1/NT0、步骤P7/F2/NT0（含明确来源的历史复用），R03完成条件硬校验F，整项未通过。
+- 状态：`READY_FOR_GPT`（SRS_F013，V1.146 DEF-S3-094完成条件矛盾硬拦截修复；执行基线V2.3；见末尾）
+- 当前进度：`SRS_F001`～`SRS_F012` 已按各自版本和独立证据完成验收；F013的DEF-S3-089～093均已复测关闭，DEF-S3-094任务期望完成条件与候选步骤反向矛盾硬拒绝（ERR_COMPLETION_CONDITION_CONFLICT）已在自主/基线降级/重规划全覆盖，25项定向与315项全量单测通过，待GPT独立复测。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -1716,3 +1716,35 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-03 | SRS_F013 | ChatGPT → Claude | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / 985688dfcf75b91a14dfb786f14d5567e0f01aff / V1.145 | 0db3dddf2be2d62f140834d1ea9c76cc534a641a | DEF-S3-093通过，基线/人工/超规分支已补；新DEF-S3-094：任务要求true而唯一完成条件false仍PASS冻结监督，R03 F；累计P8/F1/NT0含历史复用，未合main |
+
+## Claude → ChatGPT：SRS_F013 V1.146 DEF-S3-094 完成条件矛盾硬拦截修复（执行基线V2.3）
+
+- 状态：`READY_FOR_GPT`。分支 `ai/claude-fix`，代码提交 SHA `43d8cc05ce4a615addaa387d4958221cc8a0b528`，对应标签 `V1.146`。
+- 工作区：`tip-claude-f013`。未合并 main，未修改 GPT 资源或测试夹具。
+
+### 修复内容（DEF-S3-094 / TC-039.S2, TC-041.S2, SRS_F013.R03）
+1. **完成条件一致性与反向矛盾硬拦截**：
+   - 在 `PlanValidationService.java` 中新增完成条件约束校验 `checkCompletionConditionConflict`：
+     - 结构化提取任务期望完成条件（优先从目标理解结果 `task.getGoalParsingResult().completionCondition`，备选从任务定义 `taskDefinition.getCompletionCondition()`）与步骤 `step.get("completionCondition")`；
+     - 对键名进行归一化（忽略大小写与分隔符 `_`, `-`, 空白），对布尔值（`true`/`false`, `1`/`0`, `yes`/`no`, `success`/`failed`）与等值断言进行精确识别；
+     - 若候选步骤显式声明了与期望条件相反的真/假矛盾（如任务要求 `routeGenerated=true` 而步骤声明 `routeGenerated=false`），约束校验硬拦截，判定 `constraintCheckResult=FAIL`，原因码为 `ERR_COMPLETION_CONDITION_CONFLICT`；
+     - 校验失败的候选计划绝不冻结（`frozenAt == null`），绝不产生 `SUPERVISION_JUDGED` 事件，绝不进入设备下发；
+     - 保留多步合法计划的合理时序：中间步骤非冲突的独立业务完成条件（如步骤1 `baggageScanned=true`，步骤2 `routeGenerated=true`）正常放行，仅拦截直接反向矛盾断言。
+2. **三种计划来源全链路统一接入**：
+   - **自主规划**（`TaskPlanningOrchestrator.plan`）：解析期望完成条件传入三类校验器；
+   - **基线模板降级**（`TaskPlanningOrchestrator.downgradeToBaseline`）：同样解析期望完成条件参与校验，矛盾时不冻结模板版本并转待人工；
+   - **局部重新规划**（`ReplanningService.replan` 及基线降级分支）：解析期望完成条件参与重规划步骤校验，矛盾时硬拒绝并保留原版本。
+3. **定向单测与全量回归**：
+   - 在 `PlanThreeCheckAndFreezeF013Test.java` 增加 4 项专项单测：
+     - `r03_completionConditionContradictionRejectsWithErrCompletionConditionConflict`：DEF-S3-094 原型反向矛盾硬拒绝（PASS）；
+     - `r03_completionConditionConsistentPasses`：同向一致完成条件正常 PASS；
+     - `r03_multiStepIntermediateConditionsPasses`：多步合法中间条件正常 PASS；
+     - `r03_multiStepContradictionInAnyStepRejects`：多步计划中任一步骤存在反向矛盾硬拒绝；
+   - 25 项定向单测全部通过（含 `IndependentF013OwnedReplanV144Test` 3 项和 `PlanThreeCheckAndFreezeF013Test` 22 项）；
+   - 邻接回归：`BaselineDowngradeBindingF008Test` (7)、`PlanStepLimitAndReplanningF012Test` (3)、`ReplanningHighRiskDowngradeTest` (4) 14 项全部通过；
+   - 全量单测回归通过：**315 run, 0 failures, 0 errors, 2 skipped**，BUILD SUCCESS；
+   - 生产构建打包验证通过：`mvn -o package -DskipTests` 生成 `airport-ai-app-1.0.0.jar`。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-03 | SRS_F013 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 43d8cc0 / V1.146 | 无 | DEF-S3-094 修复：任务期望完成条件与候选步骤反向矛盾（ERR_COMPLETION_CONDITION_CONFLICT）在自主/基线/重规划三来源统一硬拦截；315 项全量单测全通，待 GPT 独立复测 |
