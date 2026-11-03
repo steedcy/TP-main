@@ -92,8 +92,22 @@
                                   customRender: ({ text }) => text ? '匹配' : '不匹配' }]" />
           </template>
 
+          <!-- DEF-S3-036：候选计划摘要（步骤数、剩余额度、规划说明） -->
+          <a-descriptions bordered :column="2" size="small" style="margin-top: 8px" data-testid="candidate-plan-summary">
+            <a-descriptions-item label="可执行步骤数">{{ executableStepCount(pv) }} / 5</a-descriptions-item>
+            <a-descriptions-item label="剩余步骤额度">{{ Math.max(0, 5 - executableStepCount(pv)) }}</a-descriptions-item>
+            <a-descriptions-item label="规划说明" :span="2">{{ planNote(pv) }}</a-descriptions-item>
+          </a-descriptions>
           <p style="margin-top: 8px"><b>候选步骤：</b></p>
-          <a-table :dataSource="pv.planSteps" :columns="stepColumns" rowKey="stepSeq" size="small" :pagination="false" />
+          <a-table :dataSource="pv.planSteps" :columns="stepColumns" rowKey="stepSeq" size="small" :pagination="false">
+            <template #bodyCell="{ column, record }">
+              <template v-if="column.dataIndex === 'inputParams'">
+                <code>{{ JSON.stringify(record.inputParams ?? record.paramMapping ?? {}) }}</code>
+              </template>
+              <template v-else-if="column.key === 'paramSource'">{{ paramSourceOf(pv, record) }}</template>
+              <template v-else-if="column.key === 'candidates'">{{ candidatesOf(pv, record) }}</template>
+            </template>
+          </a-table>
         </a-tab-pane>
       </a-tabs>
     </a-card>
@@ -247,6 +261,9 @@ const stepColumns = [
   { title: '步骤', dataIndex: 'stepSeq' },
   { title: '步骤目标', dataIndex: 'stepGoal' },
   { title: '所需能力', dataIndex: 'capabilityType' },
+  { title: '输入参数', dataIndex: 'inputParams' },
+  { title: '参数来源', key: 'paramSource' },
+  { title: '候选设备', key: 'candidates' },
   { title: '前置条件', dataIndex: 'precondition' },
   { title: '完成条件', dataIndex: 'completionCondition' },
   { title: '失败处理', dataIndex: 'failureHandling' }
@@ -257,6 +274,33 @@ function statusLabel(status) {
 }
 function sourceLabel(source) {
   return source === 'BASELINE_TEMPLATE' ? '基线模板' : '自主规划'
+}
+// DEF-S3-036：规划说明、参数来源与步骤候选设备，仅取页面已有的计划版本与上下文快照数据
+function executableStepCount(pv) {
+  if (!Array.isArray(pv?.planSteps)) return 0
+  return pv.planSteps.filter((s) => !s.conditionNode && s.nodeType !== 'CONDITION' && s.stepType !== 'CONDITION').length
+}
+function planNote(pv) {
+  const n = executableStepCount(pv)
+  if (pv.source === 'BASELINE_TEMPLATE') return `基线模板${pv.snapshotId ? '（' + pv.snapshotId + '）' : ''}生成的 ${n} 步计划`
+  const conf = pv.confidence != null ? `，置信度 ${pv.confidence}` : ''
+  return `规划模型依据上下文快照${pv.snapshotId ? ' ' + pv.snapshotId : ''}生成 ${n} 步候选计划${conf}`
+}
+function paramSourceOf(pv, step) {
+  if (pv.source === 'BASELINE_TEMPLATE') return '基线模板参数映射/任务场景参数'
+  return Object.keys(step.inputParams || {}).length ? '规划模型依据任务目标与场景参数生成' : '无输入参数'
+}
+function candidatesOf(pv, step) {
+  const snap = contextSnapshots.value.find((s) => s.snapshotCode === pv.snapshotId)
+  let agents = snap?.agents
+  if (typeof agents === 'string') {
+    try { agents = JSON.parse(agents) } catch (e) { agents = [] }
+  }
+  if (!Array.isArray(agents)) agents = []
+  const names = agents
+    .filter((a) => a.onlineStatus === 'ONLINE' && (a.capabilities || []).includes(step.capabilityType))
+    .map((a) => a.agentId)
+  return names.length ? names.join('，') : '无在线候选设备（或快照不可用）'
 }
 function checkLabel(result) {
   if (!result) return '未执行'

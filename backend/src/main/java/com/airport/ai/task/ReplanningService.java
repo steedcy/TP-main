@@ -83,7 +83,9 @@ public class ReplanningService {
         // 备选路径2a：剩余额度为0直接判无法重规划（异常发生步骤本身即占用了一个步骤名额，
         // 但该步骤已失败不计入"已完成"，故剩余额度=5-已完成步骤数，允许等于1时仍可重规划1个替换步骤）
         List<TaskStepAssignment> assignments = assignmentMapper.findByPlanVersionIdOrderByStepSeqAsc(task.getCurrentPlanVersionId());
-        long completedCount = assignments.stream().filter(a -> "COMPLETED".equals(a.getStepStatus())).count();
+        // 只有失败步骤之前、实际完成的动作占用额度；重试和失败事件本身不产生新步骤
+        long completedCount = assignments.stream().filter(a -> "COMPLETED".equals(a.getStepStatus())
+                && a.getStepSeq() != null && a.getStepSeq() < failedStepSeq).count();
         int remainingQuota = MAX_STEPS - (int) completedCount;
         if (remainingQuota <= 0) {
             taskEventService.append(taskId, "REPLAN_FAILED", "SYSTEM", "ERR_STEP_QUOTA_EXHAUSTED",
@@ -174,23 +176,34 @@ public class ReplanningService {
         }
 
         List<Map<String, Object>> newTailSteps = response.getPlanSteps();
-        if (newTailSteps == null || newTailSteps.isEmpty() || newTailSteps.size() > remainingQuota) {
+        if (newTailSteps == null || newTailSteps.isEmpty() || PlanStepRules.executableCount(newTailSteps) > remainingQuota) {
             taskEventService.append(taskId, "REPLAN_FAILED", "SYSTEM", "ERR_STEP_LIMIT_EXCEEDED",
-                    "新计划替换步骤数超过剩余额度" + remainingQuota + "或为空");
+                    "新计划替换的可执行步骤数" + PlanStepRules.executableCount(newTailSteps) + "超过剩余额度" + remainingQuota + "或为空（已完成"
+                            + completedSteps.size() + "步，条件节点不计数、分支动作计数）");
             toPendingManual(task, "局部重新规划失败：新计划步骤数超过剩余额度");
             return;
         }
 
         // 模型返回的替换步骤stepSeq通常从1起算，须重新编号以衔接在已完成步骤之后，避免序号冲突
         List<Map<String, Object>> renumberedTail = new ArrayList<>();
+        Map<Integer, Integer> renumbered = new java.util.HashMap<>();
         int nextSeq = failedStepSeq;
         for (Map<String, Object> step : newTailSteps) {
+            Integer originalSeq = asInteger(step.get("stepSeq"));
+            renumbered.put(originalSeq == null ? nextSeq - failedStepSeq + 1 : originalSeq, nextSeq);
             Map<String, Object> copy = new java.util.LinkedHashMap<>(step);
             copy.put("stepSeq", nextSeq++);
             renumberedTail.add(copy);
         }
+        // 分支动作引用的条件节点序号随重新编号同步；找不到所属条件节点的引用置为-1交给结构校验拒绝
+        for (Map<String, Object> step : renumberedTail) {
+            Integer owner = PlanStepRules.branchOf(step);
+            if (owner != null) step.put("branchOf", renumbered.getOrDefault(owner, -1));
+        }
+        // 条件节点不计数、不下发；冻结版本只保存可执行步骤（折叠后分支动作带branchCondition）
+        List<Map<String, Object>> actionTail = PlanStepRules.foldConditionNodes(renumberedTail);
         List<Map<String, Object>> mergedSteps = new ArrayList<>(completedSteps);
-        mergedSteps.addAll(renumberedTail);
+        mergedSteps.addAll(actionTail);
 
         List<Map<String, Object>> snapshotAgents = contextSnapshotService.parseAgents(snapshot.getAgents());
         // Completed frozen actions retain their actual results and do not require currently online devices.
@@ -198,13 +211,15 @@ public class ReplanningService {
                 allowedTypes, task.getTaskFamily(), failedStepSeq - 1);
         planValidationService.requireCoreScenarioCoverage(mergedSteps, task.getTaskFamily(), validation);
         if (mergedSteps.size() > MAX_STEPS) validation.failStructure("最终路径超过五步", null, "ERR_STEP_LIMIT_EXCEEDED");
+        List<Map<String, Object>> storedSteps = validation.isAllPassed() ? mergedSteps : new ArrayList<>(completedSteps);
+        if (!validation.isAllPassed()) storedSteps.addAll(renumberedTail);
 
         PlanVersion newVersion = new PlanVersion();
         newVersion.setTaskId(taskId);
         newVersion.setVersionNo((int) (planVersionMapper.countByTaskId(taskId) + 1));
         newVersion.setSource("AUTONOMOUS");
         newVersion.setSnapshotId(snapshot.getSnapshotCode());
-        newVersion.setPlanSteps(toJson(mergedSteps));
+        newVersion.setPlanSteps(toJson(storedSteps));
         newVersion.setConfidence(response.getConfidence());
         newVersion.setStructureCheckResult(validation.getStructureCheckResult());
         newVersion.setCapabilityCheckResult(validation.getCapabilityCheckResult());
@@ -230,7 +245,7 @@ public class ReplanningService {
                 "重新规划后新计划版本" + newVersion.getVersionNo() + "三类校验全部通过，已冻结");
 
         // 5.4.5：新版本仍须过监督判定，判高风险则按5.4.6自动基线降级（业务规则9）
-        int minCandidateCount = renumberedTail.stream().map(step -> String.valueOf(step.get("capabilityType"))).distinct()
+        int minCandidateCount = actionTail.stream().map(step -> String.valueOf(step.get("capabilityType"))).distinct()
                 .mapToInt(cap -> contextSnapshotService.countAvailableCandidates(snapshot, cap, task.getTaskFamily()))
                 .min().orElse(0);
         RiskAssessmentResult riskResult;
@@ -402,10 +417,11 @@ public class ReplanningService {
             Map<String, Object> normalized = new java.util.LinkedHashMap<>(step);
             int position = seq.incrementAndGet();
             if (normalized.get("stepSeq") == null) normalized.put("stepSeq", position);
-            normalized.putIfAbsent("stepGoal", "执行" + normalized.get("capabilityType") + "能力（基线模板步骤）");
-            normalized.putIfAbsent("precondition", "候选设备在线且空闲");
-            normalized.putIfAbsent("failureHandling", "重试一次或转人工处理");
-            normalized.putIfAbsent("inputParams", Map.of());
+            // 仅字段整体缺失时派生默认值；显式null/空串/空白保持原值交给结构硬校验拒绝（SRS_F012.R04）
+            PlanStepRules.defaultIfAbsent(normalized, "stepGoal", "执行" + normalized.get("capabilityType") + "能力（基线模板步骤）");
+            PlanStepRules.defaultIfAbsent(normalized, "precondition", "候选设备在线且空闲");
+            PlanStepRules.defaultIfAbsent(normalized, "failureHandling", "重试一次或转人工处理");
+            PlanStepRules.defaultIfAbsent(normalized, "inputParams", Map.of());
             return normalized;
         }).toList();
     }

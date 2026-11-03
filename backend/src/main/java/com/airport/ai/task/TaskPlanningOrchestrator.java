@@ -143,32 +143,33 @@ public class TaskPlanningOrchestrator {
         }
 
         List<Map<String, Object>> steps = planningResponse.getPlanSteps();
-        if (steps == null || steps.size() > MAX_STEPS) {
-            // 备选路径2a：模型返回步骤数超过5，直接判定结构校验失败，不做自动截断
+        if (steps == null || PlanStepRules.executableCount(steps) > MAX_STEPS) {
+            // 备选路径2a：模型返回可执行步骤数超过5（条件节点不计、分支动作计数），直接判定结构校验失败，不做自动截断
             taskEventService.append(taskId, "PLAN_VALIDATED", "SYSTEM", "ERR_STEP_LIMIT_EXCEEDED",
-                    "候选计划步骤数" + (steps == null ? 0 : steps.size()) + "超过上限5或为空");
+                    "候选计划可执行步骤数" + PlanStepRules.executableCount(steps) + "超过上限5或为空");
             downgradeOrManual(task, "候选计划结构校验失败：步骤数超过5或响应为空");
             return;
         }
-
-        PlanVersion planVersion = new PlanVersion();
-        planVersion.setTaskId(taskId);
-        planVersion.setVersionNo((int) (planVersionMapper.countByTaskId(taskId) + 1));
-        planVersion.setSource("AUTONOMOUS");
-        planVersion.setSnapshotId(snapshot.getSnapshotCode());
-        planVersion.setPlanSteps(toJson(steps));
-        planVersion.setConfidence(planningResponse.getConfidence());
-        planVersionMapper.insert(planVersion);
-        task.setCurrentPlanVersionId(planVersion.getId());
-        taskMapper.update(task);
-        taskEventService.append(taskId, "PLAN_GENERATED", "SYSTEM", null,
-                "候选计划生成完成，来源AUTONOMOUS，版本" + planVersion.getVersionNo());
 
         // 5.4.4 计划三类校验，约束校验维度接入5.6.1任务定义声明的可用能力类型范围
         List<Map<String, Object>> snapshotAgents = contextSnapshotService.parseAgents(snapshot.getAgents());
         List<String> allowedCapabilityTypes = allowedCapabilityTypes(task.getTaskFamily());
         PlanValidationResult validation = planValidationService.validate(steps, snapshotAgents, allowedCapabilityTypes, task.getTaskFamily());
         planValidationService.requireCoreScenarioCoverage(steps, task.getTaskFamily(), validation);
+
+        PlanVersion planVersion = new PlanVersion();
+        planVersion.setTaskId(taskId);
+        planVersion.setVersionNo((int) (planVersionMapper.countByTaskId(taskId) + 1));
+        planVersion.setSource("AUTONOMOUS");
+        planVersion.setSnapshotId(snapshot.getSnapshotCode());
+        // 校验通过的版本只保存可执行步骤（条件节点折叠进分支动作）；未通过的保留模型原始返回供错误清单核对
+        planVersion.setPlanSteps(toJson(validation.isAllPassed() ? PlanStepRules.foldConditionNodes(steps) : steps));
+        planVersion.setConfidence(planningResponse.getConfidence());
+        planVersionMapper.insert(planVersion);
+        task.setCurrentPlanVersionId(planVersion.getId());
+        taskMapper.update(task);
+        taskEventService.append(taskId, "PLAN_GENERATED", "SYSTEM", null,
+                "候选计划生成完成，来源AUTONOMOUS，版本" + planVersion.getVersionNo());
         applyValidationResult(planVersion, validation);
 
         if (!validation.isAllPassed()) {
@@ -236,6 +237,7 @@ public class TaskPlanningOrchestrator {
         List<Map<String, Object>> steps = parseSteps(planVersion.getPlanSteps());
         int min = Integer.MAX_VALUE;
         for (Map<String, Object> step : steps) {
+            if (PlanStepRules.isConditionNode(step)) continue;
             String capabilityType = String.valueOf(step.get("capabilityType"));
             int count = contextSnapshotService.countAvailableCandidates(snapshot, capabilityType, taskFamily);
             min = Math.min(min, count);
@@ -394,11 +396,13 @@ public class TaskPlanningOrchestrator {
             Map<String, Object> normalized = new java.util.LinkedHashMap<>(step);
             int position = seq.incrementAndGet();
             if (normalized.get("stepSeq") == null) normalized.put("stepSeq", position);
-            normalized.putIfAbsent("stepGoal", "执行" + normalized.get("capabilityType") + "能力（基线模板步骤）");
-            normalized.putIfAbsent("precondition", "候选设备在线且空闲");
-            normalized.putIfAbsent("failureHandling", "重试一次或转人工处理");
+            // 仅在字段整体缺失（模板5.3.1本无这三项）时派生默认值；显式写了null/空串/空白的视为模板内容缺失，
+            // 保持原值交给结构硬校验拒绝，不被默认值掩盖（SRS_F012.R04，基线模板来源）
+            PlanStepRules.defaultIfAbsent(normalized, "stepGoal", "执行" + normalized.get("capabilityType") + "能力（基线模板步骤）");
+            PlanStepRules.defaultIfAbsent(normalized, "precondition", "候选设备在线且空闲");
+            PlanStepRules.defaultIfAbsent(normalized, "failureHandling", "重试一次或转人工处理");
             // 六项字段完整性是结构硬校验（SRS_F012.R04）：无参数映射的基线步骤也要有inputParams（空对象）
-            normalized.putIfAbsent("inputParams", Map.of());
+            PlanStepRules.defaultIfAbsent(normalized, "inputParams", Map.of());
             return normalized;
         }).toList();
     }

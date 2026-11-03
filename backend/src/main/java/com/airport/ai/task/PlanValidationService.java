@@ -65,10 +65,18 @@ public class PlanValidationService {
         }
 
         // 1. 结构校验：步骤数≤5、字段完整、顺序与依赖合法、无循环、无无限轮次协商
-        if (steps.size() > MAX_STEPS) {
-            result.failStructure("可执行步骤数(" + steps.size() + ")超过上限5，系统不做自动截断", null, "ERR_STEP_LIMIT_EXCEEDED");
+        // 条件节点不计数、条件分支中的业务动作计数（SRS_F012.R01/R02）；超限直接失败，不截断
+        int executableCount = PlanStepRules.executableCount(steps);
+        if (executableCount > MAX_STEPS) {
+            result.failStructure("可执行步骤数(" + executableCount + ")超过上限5（条件节点不计数，分支动作计数），系统不做自动截断",
+                    null, "ERR_STEP_LIMIT_EXCEEDED");
+        }
+        if (executableCount == 0) {
+            result.failStructure("计划必须包含至少一个可执行步骤", null, "ERR_STEP_FIELD_MISSING");
         }
         Set<Integer> seenStepSeq = new HashSet<>();
+        Set<Integer> conditionSeqs = new HashSet<>();
+        Set<Integer> actionSeqs = new HashSet<>();
         for (int i = 0; i < steps.size(); i++) {
             Map<String, Object> step = steps.get(i);
             Integer stepSeq = asInteger(step.get("stepSeq"));
@@ -76,31 +84,66 @@ public class PlanValidationService {
             if (!seenStepSeq.add(stepSeq)) {
                 result.failStructure("步骤序号重复，可能存在循环引用", stepSeq, "ERR_STEP_DUPLICATE_SEQ");
             }
-            // 步骤六项（SRS_F012.R04）：目标、能力、输入参数、前置条件、完成条件、失败处理，缺任一项都不得冻结
+            if (PlanStepRules.isConditionNode(step)) {
+                // 条件节点只表达分支判断：要有判断文字，不得含循环/动态代码，不要求能力和设备
+                conditionSeqs.add(stepSeq);
+                if (PlanStepRules.conditionText(step) == null) {
+                    result.failStructure("条件节点缺少判断条件（condition）", stepSeq, "ERR_STEP_FIELD_MISSING");
+                }
+                for (String field : List.of("condition", "stepGoal")) {
+                    String hit = unsupportedControlFlow(step.get(field));
+                    if (hit != null) {
+                        result.failStructure("条件节点" + field + "含不支持的控制流或动态执行内容（" + hit + "）", stepSeq, "ERR_STEP_LOOP_DETECTED");
+                    }
+                }
+                continue;
+            }
+            actionSeqs.add(stepSeq);
+            Integer branchOwner = PlanStepRules.branchOf(step);
+            if (branchOwner != null && (!conditionSeqs.contains(branchOwner) || branchOwner >= stepSeq)) {
+                result.failStructure("分支动作引用不存在或位置靠后的条件节点" + branchOwner, stepSeq, "ERR_STEP_DEPENDENCY_ORDER");
+            }
+            // 步骤六项（SRS_F012.R04）：目标、能力、输入参数、前置条件、完成条件、失败处理，缺任一项都不得冻结。
+            // 缺失、null、空串、纯空白、非文本都算缺失，自主规划、基线模板、重规划三种来源共用本校验。
             for (String field : List.of("stepGoal", "capabilityType", "precondition", "completionCondition", "failureHandling")) {
-                if (isBlank(step.get(field))) {
+                Object value = step.get(field);
+                if (isBlank(value)) {
                     result.failStructure("步骤字段不完整，缺少: " + field, stepSeq, "ERR_STEP_FIELD_MISSING");
+                } else if (!(value instanceof String)) {
+                    result.failStructure("步骤字段不完整，缺少: " + field + "（须为文本）", stepSeq, "ERR_STEP_FIELD_MISSING");
                 }
             }
             if (!(step.get("inputParams") instanceof Map<?, ?>)) {
                 result.failStructure("步骤字段不完整，缺少: inputParams（须为对象，可为空对象）", stepSeq, "ERR_STEP_FIELD_MISSING");
             }
             // 不支持循环、动态代码生成执行和无限轮次协商（SRS_F012.R03）：文字字段里的循环/动态代码/无限协商也拒绝
-            for (String field : List.of("stepGoal", "precondition", "completionCondition", "failureHandling")) {
+            for (String field : List.of("stepGoal", "precondition", "completionCondition", "failureHandling", "branchCondition")) {
                 String hit = unsupportedControlFlow(step.get(field));
                 if (hit != null) {
                     result.failStructure("步骤" + field + "含不支持的控制流或动态执行内容（" + hit + "）", stepSeq, "ERR_STEP_LOOP_DETECTED");
                 }
             }
             Object paramMapping = step.get("inputParams");
-            if (paramMapping instanceof Map<?, ?> mapping && mapping.containsKey("__loop__")) {
+            if (paramMapping instanceof Map<?, ?> mapping && containsLoopMarker(mapping)) {
                 result.failStructure("步骤包含循环/动态代码生成标记，平台不支持", stepSeq, "ERR_STEP_LOOP_DETECTED");
+            }
+            // inputParams里的文字值同样不得携带循环或动态代码（SRS_F012.R03检测范围含inputParams）
+            String paramHit = unsupportedInParams(paramMapping);
+            if (paramHit != null) {
+                result.failStructure("步骤inputParams含不支持的控制流或动态执行内容（" + paramHit + "）", stepSeq, "ERR_STEP_LOOP_DETECTED");
+            }
+            if (step.get("paramMapping") instanceof List<?> mappings) {
+                String mappingHit = unsupportedInParams(mappings);
+                if (mappingHit != null) {
+                    result.failStructure("步骤paramMapping含不支持的控制流或动态执行内容（" + mappingHit + "）", stepSeq, "ERR_STEP_LOOP_DETECTED");
+                }
             }
         }
         // Execution is strictly sequential. A step may depend only on a prior
         // business step; a forward/self reference creates an impossible order.
         for (int i = 0; i < steps.size(); i++) {
             Map<String, Object> step = steps.get(i);
+            if (PlanStepRules.isConditionNode(step)) continue;
             Integer seq = asInteger(step.get("stepSeq"));
             if (seq == null) seq = i + 1;
             for (String field : List.of("precondition", "completionCondition")) {
@@ -115,7 +158,7 @@ public class PlanValidationService {
                             break;
                         }
                     }
-                    if (predecessor != null && ((!seenStepSeq.contains(predecessor)
+                    if (predecessor != null && ((!actionSeqs.contains(predecessor)
                             && predecessor > completedPrefixCount) || predecessor >= seq)) {
                         result.failStructure("步骤" + seq + "依赖不存在或尚未完成的步骤" + predecessor,
                                 seq, "ERR_STEP_DEPENDENCY_ORDER");
@@ -135,6 +178,7 @@ public class PlanValidationService {
             Map<String, Object> step = steps.get(i);
             Integer stepSeq = asInteger(step.get("stepSeq"));
             if (stepSeq == null) stepSeq = i + 1;
+            if (PlanStepRules.isConditionNode(step)) continue;
             String capabilityType = asString(step.get("capabilityType"));
             if (capabilityType == null) {
                 continue; // 结构校验已报告字段缺失，避免重复报错
@@ -163,10 +207,13 @@ public class PlanValidationService {
             Integer stepSeq = asInteger(step.get("stepSeq"));
             if (stepSeq == null) stepSeq = i + 1;
 
-            List<String> motionSafetyHits = MotionSafetyGuard.detect(step);
+            List<String> motionSafetyHits = PlanStepRules.isConditionNode(step)
+                    ? MotionSafetyGuard.detect(Map.of("stepGoal", String.valueOf(PlanStepRules.conditionText(step))))
+                    : MotionSafetyGuard.detect(step);
             if (!motionSafetyHits.isEmpty()) {
                 result.failConstraint("步骤包含运动安全控制字段: " + motionSafetyHits, stepSeq, "ERR_MOTION_SAFETY_FIELD");
             }
+            if (PlanStepRules.isConditionNode(step)) continue;
             // Where schemas are available, reject invented/malformed inputs before freezing a plan.
             if (!(step.get("paramMapping") instanceof List<?>) && step.get("inputParams") instanceof Map<?,?> inputs) {
                 List<Map<String,Object>> schemas=new ArrayList<>();
@@ -259,8 +306,19 @@ public class PlanValidationService {
      * 循环、动态代码执行、无限重试/协商的文字表述。只匹配明确的控制流写法，正常业务描述
      * （如“重试一次”“等待设备就绪”“展示直到完成”）不命中。
      */
+    private static final String BOUNDED_REPEAT_TAIL = "(?!.{0,24}(once|twice|one\\s+time|\\d+\\s*(times|x)\\b|一次|两次|二次|\\d+\\s*次))";
+
     private static final List<java.util.regex.Pattern> CONTROL_FLOW = List.of(
-            java.util.regex.Pattern.compile("\\b(while|for)\\s*\\(", java.util.regex.Pattern.CASE_INSENSITIVE),
+            java.util.regex.Pattern.compile("\\bwhile\\s*\\(", java.util.regex.Pattern.CASE_INSENSITIVE),
+            // for(;;) / for (int i=0;;i++)：三段式循环头；不误伤"wait for (30 seconds)"这类普通文字
+            java.util.regex.Pattern.compile("\\bfor\\s*\\([^)]*;[^)]*;[^)]*\\)", java.util.regex.Pattern.CASE_INSENSITIVE),
+            java.util.regex.Pattern.compile("\\b(goto\\s+step|go\\s+back\\s+to\\s+step|jump\\s+back\\s+to\\s+step)", java.util.regex.Pattern.CASE_INSENSITIVE),
+            java.util.regex.Pattern.compile("\\b(os\\.system|__import__|child_process|powershell|bash\\s+-c|cmd(\\.exe)?\\s+/c)\\b|<script\\b|\\b(javascript|vbscript):", java.util.regex.Pattern.CASE_INSENSITIVE),
+            // repeat：带明确次数（once/twice/3 times/一次）的有限重复不算循环
+            java.util.regex.Pattern.compile("\\brepeat(ed|edly|ing|s)?\\b" + BOUNDED_REPEAT_TAIL, java.util.regex.Pattern.CASE_INSENSITIVE),
+            java.util.regex.Pattern.compile("(反复|不停地|重试直到|重复直到|回到步骤\\s*\\d+|返回步骤\\s*\\d+|跳回步骤|无上限重试|无限期|直到成功为止)"),
+            java.util.regex.Pattern.compile("循环(往复|直到|重复|调用|处理|下发|发送|等待|询问|协商)|(不断|持续|永久)\\s*重复|(for|while)\\s*循环|进入循环"),
+            java.util.regex.Pattern.compile("__loop__", java.util.regex.Pattern.CASE_INSENSITIVE),
             java.util.regex.Pattern.compile("\\bdo\\s*\\{", java.util.regex.Pattern.CASE_INSENSITIVE),
             java.util.regex.Pattern.compile("\\b(eval|exec|exec\\w*|system|runtime\\.getruntime|new\\s+function|import\\s+os|subprocess)\\s*\\(", java.util.regex.Pattern.CASE_INSENSITIVE),
             java.util.regex.Pattern.compile("\\b(forever|infinite(ly)?|endless(ly)?|indefinite(ly)?|unlimited\\s+(retr(y|ies)|rounds?|loops?))\\b", java.util.regex.Pattern.CASE_INSENSITIVE),
@@ -274,6 +332,34 @@ public class PlanValidationService {
             if (m.find()) return m.group().trim();
         }
         return null;
+    }
+
+    /** inputParams（及paramMapping）的键和所有层级的文字值：循环/动态代码文字一律拒绝，返回首个命中说明。 */
+    private String unsupportedInParams(Object value) {
+        if (value instanceof Map<?, ?> map) {
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+                String keyHit = unsupportedControlFlow(String.valueOf(entry.getKey()));
+                if (keyHit != null) return String.valueOf(entry.getKey()) + ": " + keyHit;
+                String hit = unsupportedInParams(entry.getValue());
+                if (hit != null) return hit;
+            }
+        } else if (value instanceof Iterable<?> items) {
+            for (Object item : items) {
+                String hit = unsupportedInParams(item);
+                if (hit != null) return hit;
+            }
+        } else if (value instanceof String) {
+            return unsupportedControlFlow(value);
+        }
+        return null;
+    }
+
+    private boolean containsLoopMarker(Map<?, ?> map) {
+        for (Map.Entry<?, ?> entry : map.entrySet()) {
+            if ("__loop__".equals(String.valueOf(entry.getKey()))) return true;
+            if (entry.getValue() instanceof Map<?, ?> nested && containsLoopMarker(nested)) return true;
+        }
+        return false;
     }
 
     private boolean isBlank(Object value) {
