@@ -1,0 +1,1901 @@
+{
+  "version": "V1.149",
+  "codeSha": "2a5090d27e39ca85b511bd5ff8b013c4dbfd9474",
+  "observedAt": "2026-11-04T01:21:11.089226+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "cases": [
+    {
+      "name": "F149_NATURAL_GOAL",
+      "request": {
+        "taskGoal": "F149_NATURAL_GOAL synthetic navigation to F2_TEST_GATE",
+        "taskFamily": "EXT_0FA30230",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "controlledResponse": {
+        "goalCompletion": "The navigation route has been generated.",
+        "steps": [
+          {
+            "stepSeq": 1,
+            "stepGoal": "Generate route to F2_TEST_GATE",
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "precondition": "device online",
+            "completionCondition": "routeGenerated=false",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          }
+        ]
+      },
+      "observed": {
+        "task": {
+          "id": 191,
+          "taskCode": "TASK-20261104-0191",
+          "taskGoal": "F149_NATURAL_GOAL synthetic navigation to F2_TEST_GATE",
+          "taskFamily": "EXT_0FA30230",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "The navigation route has been generated.",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F149_NATURAL_GOAL synthetic navigation to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 188,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-04T01:21:11.11068",
+          "updatedAt": "2026-11-04T01:21:11.162091",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 188,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261104-0169",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Generate route to F2_TEST_GATE",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=false",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "FAIL",
+            "validationErrors": [
+              {
+                "errorType": "CONSTRAINT",
+                "description": "步骤1完成条件(routeGenerated=false)与任务目标完成条件(routeGenerated=true; The navigation route has been generated.)直接矛盾（字段routegenerated期望要求true，步骤声明包含相反值false）",
+                "stepSeq": 1,
+                "reasonCode": "ERR_COMPLETION_CONDITION_CONFLICT"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-04T01:21:11.148916"
+          }
+        ],
+        "events": [
+          {
+            "id": 1648,
+            "taskId": 191,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-04T01:21:11.112995",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F149_NATURAL_GOAL synthetic navigation to F2_TEST_GATE"
+          },
+          {
+            "id": 1649,
+            "taskId": 191,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-04T01:21:11.130285",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1650,
+            "taskId": 191,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-04T01:21:11.136985",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261104-0169"
+          },
+          {
+            "id": 1651,
+            "taskId": 191,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-04T01:21:11.151299",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1652,
+            "taskId": 191,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-04T01:21:11.152259",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_COMPLETION_CONDITION_CONFLICT",
+            "detailSummary": "候选计划三类校验未通过: 1项错误 [CONSTRAINT 步骤1: 步骤1完成条件(routeGenerated=false)与任务目标完成条件(routeGenerated=true; The navigation route has been generated.)直接矛盾（字段routegenerated期望要求true，步骤声明包含相反值false）(ERR_COMPLETION_CONDITION_CONFLICT)]"
+          },
+          {
+            "id": 1653,
+            "taskId": 191,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-04T01:21:11.159486",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT"
+          },
+          {
+            "id": 1654,
+            "taskId": 191,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-04T01:21:11.162091",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      },
+      "checks": {
+        "constraintRejected": true,
+        "conflictCode": true,
+        "notFrozen": true,
+        "notSupervisedOrDispatched": true
+      },
+      "cleanupTerminate": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 191,
+            "taskCode": "TASK-20261104-0191",
+            "taskGoal": "F149_NATURAL_GOAL synthetic navigation to F2_TEST_GATE",
+            "taskFamily": "EXT_0FA30230",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "goalParsingResult": {
+              "completionCondition": "The navigation route has been generated.",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F149_NATURAL_GOAL synthetic navigation to F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "MANUAL_TERMINATED",
+            "currentPlanVersionId": 188,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": "F013 V149 source-isolation fixture cleanup",
+            "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT；且无匹配的已启用基线模板",
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-04T01:21:11.11068",
+            "updatedAt": "2026-11-04T01:21:11.6545631",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-04T01:21:11.658550100+08:00"
+        }
+      }
+    },
+    {
+      "name": "F149_MODEL_OVERRIDE",
+      "request": {
+        "taskGoal": "F149_MODEL_OVERRIDE synthetic navigation to F2_TEST_GATE",
+        "taskFamily": "EXT_0FA30230",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "controlledResponse": {
+        "goalCompletion": "routeGenerated=false",
+        "steps": [
+          {
+            "stepSeq": 1,
+            "stepGoal": "Generate route to F2_TEST_GATE",
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "precondition": "device online",
+            "completionCondition": "routeGenerated=false",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          }
+        ]
+      },
+      "observed": {
+        "task": {
+          "id": 192,
+          "taskCode": "TASK-20261104-0192",
+          "taskGoal": "F149_MODEL_OVERRIDE synthetic navigation to F2_TEST_GATE",
+          "taskFamily": "EXT_0FA30230",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=false",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F149_MODEL_OVERRIDE synthetic navigation to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 189,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-04T01:21:11.674442",
+          "updatedAt": "2026-11-04T01:21:11.729069",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 189,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261104-0170",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Generate route to F2_TEST_GATE",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=false",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "FAIL",
+            "validationErrors": [
+              {
+                "errorType": "CONSTRAINT",
+                "description": "步骤1完成条件(routeGenerated=false)与任务目标完成条件(routeGenerated=true)直接矛盾（字段routegenerated期望要求true，步骤声明包含相反值false）",
+                "stepSeq": 1,
+                "reasonCode": "ERR_COMPLETION_CONDITION_CONFLICT"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-04T01:21:11.715294"
+          }
+        ],
+        "events": [
+          {
+            "id": 1656,
+            "taskId": 192,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-04T01:21:11.675918",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F149_MODEL_OVERRIDE synthetic navigation to F2_TEST_GATE"
+          },
+          {
+            "id": 1657,
+            "taskId": 192,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-04T01:21:11.687259",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1658,
+            "taskId": 192,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-04T01:21:11.697813",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261104-0170"
+          },
+          {
+            "id": 1659,
+            "taskId": 192,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-04T01:21:11.719324",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1660,
+            "taskId": 192,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-04T01:21:11.72167",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_COMPLETION_CONDITION_CONFLICT",
+            "detailSummary": "候选计划三类校验未通过: 1项错误 [CONSTRAINT 步骤1: 步骤1完成条件(routeGenerated=false)与任务目标完成条件(routeGenerated=true)直接矛盾（字段routegenerated期望要求true，步骤声明包含相反值false）(ERR_COMPLETION_CONDITION_CONFLICT)]"
+          },
+          {
+            "id": 1661,
+            "taskId": 192,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-04T01:21:11.726502",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT"
+          },
+          {
+            "id": 1662,
+            "taskId": 192,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-04T01:21:11.729069",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      },
+      "checks": {
+        "constraintRejected": true,
+        "conflictCode": true,
+        "notFrozen": true,
+        "notSupervisedOrDispatched": true
+      },
+      "cleanupTerminate": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 192,
+            "taskCode": "TASK-20261104-0192",
+            "taskGoal": "F149_MODEL_OVERRIDE synthetic navigation to F2_TEST_GATE",
+            "taskFamily": "EXT_0FA30230",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=false",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F149_MODEL_OVERRIDE synthetic navigation to F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "MANUAL_TERMINATED",
+            "currentPlanVersionId": 189,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": "F013 V149 source-isolation fixture cleanup",
+            "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT；且无匹配的已启用基线模板",
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-04T01:21:11.674442",
+            "updatedAt": "2026-11-04T01:21:12.180543",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-04T01:21:12.183072+08:00"
+        }
+      }
+    },
+    {
+      "name": "F149_MODEL_GOOD",
+      "request": {
+        "taskGoal": "F149_MODEL_GOOD synthetic navigation to F2_TEST_GATE",
+        "taskFamily": "EXT_0FA30230",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "controlledResponse": {
+        "goalCompletion": "routeGenerated=false",
+        "steps": [
+          {
+            "stepSeq": 1,
+            "stepGoal": "Generate route to F2_TEST_GATE",
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "precondition": "device online",
+            "completionCondition": "routeGenerated=true",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          }
+        ]
+      },
+      "observed": {
+        "task": {
+          "id": 193,
+          "taskCode": "TASK-20261104-0193",
+          "taskGoal": "F149_MODEL_GOOD synthetic navigation to F2_TEST_GATE",
+          "taskFamily": "EXT_0FA30230",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=false",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F149_MODEL_GOOD synthetic navigation to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 190,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-04T01:21:12.195912",
+          "updatedAt": "2026-11-04T01:21:12.245849",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 190,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261104-0171",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Generate route to F2_TEST_GATE",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "HIGH",
+            "riskReasonCode": "RULE_RESOURCE_CRITICAL",
+            "judgmentBasis": "可用备用候选设备数量(0)低于配置阈值(1)，命中确定性高风险规则",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.16",
+            "frozenAt": "2026-11-04T01:21:12.230149",
+            "createdAt": "2026-11-04T01:21:12.225108"
+          }
+        ],
+        "events": [
+          {
+            "id": 1664,
+            "taskId": 193,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-04T01:21:12.198492",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F149_MODEL_GOOD synthetic navigation to F2_TEST_GATE"
+          },
+          {
+            "id": 1665,
+            "taskId": 193,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-04T01:21:12.20617",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1666,
+            "taskId": 193,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-04T01:21:12.212916",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261104-0171"
+          },
+          {
+            "id": 1667,
+            "taskId": 193,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-04T01:21:12.227678",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1668,
+            "taskId": 193,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-04T01:21:12.232289",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 1669,
+            "taskId": 193,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-04T01:21:12.241625",
+            "trigger": "SYSTEM",
+            "reasonCode": "RULE_RESOURCE_CRITICAL",
+            "detailSummary": "监督判定: HIGH，可用备用候选设备数量(0)低于配置阈值(1)，命中确定性高风险规则"
+          },
+          {
+            "id": 1670,
+            "taskId": 193,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-04T01:21:12.243747",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 监督判定高风险: RULE_RESOURCE_CRITICAL"
+          },
+          {
+            "id": 1671,
+            "taskId": 193,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-04T01:21:12.246795",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      },
+      "checks": {
+        "threePass": true,
+        "frozen": true,
+        "supervised": true
+      },
+      "cleanupTerminate": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 193,
+            "taskCode": "TASK-20261104-0193",
+            "taskGoal": "F149_MODEL_GOOD synthetic navigation to F2_TEST_GATE",
+            "taskFamily": "EXT_0FA30230",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=false",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F149_MODEL_GOOD synthetic navigation to F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "MANUAL_TERMINATED",
+            "currentPlanVersionId": 190,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": "F013 V149 source-isolation fixture cleanup",
+            "failureReason": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板",
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-04T01:21:12.195912",
+            "updatedAt": "2026-11-04T01:21:12.6767478",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-04T01:21:12.681861900+08:00"
+        }
+      }
+    },
+    {
+      "name": "F149_DUPLICATE_STEP",
+      "request": {
+        "taskGoal": "F149_DUPLICATE_STEP synthetic navigation to F2_TEST_GATE",
+        "taskFamily": "EXT_0FA30230",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "controlledResponse": {
+        "goalCompletion": "The navigation route has been generated.",
+        "steps": [
+          {
+            "stepSeq": 1,
+            "stepGoal": "Generate route to F2_TEST_GATE",
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "precondition": "device online",
+            "completionCondition": "routeGenerated=true and routeGenerated=false",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          }
+        ]
+      },
+      "observed": {
+        "task": {
+          "id": 194,
+          "taskCode": "TASK-20261104-0194",
+          "taskGoal": "F149_DUPLICATE_STEP synthetic navigation to F2_TEST_GATE",
+          "taskFamily": "EXT_0FA30230",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "The navigation route has been generated.",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F149_DUPLICATE_STEP synthetic navigation to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 191,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-04T01:21:12.698805",
+          "updatedAt": "2026-11-04T01:21:12.75325",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 191,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261104-0172",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Generate route to F2_TEST_GATE",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true and routeGenerated=false",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "FAIL",
+            "validationErrors": [
+              {
+                "errorType": "CONSTRAINT",
+                "description": "步骤1完成条件(routeGenerated=true and routeGenerated=false)内部自相矛盾（字段routegenerated同时声明了相反的布尔断言: [true, false]）",
+                "stepSeq": 1,
+                "reasonCode": "ERR_COMPLETION_CONDITION_CONFLICT"
+              },
+              {
+                "errorType": "CONSTRAINT",
+                "description": "步骤1完成条件(routeGenerated=true and routeGenerated=false)与任务目标完成条件(routeGenerated=true; The navigation route has been generated.)直接矛盾（字段routegenerated期望要求true，步骤声明包含相反值false）",
+                "stepSeq": 1,
+                "reasonCode": "ERR_COMPLETION_CONDITION_CONFLICT"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-04T01:21:12.744087"
+          }
+        ],
+        "events": [
+          {
+            "id": 1673,
+            "taskId": 194,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-04T01:21:12.699939",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F149_DUPLICATE_STEP synthetic navigation to F2_TEST_GATE"
+          },
+          {
+            "id": 1674,
+            "taskId": 194,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-04T01:21:12.708148",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1675,
+            "taskId": 194,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-04T01:21:12.730572",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261104-0172"
+          },
+          {
+            "id": 1676,
+            "taskId": 194,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-04T01:21:12.746473",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1677,
+            "taskId": 194,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-04T01:21:12.748763",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_COMPLETION_CONDITION_CONFLICT",
+            "detailSummary": "候选计划三类校验未通过: 2项错误 [CONSTRAINT 步骤1: 步骤1完成条件(routeGenerated=true and routeGenerated=false)内部自相矛盾（字段routegenerated同时声明了相反的布尔断言: [true, false]）(ERR_COMPLETION_CONDITION_CONFLICT); CONSTRAINT 步骤1: 步骤1完成条件(routeGenerated=true and routeGenerated=false)与任务目标完成条件(routeGenerated=true; The navigation route has been generated.)直接矛盾（字段routegenerated期望要求true，步骤声明包含相反值false）(ERR_COMPLETION_CONDITION_CONFLICT)]"
+          },
+          {
+            "id": 1678,
+            "taskId": 194,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-04T01:21:12.75325",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT"
+          },
+          {
+            "id": 1679,
+            "taskId": 194,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-04T01:21:12.755479",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      },
+      "checks": {
+        "constraintRejected": true,
+        "conflictCode": true,
+        "notFrozen": true,
+        "notSupervisedOrDispatched": true
+      },
+      "forceAttempts": [
+        {
+          "action": "FORCE_RELEASE",
+          "response": {
+            "http": 400,
+            "body": {
+              "code": 4110,
+              "message": "硬性校验失败的计划严禁进入监督判定或强行放行",
+              "timestamp": "2026-11-04T01:21:13.643453900+08:00",
+              "path": "/api/v1/tasks/194/manual-actions",
+              "method": "POST"
+            }
+          },
+          "after": {
+            "task": {
+              "id": 194,
+              "taskCode": "TASK-20261104-0194",
+              "taskGoal": "F149_DUPLICATE_STEP synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0FA30230",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "The navigation route has been generated.",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F149_DUPLICATE_STEP synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": 191,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-04T01:21:12.698805",
+              "updatedAt": "2026-11-04T01:21:12.75325",
+              "createdBy": "oprator"
+            },
+            "plans": [
+              {
+                "id": 191,
+                "versionNo": 1,
+                "source": "AUTONOMOUS",
+                "baselineTemplateId": null,
+                "snapshotId": "CTX-20261104-0172",
+                "planSteps": [
+                  {
+                    "stepSeq": 1,
+                    "stepGoal": "Generate route to F2_TEST_GATE",
+                    "capabilityType": "CAP_NAVIGATION",
+                    "inputParams": {
+                      "targetLocation": "F2_TEST_GATE"
+                    },
+                    "precondition": "device online",
+                    "completionCondition": "routeGenerated=true and routeGenerated=false",
+                    "failureHandling": "manual handling",
+                    "stepTimeout": 60
+                  }
+                ],
+                "structureCheckResult": "PASS",
+                "capabilityCheckResult": "PASS",
+                "constraintCheckResult": "FAIL",
+                "validationErrors": [
+                  {
+                    "errorType": "CONSTRAINT",
+                    "description": "步骤1完成条件(routeGenerated=true and routeGenerated=false)内部自相矛盾（字段routegenerated同时声明了相反的布尔断言: [true, false]）",
+                    "stepSeq": 1,
+                    "reasonCode": "ERR_COMPLETION_CONDITION_CONFLICT"
+                  },
+                  {
+                    "errorType": "CONSTRAINT",
+                    "description": "步骤1完成条件(routeGenerated=true and routeGenerated=false)与任务目标完成条件(routeGenerated=true; The navigation route has been generated.)直接矛盾（字段routegenerated期望要求true，步骤声明包含相反值false）",
+                    "stepSeq": 1,
+                    "reasonCode": "ERR_COMPLETION_CONDITION_CONFLICT"
+                  }
+                ],
+                "riskLevel": null,
+                "riskReasonCode": null,
+                "judgmentBasis": null,
+                "confidence": 0.99,
+                "ruleSetVersion": null,
+                "frozenAt": null,
+                "createdAt": "2026-11-04T01:21:12.744087"
+              }
+            ],
+            "events": [
+              {
+                "id": 1673,
+                "taskId": 194,
+                "eventType": "GOAL_SUBMITTED",
+                "occurredAt": "2026-11-04T01:21:12.699939",
+                "trigger": "OPERATOR",
+                "reasonCode": null,
+                "detailSummary": "运行操作员oprator提交任务目标: F149_DUPLICATE_STEP synthetic navigation to F2_TEST_GATE"
+              },
+              {
+                "id": 1674,
+                "taskId": 194,
+                "eventType": "GOAL_CLARIFIED",
+                "occurredAt": "2026-11-04T01:21:12.708148",
+                "trigger": "SYSTEM",
+                "reasonCode": null,
+                "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+              },
+              {
+                "id": 1675,
+                "taskId": 194,
+                "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+                "occurredAt": "2026-11-04T01:21:12.730572",
+                "trigger": "SYSTEM",
+                "reasonCode": null,
+                "detailSummary": "生成规划上下文快照CTX-20261104-0172"
+              },
+              {
+                "id": 1676,
+                "taskId": 194,
+                "eventType": "PLAN_GENERATED",
+                "occurredAt": "2026-11-04T01:21:12.746473",
+                "trigger": "SYSTEM",
+                "reasonCode": null,
+                "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+              },
+              {
+                "id": 1677,
+                "taskId": 194,
+                "eventType": "PLAN_VALIDATED",
+                "occurredAt": "2026-11-04T01:21:12.748763",
+                "trigger": "SYSTEM",
+                "reasonCode": "ERR_COMPLETION_CONDITION_CONFLICT",
+                "detailSummary": "候选计划三类校验未通过: 2项错误 [CONSTRAINT 步骤1: 步骤1完成条件(routeGenerated=true and routeGenerated=false)内部自相矛盾（字段routegenerated同时声明了相反的布尔断言: [true, false]）(ERR_COMPLETION_CONDITION_CONFLICT); CONSTRAINT 步骤1: 步骤1完成条件(routeGenerated=true and routeGenerated=false)与任务目标完成条件(routeGenerated=true; The navigation route has been generated.)直接矛盾（字段routegenerated期望要求true，步骤声明包含相反值false）(ERR_COMPLETION_CONDITION_CONFLICT)]"
+              },
+              {
+                "id": 1678,
+                "taskId": 194,
+                "eventType": "BASELINE_DOWNGRADED",
+                "occurredAt": "2026-11-04T01:21:12.75325",
+                "trigger": "SYSTEM",
+                "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+                "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT"
+              },
+              {
+                "id": 1679,
+                "taskId": 194,
+                "eventType": "TASK_PENDING_MANUAL",
+                "occurredAt": "2026-11-04T01:21:12.755479",
+                "trigger": "SYSTEM",
+                "reasonCode": "ERR_PLANNING_FAILED",
+                "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT；且无匹配的已启用基线模板"
+              },
+              {
+                "id": 1680,
+                "taskId": 194,
+                "eventType": "FORCE_BYPASS_INTERCEPTED",
+                "occurredAt": "2026-11-04T01:21:13.635233",
+                "trigger": "OPERATOR",
+                "reasonCode": "ERR_FORCE_BYPASS_REJECTED",
+                "detailSummary": "操作员试图强行放行硬性校验失败的计划，系统已拦截并拒绝（操作: FORCE_RELEASE）"
+              }
+            ],
+            "assignments": [],
+            "commands": [],
+            "bypassAuditRows": [
+              "948|FORCE_BYPASS_ATTEMPT|TASK-20261104-0194 -> FORCE_RELEASE|INTERCEPTED"
+            ]
+          },
+          "checks": {
+            "http400code4110": true,
+            "pendingManual": true,
+            "noDispatch": true,
+            "plansUnchanged": true,
+            "newInterceptionEvent": true,
+            "newInterceptionAudit": true
+          }
+        },
+        {
+          "action": "REQUEST_SUPERVISION",
+          "response": {
+            "http": 400,
+            "body": {
+              "code": 4110,
+              "message": "硬性校验失败的计划严禁进入监督判定或强行放行",
+              "timestamp": "2026-11-04T01:21:14.540391300+08:00",
+              "path": "/api/v1/tasks/194/manual-actions",
+              "method": "POST"
+            }
+          },
+          "after": {
+            "task": {
+              "id": 194,
+              "taskCode": "TASK-20261104-0194",
+              "taskGoal": "F149_DUPLICATE_STEP synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0FA30230",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "The navigation route has been generated.",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F149_DUPLICATE_STEP synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": 191,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-04T01:21:12.698805",
+              "updatedAt": "2026-11-04T01:21:12.75325",
+              "createdBy": "oprator"
+            },
+            "plans": [
+              {
+                "id": 191,
+                "versionNo": 1,
+                "source": "AUTONOMOUS",
+                "baselineTemplateId": null,
+                "snapshotId": "CTX-20261104-0172",
+                "planSteps": [
+                  {
+                    "stepSeq": 1,
+                    "stepGoal": "Generate route to F2_TEST_GATE",
+                    "capabilityType": "CAP_NAVIGATION",
+                    "inputParams": {
+                      "targetLocation": "F2_TEST_GATE"
+                    },
+                    "precondition": "device online",
+                    "completionCondition": "routeGenerated=true and routeGenerated=false",
+                    "failureHandling": "manual handling",
+                    "stepTimeout": 60
+                  }
+                ],
+                "structureCheckResult": "PASS",
+                "capabilityCheckResult": "PASS",
+                "constraintCheckResult": "FAIL",
+                "validationErrors": [
+                  {
+                    "errorType": "CONSTRAINT",
+                    "description": "步骤1完成条件(routeGenerated=true and routeGenerated=false)内部自相矛盾（字段routegenerated同时声明了相反的布尔断言: [true, false]）",
+                    "stepSeq": 1,
+                    "reasonCode": "ERR_COMPLETION_CONDITION_CONFLICT"
+                  },
+                  {
+                    "errorType": "CONSTRAINT",
+                    "description": "步骤1完成条件(routeGenerated=true and routeGenerated=false)与任务目标完成条件(routeGenerated=true; The navigation route has been generated.)直接矛盾（字段routegenerated期望要求true，步骤声明包含相反值false）",
+                    "stepSeq": 1,
+                    "reasonCode": "ERR_COMPLETION_CONDITION_CONFLICT"
+                  }
+                ],
+                "riskLevel": null,
+                "riskReasonCode": null,
+                "judgmentBasis": null,
+                "confidence": 0.99,
+                "ruleSetVersion": null,
+                "frozenAt": null,
+                "createdAt": "2026-11-04T01:21:12.744087"
+              }
+            ],
+            "events": [
+              {
+                "id": 1673,
+                "taskId": 194,
+                "eventType": "GOAL_SUBMITTED",
+                "occurredAt": "2026-11-04T01:21:12.699939",
+                "trigger": "OPERATOR",
+                "reasonCode": null,
+                "detailSummary": "运行操作员oprator提交任务目标: F149_DUPLICATE_STEP synthetic navigation to F2_TEST_GATE"
+              },
+              {
+                "id": 1674,
+                "taskId": 194,
+                "eventType": "GOAL_CLARIFIED",
+                "occurredAt": "2026-11-04T01:21:12.708148",
+                "trigger": "SYSTEM",
+                "reasonCode": null,
+                "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+              },
+              {
+                "id": 1675,
+                "taskId": 194,
+                "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+                "occurredAt": "2026-11-04T01:21:12.730572",
+                "trigger": "SYSTEM",
+                "reasonCode": null,
+                "detailSummary": "生成规划上下文快照CTX-20261104-0172"
+              },
+              {
+                "id": 1676,
+                "taskId": 194,
+                "eventType": "PLAN_GENERATED",
+                "occurredAt": "2026-11-04T01:21:12.746473",
+                "trigger": "SYSTEM",
+                "reasonCode": null,
+                "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+              },
+              {
+                "id": 1677,
+                "taskId": 194,
+                "eventType": "PLAN_VALIDATED",
+                "occurredAt": "2026-11-04T01:21:12.748763",
+                "trigger": "SYSTEM",
+                "reasonCode": "ERR_COMPLETION_CONDITION_CONFLICT",
+                "detailSummary": "候选计划三类校验未通过: 2项错误 [CONSTRAINT 步骤1: 步骤1完成条件(routeGenerated=true and routeGenerated=false)内部自相矛盾（字段routegenerated同时声明了相反的布尔断言: [true, false]）(ERR_COMPLETION_CONDITION_CONFLICT); CONSTRAINT 步骤1: 步骤1完成条件(routeGenerated=true and routeGenerated=false)与任务目标完成条件(routeGenerated=true; The navigation route has been generated.)直接矛盾（字段routegenerated期望要求true，步骤声明包含相反值false）(ERR_COMPLETION_CONDITION_CONFLICT)]"
+              },
+              {
+                "id": 1678,
+                "taskId": 194,
+                "eventType": "BASELINE_DOWNGRADED",
+                "occurredAt": "2026-11-04T01:21:12.75325",
+                "trigger": "SYSTEM",
+                "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+                "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT"
+              },
+              {
+                "id": 1679,
+                "taskId": 194,
+                "eventType": "TASK_PENDING_MANUAL",
+                "occurredAt": "2026-11-04T01:21:12.755479",
+                "trigger": "SYSTEM",
+                "reasonCode": "ERR_PLANNING_FAILED",
+                "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT；且无匹配的已启用基线模板"
+              },
+              {
+                "id": 1680,
+                "taskId": 194,
+                "eventType": "FORCE_BYPASS_INTERCEPTED",
+                "occurredAt": "2026-11-04T01:21:13.635233",
+                "trigger": "OPERATOR",
+                "reasonCode": "ERR_FORCE_BYPASS_REJECTED",
+                "detailSummary": "操作员试图强行放行硬性校验失败的计划，系统已拦截并拒绝（操作: FORCE_RELEASE）"
+              },
+              {
+                "id": 1681,
+                "taskId": 194,
+                "eventType": "FORCE_BYPASS_INTERCEPTED",
+                "occurredAt": "2026-11-04T01:21:14.537819",
+                "trigger": "OPERATOR",
+                "reasonCode": "ERR_FORCE_BYPASS_REJECTED",
+                "detailSummary": "操作员试图强行放行硬性校验失败的计划，系统已拦截并拒绝（操作: REQUEST_SUPERVISION）"
+              }
+            ],
+            "assignments": [],
+            "commands": [],
+            "bypassAuditRows": [
+              "948|FORCE_BYPASS_ATTEMPT|TASK-20261104-0194 -> FORCE_RELEASE|INTERCEPTED",
+              "949|FORCE_BYPASS_ATTEMPT|TASK-20261104-0194 -> REQUEST_SUPERVISION|INTERCEPTED"
+            ]
+          },
+          "checks": {
+            "http400code4110": true,
+            "pendingManual": true,
+            "noDispatch": true,
+            "plansUnchanged": true,
+            "newInterceptionEvent": true,
+            "newInterceptionAudit": true
+          }
+        }
+      ],
+      "cleanupTerminate": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 194,
+            "taskCode": "TASK-20261104-0194",
+            "taskGoal": "F149_DUPLICATE_STEP synthetic navigation to F2_TEST_GATE",
+            "taskFamily": "EXT_0FA30230",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "goalParsingResult": {
+              "completionCondition": "The navigation route has been generated.",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F149_DUPLICATE_STEP synthetic navigation to F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "MANUAL_TERMINATED",
+            "currentPlanVersionId": 191,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": "F013 V149 source-isolation fixture cleanup",
+            "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT；且无匹配的已启用基线模板",
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-04T01:21:12.698805",
+            "updatedAt": "2026-11-04T01:21:14.9767182",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-04T01:21:14.979237700+08:00"
+        }
+      }
+    },
+    {
+      "name": "F149_REVERSE_DUP",
+      "request": {
+        "taskGoal": "F149_REVERSE_DUP synthetic navigation to F2_TEST_GATE",
+        "taskFamily": "EXT_0FA30230",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "controlledResponse": {
+        "goalCompletion": "The navigation route has been generated.",
+        "steps": [
+          {
+            "stepSeq": 1,
+            "stepGoal": "Generate route to F2_TEST_GATE",
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "precondition": "device online",
+            "completionCondition": "routeGenerated=false and routeGenerated=true",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          }
+        ]
+      },
+      "observed": {
+        "task": {
+          "id": 195,
+          "taskCode": "TASK-20261104-0195",
+          "taskGoal": "F149_REVERSE_DUP synthetic navigation to F2_TEST_GATE",
+          "taskFamily": "EXT_0FA30230",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "The navigation route has been generated.",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F149_REVERSE_DUP synthetic navigation to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 192,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-04T01:21:14.991932",
+          "updatedAt": "2026-11-04T01:21:15.027917",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 192,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261104-0173",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Generate route to F2_TEST_GATE",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=false and routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "FAIL",
+            "validationErrors": [
+              {
+                "errorType": "CONSTRAINT",
+                "description": "步骤1完成条件(routeGenerated=false and routeGenerated=true)内部自相矛盾（字段routegenerated同时声明了相反的布尔断言: [false, true]）",
+                "stepSeq": 1,
+                "reasonCode": "ERR_COMPLETION_CONDITION_CONFLICT"
+              },
+              {
+                "errorType": "CONSTRAINT",
+                "description": "步骤1完成条件(routeGenerated=false and routeGenerated=true)与任务目标完成条件(routeGenerated=true; The navigation route has been generated.)直接矛盾（字段routegenerated期望要求true，步骤声明包含相反值false）",
+                "stepSeq": 1,
+                "reasonCode": "ERR_COMPLETION_CONDITION_CONFLICT"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-04T01:21:15.020654"
+          }
+        ],
+        "events": [
+          {
+            "id": 1683,
+            "taskId": 195,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-04T01:21:14.994543",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F149_REVERSE_DUP synthetic navigation to F2_TEST_GATE"
+          },
+          {
+            "id": 1684,
+            "taskId": 195,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-04T01:21:15.002169",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1685,
+            "taskId": 195,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-04T01:21:15.009974",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261104-0173"
+          },
+          {
+            "id": 1686,
+            "taskId": 195,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-04T01:21:15.022804",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1687,
+            "taskId": 195,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-04T01:21:15.025438",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_COMPLETION_CONDITION_CONFLICT",
+            "detailSummary": "候选计划三类校验未通过: 2项错误 [CONSTRAINT 步骤1: 步骤1完成条件(routeGenerated=false and routeGenerated=true)内部自相矛盾（字段routegenerated同时声明了相反的布尔断言: [false, true]）(ERR_COMPLETION_CONDITION_CONFLICT); CONSTRAINT 步骤1: 步骤1完成条件(routeGenerated=false and routeGenerated=true)与任务目标完成条件(routeGenerated=true; The navigation route has been generated.)直接矛盾（字段routegenerated期望要求true，步骤声明包含相反值false）(ERR_COMPLETION_CONDITION_CONFLICT)]"
+          },
+          {
+            "id": 1688,
+            "taskId": 195,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-04T01:21:15.027917",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT"
+          },
+          {
+            "id": 1689,
+            "taskId": 195,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-04T01:21:15.027917",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      },
+      "checks": {
+        "constraintRejected": true,
+        "conflictCode": true,
+        "notFrozen": true,
+        "notSupervisedOrDispatched": true
+      },
+      "cleanupTerminate": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 195,
+            "taskCode": "TASK-20261104-0195",
+            "taskGoal": "F149_REVERSE_DUP synthetic navigation to F2_TEST_GATE",
+            "taskFamily": "EXT_0FA30230",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "goalParsingResult": {
+              "completionCondition": "The navigation route has been generated.",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F149_REVERSE_DUP synthetic navigation to F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "MANUAL_TERMINATED",
+            "currentPlanVersionId": 192,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": "F013 V149 source-isolation fixture cleanup",
+            "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT；且无匹配的已启用基线模板",
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-04T01:21:14.991932",
+            "updatedAt": "2026-11-04T01:21:15.5224278",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-04T01:21:15.527022700+08:00"
+        }
+      }
+    },
+    {
+      "name": "F149_EQUAL_DUP",
+      "request": {
+        "taskGoal": "F149_EQUAL_DUP synthetic navigation to F2_TEST_GATE",
+        "taskFamily": "EXT_0FA30230",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "controlledResponse": {
+        "goalCompletion": "The navigation route has been generated.",
+        "steps": [
+          {
+            "stepSeq": 1,
+            "stepGoal": "Generate route to F2_TEST_GATE",
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "precondition": "device online",
+            "completionCondition": "routeGenerated=true and routeGenerated=true",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          }
+        ]
+      },
+      "observed": {
+        "task": {
+          "id": 196,
+          "taskCode": "TASK-20261104-0196",
+          "taskGoal": "F149_EQUAL_DUP synthetic navigation to F2_TEST_GATE",
+          "taskFamily": "EXT_0FA30230",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "The navigation route has been generated.",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F149_EQUAL_DUP synthetic navigation to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 193,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-04T01:21:15.541333",
+          "updatedAt": "2026-11-04T01:21:15.583149",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 193,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261104-0174",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Generate route to F2_TEST_GATE",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true and routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "HIGH",
+            "riskReasonCode": "RULE_RESOURCE_CRITICAL",
+            "judgmentBasis": "可用备用候选设备数量(0)低于配置阈值(1)，命中确定性高风险规则",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.16",
+            "frozenAt": "2026-11-04T01:21:15.573296",
+            "createdAt": "2026-11-04T01:21:15.566765"
+          }
+        ],
+        "events": [
+          {
+            "id": 1691,
+            "taskId": 196,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-04T01:21:15.541333",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F149_EQUAL_DUP synthetic navigation to F2_TEST_GATE"
+          },
+          {
+            "id": 1692,
+            "taskId": 196,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-04T01:21:15.550407",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1693,
+            "taskId": 196,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-04T01:21:15.55768",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261104-0174"
+          },
+          {
+            "id": 1694,
+            "taskId": 196,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-04T01:21:15.571134",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1695,
+            "taskId": 196,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-04T01:21:15.573296",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 1696,
+            "taskId": 196,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-04T01:21:15.580654",
+            "trigger": "SYSTEM",
+            "reasonCode": "RULE_RESOURCE_CRITICAL",
+            "detailSummary": "监督判定: HIGH，可用备用候选设备数量(0)低于配置阈值(1)，命中确定性高风险规则"
+          },
+          {
+            "id": 1697,
+            "taskId": 196,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-04T01:21:15.580654",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 监督判定高风险: RULE_RESOURCE_CRITICAL"
+          },
+          {
+            "id": 1698,
+            "taskId": 196,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-04T01:21:15.585099",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      },
+      "checks": {
+        "threePass": true,
+        "frozen": true,
+        "supervised": true
+      },
+      "cleanupTerminate": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 196,
+            "taskCode": "TASK-20261104-0196",
+            "taskGoal": "F149_EQUAL_DUP synthetic navigation to F2_TEST_GATE",
+            "taskFamily": "EXT_0FA30230",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "goalParsingResult": {
+              "completionCondition": "The navigation route has been generated.",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F149_EQUAL_DUP synthetic navigation to F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "MANUAL_TERMINATED",
+            "currentPlanVersionId": 193,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": "F013 V149 source-isolation fixture cleanup",
+            "failureReason": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板",
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-04T01:21:15.541333",
+            "updatedAt": "2026-11-04T01:21:16.0397604",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-04T01:21:16.044557700+08:00"
+        }
+      }
+    },
+    {
+      "name": "F149_LEGAL_AND",
+      "request": {
+        "taskGoal": "F149_LEGAL_AND synthetic navigation to F2_TEST_GATE",
+        "taskFamily": "EXT_0FA30230",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "controlledResponse": {
+        "goalCompletion": "The navigation route has been generated.",
+        "steps": [
+          {
+            "stepSeq": 1,
+            "stepGoal": "Generate route to F2_TEST_GATE",
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "precondition": "device online",
+            "completionCondition": "routeGenerated=true and waypointCount>0",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          }
+        ]
+      },
+      "observed": {
+        "task": {
+          "id": 197,
+          "taskCode": "TASK-20261104-0197",
+          "taskGoal": "F149_LEGAL_AND synthetic navigation to F2_TEST_GATE",
+          "taskFamily": "EXT_0FA30230",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "The navigation route has been generated.",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F149_LEGAL_AND synthetic navigation to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 194,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-04T01:21:16.058075",
+          "updatedAt": "2026-11-04T01:21:16.10025",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 194,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261104-0175",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Generate route to F2_TEST_GATE",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true and waypointCount>0",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "HIGH",
+            "riskReasonCode": "RULE_RESOURCE_CRITICAL",
+            "judgmentBasis": "可用备用候选设备数量(0)低于配置阈值(1)，命中确定性高风险规则",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.16",
+            "frozenAt": "2026-11-04T01:21:16.090534",
+            "createdAt": "2026-11-04T01:21:16.086024"
+          }
+        ],
+        "events": [
+          {
+            "id": 1700,
+            "taskId": 197,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-04T01:21:16.058075",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F149_LEGAL_AND synthetic navigation to F2_TEST_GATE"
+          },
+          {
+            "id": 1701,
+            "taskId": 197,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-04T01:21:16.065451",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1702,
+            "taskId": 197,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-04T01:21:16.07455",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261104-0175"
+          },
+          {
+            "id": 1703,
+            "taskId": 197,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-04T01:21:16.088317",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1704,
+            "taskId": 197,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-04T01:21:16.090534",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 1705,
+            "taskId": 197,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-04T01:21:16.095666",
+            "trigger": "SYSTEM",
+            "reasonCode": "RULE_RESOURCE_CRITICAL",
+            "detailSummary": "监督判定: HIGH，可用备用候选设备数量(0)低于配置阈值(1)，命中确定性高风险规则"
+          },
+          {
+            "id": 1706,
+            "taskId": 197,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-04T01:21:16.10025",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 监督判定高风险: RULE_RESOURCE_CRITICAL"
+          },
+          {
+            "id": 1707,
+            "taskId": 197,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-04T01:21:16.102576",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      },
+      "checks": {
+        "threePass": true,
+        "frozen": true,
+        "supervised": true
+      },
+      "cleanupTerminate": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 197,
+            "taskCode": "TASK-20261104-0197",
+            "taskGoal": "F149_LEGAL_AND synthetic navigation to F2_TEST_GATE",
+            "taskFamily": "EXT_0FA30230",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "goalParsingResult": {
+              "completionCondition": "The navigation route has been generated.",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F149_LEGAL_AND synthetic navigation to F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "MANUAL_TERMINATED",
+            "currentPlanVersionId": 194,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": "F013 V149 source-isolation fixture cleanup",
+            "failureReason": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板",
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-04T01:21:16.058075",
+            "updatedAt": "2026-11-04T01:21:16.5690733",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-04T01:21:16.572455+08:00"
+        }
+      }
+    }
+  ],
+  "definition": {
+    "id": 17,
+    "definitionCode": "EXT_0FA30230",
+    "taskName": "G145 F013 baseline fixtures",
+    "goalTemplate": "Synthetic navigation to selected destination",
+    "sceneParams": [
+      {
+        "name": "targetLocation",
+        "type": "String",
+        "required": true,
+        "defaultValue": "F2_TEST_GATE",
+        "range": null
+      }
+    ],
+    "availableCapabilityTypes": [
+      "CAP_NAVIGATION"
+    ],
+    "constraintDescription": "Synthetic isolated F013 runtime baseline gate",
+    "completionCondition": "routeGenerated=true",
+    "isPreset": false,
+    "definitionStatus": "ENABLED",
+    "updatedAt": "2026-11-04T01:20:48.521879",
+    "updatedBy": "set"
+  }
+}
