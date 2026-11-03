@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -479,22 +480,47 @@ public class TaskPlanningOrchestrator {
 
     private String resolveExpectedCompletionCondition(Task task) {
         if (task == null) return null;
+        List<String> conditions = new ArrayList<>();
+
+        // 1. 结构化任务定义硬约束（基础来源，绝不允许被自然语言理解覆盖丢失，DEF-S3-094）
+        if (task.getTaskFamily() != null) {
+            var def = taskDefinitionService.findByCode(task.getTaskFamily());
+            if (def.isPresent() && def.get().getCompletionCondition() != null && !def.get().getCompletionCondition().isBlank()) {
+                conditions.add(def.get().getCompletionCondition().trim());
+            }
+        }
+
+        // 2. 目标理解结果中的完成条件（补充来源，合并保留）
         if (task.getGoalParsingResult() != null && !task.getGoalParsingResult().isBlank()) {
             try {
                 Map<?, ?> parsed = MAPPER.readValue(task.getGoalParsingResult(), Map.class);
                 Object cond = parsed.get("completionCondition");
                 if (cond != null && !String.valueOf(cond).isBlank() && !"null".equalsIgnoreCase(String.valueOf(cond))) {
-                    return String.valueOf(cond).trim();
+                    conditions.add(String.valueOf(cond).trim());
                 }
             } catch (Exception ignored) {}
         }
-        if (task.getTaskFamily() != null) {
-            var def = taskDefinitionService.findByCode(task.getTaskFamily());
-            if (def.isPresent() && def.get().getCompletionCondition() != null && !def.get().getCompletionCondition().isBlank()) {
-                return def.get().getCompletionCondition().trim();
-            }
+
+        // 3. 用户原始任务目标文本中若显式携带 key=val 格式断言（如 required routeGenerated=true）
+        if (task.getTaskGoal() != null && !task.getTaskGoal().isBlank()) {
+            extractExplicitConditionClauses(task.getTaskGoal(), conditions);
         }
-        return null;
+
+        if (conditions.isEmpty()) return null;
+        return String.join("; ", conditions.stream().distinct().toList());
+    }
+
+    private static final java.util.regex.Pattern EXPLICIT_COND_PATTERN = java.util.regex.Pattern.compile(
+            "(?i)\\b([a-zA-Z][a-zA-Z0-9_]*)\\s*(?:==|=|:)\\s*(true|false|1|0)\\b");
+
+    private void extractExplicitConditionClauses(String text, List<String> conditions) {
+        if (text == null || text.isBlank()) return;
+        java.util.regex.Matcher m = EXPLICIT_COND_PATTERN.matcher(text);
+        while (m.find()) {
+            String key = m.group(1);
+            String val = m.group(2);
+            conditions.add(key + "=" + val.toLowerCase());
+        }
     }
 
     @SuppressWarnings("unchecked")

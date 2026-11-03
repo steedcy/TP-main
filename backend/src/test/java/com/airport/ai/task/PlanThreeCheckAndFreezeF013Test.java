@@ -387,6 +387,34 @@ class PlanThreeCheckAndFreezeF013Test {
     }
 
     @Test
+    void r03_naturalLanguageUnderstandingDoesNotOverrideStructuredTaskDefinition() {
+        // DEF-S3-094 (V1.146实机绕过反例):
+        // 任务定义要求 routeGenerated=true，目标理解模型返回自然语言 "The navigation route has been generated."
+        // 两者合并保留为 "routeGenerated=true; The navigation route has been generated."
+        // 唯一步骤若声明 routeGenerated=false，仍必须硬拦截拒绝！
+        String combinedCondition = "routeGenerated=true; The navigation route has been generated.";
+        Map<String, Object> stepContradict = standardStep(1, "CAP_NAVIGATION");
+        stepContradict.put("completionCondition", "routeGenerated=false");
+
+        PlanValidationResult resultFail = validationService.validate(List.of(stepContradict), standardAgents(),
+                List.of("CAP_NAVIGATION"), "EXT_FAMILY", 162L, combinedCondition);
+
+        assertFalse(resultFail.isAllPassed(), "自然语言理解绝不能覆盖结构化任务定义硬约束");
+        assertEquals("FAIL", resultFail.getConstraintCheckResult());
+        assertTrue(resultFail.getErrors().stream().anyMatch(e -> "ERR_COMPLETION_CONDITION_CONFLICT".equals(e.getReasonCode())));
+
+        // 正例：候选步骤声明 routeGenerated=true，正常放行
+        Map<String, Object> stepPass = standardStep(1, "CAP_NAVIGATION");
+        stepPass.put("completionCondition", "routeGenerated=true");
+
+        PlanValidationResult resultPass = validationService.validate(List.of(stepPass), standardAgents(),
+                List.of("CAP_NAVIGATION"), "EXT_FAMILY", 162L, combinedCondition);
+
+        assertTrue(resultPass.isAllPassed(), "候选步骤满足结构化任务定义与自然语言理解时应正常通过");
+        assertEquals("PASS", resultPass.getConstraintCheckResult());
+    }
+
+    @Test
     void r03_sameTaskCanReuseItsOwnOccupiedAgentDuringReplanning() {
         // 当前任务自身（taskId=143）占用的代理，在重规划时不属于外部资源冲突
         List<Map<String, Object>> selfOccupiedAgents = List.of(
