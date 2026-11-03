@@ -1,0 +1,748 @@
+{
+  "version": "V1.143",
+  "codeSha": "3d3e911e0dd3ba39753ee665b4d59eb5ae42ce63",
+  "observedAt": "2026-11-03T16:33:16.236160+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "ownerTaskId": 143,
+  "fixtureCorrection": "First attempt omitted simulator /device-api/v1 prefix and got404 before creating any task; corrected endpoint and re-ran. Initial fixture error is not a product F.",
+  "resourceRuleBefore": "t",
+  "simulatorNoFeedback": {
+    "scenarioResult": "NO_FEEDBACK"
+  },
+  "ownerBeforeSecond": {
+    "task": {
+      "id": 143,
+      "taskCode": "TASK-20261103-0143",
+      "taskGoal": "F013_GOOD owner occupies exclusive robot V143",
+      "taskFamily": "EXT_2AD8B934",
+      "sceneParams": {
+        "targetLocation": "F2_TEST_GATE"
+      },
+      "goalParsingResult": {
+        "completionCondition": "routeGenerated=true",
+        "origin": "F2_SERVICE_POINT",
+        "destination": "F2_TEST_GATE",
+        "originalGoal": "F013_GOOD owner occupies exclusive robot V143",
+        "constraints": [
+          "synthetic test"
+        ]
+      },
+      "status": "EXECUTING",
+      "currentPlanVersionId": 125,
+      "replanUsed": false,
+      "replanningReason": null,
+      "manualTerminateReason": null,
+      "failureReason": null,
+      "missingInfoQuestions": null,
+      "downgradeReason": null,
+      "isDryRun": false,
+      "createdAt": "2026-11-03T16:33:16.546992",
+      "updatedAt": "2026-11-03T16:33:16.788662",
+      "createdBy": "oprator"
+    },
+    "plans": [
+      {
+        "id": 125,
+        "versionNo": 1,
+        "source": "AUTONOMOUS",
+        "baselineTemplateId": null,
+        "snapshotId": "CTX-20261103-0106",
+        "planSteps": [
+          {
+            "stepSeq": 1,
+            "stepGoal": "Synthetic navigation 1",
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "precondition": "device online",
+            "completionCondition": "routeGenerated=true",
+            "failureHandling": "最多重试2次后转人工",
+            "stepTimeout": 60
+          }
+        ],
+        "structureCheckResult": "PASS",
+        "capabilityCheckResult": "PASS",
+        "constraintCheckResult": "PASS",
+        "validationErrors": [],
+        "riskLevel": "LOW",
+        "riskReasonCode": null,
+        "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+        "confidence": 0.99,
+        "ruleSetVersion": "V1.3",
+        "frozenAt": "2026-11-03T16:33:16.594171",
+        "createdAt": "2026-11-03T16:33:16.586835"
+      }
+    ],
+    "events": [
+      {
+        "id": 1139,
+        "taskId": 143,
+        "eventType": "GOAL_SUBMITTED",
+        "occurredAt": "2026-11-03T16:33:16.55313",
+        "trigger": "OPERATOR",
+        "reasonCode": null,
+        "detailSummary": "运行操作员oprator提交任务目标: F013_GOOD owner occupies exclusive robot V143"
+      },
+      {
+        "id": 1140,
+        "taskId": 143,
+        "eventType": "GOAL_CLARIFIED",
+        "occurredAt": "2026-11-03T16:33:16.565341",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+      },
+      {
+        "id": 1141,
+        "taskId": 143,
+        "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+        "occurredAt": "2026-11-03T16:33:16.575582",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "生成规划上下文快照CTX-20261103-0106"
+      },
+      {
+        "id": 1142,
+        "taskId": 143,
+        "eventType": "PLAN_GENERATED",
+        "occurredAt": "2026-11-03T16:33:16.591186",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+      },
+      {
+        "id": 1143,
+        "taskId": 143,
+        "eventType": "PLAN_VALIDATED",
+        "occurredAt": "2026-11-03T16:33:16.595137",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+      },
+      {
+        "id": 1144,
+        "taskId": 143,
+        "eventType": "SUPERVISION_JUDGED",
+        "occurredAt": "2026-11-03T16:33:16.602679",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "监督判定: LOW，未命中确定性高风险规则，风险信号数量不足以触发降级"
+      },
+      {
+        "id": 1145,
+        "taskId": 143,
+        "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+        "occurredAt": "2026-11-03T16:33:16.641765",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-803437A3(距离0.0,负载0)，向候选AGT-803437A3发起承接请求"
+      },
+      {
+        "id": 1146,
+        "taskId": 143,
+        "eventType": "AGENT_ASSIGNED",
+        "occurredAt": "2026-11-03T16:33:16.787219",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "设备代理AGT-803437A3接受步骤1承接请求"
+      },
+      {
+        "id": 1147,
+        "taskId": 143,
+        "eventType": "STEP_DISPATCHED",
+        "occurredAt": "2026-11-03T16:33:16.796138",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "指令CMD-20261103163316-611CAF8D已下发至设备代理AGT-803437A3，业务意图: Synthetic navigation 1"
+      }
+    ],
+    "assignments": [
+      {
+        "id": 96,
+        "stepSeq": 1,
+        "deviceAgentCode": "AGT-803437A3",
+        "commandId": "CMD-20261103163316-AE4B401C",
+        "stepStatus": "EXECUTING",
+        "retryCount": 0,
+        "executionResult": null,
+        "reasonCode": null,
+        "outputParams": null,
+        "dispatchedAt": "2026-11-03T16:33:16.793623",
+        "feedbackAt": null,
+        "rejectedAgentIds": []
+      }
+    ],
+    "commands": [
+      "182|TASK_ACCEPT|ACCEPTED",
+      "183|EXECUTE_CAPABILITY|SENT"
+    ],
+    "bypassAuditRows": []
+  },
+  "occupiedAgentBeforeSecond": "AGT-803437A3|ONLINE|BUSY|143|1",
+  "secondTaskId": 144,
+  "second": {
+    "task": {
+      "id": 144,
+      "taskCode": "TASK-20261103-0144",
+      "taskGoal": "F013_GOOD competing plan for occupied exclusive robot V143",
+      "taskFamily": "EXT_2AD8B934",
+      "sceneParams": {
+        "targetLocation": "F2_TEST_GATE"
+      },
+      "goalParsingResult": {
+        "completionCondition": "routeGenerated=true",
+        "origin": "F2_SERVICE_POINT",
+        "destination": "F2_TEST_GATE",
+        "originalGoal": "F013_GOOD competing plan for occupied exclusive robot V143",
+        "constraints": [
+          "synthetic test"
+        ]
+      },
+      "status": "PENDING_MANUAL",
+      "currentPlanVersionId": 126,
+      "replanUsed": false,
+      "replanningReason": null,
+      "manualTerminateReason": null,
+      "failureReason": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板",
+      "missingInfoQuestions": null,
+      "downgradeReason": null,
+      "isDryRun": false,
+      "createdAt": "2026-11-03T16:33:18.437801",
+      "updatedAt": "2026-11-03T16:33:18.551484",
+      "createdBy": "oprator"
+    },
+    "plans": [
+      {
+        "id": 126,
+        "versionNo": 1,
+        "source": "AUTONOMOUS",
+        "baselineTemplateId": null,
+        "snapshotId": "CTX-20261103-0107",
+        "planSteps": [
+          {
+            "stepSeq": 1,
+            "stepGoal": "Synthetic navigation 1",
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "precondition": "device online",
+            "completionCondition": "routeGenerated=true",
+            "failureHandling": "最多重试2次后转人工",
+            "stepTimeout": 60
+          }
+        ],
+        "structureCheckResult": "PASS",
+        "capabilityCheckResult": "PASS",
+        "constraintCheckResult": "PASS",
+        "validationErrors": [],
+        "riskLevel": "HIGH",
+        "riskReasonCode": "RULE_RESOURCE_CRITICAL",
+        "judgmentBasis": "可用备用候选设备数量(0)低于配置阈值(1)，命中确定性高风险规则",
+        "confidence": 0.99,
+        "ruleSetVersion": "V1.4",
+        "frozenAt": "2026-11-03T16:33:18.534634",
+        "createdAt": "2026-11-03T16:33:18.526596"
+      }
+    ],
+    "events": [
+      {
+        "id": 1148,
+        "taskId": 144,
+        "eventType": "GOAL_SUBMITTED",
+        "occurredAt": "2026-11-03T16:33:18.439777",
+        "trigger": "OPERATOR",
+        "reasonCode": null,
+        "detailSummary": "运行操作员oprator提交任务目标: F013_GOOD competing plan for occupied exclusive robot V143"
+      },
+      {
+        "id": 1149,
+        "taskId": 144,
+        "eventType": "GOAL_CLARIFIED",
+        "occurredAt": "2026-11-03T16:33:18.450349",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+      },
+      {
+        "id": 1150,
+        "taskId": 144,
+        "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+        "occurredAt": "2026-11-03T16:33:18.467369",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "生成规划上下文快照CTX-20261103-0107"
+      },
+      {
+        "id": 1151,
+        "taskId": 144,
+        "eventType": "PLAN_GENERATED",
+        "occurredAt": "2026-11-03T16:33:18.531817",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+      },
+      {
+        "id": 1152,
+        "taskId": 144,
+        "eventType": "PLAN_VALIDATED",
+        "occurredAt": "2026-11-03T16:33:18.536093",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+      },
+      {
+        "id": 1153,
+        "taskId": 144,
+        "eventType": "SUPERVISION_JUDGED",
+        "occurredAt": "2026-11-03T16:33:18.548778",
+        "trigger": "SYSTEM",
+        "reasonCode": "RULE_RESOURCE_CRITICAL",
+        "detailSummary": "监督判定: HIGH，可用备用候选设备数量(0)低于配置阈值(1)，命中确定性高风险规则"
+      },
+      {
+        "id": 1154,
+        "taskId": 144,
+        "eventType": "BASELINE_DOWNGRADED",
+        "occurredAt": "2026-11-03T16:33:18.550929",
+        "trigger": "SYSTEM",
+        "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+        "detailSummary": "无匹配的已启用基线模板: 监督判定高风险: RULE_RESOURCE_CRITICAL"
+      },
+      {
+        "id": 1155,
+        "taskId": 144,
+        "eventType": "TASK_PENDING_MANUAL",
+        "occurredAt": "2026-11-03T16:33:18.562374",
+        "trigger": "SYSTEM",
+        "reasonCode": "ERR_PLANNING_FAILED",
+        "detailSummary": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板"
+      }
+    ],
+    "assignments": [],
+    "commands": [],
+    "bypassAuditRows": []
+  },
+  "secondSnapshots": [
+    {
+      "id": 107,
+      "snapshotCode": "CTX-20261103-0107",
+      "taskId": 144,
+      "agents": "[{\"agentId\":\"AGT-803437A3\",\"deviceCode\":\"G126_ROBOT\",\"deviceTypeCode\":\"SIMULATOR\",\"simulatedDeviceType\":\"MOBILE_ROBOT\",\"businessStatus\":{\"scenarioResult\":\"NO_FEEDBACK\",\"simulatedDeviceType\":\"MOBILE_ROBOT\"},\"capabilities\":[\"CAP_ESCORT\",\"CAP_NOTIFICATION\",\"CAP_NAVIGATION\"],\"capabilitySchemas\":[{\"capabilityType\":\"CAP_ESCORT\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"escortMode\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"LEAD\",\"range\":\"LEAD/FOLLOW\"},{\"name\":\"maxDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"600\",\"range\":\"60~1800\"}],\"outputParams\":[{\"name\":\"arrivalStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"actualDuration\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_NOTIFICATION\",\"inputParams\":[{\"name\":\"notificationType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BOTH\",\"range\":\"VOICE/TEXT/BOTH\"},{\"name\":\"notificationContent\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试旅客需要轮椅陪同，请现场服务人员协助\"},{\"name\":\"repeatCount\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"1\",\"range\":\"1~5\"}],\"outputParams\":[{\"name\":\"notificationStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualRepeatCount\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"routePreference\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BARRIER_FREE\",\"range\":\"SHORTEST/BARRIER_FREE\"}],\"outputParams\":[{\"name\":\"routeGenerated\",\"type\":\"Boolean\",\"required\":true},{\"name\":\"estimatedDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"estimatedDuration\",\"type\":\"Integer\",\"required\":true},{\"name\":\"waypointCount\",\"type\":\"Integer\",\"required\":true}]}],\"onlineStatus\":\"ONLINE\",\"location\":{\"x\":3.00,\"y\":4.00,\"zone\":\"F2_TEST\"},\"workload\":\"BUSY\",\"availableUntil\":\"2026-11-03T16:34:16.793623\"}]",
+      "capabilityCoverage": "{\"available\":[\"CAP_NAVIGATION\"],\"missing\":[]}",
+      "failedAgentCodes": "[]",
+      "generatedAt": "2026-11-03T16:33:18.465233"
+    }
+  ],
+  "ownerAfterSecond": {
+    "task": {
+      "id": 143,
+      "taskCode": "TASK-20261103-0143",
+      "taskGoal": "F013_GOOD owner occupies exclusive robot V143",
+      "taskFamily": "EXT_2AD8B934",
+      "sceneParams": {
+        "targetLocation": "F2_TEST_GATE"
+      },
+      "goalParsingResult": {
+        "completionCondition": "routeGenerated=true",
+        "origin": "F2_SERVICE_POINT",
+        "destination": "F2_TEST_GATE",
+        "originalGoal": "F013_GOOD owner occupies exclusive robot V143",
+        "constraints": [
+          "synthetic test"
+        ]
+      },
+      "status": "EXECUTING",
+      "currentPlanVersionId": 125,
+      "replanUsed": false,
+      "replanningReason": null,
+      "manualTerminateReason": null,
+      "failureReason": null,
+      "missingInfoQuestions": null,
+      "downgradeReason": null,
+      "isDryRun": false,
+      "createdAt": "2026-11-03T16:33:16.546992",
+      "updatedAt": "2026-11-03T16:33:16.788662",
+      "createdBy": "oprator"
+    },
+    "plans": [
+      {
+        "id": 125,
+        "versionNo": 1,
+        "source": "AUTONOMOUS",
+        "baselineTemplateId": null,
+        "snapshotId": "CTX-20261103-0106",
+        "planSteps": [
+          {
+            "stepSeq": 1,
+            "stepGoal": "Synthetic navigation 1",
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "precondition": "device online",
+            "completionCondition": "routeGenerated=true",
+            "failureHandling": "最多重试2次后转人工",
+            "stepTimeout": 60
+          }
+        ],
+        "structureCheckResult": "PASS",
+        "capabilityCheckResult": "PASS",
+        "constraintCheckResult": "PASS",
+        "validationErrors": [],
+        "riskLevel": "LOW",
+        "riskReasonCode": null,
+        "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+        "confidence": 0.99,
+        "ruleSetVersion": "V1.3",
+        "frozenAt": "2026-11-03T16:33:16.594171",
+        "createdAt": "2026-11-03T16:33:16.586835"
+      }
+    ],
+    "events": [
+      {
+        "id": 1139,
+        "taskId": 143,
+        "eventType": "GOAL_SUBMITTED",
+        "occurredAt": "2026-11-03T16:33:16.55313",
+        "trigger": "OPERATOR",
+        "reasonCode": null,
+        "detailSummary": "运行操作员oprator提交任务目标: F013_GOOD owner occupies exclusive robot V143"
+      },
+      {
+        "id": 1140,
+        "taskId": 143,
+        "eventType": "GOAL_CLARIFIED",
+        "occurredAt": "2026-11-03T16:33:16.565341",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+      },
+      {
+        "id": 1141,
+        "taskId": 143,
+        "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+        "occurredAt": "2026-11-03T16:33:16.575582",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "生成规划上下文快照CTX-20261103-0106"
+      },
+      {
+        "id": 1142,
+        "taskId": 143,
+        "eventType": "PLAN_GENERATED",
+        "occurredAt": "2026-11-03T16:33:16.591186",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+      },
+      {
+        "id": 1143,
+        "taskId": 143,
+        "eventType": "PLAN_VALIDATED",
+        "occurredAt": "2026-11-03T16:33:16.595137",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+      },
+      {
+        "id": 1144,
+        "taskId": 143,
+        "eventType": "SUPERVISION_JUDGED",
+        "occurredAt": "2026-11-03T16:33:16.602679",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "监督判定: LOW，未命中确定性高风险规则，风险信号数量不足以触发降级"
+      },
+      {
+        "id": 1145,
+        "taskId": 143,
+        "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+        "occurredAt": "2026-11-03T16:33:16.641765",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-803437A3(距离0.0,负载0)，向候选AGT-803437A3发起承接请求"
+      },
+      {
+        "id": 1146,
+        "taskId": 143,
+        "eventType": "AGENT_ASSIGNED",
+        "occurredAt": "2026-11-03T16:33:16.787219",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "设备代理AGT-803437A3接受步骤1承接请求"
+      },
+      {
+        "id": 1147,
+        "taskId": 143,
+        "eventType": "STEP_DISPATCHED",
+        "occurredAt": "2026-11-03T16:33:16.796138",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "指令CMD-20261103163316-611CAF8D已下发至设备代理AGT-803437A3，业务意图: Synthetic navigation 1"
+      }
+    ],
+    "assignments": [
+      {
+        "id": 96,
+        "stepSeq": 1,
+        "deviceAgentCode": "AGT-803437A3",
+        "commandId": "CMD-20261103163316-AE4B401C",
+        "stepStatus": "EXECUTING",
+        "retryCount": 0,
+        "executionResult": null,
+        "reasonCode": null,
+        "outputParams": null,
+        "dispatchedAt": "2026-11-03T16:33:16.793623",
+        "feedbackAt": null,
+        "rejectedAgentIds": []
+      }
+    ],
+    "commands": [
+      "182|TASK_ACCEPT|ACCEPTED",
+      "183|EXECUTE_CAPABILITY|SENT"
+    ],
+    "bypassAuditRows": []
+  },
+  "checks": {
+    "ownerReallyExecuting": true,
+    "competingConstraintFails": false,
+    "competingNotFrozen": false,
+    "competingNeverSupervised": false,
+    "noCompetingAllocationOrCommands": true,
+    "ownerContinuesUnchanged": true
+  },
+  "simulatorRestored": {
+    "scenarioResult": "SUCCESS"
+  },
+  "ownerTermination": {
+    "http": 200,
+    "body": {
+      "code": 200,
+      "message": "success",
+      "data": {
+        "id": 143,
+        "taskCode": "TASK-20261103-0143",
+        "taskGoal": "F013_GOOD owner occupies exclusive robot V143",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        },
+        "goalParsingResult": {
+          "completionCondition": "routeGenerated=true",
+          "origin": "F2_SERVICE_POINT",
+          "destination": "F2_TEST_GATE",
+          "originalGoal": "F013_GOOD owner occupies exclusive robot V143",
+          "constraints": [
+            "synthetic test"
+          ]
+        },
+        "status": "MANUAL_TERMINATED",
+        "currentPlanVersionId": 125,
+        "replanUsed": false,
+        "replanningReason": null,
+        "manualTerminateReason": "F013 synthetic occupied-resource fixture cleanup",
+        "failureReason": null,
+        "missingInfoQuestions": null,
+        "downgradeReason": null,
+        "isDryRun": false,
+        "createdAt": "2026-11-03T16:33:16.546992",
+        "updatedAt": "2026-11-03T16:33:19.6873007",
+        "createdBy": "oprator"
+      },
+      "timestamp": "2026-11-03T16:33:19.695297700+08:00"
+    }
+  },
+  "ownerAfterCleanup": {
+    "task": {
+      "id": 143,
+      "taskCode": "TASK-20261103-0143",
+      "taskGoal": "F013_GOOD owner occupies exclusive robot V143",
+      "taskFamily": "EXT_2AD8B934",
+      "sceneParams": {
+        "targetLocation": "F2_TEST_GATE"
+      },
+      "goalParsingResult": {
+        "completionCondition": "routeGenerated=true",
+        "origin": "F2_SERVICE_POINT",
+        "destination": "F2_TEST_GATE",
+        "originalGoal": "F013_GOOD owner occupies exclusive robot V143",
+        "constraints": [
+          "synthetic test"
+        ]
+      },
+      "status": "MANUAL_TERMINATED",
+      "currentPlanVersionId": 125,
+      "replanUsed": false,
+      "replanningReason": null,
+      "manualTerminateReason": "F013 synthetic occupied-resource fixture cleanup",
+      "failureReason": null,
+      "missingInfoQuestions": null,
+      "downgradeReason": null,
+      "isDryRun": false,
+      "createdAt": "2026-11-03T16:33:16.546992",
+      "updatedAt": "2026-11-03T16:33:19.687301",
+      "createdBy": "oprator"
+    },
+    "plans": [
+      {
+        "id": 125,
+        "versionNo": 1,
+        "source": "AUTONOMOUS",
+        "baselineTemplateId": null,
+        "snapshotId": "CTX-20261103-0106",
+        "planSteps": [
+          {
+            "stepSeq": 1,
+            "stepGoal": "Synthetic navigation 1",
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "precondition": "device online",
+            "completionCondition": "routeGenerated=true",
+            "failureHandling": "最多重试2次后转人工",
+            "stepTimeout": 60
+          }
+        ],
+        "structureCheckResult": "PASS",
+        "capabilityCheckResult": "PASS",
+        "constraintCheckResult": "PASS",
+        "validationErrors": [],
+        "riskLevel": "LOW",
+        "riskReasonCode": null,
+        "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+        "confidence": 0.99,
+        "ruleSetVersion": "V1.3",
+        "frozenAt": "2026-11-03T16:33:16.594171",
+        "createdAt": "2026-11-03T16:33:16.586835"
+      }
+    ],
+    "events": [
+      {
+        "id": 1139,
+        "taskId": 143,
+        "eventType": "GOAL_SUBMITTED",
+        "occurredAt": "2026-11-03T16:33:16.55313",
+        "trigger": "OPERATOR",
+        "reasonCode": null,
+        "detailSummary": "运行操作员oprator提交任务目标: F013_GOOD owner occupies exclusive robot V143"
+      },
+      {
+        "id": 1140,
+        "taskId": 143,
+        "eventType": "GOAL_CLARIFIED",
+        "occurredAt": "2026-11-03T16:33:16.565341",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+      },
+      {
+        "id": 1141,
+        "taskId": 143,
+        "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+        "occurredAt": "2026-11-03T16:33:16.575582",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "生成规划上下文快照CTX-20261103-0106"
+      },
+      {
+        "id": 1142,
+        "taskId": 143,
+        "eventType": "PLAN_GENERATED",
+        "occurredAt": "2026-11-03T16:33:16.591186",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+      },
+      {
+        "id": 1143,
+        "taskId": 143,
+        "eventType": "PLAN_VALIDATED",
+        "occurredAt": "2026-11-03T16:33:16.595137",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+      },
+      {
+        "id": 1144,
+        "taskId": 143,
+        "eventType": "SUPERVISION_JUDGED",
+        "occurredAt": "2026-11-03T16:33:16.602679",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "监督判定: LOW，未命中确定性高风险规则，风险信号数量不足以触发降级"
+      },
+      {
+        "id": 1145,
+        "taskId": 143,
+        "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+        "occurredAt": "2026-11-03T16:33:16.641765",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-803437A3(距离0.0,负载0)，向候选AGT-803437A3发起承接请求"
+      },
+      {
+        "id": 1146,
+        "taskId": 143,
+        "eventType": "AGENT_ASSIGNED",
+        "occurredAt": "2026-11-03T16:33:16.787219",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "设备代理AGT-803437A3接受步骤1承接请求"
+      },
+      {
+        "id": 1147,
+        "taskId": 143,
+        "eventType": "STEP_DISPATCHED",
+        "occurredAt": "2026-11-03T16:33:16.796138",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "指令CMD-20261103163316-611CAF8D已下发至设备代理AGT-803437A3，业务意图: Synthetic navigation 1"
+      },
+      {
+        "id": 1156,
+        "taskId": 143,
+        "eventType": "TASK_CANCEL_REQUESTED",
+        "occurredAt": "2026-11-03T16:33:19.685236",
+        "trigger": "OPERATOR",
+        "reasonCode": null,
+        "detailSummary": "已向设备代理AGT-803437A3发送业务任务取消请求"
+      },
+      {
+        "id": 1157,
+        "taskId": 143,
+        "eventType": "MANUAL_TERMINATED",
+        "occurredAt": "2026-11-03T16:33:19.690228",
+        "trigger": "OPERATOR",
+        "reasonCode": null,
+        "detailSummary": "运行操作员oprator人工终止任务，原因: F013 synthetic occupied-resource fixture cleanup，涉及设备: [AGT-803437A3]"
+      }
+    ],
+    "assignments": [
+      {
+        "id": 96,
+        "stepSeq": 1,
+        "deviceAgentCode": "AGT-803437A3",
+        "commandId": "CMD-20261103163316-AE4B401C",
+        "stepStatus": "FROZEN",
+        "retryCount": 0,
+        "executionResult": null,
+        "reasonCode": null,
+        "outputParams": null,
+        "dispatchedAt": "2026-11-03T16:33:16.793623",
+        "feedbackAt": null,
+        "rejectedAgentIds": []
+      }
+    ],
+    "commands": [
+      "182|TASK_ACCEPT|ACCEPTED",
+      "183|EXECUTE_CAPABILITY|SENT",
+      "184|TASK_CANCEL|SENT"
+    ],
+    "bypassAuditRows": []
+  },
+  "resourceRuleAfter": "t",
+  "robotAfterCleanup": "ENABLED|ONLINE|BUSY|143"
+}
