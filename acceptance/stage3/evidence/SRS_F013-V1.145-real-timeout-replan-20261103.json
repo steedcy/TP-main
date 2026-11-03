@@ -1,0 +1,556 @@
+{
+  "version": "V1.145",
+  "codeSha": "985688dfcf75b91a14dfb786f14d5567e0f01aff",
+  "observedAt": "2026-11-03T22:08:03.396268+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "taskId": 150,
+  "initial": {
+    "task": {
+      "id": 150,
+      "taskCode": "TASK-20261103-0150",
+      "taskGoal": "F013_GOOD actual simulator timeout replan V145",
+      "taskFamily": "EXT_2AD8B934",
+      "sceneParams": {
+        "targetLocation": "F2_TEST_GATE"
+      },
+      "goalParsingResult": {
+        "completionCondition": "routeGenerated=true",
+        "origin": "F2_SERVICE_POINT",
+        "destination": "F2_TEST_GATE",
+        "originalGoal": "F013_GOOD actual simulator timeout replan V145",
+        "constraints": [
+          "synthetic test"
+        ]
+      },
+      "status": "PENDING_ASSIGNMENT",
+      "currentPlanVersionId": 134,
+      "replanUsed": false,
+      "replanningReason": null,
+      "manualTerminateReason": null,
+      "failureReason": null,
+      "missingInfoQuestions": null,
+      "downgradeReason": null,
+      "isDryRun": false,
+      "createdAt": "2026-11-03T22:08:03.505005",
+      "updatedAt": "2026-11-03T22:08:03.568533",
+      "createdBy": "oprator"
+    },
+    "plans": [
+      {
+        "id": 134,
+        "versionNo": 1,
+        "source": "AUTONOMOUS",
+        "baselineTemplateId": null,
+        "snapshotId": "CTX-20261103-0115",
+        "planSteps": [
+          {
+            "stepSeq": 1,
+            "stepGoal": "Synthetic navigation 1",
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "precondition": "device online",
+            "completionCondition": "routeGenerated=true",
+            "failureHandling": "最多重试2次后转人工",
+            "stepTimeout": 60
+          }
+        ],
+        "structureCheckResult": "PASS",
+        "capabilityCheckResult": "PASS",
+        "constraintCheckResult": "PASS",
+        "validationErrors": [],
+        "riskLevel": "LOW",
+        "riskReasonCode": null,
+        "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+        "confidence": 0.99,
+        "ruleSetVersion": "V1.7",
+        "frozenAt": "2026-11-03T22:08:03.552966",
+        "createdAt": "2026-11-03T22:08:03.547085"
+      }
+    ],
+    "events": [
+      {
+        "id": 1214,
+        "taskId": 150,
+        "eventType": "GOAL_SUBMITTED",
+        "occurredAt": "2026-11-03T22:08:03.507686",
+        "trigger": "OPERATOR",
+        "reasonCode": null,
+        "detailSummary": "运行操作员oprator提交任务目标: F013_GOOD actual simulator timeout replan V145"
+      },
+      {
+        "id": 1215,
+        "taskId": 150,
+        "eventType": "GOAL_CLARIFIED",
+        "occurredAt": "2026-11-03T22:08:03.526529",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+      },
+      {
+        "id": 1216,
+        "taskId": 150,
+        "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+        "occurredAt": "2026-11-03T22:08:03.534365",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "生成规划上下文快照CTX-20261103-0115"
+      },
+      {
+        "id": 1217,
+        "taskId": 150,
+        "eventType": "PLAN_GENERATED",
+        "occurredAt": "2026-11-03T22:08:03.549497",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+      },
+      {
+        "id": 1218,
+        "taskId": 150,
+        "eventType": "PLAN_VALIDATED",
+        "occurredAt": "2026-11-03T22:08:03.552966",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+      },
+      {
+        "id": 1219,
+        "taskId": 150,
+        "eventType": "SUPERVISION_JUDGED",
+        "occurredAt": "2026-11-03T22:08:03.565898",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "监督判定: LOW，未命中确定性高风险规则，风险信号数量不足以触发降级"
+      },
+      {
+        "id": 1220,
+        "taskId": 150,
+        "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+        "occurredAt": "2026-11-03T22:08:03.578603",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-803437A3(距离0.0,负载0)，向候选AGT-803437A3发起承接请求"
+      }
+    ],
+    "assignments": [
+      {
+        "id": 99,
+        "stepSeq": 1,
+        "deviceAgentCode": "AGT-803437A3",
+        "commandId": "CMD-20261103220803-E960E656",
+        "stepStatus": "EXECUTING",
+        "retryCount": 0,
+        "executionResult": null,
+        "reasonCode": null,
+        "outputParams": null,
+        "dispatchedAt": "2026-11-03T22:08:03.632765",
+        "feedbackAt": null,
+        "rejectedAgentIds": []
+      }
+    ],
+    "commands": [
+      "190|TASK_ACCEPT|ACCEPTED",
+      "191|EXECUTE_CAPABILITY|SENT"
+    ],
+    "bypassAuditRows": []
+  },
+  "after": {
+    "task": {
+      "id": 150,
+      "taskCode": "TASK-20261103-0150",
+      "taskGoal": "F013_GOOD actual simulator timeout replan V145",
+      "taskFamily": "EXT_2AD8B934",
+      "sceneParams": {
+        "targetLocation": "F2_TEST_GATE"
+      },
+      "goalParsingResult": {
+        "completionCondition": "routeGenerated=true",
+        "origin": "F2_SERVICE_POINT",
+        "destination": "F2_TEST_GATE",
+        "originalGoal": "F013_GOOD actual simulator timeout replan V145",
+        "constraints": [
+          "synthetic test"
+        ]
+      },
+      "status": "EXECUTING",
+      "currentPlanVersionId": 135,
+      "replanUsed": true,
+      "replanningReason": "STEP_FAILED: 执行结果: TIMEOUT，原因: SIMULATED_TIMEOUT",
+      "manualTerminateReason": null,
+      "failureReason": null,
+      "missingInfoQuestions": null,
+      "downgradeReason": null,
+      "isDryRun": false,
+      "createdAt": "2026-11-03T22:08:03.505005",
+      "updatedAt": "2026-11-03T22:08:04.968209",
+      "createdBy": "oprator"
+    },
+    "plans": [
+      {
+        "id": 134,
+        "versionNo": 1,
+        "source": "AUTONOMOUS",
+        "baselineTemplateId": null,
+        "snapshotId": "CTX-20261103-0115",
+        "planSteps": [
+          {
+            "stepSeq": 1,
+            "stepGoal": "Synthetic navigation 1",
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "precondition": "device online",
+            "completionCondition": "routeGenerated=true",
+            "failureHandling": "最多重试2次后转人工",
+            "stepTimeout": 60
+          }
+        ],
+        "structureCheckResult": "PASS",
+        "capabilityCheckResult": "PASS",
+        "constraintCheckResult": "PASS",
+        "validationErrors": [],
+        "riskLevel": "LOW",
+        "riskReasonCode": null,
+        "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+        "confidence": 0.99,
+        "ruleSetVersion": "V1.7",
+        "frozenAt": "2026-11-03T22:08:03.552966",
+        "createdAt": "2026-11-03T22:08:03.547085"
+      },
+      {
+        "id": 135,
+        "versionNo": 2,
+        "source": "AUTONOMOUS",
+        "baselineTemplateId": null,
+        "snapshotId": "CTX-20261103-0116",
+        "planSteps": [
+          {
+            "stepSeq": 1,
+            "stepGoal": "Synthetic navigation 1",
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "precondition": "device online",
+            "completionCondition": "routeGenerated=true",
+            "failureHandling": "最多重试2次后转人工",
+            "stepTimeout": 60
+          }
+        ],
+        "structureCheckResult": "PASS",
+        "capabilityCheckResult": "PASS",
+        "constraintCheckResult": "PASS",
+        "validationErrors": [],
+        "riskLevel": "LOW",
+        "riskReasonCode": null,
+        "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+        "confidence": 0.99,
+        "ruleSetVersion": "V1.7",
+        "frozenAt": "2026-11-03T22:08:04.891928",
+        "createdAt": "2026-11-03T22:08:04.886663"
+      }
+    ],
+    "events": [
+      {
+        "id": 1214,
+        "taskId": 150,
+        "eventType": "GOAL_SUBMITTED",
+        "occurredAt": "2026-11-03T22:08:03.507686",
+        "trigger": "OPERATOR",
+        "reasonCode": null,
+        "detailSummary": "运行操作员oprator提交任务目标: F013_GOOD actual simulator timeout replan V145"
+      },
+      {
+        "id": 1215,
+        "taskId": 150,
+        "eventType": "GOAL_CLARIFIED",
+        "occurredAt": "2026-11-03T22:08:03.526529",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+      },
+      {
+        "id": 1216,
+        "taskId": 150,
+        "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+        "occurredAt": "2026-11-03T22:08:03.534365",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "生成规划上下文快照CTX-20261103-0115"
+      },
+      {
+        "id": 1217,
+        "taskId": 150,
+        "eventType": "PLAN_GENERATED",
+        "occurredAt": "2026-11-03T22:08:03.549497",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+      },
+      {
+        "id": 1218,
+        "taskId": 150,
+        "eventType": "PLAN_VALIDATED",
+        "occurredAt": "2026-11-03T22:08:03.552966",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+      },
+      {
+        "id": 1219,
+        "taskId": 150,
+        "eventType": "SUPERVISION_JUDGED",
+        "occurredAt": "2026-11-03T22:08:03.565898",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "监督判定: LOW，未命中确定性高风险规则，风险信号数量不足以触发降级"
+      },
+      {
+        "id": 1220,
+        "taskId": 150,
+        "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+        "occurredAt": "2026-11-03T22:08:03.578603",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-803437A3(距离0.0,负载0)，向候选AGT-803437A3发起承接请求"
+      },
+      {
+        "id": 1221,
+        "taskId": 150,
+        "eventType": "AGENT_ASSIGNED",
+        "occurredAt": "2026-11-03T22:08:03.621109",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "设备代理AGT-803437A3接受步骤1承接请求"
+      },
+      {
+        "id": 1222,
+        "taskId": 150,
+        "eventType": "STEP_DISPATCHED",
+        "occurredAt": "2026-11-03T22:08:03.635286",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "指令CMD-20261103220803-AF5792B4已下发至设备代理AGT-803437A3，业务意图: Synthetic navigation 1"
+      },
+      {
+        "id": 1223,
+        "taskId": 150,
+        "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+        "occurredAt": "2026-11-03T22:08:04.190895",
+        "trigger": "SYSTEM",
+        "reasonCode": "SIMULATED_TIMEOUT",
+        "detailSummary": "指令CMD-20261103220803-AF5792B4收到设备代理AGT-803437A3执行反馈: TIMEOUT"
+      },
+      {
+        "id": 1224,
+        "taskId": 150,
+        "eventType": "STEP_RETRY_DISPATCHED",
+        "occurredAt": "2026-11-03T22:08:04.197133",
+        "trigger": "SYSTEM",
+        "reasonCode": "SIMULATED_TIMEOUT",
+        "detailSummary": "步骤1自动重试1次，沿用执行指令编号CMD-20261103220803-AF5792B4，尝试序号1，原因: 执行结果: TIMEOUT，原因: SIMULATED_TIMEOUT"
+      },
+      {
+        "id": 1225,
+        "taskId": 150,
+        "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+        "occurredAt": "2026-11-03T22:08:04.79491",
+        "trigger": "SYSTEM",
+        "reasonCode": "SIMULATED_TIMEOUT",
+        "detailSummary": "指令CMD-20261103220803-AF5792B4收到设备代理AGT-803437A3执行反馈: TIMEOUT"
+      },
+      {
+        "id": 1226,
+        "taskId": 150,
+        "eventType": "STEP_FAILED",
+        "occurredAt": "2026-11-03T22:08:04.805377",
+        "trigger": "SYSTEM",
+        "reasonCode": "SIMULATED_TIMEOUT",
+        "detailSummary": "步骤1重试后仍失败: 执行结果: TIMEOUT，原因: SIMULATED_TIMEOUT"
+      },
+      {
+        "id": 1227,
+        "taskId": 150,
+        "eventType": "EXCEPTION_DETECTED",
+        "occurredAt": "2026-11-03T22:08:04.815493",
+        "trigger": "SYSTEM",
+        "reasonCode": "STEP_FAILED",
+        "detailSummary": "识别到异常: STEP_FAILED，步骤1，详情: 执行结果: TIMEOUT，原因: SIMULATED_TIMEOUT"
+      },
+      {
+        "id": 1228,
+        "taskId": 150,
+        "eventType": "EXCEPTION_RECOVERY_FAILED",
+        "occurredAt": "2026-11-03T22:08:04.837808",
+        "trigger": "SYSTEM",
+        "reasonCode": "STEP_FAILED",
+        "detailSummary": "恢复动作: 无可用候选设备，恢复动作未执行，结果: 失败，判断计划是否可继续"
+      },
+      {
+        "id": 1229,
+        "taskId": 150,
+        "eventType": "REPLANNING_TRIGGERED",
+        "occurredAt": "2026-11-03T22:08:04.849819",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "步骤1恢复失败且计划不可继续，重新规划机会未用，触发5.5.4局部重新规划"
+      },
+      {
+        "id": 1230,
+        "taskId": 150,
+        "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+        "occurredAt": "2026-11-03T22:08:04.87072",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "局部重新规划重建上下文快照CTX-20261103-0116"
+      },
+      {
+        "id": 1231,
+        "taskId": 150,
+        "eventType": "PLAN_VALIDATED",
+        "occurredAt": "2026-11-03T22:08:04.894556",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "重新规划后新计划版本2三类校验全部通过，已冻结"
+      },
+      {
+        "id": 1232,
+        "taskId": 150,
+        "eventType": "SUPERVISION_JUDGED",
+        "occurredAt": "2026-11-03T22:08:04.901234",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "重新规划后监督判定: LOW，未命中确定性高风险规则，风险信号数量不足以触发降级"
+      },
+      {
+        "id": 1233,
+        "taskId": 150,
+        "eventType": "REPLAN_SUCCEEDED",
+        "occurredAt": "2026-11-03T22:08:04.903764",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "局部重新规划成功，新计划版本2已冻结，任务重新进入待分配"
+      },
+      {
+        "id": 1234,
+        "taskId": 150,
+        "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+        "occurredAt": "2026-11-03T22:08:04.916473",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-803437A3(距离0.0,负载0)，向候选AGT-803437A3发起承接请求"
+      },
+      {
+        "id": 1235,
+        "taskId": 150,
+        "eventType": "AGENT_ASSIGNED",
+        "occurredAt": "2026-11-03T22:08:04.965669",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "设备代理AGT-803437A3接受步骤1承接请求"
+      },
+      {
+        "id": 1236,
+        "taskId": 150,
+        "eventType": "STEP_DISPATCHED",
+        "occurredAt": "2026-11-03T22:08:04.973381",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "指令CMD-20261103220804-5125D244已下发至设备代理AGT-803437A3，业务意图: Synthetic navigation 1"
+      }
+    ],
+    "assignments": [
+      {
+        "id": 100,
+        "stepSeq": 1,
+        "deviceAgentCode": "AGT-803437A3",
+        "commandId": "CMD-20261103220804-1D8CC21C",
+        "stepStatus": "EXECUTING",
+        "retryCount": 0,
+        "executionResult": null,
+        "reasonCode": null,
+        "outputParams": null,
+        "dispatchedAt": "2026-11-03T22:08:04.970726",
+        "feedbackAt": null,
+        "rejectedAgentIds": []
+      }
+    ],
+    "commands": [
+      "190|TASK_ACCEPT|ACCEPTED",
+      "191|EXECUTE_CAPABILITY|TIMED_OUT",
+      "192|EXECUTE_CAPABILITY|TIMED_OUT",
+      "193|TASK_ACCEPT|ACCEPTED",
+      "194|EXECUTE_CAPABILITY|TIMED_OUT",
+      "195|EXECUTE_CAPABILITY|SENT"
+    ],
+    "bypassAuditRows": []
+  },
+  "snapshots": [
+    {
+      "id": 116,
+      "snapshotCode": "CTX-20261103-0116",
+      "taskId": 150,
+      "agents": "[{\"agentId\":\"AGT-803437A3\",\"deviceCode\":\"G126_ROBOT\",\"deviceTypeCode\":\"SIMULATOR\",\"simulatedDeviceType\":\"MOBILE_ROBOT\",\"businessStatus\":{\"scenarioResult\":\"TIMEOUT\",\"simulatedDeviceType\":\"MOBILE_ROBOT\"},\"capabilities\":[\"CAP_ESCORT\",\"CAP_NOTIFICATION\",\"CAP_NAVIGATION\"],\"capabilitySchemas\":[{\"capabilityType\":\"CAP_ESCORT\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"escortMode\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"LEAD\",\"range\":\"LEAD/FOLLOW\"},{\"name\":\"maxDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"600\",\"range\":\"60~1800\"}],\"outputParams\":[{\"name\":\"arrivalStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"actualDuration\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_NOTIFICATION\",\"inputParams\":[{\"name\":\"notificationType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BOTH\",\"range\":\"VOICE/TEXT/BOTH\"},{\"name\":\"notificationContent\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试旅客需要轮椅陪同，请现场服务人员协助\"},{\"name\":\"repeatCount\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"1\",\"range\":\"1~5\"}],\"outputParams\":[{\"name\":\"notificationStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualRepeatCount\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"routePreference\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BARRIER_FREE\",\"range\":\"SHORTEST/BARRIER_FREE\"}],\"outputParams\":[{\"name\":\"routeGenerated\",\"type\":\"Boolean\",\"required\":true},{\"name\":\"estimatedDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"estimatedDuration\",\"type\":\"Integer\",\"required\":true},{\"name\":\"waypointCount\",\"type\":\"Integer\",\"required\":true}]}],\"onlineStatus\":\"ONLINE\",\"location\":{\"x\":815.00,\"y\":4600.00,\"zone\":\"F2_TEST\"},\"workload\":\"IDLE\",\"currentTaskId\":null,\"currentStepSeq\":null,\"availableUntil\":\"2026-11-03T22:08:04.865708\"}]",
+      "capabilityCoverage": "{\"available\":[\"CAP_NAVIGATION\"],\"missing\":[]}",
+      "failedAgentCodes": "[]",
+      "generatedAt": "2026-11-03T22:08:04.868241"
+    },
+    {
+      "id": 115,
+      "snapshotCode": "CTX-20261103-0115",
+      "taskId": 150,
+      "agents": "[{\"agentId\":\"AGT-803437A3\",\"deviceCode\":\"G126_ROBOT\",\"deviceTypeCode\":\"SIMULATOR\",\"simulatedDeviceType\":\"MOBILE_ROBOT\",\"businessStatus\":{\"scenarioResult\":\"TIMEOUT\",\"simulatedDeviceType\":\"MOBILE_ROBOT\"},\"capabilities\":[\"CAP_ESCORT\",\"CAP_NOTIFICATION\",\"CAP_NAVIGATION\"],\"capabilitySchemas\":[{\"capabilityType\":\"CAP_ESCORT\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"escortMode\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"LEAD\",\"range\":\"LEAD/FOLLOW\"},{\"name\":\"maxDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"600\",\"range\":\"60~1800\"}],\"outputParams\":[{\"name\":\"arrivalStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"actualDuration\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_NOTIFICATION\",\"inputParams\":[{\"name\":\"notificationType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BOTH\",\"range\":\"VOICE/TEXT/BOTH\"},{\"name\":\"notificationContent\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试旅客需要轮椅陪同，请现场服务人员协助\"},{\"name\":\"repeatCount\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"1\",\"range\":\"1~5\"}],\"outputParams\":[{\"name\":\"notificationStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualRepeatCount\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"routePreference\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BARRIER_FREE\",\"range\":\"SHORTEST/BARRIER_FREE\"}],\"outputParams\":[{\"name\":\"routeGenerated\",\"type\":\"Boolean\",\"required\":true},{\"name\":\"estimatedDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"estimatedDuration\",\"type\":\"Integer\",\"required\":true},{\"name\":\"waypointCount\",\"type\":\"Integer\",\"required\":true}]}],\"onlineStatus\":\"ONLINE\",\"location\":{\"x\":815.00,\"y\":4600.00,\"zone\":\"F2_TEST\"},\"workload\":\"IDLE\",\"currentTaskId\":null,\"currentStepSeq\":null,\"availableUntil\":\"2026-11-03T22:08:03.531803800\"}]",
+      "capabilityCoverage": "{\"available\":[\"CAP_NAVIGATION\"],\"missing\":[]}",
+      "failedAgentCodes": "[]",
+      "generatedAt": "2026-11-03T22:08:03.531804"
+    }
+  ],
+  "checks": {
+    "realTimeoutEvents": true,
+    "newLocalVersion": true,
+    "newVersionFrozen": true,
+    "oldFrozenVersionUnchanged": true,
+    "newVersionNoResourceConflict": true
+  },
+  "cleanupTerminate": {
+    "http": 200,
+    "body": {
+      "code": 200,
+      "message": "success",
+      "data": {
+        "id": 150,
+        "taskCode": "TASK-20261103-0150",
+        "taskGoal": "F013_GOOD actual simulator timeout replan V145",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        },
+        "goalParsingResult": {
+          "completionCondition": "routeGenerated=true",
+          "origin": "F2_SERVICE_POINT",
+          "destination": "F2_TEST_GATE",
+          "originalGoal": "F013_GOOD actual simulator timeout replan V145",
+          "constraints": [
+            "synthetic test"
+          ]
+        },
+        "status": "MANUAL_TERMINATED",
+        "currentPlanVersionId": 135,
+        "replanUsed": true,
+        "replanningReason": "STEP_FAILED: 执行结果: TIMEOUT，原因: SIMULATED_TIMEOUT",
+        "manualTerminateReason": "F013 actual-timeout fixture cleanup",
+        "failureReason": null,
+        "missingInfoQuestions": null,
+        "downgradeReason": null,
+        "isDryRun": false,
+        "createdAt": "2026-11-03T22:08:03.505005",
+        "updatedAt": "2026-11-03T22:08:05.9771162",
+        "createdBy": "oprator"
+      },
+      "timestamp": "2026-11-03T22:08:05.983630900+08:00"
+    }
+  }
+}
