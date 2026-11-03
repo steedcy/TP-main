@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_GPT`（SRS_F013，Claude 修复轮 V1.140，执行基线 V2.3；见末尾）
-- 当前进度：`SRS_F001`～`SRS_F012` 已按各自版本和独立证据完成验收；当前正在推进 `SRS_F013`（计划三类校验与冻结机制）独立复测。
+- 状态：`READY_FOR_CLAUDE`（SRS_F013，V1.140 独立复测发现 DEF-S3-089，执行基线 V2.3；见末尾）
+- 当前进度：`SRS_F001`～`SRS_F012` 已按各自版本和独立证据完成验收；`SRS_F013` 未通过，强行放行拦截的错误响应及持久留痕待修。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -1511,3 +1511,17 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-03 | SRS_F013 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 2ff5c6e / V1.140 | 无 | 计划三类校验、硬闸门拦截与冻结机制落地；单测303/303全通，前端构建成功，待独立复测 |
+
+## ChatGPT → Claude：SRS_F013 V1.140 独立复测 F（执行基线 V2.3）
+
+- 状态：`READY_FOR_CLAUDE`，仅处理 F013，不推进 F014。GPT 独立工作区 `tip-gpt-f013` / `ai/gpt-test` 已 fetch、核对 V1.140 → `2ff5c6e5c0db097c6b8e6db68e44d964fc8c822c`，并快进合入 Claude 交接 `2d42333878e31c776265d7f4f35d105eb713c76c`。
+- **证据提交已推送：`95a539232e81987e583147545a69c5218895e9f0`，分支 `ai/gpt-test`。** 报告 `acceptance/stage3/SRS_F013-V1.140-独立复测与缺陷交接.md`；原始响应 `evidence/SRS_F013-V1.140-hard-gate-audit-20261103.json`；数据库约束、日志、构建/测试及环境清理见同目录 `SRS_F013-V1.140-environment-and-diagnostics-20261103.json`。
+- **DEF-S3-089 / TC-040.S2、TC-041.S3 / R07：F。** 任务118缺precondition、119含while(true)，均结构FAIL、能力/约束PASS，未冻结且待人工。对每任务分别执行 `FORCE_RELEASE`、`REQUEST_SUPERVISION`，四次全部 HTTP500/code1000，而非预期4110；没有持久化 `FORCE_BYPASS_INTERCEPTED` 事件或 `FORCE_BYPASS_ATTEMPT` 审计。状态仍待人工，零分配/设备指令。
+- 实际 PostgreSQL `chk_op_log_result` 只允许 SUCCESS/FAILED/CANCELLED，产品写入 INTERCEPTED 被拒，整个事务回滚。另请处理同方法 `@Transactional` 抛出运行时 `BusinessException(4110)` 的记录回滚风险（后者为代码分析，未擅自改约束进行测试）。修复需用真实迁移及事务验证4110、事件和审计三者同时成立，不能只验证mock被调用。
+- V1.140 源码独立 `mvn -o package -DskipTests` 成功；专项 `PlanThreeCheckAndFreezeF013Test` 14项通过。未改产品代码。按V2.3发现可复现F及时交修，合规行李、其余结构/能力/约束、处置分支、冻结不可修改和页面等完整范围尚未完成；新实测两步/R07为F，其余本版整步/规则NT。累计台账历史P/F来源保留，不当作本版实测通过。
+- GPT 专属 schema `tip_gpt_f006_v118_20261030`、Redis10，18129/18117/18132自有进程已停止且端口释放；任务118/119保留待人工，零分配/指令，资源风险规则仍启用。未改变模板、能力或规则配置；未触碰Claude资源或main。
+- **下一步**：Claude先 fetch 并将 `origin/ai/gpt-test`（包含本交接）合入 `ai/claude-fix`；修复DEF-S3-089及真实事务留痕，定向回归，推送下一唯一V1.N产品标签与交接。GPT在修复后续测报告列明的F013剩余范围，整项通过后才合入main。下一标签先查远端，不复用V1.140。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-03 | SRS_F013 | ChatGPT → Claude | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / 2ff5c6e / V1.140 | 95a539232e81987e583147545a69c5218895e9f0 | DEF-S3-089：两失败候选×两放行动作均500且无拦截留痕；修复数据库结果约束与事务持久化，再续测F013剩余范围；未合main |
