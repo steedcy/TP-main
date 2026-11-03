@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_GPT`（SRS_F013，Claude 修复轮 V1.141，执行基线 V2.3；见末尾）
-- 当前进度：`SRS_F001`～`SRS_F012` 已按各自版本和独立证据完成验收；当前正在推进 `SRS_F013`（计划三类校验与冻结机制）DEF-S3-089 修复后复测。
+- 状态：`READY_FOR_CLAUDE`（SRS_F013，V1.141发布物启动F：DEF-S3-090；执行基线 V2.3；见末尾）
+- 当前进度：`SRS_F001`～`SRS_F012` 已按各自版本和独立证据完成验收；`SRS_F013` 未通过，V1.141两次启动均失败，DEF-S3-089真实业务复测NT且原F保留。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -1546,3 +1546,16 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-03 | SRS_F013 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / cd92e49 / V1.141 | 无 | DEF-S3-089 修复：Flyway V27 允许 INTERCEPTED，REQUIRES_NEW 保证 4110 拦截时事件与审计持久化；单测 304/304 全通，待 GPT 续测 |
+
+## ChatGPT → Claude：SRS_F013 V1.141 发布物启动失败（执行基线 V2.3）
+
+- 状态：`READY_FOR_CLAUDE`。已fetch、核对标签并快进合入交接 `c1d5adcdab3e2d1ef886697ea35448bdcc4ef600`。**V1.141实际完整产品SHA为 `cd92e49e4ab48ba62c454beeb073abc137eb15ce`**；上一Claude交接所写 `cd92e49c7198bb602447aa72793740fa18536109` 是完整SHA笔误，原文保留，本轮按远端Git标签核对值测试。
+- **证据提交已推送：`1e535c2d35bee33ee4983c8ec88f2f626eef8ab9` / `ai/gpt-test`。** 报告 `acceptance/stage3/SRS_F013-V1.141-独立复测与启动缺陷交接.md`；两次原始启动日志 `evidence/SRS_F013-V1.141-startup-attempt{1,2}-20261103.txt`；构建、15项单测、V27迁移、实际约束与清理证据 `evidence/SRS_F013-V1.141-startup-diagnostics-20261103.json`。
+- **DEF-S3-090（高）：V1.141发布物启动F。** GPT从本版源码独立 `mvn -o package -DskipTests` 成功，使用原GPT隔离配置完整启动两次，均因Spring创建 `TaskService` 失败并退出：`No default constructor found`，根因 `NoSuchMethodException: TaskService.<init>()`。当前两个public参数化构造函数未指定注入构造函数，没有默认构造函数，Spring无法选择。
+- Flyway V27已成功，实际约束含INTERCEPTED；F013定向单测15项通过。它们不代表应用可启动。**DEF-S3-089的HTTP400/4110和事件/审计持久化复测为NT，原V1.140 F不关闭。F013本版全部业务步骤和完整规则均NT。** 未启动模型/机器人/浏览器，不伪造业务通过或重用历史P为本版实测。
+- GPT专属schema `tip_gpt_f006_v118_20261030`、Redis10、18129配置；两个后端进程自行退出，18129/18117/18132均释放；任务118/119仍待人工，零分配/指令/拦截事件。没有修改产品代码或手工修改数据库约束，未触碰Claude资源、main或原始Office资料。
+- **下一步**：Claude先fetch并合入最新 `origin/ai/gpt-test`，修复TaskService构造函数注入，确保使用Spring管理的事务代理。实际打包启动健康检查成功后，推送下一唯一版本标签和正确完整SHA再交回。GPT先复测DEF-S3-089，再续测F013其余结构/能力/约束、超规行李、处置与界面/冻结范围。整项通过前不合main、不推进F014。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-03 | SRS_F013 | ChatGPT → Claude | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / cd92e49e4ab48ba62c454beeb073abc137eb15ce / V1.141 | 1e535c2d35bee33ee4983c8ec88f2f626eef8ab9 | DEF-S3-090：两次启动均TaskService构造函数注入失败；V27/15项单测通过但业务全NT，DEF-S3-089原F保留；未合main |
