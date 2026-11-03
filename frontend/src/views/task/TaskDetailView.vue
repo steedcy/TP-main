@@ -53,6 +53,7 @@
             <a-descriptions-item label="约束校验">{{ checkLabel(pv.constraintCheckResult) }}</a-descriptions-item>
             <a-descriptions-item label="冻结时间">{{ pv.frozenAt || '未冻结' }}</a-descriptions-item>
             <a-descriptions-item label="风险等级" v-if="pv.riskLevel">{{ pv.riskLevel }}</a-descriptions-item>
+            <a-descriptions-item label="推荐处置" v-if="pv.riskLevel">{{ recommendedActionText(pv) }}</a-descriptions-item>
             <a-descriptions-item label="风险原因" v-if="pv.riskReasonCode">{{ pv.riskReasonCode }}</a-descriptions-item>
             <a-descriptions-item label="判定依据" :span="2" v-if="pv.judgmentBasis">{{ pv.judgmentBasis }}</a-descriptions-item>
             <a-descriptions-item label="置信度" v-if="pv.confidence != null">{{ pv.confidence }}</a-descriptions-item>
@@ -293,6 +294,10 @@ function statusLabel(status) {
 }
 function sourceLabel(source) {
   return source === 'BASELINE_TEMPLATE' ? '基线模板' : '自主规划'
+}
+function recommendedActionText(pv) {
+  const action = pv?.recommendedAction || (pv?.riskLevel === 'LOW' ? 'AUTO_EXECUTE' : pv?.riskLevel === 'HIGH' ? 'BASELINE_DOWNGRADE' : 'MANUAL_HANDLING')
+  return action === 'AUTO_EXECUTE' ? '自动执行' : action === 'BASELINE_DOWNGRADE' ? '基线降级' : '转人工处理'
 }
 // DEF-S3-036：规划说明、参数来源与步骤候选设备，仅取页面已有的计划版本与上下文快照数据
 function executableStepCount(pv) {

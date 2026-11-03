@@ -68,4 +68,14 @@ public class PlanVersion {
     public void setFrozenAt(LocalDateTime frozenAt) { this.frozenAt = frozenAt; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    /** 对应5.4.5推荐处置输出：AUTO_EXECUTE / BASELINE_DOWNGRADE / MANUAL_HANDLING */
+    public String getRecommendedAction() {
+        if (riskLevel == null) return null;
+        return switch (riskLevel) {
+            case "LOW" -> "AUTO_EXECUTE";
+            case "HIGH" -> "BASELINE_DOWNGRADE";
+            default -> "MANUAL_HANDLING";
+        };
+    }
 }

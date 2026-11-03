@@ -2,6 +2,8 @@ package com.airport.ai.risk;
 
 import com.airport.ai.common.BusinessException;
 import com.airport.ai.common.ErrorCode;
+import com.airport.ai.task.CoreScenarioChannelPolicy;
+import com.airport.ai.task.PlanStepRules;
 import com.airport.ai.task.PlanVersion;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,7 +23,7 @@ import java.util.stream.Collectors;
  * 采用"确定性风险规则优先、风险信号辅助"策略（对应5.4.5业务规则4）。
  *
  * 三类确定性高风险规则命中条件（TBD-03拍板结论）：
- * 1. RULE_ESCORT_SPECIAL_PASSENGER：任务族=SPECIAL_PASSENGER_SERVICE 且步骤含CAP_ESCORT能力
+ * 1. RULE_ESCORT_SPECIAL_PASSENGER：任务族=SPECIAL_PASSENGER_SERVICE 且含绑定移动服务机器人的会合（CAP_NAVIGATION）或陪同（CAP_ESCORT）步骤
  * 2. RULE_CROSS_ZONE：移动服务机器人步骤序列跨越预定义区域边界1次及以上
  * 3. RULE_RESOURCE_CRITICAL：申请资源时可用备用候选设备数量低于配置阈值（默认1）
  *
@@ -79,23 +82,30 @@ public class RiskAssessmentService {
         if ("UNAVAILABLE".equalsIgnoreCase(faultInjectionMode)) {
             throw new IllegalStateException("injected supervision fault: service unavailable");
         }
-        if ("UNDETERMINED".equalsIgnoreCase(faultInjectionMode)) {
-            return new RiskAssessmentResult("UNDETERMINED", "INJECTED_UNDETERMINED", "注入：监督智能体输出无法确定",
-                    null, "MANUAL_HANDLING", "V1.0");
-        }
 
         List<RiskRule> enabledRules = riskRuleMapper.findByEnabled(true);
         Set<String> enabledCodes = enabledRules.stream().map(RiskRule::getRuleCode).collect(Collectors.toSet());
         List<RiskRule> allRules = riskRuleMapper.findAll();
         String ruleSetVersion = RiskRuleSetVersion.of(allRules == null || allRules.isEmpty() ? enabledRules : allRules);
+        // SRS_F014.R01：每个通过校验的计划都输出置信度；置信度只作参考，不改变确定性规则命中结论（R07）
+        BigDecimal confidence = planVersion.getConfidence();
+
+        if ("UNDETERMINED".equalsIgnoreCase(faultInjectionMode)) {
+            return new RiskAssessmentResult("UNDETERMINED", "INJECTED_UNDETERMINED", "注入：监督智能体输出无法确定",
+                    confidence, "MANUAL_HANDLING", ruleSetVersion);
+        }
 
         // 1. 确定性规则优先判定
-        if (enabledCodes.contains(RULE_ESCORT_SPECIAL_PASSENGER) && "SPECIAL_PASSENGER_SERVICE".equals(taskFamily)
-                && hitsEscortSpecialPassenger(planVersion)) {
-            return highRisk(RULE_ESCORT_SPECIAL_PASSENGER, "移动机器人陪同对象为特殊旅客，命中确定性高风险规则", null, ruleSetVersion);
+        if (enabledCodes.contains(RULE_ESCORT_SPECIAL_PASSENGER) && "SPECIAL_PASSENGER_SERVICE".equals(taskFamily)) {
+            List<String> robotServiceSteps = escortOrRendezvousRobotSteps(planVersion, taskFamily);
+            if (!robotServiceSteps.isEmpty()) {
+                return highRisk(RULE_ESCORT_SPECIAL_PASSENGER,
+                        "移动机器人会合或陪同对象为特殊旅客，命中确定性高风险规则；命中步骤：" + String.join("、", robotServiceSteps),
+                        confidence, ruleSetVersion);
+            }
         }
         if (enabledCodes.contains(RULE_CROSS_ZONE) && hitsCrossZone(planVersion)) {
-            return highRisk(RULE_CROSS_ZONE, "移动服务机器人跨区域连续服务，命中确定性高风险规则", null, ruleSetVersion);
+            return highRisk(RULE_CROSS_ZONE, "移动服务机器人跨区域连续服务，命中确定性高风险规则", confidence, ruleSetVersion);
         }
         // The selected device consumes one candidate. The rule is about spare devices,
         // so a single online candidate means zero backups, not one.
@@ -103,11 +113,10 @@ public class RiskAssessmentService {
         if (enabledCodes.contains(RULE_RESOURCE_CRITICAL) && backupCandidateCount < resourceCriticalCandidateThreshold) {
             return highRisk(RULE_RESOURCE_CRITICAL,
                     "可用备用候选设备数量(" + backupCandidateCount + ")低于配置阈值(" + resourceCriticalCandidateThreshold + ")，命中确定性高风险规则",
-                    null, ruleSetVersion);
+                    confidence, ruleSetVersion);
         }
 
         // 2. 风险信号辅助判定：两个及以上组合才触发降级，单一信号不阻断
-        BigDecimal confidence = planVersion.getConfidence();
         boolean lowConfidence = confidence != null && confidence.compareTo(lowConfidenceThreshold) < 0;
         boolean contextStale = isContextStale(snapshotGeneratedAt);
         int signalCount = (lowConfidence ? 1 : 0) + (modelCandidateDiverse ? 1 : 0) + (contextStale ? 1 : 0);
@@ -135,11 +144,26 @@ public class RiskAssessmentService {
         }
     }
 
-    private boolean hitsEscortSpecialPassenger(PlanVersion planVersion) {
-        // task_family=SPECIAL_PASSENGER_SERVICE的前提判断已在assess()调用处完成，本方法只检查
-        // 步骤是否含CAP_ESCORT。taskFamily作为assess()参数传入而非本类反查Task表，避免循环依赖
-        return parseSteps(planVersion.getPlanSteps()).stream()
-                .anyMatch(step -> "CAP_ESCORT".equals(step.get("capabilityType")));
+    /**
+     * RULE_ESCORT_SPECIAL_PASSENGER命中步骤（DEF-S3-043/SRS_F014.R05）：规则原文为"移动机器人会合或陪同"，
+     * 不只看CAP_ESCORT。会合（前往旅客所在区域会合，业务意图为空间引导CAP_NAVIGATION）与陪同（CAP_ESCORT）
+     * 两类步骤，只要在该任务族的渠道约束下绑定到移动服务机器人（CoreScenarioChannelPolicy，与候选代理过滤、
+     * 分配时使用的同一约束），即为机器人会合/陪同特殊旅客。条件节点不是业务动作，不计入。
+     * 航显/现场通知等非机器人会合陪同步骤不命中；非特殊旅客任务族的前提已在assess()调用处判断。
+     */
+    private List<String> escortOrRendezvousRobotSteps(PlanVersion planVersion, String taskFamily) {
+        List<String> hits = new ArrayList<>();
+        for (Map<String, Object> step : parseSteps(planVersion.getPlanSteps())) {
+            if (PlanStepRules.isConditionNode(step)) continue;
+            String capabilityType = step.get("capabilityType") == null ? null : String.valueOf(step.get("capabilityType"));
+            String intent = "CAP_ESCORT".equals(capabilityType) ? "陪同"
+                    : "CAP_NAVIGATION".equals(capabilityType) ? "会合" : null;
+            if (intent == null) continue;
+            if (!"MOBILE_ROBOT".equals(CoreScenarioChannelPolicy.requiredType(taskFamily, capabilityType))) continue;
+            Object seq = step.get("stepSeq");
+            hits.add("步骤" + (seq == null ? "?" : seq) + "(" + capabilityType + "，" + intent + "，绑定移动服务机器人)");
+        }
+        return hits;
     }
 
     @SuppressWarnings("unchecked")

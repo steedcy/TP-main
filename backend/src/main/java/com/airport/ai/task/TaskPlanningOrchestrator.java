@@ -231,8 +231,9 @@ public class TaskPlanningOrchestrator {
         planVersion.setRuleSetVersion(riskResult.getRuleSetVersion());
         planVersionMapper.update(planVersion);
 
+        // SRS_F014.R10：判定结果、原因码、判定依据、置信度、所用规则集版本和处置策略写入任务事件时间线
         taskEventService.append(task.getId(), "SUPERVISION_JUDGED", "SYSTEM", riskResult.getRiskReasonCode(),
-                "监督判定: " + riskResult.getRiskLevel() + "，" + riskResult.getJudgmentBasis());
+                riskResult.timelineDetail("监督判定"));
 
         switch (riskResult.getRiskLevel()) {
             case "LOW" -> {

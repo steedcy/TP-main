@@ -88,6 +88,7 @@ public enum ErrorCode {
     RISK_RULE_CODE_TAKEN(4501, "规则编号已存在", HttpStatus.CONFLICT),
     SUPERVISION_SERVICE_UNAVAILABLE(4502, "监督服务不可用或判定超时", HttpStatus.SERVICE_UNAVAILABLE),
     SUPERVISION_UNDETERMINED(4503, "监督智能体输出无法确定", HttpStatus.OK),
+    RISK_RULE_NOT_FOUND(4504, "风险规则不存在", HttpStatus.NOT_FOUND),
 
     // 任务定义错误 46xx（对应5.6.1旅客服务任务定义管理）
     TASK_DEFINITION_NOT_FOUND(4601, "任务定义不存在", HttpStatus.NOT_FOUND),

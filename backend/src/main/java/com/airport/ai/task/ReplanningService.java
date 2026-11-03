@@ -278,8 +278,9 @@ public class ReplanningService {
         newVersion.setJudgmentBasis(riskResult.getJudgmentBasis());
         newVersion.setRuleSetVersion(riskResult.getRuleSetVersion());
         planVersionMapper.update(newVersion);
+        // SRS_F014.R10：判定结果、原因码、判定依据、置信度、所用规则集版本和处置策略写入任务事件时间线
         taskEventService.append(taskId, "SUPERVISION_JUDGED", "SYSTEM", riskResult.getRiskReasonCode(),
-                "重新规划后监督判定: " + riskResult.getRiskLevel() + "，" + riskResult.getJudgmentBasis());
+                riskResult.timelineDetail("重新规划后监督判定"));
 
         if ("HIGH".equals(riskResult.getRiskLevel())) {
             downgradeReplanned(task, completedSteps, failedStepSeq, remainingQuota, riskResult);
