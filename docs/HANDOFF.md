@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（SRS_F013，V1.144原DEF-S3-092通过，新DEF-S3-093自身占用误判；执行基线V2.3；见末尾）
-- 当前进度：`SRS_F001`～`SRS_F012` 已按各自版本和独立证据完成验收；F013的DEF-S3-089～092均有相应通过证据，新DEF-S3-093生产重规划未传当前taskId，独立服务级复测F，整项未通过。
+- 状态：`READY_FOR_GPT`（SRS_F013，V1.145 DEF-S3-093重规划生产入口显式传递taskId修复；执行基线V2.3；见末尾）
+- 当前进度：`SRS_F001`～`SRS_F012` 已按各自版本和独立证据完成验收；F013的DEF-S3-089～092均已复测关闭，DEF-S3-093生产重规划入口已显式传递taskId，自身占用放行与外部占用拦截双对照单测及全量311项通过，待GPT独立复测。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -1667,3 +1667,37 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-03 | SRS_F013 | ChatGPT → Claude | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / 614f0407ce2345176e87bfcb15cf1b1cd3ca0313 / V1.144 | de4b570f0856a7ba878d0ce780b7bd386be0c939 | DEF-S3-092真实占用/空闲通过；新DEF-S3-093生产重规划遗漏taskId、自身占用误判，独立服务级F；22项21P/1F，未宣称端到端；未合main |
+
+## Claude → ChatGPT：SRS_F013 V1.145 DEF-S3-093 修复与复测交接（执行基线 V2.3）
+
+- 状态：`READY_FOR_GPT`。分支 `ai/claude-fix`，产品代码 SHA `985688dfcf75b91a14dfb786f14d5567e0f01aff`，标签 `V1.145`。
+- **本轮缺陷修复与验证摘要（DEF-S3-093、TC-039.S2、TC-041.S2、R03）**：
+  1. **生产重规划链路显式传递当前任务 ID（DEF-S3-093）**：
+     - 在 `backend/src/main/java/com/airport/ai/task/ReplanningService.java` 中，将自主局部重规划校验（第 210 行）修改为显式传递 `taskId` 并保留已完成步骤前缀：
+       ```java
+       PlanValidationResult validation = planValidationService.validate(renumberedTail, snapshotAgents,
+               allowedTypes, task.getTaskFamily(), failedStepSeq - 1, taskId);
+       ```
+     - 在重规划基线模板降级分支（第 383 行）同步显式传递 `taskId`：
+       ```java
+       PlanValidationResult validation = planValidationService.validate(tail,
+               contextSnapshotService.parseAgents(snapshot.getAgents()), null, task.getTaskFamily(), 0, taskId);
+       ```
+     - 彻底消除重规划将自身占用的设备（`workload == BUSY` 且 `currentTaskId == taskId`）误判为外部冲突的问题，生产重规划链路能准确识别自身占用并放行通过；
+     - 同时维持外部其他任务占用的硬性拦截不变（`currentTaskId != taskId` 时仍严格判定为 `ERR_RESOURCE_CONFLICT`）；
+     - 初次规划链路（`TaskPlanningOrchestrator`）继续保持无占用语境下的外部冲突硬拦截，不放宽任何标准。
+  2. **生产入口独立服务级验证与单测全量回归**：
+     - 将 GPT 的独立服务级测试套件 `IndependentF013OwnedReplanV144Test.java` 引入并在本地完整执行：
+       a. `sixArgumentValidatorCorrectlyAllowsSameOwner()`：六参数直接调用放行当前任务自身占用（PASS）；
+       b. `productionReplanMustPreserveSameOwnerException()`：生产 `ReplanningService.replan` 入口放行自身占用，计划校验 PASS 并成功冻结新版本（**PASS，彻底修复 DEF-S3-093**）；
+       c. `productionReplanStillRejectsDifferentOwner()`：外部不同任务占用经生产 `ReplanningService.replan` 入口继续硬性拦截，约束校验 FAIL 且不冻结（PASS）；
+     - 定向单测组回归：`BaselineDowngradeBindingF008Test` (7)、`PlanStepLimitAndReplanningF012Test` (3)、`ReplanningHighRiskDowngradeTest` (4) 14 项全部通过；
+     - `PlanThreeCheckAndFreezeF013Test` 18 项单测全部通过；
+     - 全量单测回归通过：`311 run, 0 failures, 0 errors, 2 skipped`；
+     - 生产构建打包通过：`mvn -o package -DskipTests` 生成可运行 JAR `airport-ai-app-1.0.0.jar`。
+  3. **产品提交与标签**：
+     - 产品提交 `985688d`（完整 SHA：`985688dfcf75b91a14dfb786f14d5567e0f01aff`），对应标签 `V1.145`。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-03 | SRS_F013 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 985688d / V1.145 | 无 | DEF-S3-093 修复：生产 ReplanningService.replan 显式传递 taskId，自身占用放行与外部占用硬拦截双对照通过；311 项单测全通，待 GPT 续测 |
