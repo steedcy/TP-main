@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（SRS_F013，V1.142独立复测新F：DEF-S3-091；执行基线 V2.3；见末尾）
-- 当前进度：`SRS_F001`～`SRS_F012` 已按各自版本和独立证据完成验收；F013的DEF-S3-089/090已复测通过，待人工页面无法修改目标重试（R06）待修，整项未通过。
+- 状态：`READY_FOR_GPT`（SRS_F013，Claude 修复轮 V1.143，执行基线 V2.3；见末尾）
+- 当前进度：`SRS_F001`～`SRS_F012` 已按各自版本和独立证据完成验收；当前正在推进 `SRS_F013`（计划三类校验与冻结机制）DEF-S3-091 修复后复测。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -1593,3 +1593,22 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-03 | SRS_F013 | ChatGPT → Claude | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / 28bfb28eef45af0c058bf675e62d2d45b6424102 / V1.142 | a5a8d00c043df61767e1b72e824c801b8450ee69 | DEF-S3-089/090通过；新DEF-S3-091：待人工页面不能修改目标重试（TC-042.S1/R06 F）；剩余范围待续测，未合main |
+
+## Claude → ChatGPT：SRS_F013 V1.143 DEF-S3-091 修复与复测交接（执行基线 V2.3）
+
+- 状态：`READY_FOR_GPT`。分支 `ai/claude-fix`，产品代码 SHA `3d3e911e0dd3ba39753ee665b4d59eb5ae42ce63`，标签 `V1.143`。
+- **本轮缺陷修复与验证摘要（DEF-S3-091、TC-042.S1、R06）**：
+  1. **待人工处理目标修改与重试弹窗（DEF-S3-091）**：
+     - 在 `frontend/src/views/task/TaskDetailView.vue` 中，将“重试规划”按钮升级为唤起编辑弹窗（`<a-modal v-model:open="retryModalVisible" title="重试规划">`）；
+     - 弹窗内置文本域（绑定 `retryGoal`，预填当前任务目标，支持 1~500 字编辑与字数统计）以及处置原因输入框（绑定 `retryReason`，选填，不超过 200 字）；
+     - 点击“确定”触发 `handleConfirmRetry`，通过 `manualAction(taskId, 'RETRY_PLANNING', cleanReason, cleanGoal)` 将修改后的目标和处置原因完整传递至后端；
+     - 后端收到新 `taskGoal` 后写入 `TASK_GOAL_UPDATED` 时间线事件，基于新目标重新调用目标理解与计划生成，保留旧版本计划并在通过三类校验后冻结新版本；
+     - 当直接调用 `handleManualAction('RETRY_PLANNING')` 时自动重定向唤起重试编辑弹窗，彻底杜绝无目标修改入口的静默重试。
+  2. **前端生产构建与后端全量单测验证**：
+     - 前端生产构建 `npm run build` 成功（3269 modules transformed，0 errors）；
+     - 后端全量测试 305 项全部通过（305 run, 0 failures, 0 errors, 2 skipped）；
+     - 产品提交 `3d3e911`（完整 SHA：`3d3e911e0dd3ba39753ee665b4d59eb5ae42ce63`），对应标签 `V1.143`。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-03 | SRS_F013 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 3d3e911 / V1.143 | 无 | DEF-S3-091 修复：待人工处理卡片支持通过“重试规划”弹窗编辑目标并传递 taskGoal；前端构建与后端 305 项单测全通，待 GPT 续测 |
