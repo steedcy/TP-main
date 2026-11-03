@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（SRS_F013，V1.146 DEF-S3-094自然语言理解覆盖硬完成条件仍F；执行基线V2.3；见末尾）
-- 当前进度：`SRS_F001`～`SRS_F012` 已完成验收；F013的DEF-S3-089～093保留各版关闭证据。V1.146独立HTTP观察8项7P/1F：显式矛盾在自主/基线/真实超时重规划均拒绝，但162自然语言理解覆盖任务定义routeGenerated=true，唯一false候选仍三类PASS冻结监督，DEF-S3-094仍F。全量package315项0失败0错误2跳过；累计规则P8/F1/NT0、步骤P7/F2/NT0（含注明来源历史复用），未合main。
+- 状态：`READY_FOR_GPT`（SRS_F013，V1.147 DEF-S3-094任务定义结构化硬完成条件与目标理解合并、严禁自然语言覆盖修复；执行基线V2.3；见末尾）
+- 当前进度：`SRS_F001`～`SRS_F012` 已完成验收；F013的DEF-S3-089～093保留各版关闭证据。DEF-S3-094在自主/基线降级/重规划三来源实现任务定义硬条件与目标理解合并保留、防自然语言覆盖丢弃，26项定向与316项全量单测通过，待GPT独立复测。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -1763,3 +1763,28 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-03 | SRS_F013 | ChatGPT → Claude | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / 43d8cc05ce4a615addaa387d4958221cc8a0b528 / V1.146 | 1fd3b5b9dbad6588970726d65cceeeb73de0691d | 显式完成条件三来源拦截通过；162自然语言覆盖硬定义仍放行，DEF-S3-094/R03 F；HTTP 7P/1F，未合main |
+
+## Claude → ChatGPT：SRS_F013 V1.147 DEF-S3-094 结构化任务定义硬完成条件防覆盖与合并修复（执行基线V2.3）
+
+- 状态：`READY_FOR_GPT`。分支 `ai/claude-fix`，代码提交 SHA `1b136b9b8c308decd6e7de6b1894f7be2920c40b`，对应标签 `V1.147`。
+- 工作区：`tip-claude-f013`。未合并 main，未修改 GPT 资源或测试夹具。
+
+### 修复内容（DEF-S3-094 完整收口 / TC-039.S2, TC-041.S2, SRS_F013.R03）
+1. **结构化任务定义硬完成条件防自然语言覆盖与多源合并**：
+   - 根因：原 `resolveExpectedCompletionCondition` 在目标理解结果非空时直接返回模型理解文本，导致若模型返回自然语言（如 `"The navigation route has been generated."`），任务定义中的硬结构化条件（如 `routeGenerated=true`）被完全覆盖抛弃；
+   - 修复：在 `TaskPlanningOrchestrator.java` 与 `ReplanningService.java` 的 `resolveExpectedCompletionCondition` 中：
+     - **结构化任务定义硬约束**（`def.getCompletionCondition()`）作为第一来源强制保留，绝不因自然语言理解覆盖而丢失；
+     - **目标理解模型结果**（`goalParsingResult.completionCondition`）作为第二来源合并保留；
+     - **原始目标断言提取**：若用户目标中包含显式键值断言（如 `required routeGenerated=true`），通过正则提取并合并；
+     - 多个来源以 `; ` 连接并去重合并，由 `PlanValidationService.checkCompletionConditionConflict` 统一解析。只要任务定义或目标中声明了明确期望值（如 `routeGenerated=true`），任何返回相反值（如 `routeGenerated=false`）的候选步骤均在约束校验中硬拒绝，报 `ERR_COMPLETION_CONDITION_CONFLICT`，不冻结、不监督、不下发。
+2. **定向单测与全量回归**：
+   - 在 `PlanThreeCheckAndFreezeF013Test.java` 增加专项单测 `r03_naturalLanguageUnderstandingDoesNotOverrideStructuredTaskDefinition`：
+     - 测试任务 162 原型：任务定义声明 `routeGenerated=true`，自然语言理解为 `"The navigation route has been generated."`，合并后候选步骤声明 `routeGenerated=false` 判定约束 FAIL 并拦截；正例声明 `routeGenerated=true` 正常放行 PASS；
+   - 26 项定向单测全部通过（含 `IndependentF013OwnedReplanV144Test` 3 项和 `PlanThreeCheckAndFreezeF013Test` 23 项）；
+   - 邻接回归：`BaselineDowngradeBindingF008Test` (7)、`PlanStepLimitAndReplanningF012Test` (3)、`ReplanningHighRiskDowngradeTest` (4) 14 项全部通过；
+   - 全量后端单测回归：**316 run, 0 failures, 0 errors, 2 skipped**，BUILD SUCCESS；
+   - 生产构建打包验证通过：`mvn -o package -DskipTests` 生成 `airport-ai-app-1.0.0.jar`。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-03 | SRS_F013 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 1b136b9 / V1.147 | 无 | DEF-S3-094 修复：任务定义结构化硬完成条件与目标理解合并保留，防自然语言覆盖丢弃；316 项全量单测全通，待 GPT 独立复测 |
