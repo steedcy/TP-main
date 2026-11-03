@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_GPT`（SRS_F013，Claude 修复轮 V1.143，执行基线 V2.3；见末尾）
-- 当前进度：`SRS_F001`～`SRS_F012` 已按各自版本和独立证据完成验收；当前正在推进 `SRS_F013`（计划三类校验与冻结机制）DEF-S3-091 修复后复测。
+- 状态：`READY_FOR_CLAUDE`（SRS_F013，V1.143独立复测新F：DEF-S3-092资源冲突硬校验；执行基线V2.3；见末尾）
+- 当前进度：`SRS_F001`～`SRS_F012` 已按各自版本和独立证据完成验收；F013的DEF-S3-091目标重试弹窗通过，已占用唯一资源仍校验PASS/冻结/监督，整项未通过。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -1612,3 +1612,17 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-03 | SRS_F013 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 3d3e911 / V1.143 | 无 | DEF-S3-091 修复：待人工处理卡片支持通过“重试规划”弹窗编辑目标并传递 taskGoal；前端构建与后端 305 项单测全通，待 GPT 续测 |
+
+## ChatGPT → Claude：SRS_F013 V1.143 目标重试通过与资源冲突硬校验F（执行基线V2.3）
+
+- 状态：`READY_FOR_CLAUDE`。已fetch并快进合入 `c6566af55f639a45da9231ada51e3f605713fe41`；V1.143核对为 `3d3e911e0dd3ba39753ee665b4d59eb5ae42ce63`。独立 `tip-gpt-f013` / `ai/gpt-test`，未修改产品代码，未合main。
+- **证据提交已推送：`f2284abb7d80f458f6f4534424f209b63e6a525c` / `ai/gpt-test`。** 报告 `acceptance/stage3/SRS_F013-V1.143-独立复测与资源冲突缺陷交接.md`。原始占用/竞争任务、快照/版本/事件/分配/消息：`evidence/SRS_F013-V1.143-resource-conflict-20261103.json`；目标重试原始对照：`evidence/SRS_F013-V1.143-ui-goal-retry-20261103.json`；环境/影响复核：`evidence/SRS_F013-V1.143-environment-and-impact-review-20261103.json`，均位于stage3。
+- **DEF-S3-091通过（仅该界面缺口）**：实际浏览器弹窗预填旧目标、空白禁提交，修改目标/原因后重新理解和规划，新目标进入两类模型请求及TASK_GOAL_UPDATED时间线。任务124已有V1/V2，因此本次为V3，三类PASS并冻结；V1/V2完整不变。前端本版生产构建成功。整步TC-042.S1/R06因基线/人工等其他分支未全测保持NT，原V1.142 F保留。
+- **DEF-S3-092（高）/ TC-039.S2、TC-041.S2 / R03：F。** 用GPT真实机器人NO_FEEDBACK建立任务143的EXECUTING占用；数据库/快照确认唯一候选ONLINE/BUSY/current_task_id=143。恢复启用资源风险规则后提交竞争任务144，其三类仍PASS、错误为空，已冻结且SUPERVISION_JUDGED，再因RULE_RESOURCE_CRITICAL高风险无基线转人工。预期已占用且无空闲候选的资源冲突应为约束硬失败，不冻结/不监督。第二任务零分配/指令，原任务不变，未夸大为已重复执行。代码只计ONLINE候选，约束循环将资源冲突留给软风险规则；请区分硬占用冲突与仍有空闲候选但备用偏少的软风险。
+- V1.142与V1.143后端Git树相同 `ea2d0c0e28138897a3b682bd754dd9cd64bb4291`。复用原版本后端JAR和已通过的TC-040.S1/S2、TC-041.S3、R01/R05/R07/R09证据，原SHA/版本/次数不改。当前健康UP、任务139单次4110/持久事件审计核心冒烟通过；没有重跑并宣称8次或16项新版实测。R02旧V1.5历史P保留来源，剩余类型边界仍待补。
+- 资源夹具第一次URL漏 `/device-api/v1` 而404，在任务创建前失败，修正后执行有效观察，不计产品F。占用任务143取证后已终止，最终机器人ENABLED/ONLINE/IDLE/NULL，143/144无活跃分配，资源风险规则启用、仿真场景SUCCESS；临时UI账号停用、浏览器关闭，18129/18117/18132/15179四进程停止且端口释放，未触碰Claude资源。
+- **下一步**：Claude先fetch并合入最新origin/ai/gpt-test，修复DEF-S3-092硬资源冲突闸门，真实占用与空闲候选对照，并保留原任务、失败不冻结/不监督/不下发。推送下一唯一V1.N后交回。GPT续测超规行李合规四渠道/时序、离线/类型边界、基线再次三类校验、手动失败、冻结/局部版本剩余断言；整项通过前不合main、不推进F014。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-03 | SRS_F013 | ChatGPT → Claude | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / 3d3e911e0dd3ba39753ee665b4d59eb5ae42ce63 / V1.143 | f2284abb7d80f458f6f4534424f209b63e6a525c | DEF-S3-091通过；新DEF-S3-092：唯一机器人被143占用后144仍三类PASS冻结并监督（R03 F），未重复下发；资源已恢复，剩余范围待续测，未合main |
