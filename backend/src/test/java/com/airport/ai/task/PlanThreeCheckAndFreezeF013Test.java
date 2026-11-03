@@ -276,6 +276,63 @@ class PlanThreeCheckAndFreezeF013Test {
         assertTrue(result.getErrors().stream().anyMatch(e -> "ERR_BAGGAGE_BRANCH_ORDER".equals(e.getReasonCode())));
     }
 
+    @Test
+    void r03_resourceConflictWhenCandidateIsOccupied_rejectsWithErrResourceConflict() {
+        // DEF-S3-092 / TC-039.S2 / TC-041.S2：唯一候选机器人在线但已被任务143占用（BUSY）
+        List<Map<String, Object>> busyAgents = List.of(
+                Map.of("agentId", "AGT-803437A3", "capabilities", List.of("CAP_NAVIGATION"),
+                        "onlineStatus", "ONLINE", "workload", "BUSY", "currentTaskId", 143L,
+                        "deviceTypeCode", "SIMULATOR", "simulatedDeviceType", "MOBILE_ROBOT",
+                        "location", Map.of())
+        );
+        Map<String, Object> step = standardStep(1, "CAP_NAVIGATION");
+        // 竞争任务 144
+        PlanValidationResult result = validationService.validate(List.of(step), busyAgents, null,
+                "EXT_2AD8B934", 0, 144L);
+        assertFalse(result.isAllPassed());
+        assertEquals("PASS", result.getStructureCheckResult());
+        assertEquals("PASS", result.getCapabilityCheckResult());
+        assertEquals("FAIL", result.getConstraintCheckResult());
+        assertTrue(result.getErrors().stream().anyMatch(e -> "ERR_RESOURCE_CONFLICT".equals(e.getReasonCode())),
+                "必须拦截资源冲突 ERR_RESOURCE_CONFLICT: " + result.getErrors());
+    }
+
+    @Test
+    void r03_resourceConflictPassesWhenIdleCandidateExists() {
+        // 一台被占用，但存在另一台空闲候选设备 -> 校验放行给软风险规则
+        List<Map<String, Object>> mixedAgents = List.of(
+                Map.of("agentId", "AGT-BUSY", "capabilities", List.of("CAP_NAVIGATION"),
+                        "onlineStatus", "ONLINE", "workload", "BUSY", "currentTaskId", 143L,
+                        "deviceTypeCode", "SIMULATOR", "simulatedDeviceType", "MOBILE_ROBOT",
+                        "location", Map.of()),
+                Map.of("agentId", "AGT-IDLE", "capabilities", List.of("CAP_NAVIGATION"),
+                        "onlineStatus", "ONLINE", "workload", "IDLE",
+                        "deviceTypeCode", "SIMULATOR", "simulatedDeviceType", "MOBILE_ROBOT",
+                        "location", Map.of())
+        );
+        Map<String, Object> step = standardStep(1, "CAP_NAVIGATION");
+        PlanValidationResult result = validationService.validate(List.of(step), mixedAgents, null,
+                "EXT_2AD8B934", 0, 144L);
+        assertTrue(result.isAllPassed());
+        assertEquals("PASS", result.getConstraintCheckResult());
+    }
+
+    @Test
+    void r03_sameTaskCanReuseItsOwnOccupiedAgentDuringReplanning() {
+        // 当前任务自身（taskId=143）占用的代理，在重规划时不属于外部资源冲突
+        List<Map<String, Object>> selfOccupiedAgents = List.of(
+                Map.of("agentId", "AGT-803437A3", "capabilities", List.of("CAP_NAVIGATION"),
+                        "onlineStatus", "ONLINE", "workload", "BUSY", "currentTaskId", 143L,
+                        "deviceTypeCode", "SIMULATOR", "simulatedDeviceType", "MOBILE_ROBOT",
+                        "location", Map.of())
+        );
+        Map<String, Object> step = standardStep(1, "CAP_NAVIGATION");
+        PlanValidationResult result = validationService.validate(List.of(step), selfOccupiedAgents, null,
+                "EXT_2AD8B934", 0, 143L);
+        assertTrue(result.isAllPassed());
+        assertEquals("PASS", result.getConstraintCheckResult());
+    }
+
     // ==========================================
     // R05: 三类校验顺序执行并汇总错误
     // ==========================================

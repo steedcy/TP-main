@@ -112,6 +112,8 @@ public class ContextSnapshotService {
             location.put("zone", device.getAreaCode());
             agentView.put("location", location);
             agentView.put("workload", agent.getWorkStatus());
+            agentView.put("currentTaskId", agent.getCurrentTaskId());
+            agentView.put("currentStepSeq", agent.getCurrentStepSeq());
             agentView.put("availableUntil", availableAt(agent));
             agentViews.add(agentView);
         }

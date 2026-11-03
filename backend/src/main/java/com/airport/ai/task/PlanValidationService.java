@@ -52,12 +52,19 @@ public class PlanValidationService {
     @SuppressWarnings("unchecked")
     public PlanValidationResult validate(List<Map<String, Object>> steps, List<Map<String, Object>> snapshotAgents,
                                           List<String> allowedCapabilityTypes, String taskFamily) {
-        return validate(steps, snapshotAgents, allowedCapabilityTypes, taskFamily, 0);
+        return validate(steps, snapshotAgents, allowedCapabilityTypes, taskFamily, 0, null);
     }
 
     @SuppressWarnings("unchecked")
     public PlanValidationResult validate(List<Map<String, Object>> steps, List<Map<String, Object>> snapshotAgents,
                                           List<String> allowedCapabilityTypes, String taskFamily, int completedPrefixCount) {
+        return validate(steps, snapshotAgents, allowedCapabilityTypes, taskFamily, completedPrefixCount, null);
+    }
+
+    @SuppressWarnings("unchecked")
+    public PlanValidationResult validate(List<Map<String, Object>> steps, List<Map<String, Object>> snapshotAgents,
+                                          List<String> allowedCapabilityTypes, String taskFamily,
+                                          int completedPrefixCount, Long currentTaskId) {
         PlanValidationResult result = new PlanValidationResult();
         if (steps == null || steps.isEmpty()) {
             result.failStructure("计划必须包含至少一个步骤", null, "ERR_STEP_FIELD_MISSING");
@@ -233,11 +240,24 @@ public class PlanValidationService {
                     if (!valid) result.failConstraint("输入参数与当前能力定义不匹配",stepSeq,"ERR_CAPABILITY_PARAMETER_INVALID");
                 }
             }
-            // 候选设备数量是否低于阈值属于5.4.5风险信号判定（RULE_RESOURCE_CRITICAL），
-            // 零候选的硬拦截已在能力校验环节处理，本环节不重复判定资源冲突
+            // 对应TC-039.S2、TC-041.S2、SRS_F013.R03：无资源冲突硬性校验
+            // 当步骤所需能力存在在线候选代理，但所有候选代理均处于占用状态（零空闲可用候选设备）时，构成确定的硬性资源冲突，
+            // 约束校验直接硬拦截拒绝，原因码 ERR_RESOURCE_CONFLICT，计划未冻结且不进入监督判定；
+            // 仍有空闲候选但备用数量偏少的情况则放行给5.4.5监督智能体风险判定（RULE_RESOURCE_CRITICAL软风险评估）。
+            String capabilityType = asString(step.get("capabilityType"));
+            if (capabilityType != null && !capabilityType.isBlank()) {
+                boolean flightExempt = partialFlightAvailable && CoreScenarioChannelPolicy.isFlightChannel(taskFamily, capabilityType);
+                if (!flightExempt) {
+                    long onlineCandidates = countOnlineCandidates(snapshotAgents, capabilityType, taskFamily);
+                    long idleCandidates = countIdleCandidates(snapshotAgents, capabilityType, taskFamily, currentTaskId);
+                    if (onlineCandidates > 0 && idleCandidates == 0) {
+                        result.failConstraint("步骤" + stepSeq + "所需能力" + capabilityType + "候选设备已被其他任务占用，存在资源冲突（零空闲可用候选设备）",
+                                stepSeq, "ERR_RESOURCE_CONFLICT");
+                    }
+                }
+            }
 
             // 对应5.6.1业务规则7：任务定义约束条件参与约束校验，落地为能力类型范围约束
-            String capabilityType = asString(step.get("capabilityType"));
             if (allowedCapabilityTypes != null && capabilityType != null
                     && !allowedCapabilityTypes.contains(capabilityType)) {
                 result.failConstraint("步骤所需能力" + capabilityType + "超出任务定义声明的可用能力类型范围: "
@@ -295,7 +315,60 @@ public class PlanValidationService {
         return snapshotAgents.stream()
                 .filter(agent -> {
                     Object online = agent.get("onlineStatus");
-                    if (online != null && !"ONLINE".equals(String.valueOf(online))) {
+                    if (online != null && !"ONLINE".equalsIgnoreCase(String.valueOf(online).trim())) {
+                        return false;
+                    }
+                    Object caps = agent.get("capabilities");
+                    return caps instanceof List<?> list && list.contains(capabilityType)
+                            && CoreScenarioChannelPolicy.matches(taskFamily, capabilityType,
+                            String.valueOf(agent.get("deviceTypeCode")), String.valueOf(agent.get("simulatedDeviceType")));
+                })
+                .count();
+    }
+
+    private boolean isAgentIdle(Map<String, Object> agent, Long currentTaskId) {
+        Object online = agent.get("onlineStatus");
+        if (online != null && !"ONLINE".equalsIgnoreCase(String.valueOf(online).trim())) {
+            return false;
+        }
+
+        // 若已被当前任务自身占用，则不构成外部资源冲突（适用于同一任务内部或局部重规划）
+        Object rawTaskId = agent.get("currentTaskId");
+        if (currentTaskId != null && rawTaskId != null) {
+            try {
+                long agentTaskId = Long.parseLong(String.valueOf(rawTaskId).trim());
+                if (agentTaskId == currentTaskId) {
+                    return true;
+                }
+            } catch (NumberFormatException ignored) {}
+        }
+
+        Object workload = agent.get("workload");
+        if (workload == null) workload = agent.get("workStatus");
+        if (workload == null) workload = agent.get("workloadStatus");
+
+        if (workload != null && "BUSY".equalsIgnoreCase(String.valueOf(workload).trim())) {
+            return false;
+        }
+
+        if (rawTaskId != null) {
+            String tidStr = String.valueOf(rawTaskId).trim();
+            if (!tidStr.isEmpty() && !"null".equalsIgnoreCase(tidStr) && !"0".equals(tidStr)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private long countIdleCandidates(List<Map<String, Object>> snapshotAgents, String capabilityType,
+                                     String taskFamily, Long currentTaskId) {
+        if (snapshotAgents == null || capabilityType == null) {
+            return 0;
+        }
+        return snapshotAgents.stream()
+                .filter(agent -> {
+                    if (!isAgentIdle(agent, currentTaskId)) {
                         return false;
                     }
                     Object caps = agent.get("capabilities");
