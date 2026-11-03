@@ -208,7 +208,7 @@ public class ReplanningService {
         List<Map<String, Object>> snapshotAgents = contextSnapshotService.parseAgents(snapshot.getAgents());
         // Completed frozen actions retain their actual results and do not require currently online devices.
         PlanValidationResult validation = planValidationService.validate(renumberedTail, snapshotAgents,
-                allowedTypes, task.getTaskFamily(), failedStepSeq - 1);
+                allowedTypes, task.getTaskFamily(), failedStepSeq - 1, taskId);
         planValidationService.requireCoreScenarioCoverage(mergedSteps, task.getTaskFamily(), validation);
         if (mergedSteps.size() > MAX_STEPS) validation.failStructure("最终路径超过五步", null, "ERR_STEP_LIMIT_EXCEEDED");
         List<Map<String, Object>> storedSteps = validation.isAllPassed() ? mergedSteps : new ArrayList<>(completedSteps);
@@ -381,7 +381,7 @@ public class ReplanningService {
         taskEventService.append(taskId, "CONTEXT_SNAPSHOT_GENERATED", "SYSTEM", null,
                 "重规划高风险基线降级快照" + snapshot.getSnapshotCode());
         PlanValidationResult validation = planValidationService.validate(tail,
-                contextSnapshotService.parseAgents(snapshot.getAgents()), null, task.getTaskFamily());
+                contextSnapshotService.parseAgents(snapshot.getAgents()), null, task.getTaskFamily(), 0, taskId);
         planValidationService.requireCoreScenarioCoverage(merged, task.getTaskFamily(), validation);
         if (merged.size() > MAX_STEPS) validation.failStructure("最终路径超过五步", null, "ERR_STEP_LIMIT_EXCEEDED");
 

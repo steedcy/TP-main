@@ -69,6 +69,10 @@ class ReplanningHighRiskDowngradeTest {
                 .thenAnswer(invocation -> new PlanValidationResult());
         when(validation.validate(anyList(), anyList(), isNull(), eq("TEST_FAMILY"), eq(1)))
                 .thenAnswer(invocation -> new PlanValidationResult());
+        when(validation.validate(anyList(), anyList(), isNull(), eq("TEST_FAMILY"), eq(1), any()))
+                .thenAnswer(invocation -> new PlanValidationResult());
+        when(validation.validate(anyList(), anyList(), isNull(), eq("TEST_FAMILY"), eq(0), any()))
+                .thenAnswer(invocation -> new PlanValidationResult());
         PlanningResponse response = new PlanningResponse();
         response.setResultCode("0");
         response.setPlanSteps(List.of(Map.of("capabilityType", "CAP_NEW", "completionCondition", "new=true")));

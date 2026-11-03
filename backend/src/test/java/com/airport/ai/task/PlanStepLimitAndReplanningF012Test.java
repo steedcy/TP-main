@@ -100,6 +100,7 @@ class PlanStepLimitAndReplanningF012Test {
         var validationService = mock(PlanValidationService.class);
         var validResult = new PlanValidationResult();
         when(validationService.validate(anyList(), any(), any(), any(), anyInt())).thenReturn(validResult);
+        when(validationService.validate(anyList(), any(), any(), any(), anyInt(), any())).thenReturn(validResult);
 
         var riskService = mock(RiskAssessmentService.class);
         var riskResult = new RiskAssessmentResult("LOW", "RULE_LOW_RISK", "符合低风险要求",
