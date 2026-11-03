@@ -443,6 +443,60 @@ class PlanThreeCheckAndFreezeF013Test {
     }
 
     @Test
+    void r03_candidateStepInternalContradictoryConditionRejects() {
+        // DEF-S3-094 (V1.148任务183实机复现):
+        // 候选唯一步骤声明 routeGenerated=true and routeGenerated=false，
+        // 同一候选步骤内部直接相反的合取条件必须在约束校验硬拦截，绝不能因首值优先而忽略后面的反向断言！
+        Map<String, Object> stepContradict1 = standardStep(1, "CAP_NAVIGATION");
+        stepContradict1.put("completionCondition", "routeGenerated=true and routeGenerated=false");
+
+        PlanValidationResult resultFail1 = validationService.validate(List.of(stepContradict1), standardAgents(),
+                List.of("CAP_NAVIGATION"), "EXT_FAMILY", 183L, "routeGenerated=true");
+
+        assertFalse(resultFail1.isAllPassed(), "候选步骤自身布尔合取自相矛盾必须硬拒绝");
+        assertEquals("FAIL", resultFail1.getConstraintCheckResult());
+        assertTrue(resultFail1.getErrors().stream().anyMatch(e -> "ERR_COMPLETION_CONDITION_CONFLICT".equals(e.getReasonCode())),
+                "必须包含 ERR_COMPLETION_CONDITION_CONFLICT 原因码: " + resultFail1.getErrors());
+
+        // 反向顺序同样必须硬拒绝：routeGenerated=false and routeGenerated=true
+        Map<String, Object> stepContradict2 = standardStep(1, "CAP_NAVIGATION");
+        stepContradict2.put("completionCondition", "routeGenerated=false and routeGenerated=true");
+
+        PlanValidationResult resultFail2 = validationService.validate(List.of(stepContradict2), standardAgents(),
+                List.of("CAP_NAVIGATION"), "EXT_FAMILY", 183L, "routeGenerated=true");
+
+        assertFalse(resultFail2.isAllPassed(), "反向顺序的自相矛盾条件同样必须硬拒绝");
+        assertEquals("FAIL", resultFail2.getConstraintCheckResult());
+        assertTrue(resultFail2.getErrors().stream().anyMatch(e -> "ERR_COMPLETION_CONDITION_CONFLICT".equals(e.getReasonCode())));
+
+        // 无显式期望条件时，候选步骤内部自相矛盾同样必须硬拒绝
+        Map<String, Object> stepContradict3 = standardStep(1, "CAP_NAVIGATION");
+        stepContradict3.put("completionCondition", "routeGenerated=true and routeGenerated=false");
+        PlanValidationResult resultFail3 = validationService.validate(List.of(stepContradict3), standardAgents(),
+                List.of("CAP_NAVIGATION"), "EXT_FAMILY", 183L, null);
+        assertFalse(resultFail3.isAllPassed(), "即使任务无期望条件，步骤自身自相矛盾也必须硬拦截");
+        assertEquals("FAIL", resultFail3.getConstraintCheckResult());
+
+        // 正例 1：合法同值重复 routeGenerated=true and routeGenerated=true 应正常放行
+        Map<String, Object> stepRepeatPass = standardStep(1, "CAP_NAVIGATION");
+        stepRepeatPass.put("completionCondition", "routeGenerated=true and routeGenerated=true");
+
+        PlanValidationResult resultPass1 = validationService.validate(List.of(stepRepeatPass), standardAgents(),
+                List.of("CAP_NAVIGATION"), "EXT_FAMILY", 183L, "routeGenerated=true");
+        assertTrue(resultPass1.isAllPassed(), "合法重复相同布尔断言应正常放行");
+        assertEquals("PASS", resultPass1.getConstraintCheckResult());
+
+        // 正例 2：合法合取 routeGenerated=true and waypointCount>0（任务176场景）应正常放行
+        Map<String, Object> stepConjunctivePass = standardStep(1, "CAP_NAVIGATION");
+        stepConjunctivePass.put("completionCondition", "routeGenerated=true and waypointCount>0");
+
+        PlanValidationResult resultPass2 = validationService.validate(List.of(stepConjunctivePass), standardAgents(),
+                List.of("CAP_NAVIGATION"), "EXT_FAMILY", 183L, "routeGenerated=true");
+        assertTrue(resultPass2.isAllPassed(), "合法合取断言应正常放行");
+        assertEquals("PASS", resultPass2.getConstraintCheckResult());
+    }
+
+    @Test
     void r03_sameTaskCanReuseItsOwnOccupiedAgentDuringReplanning() {
         // 当前任务自身（taskId=143）占用的代理，在重规划时不属于外部资源冲突
         List<Map<String, Object>> selfOccupiedAgents = List.of(

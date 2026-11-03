@@ -480,12 +480,16 @@ public class PlanValidationService {
     private void checkCompletionConditionConflict(List<Map<String, Object>> steps,
                                                   String expectedCompletionCondition,
                                                   PlanValidationResult result) {
-        if (expectedCompletionCondition == null || expectedCompletionCondition.isBlank() || steps == null) {
+        if (steps == null || steps.isEmpty()) {
             return;
         }
         // 解析期望完成条件，首出现的权威任务定义条件拥有优先权（putIfAbsent），绝不接受后续重复键覆盖（DEF-S3-094）
-        Map<String, Boolean> expectedBools = parseBooleanConditions(expectedCompletionCondition);
-        Map<String, String> expectedVals = parseValueConditions(expectedCompletionCondition);
+        Map<String, Boolean> expectedBools = (expectedCompletionCondition != null && !expectedCompletionCondition.isBlank())
+                ? parseExpectedBooleanConditions(expectedCompletionCondition)
+                : Collections.emptyMap();
+        Map<String, String> expectedVals = (expectedCompletionCondition != null && !expectedCompletionCondition.isBlank())
+                ? parseExpectedValueConditions(expectedCompletionCondition)
+                : Collections.emptyMap();
 
         for (int i = 0; i < steps.size(); i++) {
             Map<String, Object> step = steps.get(i);
@@ -495,33 +499,61 @@ public class PlanValidationService {
             String stepCond = asString(step.get("completionCondition"));
             if (stepCond == null || stepCond.isBlank()) continue;
 
+            // 解析候选步骤声明的所有布尔与等值断言（保留全部值，杜绝首值/后值截断遗漏矛盾，DEF-S3-094）
+            Map<String, Set<Boolean>> stepBools = parseCandidateBooleanConditions(stepCond);
+            Map<String, Set<String>> stepVals = parseCandidateValueConditions(stepCond);
+
+            // A. 候选步骤内部自相矛盾硬拦截（如 routeGenerated=true and routeGenerated=false）
+            for (Map.Entry<String, Set<Boolean>> entry : stepBools.entrySet()) {
+                if (entry.getValue().size() > 1) {
+                    result.failConstraint("步骤" + stepSeq + "完成条件(" + stepCond + ")内部自相矛盾（字段"
+                            + entry.getKey() + "同时声明了相反的布尔断言: " + entry.getValue() + "）",
+                            stepSeq, "ERR_COMPLETION_CONDITION_CONFLICT");
+                }
+            }
+            for (Map.Entry<String, Set<String>> entry : stepVals.entrySet()) {
+                String k = entry.getKey();
+                if (!expectedBools.containsKey(k) && !stepBools.containsKey(k)) {
+                    // 若不是布尔字段，检查是否存在不同值的等值断言（忽略大小写后）
+                    Set<String> normalizedVals = new HashSet<>();
+                    for (String v : entry.getValue()) {
+                        normalizedVals.add(v.trim().toLowerCase());
+                    }
+                    if (normalizedVals.size() > 1) {
+                        result.failConstraint("步骤" + stepSeq + "完成条件(" + stepCond + ")内部自相矛盾（字段"
+                                + k + "同时声明了互斥的取值: " + entry.getValue() + "）",
+                                stepSeq, "ERR_COMPLETION_CONDITION_CONFLICT");
+                    }
+                }
+            }
+
+            // B. 候选步骤声明的值与任务期望完成条件反向矛盾硬拦截
             // 1. 布尔字段真/假直接反向矛盾硬拒绝（SRS_F013.R03, DEF-S3-094）
-            Map<String, Boolean> stepBools = parseBooleanConditions(stepCond);
             for (Map.Entry<String, Boolean> entry : expectedBools.entrySet()) {
                 String k = entry.getKey();
                 Boolean expB = entry.getValue();
                 if (stepBools.containsKey(k)) {
-                    Boolean actB = stepBools.get(k);
-                    if (!expB.equals(actB)) {
+                    Set<Boolean> actSet = stepBools.get(k);
+                    if (actSet.contains(!expB)) {
                         result.failConstraint("步骤" + stepSeq + "完成条件(" + stepCond + ")与任务目标完成条件("
-                                + expectedCompletionCondition + ")直接矛盾（字段" + k + "期望要求" + expB + "，步骤声明为" + actB + "）",
+                                + expectedCompletionCondition + ")直接矛盾（字段" + k + "期望要求" + expB + "，步骤声明包含相反值" + (!expB) + "）",
                                 stepSeq, "ERR_COMPLETION_CONDITION_CONFLICT");
                     }
                 }
             }
 
             // 2. 确定性等值字段矛盾（如 status=SUCCESS vs status=FAILED）
-            Map<String, String> stepVals = parseValueConditions(stepCond);
             for (Map.Entry<String, String> entry : expectedVals.entrySet()) {
                 String k = entry.getKey();
                 String expV = entry.getValue();
-                if (stepVals.containsKey(k)) {
-                    String actV = stepVals.get(k);
-                    if (!expV.equalsIgnoreCase(actV)) {
-                        if (!expectedBools.containsKey(k)) {
+                if (stepVals.containsKey(k) && !expectedBools.containsKey(k)) {
+                    Set<String> actVals = stepVals.get(k);
+                    for (String actV : actVals) {
+                        if (!expV.equalsIgnoreCase(actV)) {
                             result.failConstraint("步骤" + stepSeq + "完成条件(" + stepCond + ")与任务目标完成条件("
                                     + expectedCompletionCondition + ")直接矛盾（字段" + k + "期望要求" + expV + "，步骤声明为" + actV + "）",
                                     stepSeq, "ERR_COMPLETION_CONDITION_CONFLICT");
+                            break;
                         }
                     }
                 }
@@ -529,7 +561,7 @@ public class PlanValidationService {
         }
     }
 
-    private static Map<String, Boolean> parseBooleanConditions(String conditionText) {
+    private static Map<String, Boolean> parseExpectedBooleanConditions(String conditionText) {
         Map<String, Boolean> result = new LinkedHashMap<>();
         if (conditionText == null || conditionText.isBlank()) return result;
         String[] tokens = conditionText.split("[,;\\n]|(?i)\\s+and\\s+|&&");
@@ -551,7 +583,7 @@ public class PlanValidationService {
         return result;
     }
 
-    private static Map<String, String> parseValueConditions(String conditionText) {
+    private static Map<String, String> parseExpectedValueConditions(String conditionText) {
         Map<String, String> result = new LinkedHashMap<>();
         if (conditionText == null || conditionText.isBlank()) return result;
         String[] tokens = conditionText.split("[,;\\n]|(?i)\\s+and\\s+|&&");
@@ -566,6 +598,47 @@ public class PlanValidationService {
                 // 首值优先：首个声明锁定该键，后续重复键不能覆盖（DEF-S3-094）
                 if (!key.isEmpty() && !val.isEmpty() && !result.containsKey(key)) {
                     result.put(key, val);
+                }
+            }
+        }
+        return result;
+    }
+
+    private static Map<String, Set<Boolean>> parseCandidateBooleanConditions(String conditionText) {
+        Map<String, Set<Boolean>> result = new LinkedHashMap<>();
+        if (conditionText == null || conditionText.isBlank()) return result;
+        String[] tokens = conditionText.split("[,;\\n]|(?i)\\s+and\\s+|&&");
+        for (String token : tokens) {
+            String trimmed = token.trim();
+            if (trimmed.isEmpty()) continue;
+            int sepIdx = findConditionSeparator(trimmed);
+            int sepLen = findSeparatorLength(trimmed, sepIdx);
+            if (sepIdx > 0) {
+                String key = normalizeConditionKey(trimmed.substring(0, sepIdx));
+                String val = trimmed.substring(sepIdx + sepLen).trim();
+                Boolean b = parseBooleanValue(val);
+                if (b != null && !key.isEmpty()) {
+                    result.computeIfAbsent(key, k -> new LinkedHashSet<>()).add(b);
+                }
+            }
+        }
+        return result;
+    }
+
+    private static Map<String, Set<String>> parseCandidateValueConditions(String conditionText) {
+        Map<String, Set<String>> result = new LinkedHashMap<>();
+        if (conditionText == null || conditionText.isBlank()) return result;
+        String[] tokens = conditionText.split("[,;\\n]|(?i)\\s+and\\s+|&&");
+        for (String token : tokens) {
+            String trimmed = token.trim();
+            if (trimmed.isEmpty()) continue;
+            int sepIdx = findConditionSeparator(trimmed);
+            int sepLen = findSeparatorLength(trimmed, sepIdx);
+            if (sepIdx > 0) {
+                String key = normalizeConditionKey(trimmed.substring(0, sepIdx));
+                String val = cleanQuotes(trimmed.substring(sepIdx + sepLen).trim());
+                if (!key.isEmpty() && !val.isEmpty()) {
+                    result.computeIfAbsent(key, k -> new LinkedHashSet<>()).add(val);
                 }
             }
         }
