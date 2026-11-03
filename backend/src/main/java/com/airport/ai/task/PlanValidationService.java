@@ -65,6 +65,21 @@ public class PlanValidationService {
     public PlanValidationResult validate(List<Map<String, Object>> steps, List<Map<String, Object>> snapshotAgents,
                                           List<String> allowedCapabilityTypes, String taskFamily,
                                           int completedPrefixCount, Long currentTaskId) {
+        return validate(steps, snapshotAgents, allowedCapabilityTypes, taskFamily, completedPrefixCount, currentTaskId, null);
+    }
+
+    @SuppressWarnings("unchecked")
+    public PlanValidationResult validate(List<Map<String, Object>> steps, List<Map<String, Object>> snapshotAgents,
+                                          List<String> allowedCapabilityTypes, String taskFamily,
+                                          Long currentTaskId, String expectedCompletionCondition) {
+        return validate(steps, snapshotAgents, allowedCapabilityTypes, taskFamily, 0, currentTaskId, expectedCompletionCondition);
+    }
+
+    @SuppressWarnings("unchecked")
+    public PlanValidationResult validate(List<Map<String, Object>> steps, List<Map<String, Object>> snapshotAgents,
+                                          List<String> allowedCapabilityTypes, String taskFamily,
+                                          int completedPrefixCount, Long currentTaskId,
+                                          String expectedCompletionCondition) {
         PlanValidationResult result = new PlanValidationResult();
         if (steps == null || steps.isEmpty()) {
             result.failStructure("计划必须包含至少一个步骤", null, "ERR_STEP_FIELD_MISSING");
@@ -265,6 +280,10 @@ public class PlanValidationService {
             }
         }
 
+        // 对应TC-039.S2、TC-041.S2、SRS_F013.R03 / DEF-S3-094：
+        // 约束校验比较任务目标期望完成条件与候选步骤完成条件，拒绝同一Boolean/等值字段真/假直接反向矛盾
+        checkCompletionConditionConflict(steps, expectedCompletionCondition, result);
+
         return result;
     }
 
@@ -456,5 +475,140 @@ public class PlanValidationService {
         } catch (NumberFormatException e) {
             return null;
         }
+    }
+
+    private void checkCompletionConditionConflict(List<Map<String, Object>> steps,
+                                                  String expectedCompletionCondition,
+                                                  PlanValidationResult result) {
+        if (expectedCompletionCondition == null || expectedCompletionCondition.isBlank() || steps == null) {
+            return;
+        }
+        Map<String, Boolean> expectedBools = parseBooleanConditions(expectedCompletionCondition);
+        Map<String, String> expectedVals = parseValueConditions(expectedCompletionCondition);
+
+        for (int i = 0; i < steps.size(); i++) {
+            Map<String, Object> step = steps.get(i);
+            if (PlanStepRules.isConditionNode(step)) continue;
+            Integer stepSeq = asInteger(step.get("stepSeq"));
+            if (stepSeq == null) stepSeq = i + 1;
+            String stepCond = asString(step.get("completionCondition"));
+            if (stepCond == null || stepCond.isBlank()) continue;
+
+            // 1. 布尔字段真/假直接反向矛盾硬拒绝（SRS_F013.R03, DEF-S3-094）
+            Map<String, Boolean> stepBools = parseBooleanConditions(stepCond);
+            for (Map.Entry<String, Boolean> entry : expectedBools.entrySet()) {
+                String k = entry.getKey();
+                Boolean expB = entry.getValue();
+                if (stepBools.containsKey(k)) {
+                    Boolean actB = stepBools.get(k);
+                    if (!expB.equals(actB)) {
+                        result.failConstraint("步骤" + stepSeq + "完成条件(" + stepCond + ")与任务目标完成条件("
+                                + expectedCompletionCondition + ")直接矛盾（字段" + k + "期望为" + expB + "，步骤声明为" + actB + "）",
+                                stepSeq, "ERR_COMPLETION_CONDITION_CONFLICT");
+                    }
+                }
+            }
+
+            // 2. 确定性等值字段矛盾（如 status=SUCCESS vs status=FAILED）
+            Map<String, String> stepVals = parseValueConditions(stepCond);
+            for (Map.Entry<String, String> entry : expectedVals.entrySet()) {
+                String k = entry.getKey();
+                String expV = entry.getValue();
+                if (stepVals.containsKey(k)) {
+                    String actV = stepVals.get(k);
+                    if (!expV.equalsIgnoreCase(actV)) {
+                        if (!expectedBools.containsKey(k)) {
+                            result.failConstraint("步骤" + stepSeq + "完成条件(" + stepCond + ")与任务目标完成条件("
+                                    + expectedCompletionCondition + ")直接矛盾（字段" + k + "期望为" + expV + "，步骤声明为" + actV + "）",
+                                    stepSeq, "ERR_COMPLETION_CONDITION_CONFLICT");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private static Map<String, Boolean> parseBooleanConditions(String conditionText) {
+        Map<String, Boolean> result = new LinkedHashMap<>();
+        if (conditionText == null || conditionText.isBlank()) return result;
+        String[] tokens = conditionText.split("[,;\n]|(?i)\s+and\s+|&&");
+        for (String token : tokens) {
+            String trimmed = token.trim();
+            if (trimmed.isEmpty()) continue;
+            int sepIdx = -1;
+            int sepLen = 1;
+            if (trimmed.contains("==")) {
+                sepIdx = trimmed.indexOf("==");
+                sepLen = 2;
+            } else if (trimmed.contains("=")) {
+                sepIdx = trimmed.indexOf("=");
+                sepLen = 1;
+            } else if (trimmed.contains(":")) {
+                sepIdx = trimmed.indexOf(":");
+                sepLen = 1;
+            }
+            if (sepIdx > 0) {
+                String key = normalizeConditionKey(trimmed.substring(0, sepIdx));
+                String val = trimmed.substring(sepIdx + sepLen).trim();
+                Boolean b = parseBooleanValue(val);
+                if (b != null && !key.isEmpty()) {
+                    result.put(key, b);
+                }
+            }
+        }
+        return result;
+    }
+
+    private static Map<String, String> parseValueConditions(String conditionText) {
+        Map<String, String> result = new LinkedHashMap<>();
+        if (conditionText == null || conditionText.isBlank()) return result;
+        String[] tokens = conditionText.split("[,;\n]|(?i)\s+and\s+|&&");
+        for (String token : tokens) {
+            String trimmed = token.trim();
+            if (trimmed.isEmpty()) continue;
+            int sepIdx = -1;
+            int sepLen = 1;
+            if (trimmed.contains("==")) {
+                sepIdx = trimmed.indexOf("==");
+                sepLen = 2;
+            } else if (trimmed.contains("=")) {
+                sepIdx = trimmed.indexOf("=");
+                sepLen = 1;
+            } else if (trimmed.contains(":")) {
+                sepIdx = trimmed.indexOf(":");
+                sepLen = 1;
+            }
+            if (sepIdx > 0) {
+                String key = normalizeConditionKey(trimmed.substring(0, sepIdx));
+                String val = trimmed.substring(sepIdx + sepLen).trim();
+                if (val.startsWith("\"") && val.endsWith("\"") && val.length() >= 2) {
+                    val = val.substring(1, val.length() - 1).trim();
+                } else if (val.startsWith("'") && val.endsWith("'") && val.length() >= 2) {
+                    val = val.substring(1, val.length() - 1).trim();
+                }
+                if (!key.isEmpty() && !val.isEmpty()) {
+                    result.put(key, val);
+                }
+            }
+        }
+        return result;
+    }
+
+    private static String normalizeConditionKey(String key) {
+        if (key == null) return "";
+        return key.trim().toLowerCase().replaceAll("[_\\-\\s]", "");
+    }
+
+    private static Boolean parseBooleanValue(String val) {
+        if (val == null) return null;
+        val = val.trim().toLowerCase();
+        if (val.startsWith("\"") && val.endsWith("\"") && val.length() >= 2) {
+            val = val.substring(1, val.length() - 1).trim();
+        } else if (val.startsWith("'") && val.endsWith("'") && val.length() >= 2) {
+            val = val.substring(1, val.length() - 1).trim();
+        }
+        if ("true".equals(val) || "1".equals(val) || "yes".equals(val) || "success".equals(val)) return Boolean.TRUE;
+        if ("false".equals(val) || "0".equals(val) || "no".equals(val) || "failure".equals(val) || "failed".equals(val)) return Boolean.FALSE;
+        return null;
     }
 }

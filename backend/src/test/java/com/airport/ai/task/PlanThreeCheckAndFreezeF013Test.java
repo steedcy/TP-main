@@ -317,6 +317,75 @@ class PlanThreeCheckAndFreezeF013Test {
         assertEquals("PASS", result.getConstraintCheckResult());
     }
 
+    // ----------------------------------------------------
+    // DEF-S3-094: 步骤完成条件与任务期望完成条件一致性与反向矛盾硬校验
+    // ----------------------------------------------------
+
+    @Test
+    void r03_completionConditionContradictionRejectsWithErrCompletionConditionConflict() {
+        // DEF-S3-094 / TC-039.S2 / TC-041.S2 / R03:
+        // 任务目标/定义明确要求 routeGenerated=true，候选唯一导航步骤完成条件却为 routeGenerated=false
+        Map<String, Object> step = standardStep(1, "CAP_NAVIGATION");
+        step.put("completionCondition", "routeGenerated=false");
+
+        PlanValidationResult result = validationService.validate(List.of(step), standardAgents(),
+                List.of("CAP_NAVIGATION"), "EXT_FAMILY", 155L, "routeGenerated=true");
+
+        assertFalse(result.isAllPassed(), "完成条件直接反向矛盾必须判定三类校验未通过");
+        assertEquals("PASS", result.getStructureCheckResult(), "结构校验应PASS");
+        assertEquals("PASS", result.getCapabilityCheckResult(), "能力校验应PASS");
+        assertEquals("FAIL", result.getConstraintCheckResult(), "约束校验必须FAIL");
+        assertTrue(result.getErrors().stream().anyMatch(e -> "ERR_COMPLETION_CONDITION_CONFLICT".equals(e.getReasonCode())),
+                "必须包含 ERR_COMPLETION_CONDITION_CONFLICT 原因码: " + result.getErrors());
+        assertTrue(result.getErrors().stream().anyMatch(e -> e.getDescription().contains("routegenerated")),
+                "错误描述应指明冲突的字段: " + result.getErrors());
+    }
+
+    @Test
+    void r03_completionConditionConsistentPasses() {
+        // 正例：任务目标要求 routeGenerated=true，候选唯一步骤完成条件 routeGenerated=true
+        Map<String, Object> step = standardStep(1, "CAP_NAVIGATION");
+        step.put("completionCondition", "routeGenerated=true");
+
+        PlanValidationResult result = validationService.validate(List.of(step), standardAgents(),
+                List.of("CAP_NAVIGATION"), "EXT_FAMILY", 155L, "routeGenerated=true");
+
+        assertTrue(result.isAllPassed());
+        assertEquals("PASS", result.getConstraintCheckResult());
+        assertTrue(result.getErrors().isEmpty());
+    }
+
+    @Test
+    void r03_multiStepIntermediateConditionsPasses() {
+        // 多步合法时序：中间步骤完成条件不冲突，最终步骤达成任务期望条件
+        Map<String, Object> step1 = standardStep(1, "CAP_INFO_DISPLAY");
+        step1.put("completionCondition", "infoDisplayed=true");
+        Map<String, Object> step2 = standardStep(2, "CAP_NAVIGATION");
+        step2.put("completionCondition", "routeGenerated=true");
+
+        PlanValidationResult result = validationService.validate(List.of(step1, step2), standardAgents(),
+                List.of("CAP_INFO_DISPLAY", "CAP_NAVIGATION"), "EXT_FAMILY", 155L, "routeGenerated=true");
+
+        assertTrue(result.isAllPassed(), "多步合法时序且中间步骤不冲突应正常通过校验");
+        assertEquals("PASS", result.getConstraintCheckResult());
+    }
+
+    @Test
+    void r03_multiStepContradictionInAnyStepRejects() {
+        // 多步计划中任一步骤显式声明了与任务目标相反的反向矛盾断言，必须硬拦截
+        Map<String, Object> step1 = standardStep(1, "CAP_INFO_DISPLAY");
+        step1.put("completionCondition", "routeGenerated=false"); // 显式反向矛盾
+        Map<String, Object> step2 = standardStep(2, "CAP_NAVIGATION");
+        step2.put("completionCondition", "routeGenerated=true");
+
+        PlanValidationResult result = validationService.validate(List.of(step1, step2), standardAgents(),
+                List.of("CAP_INFO_DISPLAY", "CAP_NAVIGATION"), "EXT_FAMILY", 155L, "routeGenerated=true");
+
+        assertFalse(result.isAllPassed());
+        assertEquals("FAIL", result.getConstraintCheckResult());
+        assertTrue(result.getErrors().stream().anyMatch(e -> "ERR_COMPLETION_CONDITION_CONFLICT".equals(e.getReasonCode())));
+    }
+
     @Test
     void r03_sameTaskCanReuseItsOwnOccupiedAgentDuringReplanning() {
         // 当前任务自身（taskId=143）占用的代理，在重规划时不属于外部资源冲突

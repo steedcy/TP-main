@@ -154,7 +154,10 @@ public class TaskPlanningOrchestrator {
         // 5.4.4 计划三类校验，约束校验维度接入5.6.1任务定义声明的可用能力类型范围
         List<Map<String, Object>> snapshotAgents = contextSnapshotService.parseAgents(snapshot.getAgents());
         List<String> allowedCapabilityTypes = allowedCapabilityTypes(task.getTaskFamily());
-        PlanValidationResult validation = planValidationService.validate(steps, snapshotAgents, allowedCapabilityTypes, task.getTaskFamily());
+        String expectedCompletionCondition = resolveExpectedCompletionCondition(task);
+        PlanValidationResult validation = expectedCompletionCondition != null
+                ? planValidationService.validate(steps, snapshotAgents, allowedCapabilityTypes, task.getTaskFamily(), 0, taskId, expectedCompletionCondition)
+                : planValidationService.validate(steps, snapshotAgents, allowedCapabilityTypes, task.getTaskFamily());
         planValidationService.requireCoreScenarioCoverage(steps, task.getTaskFamily(), validation);
 
         PlanVersion planVersion = new PlanVersion();
@@ -314,7 +317,10 @@ public class TaskPlanningOrchestrator {
         ContextSnapshot snapshot = contextSnapshotService.buildSnapshot(taskId, requiredCapabilities);
         List<Map<String, Object>> snapshotAgents = contextSnapshotService.parseAgents(snapshot.getAgents());
 
-        PlanValidationResult validation = planValidationService.validate(templateSteps, snapshotAgents, null, task.getTaskFamily());
+        String expectedCompletionCondition = resolveExpectedCompletionCondition(task);
+        PlanValidationResult validation = expectedCompletionCondition != null
+                ? planValidationService.validate(templateSteps, snapshotAgents, null, task.getTaskFamily(), 0, taskId, expectedCompletionCondition)
+                : planValidationService.validate(templateSteps, snapshotAgents, null, task.getTaskFamily());
         planValidationService.requireCoreScenarioCoverage(templateSteps, task.getTaskFamily(), validation);
 
         PlanVersion downgradedVersion = new PlanVersion();
@@ -469,6 +475,26 @@ public class TaskPlanningOrchestrator {
         } catch (Exception e) {
             return List.of();
         }
+    }
+
+    private String resolveExpectedCompletionCondition(Task task) {
+        if (task == null) return null;
+        if (task.getGoalParsingResult() != null && !task.getGoalParsingResult().isBlank()) {
+            try {
+                Map<?, ?> parsed = MAPPER.readValue(task.getGoalParsingResult(), Map.class);
+                Object cond = parsed.get("completionCondition");
+                if (cond != null && !String.valueOf(cond).isBlank() && !"null".equalsIgnoreCase(String.valueOf(cond))) {
+                    return String.valueOf(cond).trim();
+                }
+            } catch (Exception ignored) {}
+        }
+        if (task.getTaskFamily() != null) {
+            var def = taskDefinitionService.findByCode(task.getTaskFamily());
+            if (def.isPresent() && def.get().getCompletionCondition() != null && !def.get().getCompletionCondition().isBlank()) {
+                return def.get().getCompletionCondition().trim();
+            }
+        }
+        return null;
     }
 
     @SuppressWarnings("unchecked")

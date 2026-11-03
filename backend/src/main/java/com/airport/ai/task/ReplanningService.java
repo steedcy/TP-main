@@ -207,8 +207,10 @@ public class ReplanningService {
 
         List<Map<String, Object>> snapshotAgents = contextSnapshotService.parseAgents(snapshot.getAgents());
         // Completed frozen actions retain their actual results and do not require currently online devices.
-        PlanValidationResult validation = planValidationService.validate(renumberedTail, snapshotAgents,
-                allowedTypes, task.getTaskFamily(), failedStepSeq - 1, taskId);
+        String expectedCompletionCondition = resolveExpectedCompletionCondition(task);
+        PlanValidationResult validation = expectedCompletionCondition != null
+                ? planValidationService.validate(renumberedTail, snapshotAgents, allowedTypes, task.getTaskFamily(), failedStepSeq - 1, taskId, expectedCompletionCondition)
+                : planValidationService.validate(renumberedTail, snapshotAgents, allowedTypes, task.getTaskFamily(), failedStepSeq - 1, taskId);
         planValidationService.requireCoreScenarioCoverage(mergedSteps, task.getTaskFamily(), validation);
         if (mergedSteps.size() > MAX_STEPS) validation.failStructure("最终路径超过五步", null, "ERR_STEP_LIMIT_EXCEEDED");
         List<Map<String, Object>> storedSteps = validation.isAllPassed() ? mergedSteps : new ArrayList<>(completedSteps);
@@ -380,8 +382,10 @@ public class ReplanningService {
         ContextSnapshot snapshot = contextSnapshotService.buildSnapshot(taskId, capabilities);
         taskEventService.append(taskId, "CONTEXT_SNAPSHOT_GENERATED", "SYSTEM", null,
                 "重规划高风险基线降级快照" + snapshot.getSnapshotCode());
-        PlanValidationResult validation = planValidationService.validate(tail,
-                contextSnapshotService.parseAgents(snapshot.getAgents()), null, task.getTaskFamily(), 0, taskId);
+        String expectedCompletionCondition = resolveExpectedCompletionCondition(task);
+        PlanValidationResult validation = expectedCompletionCondition != null
+                ? planValidationService.validate(tail, contextSnapshotService.parseAgents(snapshot.getAgents()), null, task.getTaskFamily(), 0, taskId, expectedCompletionCondition)
+                : planValidationService.validate(tail, contextSnapshotService.parseAgents(snapshot.getAgents()), null, task.getTaskFamily(), 0, taskId);
         planValidationService.requireCoreScenarioCoverage(merged, task.getTaskFamily(), validation);
         if (merged.size() > MAX_STEPS) validation.failStructure("最终路径超过五步", null, "ERR_STEP_LIMIT_EXCEEDED");
 
@@ -477,5 +481,25 @@ public class ReplanningService {
         } catch (Exception e) {
             throw new RuntimeException("序列化失败", e);
         }
+    }
+
+    private String resolveExpectedCompletionCondition(Task task) {
+        if (task == null) return null;
+        if (task.getGoalParsingResult() != null && !task.getGoalParsingResult().isBlank()) {
+            try {
+                Map<?, ?> parsed = MAPPER.readValue(task.getGoalParsingResult(), Map.class);
+                Object cond = parsed.get("completionCondition");
+                if (cond != null && !String.valueOf(cond).isBlank() && !"null".equalsIgnoreCase(String.valueOf(cond))) {
+                    return String.valueOf(cond).trim();
+                }
+            } catch (Exception ignored) {}
+        }
+        if (definitions != null && task.getTaskFamily() != null) {
+            var def = definitions.findByDefinitionCode(task.getTaskFamily());
+            if (def.isPresent() && def.get().getCompletionCondition() != null && !def.get().getCompletionCondition().isBlank()) {
+                return def.get().getCompletionCondition().trim();
+            }
+        }
+        return null;
     }
 }
