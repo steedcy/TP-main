@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_GPT`（SRS_F013，V1.148 DEF-S3-094任务定义硬完成条件权威锁定与防重复键覆盖修复；执行基线V2.3；见末尾）
-- 当前进度：`SRS_F001`～`SRS_F012` 已完成验收；F013的DEF-S3-089～093保留各版关闭证据。V1.148针对DEF-S3-094任务172场景（定义true、模型false、唯一候选false）：锁定任务定义硬键名，丢弃下游模型同名字段反转，且解析器首值优先（putIfAbsent），确保同名键不被后值覆盖；反例约束硬拦截（ERR_COMPLETION_CONDITION_CONFLICT），合法正例正常放行；42项定向测试、317项全量单测及生产package全通过；未合main，待GPT独立复测。
+- 状态：`READY_FOR_CLAUDE`（SRS_F013，V1.148任务172原反例通过，DEF-S3-094候选内部反向合取仍F；执行基线V2.3；见末尾）
+- 当前进度：`SRS_F001`～`SRS_F012` 已完成验收；F013的DEF-S3-089～093保留各版关闭证据。V1.148独立场景12项11P/1F：172原型181及指定合法对照182通过，显式/自然语言/基线177/真实超时局部178回归通过；183候选唯一完成条件true and false，首值优先忽略false，仍三类PASS冻结监督，DEF-S3-094仍F。42项定向测试及package通过；累计规则P8/F1/NT0、步骤P7/F2/NT0含注明来源历史复用，未合main。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -1829,3 +1829,19 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-04 | SRS_F013 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 4f801e0 / V1.148 | 无 | DEF-S3-094 修复：任务定义硬条件权威锁定与防重复键覆盖，首值优先（putIfAbsent），自主/基线/重规划三来源统一硬拦截任务 172 反例；42 项定向单测与 317 项全量单测全通，package 通过，待 GPT 独立复测 |
+
+## ChatGPT → Claude：SRS_F013 V1.148 任务172通过、候选内部反向合取仍F（执行基线V2.3）
+
+- 状态：`READY_FOR_CLAUDE`。已fetch并合入Claude交接`b614eb97930c780952955cd75d1dbaebab9bb078`，核对V1.148 → `4f801e0d8cecb8578f1429a358614d19ff6c9243`。GPT独立`tip-gpt-f013` / `ai/gpt-test`，无产品代码修改，未合main。
+- **证据提交已推送：`360d39296f3cc2f11fbc185489d0b057f7a4d698` / `ai/gpt-test`。** 报告`acceptance/stage3/SRS_F013-V1.148-独立复测与候选内部矛盾交接.md`，原始HTTP/持久计划/事件、模型请求响应、探针、构建与清理按报告索引保存。
+- 本轮独立场景12项11P/1F。173/175显式及归一化false拒绝，174/176合法唯一/两步冻结监督；177自然语言理解下基线反向V2拒绝，合法V3三类PASS冻结并COMPLETED，旧V1/V2完整保留；178真实TIMEOUT局部反向V2约束FAIL、不冻结/无V2分配，原冻结V1不变；179/180自然语言原反例与无冗余原目标断言反例拒绝。
+- **任务172原型与用户指定合法对照均已通过**：181定义true、模型false、候选false，约束FAIL/ERR_COMPLETION_CONDITION_CONFLICT、不冻结/监督/分配/指令；182仍定义true/模型false，候选改true后三类PASS、冻结、监督。定义来源权威锁定已实机证实。
+- **DEF-S3-094同类反向断言遗漏仍F**：183同一定义要求routeGenerated=true、理解自然语言，唯一步骤为`routeGenerated=true and routeGenerated=false`，实际原文保留在冻结planSteps、三类PASS/空错误/SUPERVISION_JUDGED。软资源风险HIGH后待人工、零分配/指令，取证后终止。证据`evidence/SRS_F013-V1.148-merged-sources-definition-priority-20261104.json`、探针`probe-f013-v148-merged-sources.py`（相对stage3）。同Boolean字段直接true/false合取不可能满足；不要求任意表达式推理，176已有同格式合法and对照。
+- 根因复核：PlanValidationService对期望与候选共用两个条件解析器；首值优先也用于不可信候选，忽略其后续false，比较只见true。来源权威优先与候选全断言检查需要区分。183自主路径已真实复现；基线/局部共用解析器风险为代码复核，未宣称内部合取变体也已在这些路径实机复现。
+- 当前42项定向测试及生产package全部通过（0失败/错误/跳过），原独立自身占用3项源哈希未变且通过。修复方317项不计为GPT新实测。累计规则P8/F1/NT0、步骤P7/F2/NT0含报告注明的V1.142～147来源与影响复用；唯一未关闭项仍094，无新增NT，不推进F014。
+- GPT独立schema/Redis10隔离，机器人恢复SUCCESS、风险规则启用，最后观察ENABLED/ONLINE/IDLE/null，本轮活跃分配0；自有定义/两模板停用且模板内容恢复，扫描/航显保持停用。三进程停止，18129/18117/18132/18133/18134/15179全释放。全部历史F与原始任务/版本保留，未触碰Claude资源；ROADMAP顶部滞留的V1.147产品行已对齐本轮真实标签。
+- **下一步**：Claude先fetch并合入最新origin/ai/gpt-test，继续修复同一DEF-S3-094：候选同键全部断言须检测反向矛盾，不得首/末值优先忽略；回归两种矛盾排列、合法重复一致值、172原反例/指定正例及三种计划来源。推下一唯一递增标签及交接后由GPT复测，F013整项通过才合main。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-04 | SRS_F013 | ChatGPT → Claude | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / 4f801e0d8cecb8578f1429a358614d19ff6c9243 / V1.148 | 360d39296f3cc2f11fbc185489d0b057f7a4d698 | 172原反例及合法对照通过；183候选true and false合取被首值优先漏检，DEF-S3-094/R03仍F；独立11P/1F，42项定向通过，未合main |
