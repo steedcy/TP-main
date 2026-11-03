@@ -1,0 +1,1557 @@
+{
+  "version": "V1.139",
+  "codeSha": "6de0e9e8395cca9c22e3d24e0d36dac3ee7866f5",
+  "observedAt": "2026-11-03T09:31:33.543547+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "cases": [
+    {
+      "name": "F012_GOOD",
+      "request": {
+        "taskGoal": "F012_GOOD synthetic navigation to F2_TEST_GATE; passengerName=FICTIONAL_F012_CANARY_139",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "submit": {
+        "id": 97,
+        "taskCode": "TASK-20261103-0097",
+        "taskGoal": "F012_GOOD synthetic navigation to F2_TEST_GATE; passengerName=FICTIONAL_F012_CANARY_139",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        },
+        "goalParsingResult": {
+          "completionCondition": "routeGenerated=true",
+          "origin": "F2_SERVICE_POINT",
+          "destination": "F2_TEST_GATE",
+          "originalGoal": "F012_GOOD synthetic navigation to F2_TEST_GATE; passengerName=FICTIONAL_F012_CANARY_139",
+          "constraints": [
+            "synthetic test only"
+          ]
+        },
+        "status": "PLANNING",
+        "currentPlanVersionId": null,
+        "replanUsed": false,
+        "replanningReason": null,
+        "manualTerminateReason": null,
+        "failureReason": null,
+        "missingInfoQuestions": null,
+        "downgradeReason": null,
+        "isDryRun": false,
+        "createdAt": "2026-11-03T09:31:33.5791612",
+        "updatedAt": "2026-11-03T09:31:33.5791612",
+        "createdBy": "oprator"
+      },
+      "task": {
+        "id": 97,
+        "taskCode": "TASK-20261103-0097",
+        "taskGoal": "F012_GOOD synthetic navigation to F2_TEST_GATE; passengerName=FICTIONAL_F012_CANARY_139",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        },
+        "goalParsingResult": {
+          "completionCondition": "routeGenerated=true",
+          "origin": "F2_SERVICE_POINT",
+          "destination": "F2_TEST_GATE",
+          "originalGoal": "F012_GOOD synthetic navigation to F2_TEST_GATE; passengerName=FICTIONAL_F012_CANARY_139",
+          "constraints": [
+            "synthetic test only"
+          ]
+        },
+        "status": "PENDING_MANUAL",
+        "currentPlanVersionId": 83,
+        "replanUsed": false,
+        "replanningReason": null,
+        "manualTerminateReason": null,
+        "failureReason": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板",
+        "missingInfoQuestions": null,
+        "downgradeReason": null,
+        "isDryRun": false,
+        "createdAt": "2026-11-03T09:31:33.579161",
+        "updatedAt": "2026-11-03T09:31:33.89822",
+        "createdBy": "oprator"
+      },
+      "plans": [
+        {
+          "id": 83,
+          "versionNo": 1,
+          "source": "AUTONOMOUS",
+          "baselineTemplateId": null,
+          "snapshotId": "CTX-20261103-0056",
+          "planSteps": [
+            {
+              "stepSeq": 1,
+              "stepGoal": "Synthetic navigation action 1",
+              "capabilityType": "CAP_NAVIGATION",
+              "inputParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "precondition": "device online",
+              "completionCondition": "routeGenerated=true",
+              "failureHandling": "manual",
+              "stepTimeout": 60
+            }
+          ],
+          "structureCheckResult": "PASS",
+          "capabilityCheckResult": "PASS",
+          "constraintCheckResult": "PASS",
+          "validationErrors": [],
+          "riskLevel": "HIGH",
+          "riskReasonCode": "RULE_RESOURCE_CRITICAL",
+          "judgmentBasis": "可用备用候选设备数量(0)低于配置阈值(1)，命中确定性高风险规则",
+          "confidence": 0.99,
+          "ruleSetVersion": "V1.0",
+          "frozenAt": "2026-11-03T09:31:33.853625",
+          "createdAt": "2026-11-03T09:31:33.817893"
+        }
+      ],
+      "contexts": [
+        {
+          "id": 56,
+          "snapshotCode": "CTX-20261103-0056",
+          "taskId": 97,
+          "agents": "[{\"agentId\":\"AGT-803437A3\",\"deviceCode\":\"G126_ROBOT\",\"deviceTypeCode\":\"SIMULATOR\",\"simulatedDeviceType\":\"MOBILE_ROBOT\",\"businessStatus\":{\"scenarioResult\":\"SUCCESS\",\"simulatedDeviceType\":\"MOBILE_ROBOT\"},\"capabilities\":[\"CAP_ESCORT\",\"CAP_NOTIFICATION\",\"CAP_NAVIGATION\"],\"capabilitySchemas\":[{\"capabilityType\":\"CAP_ESCORT\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"escortMode\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"LEAD\",\"range\":\"LEAD/FOLLOW\"},{\"name\":\"maxDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"600\",\"range\":\"60~1800\"}],\"outputParams\":[{\"name\":\"arrivalStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"actualDuration\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_NOTIFICATION\",\"inputParams\":[{\"name\":\"notificationType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BOTH\",\"range\":\"VOICE/TEXT/BOTH\"},{\"name\":\"notificationContent\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试旅客需要轮椅陪同，请现场服务人员协助\"},{\"name\":\"repeatCount\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"1\",\"range\":\"1~5\"}],\"outputParams\":[{\"name\":\"notificationStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualRepeatCount\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"routePreference\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BARRIER_FREE\",\"range\":\"SHORTEST/BARRIER_FREE\"}],\"outputParams\":[{\"name\":\"routeGenerated\",\"type\":\"Boolean\",\"required\":true},{\"name\":\"estimatedDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"estimatedDuration\",\"type\":\"Integer\",\"required\":true},{\"name\":\"waypointCount\",\"type\":\"Integer\",\"required\":true}]}],\"onlineStatus\":\"ONLINE\",\"location\":{\"x\":3.00,\"y\":4.00,\"zone\":\"F2_TEST\"},\"workload\":\"IDLE\",\"availableUntil\":\"2026-11-03T09:31:33.716402600\"}]",
+          "capabilityCoverage": "{\"available\":[\"CAP_NAVIGATION\"],\"missing\":[]}",
+          "failedAgentCodes": "[]",
+          "generatedAt": "2026-11-03T09:31:33.737546"
+        }
+      ],
+      "events": [
+        {
+          "id": 742,
+          "taskId": 97,
+          "eventType": "GOAL_SUBMITTED",
+          "occurredAt": "2026-11-03T09:31:33.600725",
+          "trigger": "OPERATOR",
+          "reasonCode": null,
+          "detailSummary": "运行操作员oprator提交任务目标: F012_GOOD synthetic navigation to F2_TEST_GATE; passengerName=FICTIONAL_F012_CANARY_139"
+        },
+        {
+          "id": 743,
+          "taskId": 97,
+          "eventType": "GOAL_CLARIFIED",
+          "occurredAt": "2026-11-03T09:31:33.699628",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+        },
+        {
+          "id": 744,
+          "taskId": 97,
+          "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+          "occurredAt": "2026-11-03T09:31:33.756048",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "生成规划上下文快照CTX-20261103-0056"
+        },
+        {
+          "id": 745,
+          "taskId": 97,
+          "eventType": "PLAN_GENERATED",
+          "occurredAt": "2026-11-03T09:31:33.850244",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+        },
+        {
+          "id": 746,
+          "taskId": 97,
+          "eventType": "PLAN_VALIDATED",
+          "occurredAt": "2026-11-03T09:31:33.855667",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+        },
+        {
+          "id": 747,
+          "taskId": 97,
+          "eventType": "SUPERVISION_JUDGED",
+          "occurredAt": "2026-11-03T09:31:33.876904",
+          "trigger": "SYSTEM",
+          "reasonCode": "RULE_RESOURCE_CRITICAL",
+          "detailSummary": "监督判定: HIGH，可用备用候选设备数量(0)低于配置阈值(1)，命中确定性高风险规则"
+        },
+        {
+          "id": 748,
+          "taskId": 97,
+          "eventType": "BASELINE_DOWNGRADED",
+          "occurredAt": "2026-11-03T09:31:33.897167",
+          "trigger": "SYSTEM",
+          "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+          "detailSummary": "无匹配的已启用基线模板: 监督判定高风险: RULE_RESOURCE_CRITICAL"
+        },
+        {
+          "id": 749,
+          "taskId": 97,
+          "eventType": "TASK_PENDING_MANUAL",
+          "occurredAt": "2026-11-03T09:31:33.899531",
+          "trigger": "SYSTEM",
+          "reasonCode": "ERR_PLANNING_FAILED",
+          "detailSummary": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板"
+        }
+      ],
+      "assignments": [],
+      "commands": [],
+      "modelRequests": [
+        {
+          "at": "2026-11-03T01:31:33.693720+00:00",
+          "phase": "goal",
+          "request": {
+            "requestId": "b5cbb918-36d4-4cfe-a6aa-6b3cd4263d6d",
+            "taskGoal": "F012_GOOD synthetic navigation to F2_TEST_GATE; [PROTECTED_IDENTITY]",
+            "taskFamily": "EXT_2AD8B934",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "clarificationAnswers": null
+          }
+        },
+        {
+          "at": "2026-11-03T01:31:33.787738+00:00",
+          "phase": "planning",
+          "request": {
+            "requestId": "9db04a7b-bf57-429d-a2c8-681def03191f",
+            "taskGoal": "F012_GOOD synthetic navigation to F2_TEST_GATE; [PROTECTED_IDENTITY]",
+            "taskFamily": "EXT_2AD8B934",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "constraints": [
+              "不得下发运动安全控制指令",
+              "步骤数不超过5"
+            ],
+            "capabilityContext": [
+              {
+                "capabilityType": "CAP_NAVIGATION",
+                "candidateCount": 1,
+                "candidates": [
+                  {
+                    "agentId": "AGT-803437A3",
+                    "deviceCode": "G126_ROBOT",
+                    "deviceTypeCode": "SIMULATOR",
+                    "simulatedDeviceType": "MOBILE_ROBOT",
+                    "businessStatus": {
+                      "scenarioResult": "SUCCESS",
+                      "simulatedDeviceType": "MOBILE_ROBOT"
+                    },
+                    "capabilities": [
+                      "CAP_ESCORT",
+                      "CAP_NOTIFICATION",
+                      "CAP_NAVIGATION"
+                    ],
+                    "capabilitySchemas": [
+                      {
+                        "capabilityType": "CAP_ESCORT",
+                        "inputParams": [
+                          {
+                            "name": "targetLocation",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "F2_TEST_GATE"
+                          },
+                          {
+                            "name": "escortMode",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "LEAD",
+                            "range": "LEAD/FOLLOW"
+                          },
+                          {
+                            "name": "maxDuration",
+                            "type": "Integer",
+                            "required": true,
+                            "defaultValue": "600",
+                            "range": "60~1800"
+                          }
+                        ],
+                        "outputParams": [
+                          {
+                            "name": "arrivalStatus",
+                            "type": "String",
+                            "required": true
+                          },
+                          {
+                            "name": "actualDistance",
+                            "type": "Double",
+                            "required": true
+                          },
+                          {
+                            "name": "actualDuration",
+                            "type": "Integer",
+                            "required": true
+                          }
+                        ]
+                      },
+                      {
+                        "capabilityType": "CAP_NOTIFICATION",
+                        "inputParams": [
+                          {
+                            "name": "notificationType",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "BOTH",
+                            "range": "VOICE/TEXT/BOTH"
+                          },
+                          {
+                            "name": "notificationContent",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "测试旅客需要轮椅陪同，请现场服务人员协助"
+                          },
+                          {
+                            "name": "repeatCount",
+                            "type": "Integer",
+                            "required": true,
+                            "defaultValue": "1",
+                            "range": "1~5"
+                          }
+                        ],
+                        "outputParams": [
+                          {
+                            "name": "notificationStatus",
+                            "type": "String",
+                            "required": true
+                          },
+                          {
+                            "name": "actualRepeatCount",
+                            "type": "Integer",
+                            "required": true
+                          }
+                        ]
+                      },
+                      {
+                        "capabilityType": "CAP_NAVIGATION",
+                        "inputParams": [
+                          {
+                            "name": "targetLocation",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "F2_TEST_GATE"
+                          },
+                          {
+                            "name": "routePreference",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "BARRIER_FREE",
+                            "range": "SHORTEST/BARRIER_FREE"
+                          }
+                        ],
+                        "outputParams": [
+                          {
+                            "name": "routeGenerated",
+                            "type": "Boolean",
+                            "required": true
+                          },
+                          {
+                            "name": "estimatedDistance",
+                            "type": "Double",
+                            "required": true
+                          },
+                          {
+                            "name": "estimatedDuration",
+                            "type": "Integer",
+                            "required": true
+                          },
+                          {
+                            "name": "waypointCount",
+                            "type": "Integer",
+                            "required": true
+                          }
+                        ]
+                      }
+                    ],
+                    "onlineStatus": "ONLINE",
+                    "location": {
+                      "x": 3.0,
+                      "y": 4.0,
+                      "zone": "F2_TEST"
+                    },
+                    "workload": "IDLE",
+                    "availableUntil": "2026-11-03T09:31:33.716402600"
+                  }
+                ]
+              }
+            ],
+            "remainingStepQuota": 5,
+            "completedSteps": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "F012_COND5",
+      "request": {
+        "taskGoal": "F012_COND5 synthetic navigation to F2_TEST_GATE",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "submit": {
+        "id": 98,
+        "taskCode": "TASK-20261103-0098",
+        "taskGoal": "F012_COND5 synthetic navigation to F2_TEST_GATE",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        },
+        "goalParsingResult": {
+          "completionCondition": "routeGenerated=true",
+          "origin": "F2_SERVICE_POINT",
+          "destination": "F2_TEST_GATE",
+          "originalGoal": "F012_COND5 synthetic navigation to F2_TEST_GATE",
+          "constraints": [
+            "synthetic test only"
+          ]
+        },
+        "status": "PLANNING",
+        "currentPlanVersionId": null,
+        "replanUsed": false,
+        "replanningReason": null,
+        "manualTerminateReason": null,
+        "failureReason": null,
+        "missingInfoQuestions": null,
+        "downgradeReason": null,
+        "isDryRun": false,
+        "createdAt": "2026-11-03T09:31:34.3084482",
+        "updatedAt": "2026-11-03T09:31:34.3084482",
+        "createdBy": "oprator"
+      },
+      "task": {
+        "id": 98,
+        "taskCode": "TASK-20261103-0098",
+        "taskGoal": "F012_COND5 synthetic navigation to F2_TEST_GATE",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        },
+        "goalParsingResult": {
+          "completionCondition": "routeGenerated=true",
+          "origin": "F2_SERVICE_POINT",
+          "destination": "F2_TEST_GATE",
+          "originalGoal": "F012_COND5 synthetic navigation to F2_TEST_GATE",
+          "constraints": [
+            "synthetic test only"
+          ]
+        },
+        "status": "PENDING_MANUAL",
+        "currentPlanVersionId": 84,
+        "replanUsed": false,
+        "replanningReason": null,
+        "manualTerminateReason": null,
+        "failureReason": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板",
+        "missingInfoQuestions": null,
+        "downgradeReason": null,
+        "isDryRun": false,
+        "createdAt": "2026-11-03T09:31:34.308448",
+        "updatedAt": "2026-11-03T09:31:34.5394",
+        "createdBy": "oprator"
+      },
+      "plans": [
+        {
+          "id": 84,
+          "versionNo": 1,
+          "source": "AUTONOMOUS",
+          "baselineTemplateId": null,
+          "snapshotId": "CTX-20261103-0057",
+          "planSteps": [
+            {
+              "stepSeq": 2,
+              "stepGoal": "Synthetic navigation action 2",
+              "capabilityType": "CAP_NAVIGATION",
+              "inputParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "precondition": "device online",
+              "completionCondition": "routeGenerated=true",
+              "failureHandling": "manual",
+              "stepTimeout": 60,
+              "branchOf": 1,
+              "branchCondition": "assistanceType is wheelchair"
+            },
+            {
+              "stepSeq": 3,
+              "stepGoal": "Synthetic navigation action 3",
+              "capabilityType": "CAP_NAVIGATION",
+              "inputParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "precondition": "device online",
+              "completionCondition": "routeGenerated=true",
+              "failureHandling": "manual",
+              "stepTimeout": 60
+            },
+            {
+              "stepSeq": 4,
+              "stepGoal": "Synthetic navigation action 4",
+              "capabilityType": "CAP_NAVIGATION",
+              "inputParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "precondition": "device online",
+              "completionCondition": "routeGenerated=true",
+              "failureHandling": "manual",
+              "stepTimeout": 60
+            },
+            {
+              "stepSeq": 5,
+              "stepGoal": "Synthetic navigation action 5",
+              "capabilityType": "CAP_NAVIGATION",
+              "inputParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "precondition": "device online",
+              "completionCondition": "routeGenerated=true",
+              "failureHandling": "manual",
+              "stepTimeout": 60
+            },
+            {
+              "stepSeq": 6,
+              "stepGoal": "Synthetic navigation action 6",
+              "capabilityType": "CAP_NAVIGATION",
+              "inputParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "precondition": "device online",
+              "completionCondition": "routeGenerated=true",
+              "failureHandling": "manual",
+              "stepTimeout": 60
+            }
+          ],
+          "structureCheckResult": "PASS",
+          "capabilityCheckResult": "PASS",
+          "constraintCheckResult": "PASS",
+          "validationErrors": [],
+          "riskLevel": "HIGH",
+          "riskReasonCode": "RULE_RESOURCE_CRITICAL",
+          "judgmentBasis": "可用备用候选设备数量(0)低于配置阈值(1)，命中确定性高风险规则",
+          "confidence": 0.99,
+          "ruleSetVersion": "V1.0",
+          "frozenAt": "2026-11-03T09:31:34.519832",
+          "createdAt": "2026-11-03T09:31:34.500662"
+        }
+      ],
+      "contexts": [
+        {
+          "id": 57,
+          "snapshotCode": "CTX-20261103-0057",
+          "taskId": 98,
+          "agents": "[{\"agentId\":\"AGT-803437A3\",\"deviceCode\":\"G126_ROBOT\",\"deviceTypeCode\":\"SIMULATOR\",\"simulatedDeviceType\":\"MOBILE_ROBOT\",\"businessStatus\":{\"scenarioResult\":\"SUCCESS\",\"simulatedDeviceType\":\"MOBILE_ROBOT\"},\"capabilities\":[\"CAP_ESCORT\",\"CAP_NOTIFICATION\",\"CAP_NAVIGATION\"],\"capabilitySchemas\":[{\"capabilityType\":\"CAP_ESCORT\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"escortMode\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"LEAD\",\"range\":\"LEAD/FOLLOW\"},{\"name\":\"maxDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"600\",\"range\":\"60~1800\"}],\"outputParams\":[{\"name\":\"arrivalStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"actualDuration\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_NOTIFICATION\",\"inputParams\":[{\"name\":\"notificationType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BOTH\",\"range\":\"VOICE/TEXT/BOTH\"},{\"name\":\"notificationContent\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试旅客需要轮椅陪同，请现场服务人员协助\"},{\"name\":\"repeatCount\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"1\",\"range\":\"1~5\"}],\"outputParams\":[{\"name\":\"notificationStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualRepeatCount\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"routePreference\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BARRIER_FREE\",\"range\":\"SHORTEST/BARRIER_FREE\"}],\"outputParams\":[{\"name\":\"routeGenerated\",\"type\":\"Boolean\",\"required\":true},{\"name\":\"estimatedDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"estimatedDuration\",\"type\":\"Integer\",\"required\":true},{\"name\":\"waypointCount\",\"type\":\"Integer\",\"required\":true}]}],\"onlineStatus\":\"ONLINE\",\"location\":{\"x\":3.00,\"y\":4.00,\"zone\":\"F2_TEST\"},\"workload\":\"IDLE\",\"availableUntil\":\"2026-11-03T09:31:34.404494400\"}]",
+          "capabilityCoverage": "{\"available\":[\"CAP_NAVIGATION\"],\"missing\":[]}",
+          "failedAgentCodes": "[]",
+          "generatedAt": "2026-11-03T09:31:34.407217"
+        }
+      ],
+      "events": [
+        {
+          "id": 750,
+          "taskId": 98,
+          "eventType": "GOAL_SUBMITTED",
+          "occurredAt": "2026-11-03T09:31:34.311126",
+          "trigger": "OPERATOR",
+          "reasonCode": null,
+          "detailSummary": "运行操作员oprator提交任务目标: F012_COND5 synthetic navigation to F2_TEST_GATE"
+        },
+        {
+          "id": 751,
+          "taskId": 98,
+          "eventType": "GOAL_CLARIFIED",
+          "occurredAt": "2026-11-03T09:31:34.344651",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+        },
+        {
+          "id": 752,
+          "taskId": 98,
+          "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+          "occurredAt": "2026-11-03T09:31:34.411152",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "生成规划上下文快照CTX-20261103-0057"
+        },
+        {
+          "id": 753,
+          "taskId": 98,
+          "eventType": "PLAN_GENERATED",
+          "occurredAt": "2026-11-03T09:31:34.515415",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+        },
+        {
+          "id": 754,
+          "taskId": 98,
+          "eventType": "PLAN_VALIDATED",
+          "occurredAt": "2026-11-03T09:31:34.52217",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+        },
+        {
+          "id": 755,
+          "taskId": 98,
+          "eventType": "SUPERVISION_JUDGED",
+          "occurredAt": "2026-11-03T09:31:34.53443",
+          "trigger": "SYSTEM",
+          "reasonCode": "RULE_RESOURCE_CRITICAL",
+          "detailSummary": "监督判定: HIGH，可用备用候选设备数量(0)低于配置阈值(1)，命中确定性高风险规则"
+        },
+        {
+          "id": 756,
+          "taskId": 98,
+          "eventType": "BASELINE_DOWNGRADED",
+          "occurredAt": "2026-11-03T09:31:34.537354",
+          "trigger": "SYSTEM",
+          "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+          "detailSummary": "无匹配的已启用基线模板: 监督判定高风险: RULE_RESOURCE_CRITICAL"
+        },
+        {
+          "id": 757,
+          "taskId": 98,
+          "eventType": "TASK_PENDING_MANUAL",
+          "occurredAt": "2026-11-03T09:31:34.539991",
+          "trigger": "SYSTEM",
+          "reasonCode": "ERR_PLANNING_FAILED",
+          "detailSummary": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板"
+        }
+      ],
+      "assignments": [],
+      "commands": [],
+      "modelRequests": [
+        {
+          "at": "2026-11-03T01:31:34.336419+00:00",
+          "phase": "goal",
+          "request": {
+            "requestId": "2a100d2f-2781-41f8-bcd6-dff68f70001e",
+            "taskGoal": "F012_COND5 synthetic navigation to F2_TEST_GATE",
+            "taskFamily": "EXT_2AD8B934",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "clarificationAnswers": null
+          }
+        },
+        {
+          "at": "2026-11-03T01:31:34.445580+00:00",
+          "phase": "planning",
+          "request": {
+            "requestId": "54214f07-ed64-4690-9523-a45b6f80f2e1",
+            "taskGoal": "F012_COND5 synthetic navigation to F2_TEST_GATE",
+            "taskFamily": "EXT_2AD8B934",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "constraints": [
+              "不得下发运动安全控制指令",
+              "步骤数不超过5"
+            ],
+            "capabilityContext": [
+              {
+                "capabilityType": "CAP_NAVIGATION",
+                "candidateCount": 1,
+                "candidates": [
+                  {
+                    "agentId": "AGT-803437A3",
+                    "deviceCode": "G126_ROBOT",
+                    "deviceTypeCode": "SIMULATOR",
+                    "simulatedDeviceType": "MOBILE_ROBOT",
+                    "businessStatus": {
+                      "scenarioResult": "SUCCESS",
+                      "simulatedDeviceType": "MOBILE_ROBOT"
+                    },
+                    "capabilities": [
+                      "CAP_ESCORT",
+                      "CAP_NOTIFICATION",
+                      "CAP_NAVIGATION"
+                    ],
+                    "capabilitySchemas": [
+                      {
+                        "capabilityType": "CAP_ESCORT",
+                        "inputParams": [
+                          {
+                            "name": "targetLocation",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "F2_TEST_GATE"
+                          },
+                          {
+                            "name": "escortMode",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "LEAD",
+                            "range": "LEAD/FOLLOW"
+                          },
+                          {
+                            "name": "maxDuration",
+                            "type": "Integer",
+                            "required": true,
+                            "defaultValue": "600",
+                            "range": "60~1800"
+                          }
+                        ],
+                        "outputParams": [
+                          {
+                            "name": "arrivalStatus",
+                            "type": "String",
+                            "required": true
+                          },
+                          {
+                            "name": "actualDistance",
+                            "type": "Double",
+                            "required": true
+                          },
+                          {
+                            "name": "actualDuration",
+                            "type": "Integer",
+                            "required": true
+                          }
+                        ]
+                      },
+                      {
+                        "capabilityType": "CAP_NOTIFICATION",
+                        "inputParams": [
+                          {
+                            "name": "notificationType",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "BOTH",
+                            "range": "VOICE/TEXT/BOTH"
+                          },
+                          {
+                            "name": "notificationContent",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "测试旅客需要轮椅陪同，请现场服务人员协助"
+                          },
+                          {
+                            "name": "repeatCount",
+                            "type": "Integer",
+                            "required": true,
+                            "defaultValue": "1",
+                            "range": "1~5"
+                          }
+                        ],
+                        "outputParams": [
+                          {
+                            "name": "notificationStatus",
+                            "type": "String",
+                            "required": true
+                          },
+                          {
+                            "name": "actualRepeatCount",
+                            "type": "Integer",
+                            "required": true
+                          }
+                        ]
+                      },
+                      {
+                        "capabilityType": "CAP_NAVIGATION",
+                        "inputParams": [
+                          {
+                            "name": "targetLocation",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "F2_TEST_GATE"
+                          },
+                          {
+                            "name": "routePreference",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "BARRIER_FREE",
+                            "range": "SHORTEST/BARRIER_FREE"
+                          }
+                        ],
+                        "outputParams": [
+                          {
+                            "name": "routeGenerated",
+                            "type": "Boolean",
+                            "required": true
+                          },
+                          {
+                            "name": "estimatedDistance",
+                            "type": "Double",
+                            "required": true
+                          },
+                          {
+                            "name": "estimatedDuration",
+                            "type": "Integer",
+                            "required": true
+                          },
+                          {
+                            "name": "waypointCount",
+                            "type": "Integer",
+                            "required": true
+                          }
+                        ]
+                      }
+                    ],
+                    "onlineStatus": "ONLINE",
+                    "location": {
+                      "x": 3.0,
+                      "y": 4.0,
+                      "zone": "F2_TEST"
+                    },
+                    "workload": "IDLE",
+                    "availableUntil": "2026-11-03T09:31:34.404494400"
+                  }
+                ]
+              }
+            ],
+            "remainingStepQuota": 5,
+            "completedSteps": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "F012_MISSING_PRE",
+      "request": {
+        "taskGoal": "F012_MISSING_PRE synthetic navigation to F2_TEST_GATE",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "submit": {
+        "id": 99,
+        "taskCode": "TASK-20261103-0099",
+        "taskGoal": "F012_MISSING_PRE synthetic navigation to F2_TEST_GATE",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        },
+        "goalParsingResult": {
+          "completionCondition": "routeGenerated=true",
+          "origin": "F2_SERVICE_POINT",
+          "destination": "F2_TEST_GATE",
+          "originalGoal": "F012_MISSING_PRE synthetic navigation to F2_TEST_GATE",
+          "constraints": [
+            "synthetic test only"
+          ]
+        },
+        "status": "PLANNING",
+        "currentPlanVersionId": null,
+        "replanUsed": false,
+        "replanningReason": null,
+        "manualTerminateReason": null,
+        "failureReason": null,
+        "missingInfoQuestions": null,
+        "downgradeReason": null,
+        "isDryRun": false,
+        "createdAt": "2026-11-03T09:31:34.9833739",
+        "updatedAt": "2026-11-03T09:31:34.9833739",
+        "createdBy": "oprator"
+      },
+      "task": {
+        "id": 99,
+        "taskCode": "TASK-20261103-0099",
+        "taskGoal": "F012_MISSING_PRE synthetic navigation to F2_TEST_GATE",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        },
+        "goalParsingResult": {
+          "completionCondition": "routeGenerated=true",
+          "origin": "F2_SERVICE_POINT",
+          "destination": "F2_TEST_GATE",
+          "originalGoal": "F012_MISSING_PRE synthetic navigation to F2_TEST_GATE",
+          "constraints": [
+            "synthetic test only"
+          ]
+        },
+        "status": "PENDING_MANUAL",
+        "currentPlanVersionId": 85,
+        "replanUsed": false,
+        "replanningReason": null,
+        "manualTerminateReason": null,
+        "failureReason": "候选计划三类校验未通过，转基线模板降级；且无匹配的已启用基线模板",
+        "missingInfoQuestions": null,
+        "downgradeReason": null,
+        "isDryRun": false,
+        "createdAt": "2026-11-03T09:31:34.983374",
+        "updatedAt": "2026-11-03T09:31:35.062167",
+        "createdBy": "oprator"
+      },
+      "plans": [
+        {
+          "id": 85,
+          "versionNo": 1,
+          "source": "AUTONOMOUS",
+          "baselineTemplateId": null,
+          "snapshotId": "CTX-20261103-0058",
+          "planSteps": [
+            {
+              "stepSeq": 1,
+              "stepGoal": "Synthetic navigation action 1",
+              "capabilityType": "CAP_NAVIGATION",
+              "inputParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "completionCondition": "routeGenerated=true",
+              "failureHandling": "manual",
+              "stepTimeout": 60
+            }
+          ],
+          "structureCheckResult": "FAIL",
+          "capabilityCheckResult": "PASS",
+          "constraintCheckResult": "PASS",
+          "validationErrors": [
+            {
+              "errorType": "STRUCTURE",
+              "description": "步骤字段不完整，缺少: precondition",
+              "stepSeq": 1,
+              "reasonCode": "ERR_STEP_FIELD_MISSING"
+            }
+          ],
+          "riskLevel": null,
+          "riskReasonCode": null,
+          "judgmentBasis": null,
+          "confidence": 0.99,
+          "ruleSetVersion": null,
+          "frozenAt": null,
+          "createdAt": "2026-11-03T09:31:35.043345"
+        }
+      ],
+      "contexts": [
+        {
+          "id": 58,
+          "snapshotCode": "CTX-20261103-0058",
+          "taskId": 99,
+          "agents": "[{\"agentId\":\"AGT-803437A3\",\"deviceCode\":\"G126_ROBOT\",\"deviceTypeCode\":\"SIMULATOR\",\"simulatedDeviceType\":\"MOBILE_ROBOT\",\"businessStatus\":{\"scenarioResult\":\"SUCCESS\",\"simulatedDeviceType\":\"MOBILE_ROBOT\"},\"capabilities\":[\"CAP_ESCORT\",\"CAP_NOTIFICATION\",\"CAP_NAVIGATION\"],\"capabilitySchemas\":[{\"capabilityType\":\"CAP_ESCORT\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"escortMode\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"LEAD\",\"range\":\"LEAD/FOLLOW\"},{\"name\":\"maxDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"600\",\"range\":\"60~1800\"}],\"outputParams\":[{\"name\":\"arrivalStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"actualDuration\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_NOTIFICATION\",\"inputParams\":[{\"name\":\"notificationType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BOTH\",\"range\":\"VOICE/TEXT/BOTH\"},{\"name\":\"notificationContent\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试旅客需要轮椅陪同，请现场服务人员协助\"},{\"name\":\"repeatCount\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"1\",\"range\":\"1~5\"}],\"outputParams\":[{\"name\":\"notificationStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualRepeatCount\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"routePreference\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BARRIER_FREE\",\"range\":\"SHORTEST/BARRIER_FREE\"}],\"outputParams\":[{\"name\":\"routeGenerated\",\"type\":\"Boolean\",\"required\":true},{\"name\":\"estimatedDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"estimatedDuration\",\"type\":\"Integer\",\"required\":true},{\"name\":\"waypointCount\",\"type\":\"Integer\",\"required\":true}]}],\"onlineStatus\":\"ONLINE\",\"location\":{\"x\":3.00,\"y\":4.00,\"zone\":\"F2_TEST\"},\"workload\":\"IDLE\",\"availableUntil\":\"2026-11-03T09:31:35.013734900\"}]",
+          "capabilityCoverage": "{\"available\":[\"CAP_NAVIGATION\"],\"missing\":[]}",
+          "failedAgentCodes": "[]",
+          "generatedAt": "2026-11-03T09:31:35.014737"
+        }
+      ],
+      "events": [
+        {
+          "id": 758,
+          "taskId": 99,
+          "eventType": "GOAL_SUBMITTED",
+          "occurredAt": "2026-11-03T09:31:34.985925",
+          "trigger": "OPERATOR",
+          "reasonCode": null,
+          "detailSummary": "运行操作员oprator提交任务目标: F012_MISSING_PRE synthetic navigation to F2_TEST_GATE"
+        },
+        {
+          "id": 759,
+          "taskId": 99,
+          "eventType": "GOAL_CLARIFIED",
+          "occurredAt": "2026-11-03T09:31:35.001661",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+        },
+        {
+          "id": 760,
+          "taskId": 99,
+          "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+          "occurredAt": "2026-11-03T09:31:35.017793",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "生成规划上下文快照CTX-20261103-0058"
+        },
+        {
+          "id": 761,
+          "taskId": 99,
+          "eventType": "PLAN_GENERATED",
+          "occurredAt": "2026-11-03T09:31:35.048378",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+        },
+        {
+          "id": 762,
+          "taskId": 99,
+          "eventType": "PLAN_VALIDATED",
+          "occurredAt": "2026-11-03T09:31:35.055683",
+          "trigger": "SYSTEM",
+          "reasonCode": "ERR_VALIDATION_FAILED",
+          "detailSummary": "候选计划三类校验未通过: 1项错误"
+        },
+        {
+          "id": 763,
+          "taskId": 99,
+          "eventType": "BASELINE_DOWNGRADED",
+          "occurredAt": "2026-11-03T09:31:35.061066",
+          "trigger": "SYSTEM",
+          "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+          "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级"
+        },
+        {
+          "id": 764,
+          "taskId": 99,
+          "eventType": "TASK_PENDING_MANUAL",
+          "occurredAt": "2026-11-03T09:31:35.063799",
+          "trigger": "SYSTEM",
+          "reasonCode": "ERR_PLANNING_FAILED",
+          "detailSummary": "候选计划三类校验未通过，转基线模板降级；且无匹配的已启用基线模板"
+        }
+      ],
+      "assignments": [],
+      "commands": [],
+      "modelRequests": [
+        {
+          "at": "2026-11-03T01:31:34.997087+00:00",
+          "phase": "goal",
+          "request": {
+            "requestId": "7118f43b-ae20-4a6f-a490-75aac6fc8f57",
+            "taskGoal": "F012_MISSING_PRE synthetic navigation to F2_TEST_GATE",
+            "taskFamily": "EXT_2AD8B934",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "clarificationAnswers": null
+          }
+        },
+        {
+          "at": "2026-11-03T01:31:35.028465+00:00",
+          "phase": "planning",
+          "request": {
+            "requestId": "1aac5f3b-24d3-40ba-9ad2-550a20cb4436",
+            "taskGoal": "F012_MISSING_PRE synthetic navigation to F2_TEST_GATE",
+            "taskFamily": "EXT_2AD8B934",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "constraints": [
+              "不得下发运动安全控制指令",
+              "步骤数不超过5"
+            ],
+            "capabilityContext": [
+              {
+                "capabilityType": "CAP_NAVIGATION",
+                "candidateCount": 1,
+                "candidates": [
+                  {
+                    "agentId": "AGT-803437A3",
+                    "deviceCode": "G126_ROBOT",
+                    "deviceTypeCode": "SIMULATOR",
+                    "simulatedDeviceType": "MOBILE_ROBOT",
+                    "businessStatus": {
+                      "scenarioResult": "SUCCESS",
+                      "simulatedDeviceType": "MOBILE_ROBOT"
+                    },
+                    "capabilities": [
+                      "CAP_ESCORT",
+                      "CAP_NOTIFICATION",
+                      "CAP_NAVIGATION"
+                    ],
+                    "capabilitySchemas": [
+                      {
+                        "capabilityType": "CAP_ESCORT",
+                        "inputParams": [
+                          {
+                            "name": "targetLocation",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "F2_TEST_GATE"
+                          },
+                          {
+                            "name": "escortMode",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "LEAD",
+                            "range": "LEAD/FOLLOW"
+                          },
+                          {
+                            "name": "maxDuration",
+                            "type": "Integer",
+                            "required": true,
+                            "defaultValue": "600",
+                            "range": "60~1800"
+                          }
+                        ],
+                        "outputParams": [
+                          {
+                            "name": "arrivalStatus",
+                            "type": "String",
+                            "required": true
+                          },
+                          {
+                            "name": "actualDistance",
+                            "type": "Double",
+                            "required": true
+                          },
+                          {
+                            "name": "actualDuration",
+                            "type": "Integer",
+                            "required": true
+                          }
+                        ]
+                      },
+                      {
+                        "capabilityType": "CAP_NOTIFICATION",
+                        "inputParams": [
+                          {
+                            "name": "notificationType",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "BOTH",
+                            "range": "VOICE/TEXT/BOTH"
+                          },
+                          {
+                            "name": "notificationContent",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "测试旅客需要轮椅陪同，请现场服务人员协助"
+                          },
+                          {
+                            "name": "repeatCount",
+                            "type": "Integer",
+                            "required": true,
+                            "defaultValue": "1",
+                            "range": "1~5"
+                          }
+                        ],
+                        "outputParams": [
+                          {
+                            "name": "notificationStatus",
+                            "type": "String",
+                            "required": true
+                          },
+                          {
+                            "name": "actualRepeatCount",
+                            "type": "Integer",
+                            "required": true
+                          }
+                        ]
+                      },
+                      {
+                        "capabilityType": "CAP_NAVIGATION",
+                        "inputParams": [
+                          {
+                            "name": "targetLocation",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "F2_TEST_GATE"
+                          },
+                          {
+                            "name": "routePreference",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "BARRIER_FREE",
+                            "range": "SHORTEST/BARRIER_FREE"
+                          }
+                        ],
+                        "outputParams": [
+                          {
+                            "name": "routeGenerated",
+                            "type": "Boolean",
+                            "required": true
+                          },
+                          {
+                            "name": "estimatedDistance",
+                            "type": "Double",
+                            "required": true
+                          },
+                          {
+                            "name": "estimatedDuration",
+                            "type": "Integer",
+                            "required": true
+                          },
+                          {
+                            "name": "waypointCount",
+                            "type": "Integer",
+                            "required": true
+                          }
+                        ]
+                      }
+                    ],
+                    "onlineStatus": "ONLINE",
+                    "location": {
+                      "x": 3.0,
+                      "y": 4.0,
+                      "zone": "F2_TEST"
+                    },
+                    "workload": "IDLE",
+                    "availableUntil": "2026-11-03T09:31:35.013734900"
+                  }
+                ]
+              }
+            ],
+            "remainingStepQuota": 5,
+            "completedSteps": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "F012_LOOP_PRE",
+      "request": {
+        "taskGoal": "F012_LOOP_PRE synthetic navigation to F2_TEST_GATE",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "submit": {
+        "id": 100,
+        "taskCode": "TASK-20261103-0100",
+        "taskGoal": "F012_LOOP_PRE synthetic navigation to F2_TEST_GATE",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        },
+        "goalParsingResult": {
+          "completionCondition": "routeGenerated=true",
+          "origin": "F2_SERVICE_POINT",
+          "destination": "F2_TEST_GATE",
+          "originalGoal": "F012_LOOP_PRE synthetic navigation to F2_TEST_GATE",
+          "constraints": [
+            "synthetic test only"
+          ]
+        },
+        "status": "PLANNING",
+        "currentPlanVersionId": null,
+        "replanUsed": false,
+        "replanningReason": null,
+        "manualTerminateReason": null,
+        "failureReason": null,
+        "missingInfoQuestions": null,
+        "downgradeReason": null,
+        "isDryRun": false,
+        "createdAt": "2026-11-03T09:31:35.4653962",
+        "updatedAt": "2026-11-03T09:31:35.4653962",
+        "createdBy": "oprator"
+      },
+      "task": {
+        "id": 100,
+        "taskCode": "TASK-20261103-0100",
+        "taskGoal": "F012_LOOP_PRE synthetic navigation to F2_TEST_GATE",
+        "taskFamily": "EXT_2AD8B934",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        },
+        "goalParsingResult": {
+          "completionCondition": "routeGenerated=true",
+          "origin": "F2_SERVICE_POINT",
+          "destination": "F2_TEST_GATE",
+          "originalGoal": "F012_LOOP_PRE synthetic navigation to F2_TEST_GATE",
+          "constraints": [
+            "synthetic test only"
+          ]
+        },
+        "status": "PENDING_MANUAL",
+        "currentPlanVersionId": 86,
+        "replanUsed": false,
+        "replanningReason": null,
+        "manualTerminateReason": null,
+        "failureReason": "候选计划三类校验未通过，转基线模板降级；且无匹配的已启用基线模板",
+        "missingInfoQuestions": null,
+        "downgradeReason": null,
+        "isDryRun": false,
+        "createdAt": "2026-11-03T09:31:35.465396",
+        "updatedAt": "2026-11-03T09:31:35.524706",
+        "createdBy": "oprator"
+      },
+      "plans": [
+        {
+          "id": 86,
+          "versionNo": 1,
+          "source": "AUTONOMOUS",
+          "baselineTemplateId": null,
+          "snapshotId": "CTX-20261103-0059",
+          "planSteps": [
+            {
+              "stepSeq": 1,
+              "stepGoal": "Synthetic navigation action 1",
+              "capabilityType": "CAP_NAVIGATION",
+              "inputParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "precondition": "while(true) { repeat this display step forever; }",
+              "completionCondition": "routeGenerated=true",
+              "failureHandling": "manual",
+              "stepTimeout": 60
+            }
+          ],
+          "structureCheckResult": "FAIL",
+          "capabilityCheckResult": "PASS",
+          "constraintCheckResult": "PASS",
+          "validationErrors": [
+            {
+              "errorType": "STRUCTURE",
+              "description": "步骤precondition含不支持的控制流或动态执行内容（while(）",
+              "stepSeq": 1,
+              "reasonCode": "ERR_STEP_LOOP_DETECTED"
+            }
+          ],
+          "riskLevel": null,
+          "riskReasonCode": null,
+          "judgmentBasis": null,
+          "confidence": 0.99,
+          "ruleSetVersion": null,
+          "frozenAt": null,
+          "createdAt": "2026-11-03T09:31:35.516464"
+        }
+      ],
+      "contexts": [
+        {
+          "id": 59,
+          "snapshotCode": "CTX-20261103-0059",
+          "taskId": 100,
+          "agents": "[{\"agentId\":\"AGT-803437A3\",\"deviceCode\":\"G126_ROBOT\",\"deviceTypeCode\":\"SIMULATOR\",\"simulatedDeviceType\":\"MOBILE_ROBOT\",\"businessStatus\":{\"scenarioResult\":\"SUCCESS\",\"simulatedDeviceType\":\"MOBILE_ROBOT\"},\"capabilities\":[\"CAP_ESCORT\",\"CAP_NOTIFICATION\",\"CAP_NAVIGATION\"],\"capabilitySchemas\":[{\"capabilityType\":\"CAP_ESCORT\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"escortMode\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"LEAD\",\"range\":\"LEAD/FOLLOW\"},{\"name\":\"maxDuration\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"600\",\"range\":\"60~1800\"}],\"outputParams\":[{\"name\":\"arrivalStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"actualDuration\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_NOTIFICATION\",\"inputParams\":[{\"name\":\"notificationType\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BOTH\",\"range\":\"VOICE/TEXT/BOTH\"},{\"name\":\"notificationContent\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"测试旅客需要轮椅陪同，请现场服务人员协助\"},{\"name\":\"repeatCount\",\"type\":\"Integer\",\"required\":true,\"defaultValue\":\"1\",\"range\":\"1~5\"}],\"outputParams\":[{\"name\":\"notificationStatus\",\"type\":\"String\",\"required\":true},{\"name\":\"actualRepeatCount\",\"type\":\"Integer\",\"required\":true}]},{\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":[{\"name\":\"targetLocation\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"F2_TEST_GATE\"},{\"name\":\"routePreference\",\"type\":\"String\",\"required\":true,\"defaultValue\":\"BARRIER_FREE\",\"range\":\"SHORTEST/BARRIER_FREE\"}],\"outputParams\":[{\"name\":\"routeGenerated\",\"type\":\"Boolean\",\"required\":true},{\"name\":\"estimatedDistance\",\"type\":\"Double\",\"required\":true},{\"name\":\"estimatedDuration\",\"type\":\"Integer\",\"required\":true},{\"name\":\"waypointCount\",\"type\":\"Integer\",\"required\":true}]}],\"onlineStatus\":\"ONLINE\",\"location\":{\"x\":3.00,\"y\":4.00,\"zone\":\"F2_TEST\"},\"workload\":\"IDLE\",\"availableUntil\":\"2026-11-03T09:31:35.493908200\"}]",
+          "capabilityCoverage": "{\"available\":[\"CAP_NAVIGATION\"],\"missing\":[]}",
+          "failedAgentCodes": "[]",
+          "generatedAt": "2026-11-03T09:31:35.496192"
+        }
+      ],
+      "events": [
+        {
+          "id": 765,
+          "taskId": 100,
+          "eventType": "GOAL_SUBMITTED",
+          "occurredAt": "2026-11-03T09:31:35.46771",
+          "trigger": "OPERATOR",
+          "reasonCode": null,
+          "detailSummary": "运行操作员oprator提交任务目标: F012_LOOP_PRE synthetic navigation to F2_TEST_GATE"
+        },
+        {
+          "id": 766,
+          "taskId": 100,
+          "eventType": "GOAL_CLARIFIED",
+          "occurredAt": "2026-11-03T09:31:35.487191",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+        },
+        {
+          "id": 767,
+          "taskId": 100,
+          "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+          "occurredAt": "2026-11-03T09:31:35.497989",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "生成规划上下文快照CTX-20261103-0059"
+        },
+        {
+          "id": 768,
+          "taskId": 100,
+          "eventType": "PLAN_GENERATED",
+          "occurredAt": "2026-11-03T09:31:35.520239",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+        },
+        {
+          "id": 769,
+          "taskId": 100,
+          "eventType": "PLAN_VALIDATED",
+          "occurredAt": "2026-11-03T09:31:35.521433",
+          "trigger": "SYSTEM",
+          "reasonCode": "ERR_VALIDATION_FAILED",
+          "detailSummary": "候选计划三类校验未通过: 1项错误"
+        },
+        {
+          "id": 770,
+          "taskId": 100,
+          "eventType": "BASELINE_DOWNGRADED",
+          "occurredAt": "2026-11-03T09:31:35.524706",
+          "trigger": "SYSTEM",
+          "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+          "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级"
+        },
+        {
+          "id": 771,
+          "taskId": 100,
+          "eventType": "TASK_PENDING_MANUAL",
+          "occurredAt": "2026-11-03T09:31:35.526403",
+          "trigger": "SYSTEM",
+          "reasonCode": "ERR_PLANNING_FAILED",
+          "detailSummary": "候选计划三类校验未通过，转基线模板降级；且无匹配的已启用基线模板"
+        }
+      ],
+      "assignments": [],
+      "commands": [],
+      "modelRequests": [
+        {
+          "at": "2026-11-03T01:31:35.475358+00:00",
+          "phase": "goal",
+          "request": {
+            "requestId": "7bf47904-eed5-468d-a83e-d28a367d2852",
+            "taskGoal": "F012_LOOP_PRE synthetic navigation to F2_TEST_GATE",
+            "taskFamily": "EXT_2AD8B934",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "clarificationAnswers": null
+          }
+        },
+        {
+          "at": "2026-11-03T01:31:35.508382+00:00",
+          "phase": "planning",
+          "request": {
+            "requestId": "b1f29ce2-837a-4735-ba4a-3746263685fc",
+            "taskGoal": "F012_LOOP_PRE synthetic navigation to F2_TEST_GATE",
+            "taskFamily": "EXT_2AD8B934",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "constraints": [
+              "不得下发运动安全控制指令",
+              "步骤数不超过5"
+            ],
+            "capabilityContext": [
+              {
+                "capabilityType": "CAP_NAVIGATION",
+                "candidateCount": 1,
+                "candidates": [
+                  {
+                    "agentId": "AGT-803437A3",
+                    "deviceCode": "G126_ROBOT",
+                    "deviceTypeCode": "SIMULATOR",
+                    "simulatedDeviceType": "MOBILE_ROBOT",
+                    "businessStatus": {
+                      "scenarioResult": "SUCCESS",
+                      "simulatedDeviceType": "MOBILE_ROBOT"
+                    },
+                    "capabilities": [
+                      "CAP_ESCORT",
+                      "CAP_NOTIFICATION",
+                      "CAP_NAVIGATION"
+                    ],
+                    "capabilitySchemas": [
+                      {
+                        "capabilityType": "CAP_ESCORT",
+                        "inputParams": [
+                          {
+                            "name": "targetLocation",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "F2_TEST_GATE"
+                          },
+                          {
+                            "name": "escortMode",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "LEAD",
+                            "range": "LEAD/FOLLOW"
+                          },
+                          {
+                            "name": "maxDuration",
+                            "type": "Integer",
+                            "required": true,
+                            "defaultValue": "600",
+                            "range": "60~1800"
+                          }
+                        ],
+                        "outputParams": [
+                          {
+                            "name": "arrivalStatus",
+                            "type": "String",
+                            "required": true
+                          },
+                          {
+                            "name": "actualDistance",
+                            "type": "Double",
+                            "required": true
+                          },
+                          {
+                            "name": "actualDuration",
+                            "type": "Integer",
+                            "required": true
+                          }
+                        ]
+                      },
+                      {
+                        "capabilityType": "CAP_NOTIFICATION",
+                        "inputParams": [
+                          {
+                            "name": "notificationType",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "BOTH",
+                            "range": "VOICE/TEXT/BOTH"
+                          },
+                          {
+                            "name": "notificationContent",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "测试旅客需要轮椅陪同，请现场服务人员协助"
+                          },
+                          {
+                            "name": "repeatCount",
+                            "type": "Integer",
+                            "required": true,
+                            "defaultValue": "1",
+                            "range": "1~5"
+                          }
+                        ],
+                        "outputParams": [
+                          {
+                            "name": "notificationStatus",
+                            "type": "String",
+                            "required": true
+                          },
+                          {
+                            "name": "actualRepeatCount",
+                            "type": "Integer",
+                            "required": true
+                          }
+                        ]
+                      },
+                      {
+                        "capabilityType": "CAP_NAVIGATION",
+                        "inputParams": [
+                          {
+                            "name": "targetLocation",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "F2_TEST_GATE"
+                          },
+                          {
+                            "name": "routePreference",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "BARRIER_FREE",
+                            "range": "SHORTEST/BARRIER_FREE"
+                          }
+                        ],
+                        "outputParams": [
+                          {
+                            "name": "routeGenerated",
+                            "type": "Boolean",
+                            "required": true
+                          },
+                          {
+                            "name": "estimatedDistance",
+                            "type": "Double",
+                            "required": true
+                          },
+                          {
+                            "name": "estimatedDuration",
+                            "type": "Integer",
+                            "required": true
+                          },
+                          {
+                            "name": "waypointCount",
+                            "type": "Integer",
+                            "required": true
+                          }
+                        ]
+                      }
+                    ],
+                    "onlineStatus": "ONLINE",
+                    "location": {
+                      "x": 3.0,
+                      "y": 4.0,
+                      "zone": "F2_TEST"
+                    },
+                    "workload": "IDLE",
+                    "availableUntil": "2026-11-03T09:31:35.493908200"
+                  }
+                ]
+              }
+            ],
+            "remainingStepQuota": 5,
+            "completedSteps": []
+          }
+        }
+      ]
+    }
+  ]
+}
