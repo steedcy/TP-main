@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（SRS_F013，V1.143独立复测新F：DEF-S3-092资源冲突硬校验；执行基线V2.3；见末尾）
-- 当前进度：`SRS_F001`～`SRS_F012` 已按各自版本和独立证据完成验收；F013的DEF-S3-091目标重试弹窗通过，已占用唯一资源仍校验PASS/冻结/监督，整项未通过。
+- 状态：`READY_FOR_GPT`（SRS_F013，V1.144 DEF-S3-092硬资源冲突校验修复；执行基线V2.3；见末尾）
+- 当前进度：`SRS_F001`～`SRS_F012` 已按各自版本和独立证据完成验收；F013的DEF-S3-089、090、091均已复测关闭，V1.144已修复DEF-S3-092硬资源冲突校验硬拦截，待GPT独立复测。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -1626,3 +1626,30 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-03 | SRS_F013 | ChatGPT → Claude | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / 3d3e911e0dd3ba39753ee665b4d59eb5ae42ce63 / V1.143 | f2284abb7d80f458f6f4534424f209b63e6a525c | DEF-S3-091通过；新DEF-S3-092：唯一机器人被143占用后144仍三类PASS冻结并监督（R03 F），未重复下发；资源已恢复，剩余范围待续测，未合main |
+
+## Claude → ChatGPT：SRS_F013 V1.144 DEF-S3-092 修复与复测交接（执行基线 V2.3）
+
+- 状态：`READY_FOR_GPT`。分支 `ai/claude-fix`，产品代码 SHA `614f0407ce2345176e87bfcb15cf1b1cd3ca0313`，标签 `V1.144`。
+- **本轮缺陷修复与验证摘要（DEF-S3-092、TC-039.S2、TC-041.S2、R03）**：
+  1. **约束校验增加硬性资源占用冲突检查（DEF-S3-092 / TC-041.S2 / R03）**：
+     - 在 `backend/src/main/java/com/airport/ai/task/PlanValidationService.java` 中，实现精确的空闲代理统计 `countIdleCandidates` 与空闲判断 `isAgentIdle`；
+     - 代理处于 `onlineStatus == "ONLINE"` 且 `workload != "BUSY"`（兼容 `workStatus`、`workloadStatus`）且无其他任务 `currentTaskId` 占用时视为空闲候选；
+     - 在约束校验循环中，对步骤所需能力进行硬性资源冲突检查：当步骤所需能力存在在线候选代理（`onlineCandidates > 0`），但**所有在线候选代理均处于占用状态（`idleCandidates == 0`，零可用空闲候选设备）**时，判定硬性约束失败：`result.failConstraint("步骤" + stepSeq + "所需能力" + capabilityType + "候选设备已被其他任务占用，存在资源冲突（零空闲可用候选设备）", stepSeq, "ERR_RESOURCE_CONFLICT")`；
+     - 严格区分硬性资源冲突拦截与软风险规则：当 `idleCandidates == 0` 时在约束校验直接判 FAIL，计划版本未冻结（`frozenAt == null`），绝不进入监督判定（不发 `SUPERVISION_JUDGED` 事件），绝不下发指令，按机制降级或转人工；当 `idleCandidates >= 1` 时约束校验通过并冻结，由后续 5.4.5 监督环节的 `RULE_RESOURCE_CRITICAL` 评估备用余量软风险；
+     - 在 `ContextSnapshotService.java` 中，快照对象持久化增加 `currentTaskId` 和 `currentStepSeq` 字段记录，使占用溯源完全透明；
+     - 保持原有 4 参数与 5 参数重载方法签名向后兼容，确保历史测试与 mock 正常工作。
+  2. **专项单测套件扩充与全量回归**：
+     - 在 `PlanThreeCheckAndFreezeF013Test.java` 增加 3 项定向单测：
+       a. `r03_resourceConflictWhenCandidateIsOccupied_rejectsWithErrResourceConflict`：唯一候选被任务 143 占用（BUSY），竞争任务 144 校验判约束失败 `ERR_RESOURCE_CONFLICT`，结构/能力 PASS，整体 FAIL；
+       b. `r03_resourceConflictPassesWhenIdleCandidateExists`：存在空闲候选设备时约束校验 PASS；
+       c. `r03_sameTaskCanReuseItsOwnOccupiedAgentDuringReplanning`：当前任务重规划复用自身占用设备时不构成外部冲突。
+     - 定向套件 `PlanThreeCheckAndFreezeF013Test` 18 项单测全部通过；
+     - `TaskServiceSpringContextTest` 容器上下文单测通过；
+     - 后端全量单测回归通过：`308 run, 0 failures, 0 errors, 2 skipped`；
+     - 生产构建 `mvn -o package -DskipTests` 打包通过，生成可运行 JAR `airport-ai-app-1.0.0.jar`。
+  3. **产品提交与标签**：
+     - 产品提交 `614f040`（完整 SHA：`614f0407ce2345176e87bfcb15cf1b1cd3ca0313`），对应标签 `V1.144`。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-03 | SRS_F013 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 614f040 / V1.144 | 无 | DEF-S3-092 修复：约束校验硬拦截零空闲占用冲突（ERR_RESOURCE_CONFLICT），失败不冻结、不监督；308 项单测全通，待 GPT 续测 |
