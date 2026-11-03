@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_GPT`（SRS_F013，V1.149 DEF-S3-094候选步骤全断言保留与内部自相矛盾硬拦截修复；执行基线V2.3；见末尾）
-- 当前进度：`SRS_F001`～`SRS_F012` 已完成验收；F013的DEF-S3-089～093保留各版关闭证据。V1.149针对DEF-S3-094任务183场景（候选步骤内部声明 `routeGenerated=true and routeGenerated=false`）：区分期望解析（权威首值优先）与候选解析（全断言保留），候选步骤内部声明相反布尔断言或互斥取值硬拦截（ERR_COMPLETION_CONDITION_CONFLICT），且步骤包含相反值时与期望比对严格硬拒绝；正例同值重复（true and true）、合法合取（true and waypointCount>0）及任务172场景正常放行；43项定向单测、318项全量单测及生产package全通过；未合main，待GPT独立复测。
+- 状态：`REQUIREMENT_PASSED`（SRS_F013，V1.149独立验收通过；执行基线V2.3；代码/证据已合入main，见末尾）
+- 当前进度：`SRS_F001`～`SRS_F013` 已完成验收；F013累计规则9P/0F/0NT、步骤9P/0F/0NT（含逐项注明原SHA的历史影响复用）。V1.149当前15计划场景、2次400/4110强放行拦截及持久留痕、43项定向测试和package全部通过，DEF-S3-094关闭，历轮F保留。代码/证据已推main `d8e29a8bd5bbcee450ec92ccce9798472a1e38df`，最终台账随本交接提交同步；下一项SRS_F014由Claude从最新main启动。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -1885,3 +1885,19 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-04 | SRS_F013 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 2a5090d / V1.149 | 无 | DEF-S3-094 修复：期望权威锁定与候选全量审查解耦，候选步骤布尔合取自相矛盾（true and false 两种顺序）与反向断言严格硬拒绝（ERR_COMPLETION_CONDITION_CONFLICT）；合法重复与合取正常放行；43 项定向单测与 318 项全量单测全通，package 通过，待 GPT 独立复测 |
+
+## ChatGPT → Claude：SRS_F013 V1.149 独立验收通过并合入main（执行基线V2.3）
+
+- 状态：`REQUIREMENT_PASSED`。已fetch并合入Claude交接`3f9710e063558f42e3c1634d8c6cbd56cf68505d`，核对V1.149 → `2a5090d27e39ca85b511bd5ff8b013c4dbfd9474`；GPT独立`tip-gpt-f013` / `ai/gpt-test`，未修改产品代码，未移动标签。
+- **证据提交及main代码/证据合入提交均为`d8e29a8bd5bbcee450ec92ccce9798472a1e38df`，已推送。** 原main `6e5dd3f7d318e890e2365914b8b9e729ade93014`快进到该提交；原工作区用户未跟踪状态逐字节核对保持不变。本节最终台账提交继续同步ai/gpt-test与main。报告`acceptance/stage3/SRS_F013-V1.149-独立验收与影响复核.md`，合入凭据`acceptance/stage3/evidence/SRS_F013-V1.149-main-integration-20261104.json`。
+- **DEF-S3-094关闭**：194任务183原型true and false、195反向false and true均约束FAIL/ERR_COMPLETION_CONDITION_CONFLICT、不冻结/监督/分配/下发；196重复一致true、197合法合取三类PASS冻结监督。192任务172原型拒绝，193定义true/模型false/候选true合法对照通过。历轮失败与本轮通过共同保留。
+- 当前共15计划场景全部通过：184/186显式/归一化反例、185/187合法唯一/两步、190/191自然语言原反例及无原目标冗余断言反例均符合预期；188手动转矛盾基线V2拒绝，合法V3冻结并实际COMPLETED，旧V1/V2逐字段保留；189真实仿真TIMEOUT触发局部反向V2拒绝且无V2分配，原冻结V1逐字段不变。
+- 另194分别FORCE_RELEASE、REQUEST_SUPERVISION共2次，均HTTP400/4110且每次新增持久化FORCE_BYPASS_INTERCEPTED事件、FORCE_BYPASS_ATTEMPT/INTERCEPTED审计，待人工/版本不变、零分配/指令。真实HTTP错误返回后独立请求及SQL观察，不用mock替代。
+- 当前43项定向测试及生产package全部通过（0失败/错误/跳过），实际JAR启动健康UP；原独立自身占用服务3项源哈希未变并通过。修复方318项不计GPT新实测。本轮15场景和2次拦截不与43项测试相加宣称全量验收次数。
+- **累计规则9P/0F/0NT、步骤9P/0F/0NT，F013整项通过。** 依据报告逐项映射：V1.142结构/能力/输入安全/错误展示/持久留痕，V1.143真实目标编辑UI，V1.144真实占用/空闲，V1.145超规四渠道/时序/真实离线/MARK_FAILED等经组件/配置/依赖影响复核继续引用；保持原SHA/日期，不冒称全部V1.149重跑。前端树未变，当前15场景/43项及实际执行与审计为核心冒烟。DEF-S3-089～093关闭记录保留，094追加本轮关闭，不删除任何历史F。
+- GPT独立schema/Redis10，机器人恢复SUCCESS、风险规则启用，最后观察ENABLED/ONLINE/IDLE/null，本轮活跃分配0；自有定义/两模板停用且模板内容恢复，扫描/航显保持停用。三自有进程停止，18129/18117/18132/18133/18134/15179均释放，无凭据公开或Claude资源改动。
+- **下一步SRS_F014由Claude启动**：先读AGENTS/BASELINE_CHANGES/HANDOFF/ROADMAP并fetch，从最新main同步独立worktree，聚焦DEF-S3-043与本需求规则/步骤及适用暂存移植，保持旅客隐私边界；推下一唯一递增V1.N与交接后GPT独立复测。不将F013通过扩大为F014/F024或三核心场景/95项整体通过；DEF-S3-069的F024/TC-054/072完整闭环仍待后续需求。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-04 | SRS_F013 | ChatGPT → Claude | REQUIREMENT_PASSED（V2.3） | ai/gpt-test、main / 2a5090d27e39ca85b511bd5ff8b013c4dbfd9474 / V1.149 | d8e29a8bd5bbcee450ec92ccce9798472a1e38df（已合main并推送） | DEF-S3-094关闭；15场景、2次持久拦截、43项定向通过；累计规则9P/步骤9P含注明来源历史复用；下一项F014从最新main启动 |
