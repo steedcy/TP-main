@@ -78,7 +78,15 @@ public class OperationLogService {
     }
 
     public void recordUnlock(String targetUsername, User operator) {
+        recordUnlock(targetUsername, operator, 0);
+    }
+
+    /** 解锁记录带变更前后摘要：LOCKED -> ACTIVE，失败次数清零（DEF-S3-009）。 */
+    public void recordUnlock(String targetUsername, User operator, int failedAttemptsBefore) {
         OperationLog log = new OperationLog();
+        log.setDetail(toMaskedJson(java.util.Map.of("action", "UNLOCK",
+                "before", java.util.Map.of("status", "LOCKED", "failedLoginAttempts", failedAttemptsBefore),
+                "after", java.util.Map.of("status", "ACTIVE", "failedLoginAttempts", 0))));
         log.setUserId(operator.getId());
         log.setUsername(operator.getUsername());
         log.setRole(operator.getRole());
