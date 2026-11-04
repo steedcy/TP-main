@@ -119,15 +119,32 @@ public class RiskAssessmentService {
         // 2. 风险信号辅助判定：两个及以上组合才触发降级，单一信号不阻断
         boolean lowConfidence = confidence != null && confidence.compareTo(lowConfidenceThreshold) < 0;
         boolean contextStale = isContextStale(snapshotGeneratedAt);
-        int signalCount = (lowConfidence ? 1 : 0) + (modelCandidateDiverse ? 1 : 0) + (contextStale ? 1 : 0);
 
-        if (signalCount >= 2) {
+        List<String> hitSignals = new ArrayList<>();
+        if (lowConfidence) {
+            hitSignals.add("模型低置信度(" + confidence + "<" + lowConfidenceThreshold + ")");
+        }
+        if (modelCandidateDiverse) {
+            hitSignals.add("候选差异较大");
+        }
+        if (contextStale) {
+            hitSignals.add("上下文快照接近过期(>" + contextStaleSeconds + "秒)");
+        }
+
+        if (hitSignals.size() >= 2) {
             StringBuilder basis = new StringBuilder("风险信号组合触发基线降级：");
-            if (lowConfidence) basis.append("模型低置信度(").append(confidence).append("<").append(lowConfidenceThreshold).append(")；");
-            if (modelCandidateDiverse) basis.append("候选差异较大；");
-            if (contextStale) basis.append("上下文快照接近过期(>").append(contextStaleSeconds).append("秒)；");
+            for (String s : hitSignals) {
+                basis.append(s).append("；");
+            }
             return new RiskAssessmentResult("HIGH", "RISK_SIGNAL_COMBINATION", basis.toString(),
                     confidence, "BASELINE_DOWNGRADE", ruleSetVersion);
+        }
+
+        if (hitSignals.size() == 1) {
+            // DEF-S3-095/TC-045.S2: 单一信号不直接阻断（LOW/AUTO_EXECUTE），但须在判定依据和事件中明确列出命中信号
+            String basis = "未命中确定性高风险规则；命中单一风险信号（" + hitSignals.get(0) + "），单一信号不直接阻断，低风险自动执行";
+            return new RiskAssessmentResult("LOW", null, basis,
+                    confidence, "AUTO_EXECUTE", ruleSetVersion);
         }
 
         // 3. 未命中任何规则/信号组合：低风险，自动执行

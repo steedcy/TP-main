@@ -234,15 +234,112 @@ class SpecialPassengerSupervisionF014Test {
         assertTrue(rComb.getJudgmentBasis().contains("模型低置信度"));
         assertTrue(rComb.getJudgmentBasis().contains("候选差异较大"));
 
-        // 边界：0.80 不算低置信度，与差异标签组合仍为 LOW
-        assertEquals("LOW", service.assess(validatedPlan(steps, "0.80"), "GENERAL_GUIDANCE", LocalDateTime.now(), true, 3).getRiskLevel());
+        // 边界：0.80 不算低置信度，与差异标签组合仍为 LOW（命中单一差异信号，列明差异标签）
+        RiskAssessmentResult rBoundary80 = service.assess(validatedPlan(steps, "0.80"), "GENERAL_GUIDANCE", LocalDateTime.now(), true, 3);
+        assertEquals("LOW", rBoundary80.getRiskLevel());
+        assertTrue(rBoundary80.getJudgmentBasis().contains("候选差异较大"));
         // 边界：0.79 为低置信度，与差异标签组合为 HIGH
         assertEquals("HIGH", service.assess(validatedPlan(steps, "0.79"), "GENERAL_GUIDANCE", LocalDateTime.now(), true, 3).getRiskLevel());
 
-        // 边界：59秒快照未过期，与低置信度组合仍为 LOW
-        assertEquals("LOW", service.assess(validatedPlan(steps, "0.79"), "GENERAL_GUIDANCE", LocalDateTime.now().minusSeconds(59), false, 3).getRiskLevel());
+        // 边界：59秒快照未过期，与低置信度组合仍为 LOW（命中单置信度信号，列明低置信度）
+        RiskAssessmentResult rBoundary59 = service.assess(validatedPlan(steps, "0.79"), "GENERAL_GUIDANCE", LocalDateTime.now().minusSeconds(59), false, 3);
+        assertEquals("LOW", rBoundary59.getRiskLevel());
+        assertTrue(rBoundary59.getJudgmentBasis().contains("模型低置信度"));
         // 边界：61秒快照已过期，与低置信度组合为 HIGH
         assertEquals("HIGH", service.assess(validatedPlan(steps, "0.79"), "GENERAL_GUIDANCE", LocalDateTime.now().minusSeconds(61), false, 3).getRiskLevel());
+    }
+
+    @Test
+    @DisplayName("DEF-S3-095 / TC-045.S2: 覆盖无信号、3个单信号、3个双信号组合及3信号全量依据与事件留痕")
+    void def_s3_095_signalTraceability_single_dual_triple() {
+        String steps = "[{\"stepSeq\":1,\"capabilityType\":\"CAP_INFO_DISPLAY\"}]";
+
+        // 1. 无风险信号：LOW，通用文案，AUTO_EXECUTE，事件留痕完整
+        RiskAssessmentResult rZero = service.assess(validatedPlan(steps, "0.95"), "GENERAL_GUIDANCE", LocalDateTime.now(), false, 3);
+        assertEquals("LOW", rZero.getRiskLevel());
+        assertNull(rZero.getRiskReasonCode());
+        assertEquals("AUTO_EXECUTE", rZero.getRecommendedAction());
+        assertTrue(rZero.getJudgmentBasis().contains("未命中确定性高风险规则"));
+        assertTrue(rZero.getJudgmentBasis().contains("风险信号数量不足以触发降级"));
+        String tZero = rZero.timelineDetail("监督判定");
+        assertTrue(tZero.contains("风险等级=LOW"));
+        assertTrue(tZero.contains("原因码=无"));
+        assertTrue(tZero.contains("推荐处置=AUTO_EXECUTE（自动执行）"));
+
+        // 2. 单信号1（仅低置信度 < 0.80）：LOW，列明低置信度具体数值与阈值，单一信号不阻断
+        RiskAssessmentResult rLowOnly = service.assess(validatedPlan(steps, "0.79"), "GENERAL_GUIDANCE", LocalDateTime.now(), false, 3);
+        assertEquals("LOW", rLowOnly.getRiskLevel());
+        assertNull(rLowOnly.getRiskReasonCode());
+        assertEquals("AUTO_EXECUTE", rLowOnly.getRecommendedAction());
+        assertTrue(rLowOnly.getJudgmentBasis().contains("模型低置信度(0.79<0.8)"));
+        assertTrue(rLowOnly.getJudgmentBasis().contains("单一信号不直接阻断"));
+        String tLowOnly = rLowOnly.timelineDetail("监督判定");
+        assertTrue(tLowOnly.contains("模型低置信度(0.79<0.8)"));
+        assertTrue(tLowOnly.contains("置信度=0.79"));
+
+        // 3. 单信号2（仅候选差异较大）：LOW，列明“候选差异较大”，单一信号不阻断
+        RiskAssessmentResult rDiverseOnly = service.assess(validatedPlan(steps, "0.99"), "GENERAL_GUIDANCE", LocalDateTime.now(), true, 3);
+        assertEquals("LOW", rDiverseOnly.getRiskLevel());
+        assertNull(rDiverseOnly.getRiskReasonCode());
+        assertEquals("AUTO_EXECUTE", rDiverseOnly.getRecommendedAction());
+        assertTrue(rDiverseOnly.getJudgmentBasis().contains("候选差异较大"));
+        assertTrue(rDiverseOnly.getJudgmentBasis().contains("单一信号不直接阻断"));
+        String tDiverseOnly = rDiverseOnly.timelineDetail("监督判定");
+        assertTrue(tDiverseOnly.contains("候选差异较大"));
+        assertTrue(tDiverseOnly.contains("推荐处置=AUTO_EXECUTE（自动执行）"));
+
+        // 4. 单信号3（仅快照过期 > 60s）：LOW，列明“上下文快照接近过期”，单一信号不阻断
+        RiskAssessmentResult rStaleOnly = service.assess(validatedPlan(steps, "0.95"), "GENERAL_GUIDANCE", LocalDateTime.now().minusSeconds(65), false, 3);
+        assertEquals("LOW", rStaleOnly.getRiskLevel());
+        assertNull(rStaleOnly.getRiskReasonCode());
+        assertEquals("AUTO_EXECUTE", rStaleOnly.getRecommendedAction());
+        assertTrue(rStaleOnly.getJudgmentBasis().contains("上下文快照接近过期(>60秒)"));
+        assertTrue(rStaleOnly.getJudgmentBasis().contains("单一信号不直接阻断"));
+        String tStaleOnly = rStaleOnly.timelineDetail("监督判定");
+        assertTrue(tStaleOnly.contains("上下文快照接近过期(>60秒)"));
+
+        // 5. 双信号组合A（低置信度 + 候选差异）：HIGH，RISK_SIGNAL_COMBINATION，列明两个信号
+        RiskAssessmentResult rDualA = service.assess(validatedPlan(steps, "0.79"), "GENERAL_GUIDANCE", LocalDateTime.now(), true, 3);
+        assertEquals("HIGH", rDualA.getRiskLevel());
+        assertEquals("RISK_SIGNAL_COMBINATION", rDualA.getRiskReasonCode());
+        assertEquals("BASELINE_DOWNGRADE", rDualA.getRecommendedAction());
+        assertTrue(rDualA.getJudgmentBasis().contains("模型低置信度(0.79<0.8)"));
+        assertTrue(rDualA.getJudgmentBasis().contains("候选差异较大"));
+        assertFalse(rDualA.getJudgmentBasis().contains("上下文快照接近过期"));
+
+        // 6. 双信号组合B（低置信度 + 快照过期）：HIGH，RISK_SIGNAL_COMBINATION，列明两个信号
+        RiskAssessmentResult rDualB = service.assess(validatedPlan(steps, "0.79"), "GENERAL_GUIDANCE", LocalDateTime.now().minusSeconds(65), false, 3);
+        assertEquals("HIGH", rDualB.getRiskLevel());
+        assertEquals("RISK_SIGNAL_COMBINATION", rDualB.getRiskReasonCode());
+        assertEquals("BASELINE_DOWNGRADE", rDualB.getRecommendedAction());
+        assertTrue(rDualB.getJudgmentBasis().contains("模型低置信度(0.79<0.8)"));
+        assertTrue(rDualB.getJudgmentBasis().contains("上下文快照接近过期(>60秒)"));
+        assertFalse(rDualB.getJudgmentBasis().contains("候选差异较大"));
+
+        // 7. 双信号组合C（候选差异 + 快照过期）：HIGH，RISK_SIGNAL_COMBINATION，列明两个信号
+        RiskAssessmentResult rDualC = service.assess(validatedPlan(steps, "0.95"), "GENERAL_GUIDANCE", LocalDateTime.now().minusSeconds(65), true, 3);
+        assertEquals("HIGH", rDualC.getRiskLevel());
+        assertEquals("RISK_SIGNAL_COMBINATION", rDualC.getRiskReasonCode());
+        assertEquals("BASELINE_DOWNGRADE", rDualC.getRecommendedAction());
+        assertTrue(rDualC.getJudgmentBasis().contains("候选差异较大"));
+        assertTrue(rDualC.getJudgmentBasis().contains("上下文快照接近过期(>60秒)"));
+        assertFalse(rDualC.getJudgmentBasis().contains("模型低置信度"));
+
+        // 8. 三信号组合（低置信度 + 候选差异 + 快照过期）：HIGH，RISK_SIGNAL_COMBINATION，列明全部3个信号
+        RiskAssessmentResult rTriple = service.assess(validatedPlan(steps, "0.79"), "GENERAL_GUIDANCE", LocalDateTime.now().minusSeconds(65), true, 3);
+        assertEquals("HIGH", rTriple.getRiskLevel());
+        assertEquals("RISK_SIGNAL_COMBINATION", rTriple.getRiskReasonCode());
+        assertEquals("BASELINE_DOWNGRADE", rTriple.getRecommendedAction());
+        assertTrue(rTriple.getJudgmentBasis().contains("模型低置信度(0.79<0.8)"));
+        assertTrue(rTriple.getJudgmentBasis().contains("候选差异较大"));
+        assertTrue(rTriple.getJudgmentBasis().contains("上下文快照接近过期(>60秒)"));
+        String tTriple = rTriple.timelineDetail("监督判定");
+        assertTrue(tTriple.contains("风险等级=HIGH"));
+        assertTrue(tTriple.contains("原因码=RISK_SIGNAL_COMBINATION"));
+        assertTrue(tTriple.contains("模型低置信度"));
+        assertTrue(tTriple.contains("候选差异较大"));
+        assertTrue(tTriple.contains("上下文快照接近过期"));
+        assertTrue(tTriple.contains("推荐处置=BASELINE_DOWNGRADE（基线降级）"));
     }
 
     @Test

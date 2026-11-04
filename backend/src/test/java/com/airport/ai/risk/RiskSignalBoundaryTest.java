@@ -69,4 +69,22 @@ class RiskSignalBoundaryTest {
         assertEquals("LOW", level("0.95", false, 0));
         assertNotNull(List.of());
     }
+
+    @Test
+    void def_s3_095_singleSignalListedInBasis() {
+        RiskAssessmentResult lowOnly = service.assess(plan("0.79"), "GENERAL_GUIDANCE", LocalDateTime.now(), false, 5);
+        assertEquals("LOW", lowOnly.getRiskLevel());
+        assertTrue(lowOnly.getJudgmentBasis().contains("模型低置信度(0.79<0.8)"));
+        assertTrue(lowOnly.getJudgmentBasis().contains("单一信号不直接阻断"));
+
+        RiskAssessmentResult diverseOnly = service.assess(plan("0.95"), "GENERAL_GUIDANCE", LocalDateTime.now(), true, 5);
+        assertEquals("LOW", diverseOnly.getRiskLevel());
+        assertTrue(diverseOnly.getJudgmentBasis().contains("候选差异较大"));
+        assertTrue(diverseOnly.getJudgmentBasis().contains("单一信号不直接阻断"));
+
+        RiskAssessmentResult staleOnly = service.assess(plan("0.95"), "GENERAL_GUIDANCE", LocalDateTime.now().minusSeconds(120), false, 5);
+        assertEquals("LOW", staleOnly.getRiskLevel());
+        assertTrue(staleOnly.getJudgmentBasis().contains("上下文快照接近过期(>60秒)"));
+        assertTrue(staleOnly.getJudgmentBasis().contains("单一信号不直接阻断"));
+    }
 }
