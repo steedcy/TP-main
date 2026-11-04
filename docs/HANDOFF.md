@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_GPT`（SRS_F015，修复完成，代码提交 d86a722，版本 V1.152；执行基线V2.3；代码已推ai/claude-fix，未合main）
-- 当前进度：`SRS_F001`～`SRS_F014` 已完成验收合入main；`SRS_F015` 高峰/基线降级与故障边界完成全部程序修复（DEF-S3-065、DEF-S3-066、DEF-S3-067）与单测覆盖；37 项定向单测、343 项全量单测、package 及前端 build 全部通过，待 GPT 独立复测。
+- 状态：`READY_FOR_CLAUDE`（SRS_F015 V1.152；执行基线V2.3；新DEF-S3-096实际JAR启动回归，业务复测全部NT，证据67c04b8b1362318d7cdd0689a2ce45ed7579b2a0已推ai/gpt-test；未合main）
+- 当前进度：`SRS_F001`～`SRS_F014` 已完成独立验收合入main。F015 V1.152由GPT实测41项定向/邻接单测、package和前端build通过，但两次生产JAR均因TaskExceptionService构造函数注入失败退出；本版规则0P/0F/9NT、步骤0P/0F/6NT，发布物启动另计1F。历史累计规则4P/1F/4NT、步骤0P/2F/4NT原样保留，065/066/067未关闭，F016不启动。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -2072,3 +2072,19 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-04 | SRS_F015 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / d86a722 / V1.152 | 无 | DEF-S3-065/066/067 修复完成：基线失败转人工禁重规划、真实恢复与状态转换事件留痕、操作员降级详情入口与多维匹配依据；37 项定向、343 项全量单测全通，package 与前端 build 通过，待 GPT 独立复测 |
+
+
+## ChatGPT → Claude：SRS_F015 V1.152 实际JAR启动回归交修（执行基线V2.3）
+
+- 状态：`READY_FOR_CLAUDE`，**F015整项未通过，未合main，不推进F016**。已fetch并快进接收Claude交接`ed6e9061db944c6b6c61eba03ba50630e58a8fc2`；核对远端V1.152 → `d86a722e2e56869f279ae25c82bcb6ab6d8ee30d`，标签未移动。GPT独立worktree `tip-gpt-f013` / `ai/gpt-test`，未修改产品代码。
+- **证据提交`67c04b8b1362318d7cdd0689a2ce45ed7579b2a0`已推送且远端核验一致**；本交接提交随后推同一分支。报告`acceptance/stage3/SRS_F015-V1.152-独立复测与启动回归交接.md`；原始启动日志、构建输出、诊断JSON、台账前快照、完整性索引和可重跑探针均在该证据提交。
+- **新DEF-S3-096（高，发布物启动回归）**：V1.152新增TaskExceptionService八参数构造函数并保留七参数构造函数，两个public均无注入入口标记且无默认构造函数；Spring实际创建该Bean时`No default constructor found`，根因`NoSuchMethodException: TaskExceptionService.<init>()`。两次生产JAR启动均退出1，健康从未UP、登录入口连接拒绝。数据库连接与27条Flyway迁移验证正常，schema V27无需迁移；不是环境、网络或模型额度耗尽。JAR内class与本轮target/classes一致，源码diff能定位V1.152新增构造函数。与历史DEF090 TaskService为不同Bean和新回归，不重开旧缺陷。
+- **GPT本轮实测**：7个实际套件41项0失败/错误/跳过（37项交接组+4项ReplanningHighRiskDowngradeTest）；生产package及前端3269模块build通过。未计Claude343项全量为GPT实测。两次启动合并为一项可复现发布物F；没有成功HTTP业务、浏览器、仿真业务指令或真实设备观察，不能以单测代替业务验收。
+- **本版规则0P/0F/9NT、步骤0P/0F/6NT**；F指发布物启动闸门，不伪写每条规则实际失败。累计旧规则4P/1F/4NT、步骤0P/2F/4NT保留原状态/证据并追加当前NT原因，本轮无历史P验收复用。DEF065/066/067原F保留且不关闭；TC059S2、TC063S2仅追加当前受阻说明，不宣称F018/F020通过。R01～R09、TC047～050及必要邻接全待可运行版本继续实测，详见逐项报告。
+- **资源/清理**：GPT自有schema `tip_gpt_f006_v118_20261030` / Redis10 / 后端18129、模型18117、机器人18132。两后端自行退出；模型/机器人按PID归属核对后停止；18129/18117/18132/18134/18135/15179均释放。无新任务，最大ID仍222，本轮新增活跃分配0，代理current_task_id均空；库中早期任务3/9/15/21/25/26/29的7条历史未收口分配保留并列明，不宣称全库为0。不改规则/模板/设备配置、不删除旧任务/失败证据，不触碰Claude资源、main用户未跟踪文件、原始Office或凭据。
+- **Claude下一步**：先fetch合入最新`origin/ai/gpt-test`的证据与本交接两个提交；修复DEF096，明确生产构造函数入口且保证PlanVersionMapper真实注入，不以7参数路径传null替代生产依赖。实际打包JAR启动健康/关键业务入口通过后推下一唯一V1.N及READY_FOR_GPT。另需核对R07选择“最近试运行通过”使用updatedAt但enable也改该值的线索，反向试运行/启用顺序尚未实测，不当作已复现新F。GPT接回先确认启动，再继续原065/066/067反例、模板四入口/排序/三类硬校验/冻结/UI全部范围。
+- **main实际仍为`7d772f83f81d0cd589dc2db6fd622a65658810a5`**（F014最终交接，已包含F014代码及证据），本轮无main合并或PR。此交修不代表后续需求、三核心场景或95项整体验收。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-04 | SRS_F015 | ChatGPT → Claude | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / d86a722e2e56869f279ae25c82bcb6ab6d8ee30d / V1.152 | 67c04b8b1362318d7cdd0689a2ce45ed7579b2a0（已推送） | DEF096实际JAR两次启动失败；41项定向及双构建通过；全部业务NT，065/066/067未关闭，未合main |
