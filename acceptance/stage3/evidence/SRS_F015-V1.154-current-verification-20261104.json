@@ -1,0 +1,393 @@
+{
+  "observedAt": "2026-11-04T21:05:35.704105+08:00",
+  "timezone": "Asia/Shanghai",
+  "version": "V1.154",
+  "productSha": "612ff7d39b96e9b947f97f53e6bab6322af87018",
+  "handoffCommit": "92544c38875ad39bc63d03e5605861aa495eeeee",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "redisDb": 10,
+  "health": {
+    "status": "UP"
+  },
+  "jarSha256": "55661b76bb762738215e93f2567ab818ec19db493df3c63b00cf14b0a7bf91ea",
+  "startup": {
+    "pid": 11208,
+    "port": 18129,
+    "schema": "tip_gpt_f006_v118_20261030",
+    "version": "V1.154"
+  },
+  "authenticatedEntrySmoke": {
+    "tasks": true,
+    "dashboard": true,
+    "agents": true
+  },
+  "ruleAssessment": {
+    "P": [
+      "SRS_F015.R01",
+      "SRS_F015.R03"
+    ],
+    "F": [
+      "SRS_F015.R06"
+    ],
+    "NT": [
+      "SRS_F015.R02",
+      "SRS_F015.R04",
+      "SRS_F015.R05",
+      "SRS_F015.R07",
+      "SRS_F015.R08",
+      "SRS_F015.R09"
+    ]
+  },
+  "stepAssessment": {
+    "P": [],
+    "F": [
+      "TC-048.S2"
+    ],
+    "NT": [
+      "TC-047.S1",
+      "TC-047.S2",
+      "TC-048.S1",
+      "TC-049.S1",
+      "TC-050.S1"
+    ]
+  },
+  "sortingRetest": {
+    "actualCorrectTemplate": true,
+    "times": {
+      "actualTrialTime": "2026-11-04T20:57:25.339288",
+      "selectionTime": "2026-11-04T20:57:25.339288",
+      "sameExactTime": true
+    },
+    "sqlTrialTimes": "230|DRY_RUN_SUCCEEDED|2026-11-04 20:57:23.095644\n231|DRY_RUN_SUCCEEDED|2026-11-04 20:57:25.339288",
+    "closedIssue": "DEF-S3-097",
+    "scope": "Recent-trial tie-break and exact persisted selection time passed. Other family/step priority dimensions remain NT; no entire R07 P claimed."
+  },
+  "uiRetest": {
+    "issue": "DEF-S3-067",
+    "result": "F (residual)",
+    "allFactsConfirmed": true,
+    "browserVersion": "156.0.4314.58",
+    "operatorTemplateGet200": {
+      "id": 39,
+      "templateName": "G154 F015 newer-trial-B 205720",
+      "templateIntent": "EXT_0FA30230",
+      "isPreset": false,
+      "inputParams": [
+        {
+          "name": "targetLocation",
+          "type": "String",
+          "required": true,
+          "defaultValue": "F2_TEST_GATE",
+          "range": null
+        }
+      ],
+      "steps": [
+        {
+          "stepSeq": 1,
+          "capabilityType": "CAP_NAVIGATION",
+          "paramMapping": [
+            {
+              "target": "targetLocation",
+              "source": "TEMPLATE_INPUT.targetLocation"
+            }
+          ],
+          "stepTimeout": 60,
+          "completionCondition": "routeGenerated=true"
+        }
+      ],
+      "templateVersion": "V1.0",
+      "templateStatus": "DISABLED",
+      "updatedAt": "2026-11-04T20:57:38.569764",
+      "updatedBy": "set"
+    },
+    "operatorInvalidWrite": {
+      "http": 403,
+      "body": {
+        "code": 2003,
+        "message": "无权限访问",
+        "timestamp": "2026-11-04T21:05:36.949552500+08:00",
+        "path": "/api/v1/baseline-templates/39",
+        "method": "PUT"
+      }
+    },
+    "explanation": "Task234 template-name and frozen-version links both point to unscoped /baseline-templates. On page4 target39 row is plain text with only read-only label, no detail links/buttons and name click opens no detail. Same disabled39 exposes full details via config admin edit dialog, no save submitted. API GET for operator succeeds; not a permission/server/data absence or disabled-template restriction."
+  },
+  "uiToolDiagnostics": [
+    "Native sky pipe unavailable on initial call, retry, and after fresh initialization. No native app input performed. Fell back to independent existing Edge headless via Playwright-core.",
+    "Interactive node_repl config-admin control timed out/reset on exact two-CJK edit-button name; headless browsers closed with kernel. First saved script preserves same selector failure; corrected Ant button name to whitespace-tolerant regex and wrote separate stable files. No product F assigned to test selector error.",
+    "Early template-list screenshot captured loading/no-data row; later fully loaded snapshots prove actual rows and detail absence. Initial transient image retained as diagnostic, not defect proof."
+  ],
+  "directedSuites": [
+    {
+      "name": "com.airport.ai.task.BaselineDowngradeAndFailureBoundaryF015Test",
+      "tests": "9",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.airport.ai.baseline.BaselineDryRunLifecycleTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.airport.ai.baseline.BaselineTemplateF008Test",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.airport.ai.task.BaselineDowngradeBindingF008Test",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.airport.ai.task.BaselineFailureNoReplanF015Test",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.airport.ai.task.RecoveryEventTruthF015Test",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.airport.ai.task.ReplanningHighRiskDowngradeTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.airport.ai.task.TaskExceptionServiceSpringContextTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  ],
+  "directedTotal": {
+    "tests": 43,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "currentFormalObservations": {
+    "trials": [
+      230,
+      231
+    ],
+    "formalTasks": [
+      232,
+      233,
+      234
+    ],
+    "httpBusinessObservations": 3,
+    "uiSemanticCases": 1,
+    "note": "UI case includes operator and config-admin control; exploration/selector correction do not add business pass counts. SQL/HTTP reuse across rules does not add observations."
+  },
+  "cleanupBeforeStop": {
+    "templates": [
+      {
+        "id": 38,
+        "templateName": "G154 F015 older-trial-A 205720",
+        "templateIntent": "EXT_0FA30230",
+        "isPreset": false,
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "F2_TEST_GATE",
+            "range": null
+          }
+        ],
+        "steps": [
+          {
+            "stepSeq": 1,
+            "capabilityType": "CAP_NAVIGATION",
+            "paramMapping": [
+              {
+                "target": "targetLocation",
+                "source": "TEMPLATE_INPUT.targetLocation"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "routeGenerated=true"
+          }
+        ],
+        "templateVersion": "V1.0",
+        "templateStatus": "DISABLED",
+        "updatedAt": "2026-11-04T20:57:38.553731",
+        "updatedBy": "set"
+      },
+      {
+        "id": 39,
+        "templateName": "G154 F015 newer-trial-B 205720",
+        "templateIntent": "EXT_0FA30230",
+        "isPreset": false,
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "F2_TEST_GATE",
+            "range": null
+          }
+        ],
+        "steps": [
+          {
+            "stepSeq": 1,
+            "capabilityType": "CAP_NAVIGATION",
+            "paramMapping": [
+              {
+                "target": "targetLocation",
+                "source": "TEMPLATE_INPUT.targetLocation"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "routeGenerated=true"
+          }
+        ],
+        "templateVersion": "V1.0",
+        "templateStatus": "DISABLED",
+        "updatedAt": "2026-11-04T20:57:38.569764",
+        "updatedBy": "set"
+      }
+    ],
+    "definition": {
+      "id": 17,
+      "definitionCode": "EXT_0FA30230",
+      "taskName": "G145 F013 baseline fixtures",
+      "goalTemplate": "Synthetic navigation to selected destination",
+      "sceneParams": [
+        {
+          "name": "targetLocation",
+          "type": "String",
+          "required": true,
+          "defaultValue": "F2_TEST_GATE",
+          "range": null
+        }
+      ],
+      "availableCapabilityTypes": [
+        "CAP_NAVIGATION"
+      ],
+      "constraintDescription": "Synthetic isolated F013 runtime baseline gate",
+      "completionCondition": "routeGenerated=true",
+      "isPreset": false,
+      "definitionStatus": "DISABLED",
+      "updatedAt": "2026-11-04T20:57:38.594175",
+      "updatedBy": "set"
+    },
+    "rules": [
+      {
+        "id": 1,
+        "ruleCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+        "ruleContent": "移动机器人会合或陪同服务对象为特殊旅客时判定为高风险；普通空间引导场景不命中",
+        "ruleVersion": "V1.2",
+        "enabled": true,
+        "createdAt": "2026-10-30T13:40:48.586219",
+        "updatedAt": "2026-11-04T10:29:06.080757",
+        "updatedBy": "set"
+      },
+      {
+        "id": 2,
+        "ruleCode": "RULE_CROSS_ZONE",
+        "ruleContent": "仅移动服务机器人适用；同一任务链条中跨越预定义区域边界1次及以上命中",
+        "ruleVersion": "V1.2",
+        "enabled": true,
+        "createdAt": "2026-10-30T13:40:48.586219",
+        "updatedAt": "2026-11-04T10:29:00.250949",
+        "updatedBy": "set"
+      },
+      {
+        "id": 3,
+        "ruleCode": "RULE_RESOURCE_CRITICAL",
+        "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+        "ruleVersion": "V3.6",
+        "enabled": true,
+        "createdAt": "2026-10-30T13:40:48.586219",
+        "updatedAt": "2026-11-04T10:31:33.457227",
+        "updatedBy": "set"
+      },
+      {
+        "id": 4,
+        "ruleCode": "GPT_F014_150_API",
+        "ruleContent": "Synthetic F014 validation fixture revised",
+        "ruleVersion": "V1.2",
+        "enabled": false,
+        "createdAt": "2026-11-04T08:07:33.779259",
+        "updatedAt": "2026-11-04T08:07:33.967337",
+        "updatedBy": "set"
+      },
+      {
+        "id": 5,
+        "ruleCode": "GPT_F014_150_UI",
+        "ruleContent": "Synthetic F014 browser-created rule revised",
+        "ruleVersion": "V1.1",
+        "enabled": false,
+        "createdAt": "2026-11-04T08:09:47.309055",
+        "updatedAt": "2026-11-04T08:10:48.202617",
+        "updatedBy": "gpt_f014_ui_150"
+      }
+    ],
+    "activeOwnAssignments": "0",
+    "agentsWithCurrentTask": "0"
+  },
+  "productUnmodified": true,
+  "historyReuse": {
+    "businessHistoryReused": false,
+    "frontendBuildObservationOnly": {
+      "originalSha": "d86a722e2e56869f279ae25c82bcb6ab6d8ee30d",
+      "currentSha": "612ff7d39b96e9b947f97f53e6bab6322af87018",
+      "frontendTreeUnchanged": true,
+      "evidence": "acceptance/stage3/evidence/SRS_F015-V1.152-frontend-build-20261104.txt",
+      "currentSmoke": "Current Edge156 headless/Vite UI task234 and template39. No new production frontend build claimed."
+    }
+  },
+  "remainingScope": "R02 other triggers; R04/05 failed hard-check/no-match; R07 exact-family/fewer-step comparisons; R08 original83 multi-candidate exhausted and legal recovery; R09 live edit/frozen execution. 065/066 not closed. R06 persistent trace fields passed but its mapped UI traceability step has residual067 F; do not mark whole R06 P.",
+  "stopped": [
+    {
+      "fixture": "vite-v154-runtime.json",
+      "ownershipVerified": true,
+      "pid": 8452,
+      "exitCode": 0
+    },
+    {
+      "fixture": "robot-v154-runtime.json",
+      "ownershipVerified": true,
+      "pid": 6868,
+      "exitCode": 0
+    },
+    {
+      "fixture": "runtime-v154.json",
+      "ownershipVerified": true,
+      "pid": 11208,
+      "exitCode": 0
+    },
+    {
+      "fixture": "model-v154-runtime.json",
+      "ownershipVerified": true,
+      "pid": 9592,
+      "exitCode": 0
+    }
+  ],
+  "portsReleased": {
+    "18129": true,
+    "18117": true,
+    "18132": true,
+    "18134": true,
+    "18135": true,
+    "15179": true
+  },
+  "headlessBrowsersAfterCleanup": 0
+}
