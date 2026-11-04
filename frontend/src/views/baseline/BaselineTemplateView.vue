@@ -5,7 +5,10 @@
 
     <a-table :dataSource="templates" :columns="columns" rowKey="id" :loading="listLoading">
       <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'templateIntent'">
+        <template v-if="column.key === 'templateName' || column.dataIndex === 'templateName'">
+          <a @click="openView(record)" data-testid="template-name-link">{{ record.templateName }}</a>
+        </template>
+        <template v-else-if="column.key === 'templateIntent'">
           {{ taskDefinitionLabel(record.templateIntent) }}
         </template>
         <template v-else-if="column.key === 'templateStatus'">
@@ -13,6 +16,7 @@
         </template>
         <template v-else-if="column.key === 'action'">
           <a-space wrap v-if="isConfigAdmin">
+            <a-button size="small" @click="openView(record)" data-testid="view-template-btn">查看</a-button>
             <a-button size="small" @click="openForm(record)">编辑</a-button>
             <a-button size="small" @click="openDryRun(record)">试运行</a-button>
             <a-button
@@ -32,10 +36,83 @@
               <a-button size="small" danger>删除</a-button>
             </a-popconfirm>
           </a-space>
-          <span v-else style="color: #999">只读</span>
+          <a-space wrap v-else>
+            <a-button size="small" @click="openView(record)" data-testid="view-template-btn">查看</a-button>
+            <span style="color: #999">只读</span>
+          </a-space>
         </template>
       </template>
     </a-table>
+
+    <!-- 只读详情弹窗（操作员与配置管理员通用，DEF-S3-067） -->
+    <a-modal
+      v-model:open="viewVisible"
+      title="基线模板详情（只读）"
+      width="900px"
+      :footer="null"
+    >
+      <div v-if="viewLoading" style="text-align: center; padding: 32px">
+        <a-spin />
+      </div>
+      <template v-else-if="viewTarget">
+        <a-descriptions bordered :column="2" size="small" style="margin-bottom: 16px">
+          <a-descriptions-item label="模板名称">{{ viewTarget.templateName }}</a-descriptions-item>
+          <a-descriptions-item label="模板意图">{{ taskDefinitionLabel(viewTarget.templateIntent) }}</a-descriptions-item>
+          <a-descriptions-item label="模板版本">V{{ viewTarget.templateVersion }}</a-descriptions-item>
+          <a-descriptions-item label="模板状态">
+            <a-tag :color="statusColor(viewTarget.templateStatus)">{{ statusLabel(viewTarget.templateStatus) }}</a-tag>
+          </a-descriptions-item>
+          <a-descriptions-item label="步骤数量">{{ (viewTarget.steps || []).length }} / 5</a-descriptions-item>
+          <a-descriptions-item label="模板属性">{{ viewTarget.isPreset ? '预置任务族模板' : '自定义模板' }}</a-descriptions-item>
+        </a-descriptions>
+
+        <a-divider orientation="left">模板输入参数</a-divider>
+        <a-table
+          :dataSource="viewTarget.inputParams || []"
+          :columns="[
+            { title: '参数名称', dataIndex: 'name' },
+            { title: '类型', dataIndex: 'type' },
+            { title: '必填', dataIndex: 'required', customRender: ({ text }) => text ? '是' : '否' },
+            { title: '默认值', dataIndex: 'defaultValue', customRender: ({ text }) => text ?? '—' },
+            { title: '取值范围/说明', dataIndex: 'range', customRender: ({ text }) => text || '—' }
+          ]"
+          :pagination="false"
+          size="small"
+          :rowKey="(r, idx) => r.name || idx"
+          style="margin-bottom: 16px"
+        />
+
+        <a-divider orientation="left">步骤（顺序执行，最多5个）</a-divider>
+        <div
+          v-for="(step, idx) in (viewTarget.steps || [])"
+          :key="step.stepSeq || idx"
+          style="border: 1px solid #f0f0f0; border-radius: 4px; padding: 12px; margin-bottom: 12px; background: #fafafa"
+        >
+          <div style="font-weight: bold; margin-bottom: 8px">步骤 {{ step.stepSeq || (idx + 1) }}</div>
+          <a-descriptions size="small" :column="2" bordered style="margin-bottom: 8px">
+            <a-descriptions-item label="步骤所需能力">{{ capabilityLabel(step.capabilityType) || step.capabilityType }}</a-descriptions-item>
+            <a-descriptions-item label="步骤超时时间（10~600秒）">{{ step.stepTimeout }} 秒</a-descriptions-item>
+            <a-descriptions-item label="步骤完成条件" :span="2">{{ step.completionCondition }}</a-descriptions-item>
+          </a-descriptions>
+
+          <div style="font-weight: bold; margin: 8px 0 4px 0">参数映射：</div>
+          <a-table
+            :dataSource="step.paramMapping || []"
+            :columns="[
+              { title: '本步骤参数(target)', dataIndex: 'target' },
+              { title: '来源(source)', dataIndex: 'source' }
+            ]"
+            :pagination="false"
+            size="small"
+            :rowKey="(r, i) => r.target || i"
+          />
+        </div>
+
+        <div style="text-align: right; margin-top: 16px">
+          <a-button @click="viewVisible = false">关闭</a-button>
+        </div>
+      </template>
+    </a-modal>
 
     <a-modal
       v-model:open="formVisible"
@@ -153,6 +230,7 @@
 
 <script setup>
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { useAuthStore } from '../../store/auth'
 import { message } from 'ant-design-vue'
 import {
@@ -166,6 +244,7 @@ import ParamTableEditor from '../../components/ParamTableEditor.vue'
 import ParamMappingEditor from '../../components/ParamMappingEditor.vue'
 
 const authStore = useAuthStore()
+const route = useRoute()
 const isConfigAdmin = computed(() => authStore.role === 'CONFIG_ADMIN')
 
 const templates = ref([])
@@ -180,13 +259,31 @@ async function fetchTaskDefinitions() {
 }
 const listLoading = ref(false)
 const columns = [
-  { title: '模板名称', dataIndex: 'templateName' },
+  { title: '模板名称', dataIndex: 'templateName', key: 'templateName' },
   { title: '模板意图', key: 'templateIntent' },
   { title: '步骤数', customRender: ({ record }) => `${(record.steps || []).length} / 5` },
   { title: '版本', dataIndex: 'templateVersion' },
   { title: '状态', key: 'templateStatus' },
   { title: '操作', key: 'action', width: 380 }
 ]
+
+const viewVisible = ref(false)
+const viewTarget = ref(null)
+const viewLoading = ref(false)
+
+async function openView(recordOrId) {
+  viewLoading.value = true
+  viewVisible.value = true
+  try {
+    const id = typeof recordOrId === 'object' ? recordOrId.id : recordOrId
+    const resp = await getBaselineTemplate(id)
+    viewTarget.value = resp.data
+  } catch (err) {
+    message.error('获取模板详情失败')
+  } finally {
+    viewLoading.value = false
+  }
+}
 
 function statusLabel(s) {
   return { DRAFT: '草稿', DRY_RUN_PASSED: '试运行通过', ENABLED: '已启用', DISABLED: '已停用' }[s] || s
@@ -386,8 +483,12 @@ async function handleCancelDryRun() {
 watch(dryRunVisible, value => { if (!value) stopDryRunPoll() })
 onUnmounted(stopDryRunPoll)
 
-onMounted(() => {
-  fetchList()
-  fetchTaskDefinitions()
+onMounted(async () => {
+  await fetchList()
+  await fetchTaskDefinitions()
+  const qId = route.query.templateId || route.query.id
+  if (qId) {
+    openView(Number(qId))
+  }
 })
 </script>
