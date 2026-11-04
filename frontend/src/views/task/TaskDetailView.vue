@@ -57,6 +57,7 @@
             <a-descriptions-item label="判定依据" :span="2" v-if="pv.judgmentBasis">{{ pv.judgmentBasis }}</a-descriptions-item>
             <a-descriptions-item label="置信度" v-if="pv.confidence != null">{{ pv.confidence }}</a-descriptions-item>
             <a-descriptions-item label="规则集版本" v-if="pv.ruleSetVersion">{{ pv.ruleSetVersion }}</a-descriptions-item>
+            <a-descriptions-item label="可执行步骤数 / 剩余额度" :span="2" data-testid="plan-quota">{{ quotaText(pv) }}</a-descriptions-item>
           </a-descriptions>
 
           <a-alert v-if="pv.validationErrors?.length" type="error" show-icon style="margin: 8px 0"
@@ -93,7 +94,12 @@
           </template>
 
           <p style="margin-top: 8px"><b>候选步骤：</b></p>
-          <a-table :dataSource="pv.planSteps" :columns="stepColumns" rowKey="stepSeq" size="small" :pagination="false" />
+          <a-table :dataSource="pv.planSteps" :columns="stepColumns" rowKey="stepSeq" size="small" :pagination="false">
+            <template #bodyCell="{ column, record }">
+              <template v-if="column.dataIndex === 'inputParams'">{{ formatInputParams(record.inputParams) }}</template>
+              <template v-else-if="column.dataIndex === 'paramSource'">{{ paramSourceText(record, sceneParamsOf(task)) }}</template>
+            </template>
+          </a-table>
         </a-tab-pane>
       </a-tabs>
     </a-card>
@@ -192,6 +198,7 @@ import { useAuthStore } from '../../store/auth'
 import { message } from 'ant-design-vue'
 import { taskProgress, progressText } from '../../utils/taskProgress'
 import { templateReference, matchBasis } from '../../utils/downgradeMatch'
+import { quotaText, formatInputParams, paramSourceText } from '../../utils/planSummary'
 import { getBaselineTemplate } from '../../api/baseline'
 import { getTask, getTaskEvents, getPlanVersions, getContextSnapshots, getStepAssignments, clarifyTask, manualAction, terminateTask } from '../../api/task'
 
@@ -257,8 +264,15 @@ const stepColumns = [
   { title: '所需能力', dataIndex: 'capabilityType' },
   { title: '前置条件', dataIndex: 'precondition' },
   { title: '完成条件', dataIndex: 'completionCondition' },
-  { title: '失败处理', dataIndex: 'failureHandling' }
+  { title: '失败处理', dataIndex: 'failureHandling' },
+  // 已保存的输入参数及其来源，逐步核对候选计划用了哪些事实（DEF-S3-036）
+  { title: '输入参数', dataIndex: 'inputParams' },
+  { title: '参数来源', dataIndex: 'paramSource' }
 ]
+
+function sceneParamsOf(t) {
+  try { return typeof t?.sceneParams === 'string' ? JSON.parse(t.sceneParams) : (t?.sceneParams || {}) } catch (e) { return {} }
+}
 
 function statusLabel(status) {
   return statusOptions.find((s) => s.key === status)?.label || status
