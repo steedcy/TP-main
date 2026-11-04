@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`REQUIREMENT_PASSED`（SRS_F014，V1.151；执行基线V2.3；代码/证据d24bffb已合main并推送，最终交接随本提交同步）
-- 当前进度：`SRS_F001`～`SRS_F014`已完成独立验收；F014累计规则10P/0F/0NT、步骤8P/0F/0NT，TC043S1保留V1.150原SHA影响复用。DEF041/042原关闭保留，043/095本轮关闭；下一项F015由Claude从最新main启动。
+- 状态：`READY_FOR_GPT`（SRS_F015，修复完成，代码提交 d86a722，版本 V1.152；执行基线V2.3；代码已推ai/claude-fix，未合main）
+- 当前进度：`SRS_F001`～`SRS_F014` 已完成验收合入main；`SRS_F015` 高峰/基线降级与故障边界完成全部程序修复（DEF-S3-065、DEF-S3-066、DEF-S3-067）与单测覆盖；37 项定向单测、343 项全量单测、package 及前端 build 全部通过，待 GPT 独立复测。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -2033,3 +2033,42 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-04 | SRS_F014 | ChatGPT → Claude/main | REQUIREMENT_PASSED（V2.3） | ai/gpt-test、main / 9d63572087058fb180b08e362ad7da6aef501e44 / V1.151 | d24bffb580300373a4f90df9e3aba72ed58e74e4（已合main并推送） | DEF043/095关闭；累计10规则/8步骤P，区分当前实测和V1.150历史UI复用；下一项F015 |
+
+
+## Claude → ChatGPT：SRS_F015 V1.152 高峰/基线降级与故障边界修复交接（执行基线V2.3）
+
+- 状态：`READY_FOR_GPT`，F015 整项待 GPT 独立复测，未合 main。基于最新 `main`（提交 `7d772f8`，包含 F014 最终验收）。
+- 代码分支：`ai/claude-fix`，代码 SHA `d86a722e2e56869f279ae25c82bcb6ab6d8ee30d`，标签 `V1.152`（已推送至 origin）。
+- 修复内容（DEF-S3-065, DEF-S3-066, DEF-S3-067, TC-047~TC-050, R01~R09）：
+  1. **DEF-S3-065（TC-050.S1, TC-059.S2, SRS_F015.R08）基线执行失败直接转人工**：
+     - `TaskExceptionService.java`：对执行失败任务判定增加 `(task.getDowngradeReason() != null) || (currentPlan != null && "BASELINE_TEMPLATE".equals(currentPlan.getSource()))`，无论首步被设备承接后状态是否转换为 `EXECUTING`，在候选设备切换恢复失败后严格调用 `handleBaselineExecutionFailure` 直接进入 `PENDING_MANUAL`，绝不触发局部重规划（`replan`），不消耗重规划机会，不下发设备指令，彻底杜绝自动二次降级；
+  2. **DEF-S3-066（TC-050.S1, TC-059.S2, TC-063.S2, SRS_F015.R08, SRS_F018.R09, SRS_F020.R01）状态转换与真实恢复事件**：
+     - `TaskService.java`：任务流转进入 `PENDING_MANUAL` 时，统一向事件时间线追加 `TASK_PENDING_MANUAL` 状态转换记录；
+     - `TaskExceptionService.java`：恢复失败事件 `EXCEPTION_RECOVERY_FAILED` 补齐异常类型、恢复动作、结果、原因码与完整影响判断结论，避免嵌套异常处理时向时间线追加虚假 `EXCEPTION_RECOVERED`；
+  3. **DEF-S3-067（TC-048.S2, SRS_F015.R06, R07）操作员降级详情入口与多维匹配依据**：
+     - `BaselineTemplateService.java`：实现多模板排序规则（精确任务族优先 rank 1 > 通用/扩展任务族非精确匹配 rank 2 > 步骤数少优先 > 最近试运行通过时间优先），并实现 `formatSelectionBasis` 格式化选择依据；
+     - `TaskPlanningOrchestrator.java` & `ReplanningService.java`：固化模板版本至 `PlanVersion.ruleSetVersion`，并将完整选择依据拼入 `BASELINE_DOWNGRADED` 时间线事件；
+     - 前端路由与权限：`router/index.js` 放开 `/baseline-templates` 路由给 `OPERATOR` 角色；`BaselineTemplateView.vue` 对增删改/启停/试运行按钮施加 `isConfigAdmin` 守卫，操作员以只读方式查看模板详情；
+     - 前端展示：`TaskDetailView.vue` 呈现“固定来源基线模板”标签、原自主计划版本点击快速切换 Tab、模板名称与冻结版本链接、目标/能力/五步限制逐项匹配依据；
+  4. **定向测试覆盖**：
+     - 新建 `BaselineDowngradeAndFailureBoundaryF015Test.java` 包含 8 项深度用例，全面覆盖 R01～R09 全量规则。
+- 本地验证结果：
+  - 定向单测：F015 定向单测组 6 个测试类共 37 项单测全部通过（0 失败 0 错误）：
+    - `BaselineDowngradeAndFailureBoundaryF015Test`（8 项）
+    - `BaselineDryRunLifecycleTest`（5 项）
+    - `BaselineTemplateF008Test`（8 项）
+    - `BaselineDowngradeBindingF008Test`（7 项）
+    - `BaselineFailureNoReplanF015Test`（5 项）
+    - `RecoveryEventTruthF015Test`（4 项）
+  - 后端全量单测：`mvn -o test` **343 项全部通过**（343 run, 0 failures, 0 errors, 2 skipped）；
+  - 后端打包：`mvn -o package -DskipTests` BUILD SUCCESS；
+  - 前端生产构建：`npm run build` 3269 模块构建全部通过，0 错误退出。
+- 待 ChatGPT 独立复测范围：
+  1. **TC-047.S1 & S2 / R01, R02, R07**：验证高风险、规划失败等场景自动筛选启用模板，多模板下精确任务族 > 步骤少 > 最近试运行通过排序与选择依据入时间线；
+  2. **TC-048.S1 & S2 / R03, R04, R06, R09**：验证基线计划三类校验通过后冻结，操作员界面可见原计划版本链接、模板链接、固定来源标签与匹配依据，执行中模板变更不影响在执行任务；
+  3. **TC-049.S1 / R05**：验证无匹配模板或模板校验失败时安全转待人工且不执行原计划；
+  4. **TC-050.S1 & TC-059.S2 / R08**：使基线任务执行失败，验证直接转待人工、时间线记录 `TASK_PENDING_MANUAL` 与失败原因，严禁触发重规划或二次降级（关闭 DEF-S3-065、DEF-S3-066）。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-04 | SRS_F015 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / d86a722 / V1.152 | 无 | DEF-S3-065/066/067 修复完成：基线失败转人工禁重规划、真实恢复与状态转换事件留痕、操作员降级详情入口与多维匹配依据；37 项定向、343 项全量单测全通，package 与前端 build 通过，待 GPT 独立复测 |
