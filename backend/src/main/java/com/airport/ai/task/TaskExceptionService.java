@@ -103,12 +103,13 @@ public class TaskExceptionService {
 
         // 业务规则4/6/7：先尝试一次候选设备切换作为恢复动作（能力缺口无候选可切换时恢复直接失败）
         String excludeAgentCode = findOfflineAgentCode(taskId, stepSeq);
-        boolean canRetry = "CAPABILITY_GAP".equals(exceptionType)
-                ? false // 无候选场景下"切换候选"本身即恢复动作已在assignStep中尝试过，不重复
+        boolean canRetry = ("CAPABILITY_GAP".equals(exceptionType) || "ASSIGNMENT_FAILED".equals(exceptionType))
+                ? false // 无候选场景或全部候选已拒绝场景下"切换候选"已尝试穷尽，不重复
                 : taskExecutionOrchestrator.hasAvailableCandidate(task.getCurrentPlanVersionId(), stepSeq,
                         excludeAgentCode == null ? List.of() : List.of(excludeAgentCode));
 
-        exception.setRecoveryAction(canRetry ? "候选设备切换" : "无可用候选设备，恢复动作未执行");
+        exception.setRecoveryAction(canRetry ? "候选设备切换"
+                : ("ASSIGNMENT_FAILED".equals(exceptionType) ? "全部候选设备均拒绝，恢复动作未执行" : "无可用候选设备，恢复动作未执行"));
 
         if (canRetry) {
             exception.setRecoveryAction("候选设备切换");
@@ -291,6 +292,9 @@ public class TaskExceptionService {
                 a.setStepStatus("FROZEN");
                 a.setUpdatedAt(LocalDateTime.now());
                 assignmentMapper.update(a);
+                if (a.getDeviceAgentId() != null) {
+                    taskExecutionOrchestrator.releaseAgent(a.getDeviceAgentId());
+                }
             }
         }
     }

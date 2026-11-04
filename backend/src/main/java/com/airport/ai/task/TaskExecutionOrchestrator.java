@@ -179,17 +179,24 @@ public class TaskExecutionOrchestrator {
                 skipUnavailableFlightChannel(currentTask, assignment, capabilityType);
                 return;
             }
-            // 异常路径2a/4b：无候选或全部候选已拒绝，进入5.5.3异常识别与恢复
-            taskEventService.append(taskId, "STEP_ASSIGNMENT_FAILED", "SYSTEM", "ERR_NO_CANDIDATE_AVAILABLE",
-                    "步骤" + stepSeq + "无可用候选设备（已尝试" + rejected.size() + "个候选均拒绝或无候选）");
-            taskExceptionService.handleException(taskId, stepSeq, "CAPABILITY_GAP",
-                    "步骤" + stepSeq + "无可用候选设备");
+            // 异常路径2a/4b：无候选(CAPABILITY_GAP)或全部候选已拒绝(ASSIGNMENT_FAILED)，进入5.5.3异常识别与恢复
+            boolean hasRejected = !rejected.isEmpty();
+            String errReasonCode = hasRejected ? "ERR_ALL_CANDIDATES_REJECTED" : "ERR_NO_CANDIDATE_AVAILABLE";
+            String exceptionType = hasRejected ? "ASSIGNMENT_FAILED" : "CAPABILITY_GAP";
+            String eventDetail = hasRejected
+                    ? "步骤" + stepSeq + "所有候选设备均已拒绝承接（已尝试" + rejected.size() + "个候选）"
+                    : "步骤" + stepSeq + "无可用候选设备（已尝试0个候选均拒绝或无候选）";
+            String exceptionDetail = hasRejected
+                    ? "步骤" + stepSeq + "全部候选设备均已拒绝承接"
+                    : "步骤" + stepSeq + "无可用候选设备";
+            taskEventService.append(taskId, "STEP_ASSIGNMENT_FAILED", "SYSTEM", errReasonCode, eventDetail);
+            taskExceptionService.handleException(taskId, stepSeq, exceptionType, exceptionDetail);
             return;
         }
 
         CandidateScore chosen = candidates.get(0);
         String candidateOrder = candidates.stream()
-                .map(c -> c.agent.getAgentCode() + "(距离" + c.distance + ",负载" + c.workloadScore + ")")
+                .map(c -> c.agent.getAgentCode() + "(匹配度" + c.matchScore + ",距离" + c.distance + ",负载" + c.workloadScore + ")")
                 .collect(Collectors.joining("；"));
         taskEventService.append(taskId, "AGENT_ASSIGNMENT_REQUESTED", "SYSTEM", null,
                 "步骤" + stepSeq + "候选排序（能力匹配->距离->负载）: " + candidateOrder
@@ -514,7 +521,7 @@ public class TaskExecutionOrchestrator {
         taskExceptionService.handleException(assignment.getTaskId(), assignment.getStepSeq(), "STEP_FAILED", detail);
     }
 
-    private void releaseAgent(Long deviceAgentId) {
+    public void releaseAgent(Long deviceAgentId) {
         if (deviceAgentId == null) return;
         deviceAgentMapper.findById(deviceAgentId).ifPresent(agent -> {
             agent.setWorkStatus("IDLE");
@@ -546,8 +553,15 @@ public class TaskExecutionOrchestrator {
         Map<Long, Device> deviceById = deviceMapper.findByIds(deviceIds).stream()
                 .collect(Collectors.toMap(Device::getId, d -> d));
 
+        Map<String, Object> inputParams = stepInputParams(step);
         BigDecimal targetX = asBigDecimal(step.get("targetX"));
+        if (targetX == null && inputParams != null) {
+            targetX = asBigDecimal(inputParams.get("targetX"));
+        }
         BigDecimal targetY = asBigDecimal(step.get("targetY"));
+        if (targetY == null && inputParams != null) {
+            targetY = asBigDecimal(inputParams.get("targetY"));
+        }
 
         List<CandidateScore> scored = new ArrayList<>();
         for (DeviceAgent agent : onlineIdle) {
@@ -557,15 +571,48 @@ public class TaskExecutionOrchestrator {
             boolean hasCapability = deviceHasCapability(device.getId(), capabilityType);
             if (!hasCapability) continue;
 
+            double matchScore = 1.0;
+            if (agent.getBusinessStatus() != null) {
+                try {
+                    com.fasterxml.jackson.databind.JsonNode node = MAPPER.readTree(agent.getBusinessStatus());
+                    if (node.has("capabilityMatch")) {
+                        matchScore = node.get("capabilityMatch").asDouble();
+                    } else if (node.has("matchDegree")) {
+                        matchScore = node.get("matchDegree").asDouble();
+                    }
+                } catch (Exception ignored) {}
+            }
+            String preferredType = CoreScenarioChannelPolicy.requiredType(taskFamily, capabilityType);
+            if (preferredType != null) {
+                String actual = "SIMULATOR".equals(device.getDeviceTypeCode())
+                        ? device.getSimulatedDeviceType() : device.getDeviceTypeCode();
+                if (!preferredType.equals(actual)) {
+                    matchScore = Math.min(matchScore, 0.8);
+                }
+            }
+
             double distance = (targetX != null && targetY != null
                     && device.getPositionX() != null && device.getPositionY() != null)
                     ? Math.hypot(device.getPositionX().doubleValue() - targetX.doubleValue(),
                                  device.getPositionY().doubleValue() - targetY.doubleValue())
                     : 0.0;
+
             int workloadScore = "IDLE".equals(agent.getWorkStatus()) ? 0 : 1;
-            scored.add(new CandidateScore(agent, distance, workloadScore));
+            if (agent.getBusinessStatus() != null) {
+                try {
+                    com.fasterxml.jackson.databind.JsonNode node = MAPPER.readTree(agent.getBusinessStatus());
+                    if (node.has("workloadScore")) {
+                        workloadScore = node.get("workloadScore").asInt();
+                    } else if (node.has("workload")) {
+                        workloadScore = node.get("workload").asInt();
+                    }
+                } catch (Exception ignored) {}
+            }
+
+            scored.add(new CandidateScore(agent, matchScore, distance, workloadScore));
         }
-        scored.sort(Comparator.comparingDouble((CandidateScore c) -> c.distance)
+        scored.sort(Comparator.comparingDouble((CandidateScore c) -> -c.matchScore)
+                .thenComparingDouble(c -> c.distance)
                 .thenComparingInt(c -> c.workloadScore)
                 .thenComparing(c -> c.agent.getAgentCode()));
         return scored;
@@ -576,7 +623,7 @@ public class TaskExecutionOrchestrator {
                 deviceId, capabilityType, "ENABLED");
     }
 
-    private record CandidateScore(DeviceAgent agent, double distance, int workloadScore) {}
+    private record CandidateScore(DeviceAgent agent, double matchScore, double distance, int workloadScore) {}
 
     private Map<String, Object> findStep(Long planVersionId, Integer stepSeq) {
         PlanVersion planVersion = planVersionMapper.findById(planVersionId).orElseThrow();

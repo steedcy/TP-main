@@ -224,7 +224,7 @@ public class DeviceAgentService {
                 for (DeviceCommandRecord command : commandMapper.findRecentByAgentCode(agent.getAgentCode(), 20)) {
                     if ("TASK_CANCEL".equals(command.getCommandType())
                             && terminatedTaskId.equals(command.getTaskId())
-                            && ("SENT".equals(command.getCommandStatus()) || "TIMED_OUT".equals(command.getCommandStatus()))) {
+                            && ("SENT".equals(command.getCommandStatus()) || "TIMED_OUT".equals(command.getCommandStatus()) || "DELIVERY_FAILED".equals(command.getCommandStatus()))) {
                         confirmed = commandMapper.updateStatus(agent.getAgentCode(), command.getCommandId(),
                                 "TASK_CANCEL", command.getAttemptNo(), "CONFIRMED_IDLE", null) == 1;
                         if (confirmed) break;
