@@ -278,17 +278,52 @@ public class BaselineTemplateService {
     }
 
     /**
-     * 匹配优先级：任务族精确匹配 > 步骤数少优先 > 最近试运行通过优先（对应5.4.6业务规则7）。
+     * 匹配优先级：任务族精确匹配 > 步骤数少优先 > 最近试运行通过优先（对应5.4.6业务规则7，SRS_F015.R07）。
      * "最近试运行通过优先"按updated_at倒序：enable()/试运行通过（DRY_RUN_PASSED）都会刷新该字段，
-     * 比此前用模板版本号倒序近似排序更贴近"最近一次试运行通过时间"的字面语义。
+     * 满足TC-047.S2排序要求，选择依据同步写入事件时间线。
      */
     public Optional<BaselineTemplate> matchForDowngrade(String taskFamily) {
-        List<BaselineTemplate> candidates = mapper.findByTaskFamilyAndTemplateStatus(taskFamily, "ENABLED");
-        return candidates.stream()
+        if (taskFamily == null || taskFamily.isBlank()) return Optional.empty();
+        List<BaselineTemplate> allEnabled = mapper.findAll().stream()
+                .filter(t -> "ENABLED".equals(t.getTemplateStatus()))
+                .toList();
+
+        return allEnabled.stream()
+                .filter(t -> matchRank(taskFamily, t.getTaskFamily()) > 0)
                 .sorted(Comparator
-                        .comparingInt((BaselineTemplate t) -> fromJsonSteps(t.getSteps()).size())
-                        .thenComparing(BaselineTemplate::getUpdatedAt, Comparator.reverseOrder()))
+                        .comparingInt((BaselineTemplate t) -> matchRank(taskFamily, t.getTaskFamily()))
+                        .thenComparingInt((BaselineTemplate t) -> fromJsonSteps(t.getSteps()).size())
+                        .thenComparing(BaselineTemplate::getUpdatedAt, Comparator.reverseOrder())
+                        .thenComparing(BaselineTemplate::getId, Comparator.nullsLast(Comparator.naturalOrder())))
                 .findFirst();
+    }
+
+    public int matchRank(String targetFamily, String templateFamily) {
+        if (targetFamily == null || templateFamily == null) return -1;
+        if (targetFamily.equalsIgnoreCase(templateFamily)) {
+            return 1; // 精确任务族匹配优先
+        }
+        String tfUpper = targetFamily.toUpperCase();
+        String tplUpper = templateFamily.toUpperCase();
+        if ("COMMON".equals(tplUpper) || "GENERAL".equals(tplUpper) || "ALL".equals(tplUpper) || "*".equals(tplUpper)) {
+            return 2; // 通用任务族非精确匹配
+        }
+        if (tfUpper.startsWith(tplUpper) || tplUpper.startsWith(tfUpper)) {
+            return 2; // 前缀非精确匹配
+        }
+        if ("EXTENDED".equals(tplUpper)) {
+            return 2; // 扩展任务族非精确匹配
+        }
+        return -1;
+    }
+
+    public String formatSelectionBasis(BaselineTemplate template, String taskFamily) {
+        if (template == null) return "";
+        int rank = matchRank(taskFamily, template.getTaskFamily());
+        int steps = fromJsonSteps(template.getSteps()).size();
+        String matchType = rank == 1 ? "任务族精确匹配(" + taskFamily + ")" : "任务族非精确匹配(" + template.getTaskFamily() + ")";
+        String timeStr = template.getUpdatedAt() != null ? template.getUpdatedAt().toString() : "未知";
+        return String.format("选择依据: [%s, 步骤数%d步少优先, 最近试运行通过时间%s优先]", matchType, steps, timeStr);
     }
 
     private String nextVersion(String current) {

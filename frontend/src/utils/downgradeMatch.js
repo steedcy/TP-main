@@ -9,8 +9,8 @@ export function templateReference(planVersion, template) {
   return {
     templateId: planVersion.baselineTemplateId ?? null,
     name: template?.templateName ?? null,
-    // 计划冻结时记录的模板版本；模板之后被改过也以冻结值为准
-    version: planVersion.snapshotId ?? template?.templateVersion ?? null,
+    // 计划冻结时记录的模板版本；模板之后被改过也以冻结值为准（ruleSetVersion优先，回退snapshotId与templateVersion）
+    version: planVersion.ruleSetVersion ?? planVersion.snapshotId ?? template?.templateVersion ?? null,
     currentVersion: template?.templateVersion ?? null
   }
 }

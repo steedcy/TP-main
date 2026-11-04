@@ -1,7 +1,7 @@
 <template>
   <div>
     <a-alert message="步骤数硬限5个，第6步禁止添加；预置任务族模板不可删除，仅可停用" type="warning" style="margin-bottom: 16px" />
-    <a-button type="primary" style="margin-bottom: 16px" @click="openForm(null)">新增模板</a-button>
+    <a-button v-if="isConfigAdmin" type="primary" style="margin-bottom: 16px" @click="openForm(null)">新增模板</a-button>
 
     <a-table :dataSource="templates" :columns="columns" rowKey="id" :loading="listLoading">
       <template #bodyCell="{ column, record }">
@@ -12,7 +12,7 @@
           <a-tag :color="statusColor(record.templateStatus)">{{ statusLabel(record.templateStatus) }}</a-tag>
         </template>
         <template v-else-if="column.key === 'action'">
-          <a-space wrap>
+          <a-space wrap v-if="isConfigAdmin">
             <a-button size="small" @click="openForm(record)">编辑</a-button>
             <a-button size="small" @click="openDryRun(record)">试运行</a-button>
             <a-button
@@ -32,6 +32,7 @@
               <a-button size="small" danger>删除</a-button>
             </a-popconfirm>
           </a-space>
+          <span v-else style="color: #999">只读</span>
         </template>
       </template>
     </a-table>
@@ -151,7 +152,8 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, reactive, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
+import { useAuthStore } from '../../store/auth'
 import { message } from 'ant-design-vue'
 import {
   listBaselineTemplates, getBaselineTemplate, createBaselineTemplate, updateBaselineTemplate,
@@ -162,6 +164,9 @@ import { listTaskDefinitions } from '../../api/taskDefinition'
 import { CAPABILITY_TYPES, capabilityLabel } from '../../constants/capability'
 import ParamTableEditor from '../../components/ParamTableEditor.vue'
 import ParamMappingEditor from '../../components/ParamMappingEditor.vue'
+
+const authStore = useAuthStore()
+const isConfigAdmin = computed(() => authStore.role === 'CONFIG_ADMIN')
 
 const templates = ref([])
 // 模板意图下拉改为动态取任务定义（对应5.6.1联动），取代硬编码4值枚举，扩展任务族也可配置降级模板

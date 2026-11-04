@@ -330,6 +330,7 @@ public class TaskPlanningOrchestrator {
         downgradedVersion.setVersionNo((int) (planVersionMapper.countByTaskId(taskId) + 1));
         downgradedVersion.setSource("BASELINE_TEMPLATE");
         downgradedVersion.setBaselineTemplateId(template.getId());
+        downgradedVersion.setRuleSetVersion(template.getTemplateVersion());
         downgradedVersion.setSnapshotId(snapshot.getSnapshotCode());
         downgradedVersion.setPlanSteps(toJson(templateSteps));
         applyValidationResult(downgradedVersion, validation);
@@ -364,8 +365,12 @@ public class TaskPlanningOrchestrator {
         task.setUpdatedAt(LocalDateTime.now());
         taskMapper.update(task);
 
-        taskEventService.append(taskId, "BASELINE_DOWNGRADED", "SYSTEM", null,
-                "已自动切换至基线模板" + template.getTemplateName() + "(" + template.getTemplateVersion() + ")，原因: " + downgradeReason);
+        String matchBasis = baselineTemplateService != null ? baselineTemplateService.formatSelectionBasis(template, taskFamily) : "";
+        String downgradeDetail = "已自动切换至基线模板" + template.getTemplateName() + "(" + template.getTemplateVersion() + ")，原因: " + downgradeReason;
+        if (matchBasis != null && !matchBasis.isBlank()) {
+            downgradeDetail += "，" + matchBasis;
+        }
+        taskEventService.append(taskId, "BASELINE_DOWNGRADED", "SYSTEM", null, downgradeDetail);
 
         // 对应5.5.1前置条件：降级执行同样立即启动执行监督链路
         taskExecutionOrchestrator.startExecution(taskId, downgradedVersion.getId());

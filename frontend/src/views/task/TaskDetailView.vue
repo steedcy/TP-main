@@ -44,7 +44,7 @@
 
     <!-- 对应5.4.3~5.4.6：候选步骤、三类校验结果与错误清单、监督判定、降级信息 -->
     <a-card title="计划版本与校验/判定结果" style="margin-top: 16px" v-if="planVersions.length">
-      <a-tabs>
+      <a-tabs v-model:activeKey="activePlanTab">
         <a-tab-pane v-for="pv in planVersions" :key="pv.versionNo"
                     :tab="`版本${pv.versionNo}（${sourceLabel(pv.source)}）`">
           <a-descriptions bordered :column="2" size="small">
@@ -74,14 +74,25 @@
           <!-- 基线降级：原计划与所用模板的关联入口，以及目标/能力/五步限制的逐项匹配依据（DEF-S3-067） -->
           <template v-if="pv.source === 'BASELINE_TEMPLATE'">
             <a-descriptions bordered :column="2" size="small" style="margin-top: 8px" data-testid="baseline-template-ref">
+              <a-descriptions-item label="计划来源">
+                <a-tag color="blue">固定来源基线模板</a-tag>
+              </a-descriptions-item>
+              <a-descriptions-item label="原计划版本" v-if="priorPlanVersion(pv)">
+                <a @click="activePlanTab = priorPlanVersion(pv).versionNo" data-testid="prior-plan-link">
+                  版本{{ priorPlanVersion(pv).versionNo }}（{{ sourceLabel(priorPlanVersion(pv).source) }}）
+                </a>
+              </a-descriptions-item>
               <a-descriptions-item label="所用基线模板">
-                <router-link v-if="authStore.role === 'CONFIG_ADMIN' && pv.baselineTemplateId" to="/baseline-templates">
+                <router-link v-if="pv.baselineTemplateId" to="/baseline-templates">
                   {{ templateRefOf(pv)?.name || ('模板#' + pv.baselineTemplateId) }}
                 </router-link>
-                <span v-else>{{ templateRefOf(pv)?.name || ('模板#' + pv.baselineTemplateId) }}</span>
+                <span v-else>—</span>
               </a-descriptions-item>
               <a-descriptions-item label="模板版本（冻结时）">
-                {{ templateRefOf(pv)?.version || '—' }}
+                <router-link v-if="pv.baselineTemplateId" to="/baseline-templates">
+                  {{ templateRefOf(pv)?.version || '—' }}
+                </router-link>
+                <span v-else>{{ templateRefOf(pv)?.version || '—' }}</span>
                 <span v-if="templateRefOf(pv)?.currentVersion && templateRefOf(pv).currentVersion !== templateRefOf(pv).version"
                       style="color: #999">（模板当前为 {{ templateRefOf(pv).currentVersion }}）</span>
               </a-descriptions-item>
@@ -225,6 +236,12 @@ const taskId = route.params.taskId
 const task = ref(null)
 const events = ref([])
 const planVersions = ref([])
+const activePlanTab = ref(1)
+function priorPlanVersion(pv) {
+  if (!planVersions.value || planVersions.value.length <= 1) return null
+  const prior = planVersions.value.filter((v) => v.versionNo < pv.versionNo)
+  return prior.length ? prior[prior.length - 1] : null
+}
 const contextSnapshots = ref([])
 const stepAssignments = ref([])
 const currentSteps = computed(() => planVersions.value.find(p => p.id === task.value?.currentPlanVersionId)?.planSteps || [])
@@ -353,6 +370,9 @@ async function fetchAll() {
   task.value = taskResp.data
   events.value = eventsResp.data
   planVersions.value = planResp.data
+  if (planResp.data?.length) {
+    activePlanTab.value = planResp.data[planResp.data.length - 1].versionNo
+  }
   contextSnapshots.value = snapResp.data
   stepAssignments.value = stepResp.data
   await loadTemplates(planResp.data)

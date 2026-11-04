@@ -31,6 +31,7 @@ public class TaskExceptionService {
     private final TaskEventService taskEventService;
     private final TaskExecutionOrchestrator taskExecutionOrchestrator;
     private final ReplanningService replanningService;
+    private final PlanVersionMapper planVersionMapper;
 
     public TaskExceptionService(TaskMapper taskMapper,
                                  TaskStepAssignmentMapper assignmentMapper,
@@ -39,6 +40,18 @@ public class TaskExceptionService {
                                  TaskEventService taskEventService,
                                  @Lazy TaskExecutionOrchestrator taskExecutionOrchestrator,
                                  @Lazy ReplanningService replanningService) {
+        this(taskMapper, assignmentMapper, taskExceptionMapper, deviceAgentMapper, taskEventService,
+                taskExecutionOrchestrator, replanningService, null);
+    }
+
+    public TaskExceptionService(TaskMapper taskMapper,
+                                 TaskStepAssignmentMapper assignmentMapper,
+                                 TaskExceptionMapper taskExceptionMapper,
+                                 DeviceAgentMapper deviceAgentMapper,
+                                 TaskEventService taskEventService,
+                                 @Lazy TaskExecutionOrchestrator taskExecutionOrchestrator,
+                                 @Lazy ReplanningService replanningService,
+                                 @Lazy PlanVersionMapper planVersionMapper) {
         this.taskMapper = taskMapper;
         this.assignmentMapper = assignmentMapper;
         this.taskExceptionMapper = taskExceptionMapper;
@@ -46,6 +59,7 @@ public class TaskExceptionService {
         this.taskEventService = taskEventService;
         this.taskExecutionOrchestrator = taskExecutionOrchestrator;
         this.replanningService = replanningService;
+        this.planVersionMapper = planVersionMapper;
     }
 
     /**
@@ -97,7 +111,8 @@ public class TaskExceptionService {
                 exception.setResolvedBy("SYSTEM");
                 taskExceptionMapper.update(exception);
                 taskEventService.append(taskId, "EXCEPTION_RECOVERY_FAILED", "SYSTEM", exceptionType,
-                        "恢复动作: 候选设备切换，结果: 失败（重新分配后任务状态为" + after.getStatus() + "）");
+                        "恢复动作: 候选设备切换，结果: 失败（重新分配后任务状态为" + after.getStatus() + "），异常类型: " + exceptionType
+                                + "，影响结论: " + exception.getImpactConclusion());
                 return;
             }
             exception.setRecoveryResult("SUCCESS");
@@ -115,7 +130,8 @@ public class TaskExceptionService {
         exception.setRecoveryResult("FAILED");
         taskExceptionMapper.update(exception);
         taskEventService.append(taskId, "EXCEPTION_RECOVERY_FAILED", "SYSTEM", exceptionType,
-                "恢复动作: " + exception.getRecoveryAction() + "，结果: 失败，判断计划是否可继续");
+                "恢复动作: " + exception.getRecoveryAction() + "，结果: 失败，异常类型: " + exceptionType
+                        + "，影响结论: 候选设备切换恢复失败，判断计划是否可继续");
 
         handleUnrecoverable(task, exception, stepSeq);
     }
@@ -171,7 +187,9 @@ public class TaskExceptionService {
 
         // 降级任务的判断不能只看状态：基线首步被承接后任务已转EXECUTING，状态不再是DOWNGRADING；
         // 以当前计划版本的来源为准，基线模板计划执行失败恢复穷尽后直接待人工，不再局部重规划（DEF-S3-065、F015.R08）
-        boolean isDowngradedTask = task.getStatus() == TaskStatus.DOWNGRADING || currentPlanIsBaseline(task);
+        boolean isDowngradedTask = task.getStatus() == TaskStatus.DOWNGRADING
+                || currentPlanIsBaseline(task)
+                || task.getDowngradeReason() != null;
         if (Boolean.TRUE.equals(task.getReplanUsed()) || isDowngradedTask) {
             String reason = isDowngradedTask
                     ? "基线降级任务执行异常且恢复失败，按业务规则不再二次自动降级"
@@ -188,9 +206,6 @@ public class TaskExceptionService {
                 "步骤" + stepSeq + "恢复失败且计划不可继续，重新规划机会未用，触发5.5.4局部重新规划");
         replanningService.replan(task.getId(), stepSeq, exception.getExceptionType() + ": " + exception.getReasonCode());
     }
-
-    @org.springframework.beans.factory.annotation.Autowired(required = false)
-    private PlanVersionMapper planVersionMapper;
 
     private boolean currentPlanIsBaseline(Task task) {
         if (planVersionMapper == null || task.getCurrentPlanVersionId() == null) return false;

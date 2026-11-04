@@ -509,7 +509,7 @@ public class TaskService {
                     "目标理解发现信息缺失，已补充" + (clarificationAnswers == null ? 0 : clarificationAnswers.size())
                             + "轮，待补充问题: " + response.getMissingInfoQuestions());
             if (task.getStatus() == TaskStatus.PENDING_MANUAL) {
-                taskEventService.append(task.getId(), "TASK_MANUAL_REQUIRED", "SYSTEM", "INFO_INCOMPLETE",
+                taskEventService.append(task.getId(), "TASK_PENDING_MANUAL", "SYSTEM", "INFO_INCOMPLETE",
                         task.getFailureReason());
             }
         }

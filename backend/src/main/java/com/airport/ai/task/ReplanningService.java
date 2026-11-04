@@ -395,6 +395,7 @@ public class ReplanningService {
         baselineVersion.setVersionNo((int) (planVersionMapper.countByTaskId(taskId) + 1));
         baselineVersion.setSource("BASELINE_TEMPLATE");
         baselineVersion.setBaselineTemplateId(template.getId());
+        baselineVersion.setRuleSetVersion(template.getTemplateVersion());
         baselineVersion.setSnapshotId(snapshot.getSnapshotCode());
         baselineVersion.setPlanSteps(toJson(merged));
         baselineVersion.setStructureCheckResult(validation.getStructureCheckResult());
@@ -417,9 +418,13 @@ public class ReplanningService {
         task.setStatus(TaskStatus.DOWNGRADING);
         task.setUpdatedAt(LocalDateTime.now());
         taskMapper.update(task);
-        taskEventService.append(taskId, "BASELINE_DOWNGRADED", "SYSTEM", risk.getRiskReasonCode(),
-                "局部重规划后切换至基线模板" + template.getTemplateName() + "(" + template.getTemplateVersion()
-                        + ")，保留" + completedSteps.size() + "个已完成步骤，剩余额度" + remainingQuota);
+        String matchBasis = baselineTemplateService != null ? baselineTemplateService.formatSelectionBasis(template, task.getTaskFamily()) : "";
+        String downgradeDetail = "局部重规划后切换至基线模板" + template.getTemplateName() + "(" + template.getTemplateVersion()
+                + ")，保留" + completedSteps.size() + "个已完成步骤，剩余额度" + remainingQuota;
+        if (matchBasis != null && !matchBasis.isBlank()) {
+            downgradeDetail += "，" + matchBasis;
+        }
+        taskEventService.append(taskId, "BASELINE_DOWNGRADED", "SYSTEM", risk.getRiskReasonCode(), downgradeDetail);
         taskExecutionOrchestrator.startExecution(taskId, baselineVersion.getId(), failedStepSeq);
     }
 
