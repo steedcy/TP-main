@@ -35,7 +35,13 @@
 
 ## 二、暂存改动（WIP / Staging）规整映射表
 
-在 `ai/claude-staging` 与工作区中暂存的改动，**严禁粗暴一次性合入主干**，必须在进入对应需求修复会话时精准移植、补全单测并交付：
+暂存改动位于 **`origin/ai/claude-staging`**（基线 `d66703e`，已推送；先 `git fetch origin ai/claude-staging`）。**严禁整分支合并**，必须在进入对应需求修复会话时只摘取该需求对应的提交：
+
+- 移植方法：`git cherry-pick <哈希>` 或手工比对移植核心变更；冲突时以 `main` 当前代码为准，保留 `main` 上已有的行为，严禁用暂存分支旧文件整文件覆盖 `main`。
+- 移植后立即把下表该行状态改为 `已移植（版本号）`，并在 Git 提交说明里写明原提交哈希（如 `ported from ai/claude-staging commit <hash>`），避免重复移植或重复登记。
+- 每个提交内的自检脚本（`*.check.mjs`）和单测一并带走。
+- 暂存分支的完整说明见该分支上的 `docs/CLAUDE_STAGED_FIXES.md`。
+- 分支内各提交彼此无顺序依赖，但 `4ec6695`、`332e250`、`01afe2d` 都改了 `TaskService.java` / 审计相关文件，同一会话里移植多个时注意按需求分别解决冲突。
 
 | 暂存来源 | 涉及文件 | 覆盖缺陷 / 规则 | 对应目标需求 | 移植策略与注意事项 | 状态 |
 |---|---|---|:---:|---|:---:|
@@ -48,7 +54,12 @@
 | **commit `64d1f8e`** | `TaskDetailView.vue` | **DEF-S3-007** | **SRS_F020** | 任务详情 404 告警并安全回退列表页，停止轮询 | 待移植 |
 | **commit `64d1f8e`** | `TaskListView.vue`, `taskListView.js` | **DEF-S3-060** (`F020.R04`) | **SRS_F020** | 待人工接管任务橙色标签与左侧提示条醒目高亮 | 待移植 |
 | **commit `332e250`** | `RequiredInfoGuard.java`<br/>`TaskService.java` | **DEF-S3-003** (`F024.R03`)<br/>**DEF-S3-004** (`F025.R01`)<br/>**DEF-S3-005** (`F026.R04`) | **SRS_F024**<br/>**SRS_F025**<br/>**SRS_F026** | 系统端强校验超规行李、特殊旅客、航班变动的必需字段；完整时发 `INFO_CHECK_OVERRIDE` 放行，替代大模型幻觉追问与套取旅客隐私 | 待移植 |
-| **工作区未提交改动** | `AuthService.java`<br/>`OperationLogService.java`<br/>`UserService.java` | **DEF-S3-009** (`F028.R03`) | **SRS_F028** | 用户创建、重置密码、状态切换、解锁操作记录清晰 `before`/`after` 结构化摘要，严格杜绝密码明文或哈希外泄 | 待移植 |
+| **commit `01afe2d`** | `AuthService.java`<br/>`OperationLogService.java`<br/>`UserService.java`<br/>`AccountAuditDetailTest.java` | **DEF-S3-009** (`F028.R03`) | **SRS_F028** | 用户创建、重置密码、状态切换、解锁操作记录带 `before`/`after` 结构化摘要，不含密码明文或哈希；解锁详情为合法 JSON 并经同一脱敏 | 待移植 |
+| **commit `c9a7d5f`** | `EventReasonCodes.java`<br/>`TaskEventService.java`<br/>`EventReasonCodesTest.java` | **DEF-S3-057** (`F027.R02`) | **SRS_F027** | 每条任务事件都有原因码：调用方显式给的保留，缺失时按事件类型补 `NORMAL_*`/`ERR_*`/`WARN_*`；扫描测试保证新增事件类型必须登记。**取值是约定，SRS 未定义，需求方可改 `EventReasonCodes`** | 待移植 |
+| **commit `6f7f389`** | `TaskTraceView.vue` | **DEF-S3-008** (`F027.R01`) | **SRS_F027** | 追溯页每个计划版本展开后显示来源、冻结时间、校验错误清单和步骤明细表（含被替换的历史版本） | 待移植 |
+| **commit `efe0790`** | `SituationController.java`<br/>`SituationView.vue`<br/>`situationMarkers.js`<br/>`SituationOfflineInfoTest.java` | **DEF-S3-047**、**DEF-S3-048** | **SRS_F023** | 态势快照为离线代理带 `offline`（原因码、离线时间、是否影响任务）；页面离线上报时间红色高亮、详情显示原因码与任务影响；标记层级 选中>离线>忙碌>空闲，悬停置顶，离线终端不再被机器人遮住 | 待移植 |
+| **commit `e2d50d2`** | `RiskRuleView.vue`<br/>`riskRuleForm.js` | **DEF-S3-042** | **SRS_F014** | 风险规则页新增弹窗 | **已被 main 取代，勿移植**（`69b841f` / V1.150 已实现等价功能） |
+| **commit `2099c75`** | `TaskDetailView.vue`<br/>`planSummary.js` | **DEF-S3-036** | **SRS_F012** | 计划详情步数/剩余额度/输入参数/参数来源 | **已被 main 取代，勿移植**（`6de0e9e` / F012 已验收；main 另有"规划说明"） |
 
 ---
 
@@ -59,19 +70,19 @@
 | 需求编号 | 需求名称 | 规则状态 (P/F/NT) | 关联用例步骤 | 待修缺陷 / 攻坚重点 | 目标版本 | 当前状态 |
 |---|---|:---:|---|---|:---:|:---:|
 | **SRS_F015** | 高峰/基线降级与故障边界 | P:4 F:1 NT:4 | TC-048.S2, TC-050.S1 | DEF-S3-065（基线模板失败直接转人工不重规划）；DEF-S3-066（候选切换真实状态恢复判定）。 | V1.142 | ⏳ 待Claude启动 |
-| **SRS_F016** | 设备匹配与能力约束评估 | P:3 F:0 NT:5 | TC-051, TC-052 | 在线状态、能力打标匹配、设备电量/载荷/空闲度硬约束过滤。 | V1.143 | 待启动 |
-| **SRS_F017** | 业务指令下发与状态流转 | P:4 F:1 NT:5 | TC-054.S2, TC-055 | DEF-S3-066（指令状态机与设备应答 ACK/NACK 流转超时判定，状态回滚）。 | V1.144 | 待启动 |
-| **SRS_F018** | 任务异常识别与单次重规划 | P:0 F:2 NT:8 | TC-058.S2, TC-059 | DEF-S3-064（执行超时与硬件报错识别，局部单次重规划机会消耗，二次失败转人工）。 | V1.145 | 待启动 |
-| **SRS_F019** | 局部重规划与上下文继承 | P:0 F:0 NT:9 | TC-060, TC-062 | 继承已完成步骤结果、剩余五步额度扣减、失效设备替换。 | V1.146 | 待启动 |
-| **SRS_F020** | 任务检索与全生命周期追踪 | P:3 F:4 NT:2 | TC-063～TC-065 | DEF-S3-006, 060, 062, 066（移植暂存：多条件关键字检索、待人工接管高亮、失败原因必填）。 | V1.147 | 待启动 |
-| **SRS_F021** | 人工终止与安全制动 | P:7 F:1 NT:0 | TC-067.S1 | DEF-S3-059（移植暂存：人工终止任务联动下发设备取消指令，记录设备执行结果与审计）。 | V1.148 | 待启动 |
-| **SRS_F022** | 任务定义与约束管理 | P:3 F:1 NT:4 | TC-068, TC-069 | DEF-S3-030（移植暂存：约束描述必填校验，任务族与能力绑定）。 | V1.149 | 待启动 |
-| **SRS_F023** | 协同态势与多维大屏监控 | P:7 F:1 NT:2 | TC-070.S1, TC-071 | DEF-S3-048（实时监控告警推送，大屏刷新时延与异常链路标记）。 | V1.150 | 待启动 |
+| **SRS_F016** | 设备匹配与能力约束评估 | P:3 F:0 NT:5 | TC-051, TC-052 | 台账无缺陷记录，也无修复提交；NOT_RUN 的 5 条规则等 GPT 测到失败项再修，不做推测性改动。 | V1.143 | 待启动 |
+| **SRS_F017** | 业务指令下发与状态流转 | P:4 F:1 NT:5 | TC-054.S2, TC-055 | DEF-S3-068（任务进度）已在 main（`107da41`），勿重修；DEF-S3-066 的事件真实性部分已在 `06448d6`，仅余复测。 | V1.144 | 待启动（修复已在 main，待复测） |
+| **SRS_F018** | 任务异常识别与单次重规划 | P:0 F:2 NT:8 | TC-058.S2, TC-059 | DEF-S3-064（异常列表原因码/历史归档）已在 main（`107da41`）、DEF-S3-066 已在 `06448d6`，勿重修；其余为 NOT_RUN 规则，等 GPT 测试结果。 | V1.145 | 待启动（修复已在 main，待复测） |
+| **SRS_F019** | 局部重规划与上下文继承 | P:0 F:0 NT:9 | TC-060, TC-062 | 台账无缺陷记录，也无修复提交；9 条规则全部 NOT_RUN，等 GPT 测到失败项再修，不做推测性改动。 | V1.146 | 待启动 |
+| **SRS_F020** | 任务检索与全生命周期追踪 | P:3 F:4 NT:2 | TC-063～TC-065 | DEF-S3-006, 060, 062（移植暂存 `4ec6695` + `64d1f8e`：关键字检索、待人工高亮、失败原因必填、详情 404 回退；DEF-S3-066 已在 main，勿重修）。 | V1.147 | 待启动 |
+| **SRS_F021** | 人工终止与安全制动 | P:7 F:1 NT:0 | TC-067.S1 | DEF-S3-059（移植暂存 `4ec6695`：终止操作记录带原因、前状态和每台设备的取消结果与 cancelCommandId）。 | V1.148 | 待启动 |
+| **SRS_F022** | 任务定义与约束管理 | P:3 F:1 NT:4 | TC-068, TC-069 | DEF-S3-030（移植暂存 `4ec6695`：约束描述必填校验）。 | V1.149 | 待启动 |
+| **SRS_F023** | 协同态势与多维大屏监控 | P:7 F:1 NT:2 | TC-070.S1, TC-071 | DEF-S3-047、048（移植暂存 `efe0790`：离线原因码与任务影响、标记层级）。 | V1.150 | 待启动 |
 | **SRS_F024** | 形式化目标歧义消除（超规行李） | P:2 F:2 NT:5 | TC-072, TC-073 | DEF-S3-003, DEF-S3-032（移植暂存：`RequiredInfoGuard` 超规行李必需字段把关）。 | V1.151 | 待启动 |
 | **SRS_F025** | 特殊旅客场景参数完整性 | P:0 F:1 NT:8 | TC-074, TC-075 | DEF-S3-004（移植暂存：特殊旅客服务参数完整性，拒绝身份隐私套取）。 | V1.152 | 待启动 |
 | **SRS_F026** | 航班变动应急协同响应 | P:0 F:1 NT:9 | TC-076, TC-077 | DEF-S3-005（移植暂存：航班变动信息系统级校验，禁止追问设备路由内部字段）。 | V1.153 | 待启动 |
-| **SRS_F027** | 任务全流程追溯与因果复盘 | P:4 F:2 NT:2 | TC-078, TC-079 | DEF-S3-008, DEF-S3-057（时间线事件完整性、异常上下文追溯链）。 | V1.154 | 待启动 |
-| **SRS_F028** | 安全审计与管理日志留痕 | P:7 F:1 NT:0 | TC-080, TC-081 | DEF-S3-009（移植暂存：用户管理关键操作 before/after 审计留痕，杜绝密码泄密）。 | V1.155 | 待启动 |
+| **SRS_F027** | 任务全流程追溯与因果复盘 | P:4 F:2 NT:2 | TC-078, TC-079 | DEF-S3-008、057（移植暂存 `6f7f389` 追溯页步骤明细、`c9a7d5f` 事件原因码）。 | V1.154 | 待启动 |
+| **SRS_F028** | 安全审计与管理日志留痕 | P:7 F:1 NT:0 | TC-080, TC-081 | DEF-S3-009（移植暂存 `01afe2d`：用户管理关键操作 before/after 审计留痕，杜绝密码泄密）。 | V1.155 | 待启动 |
 
 ### 2. 非功能需求全景（18 项待推进）
 
@@ -114,14 +125,22 @@
 
 ### 3. 用户在新对话中启动下一需求的标准指令模板
 
-用户在 Antigravity 中新建对话时，可直接复制以下模板（只需替换需求编号）：
+用户在 Antigravity 中新建对话时，可直接复制以下模板（只需替换需求编号与名称）：
 
 ```markdown
-# 启动需求修复：SRS_F013 计划三类校验与冻结机制（Claude 修复轮）
+# 启动需求修复：SRS_F0XX [需求名称]（Claude 修复轮）
 
 请严格遵守 AGENTS.md 与 docs/ROADMAP.md 全景规划：
-1. 先读取 AGENTS.md、docs/HANDOFF.md、docs/BASELINE_CHANGES.md 和 docs/ROADMAP.md 对齐全局基准与暂存清单。
-2. 新建独立工作区（从最新 origin/main 分支检出，不使用 tip-claude，不影响 GPT 资源）。
-3. 按照 docs/ROADMAP.md 中针对 SRS_F013 的规划要点进行代码修复与单测编写。
-4. 本地验证通过后，先提交产品代码并创建递增标签（如 V1.140），再更新 docs/HANDOFF.md 为 READY_FOR_GPT，并同步更新 docs/ROADMAP.md 的进度台账。
+1. 开工基准：先执行 git fetch origin，严格从最新 origin/main 分支检出独立工作区（如 tip-claude-f0xx，严禁触碰主工作区 tip 或 GPT 端口资源）。
+2. 文档与暂存对齐：读取 AGENTS.md、docs/HANDOFF.md、docs/BASELINE_CHANGES.md 和 docs/ROADMAP.md：
+   - 检查 docs/ROADMAP.md 第二节【暂存待移植代码清单】中涉及本需求的暂存提交（来自 origin/ai/claude-staging）；
+   - 【防冲突防覆盖关键准则】：
+     a. 若使用 git cherry-pick <哈希> 或手工移植代码，冲突时必须以 main 当前最新代码为准，保留 main 已通过验收的所有行为与单测；严禁用暂存分支旧文件整文件覆盖 main！
+     b. 若该项需求在 main 中已有等价实现或已被 main 取代，切勿重复移植；
+     c. 移植暂存代码后，提交说明必须写明原暂存提交哈希（例如：ported from ai/claude-staging commit <hash>），并同步把 docs/ROADMAP.md 暂存表该行状态更新为“已移植 (V1.N)”，避免后续会话再次登记同一项；
+3. 代码修复与验证：编写/补齐产品代码及修复单测，运行 mvn -o test 确保全量通过。
+4. 打包与提交：
+   - 运行 mvn -o package -DskipTests 确保生产构建通过；
+   - 先提交产品与单测代码，创建下一递增版本标签（如 V1.N）并推送到 origin；
+   - 再更新 docs/HANDOFF.md（标为 READY_FOR_GPT）与 docs/ROADMAP.md，提交并推送到 ai/claude-fix 分支。
 ```
