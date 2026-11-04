@@ -33,6 +33,15 @@ public class TaskExceptionService {
     private final TaskExecutionOrchestrator taskExecutionOrchestrator;
     private final ReplanningService replanningService;
     private final PlanVersionMapper planVersionMapper;
+    private final java.util.concurrent.ConcurrentHashMap<Long, List<TaskException>> activeExceptions = new java.util.concurrent.ConcurrentHashMap<>();
+
+    private List<TaskException> getTaskExceptions(Long taskId) {
+        List<TaskException> persisted = taskExceptionMapper.findByTaskIdOrderByOccurredAtDesc(taskId);
+        if (persisted != null && !persisted.isEmpty()) {
+            return persisted;
+        }
+        return activeExceptions.getOrDefault(taskId, List.of());
+    }
 
     public TaskExceptionService(TaskMapper taskMapper,
                                  TaskStepAssignmentMapper assignmentMapper,
@@ -80,7 +89,9 @@ public class TaskExceptionService {
         exception.setStepSeq(stepSeq);
         exception.setExceptionType(exceptionType);
         exception.setReasonCode(detail);
+        exception.setExceptionStatus("PROCESSING");
         taskExceptionMapper.insert(exception);
+        activeExceptions.computeIfAbsent(taskId, k -> new java.util.concurrent.CopyOnWriteArrayList<>()).add(exception);
         taskEventService.append(taskId, "EXCEPTION_DETECTED", "SYSTEM", exceptionType,
                 "识别到异常: " + exceptionType + "，步骤" + stepSeq + "，详情: " + detail);
 
@@ -100,32 +111,25 @@ public class TaskExceptionService {
         exception.setRecoveryAction(canRetry ? "候选设备切换" : "无可用候选设备，恢复动作未执行");
 
         if (canRetry) {
+            exception.setRecoveryAction("候选设备切换");
+            exception.setRecoveryResult(null);
+            exception.setExceptionStatus("PROCESSING");
+            exception.setImpactConclusion("已尝试候选设备切换，等待新设备承接与执行反馈以确认最终恢复结果");
+            taskExceptionMapper.update(exception);
+
             taskExecutionOrchestrator.retryAssignmentExcluding(task.getId(), task.getCurrentPlanVersionId(),
                     stepSeq, excludeAgentCode);
             // 重新分配本身可能立即失败并触发嵌套的异常处理（转人工、重规划等）。恢复结果以重新分配之后的
             // 任务实际状态为准，不能在任务已待人工/终止时再追加“恢复成功”（DEF-S3-066、F015.R08/F018.R09）
             Task after = taskMapper.findById(taskId).orElse(task);
             if (isTerminalOrManual(after.getStatus())) {
-                exception.setRecoveryResult("FAILED");
-                exception.setImpactConclusion("候选设备切换后重新分配仍失败，任务已转入" + after.getStatus() + "，恢复未成功");
-                exception.setExceptionStatus("RESOLVED");
-                exception.setResolvedAt(LocalDateTime.now());
-                exception.setResolvedBy("SYSTEM");
-                taskExceptionMapper.update(exception);
+                markAllUnresolvedFailed(taskId, "候选设备切换后重新分配仍失败，任务已转入" + after.getStatus() + "，恢复未成功");
                 taskEventService.append(taskId, "EXCEPTION_RECOVERY_FAILED", "SYSTEM", exceptionType,
                         "恢复动作: 候选设备切换，结果: 失败（重新分配后任务状态为" + after.getStatus() + "），异常类型: " + exceptionType
-                                + "，影响结论: " + exception.getImpactConclusion());
+                                + "，影响结论: 候选设备切换恢复失败");
                 return;
             }
-            exception.setRecoveryResult("SUCCESS");
-            exception.setImpactConclusion("已切换候选设备重新分配，计划可继续执行，不触发重新规划");
-            exception.setExceptionStatus("RESOLVED");
-            exception.setResolvedAt(LocalDateTime.now());
-            exception.setResolvedBy("SYSTEM");
-            taskExceptionMapper.update(exception);
-            taskEventService.append(taskId, "EXCEPTION_RECOVERED", "SYSTEM", exceptionType,
-                    "恢复动作: 候选设备切换，结果: 成功，步骤" + stepSeq + "已重新分配，异常类型: " + exceptionType
-                            + "，影响结论: 计划可继续执行");
+            // 候选设备切换已下发，等待新设备承接并执行成功后再确认恢复成功（DEF-S3-066）
             return;
         }
 
@@ -182,7 +186,49 @@ public class TaskExceptionService {
      * 恢复失败且判定计划不可继续，若重规划额度未用则触发5.5.4局部重新规划；
      * 额度已用或任务本身即为降级执行（DOWNGRADING）则直接转人工处理，不再自动降级。
      */
+    /**
+     * 对应DEF-S3-066：候选设备切换后，等待新设备承接并实际执行成功（完成条件满足）后，
+     * 再确认恢复成功并写入EXCEPTION_RECOVERED。
+     */
+    @Transactional
+    public void onStepRecovered(Long taskId, Integer stepSeq) {
+        List<TaskException> list = getTaskExceptions(taskId);
+        for (TaskException ex : list) {
+            if (stepSeq != null && stepSeq.equals(ex.getStepSeq()) && !"RESOLVED".equals(ex.getExceptionStatus())) {
+                ex.setRecoveryResult("SUCCESS");
+                ex.setExceptionStatus("RESOLVED");
+                ex.setResolvedAt(LocalDateTime.now());
+                ex.setResolvedBy("SYSTEM");
+                ex.setImpactConclusion("已切换候选设备重新分配，计划可继续执行，不触发重新规划");
+                taskExceptionMapper.update(ex);
+                taskEventService.append(taskId, "EXCEPTION_RECOVERED", "SYSTEM", ex.getExceptionType(),
+                        "恢复动作: 候选设备切换，结果: 成功，步骤" + stepSeq + "已重新分配，异常类型: " + ex.getExceptionType()
+                                + "，影响结论: 计划可继续执行");
+            }
+        }
+    }
+
+    private void markAllUnresolvedFailed(Long taskId, String reason) {
+        List<TaskException> list = getTaskExceptions(taskId);
+        for (TaskException ex : list) {
+            if (!"RESOLVED".equals(ex.getExceptionStatus())) {
+                ex.setRecoveryResult("FAILED");
+                ex.setExceptionStatus("RESOLVED");
+                ex.setResolvedAt(LocalDateTime.now());
+                ex.setResolvedBy("SYSTEM");
+                ex.setImpactConclusion("候选设备切换后重新分配仍失败（候选设备穷尽），任务转入人工处理，恢复未成功");
+                taskExceptionMapper.update(ex);
+            }
+        }
+    }
+
+    /**
+     * 对应异常路径4a/4b、5.5.3业务规则1a（降级任务基线执行失败不再二次自动降级）：
+     * 恢复失败且判定计划不可继续，若重规划额度未用则触发5.5.4局部重新规划；
+     * 额度已用或任务本身即为降级执行（DOWNGRADING）则直接转人工处理，不再自动降级。
+     */
     private void handleUnrecoverable(Task task, TaskException exception, Integer stepSeq) {
+        exception.setRecoveryResult("FAILED");
         exception.setImpactConclusion("候选设备切换恢复失败，当前计划不可继续执行");
         exception.setExceptionStatus("PROCESSING");
         taskExceptionMapper.update(exception);
@@ -200,10 +246,12 @@ public class TaskExceptionService {
             return;
         }
 
+        exception.setRecoveryResult("FAILED");
         exception.setExceptionStatus("RESOLVED");
         exception.setResolvedAt(LocalDateTime.now());
         exception.setResolvedBy("SYSTEM");
         taskExceptionMapper.update(exception);
+        markAllUnresolvedFailed(task.getId(), "步骤" + stepSeq + "恢复失败且计划不可继续，触发重新规划");
         taskEventService.append(task.getId(), "REPLANNING_TRIGGERED", "SYSTEM", null,
                 "步骤" + stepSeq + "恢复失败且计划不可继续，重新规划机会未用，触发5.5.4局部重新规划");
         replanningService.replan(task.getId(), stepSeq, exception.getExceptionType() + ": " + exception.getReasonCode());
@@ -216,16 +264,21 @@ public class TaskExceptionService {
     }
 
     private void markUnresolvable(Task task, TaskException exception, String reason) {
-        exception.setExceptionStatus("RESOLVED");
-        exception.setResolvedAt(LocalDateTime.now());
-        exception.setResolvedBy("SYSTEM");
-        taskExceptionMapper.update(exception);
+        if (exception != null) {
+            exception.setRecoveryResult("FAILED");
+            exception.setExceptionStatus("RESOLVED");
+            exception.setResolvedAt(LocalDateTime.now());
+            exception.setResolvedBy("SYSTEM");
+            taskExceptionMapper.update(exception);
+        }
+        markAllUnresolvedFailed(task.getId(), reason);
 
         task.setStatus(TaskStatus.PENDING_MANUAL);
         task.setFailureReason(reason);
         task.setUpdatedAt(LocalDateTime.now());
         taskMapper.update(task);
-        taskEventService.append(task.getId(), "TASK_PENDING_MANUAL", "SYSTEM", exception.getExceptionType(), reason);
+        taskEventService.append(task.getId(), "TASK_PENDING_MANUAL", "SYSTEM",
+                exception != null ? exception.getExceptionType() : "SYSTEM", reason);
     }
 
     /** 对应业务规则2："冻结未执行步骤"，已完成步骤结果保留，异常发生步骤之后的PENDING_ASSIGNMENT步骤置FROZEN */

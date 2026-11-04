@@ -45,12 +45,19 @@ class RecoveryEventTruthF015Test {
     void successfulReassignmentRecordsRecoveryWithTypeAndImpact() {
         service.handleException(83L, 2, "STEP_FAILED", "设备失败");
         verify(orchestrator).retryAssignmentExcluding(eq(83L), eq(7L), eq(2), any());
+        // 候选切换下发后，尚未收到执行成功反馈前，不应过早确认恢复成功
+        verify(events, never()).append(eq(83L), eq("EXCEPTION_RECOVERED"), any(), any(), any());
+        TaskException inProgress = lastException();
+        assertNull(inProgress.getRecoveryResult());
+        assertEquals("PROCESSING", inProgress.getExceptionStatus());
+
+        // 新设备承接并执行成功后，确认恢复成功
+        service.onStepRecovered(83L, 2);
         ArgumentCaptor<String> msg = ArgumentCaptor.forClass(String.class);
         verify(events).append(eq(83L), eq("EXCEPTION_RECOVERED"), eq("SYSTEM"), eq("STEP_FAILED"), msg.capture());
         assertTrue(msg.getValue().contains("STEP_FAILED") && msg.getValue().contains("影响结论"));
-        TaskException e = lastException();
-        assertEquals("SUCCESS", e.getRecoveryResult());
-        assertEquals("RESOLVED", e.getExceptionStatus());
+        assertEquals("SUCCESS", inProgress.getRecoveryResult());
+        assertEquals("RESOLVED", inProgress.getExceptionStatus());
     }
 
     @Test
@@ -76,6 +83,7 @@ class RecoveryEventTruthF015Test {
     @Test
     void recoveryEventKeepsAgentOfflineTypeAsItsReasonCode() {
         service.handleException(83L, 1, "AGENT_OFFLINE", "离线");
+        service.onStepRecovered(83L, 1);
         verify(events).append(eq(83L), eq("EXCEPTION_RECOVERED"), eq("SYSTEM"), eq("AGENT_OFFLINE"), anyString());
     }
 }

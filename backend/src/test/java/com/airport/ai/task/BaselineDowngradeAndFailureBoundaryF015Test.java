@@ -356,6 +356,7 @@ class BaselineDowngradeAndFailureBoundaryF015Test {
         // 2. 有候选设备切换成功
         when(taskExecutionOrchestrator.hasAvailableCandidate(anyLong(), anyInt(), anyList())).thenReturn(true);
         exceptionService.handleException(83L, 2, "STEP_FAILED", "步骤失败");
+        exceptionService.onStepRecovered(83L, 2);
 
         ArgumentCaptor<String> recoveredMsg = ArgumentCaptor.forClass(String.class);
         verify(taskEventService).append(eq(83L), eq("EXCEPTION_RECOVERED"), eq("SYSTEM"), eq("STEP_FAILED"), recoveredMsg.capture());

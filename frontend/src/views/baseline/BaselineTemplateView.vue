@@ -58,7 +58,7 @@
         <a-descriptions bordered :column="2" size="small" style="margin-bottom: 16px">
           <a-descriptions-item label="模板名称">{{ viewTarget.templateName }}</a-descriptions-item>
           <a-descriptions-item label="模板意图">{{ taskDefinitionLabel(viewTarget.templateIntent) }}</a-descriptions-item>
-          <a-descriptions-item label="模板版本">V{{ viewTarget.templateVersion }}</a-descriptions-item>
+          <a-descriptions-item label="模板版本">{{ formatVersion(viewTarget?.templateVersion) }}</a-descriptions-item>
           <a-descriptions-item label="模板状态">
             <a-tag :color="statusColor(viewTarget.templateStatus)">{{ statusLabel(viewTarget.templateStatus) }}</a-tag>
           </a-descriptions-item>
@@ -290,6 +290,10 @@ function statusLabel(s) {
 }
 function statusColor(s) {
   return { DRAFT: 'default', DRY_RUN_PASSED: 'blue', ENABLED: 'green', DISABLED: 'default' }[s]
+}
+function formatVersion(v) {
+  if (!v) return '—'
+  return String(v).startsWith('V') ? String(v) : 'V' + v
 }
 
 async function fetchList() {

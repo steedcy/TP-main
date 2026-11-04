@@ -135,7 +135,19 @@ public class TaskExecutionOrchestrator {
         String capabilityType = String.valueOf(step.get("capabilityType"));
         String family = taskMapper.findById(planVersionMapper.findById(planVersionId).orElseThrow().getTaskId())
                 .orElseThrow().getTaskFamily();
-        return !findRankedCandidates(capabilityType, step, excludeAgentCodes, family).isEmpty();
+        TaskStepAssignment assignment = assignmentMapper.findByPlanVersionIdAndStepSeq(planVersionId, stepSeq).orElse(null);
+        List<String> allExcludes = new ArrayList<>();
+        if (assignment != null && assignment.getRejectedAgentIds() != null) {
+            allExcludes.addAll(parseRejectedIds(assignment.getRejectedAgentIds()));
+        }
+        if (excludeAgentCodes != null) {
+            for (String code : excludeAgentCodes) {
+                if (code != null && !allExcludes.contains(code)) {
+                    allExcludes.add(code);
+                }
+            }
+        }
+        return !findRankedCandidates(capabilityType, step, allExcludes, family).isEmpty();
     }
 
     /**
@@ -352,6 +364,7 @@ public class TaskExecutionOrchestrator {
             releaseAgent(assignment.getDeviceAgentId());
             taskEventService.append(assignment.getTaskId(), "STEP_COMPLETED", "SYSTEM", null,
                     "步骤" + assignment.getStepSeq() + "完成条件已满足: " + step.get("completionCondition"));
+            taskExceptionService.onStepRecovered(assignment.getTaskId(), assignment.getStepSeq());
             Task currentTask = taskMapper.findById(assignment.getTaskId()).orElseThrow();
             if (!Boolean.TRUE.equals(currentTask.getIsDryRun())
                     && "OVERSIZE_BAGGAGE_HANDLING".equals(currentTask.getTaskFamily())

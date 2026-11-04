@@ -251,7 +251,7 @@
         <a-descriptions bordered :column="2" size="small" style="margin-bottom: 16px">
           <a-descriptions-item label="模板名称">{{ templateModalTarget.templateName }}</a-descriptions-item>
           <a-descriptions-item label="模板意图">{{ templateModalTarget.templateIntent }}</a-descriptions-item>
-          <a-descriptions-item label="模板版本">V{{ templateModalTarget.templateVersion }}</a-descriptions-item>
+          <a-descriptions-item label="模板版本">{{ formatVersion(templateModalTarget?.templateVersion) }}</a-descriptions-item>
           <a-descriptions-item label="模板状态">{{ templateModalTarget.templateStatus }}</a-descriptions-item>
           <a-descriptions-item label="步骤数量">{{ (templateModalTarget.steps || []).length }} / 5</a-descriptions-item>
           <a-descriptions-item label="模板属性">{{ templateModalTarget.isPreset ? '预置任务族模板' : '自定义模板' }}</a-descriptions-item>
@@ -572,6 +572,11 @@ async function openBaselineTemplateModal(templateId) {
   } finally {
     templateModalLoading.value = false
   }
+}
+
+function formatVersion(v) {
+  if (!v) return '—'
+  return String(v).startsWith('V') ? String(v) : 'V' + v
 }
 
 async function handleTerminate() {
