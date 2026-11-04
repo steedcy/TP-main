@@ -279,8 +279,9 @@ public class BaselineTemplateService {
 
     /**
      * 匹配优先级：任务族精确匹配 > 步骤数少优先 > 最近试运行通过优先（对应5.4.6业务规则7，SRS_F015.R07）。
-     * "最近试运行通过优先"按updated_at倒序：enable()/试运行通过（DRY_RUN_PASSED）都会刷新该字段，
-     * 满足TC-047.S2排序要求，选择依据同步写入事件时间线。
+     * "最近试运行通过优先"按真实绑定的试运行成功时间（DRY_RUN_SUCCEEDED）倒序：
+     * 避免使用updated_at导致启用/停用等配置更新误冒充试运行通过时间（DEF-S3-097）。
+     * 选择依据同步写入事件时间线。
      */
     public Optional<BaselineTemplate> matchForDowngrade(String taskFamily) {
         if (taskFamily == null || taskFamily.isBlank()) return Optional.empty();
@@ -293,9 +294,28 @@ public class BaselineTemplateService {
                 .sorted(Comparator
                         .comparingInt((BaselineTemplate t) -> matchRank(taskFamily, t.getTaskFamily()))
                         .thenComparingInt((BaselineTemplate t) -> fromJsonSteps(t.getSteps()).size())
-                        .thenComparing(BaselineTemplate::getUpdatedAt, Comparator.reverseOrder())
+                        .thenComparing(this::getTrialPassedTime, Comparator.reverseOrder())
                         .thenComparing(BaselineTemplate::getId, Comparator.nullsLast(Comparator.naturalOrder())))
                 .findFirst();
+    }
+
+    public LocalDateTime getTrialPassedTime(BaselineTemplate template) {
+        if (template == null) return LocalDateTime.MIN;
+        if (template.getLastDryRunPassedAt() != null) {
+            return template.getLastDryRunPassedAt();
+        }
+        if (template.getId() != null && mapper != null) {
+            try {
+                LocalDateTime dbTime = mapper.findLatestDryRunPassedTime(template.getId(), template.getTemplateVersion());
+                if (dbTime != null) {
+                    template.setLastDryRunPassedAt(dbTime);
+                    return dbTime;
+                }
+            } catch (Exception ignored) {
+                // In non-DB unit tests or if table doesn't have events
+            }
+        }
+        return LocalDateTime.MIN;
     }
 
     public int matchRank(String targetFamily, String templateFamily) {
@@ -322,7 +342,8 @@ public class BaselineTemplateService {
         int rank = matchRank(taskFamily, template.getTaskFamily());
         int steps = fromJsonSteps(template.getSteps()).size();
         String matchType = rank == 1 ? "任务族精确匹配(" + taskFamily + ")" : "任务族非精确匹配(" + template.getTaskFamily() + ")";
-        String timeStr = template.getUpdatedAt() != null ? template.getUpdatedAt().toString() : "未知";
+        LocalDateTime trialTime = getTrialPassedTime(template);
+        String timeStr = trialTime != null && !trialTime.equals(LocalDateTime.MIN) ? trialTime.toString() : "未知";
         return String.format("选择依据: [%s, 步骤数%d步少优先, 最近试运行通过时间%s优先]", matchType, steps, timeStr);
     }
 

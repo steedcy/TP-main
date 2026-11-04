@@ -20,6 +20,8 @@ public class BaselineTemplate {
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime updatedAt = LocalDateTime.now();
     private String updatedBy;
+    /** 最近一次试运行通过时间（DEF-S3-097） */
+    private LocalDateTime lastDryRunPassedAt;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -43,4 +45,6 @@ public class BaselineTemplate {
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
     public String getUpdatedBy() { return updatedBy; }
     public void setUpdatedBy(String updatedBy) { this.updatedBy = updatedBy; }
+    public LocalDateTime getLastDryRunPassedAt() { return lastDryRunPassedAt; }
+    public void setLastDryRunPassedAt(LocalDateTime lastDryRunPassedAt) { this.lastDryRunPassedAt = lastDryRunPassedAt; }
 }

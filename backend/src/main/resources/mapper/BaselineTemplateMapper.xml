@@ -38,6 +38,15 @@
         WHERE task_family = #{taskFamily} AND template_status = #{templateStatus}
     </select>
 
+    <select id="findLatestDryRunPassedTime" resultType="java.time.LocalDateTime">
+        SELECT MAX(e.occurred_at)
+        FROM task_events e
+        INNER JOIN plan_versions pv ON e.task_id = pv.task_id
+        WHERE pv.baseline_template_id = #{templateId}
+          AND pv.snapshot_id = #{templateVersion}
+          AND e.event_type = 'DRY_RUN_SUCCEEDED'
+    </select>
+
     <insert id="insert" parameterType="com.airport.ai.baseline.BaselineTemplate" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO baseline_templates (template_name, task_family, is_preset, input_params, steps,
                                           template_version, template_status, created_at, updated_at, updated_by)

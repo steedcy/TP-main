@@ -50,7 +50,11 @@ public class BaselineDryRunLifecycle {
         templates.findById(plan.getBaselineTemplateId()).ifPresent(template -> {
             if (java.util.Objects.equals(template.getTemplateVersion(), plan.getSnapshotId())) {
                 template.setTemplateStatus(success ? "DRY_RUN_PASSED" : "DRAFT");
-                template.setUpdatedAt(LocalDateTime.now()); templates.update(template);
+                template.setUpdatedAt(LocalDateTime.now());
+                if (success) {
+                    template.setLastDryRunPassedAt(LocalDateTime.now());
+                }
+                templates.update(template);
             }
         });
         events.append(taskId, success ? "DRY_RUN_SUCCEEDED" : cancelled ? "DRY_RUN_CANCELLED" : "DRY_RUN_FAILED", "SYSTEM",

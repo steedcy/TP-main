@@ -84,6 +84,7 @@ class BaselineDowngradeAndFailureBoundaryF015Test {
         t.setTemplateStatus("ENABLED");
         t.setUpdatedAt(updatedAt);
         t.setCreatedAt(updatedAt.minusDays(1));
+        t.setLastDryRunPassedAt(updatedAt);
         t.setInputParams("[]");
 
         StringBuilder steps = new StringBuilder("[");
@@ -231,6 +232,44 @@ class BaselineDowngradeAndFailureBoundaryF015Test {
         assertTrue(basis.contains("任务族精确匹配"));
         assertTrue(basis.contains("步骤数3步少优先"));
         assertTrue(basis.contains("最近试运行通过时间"));
+    }
+
+    /**
+     * DEF-S3-097 / SRS_F015.R07: 最近试运行通过优先必须基于真实试运行成功时间（DRY_RUN_SUCCEEDED），
+     * 严禁被后续 enable() 修改的 updated_at 干扰替换。
+     * 场景：模板A试运行通过时间为 t1（早），但后续在 t3 启用（updated_at = t3）；
+     *       模板B试运行通过时间为 t2（晚于t1），但在 t2 启用（updated_at = t2 < t3）；
+     * 规则要求同任务族同步骤数下选择试运行通过更近的模板B，而非按启用时间选A。
+     */
+    @Test
+    void r07_defS3097_trialSuccessPriorityNotAffectedByEnableOrder() {
+        LocalDateTime trialTimeA = LocalDateTime.of(2026, 11, 4, 15, 19, 34);
+        LocalDateTime trialTimeB = LocalDateTime.of(2026, 11, 4, 15, 19, 37);
+        LocalDateTime enableTimeB = LocalDateTime.of(2026, 11, 4, 15, 19, 38);
+        LocalDateTime enableTimeA = LocalDateTime.of(2026, 11, 4, 15, 19, 41);
+
+        // 模板A：试运行早（trialTimeA），启用晚（enableTimeA，导致 updatedAt 较晚）
+        BaselineTemplate templateA = createTemplate(36L, "G153 F015 older-trial-A", "EXT_0FA30230", 1, enableTimeA);
+        templateA.setTemplateVersion("V1.0");
+        templateA.setLastDryRunPassedAt(null); // 测试从 Mapper 动态查询
+
+        // 模板B：试运行晚（trialTimeB），启用早（enableTimeB）
+        BaselineTemplate templateB = createTemplate(37L, "G153 F015 newer-trial-B", "EXT_0FA30230", 1, enableTimeB);
+        templateB.setTemplateVersion("V1.0");
+        templateB.setLastDryRunPassedAt(null); // 测试从 Mapper 动态查询
+
+        when(templateMapper.findAll()).thenReturn(List.of(templateA, templateB));
+        when(templateMapper.findLatestDryRunPassedTime(36L, "V1.0")).thenReturn(trialTimeA);
+        when(templateMapper.findLatestDryRunPassedTime(37L, "V1.0")).thenReturn(trialTimeB);
+
+        Optional<BaselineTemplate> match = baselineTemplateService.matchForDowngrade("EXT_0FA30230");
+        assertTrue(match.isPresent(), "必须匹配到已启用的基线模板");
+        assertEquals(37L, match.get().getId(), "必须按最近试运行通过时间选择模板B(37)，严禁因A后启用而误选A(36)");
+
+        // 验证选择依据格式化输出包含真实的试运行通过时间 trialTimeB，而不是启用时间 enableTimeA
+        String basis = baselineTemplateService.formatSelectionBasis(match.get(), "EXT_0FA30230");
+        assertTrue(basis.contains(trialTimeB.toString()), "选择依据必须显示真实的试运行通过时间");
+        assertFalse(basis.contains(enableTimeA.toString()), "选择依据绝不能显示模板A的启用更新时间");
     }
 
     /**
