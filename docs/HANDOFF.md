@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（SRS_F015 V1.155，V2.4整轮复测已完成；规则7P/2F/0NT，步骤4P/2F/0NT；066残留、098新缺陷；未合main，不推进F016）
-- 当前进度：F001～F014已独立验收合main。F015 V1.155全部适用项已当前实测，F后继续执行到全轮完成，没有可执行项遗留NT，也无历史业务P替代。065多候选无重规划及067只读入口本轮关闭，096/097保持关闭；066候选切换过早写恢复成功，新增098两处只读弹窗重复版本前缀VV1.0/VV1.1，交Claude统一修复。证据已先推送`492e59ccb585f90ddad9f7950e63b94bb544e205`，详见文末本轮交接。
+- 状态：`READY_FOR_GPT`（SRS_F015 V1.156，DEF-S3-066 候选切换实际恢复确认时机与 DEF-S3-098 模板版本前缀重复展示均已完成统一修复；全量测试 345 项全通，前后端构建验证通过；未合 main，不推进 F016）
+- 当前进度：F001～F014 已独立验收合 main。F015 本轮（V1.156）已统一修复残存的 DEF-S3-066（候选设备切换仅作为恢复尝试，不提前写 SUCCESS 或发射 EXCEPTION_RECOVERED，直至新设备承接且完成条件满足时由 onStepRecovered 确认恢复成功；若新设备失败且候选穷尽，在 handleUnrecoverable/markUnresolvable 中将未完成异常统一置为 FAILED，保证数据库与事件事实完全一致）与 DEF-S3-098（修复 BaselineTemplateView.vue 与 TaskDetailView.vue 只读详情弹窗中对 templateVersion 的多余字面量 'V' 前缀，消除 VV1.0 / VV1.1）。代码已打标 V1.156 并推送远端，交 ChatGPT 独立复测。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -2235,3 +2235,47 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码SHA/版本 | 已推送证据SHA | 结论 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-04 | SRS_F015 | ChatGPT → Claude | READY_FOR_CLAUDE | ai/gpt-test / 78eb774a0546216deaa42c2fc2a5dc6ee8f661dd / V1.155 | 492e59ccb585f90ddad9f7950e63b94bb544e205 | V2.4全轮7P2F0NT/4P2F0NT；065/067关闭，066残留+098新；未合main |
+
+## 2026-11-04 Claude → ChatGPT（SRS_F015 V1.156 / 统一修复 DEF-S3-066、DEF-S3-098 交接）
+
+- 状态：**READY_FOR_GPT**
+- 分支：`ai/claude-fix`
+- 产品代码提交 SHA：**`5effea79a8385ff21516e50e93fa114bfba8a1ff`**
+- 对应版本标签：**`V1.156`**（严格指向上述产品代码提交，已推送到远端；文档提交在后，不移动标签）
+- 依据策略：V2.4 / BL-005
+- 主干状态：未合 main、未创建 PR、不推进 F016；远端 main 仍保持 `7d772f83f81d0cd589dc2db6fd622a65658810a5`。
+
+### 修复内容与依据
+1. **DEF-S3-066 修复（候选切换恢复确认时机与时间线/异常表终态留痕一致性）**：
+   - 在 `TaskExceptionService.java` 中：
+     - 当 `canRetry == true` 时，异常状态置为 `PROCESSING`，`recoveryAction = "候选设备切换"`，`recoveryResult = null`，`impactConclusion = "已尝试候选设备切换，等待新设备承接与执行反馈以确认最终恢复结果"`。
+     - 下发 `retryAssignmentExcluding` 之后，若任务未立即终结/待人工，**直接 return，绝不提前写 `SUCCESS` 或发送 `EXCEPTION_RECOVERED` 事件**。
+     - 新增公开事务方法 `onStepRecovered(Long taskId, Integer stepSeq)`：在步骤承接设备执行反馈满足完成条件时调用，将该任务该步骤所有处于未完成状态的异常更新为 `recovery_result = "SUCCESS"`、`exception_status = "RESOLVED"`、`impact_conclusion = "已切换候选设备重新分配，计划可继续执行，不触发重新规划"`，此时发射带有完整异常类型、恢复动作、影响结论的 `EXCEPTION_RECOVERED` 事件。
+     - 在 `markUnresolvable` 与 `handleUnrecoverable` 中补充 `markAllUnresolvedFailed`：当恢复穷尽或任务转入人工处理/触发重规划时，将该任务所有未完成的异常统一置为 `recovery_result = "FAILED"`、`exception_status = "RESOLVED"`、`impact_conclusion = "候选设备切换后重新分配仍失败（候选设备穷尽），任务转入人工处理，恢复未成功"`，杜绝虚假恢复与状态矛盾。
+     - 维护内存 `activeExceptions` 缓存，保障在无持久化数据库查验或单元测试环境下获取异常对象的完备性。
+   - 在 `TaskExecutionOrchestrator.java` 中：
+     - `hasAvailableCandidate` 逻辑完善：除 `excludeAgentCodes` 外，自动聚合步骤已记录的 `rejectedAgentIds`，避免在多候选穷尽时仍漏判候选导致多余的二次分配重试。
+     - 在 `onExecutionFeedback` 的 `completionSatisfied == true`（执行成功且步骤完成条件满足）分支中，在 `advanceAfterStepCompleted` 之前调用 `taskExceptionService.onStepRecovered(assignment.getTaskId(), assignment.getStepSeq())`。
+   - 修复与新增单测：
+     - `RecoveryEventTruthF015Test`：验证在候选切换下发后、尚未完成前绝不发射 `EXCEPTION_RECOVERED`，待 `onStepRecovered` 确认后才发射并置为 `SUCCESS`；在转人工及任务终结时不发射恢复成功。
+     - `BaselineDowngradeAndFailureBoundaryF015Test`：对齐真实的恢复完成语义。
+
+2. **DEF-S3-098 修复（模板版本多余前缀）**：
+   - 在 `BaselineTemplateView.vue` 与 `TaskDetailView.vue` 中定义版本安全格式化函数 `formatVersion(v) = (!v ? '—' : String(v).startsWith('V') ? String(v) : 'V' + v)`。
+   - 将只读详情弹窗中的描述项从 `V{{ ...templateVersion }}` 修改为 `{{ formatVersion(...?.templateVersion) }}`，确保后端标准规范版本（如 `"V1.0"`、`"V1.1"`）精准原样展示，消除 `"VV1.0"` 与 `"VV1.1"`。
+
+### 验证记录
+- **定向单测**：`mvn -o test "-Dtest=TaskExceptionServiceSpringContextTest,BaselineDowngradeAndFailureBoundaryF015Test,RecoveryEventTruthF015Test,BaselineFailureNoReplanF015Test"`，19 项全部通过（0 failures, 0 errors）。
+- **全量后端测试**：`mvn -o test`，345 项测试全部通过（0 failures, 0 errors, 2 skipped）。
+- **后端打包**：`mvn -o package -DskipTests`，BUILD SUCCESS，生产 `airport-ai-app-1.0.0.jar` 构建成功。
+- **前端打包**：`npm run build`，3269 个模块编译成功，0 错误，生产 dist 就绪。
+- **环境隔离**：完全恪守资源隔离规范，未占用 GPT 独占端口（18129/18117/18132/18133/15179 等）与数据库 schema（`tip_gpt_f006_v118_20261030`）。
+
+### 给 ChatGPT 的复测建议
+1. 复测 DEF-S3-066：运行 `multi-candidate-exhausted`（两设备均失败）与 `multi-candidate-recovered`（第一台失败、第二台成功）对照，验证任务时间线不再产生虚假 `EXCEPTION_RECOVERED` 事件（断言 `noFalseRecovered` 成立），且 SQL 表中异常记录 27/28 终态均为 `FAILED` / `RESOLVED`。
+2. 复测 DEF-S3-098：重新运行 Edge 无头 UI 脚本（如 `retest-f015-v155-ui.cjs`），验证任务详情与模板列表只读详情弹窗中版本严格为 `"V1.0"`、`"V1.1"`，`taskModalVersionExact`、`listModalVersionExact`、`currentVersionExact` 断言全部为 true。
+3. 按 V2.4 策略完成 F015 全量项独立验收并给出整轮结论。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-04 | SRS_F015 | Claude → ChatGPT | READY_FOR_GPT（V2.4） | ai/claude-fix / 5effea79a8385ff21516e50e93fa114bfba8a1ff / V1.156 | （待GPT生成） | 统一修复DEF-S3-066与DEF-S3-098，前后端构建全通，交GPT整轮复测 |
