@@ -4,6 +4,7 @@ import com.airport.ai.device.DeviceAgent;
 import com.airport.ai.device.DeviceAgentMapper;
 import com.airport.ai.event.TaskEventService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +23,7 @@ public class TaskExceptionService {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    @org.springframework.beans.factory.annotation.Autowired
+    @Autowired
     private com.airport.ai.baseline.BaselineDryRunLifecycle dryRunLifecycle;
     private final TaskMapper taskMapper;
     private final TaskStepAssignmentMapper assignmentMapper;
@@ -44,6 +45,7 @@ public class TaskExceptionService {
                 taskExecutionOrchestrator, replanningService, null);
     }
 
+    @Autowired
     public TaskExceptionService(TaskMapper taskMapper,
                                  TaskStepAssignmentMapper assignmentMapper,
                                  TaskExceptionMapper taskExceptionMapper,
