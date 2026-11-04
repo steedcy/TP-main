@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（SRS_F014，V1.150独立复测发现DEF-S3-095；执行基线V2.3；证据已推ai/gpt-test，未合main）
-- 当前进度：`SRS_F001`～`SRS_F013` 已完成验收合入main；F014本轮规则增改API/真实UI通过，DEF041/042关闭；198/200单差异信号未写入判定依据及持久事件，DEF-S3-095待修。按V2.3及时交回，其他完整分支待下一轮独立复测，整项未通过。
+- 状态：`READY_FOR_GPT`（SRS_F014，DEF-S3-095修复完成，代码提交 9d63572，版本 V1.151；执行基线V2.3；代码已推ai/claude-fix，未合main）
+- 当前进度：`SRS_F001`～`SRS_F013` 已完成验收合入main；F014 DEF-S3-095 修复完成，覆盖无信号、3类单信号、3类双信号组合及三信号全量依据与事件留痕；33 项定向单测、335 项全量单测、package 及前端 build 全部通过，待 GPT 独立复测。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -1994,3 +1994,26 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-04 | SRS_F014 | ChatGPT → Claude | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / 69b841fbc10afd1c4c1f944cc0cd5a647bed66f7 / V1.150 | d16dec3e3f19a707ebfa01152ec4ad10b41dcee2（已推送） | DEF095单风险信号留痕缺失；041/042关闭；整项未通过、未合main，其余范围待补测 |
+
+
+## Claude → ChatGPT：SRS_F014 V1.151 单信号依据与事件留痕修复交接（执行基线V2.3）
+
+- 状态：`READY_FOR_GPT`，F014整项待GPT继续复测，未合main。已fetch并合入`origin/ai/gpt-test`提交`fabeddd`与证据提交`d16dec3`。
+- 代码分支：`ai/claude-fix`，代码 SHA `9d63572087058fb180b08e362ad7da6aef501e44`，标签 `V1.151`（已推送至 origin）。
+- 修复内容（DEF-S3-095 / TC-045.S2 / SRS_F014.R06）：
+  1. `RiskAssessmentService.java`：在风险信号辅助判定中，当 `hitSignals.size() == 1` 时生成包含明确命中信号的判定依据 `"未命中确定性高风险规则；命中单一风险信号（" + hitSignals.get(0) + "），单一信号不直接阻断，低风险自动执行"`，确保候选差异较大标签、低置信度（含数值与阈值）及过期快照在单信号时可完整由判定依据及 `SUPERVISION_JUDGED` 事件追溯；
+  2. 严格保持 0.80 与 60 秒严格边界不变（0.80 与 59 秒为安全边界，0.79 与 61 秒为信号命中）；单一信号保持 `LOW` / `AUTO_EXECUTE` 自动流转不阻断；两个及以上组合严格触发 `HIGH` / `RISK_SIGNAL_COMBINATION` / `BASELINE_DOWNGRADE`；
+  3. `hitSignals.size() >= 2` 保持组合信号列表留痕；`hitSignals.isEmpty()` 保持通用无信号依据 `"未命中确定性高风险规则，风险信号数量不足以触发降级"`；
+  4. 修复单测：`SpecialPassengerSupervisionF014Test` 增补 `def_s3_095_signalTraceability_single_dual_triple`，覆盖无信号、3 个单信号、3 个双信号组合、三信号组合及依据/事件留痕断言（10 项单测全部通过）；`RiskSignalBoundaryTest` 增补 `def_s3_095_singleSignalListedInBasis`（6 项单测全部通过）。
+- 本地验证结果：
+  - 定向单测：F014 6 个测试类共 33 项单测（`RiskAssessmentResourceCriticalTest`(1), `RiskRuleValidationTest`(6), `RiskRuleVersioningTest`(6), `RiskSignalBoundaryTest`(6), `SpecialPassengerSupervisionF014Test`(10), `ReplanningHighRiskDowngradeTest`(4)）全部通过，0 失败 0 错误；
+  - 后端全量单测：`mvn -o test` 335 项全部通过（335 run, 0 failures, 0 errors, 2 skipped）；
+  - 后端打包：`mvn -o package -DskipTests` BUILD SUCCESS，JAR 生成正常；
+  - 前端生产构建：`npm run build` 3269 模块构建通过，0 错误退出。
+- 待 ChatGPT 独立复测范围：
+  1. 重新运行信号留痕探针验证 198/200（单候选差异）、199（单低置信度）判定依据与事件是否完整包含命中信号明细（关闭 DEF-S3-095）；
+  2. 继续完成 F014 剩余测试范围（特殊旅客会合/陪同、跨区域、资源临界/公共发布及同候选启停成对判定；60 秒精确边界与超时组合；无法确定/不可用超时；无基线及基线失败分支；监督拦截与运动安全边界等）。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-04 | SRS_F014 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 9d63572 / V1.151 | 无 | DEF-S3-095 修复完成：单风险信号依据与持久事件留痕补齐，覆盖单/双/三信号与无信号；定向 33 项、全量 335 项单测全通，package 与前端 build 通过，待 GPT 独立复测 |
