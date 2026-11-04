@@ -1,0 +1,94 @@
+{
+  "source": "SRS_F015-V1.156-full-round-20261104.json",
+  "sourceSha256": "e3b0d8d66bd541b8e0c7d3fe967298f2d422262cb9536ed9a983a35da942d82b",
+  "layer": "Offline assertions on original real HTTP/command/SQL observations; zero new tasks",
+  "cases": [
+    {
+      "name": "multi-candidate-recovered",
+      "taskId": 288,
+      "feedbackByAgent": {
+        "AGT-803437A3": [
+          "FAILED",
+          "FAILED"
+        ],
+        "AGT-D46B6787": [
+          "SUCCESS"
+        ]
+      },
+      "exceptions": [
+        {
+          "id": 36,
+          "task_id": 288,
+          "step_seq": 1,
+          "exception_type": "STEP_FAILED",
+          "occurred_at": "2026-11-04T23:55:56.027099",
+          "recovery_action": "候选设备切换",
+          "recovery_result": "SUCCESS",
+          "impact_conclusion": "已切换候选设备重新分配，计划可继续执行，不触发重新规划",
+          "reason_code": "执行结果: FAILED，原因: SIMULATED_DEVICE_ERROR",
+          "exception_status": "RESOLVED",
+          "resolved_at": "2026-11-04T23:56:02.402884",
+          "resolved_by": "SYSTEM"
+        }
+      ],
+      "recoveredEvents": [
+        {
+          "id": 2844,
+          "taskId": 288,
+          "eventType": "EXCEPTION_RECOVERED",
+          "occurredAt": "2026-11-04T23:56:02.405471",
+          "trigger": "SYSTEM",
+          "reasonCode": "STEP_FAILED",
+          "detailSummary": "恢复动作: 候选设备切换，结果: 成功，步骤1已重新分配，异常类型: STEP_FAILED，影响结论: 计划可继续执行"
+        }
+      ],
+      "result": "P"
+    },
+    {
+      "name": "multi-candidate-exhausted",
+      "taskId": 289,
+      "feedbackByAgent": {
+        "AGT-803437A3": [
+          "FAILED",
+          "FAILED"
+        ],
+        "AGT-D46B6787": [
+          "FAILED",
+          "FAILED"
+        ]
+      },
+      "exceptions": [
+        {
+          "id": 37,
+          "task_id": 289,
+          "step_seq": 1,
+          "exception_type": "STEP_FAILED",
+          "occurred_at": "2026-11-04T23:56:10.880801",
+          "recovery_action": "候选设备切换",
+          "recovery_result": "FAILED",
+          "impact_conclusion": "候选设备切换后重新分配仍失败（候选设备穷尽），任务转入人工处理，恢复未成功",
+          "reason_code": "执行结果: FAILED，原因: SIMULATED_DEVICE_ERROR",
+          "exception_status": "RESOLVED",
+          "resolved_at": "2026-11-04T23:56:17.062686",
+          "resolved_by": "SYSTEM"
+        },
+        {
+          "id": 38,
+          "task_id": 289,
+          "step_seq": 1,
+          "exception_type": "STEP_FAILED",
+          "occurred_at": "2026-11-04T23:56:17.051674",
+          "recovery_action": "无可用候选设备，恢复动作未执行",
+          "recovery_result": "FAILED",
+          "impact_conclusion": "候选设备切换恢复失败，当前计划不可继续执行",
+          "reason_code": "执行结果: FAILED，原因: SIMULATED_DEVICE_ERROR",
+          "exception_status": "RESOLVED",
+          "resolved_at": "2026-11-04T23:56:17.060183",
+          "resolved_by": "SYSTEM"
+        }
+      ],
+      "recoveredEvents": [],
+      "result": "P"
+    }
+  ]
+}

@@ -1,0 +1,848 @@
+{
+  "at": "2026-11-04T23:58:14.231112+08:00",
+  "timezone": "Asia/Shanghai",
+  "tag": "V1.156",
+  "productSha": "5effea7e267f5ef724a00a58716c67a59b284272",
+  "executionBaseline": "V2.4",
+  "receivedHandoff": "ee77957e776b5985393f1263d605905035bdacea",
+  "branch": "ai/gpt-test",
+  "mainBefore": "7d772f83f81d0cd589dc2db6fd622a65658810a5",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "redisDb": 10,
+  "jarSha256": "b5a041ed8c2134253f215742eca88e405bab3fae37be4066e5eef5c3710c22a5",
+  "health": {
+    "status": "UP"
+  },
+  "coreSmoke": {
+    "tasks": true,
+    "dashboard": true,
+    "agents": true
+  },
+  "ruleAssessment": {
+    "P": [
+      "SRS_F015.R01",
+      "SRS_F015.R02",
+      "SRS_F015.R03",
+      "SRS_F015.R04",
+      "SRS_F015.R05",
+      "SRS_F015.R06",
+      "SRS_F015.R07",
+      "SRS_F015.R08",
+      "SRS_F015.R09"
+    ],
+    "F": [],
+    "NT": []
+  },
+  "stepAssessment": {
+    "P": [
+      "TC-047.S1",
+      "TC-047.S2",
+      "TC-048.S1",
+      "TC-048.S2",
+      "TC-049.S1",
+      "TC-050.S1"
+    ],
+    "F": [],
+    "NT": []
+  },
+  "caseFiles": [
+    "SRS_F015-V1.156-full-round-20261104.json",
+    "SRS_F015-V1.156-full-round-20261104-supplement.json",
+    "SRS_F015-V1.156-full-round-20261104-prefix-control.json"
+  ],
+  "independentCases": [
+    {
+      "name": "high-valid",
+      "taskId": 267,
+      "result": "P"
+    },
+    {
+      "name": "malformed-plan",
+      "taskId": 268,
+      "result": "P"
+    },
+    {
+      "name": "planning-unavailable",
+      "taskId": 269,
+      "result": "P"
+    },
+    {
+      "name": "understanding-unavailable",
+      "taskId": 270,
+      "result": "P"
+    },
+    {
+      "name": "capability-hard-fail",
+      "taskId": 271,
+      "result": "P"
+    },
+    {
+      "name": "constraint-hard-fail",
+      "taskId": 272,
+      "result": "P"
+    },
+    {
+      "name": "structure-hard-fail-six",
+      "taskId": 286,
+      "result": "P"
+    },
+    {
+      "name": "valid-five-steps",
+      "taskId": 285,
+      "result": "P"
+    },
+    {
+      "name": "true-empty-family-no-match",
+      "taskId": 292,
+      "result": "P"
+    },
+    {
+      "name": "disabled-template",
+      "taskId": 273,
+      "result": "P"
+    },
+    {
+      "name": "manual-ui-switch",
+      "taskId": 274,
+      "result": "P"
+    },
+    {
+      "name": "fewer-steps",
+      "taskId": 278,
+      "result": "P"
+    },
+    {
+      "name": "exact-family",
+      "taskId": 280,
+      "result": "P"
+    },
+    {
+      "name": "recent-trial-reversed-enable",
+      "taskId": 283,
+      "result": "P"
+    },
+    {
+      "name": "non-exact-eligible-control",
+      "taskId": 294,
+      "result": "P"
+    },
+    {
+      "name": "multi-candidate-recovered",
+      "taskId": 288,
+      "result": "P"
+    },
+    {
+      "name": "multi-candidate-exhausted",
+      "taskId": 289,
+      "result": "P"
+    },
+    {
+      "name": "frozen-live-edit",
+      "taskId": 290,
+      "result": "P"
+    },
+    {
+      "name": "autonomous-replan-neighbor",
+      "taskId": 291,
+      "result": "P"
+    }
+  ],
+  "tasks": {
+    "all": [
+      266,
+      267,
+      268,
+      269,
+      270,
+      271,
+      272,
+      273,
+      274,
+      275,
+      276,
+      277,
+      278,
+      279,
+      280,
+      281,
+      282,
+      283,
+      284,
+      285,
+      286,
+      287,
+      288,
+      289,
+      290,
+      291,
+      292,
+      293,
+      294
+    ],
+    "trials": [
+      266,
+      275,
+      276,
+      277,
+      279,
+      281,
+      282,
+      284,
+      287,
+      293
+    ],
+    "formal": [
+      267,
+      268,
+      269,
+      270,
+      271,
+      272,
+      273,
+      274,
+      278,
+      280,
+      283,
+      285,
+      286,
+      288,
+      289,
+      290,
+      291,
+      292,
+      294
+    ],
+    "note": "29 real tasks =10 real passed dry runs +19 distinct formal observations. Browser actions/static API bounds/unit tests are separate layers."
+  },
+  "historyBusinessReuse": [],
+  "staticBounds": {
+    "zero": {
+      "http": 400,
+      "body": {
+        "code": 3001,
+        "message": "请添加至少1个步骤",
+        "timestamp": "2026-11-04T23:57:43.063732100+08:00",
+        "path": "/api/v1/baseline-templates",
+        "method": "POST"
+      }
+    },
+    "six": {
+      "http": 400,
+      "body": {
+        "code": 4403,
+        "message": "模板步骤总数超过5",
+        "timestamp": "2026-11-04T23:57:43.075497400+08:00",
+        "path": "/api/v1/baseline-templates",
+        "method": "POST"
+      }
+    },
+    "countBefore": "52",
+    "countAfter": "52",
+    "checks": {
+      "zeroRejected": true,
+      "sixRejected": true,
+      "noInvalidTemplateWritten": true
+    }
+  },
+  "ui": {
+    "browser": "156.0.4314.58",
+    "layer": "Real Edge headless actions on current Vite source, production frontend build separately passed; no physical device/native UI claim",
+    "checks": {
+      "fixedSource": true,
+      "matchBasis": true,
+      "priorPlanLink": true,
+      "taskDirectReadOnly": true,
+      "taskModalVersionExact": true,
+      "nameLinkOpensReadonly": true,
+      "listModalVersionExact": true,
+      "viewButtonOpensReadonly": true,
+      "frozenVersionEntryCanView": true,
+      "queryDirect": true,
+      "original39Readonly": true,
+      "configReadonly": true,
+      "configCanEdit": true,
+      "frozenVersionDistinguished": true
+    },
+    "frozenChecks": {
+      "frozenAndCurrentVersionDistinguished": true,
+      "readonlyCurrentDetails": true,
+      "currentVersionExact": true
+    },
+    "taskVersion": "V1.0",
+    "listVersion": "V1.0",
+    "currentEditedVersion": "V1.1"
+  },
+  "issues": {
+    "closedNow": [
+      "DEF-S3-066",
+      "DEF-S3-098"
+    ],
+    "currentRegressionPassed": [
+      "DEF-S3-065",
+      "DEF-S3-067",
+      "DEF-S3-096",
+      "DEF-S3-097"
+    ],
+    "open": []
+  },
+  "productUnmodified": true,
+  "operatorPermissions": {
+    "get": {
+      "id": 51,
+      "templateName": "G156 base-one 235145180693",
+      "templateIntent": "EXT_5638A1C8",
+      "isPreset": false,
+      "inputParams": [
+        {
+          "name": "targetLocation",
+          "type": "String",
+          "required": true,
+          "defaultValue": "F2_TEST_GATE",
+          "range": null
+        }
+      ],
+      "steps": [
+        {
+          "stepSeq": 1,
+          "capabilityType": "CAP_NAVIGATION",
+          "paramMapping": [
+            {
+              "target": "targetLocation",
+              "source": "TEMPLATE_INPUT.targetLocation"
+            }
+          ],
+          "stepTimeout": 60,
+          "completionCondition": "routeGenerated=true"
+        }
+      ],
+      "templateVersion": "V1.0",
+      "templateStatus": "DISABLED",
+      "updatedAt": "2026-11-04T23:52:31.219863",
+      "updatedBy": "set"
+    },
+    "put": {
+      "http": 403,
+      "body": {
+        "code": 2003,
+        "message": "无权限访问",
+        "timestamp": "2026-11-04T23:58:14.671626300+08:00",
+        "path": "/api/v1/baseline-templates/51",
+        "method": "PUT"
+      }
+    }
+  },
+  "restoredStorageFault": {
+    "templateId": 58,
+    "stepsExact": true
+  },
+  "cleanup": {
+    "templates": [
+      {
+        "id": 51,
+        "status": "DISABLED"
+      },
+      {
+        "id": 52,
+        "status": "DISABLED"
+      },
+      {
+        "id": 53,
+        "status": "DISABLED"
+      },
+      {
+        "id": 54,
+        "status": "DISABLED"
+      },
+      {
+        "id": 55,
+        "status": "DISABLED"
+      },
+      {
+        "id": 56,
+        "status": "DISABLED"
+      },
+      {
+        "id": 57,
+        "status": "DISABLED"
+      },
+      {
+        "id": 58,
+        "status": "DISABLED"
+      },
+      {
+        "id": 59,
+        "status": "DISABLED"
+      },
+      {
+        "id": 60,
+        "status": "DISABLED"
+      }
+    ],
+    "definitions": [
+      {
+        "id": 21,
+        "status": "DISABLED"
+      },
+      {
+        "id": 22,
+        "status": "DISABLED"
+      },
+      {
+        "id": 23,
+        "status": "DISABLED"
+      }
+    ],
+    "activeOwnAssignments": "0",
+    "agentsAllocated": "0",
+    "robotB": {
+      "id": 9,
+      "deviceCode": "G156_F015_ROBOT_B",
+      "deviceName": "Synthetic F015 recovery robot B",
+      "deviceTypeCode": "SIMULATOR",
+      "isSimulator": true,
+      "simulatedDeviceType": "MOBILE_ROBOT",
+      "areaCode": "F2_TEST",
+      "positionX": 815.0,
+      "positionY": 4600.0,
+      "accessEndpoint": "http://127.0.0.1:18133",
+      "accessCredentialRefMasked": "gp****-b",
+      "statusReportInterval": 5,
+      "connectionTestStatus": "PASSED",
+      "connectionTestResult": "身份、协议版本及状态快照校验通过",
+      "remark": null,
+      "deviceStatus": "INACTIVE",
+      "agentStatus": null,
+      "onlineStatus": null,
+      "createdAt": "2026-11-04T23:55:23.151416",
+      "updatedAt": "2026-11-04T23:57:25.687591"
+    },
+    "primaryCaps": [
+      {
+        "id": 20,
+        "capabilityCode": "CAP_SIM_STATUS",
+        "capabilityName": "仿真状态生成",
+        "capabilityType": "CAP_SIM_STATUS",
+        "inputParams": [],
+        "outputParams": [],
+        "applicableConditions": null,
+        "capabilityStatus": "UNTESTED",
+        "testResult": null,
+        "lastTestAt": null,
+        "testRequest": null,
+        "testResponse": null,
+        "testDurationMs": null,
+        "capabilityDescription": "仿真体生成并上报模拟设备状态"
+      },
+      {
+        "id": 22,
+        "capabilityCode": "CAP_INFO_DISPLAY",
+        "capabilityName": "综合信息展示",
+        "capabilityType": "CAP_INFO_DISPLAY",
+        "inputParams": [
+          {
+            "name": "contentType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEXT",
+            "range": "TEXT/IMAGE/VIDEO/HTML"
+          },
+          {
+            "name": "contentData",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试信息：请前往F2服务点",
+            "range": null
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "5~300"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "displayStatus",
+            "type": "String",
+            "required": true,
+            "defaultValue": null,
+            "range": null
+          },
+          {
+            "name": "actualDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": null,
+            "range": null
+          },
+          {
+            "name": "errorMessage",
+            "type": "String",
+            "required": false,
+            "defaultValue": null,
+            "range": null
+          }
+        ],
+        "applicableConditions": null,
+        "capabilityStatus": "UNTESTED",
+        "testResult": null,
+        "lastTestAt": null,
+        "testRequest": null,
+        "testResponse": null,
+        "testDurationMs": null,
+        "capabilityDescription": "标准能力模板：综合信息展示"
+      },
+      {
+        "id": 23,
+        "capabilityCode": "CAP_NAVIGATION",
+        "capabilityName": "空间引导",
+        "capabilityType": "CAP_NAVIGATION",
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "F2_TEST_GATE",
+            "range": null
+          },
+          {
+            "name": "routePreference",
+            "type": "String",
+            "required": true,
+            "defaultValue": "BARRIER_FREE",
+            "range": "SHORTEST/BARRIER_FREE"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "routeGenerated",
+            "type": "Boolean",
+            "required": true,
+            "defaultValue": null,
+            "range": null
+          },
+          {
+            "name": "estimatedDistance",
+            "type": "Double",
+            "required": true,
+            "defaultValue": null,
+            "range": null
+          },
+          {
+            "name": "estimatedDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": null,
+            "range": null
+          },
+          {
+            "name": "waypointCount",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": null,
+            "range": null
+          }
+        ],
+        "applicableConditions": null,
+        "capabilityStatus": "ENABLED",
+        "testResult": "实际设备代理调用通过，指令 TEST-76ba95e4eddc4bb4b365f16d36",
+        "lastTestAt": "2026-11-04T23:52:29.157885",
+        "testRequest": null,
+        "testResponse": null,
+        "testDurationMs": null,
+        "capabilityDescription": "标准能力模板：空间引导"
+      },
+      {
+        "id": 21,
+        "capabilityCode": "CAP_ESCORT",
+        "capabilityName": "陪同服务",
+        "capabilityType": "CAP_ESCORT",
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "F2_TEST_GATE",
+            "range": null
+          },
+          {
+            "name": "escortMode",
+            "type": "String",
+            "required": true,
+            "defaultValue": "LEAD",
+            "range": "LEAD/FOLLOW"
+          },
+          {
+            "name": "maxDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "600",
+            "range": "60~1800"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "arrivalStatus",
+            "type": "String",
+            "required": true,
+            "defaultValue": null,
+            "range": null
+          },
+          {
+            "name": "actualDistance",
+            "type": "Double",
+            "required": true,
+            "defaultValue": null,
+            "range": null
+          },
+          {
+            "name": "actualDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": null,
+            "range": null
+          }
+        ],
+        "applicableConditions": null,
+        "capabilityStatus": "ENABLED",
+        "testResult": "实际设备代理调用通过，指令 TEST-2902c00f935d4490b68608613b",
+        "lastTestAt": "2026-11-01T21:42:03.440375",
+        "testRequest": null,
+        "testResponse": null,
+        "testDurationMs": null,
+        "capabilityDescription": "标准能力模板：陪同服务"
+      },
+      {
+        "id": 24,
+        "capabilityCode": "CAP_NOTIFICATION",
+        "capabilityName": "现场通知",
+        "capabilityType": "CAP_NOTIFICATION",
+        "inputParams": [
+          {
+            "name": "notificationType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "BOTH",
+            "range": "VOICE/TEXT/BOTH"
+          },
+          {
+            "name": "notificationContent",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试旅客需要轮椅陪同，请现场服务人员协助",
+            "range": null
+          },
+          {
+            "name": "repeatCount",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "1",
+            "range": "1~5"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "notificationStatus",
+            "type": "String",
+            "required": true,
+            "defaultValue": null,
+            "range": null
+          },
+          {
+            "name": "actualRepeatCount",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": null,
+            "range": null
+          }
+        ],
+        "applicableConditions": null,
+        "capabilityStatus": "ENABLED",
+        "testResult": "实际设备代理调用通过，指令 TEST-c77e43a8f7a045519acdd0ffef",
+        "lastTestAt": "2026-11-01T21:42:03.511667",
+        "testRequest": null,
+        "testResponse": null,
+        "testDurationMs": null,
+        "capabilityDescription": "标准能力模板：现场通知"
+      }
+    ],
+    "rules": [
+      {
+        "id": 1,
+        "ruleCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+        "ruleContent": "移动机器人会合或陪同服务对象为特殊旅客时判定为高风险；普通空间引导场景不命中",
+        "ruleVersion": "V1.2",
+        "enabled": true,
+        "createdAt": "2026-10-30T13:40:48.586219",
+        "updatedAt": "2026-11-04T10:29:06.080757",
+        "updatedBy": "set"
+      },
+      {
+        "id": 2,
+        "ruleCode": "RULE_CROSS_ZONE",
+        "ruleContent": "仅移动服务机器人适用；同一任务链条中跨越预定义区域边界1次及以上命中",
+        "ruleVersion": "V1.2",
+        "enabled": true,
+        "createdAt": "2026-10-30T13:40:48.586219",
+        "updatedAt": "2026-11-04T10:29:00.250949",
+        "updatedBy": "set"
+      },
+      {
+        "id": 3,
+        "ruleCode": "RULE_RESOURCE_CRITICAL",
+        "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+        "ruleVersion": "V3.6",
+        "enabled": true,
+        "createdAt": "2026-10-30T13:40:48.586219",
+        "updatedAt": "2026-11-04T10:31:33.457227",
+        "updatedBy": "set"
+      },
+      {
+        "id": 4,
+        "ruleCode": "GPT_F014_150_API",
+        "ruleContent": "Synthetic F014 validation fixture revised",
+        "ruleVersion": "V1.2",
+        "enabled": false,
+        "createdAt": "2026-11-04T08:07:33.779259",
+        "updatedAt": "2026-11-04T08:07:33.967337",
+        "updatedBy": "set"
+      },
+      {
+        "id": 5,
+        "ruleCode": "GPT_F014_150_UI",
+        "ruleContent": "Synthetic F014 browser-created rule revised",
+        "ruleVersion": "V1.1",
+        "enabled": false,
+        "createdAt": "2026-11-04T08:09:47.309055",
+        "updatedAt": "2026-11-04T08:10:48.202617",
+        "updatedBy": "gpt_f014_ui_150"
+      }
+    ],
+    "legacyRowsPreserved": "3|2|EXECUTING\n9|8|PENDING_ASSIGNMENT\n15|14|PENDING_ASSIGNMENT\n21|20|PENDING_ASSIGNMENT\n25|24|PENDING_ASSIGNMENT\n26|25|PENDING_ASSIGNMENT\n29|28|PENDING_ASSIGNMENT"
+  },
+  "directedSuites": [
+    {
+      "name": "com.airport.ai.task.BaselineDowngradeAndFailureBoundaryF015Test",
+      "tests": "9",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.airport.ai.baseline.BaselineDryRunLifecycleTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.airport.ai.baseline.BaselineTemplateF008Test",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.airport.ai.task.BaselineDowngradeBindingF008Test",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.airport.ai.task.BaselineFailureNoReplanF015Test",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.airport.ai.task.RecoveryEventTruthF015Test",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.airport.ai.task.ReplanningHighRiskDowngradeTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.airport.ai.task.TaskExceptionServiceSpringContextTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  ],
+  "directedTotal": {
+    "tests": 43,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "commands": [
+    "mvn -o -Dtest=TaskExceptionServiceSpringContextTest,BaselineDowngradeAndFailureBoundaryF015Test,BaselineDryRunLifecycleTest,BaselineTemplateF008Test,BaselineDowngradeBindingF008Test,BaselineFailureNoReplanF015Test,RecoveryEventTruthF015Test,ReplanningHighRiskDowngradeTest test",
+    "mvn -o package -DskipTests",
+    "npm run build",
+    "python .local-test/launch156-model.py",
+    "python .local-test/start156.py",
+    "python .local-test/launch-robot156.py",
+    "python .local-test/launch156-vite.py",
+    "python acceptance/stage3/probe-f015-v156.py",
+    "python acceptance/stage3/probe-f015-v156-supplement.py",
+    "python acceptance/stage3/probe-f015-v156-prefix-control.py",
+    "node acceptance/stage3/retest-f015-v156-ui.cjs manual <taskId>|details|frozen (UI invoked by main probe)"
+  ],
+  "logRedaction": "UTF8 console decoded to UTF8; generated Spring password redacted. Original stays local.",
+  "processCleanup": {
+    "resources": [
+      {
+        "file": "vite-v156-runtime.json",
+        "pid": 9392,
+        "verifiedCommand": "node --max-old-space-size=384 C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\frontend\\node_modules\\vite\\bin\\vite.js --config C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\.local-test\\vite-v142.mjs",
+        "stopped": true
+      },
+      {
+        "file": "robot-b-v156-runtime.json",
+        "pid": 8016,
+        "verifiedCommand": "java -Xmx96m -XX:+UseSerialGC -jar C:\\Users\\savy\\Desktop\\TIP-main\\tip\\.local-test\\gpt-f007-v123-simulator-build\\target\\device-simulator-runtime.jar",
+        "stopped": true
+      },
+      {
+        "file": "robot-v156-runtime.json",
+        "pid": 13720,
+        "verifiedCommand": "java -Xmx128m -XX:+UseSerialGC -jar C:\\Users\\savy\\Desktop\\TIP-main\\tip\\.local-test\\gpt-f007-v123-simulator-build\\target\\device-simulator-runtime.jar",
+        "stopped": true
+      },
+      {
+        "file": "runtime-v156.json",
+        "pid": 10780,
+        "verifiedCommand": "java -Xms32m -Xmx192m -XX:TieredStopAtLevel=1 -XX:+UseSerialGC -jar C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\backend\\target\\airport-ai-app-1.0.0.jar",
+        "stopped": true
+      },
+      {
+        "file": "model-v156-runtime.json",
+        "pid": 16356,
+        "verifiedCommand": "python C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\fixtures\\f015-v156-controlled-model.py",
+        "stopped": true
+      }
+    ],
+    "checkedPorts": [
+      18129,
+      18117,
+      18132,
+      18133,
+      18134,
+      18135,
+      15179
+    ],
+    "stoppedAt": "2026-11-04T23:58:36.7871538+08:00",
+    "listeners": [],
+    "headlessEdge": []
+  }
+}
