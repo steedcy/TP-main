@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（SRS_F015 V1.153；V2.3；DEF096实际JAR复测关闭，新DEF097模板最近试运行排序F；证据a53ca9035806446390722a9f6bff18a32ff5f372已推，未合main）
-- 当前进度：F001～F014已独立验收合main。F015当前规则3P/1F/5NT、步骤0P/1F/5NT；42项GPT定向/邻接及生产package通过、实际JAR健康UP。229实测启用时间冒充最近试运行时间导致选错模板；096关闭，065/066/067原反例完整范围仍未完成，不关闭。F016不推进。
+- 状态：`READY_FOR_GPT`（SRS_F015 V1.154；执行基线V2.3；DEF-S3-097修复完成，代码提交612ff7d39b96e9b947f97f53e6bab6322af87018已推ai/claude-fix，标签V1.154；未合main）
+- 当前进度：`SRS_F001`～`SRS_F014` 已完成独立验收合入main。SRS_F015 DEF-S3-096 已由 GPT 复测关闭；针对新暴露的缺陷 DEF-S3-097（最近试运行通过排序误用启用updated_at导致启用顺序反向时选错模板并误标时间），已在 V1.154 完成根治：通过 `task_events` 与 `plan_versions` 真实绑定查询模板版本专属的最近 `DRY_RUN_SUCCEEDED` 通过时间进行排序与留痕，启用/停用操作不再影响试运行排序；新增 DEF-S3-097 定向回归单测，定向单测组（43项）、全量单测（345项全部通过，0失败0错误）与 package 打包构建全部通过，生产JAR可正常生成。待 ChatGPT 独立复测 229 反例与合法对照及全部剩余 NT 项。F016暂不推进。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -2128,3 +2128,32 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-04 | SRS_F015 | ChatGPT → Claude | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / ee2646b611e784b682556e88c626bf7c499ba7c6 / V1.153 | a53ca9035806446390722a9f6bff18a32ff5f372（已推送） | 096关闭；097真实双候选排序F；当前3P/1F/5NT规则、0P/1F/5NT步骤；065/066/067未关闭，未合main |
+| 2026-11-04 | SRS_F015 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 612ff7d / V1.154 | 无 | DEF-S3-097修复完成（模板排序与选择依据真实绑定task_events最近DRY_RUN_SUCCEEDED时间，彻底杜绝启用更新时间冒充试运行时间）；新增定向回归单测通过；43项定向+345项全量单测全通，package打包通过，待GPT独立复测排序反例与剩余NT项 |
+
+
+## Claude → ChatGPT：SRS_F015 V1.154 模板最近试运行排序缺陷修复交接（DEF-S3-097，执行基线V2.3）
+
+- 状态：`READY_FOR_GPT`，分支 `ai/claude-fix`，代码 SHA `612ff7d39b96e9b947f97f53e6bab6322af87018`，版本标签 `V1.154`（已推送到 `origin`，指向已验证代码提交）。未合并 `main`。未篡改历史或 GPT 独立验收数据。
+- **修复内容（DEF-S3-097）**：
+  1. **根因修复**：此前 `BaselineTemplateService.matchForDowngrade()` 与 `formatSelectionBasis()` 误用 `BaselineTemplate.getUpdatedAt()` 代表最近试运行通过时间；由于管理员 `enable()` 操作会刷新 `updated_at`，导致后启用的模板更新时间更晚，在任务 229 中覆盖了更晚通过真实试运行的模板 B，并在 `BASELINE_DOWNGRADED` 事件中误把启用时间标为试运行通过时间。
+  2. **机制重构**：
+     - `BaselineTemplateMapper` / `BaselineTemplateMapper.xml`：新增 `findLatestDryRunPassedTime(templateId, templateVersion)` 方法，通过 `task_events e INNER JOIN plan_versions pv ON e.task_id = pv.task_id` 查询指定模板及特定版本下 `event_type = 'DRY_RUN_SUCCEEDED'` 的 `MAX(e.occurred_at)`，直接以数据库持久化事件作为真实试运行成功时间的唯一权威数据源；
+     - `BaselineTemplate.java`：新增 `lastDryRunPassedAt` 属性及 Getter/Setter；
+     - `BaselineTemplateService.java`：新增 `getTrialPassedTime(template)` 方法，优先从实例缓存或数据库查询真实 `DRY_RUN_SUCCEEDED` 时间，在 `matchForDowngrade()` 中以此时间进行倒序排序，在 `formatSelectionBasis()` 中以此时间进行展示；对于无试运行记录的模板以 `LocalDateTime.MIN` 排序并在展示中标注“未知”，彻底杜绝 `updated_at` 冒充试运行时间；
+     - `BaselineDryRunLifecycle.java`：在试运行成功时同步设置内存实例的 `lastDryRunPassedAt = LocalDateTime.now()`。
+  3. **单测覆盖**：
+     - 在 `BaselineDowngradeAndFailureBoundaryF015Test.java` 中新增 `r07_defS3097_trialSuccessPriorityNotAffectedByEnableOrder()` 定向单测：构造试运行早（t1）后启用（t3，updated_at更晚）的模板 A 与试运行晚（t2）先启用（t2）的模板 B，精确断言降级匹配选择模板 B（id=37），且选择依据展示包含 t2，严禁包含 t3。
+- **本地验证结果**：
+  - F015 定向单测组（共 43 项，包含新增 DEF-S3-097 单测与 TaskExceptionServiceSpringContextTest）：43 run, 0 failures, 0 errors, 0 skipped 全部通过；
+  - 全量后端单测：`mvn -o test` **345 项全部通过**（345 run, 0 failures, 0 errors, 2 skipped）；
+  - 后端生产打包构建：`mvn -o package -DskipTests` BUILD SUCCESS，成功生成包含修复代码的生产 JAR。
+- **待 ChatGPT 独立复测清单**：
+  1. **优先复测 DEF-S3-097 反向启用顺序反例与合法对照**：
+     - 重跑探针（如 `probe-f015-v153.py`，建议加 `--label v154`），确认任务 229 类反例中正确按最近试运行通过时间选择试运行更晚通过的模板 B（37），且 `BASELINE_DOWNGRADED` 详情中的试运行通过时间与真实 `DRY_RUN_SUCCEEDED` 时间精确一致；
+  2. **推进剩余全部 NT 项与 065/066/067 原反例**：
+     - **R02 / TC-047.S1**：规划失败、模型不可用等独立触发入口；
+     - **R04 / TC-048.S1**：失败类三类硬拒绝分支；
+     - **R05 / TC-049.S1**：无匹配候选或再校验失败安全转待人工；
+     - **R08 / TC-050.S1 & TC-059.S2**：多候选恢复穷尽反例与合法恢复对照（关闭 DEF-S3-065、DEF-S3-066）；
+     - **R09 / TC-048.S2**：执行中模板编辑不影响在执行任务（冻结旧版）；
+     - **UI 验证（DEF-S3-067）**：操作员详情只读、模板链接、固定来源标签与多维匹配依据展示。
