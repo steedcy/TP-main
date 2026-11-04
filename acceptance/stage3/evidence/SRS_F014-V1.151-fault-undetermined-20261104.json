@@ -1,0 +1,576 @@
+{
+  "version": "V1.151",
+  "codeSha": "9d63572087058fb180b08e362ad7da6aef501e44",
+  "observedAt": "2026-11-04T10:32:17.374978+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "mode": "UNDETERMINED",
+  "definitionBefore": {
+    "id": 17,
+    "definitionCode": "EXT_0FA30230",
+    "taskName": "G145 F013 baseline fixtures",
+    "goalTemplate": "Synthetic navigation to selected destination",
+    "sceneParams": [
+      {
+        "name": "targetLocation",
+        "type": "String",
+        "required": true,
+        "defaultValue": "F2_TEST_GATE",
+        "range": null
+      }
+    ],
+    "availableCapabilityTypes": [
+      "CAP_NAVIGATION"
+    ],
+    "constraintDescription": "Synthetic isolated F013 runtime baseline gate",
+    "completionCondition": "routeGenerated=true",
+    "isPreset": false,
+    "definitionStatus": "DISABLED",
+    "updatedAt": "2026-11-04T10:29:44.417368",
+    "updatedBy": "set"
+  },
+  "request": {
+    "taskGoal": "F151_FAULT_UNDETERMINED synthetic service to F2_TEST_GATE",
+    "taskFamily": "EXT_0FA30230",
+    "sceneParams": {
+      "targetLocation": "F2_TEST_GATE"
+    }
+  },
+  "observed": {
+    "task": {
+      "id": 220,
+      "taskCode": "TASK-20261104-0220",
+      "taskGoal": "F151_FAULT_UNDETERMINED synthetic service to F2_TEST_GATE",
+      "taskFamily": "EXT_0FA30230",
+      "sceneParams": {
+        "targetLocation": "F2_TEST_GATE"
+      },
+      "goalParsingResult": {
+        "completionCondition": "routeGenerated=true",
+        "origin": "F2_SERVICE_POINT",
+        "destination": "F2_TEST_GATE",
+        "originalGoal": "F151_FAULT_UNDETERMINED synthetic service to F2_TEST_GATE",
+        "constraints": [
+          "synthetic test"
+        ]
+      },
+      "status": "PENDING_MANUAL",
+      "currentPlanVersionId": 220,
+      "replanUsed": false,
+      "replanningReason": null,
+      "manualTerminateReason": null,
+      "failureReason": "监督智能体输出无法确定",
+      "missingInfoQuestions": null,
+      "downgradeReason": null,
+      "isDryRun": false,
+      "createdAt": "2026-11-04T10:32:18.426477",
+      "updatedAt": "2026-11-04T10:32:20.697007",
+      "createdBy": "oprator"
+    },
+    "plans": [
+      {
+        "id": 220,
+        "versionNo": 1,
+        "source": "AUTONOMOUS",
+        "baselineTemplateId": null,
+        "snapshotId": "CTX-20261104-0201",
+        "planSteps": [
+          {
+            "stepSeq": 1,
+            "stepGoal": "Synthetic passenger service",
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "precondition": "device online",
+            "completionCondition": "routeGenerated=true",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          }
+        ],
+        "structureCheckResult": "PASS",
+        "capabilityCheckResult": "PASS",
+        "constraintCheckResult": "PASS",
+        "validationErrors": [],
+        "riskLevel": "UNDETERMINED",
+        "riskReasonCode": "INJECTED_UNDETERMINED",
+        "judgmentBasis": "注入：监督智能体输出无法确定",
+        "confidence": 0.99,
+        "ruleSetVersion": "V1.35",
+        "frozenAt": "2026-11-04T10:32:20.419367",
+        "createdAt": "2026-11-04T10:32:20.331439"
+      }
+    ],
+    "events": [
+      {
+        "id": 1986,
+        "taskId": 220,
+        "eventType": "GOAL_SUBMITTED",
+        "occurredAt": "2026-11-04T10:32:18.485021",
+        "trigger": "OPERATOR",
+        "reasonCode": null,
+        "detailSummary": "运行操作员oprator提交任务目标: F151_FAULT_UNDETERMINED synthetic service to F2_TEST_GATE"
+      },
+      {
+        "id": 1987,
+        "taskId": 220,
+        "eventType": "GOAL_CLARIFIED",
+        "occurredAt": "2026-11-04T10:32:18.858868",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+      },
+      {
+        "id": 1988,
+        "taskId": 220,
+        "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+        "occurredAt": "2026-11-04T10:32:19.779811",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "生成规划上下文快照CTX-20261104-0201"
+      },
+      {
+        "id": 1989,
+        "taskId": 220,
+        "eventType": "PLAN_GENERATED",
+        "occurredAt": "2026-11-04T10:32:20.380008",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+      },
+      {
+        "id": 1990,
+        "taskId": 220,
+        "eventType": "PLAN_VALIDATED",
+        "occurredAt": "2026-11-04T10:32:20.421562",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+      },
+      {
+        "id": 1991,
+        "taskId": 220,
+        "eventType": "SUPERVISION_JUDGED",
+        "occurredAt": "2026-11-04T10:32:20.694051",
+        "trigger": "SYSTEM",
+        "reasonCode": "INJECTED_UNDETERMINED",
+        "detailSummary": "监督判定: 风险等级=UNDETERMINED；原因码=INJECTED_UNDETERMINED；判定依据=注入：监督智能体输出无法确定；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.35；推荐处置=MANUAL_HANDLING（转人工处理）"
+      },
+      {
+        "id": 1992,
+        "taskId": 220,
+        "eventType": "TASK_PENDING_MANUAL",
+        "occurredAt": "2026-11-04T10:32:20.699601",
+        "trigger": "SYSTEM",
+        "reasonCode": "ERR_PLANNING_FAILED",
+        "detailSummary": "监督智能体输出无法确定"
+      }
+    ],
+    "assignments": [],
+    "commands": [],
+    "bypassAuditRows": []
+  },
+  "otherPages": {
+    "dashboard": {
+      "metrics": {
+        "agentTotal": 6,
+        "agentOnline": 3,
+        "taskInProgress": 0,
+        "pendingManual": 111,
+        "unhandledExceptions": 0,
+        "replanningCount": 4,
+        "statusCounts": {
+          "PLANNING": 1,
+          "SUPERVISING": 0,
+          "PENDING_ASSIGNMENT": 0,
+          "DOWNGRADING": 0,
+          "EXECUTING": 0,
+          "COMPLETED": 44,
+          "FAILED": 3,
+          "PENDING_MANUAL": 111,
+          "MANUAL_TERMINATED": 46
+        }
+      },
+      "latestExceptions": [
+        {
+          "id": 23,
+          "taskId": 215,
+          "taskCode": "TASK-20261104-0215",
+          "exceptionType": "STEP_FAILED",
+          "occurredAt": "2026-11-04T10:29:36.529212",
+          "exceptionStatus": "RESOLVED",
+          "reasonCode": "执行结果: TIMEOUT，原因: SIMULATED_TIMEOUT",
+          "impactConclusion": "候选设备切换恢复失败，当前计划不可继续执行"
+        },
+        {
+          "id": 22,
+          "taskId": 213,
+          "taskCode": "TASK-20261104-0213",
+          "exceptionType": "STEP_FAILED",
+          "occurredAt": "2026-11-04T10:29:09.48349",
+          "exceptionStatus": "RESOLVED",
+          "reasonCode": "设备返回执行成功，但完成条件未满足",
+          "impactConclusion": "候选设备切换恢复失败，当前计划不可继续执行"
+        },
+        {
+          "id": 21,
+          "taskId": 189,
+          "taskCode": "TASK-20261104-0189",
+          "exceptionType": "STEP_FAILED",
+          "occurredAt": "2026-11-04T01:21:08.199025",
+          "exceptionStatus": "RESOLVED",
+          "reasonCode": "执行结果: TIMEOUT，原因: SIMULATED_TIMEOUT",
+          "impactConclusion": "候选设备切换恢复失败，当前计划不可继续执行"
+        },
+        {
+          "id": 20,
+          "taskId": 178,
+          "taskCode": "TASK-20261104-0178",
+          "exceptionType": "STEP_FAILED",
+          "occurredAt": "2026-11-04T00:48:16.801015",
+          "exceptionStatus": "RESOLVED",
+          "reasonCode": "执行结果: TIMEOUT，原因: SIMULATED_TIMEOUT",
+          "impactConclusion": "候选设备切换恢复失败，当前计划不可继续执行"
+        },
+        {
+          "id": 19,
+          "taskId": 168,
+          "taskCode": "TASK-20261104-0168",
+          "exceptionType": "STEP_FAILED",
+          "occurredAt": "2026-11-04T00:04:22.883948",
+          "exceptionStatus": "RESOLVED",
+          "reasonCode": "执行结果: TIMEOUT，原因: SIMULATED_TIMEOUT",
+          "impactConclusion": "候选设备切换恢复失败，当前计划不可继续执行"
+        }
+      ],
+      "failedMetrics": [],
+      "period": "TODAY"
+    },
+    "tasks": {
+      "content": [
+        {
+          "id": 220,
+          "taskCode": "TASK-20261104-0220",
+          "taskGoal": "F151_FAULT_UNDETERMINED synthetic service to F2_TEST_GATE",
+          "taskFamily": "EXT_0FA30230",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F151_FAULT_UNDETERMINED synthetic service to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 220,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "监督智能体输出无法确定",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-04T10:32:18.426477",
+          "updatedAt": "2026-11-04T10:32:20.697007",
+          "createdBy": "oprator"
+        },
+        {
+          "id": 219,
+          "taskCode": "TASK-20261104-0219",
+          "taskGoal": "F151_PUBLIC_FLIGHT_CORRECTED public flight ZZ151 gate service to F2_TEST_GATE",
+          "taskFamily": "FLIGHT_CHANGE_RESPONSE",
+          "sceneParams": {
+            "flightNumber": "ZZ151",
+            "targetLocation": "F2_TEST_GATE",
+            "newGate": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "航班变更信息已送达且旅客后续引导（如需）已完成",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F151_PUBLIC_FLIGHT_CORRECTED public flight ZZ151 gate service to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "COMPLETED",
+          "currentPlanVersionId": 219,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": null,
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-04T10:31:26.85237",
+          "updatedAt": "2026-11-04T10:31:30.662952",
+          "createdBy": "oprator"
+        },
+        {
+          "id": 218,
+          "taskCode": "TASK-20261104-0218",
+          "taskGoal": "F151_BAD_SAFETY synthetic navigation to F2_TEST_GATE",
+          "taskFamily": "EXT_0FA30230",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F151_BAD_SAFETY synthetic navigation to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "MANUAL_TERMINATED",
+          "currentPlanVersionId": 218,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": "F014 V151 baseline and gate cleanup",
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_MOTION_SAFETY_FIELD；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-04T10:29:41.894689",
+          "updatedAt": "2026-11-04T10:29:44.604618",
+          "createdBy": "oprator"
+        },
+        {
+          "id": 217,
+          "taskCode": "TASK-20261104-0217",
+          "taskGoal": "F151_BAD_CAPABILITY synthetic navigation to F2_TEST_GATE",
+          "taskFamily": "EXT_0FA30230",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F151_BAD_CAPABILITY synthetic navigation to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "MANUAL_TERMINATED",
+          "currentPlanVersionId": 217,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": "F014 V151 baseline and gate cleanup",
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_CAPABILITY_GAP；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-04T10:29:40.205874",
+          "updatedAt": "2026-11-04T10:29:44.564557",
+          "createdBy": "oprator"
+        },
+        {
+          "id": 216,
+          "taskCode": "TASK-20261104-0216",
+          "taskGoal": "F151_BAD_STRUCTURE synthetic navigation to F2_TEST_GATE",
+          "taskFamily": "EXT_0FA30230",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F151_BAD_STRUCTURE synthetic navigation to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "MANUAL_TERMINATED",
+          "currentPlanVersionId": 216,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": "F014 V151 baseline and gate cleanup",
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_STEP_FIELD_MISSING；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-04T10:29:38.38748",
+          "updatedAt": "2026-11-04T10:29:44.521484",
+          "createdBy": "oprator"
+        }
+      ],
+      "totalElements": 205,
+      "page": 1,
+      "size": 5
+    },
+    "devices": {
+      "content": [
+        {
+          "id": 1,
+          "deviceCode": "G6_UNTESTED_134145",
+          "deviceName": "GPT F006 untested enable fixture",
+          "deviceTypeCode": "SIMULATOR",
+          "isSimulator": true,
+          "simulatedDeviceType": "SMART_DISPLAY",
+          "areaCode": "F2_TEST",
+          "positionX": 3.0,
+          "positionY": 4.0,
+          "accessEndpoint": "http://127.0.0.1:18130",
+          "accessCredentialRefMasked": "sy****06",
+          "statusReportInterval": 15,
+          "connectionTestStatus": "PASSED",
+          "connectionTestResult": "身份、协议版本及状态快照校验通过",
+          "remark": null,
+          "deviceStatus": "ACTIVE",
+          "agentStatus": "ENABLED",
+          "onlineStatus": "OFFLINE",
+          "createdAt": "2026-10-30T13:41:46.051807",
+          "updatedAt": "2026-10-31T02:54:01.659406"
+        },
+        {
+          "id": 2,
+          "deviceCode": "G120_NEW",
+          "deviceName": "GPT inactive template fixture",
+          "deviceTypeCode": "SIMULATOR",
+          "isSimulator": true,
+          "simulatedDeviceType": "SMART_DISPLAY",
+          "areaCode": "F2_TEST",
+          "positionX": 3.0,
+          "positionY": 4.0,
+          "accessEndpoint": "http://127.0.0.1:18131",
+          "accessCredentialRefMasked": "sy****20",
+          "statusReportInterval": 15,
+          "connectionTestStatus": "PASSED",
+          "connectionTestResult": "身份、协议版本及状态快照校验通过",
+          "remark": null,
+          "deviceStatus": "ACTIVE",
+          "agentStatus": "ENABLED",
+          "onlineStatus": "OFFLINE",
+          "createdAt": "2026-10-30T19:02:23.530422",
+          "updatedAt": "2026-10-30T20:56:09.664687"
+        },
+        {
+          "id": 3,
+          "deviceCode": "G121_PHYSICAL",
+          "deviceName": "GPT UI template prefill fixture",
+          "deviceTypeCode": "SMART_DISPLAY",
+          "isSimulator": false,
+          "simulatedDeviceType": null,
+          "areaCode": "F2_TEST",
+          "positionX": 1.0,
+          "positionY": 2.0,
+          "accessEndpoint": "http://127.0.0.1:18133",
+          "accessCredentialRefMasked": "sy****21",
+          "statusReportInterval": 5,
+          "connectionTestStatus": "UNTESTED",
+          "connectionTestResult": null,
+          "remark": null,
+          "deviceStatus": "ACTIVE",
+          "agentStatus": null,
+          "onlineStatus": null,
+          "createdAt": "2026-10-30T21:12:05.133268",
+          "updatedAt": "2026-10-30T21:12:05.133268"
+        },
+        {
+          "id": 4,
+          "deviceCode": "G126_ROBOT",
+          "deviceName": "GPT F007 robot fixture",
+          "deviceTypeCode": "SIMULATOR",
+          "isSimulator": true,
+          "simulatedDeviceType": "MOBILE_ROBOT",
+          "areaCode": "F2_TEST",
+          "positionX": 815.0,
+          "positionY": 4600.0,
+          "accessEndpoint": "http://127.0.0.1:18132",
+          "accessCredentialRefMasked": "gp****ic",
+          "statusReportInterval": 15,
+          "connectionTestStatus": "PASSED",
+          "connectionTestResult": "身份、协议版本及状态快照校验通过",
+          "remark": null,
+          "deviceStatus": "ACTIVE",
+          "agentStatus": "ENABLED",
+          "onlineStatus": "ONLINE",
+          "createdAt": "2026-11-01T21:41:00.037187",
+          "updatedAt": "2026-11-01T21:41:00.264932"
+        },
+        {
+          "id": 5,
+          "deviceCode": "G145_F013_SCAN",
+          "deviceName": "GPT F013 SCAN fixture",
+          "deviceTypeCode": "SIMULATOR",
+          "isSimulator": true,
+          "simulatedDeviceType": "BAGGAGE_SCANNER",
+          "areaCode": "F2_TEST",
+          "positionX": 5.0,
+          "positionY": 6.0,
+          "accessEndpoint": "http://127.0.0.1:18133",
+          "accessCredentialRefMasked": "gp****AN",
+          "statusReportInterval": 5,
+          "connectionTestStatus": "PASSED",
+          "connectionTestResult": "身份、协议版本及状态快照校验通过",
+          "remark": null,
+          "deviceStatus": "INACTIVE",
+          "agentStatus": "DISABLED",
+          "onlineStatus": "OFFLINE",
+          "createdAt": "2026-11-03T22:09:33.404838",
+          "updatedAt": "2026-11-03T22:20:41.253937"
+        },
+        {
+          "id": 6,
+          "deviceCode": "G145_F013_DISPLAY",
+          "deviceName": "GPT F013 DISPLAY fixture",
+          "deviceTypeCode": "SIMULATOR",
+          "isSimulator": true,
+          "simulatedDeviceType": "SMART_DISPLAY",
+          "areaCode": "F2_TEST",
+          "positionX": 5.0,
+          "positionY": 6.0,
+          "accessEndpoint": "http://127.0.0.1:18134",
+          "accessCredentialRefMasked": "gp****AY",
+          "statusReportInterval": 5,
+          "connectionTestStatus": "PASSED",
+          "connectionTestResult": "身份、协议版本及状态快照校验通过",
+          "remark": null,
+          "deviceStatus": "ACTIVE",
+          "agentStatus": "ENABLED",
+          "onlineStatus": "ONLINE",
+          "createdAt": "2026-11-03T22:13:12.716905",
+          "updatedAt": "2026-11-04T10:28:04.597596"
+        },
+        {
+          "id": 7,
+          "deviceCode": "G151_F014_FLIGHT",
+          "deviceName": "Synthetic F014 FLIGHT_DELAY_BOARD",
+          "deviceTypeCode": "SIMULATOR",
+          "isSimulator": true,
+          "simulatedDeviceType": "FLIGHT_DELAY_BOARD",
+          "areaCode": "F2_TEST",
+          "positionX": 5.0,
+          "positionY": 6.0,
+          "accessEndpoint": "http://127.0.0.1:18135",
+          "accessCredentialRefMasked": "gp****RD",
+          "statusReportInterval": 5,
+          "connectionTestStatus": "PASSED",
+          "connectionTestResult": "身份、协议版本及状态快照校验通过",
+          "remark": null,
+          "deviceStatus": "ACTIVE",
+          "agentStatus": "ENABLED",
+          "onlineStatus": "ONLINE",
+          "createdAt": "2026-11-04T10:28:08.533375",
+          "updatedAt": "2026-11-04T10:28:09.00107"
+        }
+      ],
+      "totalElements": 7,
+      "page": 1,
+      "size": 10
+    }
+  },
+  "checks": {
+    "pendingManual": true,
+    "threePassAndFrozen": true,
+    "noDeviceCommandsOrAssignments": true,
+    "errorRecorded": true,
+    "otherPagesAvailable": true
+  }
+}

@@ -1,0 +1,3028 @@
+{
+  "version": "V1.151",
+  "codeSha": "9d63572087058fb180b08e362ad7da6aef501e44",
+  "observedAt": "2026-11-04T10:28:50.276328+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "cases": [
+    {
+      "name": "F151_RESOURCE_ON",
+      "request": {
+        "taskGoal": "F151_RESOURCE_ON synthetic service to F2_TEST_GATE",
+        "taskFamily": "EXT_0FA30230",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "controlledResponse": {
+        "steps": [
+          {
+            "stepSeq": 1,
+            "stepGoal": "Synthetic passenger service",
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "precondition": "device online",
+            "completionCondition": "routeGenerated=true",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          }
+        ],
+        "goalCompletion": "routeGenerated=true"
+      },
+      "observed": {
+        "task": {
+          "id": 206,
+          "taskCode": "TASK-20261104-0206",
+          "taskGoal": "F151_RESOURCE_ON synthetic service to F2_TEST_GATE",
+          "taskFamily": "EXT_0FA30230",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F151_RESOURCE_ON synthetic service to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 203,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-04T10:28:50.375613",
+          "updatedAt": "2026-11-04T10:28:50.54409",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 203,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261104-0184",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "HIGH",
+            "riskReasonCode": "RULE_RESOURCE_CRITICAL",
+            "judgmentBasis": "可用备用候选设备数量(0)低于配置阈值(1)，命中确定性高风险规则",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.25",
+            "frozenAt": "2026-11-04T10:28:50.532621",
+            "createdAt": "2026-11-04T10:28:50.507204"
+          }
+        ],
+        "events": [
+          {
+            "id": 1799,
+            "taskId": 206,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-04T10:28:50.417667",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F151_RESOURCE_ON synthetic service to F2_TEST_GATE"
+          },
+          {
+            "id": 1800,
+            "taskId": 206,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-04T10:28:50.484302",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1801,
+            "taskId": 206,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-04T10:28:50.495715",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261104-0184"
+          },
+          {
+            "id": 1802,
+            "taskId": 206,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-04T10:28:50.530359",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1803,
+            "taskId": 206,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-04T10:28:50.533802",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 1804,
+            "taskId": 206,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-04T10:28:50.540989",
+            "trigger": "SYSTEM",
+            "reasonCode": "RULE_RESOURCE_CRITICAL",
+            "detailSummary": "监督判定: 风险等级=HIGH；原因码=RULE_RESOURCE_CRITICAL；判定依据=可用备用候选设备数量(0)低于配置阈值(1)，命中确定性高风险规则；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.25；推荐处置=BASELINE_DOWNGRADE（基线降级）"
+          },
+          {
+            "id": 1805,
+            "taskId": 206,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-04T10:28:50.543028",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 监督判定高风险: RULE_RESOURCE_CRITICAL"
+          },
+          {
+            "id": 1806,
+            "taskId": 206,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-04T10:28:50.545097",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      },
+      "checks": {
+        "threePass": true,
+        "supervised": true,
+        "sixFieldsInEvent": true
+      },
+      "ruleSnapshot": [
+        {
+          "id": 1,
+          "ruleCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+          "ruleContent": "移动机器人会合或陪同服务对象为特殊旅客时判定为高风险；普通空间引导场景不命中",
+          "ruleVersion": "V1.0",
+          "enabled": true,
+          "createdAt": "2026-10-30T13:40:48.586219",
+          "updatedAt": "2026-10-30T13:40:48.586219",
+          "updatedBy": null
+        },
+        {
+          "id": 2,
+          "ruleCode": "RULE_CROSS_ZONE",
+          "ruleContent": "仅移动服务机器人适用；同一任务链条中跨越预定义区域边界1次及以上命中",
+          "ruleVersion": "V1.0",
+          "enabled": true,
+          "createdAt": "2026-10-30T13:40:48.586219",
+          "updatedAt": "2026-10-30T13:40:48.586219",
+          "updatedBy": null
+        },
+        {
+          "id": 3,
+          "ruleCode": "RULE_RESOURCE_CRITICAL",
+          "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+          "ruleVersion": "V3",
+          "enabled": true,
+          "createdAt": "2026-10-30T13:40:48.586219",
+          "updatedAt": "2026-11-04T10:26:37.977788",
+          "updatedBy": "set"
+        },
+        {
+          "id": 4,
+          "ruleCode": "GPT_F014_150_API",
+          "ruleContent": "Synthetic F014 validation fixture revised",
+          "ruleVersion": "V1.2",
+          "enabled": false,
+          "createdAt": "2026-11-04T08:07:33.779259",
+          "updatedAt": "2026-11-04T08:07:33.967337",
+          "updatedBy": "set"
+        },
+        {
+          "id": 5,
+          "ruleCode": "GPT_F014_150_UI",
+          "ruleContent": "Synthetic F014 browser-created rule revised",
+          "ruleVersion": "V1.1",
+          "enabled": false,
+          "createdAt": "2026-11-04T08:09:47.309055",
+          "updatedAt": "2026-11-04T08:10:48.202617",
+          "updatedBy": "gpt_f014_ui_150"
+        }
+      ],
+      "cleanupTerminate": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 206,
+            "taskCode": "TASK-20261104-0206",
+            "taskGoal": "F151_RESOURCE_ON synthetic service to F2_TEST_GATE",
+            "taskFamily": "EXT_0FA30230",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=true",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F151_RESOURCE_ON synthetic service to F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "MANUAL_TERMINATED",
+            "currentPlanVersionId": 203,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": "F014 V151 deterministic fixture cleanup",
+            "failureReason": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板",
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-04T10:28:50.375613",
+            "updatedAt": "2026-11-04T10:28:51.6339148",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-04T10:28:51.639672700+08:00"
+        }
+      }
+    },
+    {
+      "name": "F151_RESOURCE_OFF",
+      "request": {
+        "taskGoal": "F151_RESOURCE_OFF synthetic service to F2_TEST_GATE",
+        "taskFamily": "EXT_0FA30230",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "controlledResponse": {
+        "steps": [
+          {
+            "stepSeq": 1,
+            "stepGoal": "Synthetic passenger service",
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "precondition": "device online",
+            "completionCondition": "routeGenerated=true",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          }
+        ],
+        "goalCompletion": "routeGenerated=true"
+      },
+      "observed": {
+        "task": {
+          "id": 207,
+          "taskCode": "TASK-20261104-0207",
+          "taskGoal": "F151_RESOURCE_OFF synthetic service to F2_TEST_GATE",
+          "taskFamily": "EXT_0FA30230",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F151_RESOURCE_OFF synthetic service to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "COMPLETED",
+          "currentPlanVersionId": 204,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": null,
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-04T10:28:51.668819",
+          "updatedAt": "2026-11-04T10:28:53.114708",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 204,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261104-0185",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "LOW",
+            "riskReasonCode": null,
+            "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.26",
+            "frozenAt": "2026-11-04T10:28:51.730123",
+            "createdAt": "2026-11-04T10:28:51.724389"
+          }
+        ],
+        "events": [
+          {
+            "id": 1808,
+            "taskId": 207,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-04T10:28:51.670612",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F151_RESOURCE_OFF synthetic service to F2_TEST_GATE"
+          },
+          {
+            "id": 1809,
+            "taskId": 207,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-04T10:28:51.702801",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1810,
+            "taskId": 207,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-04T10:28:51.713353",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261104-0185"
+          },
+          {
+            "id": 1811,
+            "taskId": 207,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-04T10:28:51.727955",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1812,
+            "taskId": 207,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-04T10:28:51.73127",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 1813,
+            "taskId": 207,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-04T10:28:51.736171",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.26；推荐处置=AUTO_EXECUTE（自动执行）"
+          },
+          {
+            "id": 1814,
+            "taskId": 207,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-04T10:28:51.746933",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-803437A3(距离0.0,负载0)，向候选AGT-803437A3发起承接请求"
+          },
+          {
+            "id": 1815,
+            "taskId": 207,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-04T10:28:51.798862",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-803437A3接受步骤1承接请求"
+          },
+          {
+            "id": 1816,
+            "taskId": 207,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-04T10:28:51.803857",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261104102851-AE58B27E已下发至设备代理AGT-803437A3，业务意图: Synthetic passenger service"
+          },
+          {
+            "id": 1817,
+            "taskId": 207,
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "occurredAt": "2026-11-04T10:28:53.10595",
+            "trigger": "SYSTEM",
+            "reasonCode": "DEVICE_SUCCESS",
+            "detailSummary": "指令CMD-20261104102851-AE58B27E收到设备代理AGT-803437A3执行反馈: SUCCESS"
+          },
+          {
+            "id": 1818,
+            "taskId": 207,
+            "eventType": "STEP_COMPLETED",
+            "occurredAt": "2026-11-04T10:28:53.112651",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1完成条件已满足: routeGenerated=true"
+          },
+          {
+            "id": 1819,
+            "taskId": 207,
+            "eventType": "TASK_COMPLETED",
+            "occurredAt": "2026-11-04T10:28:53.115733",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "全部步骤完成条件均已满足，任务完成"
+          }
+        ],
+        "assignments": [
+          {
+            "id": 115,
+            "stepSeq": 1,
+            "deviceAgentCode": "AGT-803437A3",
+            "commandId": "CMD-20261104102851-3012D13C",
+            "stepStatus": "COMPLETED",
+            "retryCount": 0,
+            "executionResult": "SUCCESS",
+            "reasonCode": "DEVICE_SUCCESS",
+            "outputParams": {
+              "estimatedDistance": 238.0,
+              "routeGenerated": true,
+              "waypointCount": 11,
+              "estimatedDuration": 241
+            },
+            "dispatchedAt": "2026-11-04T10:28:51.801653",
+            "feedbackAt": "2026-11-04T10:28:53.104878",
+            "rejectedAgentIds": []
+          }
+        ],
+        "commands": [
+          "236|TASK_ACCEPT|ACCEPTED",
+          "237|EXECUTE_CAPABILITY|SUCCEEDED"
+        ],
+        "bypassAuditRows": []
+      },
+      "checks": {
+        "threePass": true,
+        "supervised": true,
+        "sixFieldsInEvent": true
+      },
+      "ruleSnapshot": [
+        {
+          "id": 1,
+          "ruleCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+          "ruleContent": "移动机器人会合或陪同服务对象为特殊旅客时判定为高风险；普通空间引导场景不命中",
+          "ruleVersion": "V1.0",
+          "enabled": true,
+          "createdAt": "2026-10-30T13:40:48.586219",
+          "updatedAt": "2026-10-30T13:40:48.586219",
+          "updatedBy": null
+        },
+        {
+          "id": 2,
+          "ruleCode": "RULE_CROSS_ZONE",
+          "ruleContent": "仅移动服务机器人适用；同一任务链条中跨越预定义区域边界1次及以上命中",
+          "ruleVersion": "V1.0",
+          "enabled": true,
+          "createdAt": "2026-10-30T13:40:48.586219",
+          "updatedAt": "2026-10-30T13:40:48.586219",
+          "updatedBy": null
+        },
+        {
+          "id": 3,
+          "ruleCode": "RULE_RESOURCE_CRITICAL",
+          "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+          "ruleVersion": "V3.1",
+          "enabled": false,
+          "createdAt": "2026-10-30T13:40:48.586219",
+          "updatedAt": "2026-11-04T10:28:51.652461",
+          "updatedBy": "set"
+        },
+        {
+          "id": 4,
+          "ruleCode": "GPT_F014_150_API",
+          "ruleContent": "Synthetic F014 validation fixture revised",
+          "ruleVersion": "V1.2",
+          "enabled": false,
+          "createdAt": "2026-11-04T08:07:33.779259",
+          "updatedAt": "2026-11-04T08:07:33.967337",
+          "updatedBy": "set"
+        },
+        {
+          "id": 5,
+          "ruleCode": "GPT_F014_150_UI",
+          "ruleContent": "Synthetic F014 browser-created rule revised",
+          "ruleVersion": "V1.1",
+          "enabled": false,
+          "createdAt": "2026-11-04T08:09:47.309055",
+          "updatedAt": "2026-11-04T08:10:48.202617",
+          "updatedBy": "gpt_f014_ui_150"
+        }
+      ]
+    },
+    {
+      "name": "F151_CROSS_ON",
+      "request": {
+        "taskGoal": "F151_CROSS_ON synthetic service to F2_TEST_GATE",
+        "taskFamily": "EXT_0FA30230",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "controlledResponse": {
+        "steps": [
+          {
+            "stepSeq": 1,
+            "stepGoal": "Synthetic passenger service",
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE",
+              "targetZone": "F2_ZONE_A"
+            },
+            "precondition": "device online",
+            "completionCondition": "routeGenerated=true",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          },
+          {
+            "stepSeq": 2,
+            "stepGoal": "Synthetic passenger service",
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE",
+              "targetZone": "F2_ZONE_B"
+            },
+            "precondition": "device online",
+            "completionCondition": "routeGenerated=true",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          }
+        ],
+        "goalCompletion": "routeGenerated=true"
+      },
+      "observed": {
+        "task": {
+          "id": 208,
+          "taskCode": "TASK-20261104-0208",
+          "taskGoal": "F151_CROSS_ON synthetic service to F2_TEST_GATE",
+          "taskFamily": "EXT_0FA30230",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F151_CROSS_ON synthetic service to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 205,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "监督判定高风险: RULE_CROSS_ZONE；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-04T10:28:54.636333",
+          "updatedAt": "2026-11-04T10:28:54.695957",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 205,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261104-0186",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "targetZone": "F2_ZONE_A"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              },
+              {
+                "stepSeq": 2,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "targetZone": "F2_ZONE_B"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "HIGH",
+            "riskReasonCode": "RULE_CROSS_ZONE",
+            "judgmentBasis": "移动服务机器人跨区域连续服务，命中确定性高风险规则",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.26",
+            "frozenAt": "2026-11-04T10:28:54.687084",
+            "createdAt": "2026-11-04T10:28:54.681969"
+          }
+        ],
+        "events": [
+          {
+            "id": 1820,
+            "taskId": 208,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-04T10:28:54.6378",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F151_CROSS_ON synthetic service to F2_TEST_GATE"
+          },
+          {
+            "id": 1821,
+            "taskId": 208,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-04T10:28:54.661801",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1822,
+            "taskId": 208,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-04T10:28:54.671312",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261104-0186"
+          },
+          {
+            "id": 1823,
+            "taskId": 208,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-04T10:28:54.685071",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1824,
+            "taskId": 208,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-04T10:28:54.688087",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 1825,
+            "taskId": 208,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-04T10:28:54.693952",
+            "trigger": "SYSTEM",
+            "reasonCode": "RULE_CROSS_ZONE",
+            "detailSummary": "监督判定: 风险等级=HIGH；原因码=RULE_CROSS_ZONE；判定依据=移动服务机器人跨区域连续服务，命中确定性高风险规则；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.26；推荐处置=BASELINE_DOWNGRADE（基线降级）"
+          },
+          {
+            "id": 1826,
+            "taskId": 208,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-04T10:28:54.695957",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 监督判定高风险: RULE_CROSS_ZONE"
+          },
+          {
+            "id": 1827,
+            "taskId": 208,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-04T10:28:54.697783",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "监督判定高风险: RULE_CROSS_ZONE；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      },
+      "checks": {
+        "threePass": true,
+        "supervised": true,
+        "sixFieldsInEvent": true
+      },
+      "ruleSnapshot": [
+        {
+          "id": 1,
+          "ruleCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+          "ruleContent": "移动机器人会合或陪同服务对象为特殊旅客时判定为高风险；普通空间引导场景不命中",
+          "ruleVersion": "V1.0",
+          "enabled": true,
+          "createdAt": "2026-10-30T13:40:48.586219",
+          "updatedAt": "2026-10-30T13:40:48.586219",
+          "updatedBy": null
+        },
+        {
+          "id": 2,
+          "ruleCode": "RULE_CROSS_ZONE",
+          "ruleContent": "仅移动服务机器人适用；同一任务链条中跨越预定义区域边界1次及以上命中",
+          "ruleVersion": "V1.0",
+          "enabled": true,
+          "createdAt": "2026-10-30T13:40:48.586219",
+          "updatedAt": "2026-10-30T13:40:48.586219",
+          "updatedBy": null
+        },
+        {
+          "id": 3,
+          "ruleCode": "RULE_RESOURCE_CRITICAL",
+          "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+          "ruleVersion": "V3.1",
+          "enabled": false,
+          "createdAt": "2026-10-30T13:40:48.586219",
+          "updatedAt": "2026-11-04T10:28:51.652461",
+          "updatedBy": "set"
+        },
+        {
+          "id": 4,
+          "ruleCode": "GPT_F014_150_API",
+          "ruleContent": "Synthetic F014 validation fixture revised",
+          "ruleVersion": "V1.2",
+          "enabled": false,
+          "createdAt": "2026-11-04T08:07:33.779259",
+          "updatedAt": "2026-11-04T08:07:33.967337",
+          "updatedBy": "set"
+        },
+        {
+          "id": 5,
+          "ruleCode": "GPT_F014_150_UI",
+          "ruleContent": "Synthetic F014 browser-created rule revised",
+          "ruleVersion": "V1.1",
+          "enabled": false,
+          "createdAt": "2026-11-04T08:09:47.309055",
+          "updatedAt": "2026-11-04T08:10:48.202617",
+          "updatedBy": "gpt_f014_ui_150"
+        }
+      ],
+      "cleanupTerminate": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 208,
+            "taskCode": "TASK-20261104-0208",
+            "taskGoal": "F151_CROSS_ON synthetic service to F2_TEST_GATE",
+            "taskFamily": "EXT_0FA30230",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=true",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F151_CROSS_ON synthetic service to F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "MANUAL_TERMINATED",
+            "currentPlanVersionId": 205,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": "F014 V151 deterministic fixture cleanup",
+            "failureReason": "监督判定高风险: RULE_CROSS_ZONE；且无匹配的已启用基线模板",
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-04T10:28:54.636333",
+            "updatedAt": "2026-11-04T10:28:55.2552766",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-04T10:28:55.264112200+08:00"
+        }
+      }
+    },
+    {
+      "name": "F151_CROSS_OFF",
+      "request": {
+        "taskGoal": "F151_CROSS_OFF synthetic service to F2_TEST_GATE",
+        "taskFamily": "EXT_0FA30230",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "controlledResponse": {
+        "steps": [
+          {
+            "stepSeq": 1,
+            "stepGoal": "Synthetic passenger service",
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE",
+              "targetZone": "F2_ZONE_A"
+            },
+            "precondition": "device online",
+            "completionCondition": "routeGenerated=true",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          },
+          {
+            "stepSeq": 2,
+            "stepGoal": "Synthetic passenger service",
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE",
+              "targetZone": "F2_ZONE_B"
+            },
+            "precondition": "device online",
+            "completionCondition": "routeGenerated=true",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          }
+        ],
+        "goalCompletion": "routeGenerated=true"
+      },
+      "observed": {
+        "task": {
+          "id": 209,
+          "taskCode": "TASK-20261104-0209",
+          "taskGoal": "F151_CROSS_OFF synthetic service to F2_TEST_GATE",
+          "taskFamily": "EXT_0FA30230",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F151_CROSS_OFF synthetic service to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "COMPLETED",
+          "currentPlanVersionId": 206,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": null,
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-04T10:28:55.354886",
+          "updatedAt": "2026-11-04T10:28:58.112941",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 206,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261104-0187",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "targetZone": "F2_ZONE_A"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              },
+              {
+                "stepSeq": 2,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "targetZone": "F2_ZONE_B"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "LOW",
+            "riskReasonCode": null,
+            "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.27",
+            "frozenAt": "2026-11-04T10:28:55.433318",
+            "createdAt": "2026-11-04T10:28:55.420255"
+          }
+        ],
+        "events": [
+          {
+            "id": 1829,
+            "taskId": 209,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-04T10:28:55.356305",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F151_CROSS_OFF synthetic service to F2_TEST_GATE"
+          },
+          {
+            "id": 1830,
+            "taskId": 209,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-04T10:28:55.38186",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1831,
+            "taskId": 209,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-04T10:28:55.406977",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261104-0187"
+          },
+          {
+            "id": 1832,
+            "taskId": 209,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-04T10:28:55.430317",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1833,
+            "taskId": 209,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-04T10:28:55.434323",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 1834,
+            "taskId": 209,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-04T10:28:55.442711",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.27；推荐处置=AUTO_EXECUTE（自动执行）"
+          },
+          {
+            "id": 1835,
+            "taskId": 209,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-04T10:28:55.457877",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-803437A3(距离0.0,负载0)，向候选AGT-803437A3发起承接请求"
+          },
+          {
+            "id": 1836,
+            "taskId": 209,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-04T10:28:55.498034",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-803437A3接受步骤1承接请求"
+          },
+          {
+            "id": 1837,
+            "taskId": 209,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-04T10:28:55.504539",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261104102855-1A1E60DE已下发至设备代理AGT-803437A3，业务意图: Synthetic passenger service"
+          },
+          {
+            "id": 1838,
+            "taskId": 209,
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "occurredAt": "2026-11-04T10:28:56.733169",
+            "trigger": "SYSTEM",
+            "reasonCode": "DEVICE_SUCCESS",
+            "detailSummary": "指令CMD-20261104102855-1A1E60DE收到设备代理AGT-803437A3执行反馈: SUCCESS"
+          },
+          {
+            "id": 1839,
+            "taskId": 209,
+            "eventType": "STEP_COMPLETED",
+            "occurredAt": "2026-11-04T10:28:56.739441",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1完成条件已满足: routeGenerated=true"
+          },
+          {
+            "id": 1840,
+            "taskId": 209,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-04T10:28:56.755507",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤2候选排序（能力匹配->距离->负载）: AGT-803437A3(距离0.0,负载0)，向候选AGT-803437A3发起承接请求"
+          },
+          {
+            "id": 1841,
+            "taskId": 209,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-04T10:28:56.813533",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-803437A3接受步骤2承接请求"
+          },
+          {
+            "id": 1842,
+            "taskId": 209,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-04T10:28:56.820754",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261104102856-4F130EEE已下发至设备代理AGT-803437A3，业务意图: Synthetic passenger service"
+          },
+          {
+            "id": 1843,
+            "taskId": 209,
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "occurredAt": "2026-11-04T10:28:58.097738",
+            "trigger": "SYSTEM",
+            "reasonCode": "DEVICE_SUCCESS",
+            "detailSummary": "指令CMD-20261104102856-4F130EEE收到设备代理AGT-803437A3执行反馈: SUCCESS"
+          },
+          {
+            "id": 1844,
+            "taskId": 209,
+            "eventType": "STEP_COMPLETED",
+            "occurredAt": "2026-11-04T10:28:58.110376",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤2完成条件已满足: routeGenerated=true"
+          },
+          {
+            "id": 1845,
+            "taskId": 209,
+            "eventType": "TASK_COMPLETED",
+            "occurredAt": "2026-11-04T10:28:58.114586",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "全部步骤完成条件均已满足，任务完成"
+          }
+        ],
+        "assignments": [
+          {
+            "id": 116,
+            "stepSeq": 1,
+            "deviceAgentCode": "AGT-803437A3",
+            "commandId": "CMD-20261104102855-39BA0386",
+            "stepStatus": "COMPLETED",
+            "retryCount": 0,
+            "executionResult": "SUCCESS",
+            "reasonCode": "DEVICE_SUCCESS",
+            "outputParams": {
+              "estimatedDistance": 238.0,
+              "routeGenerated": true,
+              "waypointCount": 11,
+              "estimatedDuration": 241
+            },
+            "dispatchedAt": "2026-11-04T10:28:55.502674",
+            "feedbackAt": "2026-11-04T10:28:56.733169",
+            "rejectedAgentIds": []
+          },
+          {
+            "id": 117,
+            "stepSeq": 2,
+            "deviceAgentCode": "AGT-803437A3",
+            "commandId": "CMD-20261104102856-18940480",
+            "stepStatus": "COMPLETED",
+            "retryCount": 0,
+            "executionResult": "SUCCESS",
+            "reasonCode": "DEVICE_SUCCESS",
+            "outputParams": {
+              "estimatedDistance": 238.0,
+              "routeGenerated": true,
+              "waypointCount": 11,
+              "estimatedDuration": 241
+            },
+            "dispatchedAt": "2026-11-04T10:28:56.818016",
+            "feedbackAt": "2026-11-04T10:28:58.097738",
+            "rejectedAgentIds": []
+          }
+        ],
+        "commands": [
+          "238|TASK_ACCEPT|ACCEPTED",
+          "239|EXECUTE_CAPABILITY|SUCCEEDED",
+          "240|TASK_ACCEPT|ACCEPTED",
+          "241|EXECUTE_CAPABILITY|SUCCEEDED"
+        ],
+        "bypassAuditRows": []
+      },
+      "checks": {
+        "threePass": true,
+        "supervised": true,
+        "sixFieldsInEvent": true
+      },
+      "ruleSnapshot": [
+        {
+          "id": 1,
+          "ruleCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+          "ruleContent": "移动机器人会合或陪同服务对象为特殊旅客时判定为高风险；普通空间引导场景不命中",
+          "ruleVersion": "V1.0",
+          "enabled": true,
+          "createdAt": "2026-10-30T13:40:48.586219",
+          "updatedAt": "2026-10-30T13:40:48.586219",
+          "updatedBy": null
+        },
+        {
+          "id": 2,
+          "ruleCode": "RULE_CROSS_ZONE",
+          "ruleContent": "仅移动服务机器人适用；同一任务链条中跨越预定义区域边界1次及以上命中",
+          "ruleVersion": "V1.1",
+          "enabled": false,
+          "createdAt": "2026-10-30T13:40:48.586219",
+          "updatedAt": "2026-11-04T10:28:55.326027",
+          "updatedBy": "set"
+        },
+        {
+          "id": 3,
+          "ruleCode": "RULE_RESOURCE_CRITICAL",
+          "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+          "ruleVersion": "V3.1",
+          "enabled": false,
+          "createdAt": "2026-10-30T13:40:48.586219",
+          "updatedAt": "2026-11-04T10:28:51.652461",
+          "updatedBy": "set"
+        },
+        {
+          "id": 4,
+          "ruleCode": "GPT_F014_150_API",
+          "ruleContent": "Synthetic F014 validation fixture revised",
+          "ruleVersion": "V1.2",
+          "enabled": false,
+          "createdAt": "2026-11-04T08:07:33.779259",
+          "updatedAt": "2026-11-04T08:07:33.967337",
+          "updatedBy": "set"
+        },
+        {
+          "id": 5,
+          "ruleCode": "GPT_F014_150_UI",
+          "ruleContent": "Synthetic F014 browser-created rule revised",
+          "ruleVersion": "V1.1",
+          "enabled": false,
+          "createdAt": "2026-11-04T08:09:47.309055",
+          "updatedAt": "2026-11-04T08:10:48.202617",
+          "updatedBy": "gpt_f014_ui_150"
+        }
+      ]
+    },
+    {
+      "name": "F151_ESCORT_ON",
+      "request": {
+        "taskGoal": "F151_ESCORT_ON synthetic service to F2_TEST_GATE",
+        "taskFamily": "SPECIAL_PASSENGER_SERVICE",
+        "sceneParams": {
+          "assistanceType": "WHEELCHAIR",
+          "serviceLocation": "F2_SERVICE_POINT",
+          "targetLocation": "F2_TEST_GATE",
+          "notificationRequired": true
+        }
+      },
+      "controlledResponse": {
+        "steps": [
+          {
+            "stepSeq": 1,
+            "stepGoal": "Synthetic passenger service",
+            "capabilityType": "CAP_INFO_DISPLAY",
+            "inputParams": {
+              "contentType": "TEXT",
+              "contentData": "测试信息：请前往F2服务点",
+              "displayDuration": 60
+            },
+            "precondition": "device online",
+            "completionCondition": "displayStatus=SUCCESS",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          },
+          {
+            "stepSeq": 2,
+            "stepGoal": "Synthetic passenger service",
+            "capabilityType": "CAP_NOTIFICATION",
+            "inputParams": {
+              "notificationType": "BOTH",
+              "notificationContent": "测试旅客需要轮椅陪同，请现场服务人员协助",
+              "repeatCount": 1
+            },
+            "precondition": "device online",
+            "completionCondition": "notificationStatus=SUCCESS",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          },
+          {
+            "stepSeq": 3,
+            "stepGoal": "Synthetic passenger service",
+            "capabilityType": "CAP_ESCORT",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE",
+              "escortMode": "LEAD",
+              "maxDuration": 600
+            },
+            "precondition": "device online",
+            "completionCondition": "arrivalStatus=ARRIVED",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          }
+        ],
+        "goalCompletion": "旅客已到达目标地点"
+      },
+      "observed": {
+        "task": {
+          "id": 210,
+          "taskCode": "TASK-20261104-0210",
+          "taskGoal": "F151_ESCORT_ON synthetic service to F2_TEST_GATE",
+          "taskFamily": "SPECIAL_PASSENGER_SERVICE",
+          "sceneParams": {
+            "assistanceType": "WHEELCHAIR",
+            "serviceLocation": "F2_SERVICE_POINT",
+            "targetLocation": "F2_TEST_GATE",
+            "notificationRequired": true
+          },
+          "goalParsingResult": {
+            "completionCondition": "旅客已到达目标地点",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F151_ESCORT_ON synthetic service to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 207,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "监督判定高风险: RULE_ESCORT_SPECIAL_PASSENGER；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-04T10:29:00.534007",
+          "updatedAt": "2026-11-04T10:29:00.712835",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 207,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261104-0188",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_INFO_DISPLAY",
+                "inputParams": {
+                  "contentType": "TEXT",
+                  "contentData": "测试信息：请前往F2服务点",
+                  "displayDuration": 60
+                },
+                "precondition": "device online",
+                "completionCondition": "displayStatus=SUCCESS",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              },
+              {
+                "stepSeq": 2,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_NOTIFICATION",
+                "inputParams": {
+                  "notificationType": "BOTH",
+                  "notificationContent": "测试旅客需要轮椅陪同，请现场服务人员协助",
+                  "repeatCount": 1
+                },
+                "precondition": "device online",
+                "completionCondition": "notificationStatus=SUCCESS",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              },
+              {
+                "stepSeq": 3,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_ESCORT",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "escortMode": "LEAD",
+                  "maxDuration": 600
+                },
+                "precondition": "device online",
+                "completionCondition": "arrivalStatus=ARRIVED",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "HIGH",
+            "riskReasonCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+            "judgmentBasis": "移动机器人会合或陪同对象为特殊旅客，命中确定性高风险规则；命中步骤：步骤3(CAP_ESCORT，陪同，绑定移动服务机器人)",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.28",
+            "frozenAt": "2026-11-04T10:29:00.697593",
+            "createdAt": "2026-11-04T10:29:00.686269"
+          }
+        ],
+        "events": [
+          {
+            "id": 1846,
+            "taskId": 210,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-04T10:29:00.538694",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F151_ESCORT_ON synthetic service to F2_TEST_GATE"
+          },
+          {
+            "id": 1847,
+            "taskId": 210,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-04T10:29:00.652211",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1848,
+            "taskId": 210,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-04T10:29:00.664656",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261104-0188"
+          },
+          {
+            "id": 1849,
+            "taskId": 210,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-04T10:29:00.696006",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1850,
+            "taskId": 210,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-04T10:29:00.698572",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 1851,
+            "taskId": 210,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-04T10:29:00.705936",
+            "trigger": "SYSTEM",
+            "reasonCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+            "detailSummary": "监督判定: 风险等级=HIGH；原因码=RULE_ESCORT_SPECIAL_PASSENGER；判定依据=移动机器人会合或陪同对象为特殊旅客，命中确定性高风险规则；命中步骤：步骤3(CAP_ESCORT，陪同，绑定移动服务机器人)；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.28；推荐处置=BASELINE_DOWNGRADE（基线降级）"
+          },
+          {
+            "id": 1852,
+            "taskId": 210,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-04T10:29:00.708067",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 监督判定高风险: RULE_ESCORT_SPECIAL_PASSENGER"
+          },
+          {
+            "id": 1853,
+            "taskId": 210,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-04T10:29:00.715168",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "监督判定高风险: RULE_ESCORT_SPECIAL_PASSENGER；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      },
+      "checks": {
+        "threePass": true,
+        "supervised": true,
+        "sixFieldsInEvent": true
+      },
+      "ruleSnapshot": [
+        {
+          "id": 1,
+          "ruleCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+          "ruleContent": "移动机器人会合或陪同服务对象为特殊旅客时判定为高风险；普通空间引导场景不命中",
+          "ruleVersion": "V1.0",
+          "enabled": true,
+          "createdAt": "2026-10-30T13:40:48.586219",
+          "updatedAt": "2026-10-30T13:40:48.586219",
+          "updatedBy": null
+        },
+        {
+          "id": 2,
+          "ruleCode": "RULE_CROSS_ZONE",
+          "ruleContent": "仅移动服务机器人适用；同一任务链条中跨越预定义区域边界1次及以上命中",
+          "ruleVersion": "V1.2",
+          "enabled": true,
+          "createdAt": "2026-10-30T13:40:48.586219",
+          "updatedAt": "2026-11-04T10:29:00.250949",
+          "updatedBy": "set"
+        },
+        {
+          "id": 3,
+          "ruleCode": "RULE_RESOURCE_CRITICAL",
+          "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+          "ruleVersion": "V3.1",
+          "enabled": false,
+          "createdAt": "2026-10-30T13:40:48.586219",
+          "updatedAt": "2026-11-04T10:28:51.652461",
+          "updatedBy": "set"
+        },
+        {
+          "id": 4,
+          "ruleCode": "GPT_F014_150_API",
+          "ruleContent": "Synthetic F014 validation fixture revised",
+          "ruleVersion": "V1.2",
+          "enabled": false,
+          "createdAt": "2026-11-04T08:07:33.779259",
+          "updatedAt": "2026-11-04T08:07:33.967337",
+          "updatedBy": "set"
+        },
+        {
+          "id": 5,
+          "ruleCode": "GPT_F014_150_UI",
+          "ruleContent": "Synthetic F014 browser-created rule revised",
+          "ruleVersion": "V1.1",
+          "enabled": false,
+          "createdAt": "2026-11-04T08:09:47.309055",
+          "updatedAt": "2026-11-04T08:10:48.202617",
+          "updatedBy": "gpt_f014_ui_150"
+        }
+      ],
+      "cleanupTerminate": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 210,
+            "taskCode": "TASK-20261104-0210",
+            "taskGoal": "F151_ESCORT_ON synthetic service to F2_TEST_GATE",
+            "taskFamily": "SPECIAL_PASSENGER_SERVICE",
+            "sceneParams": {
+              "assistanceType": "WHEELCHAIR",
+              "serviceLocation": "F2_SERVICE_POINT",
+              "targetLocation": "F2_TEST_GATE",
+              "notificationRequired": true
+            },
+            "goalParsingResult": {
+              "completionCondition": "旅客已到达目标地点",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F151_ESCORT_ON synthetic service to F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "MANUAL_TERMINATED",
+            "currentPlanVersionId": 207,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": "F014 V151 deterministic fixture cleanup",
+            "failureReason": "监督判定高风险: RULE_ESCORT_SPECIAL_PASSENGER；且无匹配的已启用基线模板",
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-04T10:29:00.534007",
+            "updatedAt": "2026-11-04T10:29:01.3866996",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-04T10:29:01.391593900+08:00"
+        }
+      }
+    },
+    {
+      "name": "F151_ESCORT_OFF",
+      "request": {
+        "taskGoal": "F151_ESCORT_OFF synthetic service to F2_TEST_GATE",
+        "taskFamily": "SPECIAL_PASSENGER_SERVICE",
+        "sceneParams": {
+          "assistanceType": "WHEELCHAIR",
+          "serviceLocation": "F2_SERVICE_POINT",
+          "targetLocation": "F2_TEST_GATE",
+          "notificationRequired": true
+        }
+      },
+      "controlledResponse": {
+        "steps": [
+          {
+            "stepSeq": 1,
+            "stepGoal": "Synthetic passenger service",
+            "capabilityType": "CAP_INFO_DISPLAY",
+            "inputParams": {
+              "contentType": "TEXT",
+              "contentData": "测试信息：请前往F2服务点",
+              "displayDuration": 60
+            },
+            "precondition": "device online",
+            "completionCondition": "displayStatus=SUCCESS",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          },
+          {
+            "stepSeq": 2,
+            "stepGoal": "Synthetic passenger service",
+            "capabilityType": "CAP_NOTIFICATION",
+            "inputParams": {
+              "notificationType": "BOTH",
+              "notificationContent": "测试旅客需要轮椅陪同，请现场服务人员协助",
+              "repeatCount": 1
+            },
+            "precondition": "device online",
+            "completionCondition": "notificationStatus=SUCCESS",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          },
+          {
+            "stepSeq": 3,
+            "stepGoal": "Synthetic passenger service",
+            "capabilityType": "CAP_ESCORT",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE",
+              "escortMode": "LEAD",
+              "maxDuration": 600
+            },
+            "precondition": "device online",
+            "completionCondition": "arrivalStatus=ARRIVED",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          }
+        ],
+        "goalCompletion": "旅客已到达目标地点"
+      },
+      "observed": {
+        "task": {
+          "id": 211,
+          "taskCode": "TASK-20261104-0211",
+          "taskGoal": "F151_ESCORT_OFF synthetic service to F2_TEST_GATE",
+          "taskFamily": "SPECIAL_PASSENGER_SERVICE",
+          "sceneParams": {
+            "assistanceType": "WHEELCHAIR",
+            "serviceLocation": "F2_SERVICE_POINT",
+            "targetLocation": "F2_TEST_GATE",
+            "notificationRequired": true
+          },
+          "goalParsingResult": {
+            "completionCondition": "旅客已到达目标地点",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F151_ESCORT_OFF synthetic service to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "COMPLETED",
+          "currentPlanVersionId": 208,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": null,
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-04T10:29:01.429308",
+          "updatedAt": "2026-11-04T10:29:04.293221",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 208,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261104-0189",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_INFO_DISPLAY",
+                "inputParams": {
+                  "contentType": "TEXT",
+                  "contentData": "测试信息：请前往F2服务点",
+                  "displayDuration": 60
+                },
+                "precondition": "device online",
+                "completionCondition": "displayStatus=SUCCESS",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              },
+              {
+                "stepSeq": 2,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_NOTIFICATION",
+                "inputParams": {
+                  "notificationType": "BOTH",
+                  "notificationContent": "测试旅客需要轮椅陪同，请现场服务人员协助",
+                  "repeatCount": 1
+                },
+                "precondition": "device online",
+                "completionCondition": "notificationStatus=SUCCESS",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              },
+              {
+                "stepSeq": 3,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_ESCORT",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "escortMode": "LEAD",
+                  "maxDuration": 600
+                },
+                "precondition": "device online",
+                "completionCondition": "arrivalStatus=ARRIVED",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "LOW",
+            "riskReasonCode": null,
+            "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.29",
+            "frozenAt": "2026-11-04T10:29:01.535203",
+            "createdAt": "2026-11-04T10:29:01.523831"
+          }
+        ],
+        "events": [
+          {
+            "id": 1855,
+            "taskId": 211,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-04T10:29:01.431351",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F151_ESCORT_OFF synthetic service to F2_TEST_GATE"
+          },
+          {
+            "id": 1856,
+            "taskId": 211,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-04T10:29:01.47306",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1857,
+            "taskId": 211,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-04T10:29:01.484023",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261104-0189"
+          },
+          {
+            "id": 1858,
+            "taskId": 211,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-04T10:29:01.533178",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1859,
+            "taskId": 211,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-04T10:29:01.536209",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 1860,
+            "taskId": 211,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-04T10:29:01.543455",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.29；推荐处置=AUTO_EXECUTE（自动执行）"
+          },
+          {
+            "id": 1861,
+            "taskId": 211,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-04T10:29:01.561579",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-95E1692F(距离0.0,负载0)，向候选AGT-95E1692F发起承接请求"
+          },
+          {
+            "id": 1862,
+            "taskId": 211,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-04T10:29:01.743442",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-95E1692F接受步骤1承接请求"
+          },
+          {
+            "id": 1863,
+            "taskId": 211,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-04T10:29:01.756515",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261104102901-8147BBB7已下发至设备代理AGT-95E1692F，业务意图: Synthetic passenger service"
+          },
+          {
+            "id": 1864,
+            "taskId": 211,
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "occurredAt": "2026-11-04T10:29:02.346783",
+            "trigger": "SYSTEM",
+            "reasonCode": "DEVICE_SUCCESS",
+            "detailSummary": "指令CMD-20261104102901-8147BBB7收到设备代理AGT-95E1692F执行反馈: SUCCESS"
+          },
+          {
+            "id": 1865,
+            "taskId": 211,
+            "eventType": "STEP_COMPLETED",
+            "occurredAt": "2026-11-04T10:29:02.353669",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1完成条件已满足: displayStatus=SUCCESS"
+          },
+          {
+            "id": 1866,
+            "taskId": 211,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-04T10:29:02.363465",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤2候选排序（能力匹配->距离->负载）: AGT-803437A3(距离0.0,负载0)，向候选AGT-803437A3发起承接请求"
+          },
+          {
+            "id": 1867,
+            "taskId": 211,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-04T10:29:02.423898",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-803437A3接受步骤2承接请求"
+          },
+          {
+            "id": 1868,
+            "taskId": 211,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-04T10:29:02.427972",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261104102902-2B72775F已下发至设备代理AGT-803437A3，业务意图: Synthetic passenger service"
+          },
+          {
+            "id": 1869,
+            "taskId": 211,
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "occurredAt": "2026-11-04T10:29:03.000515",
+            "trigger": "SYSTEM",
+            "reasonCode": "DEVICE_SUCCESS",
+            "detailSummary": "指令CMD-20261104102902-2B72775F收到设备代理AGT-803437A3执行反馈: SUCCESS"
+          },
+          {
+            "id": 1870,
+            "taskId": 211,
+            "eventType": "STEP_COMPLETED",
+            "occurredAt": "2026-11-04T10:29:03.004008",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤2完成条件已满足: notificationStatus=SUCCESS"
+          },
+          {
+            "id": 1871,
+            "taskId": 211,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-04T10:29:03.013492",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤3候选排序（能力匹配->距离->负载）: AGT-803437A3(距离0.0,负载0)，向候选AGT-803437A3发起承接请求"
+          },
+          {
+            "id": 1872,
+            "taskId": 211,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-04T10:29:03.077484",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-803437A3接受步骤3承接请求"
+          },
+          {
+            "id": 1873,
+            "taskId": 211,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-04T10:29:03.082798",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261104102903-88427B43已下发至设备代理AGT-803437A3，业务意图: Synthetic passenger service"
+          },
+          {
+            "id": 1874,
+            "taskId": 211,
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "occurredAt": "2026-11-04T10:29:04.286243",
+            "trigger": "SYSTEM",
+            "reasonCode": "DEVICE_SUCCESS",
+            "detailSummary": "指令CMD-20261104102903-88427B43收到设备代理AGT-803437A3执行反馈: SUCCESS"
+          },
+          {
+            "id": 1875,
+            "taskId": 211,
+            "eventType": "STEP_COMPLETED",
+            "occurredAt": "2026-11-04T10:29:04.291298",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤3完成条件已满足: arrivalStatus=ARRIVED"
+          },
+          {
+            "id": 1876,
+            "taskId": 211,
+            "eventType": "TASK_COMPLETED",
+            "occurredAt": "2026-11-04T10:29:04.293221",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "全部步骤完成条件均已满足，任务完成"
+          }
+        ],
+        "assignments": [
+          {
+            "id": 118,
+            "stepSeq": 1,
+            "deviceAgentCode": "AGT-95E1692F",
+            "commandId": "CMD-20261104102901-8D3AAA7F",
+            "stepStatus": "COMPLETED",
+            "retryCount": 0,
+            "executionResult": "SUCCESS",
+            "reasonCode": "DEVICE_SUCCESS",
+            "outputParams": {
+              "errorMessage": "",
+              "actualDuration": 60,
+              "displayStatus": "SUCCESS"
+            },
+            "dispatchedAt": "2026-11-04T10:29:01.754573",
+            "feedbackAt": "2026-11-04T10:29:02.346783",
+            "rejectedAgentIds": []
+          },
+          {
+            "id": 119,
+            "stepSeq": 2,
+            "deviceAgentCode": "AGT-803437A3",
+            "commandId": "CMD-20261104102902-ACF666AC",
+            "stepStatus": "COMPLETED",
+            "retryCount": 0,
+            "executionResult": "SUCCESS",
+            "reasonCode": "DEVICE_SUCCESS",
+            "outputParams": {
+              "notificationStatus": "SUCCESS",
+              "actualRepeatCount": 1
+            },
+            "dispatchedAt": "2026-11-04T10:29:02.426447",
+            "feedbackAt": "2026-11-04T10:29:03.000515",
+            "rejectedAgentIds": []
+          },
+          {
+            "id": 120,
+            "stepSeq": 3,
+            "deviceAgentCode": "AGT-803437A3",
+            "commandId": "CMD-20261104102903-C2C0FF79",
+            "stepStatus": "COMPLETED",
+            "retryCount": 0,
+            "executionResult": "SUCCESS",
+            "reasonCode": "DEVICE_SUCCESS",
+            "outputParams": {
+              "arrivalStatus": "ARRIVED",
+              "actualDistance": 85.2,
+              "actualDuration": 420
+            },
+            "dispatchedAt": "2026-11-04T10:29:03.081132",
+            "feedbackAt": "2026-11-04T10:29:04.286243",
+            "rejectedAgentIds": []
+          }
+        ],
+        "commands": [
+          "242|TASK_ACCEPT|ACCEPTED",
+          "243|EXECUTE_CAPABILITY|SUCCEEDED",
+          "244|TASK_ACCEPT|ACCEPTED",
+          "245|EXECUTE_CAPABILITY|SUCCEEDED",
+          "246|TASK_ACCEPT|ACCEPTED",
+          "247|EXECUTE_CAPABILITY|SUCCEEDED"
+        ],
+        "bypassAuditRows": []
+      },
+      "checks": {
+        "threePass": true,
+        "supervised": true,
+        "sixFieldsInEvent": true
+      },
+      "ruleSnapshot": [
+        {
+          "id": 1,
+          "ruleCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+          "ruleContent": "移动机器人会合或陪同服务对象为特殊旅客时判定为高风险；普通空间引导场景不命中",
+          "ruleVersion": "V1.1",
+          "enabled": false,
+          "createdAt": "2026-10-30T13:40:48.586219",
+          "updatedAt": "2026-11-04T10:29:01.40837",
+          "updatedBy": "set"
+        },
+        {
+          "id": 2,
+          "ruleCode": "RULE_CROSS_ZONE",
+          "ruleContent": "仅移动服务机器人适用；同一任务链条中跨越预定义区域边界1次及以上命中",
+          "ruleVersion": "V1.2",
+          "enabled": true,
+          "createdAt": "2026-10-30T13:40:48.586219",
+          "updatedAt": "2026-11-04T10:29:00.250949",
+          "updatedBy": "set"
+        },
+        {
+          "id": 3,
+          "ruleCode": "RULE_RESOURCE_CRITICAL",
+          "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+          "ruleVersion": "V3.1",
+          "enabled": false,
+          "createdAt": "2026-10-30T13:40:48.586219",
+          "updatedAt": "2026-11-04T10:28:51.652461",
+          "updatedBy": "set"
+        },
+        {
+          "id": 4,
+          "ruleCode": "GPT_F014_150_API",
+          "ruleContent": "Synthetic F014 validation fixture revised",
+          "ruleVersion": "V1.2",
+          "enabled": false,
+          "createdAt": "2026-11-04T08:07:33.779259",
+          "updatedAt": "2026-11-04T08:07:33.967337",
+          "updatedBy": "set"
+        },
+        {
+          "id": 5,
+          "ruleCode": "GPT_F014_150_UI",
+          "ruleContent": "Synthetic F014 browser-created rule revised",
+          "ruleVersion": "V1.1",
+          "enabled": false,
+          "createdAt": "2026-11-04T08:09:47.309055",
+          "updatedAt": "2026-11-04T08:10:48.202617",
+          "updatedBy": "gpt_f014_ui_150"
+        }
+      ]
+    },
+    {
+      "name": "F151_RENDEZVOUS",
+      "request": {
+        "taskGoal": "F151_RENDEZVOUS synthetic service to F2_TEST_GATE",
+        "taskFamily": "SPECIAL_PASSENGER_SERVICE",
+        "sceneParams": {
+          "assistanceType": "WHEELCHAIR",
+          "serviceLocation": "F2_SERVICE_POINT",
+          "targetLocation": "F2_TEST_GATE",
+          "notificationRequired": true
+        }
+      },
+      "controlledResponse": {
+        "steps": [
+          {
+            "stepSeq": 1,
+            "stepGoal": "Synthetic passenger service",
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "precondition": "device online",
+            "completionCondition": "routeGenerated=true",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          },
+          {
+            "stepSeq": 2,
+            "stepGoal": "Synthetic passenger service",
+            "capabilityType": "CAP_INFO_DISPLAY",
+            "inputParams": {
+              "contentType": "TEXT",
+              "contentData": "测试信息：请前往F2服务点",
+              "displayDuration": 60
+            },
+            "precondition": "device online",
+            "completionCondition": "displayStatus=SUCCESS",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          },
+          {
+            "stepSeq": 3,
+            "stepGoal": "Synthetic passenger service",
+            "capabilityType": "CAP_NOTIFICATION",
+            "inputParams": {
+              "notificationType": "BOTH",
+              "notificationContent": "测试旅客需要轮椅陪同，请现场服务人员协助",
+              "repeatCount": 1
+            },
+            "precondition": "device online",
+            "completionCondition": "notificationStatus=SUCCESS",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          },
+          {
+            "stepSeq": 4,
+            "stepGoal": "Synthetic passenger service",
+            "capabilityType": "CAP_ESCORT",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE",
+              "escortMode": "LEAD",
+              "maxDuration": 600
+            },
+            "precondition": "device online",
+            "completionCondition": "arrivalStatus=ARRIVED",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          }
+        ],
+        "goalCompletion": "旅客已到达目标地点"
+      },
+      "observed": {
+        "task": {
+          "id": 212,
+          "taskCode": "TASK-20261104-0212",
+          "taskGoal": "F151_RENDEZVOUS synthetic service to F2_TEST_GATE",
+          "taskFamily": "SPECIAL_PASSENGER_SERVICE",
+          "sceneParams": {
+            "assistanceType": "WHEELCHAIR",
+            "serviceLocation": "F2_SERVICE_POINT",
+            "targetLocation": "F2_TEST_GATE",
+            "notificationRequired": true
+          },
+          "goalParsingResult": {
+            "completionCondition": "旅客已到达目标地点",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F151_RENDEZVOUS synthetic service to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 209,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "监督判定高风险: RULE_ESCORT_SPECIAL_PASSENGER；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-04T10:29:06.102523",
+          "updatedAt": "2026-11-04T10:29:07.279452",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 209,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261104-0190",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              },
+              {
+                "stepSeq": 2,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_INFO_DISPLAY",
+                "inputParams": {
+                  "contentType": "TEXT",
+                  "contentData": "测试信息：请前往F2服务点",
+                  "displayDuration": 60
+                },
+                "precondition": "device online",
+                "completionCondition": "displayStatus=SUCCESS",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              },
+              {
+                "stepSeq": 3,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_NOTIFICATION",
+                "inputParams": {
+                  "notificationType": "BOTH",
+                  "notificationContent": "测试旅客需要轮椅陪同，请现场服务人员协助",
+                  "repeatCount": 1
+                },
+                "precondition": "device online",
+                "completionCondition": "notificationStatus=SUCCESS",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              },
+              {
+                "stepSeq": 4,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_ESCORT",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "escortMode": "LEAD",
+                  "maxDuration": 600
+                },
+                "precondition": "device online",
+                "completionCondition": "arrivalStatus=ARRIVED",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "HIGH",
+            "riskReasonCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+            "judgmentBasis": "移动机器人会合或陪同对象为特殊旅客，命中确定性高风险规则；命中步骤：步骤1(CAP_NAVIGATION，会合，绑定移动服务机器人)、步骤4(CAP_ESCORT，陪同，绑定移动服务机器人)",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.30",
+            "frozenAt": "2026-11-04T10:29:07.266751",
+            "createdAt": "2026-11-04T10:29:07.229161"
+          }
+        ],
+        "events": [
+          {
+            "id": 1877,
+            "taskId": 212,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-04T10:29:06.103552",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F151_RENDEZVOUS synthetic service to F2_TEST_GATE"
+          },
+          {
+            "id": 1878,
+            "taskId": 212,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-04T10:29:06.568367",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1879,
+            "taskId": 212,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-04T10:29:06.848416",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261104-0190"
+          },
+          {
+            "id": 1880,
+            "taskId": 212,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-04T10:29:07.264484",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1881,
+            "taskId": 212,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-04T10:29:07.267878",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 1882,
+            "taskId": 212,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-04T10:29:07.276756",
+            "trigger": "SYSTEM",
+            "reasonCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+            "detailSummary": "监督判定: 风险等级=HIGH；原因码=RULE_ESCORT_SPECIAL_PASSENGER；判定依据=移动机器人会合或陪同对象为特殊旅客，命中确定性高风险规则；命中步骤：步骤1(CAP_NAVIGATION，会合，绑定移动服务机器人)、步骤4(CAP_ESCORT，陪同，绑定移动服务机器人)；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.30；推荐处置=BASELINE_DOWNGRADE（基线降级）"
+          },
+          {
+            "id": 1883,
+            "taskId": 212,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-04T10:29:07.278478",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 监督判定高风险: RULE_ESCORT_SPECIAL_PASSENGER"
+          },
+          {
+            "id": 1884,
+            "taskId": 212,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-04T10:29:07.280483",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "监督判定高风险: RULE_ESCORT_SPECIAL_PASSENGER；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": []
+      },
+      "checks": {
+        "threePass": true,
+        "supervised": true,
+        "sixFieldsInEvent": true
+      },
+      "ruleSnapshot": [
+        {
+          "id": 1,
+          "ruleCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+          "ruleContent": "移动机器人会合或陪同服务对象为特殊旅客时判定为高风险；普通空间引导场景不命中",
+          "ruleVersion": "V1.2",
+          "enabled": true,
+          "createdAt": "2026-10-30T13:40:48.586219",
+          "updatedAt": "2026-11-04T10:29:06.080757",
+          "updatedBy": "set"
+        },
+        {
+          "id": 2,
+          "ruleCode": "RULE_CROSS_ZONE",
+          "ruleContent": "仅移动服务机器人适用；同一任务链条中跨越预定义区域边界1次及以上命中",
+          "ruleVersion": "V1.2",
+          "enabled": true,
+          "createdAt": "2026-10-30T13:40:48.586219",
+          "updatedAt": "2026-11-04T10:29:00.250949",
+          "updatedBy": "set"
+        },
+        {
+          "id": 3,
+          "ruleCode": "RULE_RESOURCE_CRITICAL",
+          "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+          "ruleVersion": "V3.1",
+          "enabled": false,
+          "createdAt": "2026-10-30T13:40:48.586219",
+          "updatedAt": "2026-11-04T10:28:51.652461",
+          "updatedBy": "set"
+        },
+        {
+          "id": 4,
+          "ruleCode": "GPT_F014_150_API",
+          "ruleContent": "Synthetic F014 validation fixture revised",
+          "ruleVersion": "V1.2",
+          "enabled": false,
+          "createdAt": "2026-11-04T08:07:33.779259",
+          "updatedAt": "2026-11-04T08:07:33.967337",
+          "updatedBy": "set"
+        },
+        {
+          "id": 5,
+          "ruleCode": "GPT_F014_150_UI",
+          "ruleContent": "Synthetic F014 browser-created rule revised",
+          "ruleVersion": "V1.1",
+          "enabled": false,
+          "createdAt": "2026-11-04T08:09:47.309055",
+          "updatedAt": "2026-11-04T08:10:48.202617",
+          "updatedBy": "gpt_f014_ui_150"
+        }
+      ],
+      "cleanupTerminate": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 212,
+            "taskCode": "TASK-20261104-0212",
+            "taskGoal": "F151_RENDEZVOUS synthetic service to F2_TEST_GATE",
+            "taskFamily": "SPECIAL_PASSENGER_SERVICE",
+            "sceneParams": {
+              "assistanceType": "WHEELCHAIR",
+              "serviceLocation": "F2_SERVICE_POINT",
+              "targetLocation": "F2_TEST_GATE",
+              "notificationRequired": true
+            },
+            "goalParsingResult": {
+              "completionCondition": "旅客已到达目标地点",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F151_RENDEZVOUS synthetic service to F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "MANUAL_TERMINATED",
+            "currentPlanVersionId": 209,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": "F014 V151 deterministic fixture cleanup",
+            "failureReason": "监督判定高风险: RULE_ESCORT_SPECIAL_PASSENGER；且无匹配的已启用基线模板",
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-04T10:29:06.102523",
+            "updatedAt": "2026-11-04T10:29:07.9616819",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-04T10:29:07.965031200+08:00"
+        }
+      }
+    },
+    {
+      "name": "F151_PUBLIC_FLIGHT",
+      "request": {
+        "taskGoal": "F151_PUBLIC_FLIGHT synthetic service to F2_TEST_GATE",
+        "taskFamily": "FLIGHT_CHANGE_RESPONSE",
+        "sceneParams": {
+          "flightNumber": "ZZ151",
+          "targetLocation": "F2_TEST_GATE",
+          "newGate": "F2_TEST_GATE"
+        }
+      },
+      "controlledResponse": {
+        "steps": [
+          {
+            "stepSeq": 1,
+            "stepGoal": "Synthetic passenger service",
+            "capabilityType": "CAP_FLIGHT_UPDATE",
+            "inputParams": {
+              "flightNumber": "TEST1022",
+              "updateType": "GATE_CHANGE",
+              "updateContent": "测试航班登机口变更至F2_TEST_GATE",
+              "displayDuration": 60
+            },
+            "precondition": "device online",
+            "completionCondition": "updateStatus=SUCCESS",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          },
+          {
+            "stepSeq": 2,
+            "stepGoal": "Synthetic passenger service",
+            "capabilityType": "CAP_INFO_DISPLAY",
+            "inputParams": {
+              "contentType": "TEXT",
+              "contentData": "测试信息：请前往F2服务点",
+              "displayDuration": 60
+            },
+            "precondition": "device online",
+            "completionCondition": "displayStatus=SUCCESS",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          },
+          {
+            "stepSeq": 3,
+            "stepGoal": "Synthetic passenger service",
+            "capabilityType": "CAP_NOTIFICATION",
+            "inputParams": {
+              "notificationType": "BOTH",
+              "notificationContent": "测试旅客需要轮椅陪同，请现场服务人员协助",
+              "repeatCount": 1
+            },
+            "precondition": "device online",
+            "completionCondition": "notificationStatus=SUCCESS",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          }
+        ],
+        "goalCompletion": "航班变更信息已送达且旅客后续引导（如需）已完成"
+      },
+      "observed": {
+        "task": {
+          "id": 213,
+          "taskCode": "TASK-20261104-0213",
+          "taskGoal": "F151_PUBLIC_FLIGHT synthetic service to F2_TEST_GATE",
+          "taskFamily": "FLIGHT_CHANGE_RESPONSE",
+          "sceneParams": {
+            "flightNumber": "ZZ151",
+            "targetLocation": "F2_TEST_GATE",
+            "newGate": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "航班变更信息已送达且旅客后续引导（如需）已完成",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F151_PUBLIC_FLIGHT synthetic service to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 210,
+          "replanUsed": true,
+          "replanningReason": "STEP_FAILED: 设备返回执行成功，但完成条件未满足",
+          "manualTerminateReason": null,
+          "failureReason": "局部重新规划失败：新计划版本三类校验未通过: ERR_REQUIRED_CHANNEL_MISSING",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-04T10:29:07.993547",
+          "updatedAt": "2026-11-04T10:29:09.587585",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 210,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261104-0191",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_FLIGHT_UPDATE",
+                "inputParams": {
+                  "flightNumber": "TEST1022",
+                  "updateType": "GATE_CHANGE",
+                  "updateContent": "测试航班登机口变更至F2_TEST_GATE",
+                  "displayDuration": 60
+                },
+                "precondition": "device online",
+                "completionCondition": "updateStatus=SUCCESS",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              },
+              {
+                "stepSeq": 2,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_INFO_DISPLAY",
+                "inputParams": {
+                  "contentType": "TEXT",
+                  "contentData": "测试信息：请前往F2服务点",
+                  "displayDuration": 60
+                },
+                "precondition": "device online",
+                "completionCondition": "displayStatus=SUCCESS",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              },
+              {
+                "stepSeq": 3,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_NOTIFICATION",
+                "inputParams": {
+                  "notificationType": "BOTH",
+                  "notificationContent": "测试旅客需要轮椅陪同，请现场服务人员协助",
+                  "repeatCount": 1
+                },
+                "precondition": "device online",
+                "completionCondition": "notificationStatus=SUCCESS",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "LOW",
+            "riskReasonCode": null,
+            "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.30",
+            "frozenAt": "2026-11-04T10:29:08.09962",
+            "createdAt": "2026-11-04T10:29:08.073668"
+          },
+          {
+            "id": 211,
+            "versionNo": 2,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261104-0192",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic navigation 1",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "最多重试2次后转人工",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "FAIL",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [
+              {
+                "errorType": "CAPABILITY",
+                "description": "核心场景计划缺少必需渠道FLIGHT_DELAY_BOARD的能力CAP_FLIGHT_UPDATE",
+                "stepSeq": null,
+                "reasonCode": "ERR_REQUIRED_CHANNEL_MISSING"
+              },
+              {
+                "errorType": "CAPABILITY",
+                "description": "核心场景计划缺少必需渠道SMART_DISPLAY的能力CAP_INFO_DISPLAY",
+                "stepSeq": null,
+                "reasonCode": "ERR_REQUIRED_CHANNEL_MISSING"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-04T10:29:09.581804"
+          }
+        ],
+        "events": [
+          {
+            "id": 1886,
+            "taskId": 213,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-04T10:29:08.024075",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F151_PUBLIC_FLIGHT synthetic service to F2_TEST_GATE"
+          },
+          {
+            "id": 1887,
+            "taskId": 213,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-04T10:29:08.045856",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 1888,
+            "taskId": 213,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-04T10:29:08.056565",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261104-0191"
+          },
+          {
+            "id": 1889,
+            "taskId": 213,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-04T10:29:08.096894",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 1890,
+            "taskId": 213,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-04T10:29:08.100624",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 1891,
+            "taskId": 213,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-04T10:29:08.104912",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.30；推荐处置=AUTO_EXECUTE（自动执行）"
+          },
+          {
+            "id": 1892,
+            "taskId": 213,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-04T10:29:08.117424",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-C1E2CAF3(距离0.0,负载0)，向候选AGT-C1E2CAF3发起承接请求"
+          },
+          {
+            "id": 1893,
+            "taskId": 213,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-04T10:29:08.179018",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-C1E2CAF3接受步骤1承接请求"
+          },
+          {
+            "id": 1894,
+            "taskId": 213,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-04T10:29:08.184156",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261104102908-962B8489已下发至设备代理AGT-C1E2CAF3，业务意图: Synthetic passenger service"
+          },
+          {
+            "id": 1895,
+            "taskId": 213,
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "occurredAt": "2026-11-04T10:29:08.742609",
+            "trigger": "SYSTEM",
+            "reasonCode": "DEVICE_SUCCESS",
+            "detailSummary": "指令CMD-20261104102908-962B8489收到设备代理AGT-C1E2CAF3执行反馈: SUCCESS"
+          },
+          {
+            "id": 1896,
+            "taskId": 213,
+            "eventType": "STEP_RETRY_DISPATCHED",
+            "occurredAt": "2026-11-04T10:29:08.76425",
+            "trigger": "SYSTEM",
+            "reasonCode": "DEVICE_SUCCESS",
+            "detailSummary": "步骤1自动重试1次，沿用执行指令编号CMD-20261104102908-962B8489，尝试序号1，原因: 设备返回执行成功，但完成条件未满足"
+          },
+          {
+            "id": 1897,
+            "taskId": 213,
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "occurredAt": "2026-11-04T10:29:09.476104",
+            "trigger": "SYSTEM",
+            "reasonCode": "DEVICE_SUCCESS",
+            "detailSummary": "指令CMD-20261104102908-962B8489收到设备代理AGT-C1E2CAF3执行反馈: SUCCESS"
+          },
+          {
+            "id": 1898,
+            "taskId": 213,
+            "eventType": "STEP_FAILED",
+            "occurredAt": "2026-11-04T10:29:09.482066",
+            "trigger": "SYSTEM",
+            "reasonCode": "DEVICE_SUCCESS",
+            "detailSummary": "步骤1重试后仍失败: 设备返回执行成功，但完成条件未满足"
+          },
+          {
+            "id": 1899,
+            "taskId": 213,
+            "eventType": "EXCEPTION_DETECTED",
+            "occurredAt": "2026-11-04T10:29:09.488554",
+            "trigger": "SYSTEM",
+            "reasonCode": "STEP_FAILED",
+            "detailSummary": "识别到异常: STEP_FAILED，步骤1，详情: 设备返回执行成功，但完成条件未满足"
+          },
+          {
+            "id": 1900,
+            "taskId": 213,
+            "eventType": "EXCEPTION_RECOVERY_FAILED",
+            "occurredAt": "2026-11-04T10:29:09.514018",
+            "trigger": "SYSTEM",
+            "reasonCode": "STEP_FAILED",
+            "detailSummary": "恢复动作: 无可用候选设备，恢复动作未执行，结果: 失败，判断计划是否可继续"
+          },
+          {
+            "id": 1901,
+            "taskId": 213,
+            "eventType": "REPLANNING_TRIGGERED",
+            "occurredAt": "2026-11-04T10:29:09.518944",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1恢复失败且计划不可继续，重新规划机会未用，触发5.5.4局部重新规划"
+          },
+          {
+            "id": 1902,
+            "taskId": 213,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-04T10:29:09.550577",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "局部重新规划重建上下文快照CTX-20261104-0192"
+          },
+          {
+            "id": 1903,
+            "taskId": 213,
+            "eventType": "REPLAN_FAILED",
+            "occurredAt": "2026-11-04T10:29:09.586671",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_REQUIRED_CHANNEL_MISSING",
+            "detailSummary": "重新规划后新计划版本2三类校验未通过: 2项错误 [CAPABILITY 步骤-: 核心场景计划缺少必需渠道FLIGHT_DELAY_BOARD的能力CAP_FLIGHT_UPDATE(ERR_REQUIRED_CHANNEL_MISSING); CAPABILITY 步骤-: 核心场景计划缺少必需渠道SMART_DISPLAY的能力CAP_INFO_DISPLAY(ERR_REQUIRED_CHANNEL_MISSING)]"
+          },
+          {
+            "id": 1904,
+            "taskId": 213,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-04T10:29:09.588831",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_REPLAN_FAILED",
+            "detailSummary": "局部重新规划失败：新计划版本三类校验未通过: ERR_REQUIRED_CHANNEL_MISSING"
+          }
+        ],
+        "assignments": [
+          {
+            "id": 121,
+            "stepSeq": 1,
+            "deviceAgentCode": "AGT-C1E2CAF3",
+            "commandId": "CMD-20261104102908-9E1B4AC3",
+            "stepStatus": "FAILED",
+            "retryCount": 1,
+            "executionResult": "SUCCESS",
+            "reasonCode": "DEVICE_SUCCESS",
+            "outputParams": {
+              "publishStatus": "SUCCESS",
+              "publishTime": "2026-11-04T10:29:09.447044600+08:00"
+            },
+            "dispatchedAt": "2026-11-04T10:29:08.744743",
+            "feedbackAt": "2026-11-04T10:29:09.476104",
+            "rejectedAgentIds": []
+          },
+          {
+            "id": 122,
+            "stepSeq": 2,
+            "deviceAgentCode": null,
+            "commandId": null,
+            "stepStatus": "FROZEN",
+            "retryCount": 0,
+            "executionResult": null,
+            "reasonCode": null,
+            "outputParams": null,
+            "dispatchedAt": null,
+            "feedbackAt": null,
+            "rejectedAgentIds": []
+          },
+          {
+            "id": 123,
+            "stepSeq": 3,
+            "deviceAgentCode": null,
+            "commandId": null,
+            "stepStatus": "FROZEN",
+            "retryCount": 0,
+            "executionResult": null,
+            "reasonCode": null,
+            "outputParams": null,
+            "dispatchedAt": null,
+            "feedbackAt": null,
+            "rejectedAgentIds": []
+          }
+        ],
+        "commands": [
+          "248|TASK_ACCEPT|ACCEPTED",
+          "249|EXECUTE_CAPABILITY|SUCCEEDED",
+          "250|EXECUTE_CAPABILITY|SUCCEEDED"
+        ],
+        "bypassAuditRows": []
+      },
+      "checks": {
+        "threePass": true,
+        "supervised": true,
+        "sixFieldsInEvent": true
+      },
+      "ruleSnapshot": [
+        {
+          "id": 1,
+          "ruleCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+          "ruleContent": "移动机器人会合或陪同服务对象为特殊旅客时判定为高风险；普通空间引导场景不命中",
+          "ruleVersion": "V1.2",
+          "enabled": true,
+          "createdAt": "2026-10-30T13:40:48.586219",
+          "updatedAt": "2026-11-04T10:29:06.080757",
+          "updatedBy": "set"
+        },
+        {
+          "id": 2,
+          "ruleCode": "RULE_CROSS_ZONE",
+          "ruleContent": "仅移动服务机器人适用；同一任务链条中跨越预定义区域边界1次及以上命中",
+          "ruleVersion": "V1.2",
+          "enabled": true,
+          "createdAt": "2026-10-30T13:40:48.586219",
+          "updatedAt": "2026-11-04T10:29:00.250949",
+          "updatedBy": "set"
+        },
+        {
+          "id": 3,
+          "ruleCode": "RULE_RESOURCE_CRITICAL",
+          "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+          "ruleVersion": "V3.1",
+          "enabled": false,
+          "createdAt": "2026-10-30T13:40:48.586219",
+          "updatedAt": "2026-11-04T10:28:51.652461",
+          "updatedBy": "set"
+        },
+        {
+          "id": 4,
+          "ruleCode": "GPT_F014_150_API",
+          "ruleContent": "Synthetic F014 validation fixture revised",
+          "ruleVersion": "V1.2",
+          "enabled": false,
+          "createdAt": "2026-11-04T08:07:33.779259",
+          "updatedAt": "2026-11-04T08:07:33.967337",
+          "updatedBy": "set"
+        },
+        {
+          "id": 5,
+          "ruleCode": "GPT_F014_150_UI",
+          "ruleContent": "Synthetic F014 browser-created rule revised",
+          "ruleVersion": "V1.1",
+          "enabled": false,
+          "createdAt": "2026-11-04T08:09:47.309055",
+          "updatedAt": "2026-11-04T08:10:48.202617",
+          "updatedBy": "gpt_f014_ui_150"
+        }
+      ],
+      "cleanupTerminate": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 213,
+            "taskCode": "TASK-20261104-0213",
+            "taskGoal": "F151_PUBLIC_FLIGHT synthetic service to F2_TEST_GATE",
+            "taskFamily": "FLIGHT_CHANGE_RESPONSE",
+            "sceneParams": {
+              "flightNumber": "ZZ151",
+              "targetLocation": "F2_TEST_GATE",
+              "newGate": "F2_TEST_GATE"
+            },
+            "goalParsingResult": {
+              "completionCondition": "航班变更信息已送达且旅客后续引导（如需）已完成",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F151_PUBLIC_FLIGHT synthetic service to F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "MANUAL_TERMINATED",
+            "currentPlanVersionId": 210,
+            "replanUsed": true,
+            "replanningReason": "STEP_FAILED: 设备返回执行成功，但完成条件未满足",
+            "manualTerminateReason": "F014 V151 deterministic fixture cleanup",
+            "failureReason": "局部重新规划失败：新计划版本三类校验未通过: ERR_REQUIRED_CHANNEL_MISSING",
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-04T10:29:07.993547",
+            "updatedAt": "2026-11-04T10:29:11.9618668",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-04T10:29:11.967072400+08:00"
+        }
+      }
+    }
+  ],
+  "rulesBefore": [
+    {
+      "id": 1,
+      "ruleCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+      "ruleContent": "移动机器人会合或陪同服务对象为特殊旅客时判定为高风险；普通空间引导场景不命中",
+      "ruleVersion": "V1.0",
+      "enabled": true,
+      "createdAt": "2026-10-30T13:40:48.586219",
+      "updatedAt": "2026-10-30T13:40:48.586219",
+      "updatedBy": null
+    },
+    {
+      "id": 2,
+      "ruleCode": "RULE_CROSS_ZONE",
+      "ruleContent": "仅移动服务机器人适用；同一任务链条中跨越预定义区域边界1次及以上命中",
+      "ruleVersion": "V1.0",
+      "enabled": true,
+      "createdAt": "2026-10-30T13:40:48.586219",
+      "updatedAt": "2026-10-30T13:40:48.586219",
+      "updatedBy": null
+    },
+    {
+      "id": 3,
+      "ruleCode": "RULE_RESOURCE_CRITICAL",
+      "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+      "ruleVersion": "V3",
+      "enabled": true,
+      "createdAt": "2026-10-30T13:40:48.586219",
+      "updatedAt": "2026-11-04T10:26:37.977788",
+      "updatedBy": "set"
+    },
+    {
+      "id": 4,
+      "ruleCode": "GPT_F014_150_API",
+      "ruleContent": "Synthetic F014 validation fixture revised",
+      "ruleVersion": "V1.2",
+      "enabled": false,
+      "createdAt": "2026-11-04T08:07:33.779259",
+      "updatedAt": "2026-11-04T08:07:33.967337",
+      "updatedBy": "set"
+    },
+    {
+      "id": 5,
+      "ruleCode": "GPT_F014_150_UI",
+      "ruleContent": "Synthetic F014 browser-created rule revised",
+      "ruleVersion": "V1.1",
+      "enabled": false,
+      "createdAt": "2026-11-04T08:09:47.309055",
+      "updatedAt": "2026-11-04T08:10:48.202617",
+      "updatedBy": "gpt_f014_ui_150"
+    }
+  ],
+  "definitionBefore": {
+    "id": 17,
+    "definitionCode": "EXT_0FA30230",
+    "taskName": "G145 F013 baseline fixtures",
+    "goalTemplate": "Synthetic navigation to selected destination",
+    "sceneParams": [
+      {
+        "name": "targetLocation",
+        "type": "String",
+        "required": true,
+        "defaultValue": "F2_TEST_GATE",
+        "range": null
+      }
+    ],
+    "availableCapabilityTypes": [
+      "CAP_NAVIGATION"
+    ],
+    "constraintDescription": "Synthetic isolated F013 runtime baseline gate",
+    "completionCondition": "routeGenerated=true",
+    "isPreset": false,
+    "definitionStatus": "DISABLED",
+    "updatedAt": "2026-11-04T10:26:38.002522",
+    "updatedBy": "set"
+  },
+  "resourcePairChecks": {
+    "sameCandidate": true,
+    "onHigh": true,
+    "offLow": true,
+    "versionChanged": true
+  },
+  "navigationSchemaBefore": "[{\"name\": \"targetLocation\", \"type\": \"String\", \"required\": true, \"defaultValue\": \"F2_TEST_GATE\"}, {\"name\": \"routePreference\", \"type\": \"String\", \"required\": true, \"defaultValue\": \"BARRIER_FREE\", \"range\": \"SHORTEST/BARRIER_FREE\"}]",
+  "crossPairChecks": {
+    "sameCandidate": true,
+    "onHigh": true,
+    "offLow": true,
+    "versionChanged": true
+  },
+  "escortPairChecks": {
+    "sameCandidate": true,
+    "onHigh": true,
+    "offLow": true,
+    "versionChanged": true
+  },
+  "ruleAudit": "RISK_RULE_CHANGE|RULE_ESCORT_SPECIAL_PASSENGER|SUCCESS|{\"before\":{\"ruleContent\":\"移动机器人会合或陪同服务对象为特殊旅客时判定为高风险；普通空间引导场景不命中\",\"ruleVersion\":\"V1.1\",\"enabled\":false},\"ruleSetVersion\":\"V1.30\",\"action\":\"UPDATE\",\"after\":{\"ruleContent\":\"移动机器人会合或陪同服务对象为特殊旅客时判定为高风险；普通空间引导场景不命中\",\"ruleVersion\":\"V1.2\",\"enabled\":true}}\nRISK_RULE_CHANGE|RULE_ESCORT_SPECIAL_PASSENGER|SUCCESS|{\"before\":{\"ruleContent\":\"移动机器人会合或陪同服务对象为特殊旅客时判定为高风险；普通空间引导场景不命中\",\"ruleVersion\":\"V1.0\",\"enabled\":true},\"ruleSetVersion\":\"V1.29\",\"action\":\"UPDATE\",\"after\":{\"ruleContent\":\"移动机器人会合或陪同服务对象为特殊旅客时判定为高风险；普通空间引导场景不命中\",\"ruleVersion\":\"V1.1\",\"enabled\":false}}\nRISK_RULE_CHANGE|RULE_CROSS_ZONE|SUCCESS|{\"before\":{\"ruleContent\":\"仅移动服务机器人适用；同一任务链条中跨越预定义区域边界1次及以上命中\",\"ruleVersion\":\"V1.1\",\"enabled\":false},\"ruleSetVersion\":\"V1.28\",\"action\":\"UPDATE\",\"after\":{\"ruleContent\":\"仅移动服务机器人适用；同一任务链条中跨越预定义区域边界1次及以上命中\",\"ruleVersion\":\"V1.2\",\"enabled\":true}}\nRISK_RULE_CHANGE|RULE_CROSS_ZONE|SUCCESS|{\"before\":{\"ruleContent\":\"仅移动服务机器人适用；同一任务链条中跨越预定义区域边界1次及以上命中\",\"ruleVersion\":\"V1.0\",\"enabled\":true},\"ruleSetVersion\":\"V1.27\",\"action\":\"UPDATE\",\"after\":{\"ruleContent\":\"仅移动服务机器人适用；同一任务链条中跨越预定义区域边界1次及以上命中\",\"ruleVersion\":\"V1.1\",\"enabled\":false}}\nRISK_RULE_CHANGE|RULE_RESOURCE_CRITICAL|SUCCESS|{\"before\":{\"ruleContent\":\"任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中\",\"ruleVersion\":\"V3\",\"enabled\":true},\"ruleSetVersion\":\"V1.26\",\"action\":\"UPDATE\",\"after\":{\"ruleContent\":\"任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中\",\"ruleVersion\":\"V3.1\",\"enabled\":false}}\nRISK_RULE_CHANGE|RULE_RESOURCE_CRITICAL|SUCCESS|{\"before\":{\"ruleContent\":\"任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中\",\"ruleVersion\":\"V2.9\",\"enabled\":false},\"ruleSetVersion\":\"V1.25\",\"action\":\"UPDATE\",\"after\":{\"ruleContent\":\"任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中\",\"ruleVersion\":\"V3\",\"enabled\":true}}\nRISK_RULE_CHANGE|RULE_RESOURCE_CRITICAL|SUCCESS|{\"before\":{\"ruleContent\":\"任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中\",\"ruleVersion\":\"V2.8\",\"enabled\":true},\"ruleSetVersion\":\"V1.24\",\"action\":\"UPDATE\",\"after\":{\"ruleContent\":\"任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中\",\"ruleVersion\":\"V2.9\",\"enabled\":false}}\nRISK_RULE_CHANGE|RULE_RESOURCE_CRITICAL|SUCCESS|{\"before\":{\"ruleContent\":\"任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中\",\"ruleVersion\":\"V2.7\",\"enabled\":false},\"ruleSetVersion\":\"V1.23\",\"action\":\"UPDATE\",\"after\":{\"ruleContent\":\"任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中\",\"ruleVersion\":\"V2.8\",\"enabled\":true}}\nRISK_RULE_CHANGE|RULE_RESOURCE_CRITICAL|SUCCESS|{\"before\":{\"ruleContent\":\"任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中\",\"ruleVersion\":\"V2.6\",\"enabled\":true},\"ruleSetVersion\":\"V1.22\",\"action\":\"UPDATE\",\"after\":{\"ruleContent\":\"任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中\",\"ruleVersion\":\"V2.7\",\"enabled\":false}}\nRISK_RULE_CHANGE|GPT_F014_150_UI|SUCCESS|{\"before\":{\"ruleContent\":\"Synthetic F014 browser-created rule\",\"ruleVersion\":\"V1.0\",\"enabled\":false},\"ruleSetVersion\":\"V1.21\",\"action\":\"UPDATE\",\"after\":{\"ruleContent\":\"Synthetic F014 browser-created rule revised\",\"ruleVersion\":\"V1.1\",\"enabled\":false}}\nRISK_RULE_CHANGE|GPT_F014_150_UI|SUCCESS|{\"ruleContent\":\"Synthetic F014 browser-created rule\",\"ruleSetVersion\":\"V1.20\",\"ruleVersion\":\"V1.0\",\"action\":\"CREATE\",\"enabled\":false}\nRISK_RULE_CHANGE|GPT_F014_150_API|SUCCESS|{\"before\":{\"ruleContent\":\"Synthetic F014 validation fixture revised\",\"ruleVersion\":\"V1.1\",\"enabled\":true},\"ruleSetVersion\":\"V1.19\",\"action\":\"UPDATE\",\"after\":{\"ruleContent\":\"Synthetic F014 validation fixture revised\",\"ruleVersion\":\"V1.2\",\"enabled\":false}}",
+  "fixturesRestored": true
+}

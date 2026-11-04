@@ -1,0 +1,460 @@
+{
+  "version": "V1.151",
+  "codeSha": "9d63572087058fb180b08e362ad7da6aef501e44",
+  "observedAt": "2026-11-04T10:31:26.646113+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "fixtureDiagnostic": {
+    "originalTaskId": 213,
+    "incorrectCondition": "updateStatus=SUCCESS",
+    "actualSimulatorOutput": "publishStatus=SUCCESS",
+    "reason": "GPT probe used a field outside the capability output schema, leading to expected condition failure after a device SUCCESS. Original raw evidence retained; not a product F."
+  },
+  "actualFlightCapabilitySchema": {
+    "id": 34,
+    "capabilityCode": "CAP_FLIGHT_UPDATE",
+    "capabilityName": "航班信息发布",
+    "capabilityType": "CAP_FLIGHT_UPDATE",
+    "inputParams": [
+      {
+        "name": "flightNumber",
+        "type": "String",
+        "required": true,
+        "defaultValue": "TEST1022",
+        "range": null
+      },
+      {
+        "name": "updateType",
+        "type": "String",
+        "required": true,
+        "defaultValue": "GATE_CHANGE",
+        "range": "DELAY/EARLY/GATE_CHANGE/CANCEL"
+      },
+      {
+        "name": "updateContent",
+        "type": "String",
+        "required": true,
+        "defaultValue": "测试航班登机口变更至F2_TEST_GATE",
+        "range": null
+      },
+      {
+        "name": "displayDuration",
+        "type": "Integer",
+        "required": true,
+        "defaultValue": "60",
+        "range": "10~600"
+      }
+    ],
+    "outputParams": [
+      {
+        "name": "publishStatus",
+        "type": "String",
+        "required": true,
+        "defaultValue": null,
+        "range": null
+      },
+      {
+        "name": "publishTime",
+        "type": "String",
+        "required": true,
+        "defaultValue": null,
+        "range": null
+      }
+    ],
+    "applicableConditions": null,
+    "capabilityStatus": "ENABLED",
+    "testResult": "实际设备代理调用通过，指令 TEST-02ade5ac2d4646669fcf9470e5",
+    "lastTestAt": "2026-11-04T10:28:49.385634",
+    "testRequest": null,
+    "testResponse": null,
+    "testDurationMs": null,
+    "capabilityDescription": "标准能力模板：航班信息发布"
+  },
+  "ruleBefore": {
+    "id": 3,
+    "ruleCode": "RULE_RESOURCE_CRITICAL",
+    "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+    "ruleVersion": "V3.4",
+    "enabled": true,
+    "createdAt": "2026-10-30T13:40:48.586219",
+    "updatedAt": "2026-11-04T10:29:44.398517",
+    "updatedBy": "set"
+  },
+  "request": {
+    "taskGoal": "F151_PUBLIC_FLIGHT_CORRECTED public flight ZZ151 gate service to F2_TEST_GATE",
+    "taskFamily": "FLIGHT_CHANGE_RESPONSE",
+    "sceneParams": {
+      "flightNumber": "ZZ151",
+      "targetLocation": "F2_TEST_GATE",
+      "newGate": "F2_TEST_GATE"
+    }
+  },
+  "observed": {
+    "task": {
+      "id": 219,
+      "taskCode": "TASK-20261104-0219",
+      "taskGoal": "F151_PUBLIC_FLIGHT_CORRECTED public flight ZZ151 gate service to F2_TEST_GATE",
+      "taskFamily": "FLIGHT_CHANGE_RESPONSE",
+      "sceneParams": {
+        "flightNumber": "ZZ151",
+        "targetLocation": "F2_TEST_GATE",
+        "newGate": "F2_TEST_GATE"
+      },
+      "goalParsingResult": {
+        "completionCondition": "航班变更信息已送达且旅客后续引导（如需）已完成",
+        "origin": "F2_SERVICE_POINT",
+        "destination": "F2_TEST_GATE",
+        "originalGoal": "F151_PUBLIC_FLIGHT_CORRECTED public flight ZZ151 gate service to F2_TEST_GATE",
+        "constraints": [
+          "synthetic test"
+        ]
+      },
+      "status": "COMPLETED",
+      "currentPlanVersionId": 219,
+      "replanUsed": false,
+      "replanningReason": null,
+      "manualTerminateReason": null,
+      "failureReason": null,
+      "missingInfoQuestions": null,
+      "downgradeReason": null,
+      "isDryRun": false,
+      "createdAt": "2026-11-04T10:31:26.85237",
+      "updatedAt": "2026-11-04T10:31:30.662952",
+      "createdBy": "oprator"
+    },
+    "plans": [
+      {
+        "id": 219,
+        "versionNo": 1,
+        "source": "AUTONOMOUS",
+        "baselineTemplateId": null,
+        "snapshotId": "CTX-20261104-0200",
+        "planSteps": [
+          {
+            "stepSeq": 1,
+            "stepGoal": "Synthetic passenger service",
+            "capabilityType": "CAP_FLIGHT_UPDATE",
+            "inputParams": {
+              "flightNumber": "ZZ151",
+              "updateType": "GATE_CHANGE",
+              "updateContent": "测试航班登机口变更至F2_TEST_GATE",
+              "displayDuration": 60
+            },
+            "precondition": "device online",
+            "completionCondition": "publishStatus=SUCCESS",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          },
+          {
+            "stepSeq": 2,
+            "stepGoal": "Synthetic passenger service",
+            "capabilityType": "CAP_INFO_DISPLAY",
+            "inputParams": {
+              "contentType": "TEXT",
+              "contentData": "测试信息：请前往F2服务点",
+              "displayDuration": 60
+            },
+            "precondition": "device online",
+            "completionCondition": "displayStatus=SUCCESS",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          },
+          {
+            "stepSeq": 3,
+            "stepGoal": "Synthetic passenger service",
+            "capabilityType": "CAP_NOTIFICATION",
+            "inputParams": {
+              "notificationType": "BOTH",
+              "notificationContent": "Synthetic public flight ZZ151 gate information",
+              "repeatCount": 1
+            },
+            "precondition": "device online",
+            "completionCondition": "notificationStatus=SUCCESS",
+            "failureHandling": "manual handling",
+            "stepTimeout": 60
+          }
+        ],
+        "structureCheckResult": "PASS",
+        "capabilityCheckResult": "PASS",
+        "constraintCheckResult": "PASS",
+        "validationErrors": [],
+        "riskLevel": "LOW",
+        "riskReasonCode": null,
+        "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+        "confidence": 0.99,
+        "ruleSetVersion": "V1.34",
+        "frozenAt": "2026-11-04T10:31:27.239413",
+        "createdAt": "2026-11-04T10:31:27.226456"
+      }
+    ],
+    "events": [
+      {
+        "id": 1964,
+        "taskId": 219,
+        "eventType": "GOAL_SUBMITTED",
+        "occurredAt": "2026-11-04T10:31:26.872831",
+        "trigger": "OPERATOR",
+        "reasonCode": null,
+        "detailSummary": "运行操作员oprator提交任务目标: F151_PUBLIC_FLIGHT_CORRECTED public flight ZZ151 gate service to F2_TEST_GATE"
+      },
+      {
+        "id": 1965,
+        "taskId": 219,
+        "eventType": "GOAL_CLARIFIED",
+        "occurredAt": "2026-11-04T10:31:27.146737",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+      },
+      {
+        "id": 1966,
+        "taskId": 219,
+        "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+        "occurredAt": "2026-11-04T10:31:27.182972",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "生成规划上下文快照CTX-20261104-0200"
+      },
+      {
+        "id": 1967,
+        "taskId": 219,
+        "eventType": "PLAN_GENERATED",
+        "occurredAt": "2026-11-04T10:31:27.234166",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+      },
+      {
+        "id": 1968,
+        "taskId": 219,
+        "eventType": "PLAN_VALIDATED",
+        "occurredAt": "2026-11-04T10:31:27.241563",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+      },
+      {
+        "id": 1969,
+        "taskId": 219,
+        "eventType": "SUPERVISION_JUDGED",
+        "occurredAt": "2026-11-04T10:31:27.266251",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.34；推荐处置=AUTO_EXECUTE（自动执行）"
+      },
+      {
+        "id": 1970,
+        "taskId": 219,
+        "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+        "occurredAt": "2026-11-04T10:31:27.302601",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-C1E2CAF3(距离0.0,负载0)，向候选AGT-C1E2CAF3发起承接请求"
+      },
+      {
+        "id": 1971,
+        "taskId": 219,
+        "eventType": "AGENT_ASSIGNED",
+        "occurredAt": "2026-11-04T10:31:27.537296",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "设备代理AGT-C1E2CAF3接受步骤1承接请求"
+      },
+      {
+        "id": 1972,
+        "taskId": 219,
+        "eventType": "STEP_DISPATCHED",
+        "occurredAt": "2026-11-04T10:31:27.553274",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "指令CMD-20261104103127-CAC70A08已下发至设备代理AGT-C1E2CAF3，业务意图: Synthetic passenger service"
+      },
+      {
+        "id": 1973,
+        "taskId": 219,
+        "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+        "occurredAt": "2026-11-04T10:31:28.196941",
+        "trigger": "SYSTEM",
+        "reasonCode": "DEVICE_SUCCESS",
+        "detailSummary": "指令CMD-20261104103127-CAC70A08收到设备代理AGT-C1E2CAF3执行反馈: SUCCESS"
+      },
+      {
+        "id": 1974,
+        "taskId": 219,
+        "eventType": "STEP_COMPLETED",
+        "occurredAt": "2026-11-04T10:31:28.208496",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "步骤1完成条件已满足: publishStatus=SUCCESS"
+      },
+      {
+        "id": 1975,
+        "taskId": 219,
+        "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+        "occurredAt": "2026-11-04T10:31:28.231283",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "步骤2候选排序（能力匹配->距离->负载）: AGT-95E1692F(距离0.0,负载0)，向候选AGT-95E1692F发起承接请求"
+      },
+      {
+        "id": 1976,
+        "taskId": 219,
+        "eventType": "AGENT_ASSIGNED",
+        "occurredAt": "2026-11-04T10:31:28.347029",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "设备代理AGT-95E1692F接受步骤2承接请求"
+      },
+      {
+        "id": 1977,
+        "taskId": 219,
+        "eventType": "STEP_DISPATCHED",
+        "occurredAt": "2026-11-04T10:31:28.405797",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "指令CMD-20261104103128-320DBEE5已下发至设备代理AGT-95E1692F，业务意图: Synthetic passenger service"
+      },
+      {
+        "id": 1978,
+        "taskId": 219,
+        "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+        "occurredAt": "2026-11-04T10:31:29.449689",
+        "trigger": "SYSTEM",
+        "reasonCode": "DEVICE_SUCCESS",
+        "detailSummary": "指令CMD-20261104103128-320DBEE5收到设备代理AGT-95E1692F执行反馈: SUCCESS"
+      },
+      {
+        "id": 1979,
+        "taskId": 219,
+        "eventType": "STEP_COMPLETED",
+        "occurredAt": "2026-11-04T10:31:29.540299",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "步骤2完成条件已满足: displayStatus=SUCCESS"
+      },
+      {
+        "id": 1980,
+        "taskId": 219,
+        "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+        "occurredAt": "2026-11-04T10:31:29.562044",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "步骤3候选排序（能力匹配->距离->负载）: AGT-803437A3(距离0.0,负载0)，向候选AGT-803437A3发起承接请求"
+      },
+      {
+        "id": 1981,
+        "taskId": 219,
+        "eventType": "AGENT_ASSIGNED",
+        "occurredAt": "2026-11-04T10:31:29.773857",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "设备代理AGT-803437A3接受步骤3承接请求"
+      },
+      {
+        "id": 1982,
+        "taskId": 219,
+        "eventType": "STEP_DISPATCHED",
+        "occurredAt": "2026-11-04T10:31:29.783099",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "指令CMD-20261104103129-1AE4EC2F已下发至设备代理AGT-803437A3，业务意图: Synthetic passenger service"
+      },
+      {
+        "id": 1983,
+        "taskId": 219,
+        "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+        "occurredAt": "2026-11-04T10:31:30.62931",
+        "trigger": "SYSTEM",
+        "reasonCode": "DEVICE_SUCCESS",
+        "detailSummary": "指令CMD-20261104103129-1AE4EC2F收到设备代理AGT-803437A3执行反馈: SUCCESS"
+      },
+      {
+        "id": 1984,
+        "taskId": 219,
+        "eventType": "STEP_COMPLETED",
+        "occurredAt": "2026-11-04T10:31:30.649342",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "步骤3完成条件已满足: notificationStatus=SUCCESS"
+      },
+      {
+        "id": 1985,
+        "taskId": 219,
+        "eventType": "TASK_COMPLETED",
+        "occurredAt": "2026-11-04T10:31:30.665179",
+        "trigger": "SYSTEM",
+        "reasonCode": null,
+        "detailSummary": "航班变更可用渠道执行完成；已覆盖: [CAP_FLIGHT_UPDATE, CAP_INFO_DISPLAY, CAP_NOTIFICATION]；未覆盖: []"
+      }
+    ],
+    "assignments": [
+      {
+        "id": 126,
+        "stepSeq": 1,
+        "deviceAgentCode": "AGT-C1E2CAF3",
+        "commandId": "CMD-20261104103127-0AB0CD3C",
+        "stepStatus": "COMPLETED",
+        "retryCount": 0,
+        "executionResult": "SUCCESS",
+        "reasonCode": "DEVICE_SUCCESS",
+        "outputParams": {
+          "publishStatus": "SUCCESS",
+          "publishTime": "2026-11-04T10:31:28.149896+08:00"
+        },
+        "dispatchedAt": "2026-11-04T10:31:27.548711",
+        "feedbackAt": "2026-11-04T10:31:28.196941",
+        "rejectedAgentIds": []
+      },
+      {
+        "id": 127,
+        "stepSeq": 2,
+        "deviceAgentCode": "AGT-95E1692F",
+        "commandId": "CMD-20261104103128-243D6728",
+        "stepStatus": "COMPLETED",
+        "retryCount": 0,
+        "executionResult": "SUCCESS",
+        "reasonCode": "DEVICE_SUCCESS",
+        "outputParams": {
+          "errorMessage": "",
+          "actualDuration": 60,
+          "displayStatus": "SUCCESS"
+        },
+        "dispatchedAt": "2026-11-04T10:31:28.393422",
+        "feedbackAt": "2026-11-04T10:31:29.449689",
+        "rejectedAgentIds": []
+      },
+      {
+        "id": 128,
+        "stepSeq": 3,
+        "deviceAgentCode": "AGT-803437A3",
+        "commandId": "CMD-20261104103129-EC89C58A",
+        "stepStatus": "COMPLETED",
+        "retryCount": 0,
+        "executionResult": "SUCCESS",
+        "reasonCode": "DEVICE_SUCCESS",
+        "outputParams": {
+          "notificationStatus": "SUCCESS",
+          "actualRepeatCount": 1
+        },
+        "dispatchedAt": "2026-11-04T10:31:29.779913",
+        "feedbackAt": "2026-11-04T10:31:30.62931",
+        "rejectedAgentIds": []
+      }
+    ],
+    "commands": [
+      "256|TASK_ACCEPT|ACCEPTED",
+      "257|EXECUTE_CAPABILITY|SUCCEEDED",
+      "258|TASK_ACCEPT|ACCEPTED",
+      "259|EXECUTE_CAPABILITY|SUCCEEDED",
+      "260|TASK_ACCEPT|ACCEPTED",
+      "261|EXECUTE_CAPABILITY|SUCCEEDED"
+    ],
+    "bypassAuditRows": []
+  },
+  "checks": {
+    "threePass": true,
+    "publicInfoLow": true,
+    "automaticExecutionAndCompletion": true,
+    "noReplan": true,
+    "sixFieldsInTimeline": true
+  }
+}
