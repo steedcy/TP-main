@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`REQUIREMENT_PASSED`（SRS_F015 V1.156 / V2.4整轮，9规则9P/0F/0NT、6步骤6P/0F/0NT；066/098关闭；已合main并推送949c3b3e110bae95f27833f7ca82b00b716aadfe，最终交接随本提交同步；下一项F016另启动）
-- 当前进度：F001～F015已独立验收合main。F015全部当前实测，无历史业务P替代；29真实任务（10成功试运行+19独立正式观察）、43项GPT定向、package/前端build/实际JAR健康及关键HTTP/真实Edge无头UI通过。066候选切换中不记成功、实际完成后确认及穷尽终态一致，098两弹窗版本V1.0/V1.1精确展示；065/067/096/097当前回归保持关闭。证据9c94dccfbde848483a52ed15f345e4405312101e已先推送；产品实际完整SHA更正见文末。
+- 状态：`READY_FOR_GPT`（SRS_F016 V1.157 / V2.4整轮 Claude 修复完成交接，覆盖规则 R01～R08，单测全量 352 通过，生产构建通过，待 GPT 独立复测）
+- 当前进度：F001～F015 已独立验收合 main。F016（步骤设备匹配与任务接受，TC-051～TC-053）完成产品逻辑对齐与 8 条业务规则修复，新增 7 项单测全通，待 GPT 独立复测。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -2303,3 +2303,54 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 产品SHA/标签 | 证据提交SHA | main验收合入SHA |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-05 | SRS_F015 | ChatGPT → Claude | REQUIREMENT_PASSED | 5effea7e267f5ef724a00a58716c67a59b284272 / V1.156 | 9c94dccfbde848483a52ed15f345e4405312101e | 949c3b3e110bae95f27833f7ca82b00b716aadfe（最终交接随本提交同步） |
+
+## 2026-11-05 Claude → ChatGPT（SRS_F016 V1.157 / 步骤设备匹配与任务接受 修复交接）
+
+- 状态：**READY_FOR_GPT**
+- 分支：`ai/claude-fix`
+- 产品代码提交 SHA：**`ea6901eb4e35448ca91773f8ea1424fa797d88e5`**
+- 对应版本标签：**`V1.157`**（严格指向上述产品代码提交，已推送到远端；文档提交在后，不移动标签）
+- 依据策略：V2.4 / 需求规格说明书 5.5.1
+- 主干状态：未合 main、未创建 PR；远端 main 保持 `949c3b3e110bae95f27833f7ca82b00b716aadfe`。
+
+### 修复内容与规则对齐（SRS_F016 R01～R08，TC-051～TC-053）
+
+1. **R01 候选设备准入条件与能力匹配**：
+   - 候选设备严格限定为：代理状态启用、网络状态 `ONLINE`、工作状态 `IDLE` 且设备具备对应且启用的能力（`ENABLED`）。
+   - 任何离线、禁用或无对应能力的设备均不进入候选列表。
+2. **R02 单设备单步骤独占与忙碌设备排他**：
+   - 分配执行独占约束：同一时间一台设备代理只能被一个步骤占用（`currentTaskId` / `currentStepSeq`）。
+   - 处于 `BUSY` 状态的设备代理直接被候选筛选排除，不可重复分配。
+3. **R03 拒绝记录与多候选顺位切换**：
+   - 设备代理拒绝承接时，系统在任务事件流中完整记录拒绝原因（`AGENT_ASSIGNMENT_REJECTED`），并将该设备加入 `rejected` 集合，自动顺位请求下一个候选设备。
+4. **R04 三维多指标综合排序与时间线留痕**：
+   - 候选设备评分支持三维综合排序：**能力匹配度 (capabilityMatch) 降序 -> 目标区域距离 (distance) 升序 -> 当前负载 (workloadScore) 升序 -> 代理编号 (agentCode) 升序**。
+   - 支持从步骤根参数或 `inputParams` 中动态解析 `targetX` / `targetY`。
+   - 分配请求事件（`AGENT_ASSIGNMENT_REQUESTED`）中显式记录三维指标格式 `(匹配度{matchScore},距离{distance},负载{workloadScore})`。
+5. **R05 异常识别与恢复流转分流**：
+   - 无初始候选设备时，触发 `CAPABILITY_GAP` 异常，原因码记为 `ERR_NO_CANDIDATE_AVAILABLE`。
+   - 所有候选设备均拒绝时，触发 `ASSIGNMENT_FAILED` 异常，原因码记为 `ERR_ALL_CANDIDATES_REJECTED`。
+   - 两类异常在 `TaskExceptionService` 中均被识别为不可重试（`canRetry = false`），恢复动作分别标记为“无可用候选设备，恢复动作未执行”与“全部候选设备均拒绝，恢复动作未执行”，直接转入 5.5.3 异常处理或人工干预，杜绝死循环。
+6. **R06 过程审计与任务时间线留痕**：
+   - 分配请求（`AGENT_ASSIGNMENT_REQUESTED`）、接受（`AGENT_ASSIGNMENT_ACCEPTED`）、拒绝（`AGENT_ASSIGNMENT_REJECTED`）、失败（`STEP_ASSIGNMENT_FAILED`）均写入任务事件流。
+7. **R07 分配阶段严禁下发业务指令**：
+   - 分配阶段仅发送 `TASK_ACCEPT` 指令询问接受意向；只有在设备确认接受后，才下发业务执行指令（`EXECUTE_CAPABILITY`）。
+8. **R08 步骤冻结与手动终止释放设备占用**：
+   - 步骤冻结（`freezeRemainingSteps`）或人工终止任务（`terminateTask`）时，自动释放已分配设备的占用（`workStatus = IDLE`, `currentTaskId = null`, `currentStepSeq = null`）。
+   - 允许离线取消指令在设备重新上线并上报 `IDLE` 时确认解除占用。
+
+### 验证记录
+- **定向单测**：`mvn -o test "-Dtest=DeviceMatchingAndTaskAcceptanceF016Test,BaselineDowngradeAndFailureBoundaryF015Test,RecoveryEventTruthF015Test,BaselineFailureNoReplanF015Test,FlightPartialChannelExecutionTest"`，28 项测试全部通过（0 failures, 0 errors）。
+- **全量后端测试**：`mvn -o test`，352 项测试全部通过（0 failures, 0 errors, 2 skipped）。
+- **后端打包**：`mvn -o package -DskipTests`，BUILD SUCCESS，生产 `airport-ai-app-1.0.0.jar` 构建成功。
+- **环境隔离**：严格恪守资源隔离规范，未占用 GPT 独占端口与数据库 schema。
+
+### 给 ChatGPT 的复测建议
+1. 复测 TC-051（步骤设备匹配与接受）：验证多候选设备三维排序（能力匹配度->距离->负载）、首选设备接受、独占锁定与时间线留痕。
+2. 复测 TC-052（设备拒绝与候选顺位切换）：验证第一候选设备拒绝后记录拒绝原因，自动顺位向第二候选设备发送 `TASK_ACCEPT`。
+3. 复测 TC-053（候选设备穷尽与能力缺口分流）：验证初始无候选（`CAPABILITY_GAP` / `ERR_NO_CANDIDATE_AVAILABLE`）与全部候选拒绝（`ASSIGNMENT_FAILED` / `ERR_ALL_CANDIDATES_REJECTED`）正确流转至 5.5.3 异常处理，不发生死循环。
+4. 验证 R08：步骤冻结与人工终止时设备占用正常释放。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-05 | SRS_F016 | Claude → ChatGPT | READY_FOR_GPT（V2.4） | ai/claude-fix / ea6901eb4e35448ca91773f8ea1424fa797d88e5 / V1.157 | （待GPT生成） | 覆盖全部8条业务规则（R01~R08，TC-051~TC-053），后端构建与全量352单测通过，交GPT整轮独立复测 |
