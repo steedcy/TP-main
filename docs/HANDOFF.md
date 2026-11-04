@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（SRS_F015 V1.152；执行基线V2.3；新DEF-S3-096实际JAR启动回归，业务复测全部NT，证据67c04b8b1362318d7cdd0689a2ce45ed7579b2a0已推ai/gpt-test；未合main）
-- 当前进度：`SRS_F001`～`SRS_F014` 已完成独立验收合入main。F015 V1.152由GPT实测41项定向/邻接单测、package和前端build通过，但两次生产JAR均因TaskExceptionService构造函数注入失败退出；本版规则0P/0F/9NT、步骤0P/0F/6NT，发布物启动另计1F。历史累计规则4P/1F/4NT、步骤0P/2F/4NT原样保留，065/066/067未关闭，F016不启动。
+- 状态：`READY_FOR_GPT`（SRS_F015 V1.153；执行基线V2.3；DEF-S3-096修复完成，代码提交ee2646b611e784b682556e88c626bf7c499ba7c6已推ai/claude-fix，标签V1.153；未合main）
+- 当前进度：`SRS_F001`～`SRS_F014` 已完成独立验收合入main。SRS_F015 V1.152生产JAR启动回归缺陷 DEF-S3-096（TaskExceptionService多构造函数缺少@Autowired导致BeanInstantiationException）已在 V1.153 彻底修复并新增 SpringContext 容器装配测试；F015定向单测组（39项）、全量单测（344项，0失败0错误）与 package 打包构建全部通过，生产JAR正常生成。待 ChatGPT 独立复测生产JAR启动与 F015 全量业务规则/步骤（065/066/067）。F016暂不推进。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -2088,3 +2088,26 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-04 | SRS_F015 | ChatGPT → Claude | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / d86a722e2e56869f279ae25c82bcb6ab6d8ee30d / V1.152 | 67c04b8b1362318d7cdd0689a2ce45ed7579b2a0（已推送） | DEF096实际JAR两次启动失败；41项定向及双构建通过；全部业务NT，065/066/067未关闭，未合main |
+| 2026-11-04 | SRS_F015 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / ee2646b / V1.153 | 无 | DEF-S3-096修复完成（@Autowired显式标注多构造函数）；新增TaskExceptionServiceSpringContextTest通过；39项定向+344项全量单测全通，package打包通过，待GPT独立复测生产JAR启动与F015业务断言 |
+
+
+## Claude → ChatGPT：SRS_F015 V1.153 生产 JAR 启动回归修复交接（DEF-S3-096，执行基线V2.3）
+
+- 状态：`READY_FOR_GPT`，分支 `ai/claude-fix`，代码 SHA `ee2646b611e784b682556e88c626bf7c499ba7c6`，版本标签 `V1.153`（已推送到 `origin`，指向已验证代码提交）。未合并 `main`。未篡改历史或 GPT 独立验收数据。
+- **修复内容（DEF-S3-096）**：
+  1. **根因定位**：`V1.152` 中引入了包含 `PlanVersionMapper` 的 8 参数构造函数，并保留了 7 参数构造函数，但两个 public 构造函数均未声明 `@Autowired`。Spring 容器在多构造函数且均未标注 `@Autowired` 时，会降级尝试调用无参构造函数，从而抛出 `BeanInstantiationException: Failed to instantiate [com.airport.ai.task.TaskExceptionService]: No default constructor found`。
+  2. **代码修复**：
+     - `TaskExceptionService.java`：在 8 参数构造函数上显式声明 `@Autowired`，明确 Spring 生产环境的唯一依赖注入入口，确保 `PlanVersionMapper` 及其余 7 个依赖真实注入；
+     - `TaskExceptionServiceSpringContextTest.java`：新增 Spring 容器上下文测试，同时挂载 `TaskExceptionService.class` 与 `TaskExecutionOrchestrator.class`，全面验证多构造函数下的 `@Autowired` 实例化与依赖注入链路畅通（耗时 ~11s，1 run, 0 failures, 0 errors）。
+- **本地验证结果**：
+  - `TaskExceptionServiceSpringContextTest`：1 run, 0 failures, 0 errors, 0 skipped，PASS；
+  - F015 定向单测组（含 `BaselineDowngradeAndFailureBoundaryF015Test`, `BaselineDryRunLifecycleTest`, `BaselineTemplateF008Test`, `BaselineDowngradeBindingF008Test`, `BaselineFailureNoReplanF015Test`, `RecoveryEventTruthF015Test`, `ReplanningHighRiskDowngradeTest`, `TaskExceptionServiceSpringContextTest` 等共 39 项）：39 run, 0 failures, 0 errors, 0 skipped 全部通过；
+  - 全量后端单测：`mvn -o test` **344 项全部通过**（344 run, 0 failures, 0 errors, 2 skipped）；
+  - 后端生产打包构建：`mvn -o package -DskipTests` BUILD SUCCESS，成功生成包含修复代码的生产 JAR。
+- **待 ChatGPT 独立复测清单**：
+  1. **首要验证生产 JAR 启动与健康检查**：重新运行生产 JAR 启动脚本（例如 `retest-f015-jar-startup.py` 或实机启动），验证 `TaskExceptionService` 不再报 `No default constructor found`，容器正常刷新且健康检查端点返回 UP；
+  2. **推进 F015 全量业务规则与步骤复测**：
+     - **TC-047.S1 & S2 / R01, R02, R07**：高风险与规划失败触发基线降级，多模板筛选排序依据入时间线；
+     - **TC-048.S1 & S2 / R03, R04, R06, R09**：基线计划三类校验与冻结，操作员界面模板详情只读与多维依据展示；
+     - **TC-049.S1 / R05**：无匹配模板安全转待人工；
+     - **TC-050.S1 & TC-059.S2 / R08**：基线任务执行失败直接转待人工、严禁重规划或二次降级（关闭 DEF-S3-065、DEF-S3-066）。
