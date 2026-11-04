@@ -1,0 +1,689 @@
+{
+  "at": "2026-11-04T15:21:41.789198+08:00",
+  "timezone": "Asia/Shanghai",
+  "version": "V1.153",
+  "codeSha": "ee2646b611e784b682556e88c626bf7c499ba7c6",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "redisDb": 10,
+  "jarSha256": "0dbccaff0534001c49a05e4c1baeab6a084bea17961d8c8ecf8347d364f1508d",
+  "startupRuntime": {
+    "pid": 11288,
+    "port": 18129,
+    "schema": "tip_gpt_f006_v118_20261030",
+    "version": "V1.153"
+  },
+  "health": {
+    "status": "UP"
+  },
+  "entries": {
+    "tasksReadable": true,
+    "dashboardReadable": true,
+    "agentsReadable": true
+  },
+  "control225": {
+    "observed": {
+      "task": {
+        "id": 225,
+        "taskCode": "TASK-20261104-0225",
+        "taskGoal": "F153_QUALIFIED_BASELINE_SUCCESS synthetic navigation to F2_TEST_GATE",
+        "taskFamily": "EXT_0FA30230",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        },
+        "goalParsingResult": {
+          "completionCondition": "routeGenerated=true",
+          "origin": "F2_SERVICE_POINT",
+          "destination": "F2_TEST_GATE",
+          "originalGoal": "F153_QUALIFIED_BASELINE_SUCCESS synthetic navigation to F2_TEST_GATE",
+          "constraints": [
+            "synthetic test"
+          ]
+        },
+        "status": "COMPLETED",
+        "currentPlanVersionId": 226,
+        "replanUsed": false,
+        "replanningReason": null,
+        "manualTerminateReason": null,
+        "failureReason": null,
+        "missingInfoQuestions": null,
+        "downgradeReason": "监督判定高风险: RULE_RESOURCE_CRITICAL",
+        "isDryRun": false,
+        "createdAt": "2026-11-04T15:18:19.707328",
+        "updatedAt": "2026-11-04T15:18:21.215894",
+        "createdBy": "oprator"
+      },
+      "plans": [
+        {
+          "id": 225,
+          "versionNo": 1,
+          "source": "AUTONOMOUS",
+          "baselineTemplateId": null,
+          "snapshotId": "CTX-20261104-0204",
+          "planSteps": [
+            {
+              "stepSeq": 1,
+              "stepGoal": "Synthetic passenger service",
+              "capabilityType": "CAP_NAVIGATION",
+              "inputParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "precondition": "device online",
+              "completionCondition": "routeGenerated=true",
+              "failureHandling": "manual handling",
+              "stepTimeout": 60
+            }
+          ],
+          "structureCheckResult": "PASS",
+          "capabilityCheckResult": "PASS",
+          "constraintCheckResult": "PASS",
+          "validationErrors": [],
+          "riskLevel": "HIGH",
+          "riskReasonCode": "RULE_RESOURCE_CRITICAL",
+          "judgmentBasis": "可用备用候选设备数量(0)低于配置阈值(1)，命中确定性高风险规则",
+          "confidence": 1.0,
+          "ruleSetVersion": "V1.35",
+          "frozenAt": "2026-11-04T15:18:19.88413",
+          "createdAt": "2026-11-04T15:18:19.877066"
+        },
+        {
+          "id": 226,
+          "versionNo": 2,
+          "source": "BASELINE_TEMPLATE",
+          "baselineTemplateId": 35,
+          "snapshotId": "CTX-20261104-0205",
+          "planSteps": [
+            {
+              "stepSeq": 1,
+              "capabilityType": "CAP_NAVIGATION",
+              "paramMapping": [
+                {
+                  "target": "targetLocation",
+                  "source": "TEMPLATE_INPUT.targetLocation"
+                }
+              ],
+              "stepTimeout": 60,
+              "completionCondition": "routeGenerated=true",
+              "stepGoal": "执行CAP_NAVIGATION能力（基线模板步骤）",
+              "precondition": "候选设备在线且空闲",
+              "failureHandling": "重试一次或转人工处理",
+              "inputParams": {}
+            }
+          ],
+          "structureCheckResult": "PASS",
+          "capabilityCheckResult": "PASS",
+          "constraintCheckResult": "PASS",
+          "validationErrors": [],
+          "riskLevel": null,
+          "riskReasonCode": null,
+          "judgmentBasis": null,
+          "confidence": null,
+          "ruleSetVersion": "V1.0",
+          "frozenAt": "2026-11-04T15:18:19.930469",
+          "createdAt": "2026-11-04T15:18:19.927955"
+        }
+      ],
+      "events": [
+        {
+          "id": 2027,
+          "taskId": 225,
+          "eventType": "GOAL_SUBMITTED",
+          "occurredAt": "2026-11-04T15:18:19.709596",
+          "trigger": "OPERATOR",
+          "reasonCode": null,
+          "detailSummary": "运行操作员oprator提交任务目标: F153_QUALIFIED_BASELINE_SUCCESS synthetic navigation to F2_TEST_GATE"
+        },
+        {
+          "id": 2028,
+          "taskId": 225,
+          "eventType": "GOAL_CLARIFIED",
+          "occurredAt": "2026-11-04T15:18:19.781567",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+        },
+        {
+          "id": 2029,
+          "taskId": 225,
+          "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+          "occurredAt": "2026-11-04T15:18:19.834646",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "生成规划上下文快照CTX-20261104-0204"
+        },
+        {
+          "id": 2030,
+          "taskId": 225,
+          "eventType": "PLAN_GENERATED",
+          "occurredAt": "2026-11-04T15:18:19.881612",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+        },
+        {
+          "id": 2031,
+          "taskId": 225,
+          "eventType": "PLAN_VALIDATED",
+          "occurredAt": "2026-11-04T15:18:19.886894",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+        },
+        {
+          "id": 2032,
+          "taskId": 225,
+          "eventType": "SUPERVISION_JUDGED",
+          "occurredAt": "2026-11-04T15:18:19.902717",
+          "trigger": "SYSTEM",
+          "reasonCode": "RULE_RESOURCE_CRITICAL",
+          "detailSummary": "监督判定: 风险等级=HIGH；原因码=RULE_RESOURCE_CRITICAL；判定依据=可用备用候选设备数量(0)低于配置阈值(1)，命中确定性高风险规则；置信度=1.0（仅作参考，不覆盖三类校验结果）；规则集版本=V1.35；推荐处置=BASELINE_DOWNGRADE（基线降级）"
+        },
+        {
+          "id": 2033,
+          "taskId": 225,
+          "eventType": "BASELINE_DOWNGRADED",
+          "occurredAt": "2026-11-04T15:18:19.935609",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "已自动切换至基线模板G153 F015 newer-trial-B 151814(V1.0)，原因: 监督判定高风险: RULE_RESOURCE_CRITICAL，选择依据: [任务族精确匹配(EXT_0FA30230), 步骤数1步少优先, 最近试运行通过时间2026-11-04T15:18:19.573395优先]"
+        },
+        {
+          "id": 2034,
+          "taskId": 225,
+          "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+          "occurredAt": "2026-11-04T15:18:19.947836",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-803437A3(距离0.0,负载0)，向候选AGT-803437A3发起承接请求"
+        },
+        {
+          "id": 2035,
+          "taskId": 225,
+          "eventType": "AGENT_ASSIGNED",
+          "occurredAt": "2026-11-04T15:18:19.997728",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "设备代理AGT-803437A3接受步骤1承接请求"
+        },
+        {
+          "id": 2036,
+          "taskId": 225,
+          "eventType": "STEP_DISPATCHED",
+          "occurredAt": "2026-11-04T15:18:20.002787",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "指令CMD-20261104151820-B2314710已下发至设备代理AGT-803437A3，业务意图: 执行CAP_NAVIGATION能力（基线模板步骤）"
+        },
+        {
+          "id": 2037,
+          "taskId": 225,
+          "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+          "occurredAt": "2026-11-04T15:18:21.208103",
+          "trigger": "SYSTEM",
+          "reasonCode": "DEVICE_SUCCESS",
+          "detailSummary": "指令CMD-20261104151820-B2314710收到设备代理AGT-803437A3执行反馈: SUCCESS"
+        },
+        {
+          "id": 2038,
+          "taskId": 225,
+          "eventType": "STEP_COMPLETED",
+          "occurredAt": "2026-11-04T15:18:21.213336",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "步骤1完成条件已满足: routeGenerated=true"
+        },
+        {
+          "id": 2039,
+          "taskId": 225,
+          "eventType": "TASK_COMPLETED",
+          "occurredAt": "2026-11-04T15:18:21.218235",
+          "trigger": "SYSTEM",
+          "reasonCode": null,
+          "detailSummary": "全部步骤完成条件均已满足，任务完成"
+        }
+      ],
+      "assignments": [
+        {
+          "id": 131,
+          "stepSeq": 1,
+          "deviceAgentCode": "AGT-803437A3",
+          "commandId": "CMD-20261104151819-025AA181",
+          "stepStatus": "COMPLETED",
+          "retryCount": 0,
+          "executionResult": "SUCCESS",
+          "reasonCode": "DEVICE_SUCCESS",
+          "outputParams": {
+            "waypointCount": 11,
+            "estimatedDuration": 241,
+            "estimatedDistance": 238.0,
+            "routeGenerated": true
+          },
+          "dispatchedAt": "2026-11-04T15:18:20.002787",
+          "feedbackAt": "2026-11-04T15:18:21.208103",
+          "rejectedAgentIds": []
+        }
+      ],
+      "commands": [
+        "266|TASK_ACCEPT|ACCEPTED",
+        "267|EXECUTE_CAPABILITY|SUCCEEDED"
+      ],
+      "bypassAuditRows": []
+    },
+    "persistedPlans": "225|1|AUTONOMOUS||V1.35|2026-11-04 15:18:19.88413\n226|2|BASELINE_TEMPLATE|35|V1.0|2026-11-04 15:18:19.930469",
+    "persistedEvents": "GOAL_SUBMITTED||运行操作员oprator提交任务目标: F153_QUALIFIED_BASELINE_SUCCESS synthetic navigation to F2_TEST_GATE|2026-11-04 15:18:19.709596\nGOAL_CLARIFIED||目标理解完成，关键信息已完整，进入规划上下文构建|2026-11-04 15:18:19.781567\nCONTEXT_SNAPSHOT_GENERATED||生成规划上下文快照CTX-20261104-0204|2026-11-04 15:18:19.834646\nPLAN_GENERATED||候选计划生成完成，来源AUTONOMOUS，版本1|2026-11-04 15:18:19.881612\nPLAN_VALIDATED||候选计划三类校验全部通过，已冻结版本|2026-11-04 15:18:19.886894\nSUPERVISION_JUDGED|RULE_RESOURCE_CRITICAL|监督判定: 风险等级=HIGH；原因码=RULE_RESOURCE_CRITICAL；判定依据=可用备用候选设备数量(0)低于配置阈值(1)，命中确定性高风险规则；置信度=1.0（仅作参考，不覆盖三类校验结果）；规则集版本=V1.35；推荐处置=BASELINE_DOWNGRADE（基线降级）|2026-11-04 15:18:19.902717\nBASELINE_DOWNGRADED||已自动切换至基线模板G153 F015 newer-trial-B 151814(V1.0)，原因: 监督判定高风险: RULE_RESOURCE_CRITICAL，选择依据: [任务族精确匹配(EXT_0FA30230), 步骤数1步少优先, 最近试运行通过时间2026-11-04T15:18:19.573395优先]|2026-11-04 15:18:19.935609\nAGENT_ASSIGNMENT_REQUESTED||步骤1候选排序（能力匹配->距离->负载）: AGT-803437A3(距离0.0,负载0)，向候选AGT-803437A3发起承接请求|2026-11-04 15:18:19.947836\nAGENT_ASSIGNED||设备代理AGT-803437A3接受步骤1承接请求|2026-11-04 15:18:19.997728\nSTEP_DISPATCHED||指令CMD-20261104151820-B2314710已下发至设备代理AGT-803437A3，业务意图: 执行CAP_NAVIGATION能力（基线模板步骤）|2026-11-04 15:18:20.002787\nEXECUTION_FEEDBACK_RECEIVED|DEVICE_SUCCESS|指令CMD-20261104151820-B2314710收到设备代理AGT-803437A3执行反馈: SUCCESS|2026-11-04 15:18:21.208103\nSTEP_COMPLETED||步骤1完成条件已满足: routeGenerated=true|2026-11-04 15:18:21.213336\nTASK_COMPLETED||全部步骤完成条件均已满足，任务完成|2026-11-04 15:18:21.218235",
+    "checks": {
+      "completed": true,
+      "autonomousHigh": true,
+      "baselineOnlyAssignments": true,
+      "threePassAndFrozen": true,
+      "templateVersionPersisted": true
+    }
+  },
+  "sortingAssertions": {
+    "twoLegitimateTrials": true,
+    "sameFamilyContentAndVersion": true,
+    "bTrialLater": true,
+    "aEnableLater": true,
+    "expectedB37": true,
+    "actualA36": true,
+    "eventMislabelsEnableTime": true
+  },
+  "fixturesRestored": {
+    "definition": {
+      "id": 17,
+      "definitionCode": "EXT_0FA30230",
+      "taskName": "G145 F013 baseline fixtures",
+      "goalTemplate": "Synthetic navigation to selected destination",
+      "sceneParams": [
+        {
+          "name": "targetLocation",
+          "type": "String",
+          "required": true,
+          "defaultValue": "F2_TEST_GATE",
+          "range": null
+        }
+      ],
+      "availableCapabilityTypes": [
+        "CAP_NAVIGATION"
+      ],
+      "constraintDescription": "Synthetic isolated F013 runtime baseline gate",
+      "completionCondition": "routeGenerated=true",
+      "isPreset": false,
+      "definitionStatus": "DISABLED",
+      "updatedAt": "2026-11-04T15:19:47.957885",
+      "updatedBy": "set"
+    },
+    "rules": [
+      {
+        "id": 1,
+        "ruleCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+        "ruleContent": "移动机器人会合或陪同服务对象为特殊旅客时判定为高风险；普通空间引导场景不命中",
+        "ruleVersion": "V1.2",
+        "enabled": true,
+        "createdAt": "2026-10-30T13:40:48.586219",
+        "updatedAt": "2026-11-04T10:29:06.080757",
+        "updatedBy": "set"
+      },
+      {
+        "id": 2,
+        "ruleCode": "RULE_CROSS_ZONE",
+        "ruleContent": "仅移动服务机器人适用；同一任务链条中跨越预定义区域边界1次及以上命中",
+        "ruleVersion": "V1.2",
+        "enabled": true,
+        "createdAt": "2026-10-30T13:40:48.586219",
+        "updatedAt": "2026-11-04T10:29:00.250949",
+        "updatedBy": "set"
+      },
+      {
+        "id": 3,
+        "ruleCode": "RULE_RESOURCE_CRITICAL",
+        "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+        "ruleVersion": "V3.6",
+        "enabled": true,
+        "createdAt": "2026-10-30T13:40:48.586219",
+        "updatedAt": "2026-11-04T10:31:33.457227",
+        "updatedBy": "set"
+      },
+      {
+        "id": 4,
+        "ruleCode": "GPT_F014_150_API",
+        "ruleContent": "Synthetic F014 validation fixture revised",
+        "ruleVersion": "V1.2",
+        "enabled": false,
+        "createdAt": "2026-11-04T08:07:33.779259",
+        "updatedAt": "2026-11-04T08:07:33.967337",
+        "updatedBy": "set"
+      },
+      {
+        "id": 5,
+        "ruleCode": "GPT_F014_150_UI",
+        "ruleContent": "Synthetic F014 browser-created rule revised",
+        "ruleVersion": "V1.1",
+        "enabled": false,
+        "createdAt": "2026-11-04T08:09:47.309055",
+        "updatedAt": "2026-11-04T08:10:48.202617",
+        "updatedBy": "gpt_f014_ui_150"
+      }
+    ],
+    "templates": [
+      {
+        "id": 34,
+        "templateName": "G153 F015 older-trial-A 151814",
+        "templateIntent": "EXT_0FA30230",
+        "isPreset": false,
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "F2_TEST_GATE",
+            "range": null
+          }
+        ],
+        "steps": [
+          {
+            "stepSeq": 1,
+            "capabilityType": "CAP_NAVIGATION",
+            "paramMapping": [
+              {
+                "target": "targetLocation",
+                "source": "TEMPLATE_INPUT.targetLocation"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "routeGenerated=true"
+          }
+        ],
+        "templateVersion": "V1.0",
+        "templateStatus": "DISABLED",
+        "updatedAt": "2026-11-04T15:18:22.749639",
+        "updatedBy": "set"
+      },
+      {
+        "id": 35,
+        "templateName": "G153 F015 newer-trial-B 151814",
+        "templateIntent": "EXT_0FA30230",
+        "isPreset": false,
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "F2_TEST_GATE",
+            "range": null
+          }
+        ],
+        "steps": [
+          {
+            "stepSeq": 1,
+            "capabilityType": "CAP_NAVIGATION",
+            "paramMapping": [
+              {
+                "target": "targetLocation",
+                "source": "TEMPLATE_INPUT.targetLocation"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "routeGenerated=true"
+          }
+        ],
+        "templateVersion": "V1.0",
+        "templateStatus": "DISABLED",
+        "updatedAt": "2026-11-04T15:18:22.777391",
+        "updatedBy": "set"
+      },
+      {
+        "id": 36,
+        "templateName": "G153 F015 older-trial-A 151933",
+        "templateIntent": "EXT_0FA30230",
+        "isPreset": false,
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "F2_TEST_GATE",
+            "range": null
+          }
+        ],
+        "steps": [
+          {
+            "stepSeq": 1,
+            "capabilityType": "CAP_NAVIGATION",
+            "paramMapping": [
+              {
+                "target": "targetLocation",
+                "source": "TEMPLATE_INPUT.targetLocation"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "routeGenerated=true"
+          }
+        ],
+        "templateVersion": "V1.0",
+        "templateStatus": "DISABLED",
+        "updatedAt": "2026-11-04T15:19:47.898196",
+        "updatedBy": "set"
+      },
+      {
+        "id": 37,
+        "templateName": "G153 F015 newer-trial-B 151933",
+        "templateIntent": "EXT_0FA30230",
+        "isPreset": false,
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "F2_TEST_GATE",
+            "range": null
+          }
+        ],
+        "steps": [
+          {
+            "stepSeq": 1,
+            "capabilityType": "CAP_NAVIGATION",
+            "paramMapping": [
+              {
+                "target": "targetLocation",
+                "source": "TEMPLATE_INPUT.targetLocation"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "routeGenerated=true"
+          }
+        ],
+        "templateVersion": "V1.0",
+        "templateStatus": "DISABLED",
+        "updatedAt": "2026-11-04T15:19:47.928656",
+        "updatedBy": "set"
+      }
+    ],
+    "agent": {
+      "agentId": "AGT-803437A3",
+      "deviceCode": "G126_ROBOT",
+      "deviceName": "GPT F007 robot fixture",
+      "agentStatus": "ENABLED",
+      "onlineStatus": "ONLINE",
+      "workStatus": "IDLE",
+      "currentTaskId": null,
+      "currentStepSeq": null,
+      "lastReportedAt": "2026-11-04T15:21:42.923249",
+      "enabledCapabilities": [
+        {
+          "capabilityName": "陪同服务",
+          "capabilityCode": "CAP_ESCORT"
+        },
+        {
+          "capabilityName": "现场通知",
+          "capabilityCode": "CAP_NOTIFICATION"
+        },
+        {
+          "capabilityName": "空间引导",
+          "capabilityCode": "CAP_NAVIGATION"
+        }
+      ],
+      "offlineInfo": null
+    },
+    "ownActiveAssignments": "0",
+    "agentsAllocated": "0"
+  },
+  "fixtureDiagnostic": "Initial SQL text decoding used Windows GBK for PostgreSQL UTF8 event rows. API tasks223/224 trials and225 successful control completed correctly. Probe cleaned templates and definition. Corrected only test SQL helper to explicit UTF8; recovered225 persistence without repeating its success task. Newly created templates36/37 had genuine new trials226/227 because prior pair34/35 was already disabled by cleanup. Stable run skips already completed successful control. This is not a product defect and observations/trials are counted separately.",
+  "executions": {
+    "actualTrialTasks": [
+      223,
+      224,
+      226,
+      227
+    ],
+    "actualFormalTasks": [
+      225,
+      228,
+      229
+    ],
+    "formalSemanticObservations": 3,
+    "effectiveTrialPairForSorting": [
+      226,
+      227
+    ],
+    "probeAttempts": 2,
+    "note": "Four real successful trial tasks; only226/227 form sorting fixture. SQL recovery of225 is not a new task or observation."
+  },
+  "historyReuse": {
+    "acceptanceHistoryReused": false,
+    "frontendBuildOnly": {
+      "originalTag": "V1.152",
+      "originalSha": "d86a722e2e56869f279ae25c82bcb6ab6d8ee30d",
+      "currentSha": "ee2646b611e784b682556e88c626bf7c499ba7c6",
+      "frontendTreeUnchanged": true,
+      "originalEvidence": "acceptance/stage3/evidence/SRS_F015-V1.152-frontend-build-20261104.txt",
+      "note": "Build observation only; no current or historical F015 UI pass claimed."
+    }
+  },
+  "directedSuites": [
+    {
+      "name": "com.airport.ai.task.BaselineDowngradeAndFailureBoundaryF015Test",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.airport.ai.baseline.BaselineDryRunLifecycleTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.airport.ai.baseline.BaselineTemplateF008Test",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.airport.ai.task.BaselineDowngradeBindingF008Test",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.airport.ai.task.BaselineFailureNoReplanF015Test",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.airport.ai.task.RecoveryEventTruthF015Test",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.airport.ai.task.ReplanningHighRiskDowngradeTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.airport.ai.task.TaskExceptionServiceSpringContextTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  ],
+  "directedTotal": {
+    "tests": 42,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "logRedaction": "Only generated Spring development password line redacted; original full log retained locally and not committed.",
+  "stopped": [
+    {
+      "pid": 13968,
+      "verifiedOwnership": true,
+      "stopped": true,
+      "fixture": "robot-v153-runtime.json"
+    },
+    {
+      "pid": 11288,
+      "verifiedOwnership": true,
+      "stopped": true,
+      "fixture": "runtime-v153.json"
+    },
+    {
+      "pid": 11276,
+      "verifiedOwnership": true,
+      "stopped": true,
+      "fixture": "model-v153-runtime.json"
+    }
+  ],
+  "portsReleased": {
+    "18129": true,
+    "18117": true,
+    "18132": true,
+    "18134": true,
+    "18135": true,
+    "15179": true
+  },
+  "productUnmodified": true,
+  "gitHandoff": "e7ec045d191830a96725ecdd55686034ca9ae804",
+  "startupDefect096": "CLOSED by current actual packaged JAR startup, UP, authenticated HTTP entries, and real template trials/formal execution. Original V1.152 failed logs preserved.",
+  "ruleAssessment": {
+    "P": [
+      "SRS_F015.R01",
+      "SRS_F015.R03",
+      "SRS_F015.R06"
+    ],
+    "F": [
+      "SRS_F015.R07"
+    ],
+    "NT": [
+      "SRS_F015.R02",
+      "SRS_F015.R04",
+      "SRS_F015.R05",
+      "SRS_F015.R08",
+      "SRS_F015.R09"
+    ]
+  },
+  "stepAssessment": {
+    "P": [],
+    "F": [
+      "TC-047.S2"
+    ],
+    "NT": [
+      "TC-047.S1",
+      "TC-048.S1",
+      "TC-048.S2",
+      "TC-049.S1",
+      "TC-050.S1"
+    ]
+  },
+  "remainingNote": "R04 positive revalidation passed, but negative rejection not run; R08 one-agent timeout passed, original two-agent switch/exhaustion counterexample and successful candidate recovery not run, so overall R08/TC050 remain NT and DEF065/066 not closed. R06 is persistent traceability only; UI assertions/DEF067 remain untested."
+}
