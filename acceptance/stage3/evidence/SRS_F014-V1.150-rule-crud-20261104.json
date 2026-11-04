@@ -1,0 +1,377 @@
+{
+  "version": "V1.150",
+  "codeSha": "69b841fbc10afd1c4c1f944cc0cd5a647bed66f7",
+  "observedAt": "2026-11-04T08:07:32.663485+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "before": [
+    {
+      "id": 1,
+      "ruleCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+      "ruleContent": "移动机器人会合或陪同服务对象为特殊旅客时判定为高风险；普通空间引导场景不命中",
+      "ruleVersion": "V1.0",
+      "enabled": true,
+      "createdAt": "2026-10-30T13:40:48.586219",
+      "updatedAt": "2026-10-30T13:40:48.586219",
+      "updatedBy": null
+    },
+    {
+      "id": 2,
+      "ruleCode": "RULE_CROSS_ZONE",
+      "ruleContent": "仅移动服务机器人适用；同一任务链条中跨越预定义区域边界1次及以上命中",
+      "ruleVersion": "V1.0",
+      "enabled": true,
+      "createdAt": "2026-10-30T13:40:48.586219",
+      "updatedAt": "2026-10-30T13:40:48.586219",
+      "updatedBy": null
+    },
+    {
+      "id": 3,
+      "ruleCode": "RULE_RESOURCE_CRITICAL",
+      "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+      "ruleVersion": "V2.6",
+      "enabled": true,
+      "createdAt": "2026-10-30T13:40:48.586219",
+      "updatedAt": "2026-11-04T01:21:08.947312",
+      "updatedBy": null
+    }
+  ],
+  "invalid": [
+    {
+      "request": {},
+      "response": {
+        "http": 400,
+        "body": {
+          "code": 3000,
+          "message": "规则编号不能为空",
+          "timestamp": "2026-11-04T08:07:33.291647100+08:00",
+          "path": "/api/v1/risk-rules",
+          "method": "POST"
+        }
+      }
+    },
+    {
+      "request": {
+        "ruleCode": "",
+        "ruleContent": "Synthetic F014 validation fixture",
+        "enabled": false
+      },
+      "response": {
+        "http": 400,
+        "body": {
+          "code": 3000,
+          "message": "规则编号不能为空",
+          "timestamp": "2026-11-04T08:07:33.320061300+08:00",
+          "path": "/api/v1/risk-rules",
+          "method": "POST"
+        }
+      }
+    },
+    {
+      "request": {
+        "ruleCode": " ",
+        "ruleContent": "Synthetic F014 validation fixture",
+        "enabled": false
+      },
+      "response": {
+        "http": 400,
+        "body": {
+          "code": 3000,
+          "message": "规则编号不能为空",
+          "timestamp": "2026-11-04T08:07:33.342409700+08:00",
+          "path": "/api/v1/risk-rules",
+          "method": "POST"
+        }
+      }
+    },
+    {
+      "request": {
+        "ruleCode": "GPT_F014_150_API",
+        "ruleContent": "",
+        "enabled": false
+      },
+      "response": {
+        "http": 400,
+        "body": {
+          "code": 3000,
+          "message": "规则内容不能为空",
+          "timestamp": "2026-11-04T08:07:33.371382900+08:00",
+          "path": "/api/v1/risk-rules",
+          "method": "POST"
+        }
+      }
+    },
+    {
+      "request": {
+        "ruleCode": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "ruleContent": "Synthetic F014 validation fixture",
+        "enabled": false
+      },
+      "response": {
+        "http": 400,
+        "body": {
+          "code": 3001,
+          "message": "规则编号不得超过64个字符",
+          "timestamp": "2026-11-04T08:07:33.409549100+08:00",
+          "path": "/api/v1/risk-rules",
+          "method": "POST"
+        }
+      }
+    },
+    {
+      "request": {
+        "ruleCode": "GPT_F014_150_API",
+        "ruleContent": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "enabled": false
+      },
+      "response": {
+        "http": 400,
+        "body": {
+          "code": 3001,
+          "message": "规则内容不得超过1000个字符",
+          "timestamp": "2026-11-04T08:07:33.426109400+08:00",
+          "path": "/api/v1/risk-rules",
+          "method": "POST"
+        }
+      }
+    },
+    {
+      "request": {
+        "ruleCode": "BAD CODE",
+        "ruleContent": "Synthetic F014 validation fixture",
+        "enabled": false
+      },
+      "response": {
+        "http": 400,
+        "body": {
+          "code": 3001,
+          "message": "规则编号仅允许字母、数字、下划线和连字符",
+          "timestamp": "2026-11-04T08:07:33.471892+08:00",
+          "path": "/api/v1/risk-rules",
+          "method": "POST"
+        }
+      }
+    },
+    {
+      "request": {
+        "ruleCode": "GPT_F014_150_API",
+        "ruleContent": "Synthetic F014 validation fixture",
+        "enabled": 1
+      },
+      "response": {
+        "http": 400,
+        "body": {
+          "code": 3001,
+          "message": "启用状态应为true或false",
+          "timestamp": "2026-11-04T08:07:33.490547300+08:00",
+          "path": "/api/v1/risk-rules",
+          "method": "POST"
+        }
+      }
+    },
+    {
+      "request": {
+        "ruleCode": "GPT_F014_150_API",
+        "ruleContent": [],
+        "enabled": false
+      },
+      "response": {
+        "http": 400,
+        "body": {
+          "code": 3001,
+          "message": "规则内容应为文本",
+          "timestamp": "2026-11-04T08:07:33.513701500+08:00",
+          "path": "/api/v1/risk-rules",
+          "method": "POST"
+        }
+      }
+    }
+  ],
+  "countBefore": "3",
+  "countAfterInvalid": "3",
+  "created": {
+    "http": 200,
+    "body": {
+      "code": 200,
+      "message": "success",
+      "data": {
+        "id": 4,
+        "ruleCode": "GPT_F014_150_API",
+        "ruleContent": "Synthetic F014 validation fixture",
+        "ruleVersion": "V1.0",
+        "enabled": false,
+        "createdAt": "2026-11-04T08:07:33.7792593",
+        "updatedAt": "2026-11-04T08:07:33.7792593",
+        "updatedBy": "set"
+      },
+      "timestamp": "2026-11-04T08:07:33.808546400+08:00"
+    }
+  },
+  "duplicate": {
+    "http": 409,
+    "body": {
+      "code": 4501,
+      "message": "规则编号已存在：GPT_F014_150_API",
+      "timestamp": "2026-11-04T08:07:33.834257800+08:00",
+      "path": "/api/v1/risk-rules",
+      "method": "POST"
+    }
+  },
+  "afterCreate": [
+    {
+      "id": 1,
+      "ruleCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+      "ruleContent": "移动机器人会合或陪同服务对象为特殊旅客时判定为高风险；普通空间引导场景不命中",
+      "ruleVersion": "V1.0",
+      "enabled": true,
+      "createdAt": "2026-10-30T13:40:48.586219",
+      "updatedAt": "2026-10-30T13:40:48.586219",
+      "updatedBy": null
+    },
+    {
+      "id": 2,
+      "ruleCode": "RULE_CROSS_ZONE",
+      "ruleContent": "仅移动服务机器人适用；同一任务链条中跨越预定义区域边界1次及以上命中",
+      "ruleVersion": "V1.0",
+      "enabled": true,
+      "createdAt": "2026-10-30T13:40:48.586219",
+      "updatedAt": "2026-10-30T13:40:48.586219",
+      "updatedBy": null
+    },
+    {
+      "id": 3,
+      "ruleCode": "RULE_RESOURCE_CRITICAL",
+      "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+      "ruleVersion": "V2.6",
+      "enabled": true,
+      "createdAt": "2026-10-30T13:40:48.586219",
+      "updatedAt": "2026-11-04T01:21:08.947312",
+      "updatedBy": null
+    },
+    {
+      "id": 4,
+      "ruleCode": "GPT_F014_150_API",
+      "ruleContent": "Synthetic F014 validation fixture",
+      "ruleVersion": "V1.0",
+      "enabled": false,
+      "createdAt": "2026-11-04T08:07:33.779259",
+      "updatedAt": "2026-11-04T08:07:33.779259",
+      "updatedBy": "set"
+    }
+  ],
+  "noop": {
+    "http": 200,
+    "body": {
+      "code": 200,
+      "message": "success",
+      "data": {
+        "id": 4,
+        "ruleCode": "GPT_F014_150_API",
+        "ruleContent": "Synthetic F014 validation fixture",
+        "ruleVersion": "V1.0",
+        "enabled": false,
+        "createdAt": "2026-11-04T08:07:33.779259",
+        "updatedAt": "2026-11-04T08:07:33.779259",
+        "updatedBy": "set"
+      },
+      "timestamp": "2026-11-04T08:07:33.909046700+08:00"
+    }
+  },
+  "update": {
+    "http": 200,
+    "body": {
+      "code": 200,
+      "message": "success",
+      "data": {
+        "id": 4,
+        "ruleCode": "GPT_F014_150_API",
+        "ruleContent": "Synthetic F014 validation fixture revised",
+        "ruleVersion": "V1.1",
+        "enabled": true,
+        "createdAt": "2026-11-04T08:07:33.779259",
+        "updatedAt": "2026-11-04T08:07:33.9316635",
+        "updatedBy": "set"
+      },
+      "timestamp": "2026-11-04T08:07:33.946303700+08:00"
+    }
+  },
+  "disable": {
+    "http": 200,
+    "body": {
+      "code": 200,
+      "message": "success",
+      "data": {
+        "id": 4,
+        "ruleCode": "GPT_F014_150_API",
+        "ruleContent": "Synthetic F014 validation fixture revised",
+        "ruleVersion": "V1.2",
+        "enabled": false,
+        "createdAt": "2026-11-04T08:07:33.779259",
+        "updatedAt": "2026-11-04T08:07:33.9673372",
+        "updatedBy": "set"
+      },
+      "timestamp": "2026-11-04T08:07:33.976517500+08:00"
+    }
+  },
+  "unauthorized": {
+    "http": 403,
+    "body": {
+      "code": 2003,
+      "message": "无权限访问",
+      "timestamp": "2026-11-04T08:07:33.994479+08:00",
+      "path": "/api/v1/risk-rules",
+      "method": "POST"
+    }
+  },
+  "audit": "RISK_RULE_CHANGE|GPT_F014_150_API|SUCCESS|{\"ruleContent\":\"Synthetic F014 validation fixture\",\"ruleSetVersion\":\"V1.17\",\"ruleVersion\":\"V1.0\",\"action\":\"CREATE\",\"enabled\":false}\nRISK_RULE_CHANGE|GPT_F014_150_API|SUCCESS|{\"before\":{\"ruleContent\":\"Synthetic F014 validation fixture\",\"ruleVersion\":\"V1.0\",\"enabled\":false},\"ruleSetVersion\":\"V1.18\",\"action\":\"UPDATE\",\"after\":{\"ruleContent\":\"Synthetic F014 validation fixture revised\",\"ruleVersion\":\"V1.1\",\"enabled\":true}}\nRISK_RULE_CHANGE|GPT_F014_150_API|SUCCESS|{\"before\":{\"ruleContent\":\"Synthetic F014 validation fixture revised\",\"ruleVersion\":\"V1.1\",\"enabled\":true},\"ruleSetVersion\":\"V1.19\",\"action\":\"UPDATE\",\"after\":{\"ruleContent\":\"Synthetic F014 validation fixture revised\",\"ruleVersion\":\"V1.2\",\"enabled\":false}}",
+  "after": [
+    {
+      "id": 1,
+      "ruleCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+      "ruleContent": "移动机器人会合或陪同服务对象为特殊旅客时判定为高风险；普通空间引导场景不命中",
+      "ruleVersion": "V1.0",
+      "enabled": true,
+      "createdAt": "2026-10-30T13:40:48.586219",
+      "updatedAt": "2026-10-30T13:40:48.586219",
+      "updatedBy": null
+    },
+    {
+      "id": 2,
+      "ruleCode": "RULE_CROSS_ZONE",
+      "ruleContent": "仅移动服务机器人适用；同一任务链条中跨越预定义区域边界1次及以上命中",
+      "ruleVersion": "V1.0",
+      "enabled": true,
+      "createdAt": "2026-10-30T13:40:48.586219",
+      "updatedAt": "2026-10-30T13:40:48.586219",
+      "updatedBy": null
+    },
+    {
+      "id": 3,
+      "ruleCode": "RULE_RESOURCE_CRITICAL",
+      "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+      "ruleVersion": "V2.6",
+      "enabled": true,
+      "createdAt": "2026-10-30T13:40:48.586219",
+      "updatedAt": "2026-11-04T01:21:08.947312",
+      "updatedBy": null
+    },
+    {
+      "id": 4,
+      "ruleCode": "GPT_F014_150_API",
+      "ruleContent": "Synthetic F014 validation fixture revised",
+      "ruleVersion": "V1.2",
+      "enabled": false,
+      "createdAt": "2026-11-04T08:07:33.779259",
+      "updatedAt": "2026-11-04T08:07:33.967337",
+      "updatedBy": "set"
+    }
+  ],
+  "checks": {
+    "invalidAll400": true,
+    "noInvalidData": true,
+    "create200": true,
+    "duplicate409": true,
+    "unauthorized403": true,
+    "noopSameVersion": true,
+    "editAndToggleVersioned": true
+  }
+}

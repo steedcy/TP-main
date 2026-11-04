@@ -1,0 +1,239 @@
+{
+  "version": "V1.150",
+  "codeSha": "69b841fbc10afd1c4c1f944cc0cd5a647bed66f7",
+  "observedAt": "2026-11-04T08:14:57.999386+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "rulesAfter": [
+    {
+      "id": 1,
+      "ruleCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+      "ruleContent": "移动机器人会合或陪同服务对象为特殊旅客时判定为高风险；普通空间引导场景不命中",
+      "ruleVersion": "V1.0",
+      "enabled": true,
+      "createdAt": "2026-10-30T13:40:48.586219",
+      "updatedAt": "2026-10-30T13:40:48.586219",
+      "updatedBy": null
+    },
+    {
+      "id": 2,
+      "ruleCode": "RULE_CROSS_ZONE",
+      "ruleContent": "仅移动服务机器人适用；同一任务链条中跨越预定义区域边界1次及以上命中",
+      "ruleVersion": "V1.0",
+      "enabled": true,
+      "createdAt": "2026-10-30T13:40:48.586219",
+      "updatedAt": "2026-10-30T13:40:48.586219",
+      "updatedBy": null
+    },
+    {
+      "id": 3,
+      "ruleCode": "RULE_RESOURCE_CRITICAL",
+      "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+      "ruleVersion": "V2.8",
+      "enabled": true,
+      "createdAt": "2026-10-30T13:40:48.586219",
+      "updatedAt": "2026-11-04T08:12:25.254731",
+      "updatedBy": "set"
+    },
+    {
+      "id": 4,
+      "ruleCode": "GPT_F014_150_API",
+      "ruleContent": "Synthetic F014 validation fixture revised",
+      "ruleVersion": "V1.2",
+      "enabled": false,
+      "createdAt": "2026-11-04T08:07:33.779259",
+      "updatedAt": "2026-11-04T08:07:33.967337",
+      "updatedBy": "set"
+    },
+    {
+      "id": 5,
+      "ruleCode": "GPT_F014_150_UI",
+      "ruleContent": "Synthetic F014 browser-created rule revised",
+      "ruleVersion": "V1.1",
+      "enabled": false,
+      "createdAt": "2026-11-04T08:09:47.309055",
+      "updatedAt": "2026-11-04T08:10:48.202617",
+      "updatedBy": "gpt_f014_ui_150"
+    }
+  ],
+  "definitionAfter": {
+    "id": 17,
+    "definitionCode": "EXT_0FA30230",
+    "taskName": "G145 F013 baseline fixtures",
+    "goalTemplate": "Synthetic navigation to selected destination",
+    "sceneParams": [
+      {
+        "name": "targetLocation",
+        "type": "String",
+        "required": true,
+        "defaultValue": "F2_TEST_GATE",
+        "range": null
+      }
+    ],
+    "availableCapabilityTypes": [
+      "CAP_NAVIGATION"
+    ],
+    "constraintDescription": "Synthetic isolated F013 runtime baseline gate",
+    "completionCondition": "routeGenerated=true",
+    "isPreset": false,
+    "definitionStatus": "DISABLED",
+    "updatedAt": "2026-11-04T08:12:25.285226",
+    "updatedBy": "set"
+  },
+  "agentsBeforeStop": {
+    "content": [
+      {
+        "agentId": "AGT-D68FD3AB",
+        "deviceCode": "G6_UNTESTED_134145",
+        "deviceName": "GPT F006 untested enable fixture",
+        "agentStatus": "ENABLED",
+        "onlineStatus": "OFFLINE",
+        "workStatus": "IDLE",
+        "currentTaskId": null,
+        "currentStepSeq": null,
+        "lastReportedAt": "2026-11-01T21:43:39.146079",
+        "enabledCapabilities": [
+          {
+            "capabilityCode": "G120_TEMPLATE",
+            "capabilityName": "GPT V120 live"
+          }
+        ],
+        "offlineInfo": {
+          "agentCode": "AGT-D68FD3AB",
+          "offlineAt": "2026-11-03T01:17:45.41812",
+          "reasonCode": "ERR_HEARTBEAT_TIMEOUT",
+          "detail": "设备代理AGT-D68FD3AB超过30秒未上报，判定离线",
+          "affectsTask": false
+        }
+      },
+      {
+        "agentId": "AGT-9C2FF6F2",
+        "deviceCode": "G120_NEW",
+        "deviceName": "GPT inactive template fixture",
+        "agentStatus": "ENABLED",
+        "onlineStatus": "OFFLINE",
+        "workStatus": "IDLE",
+        "currentTaskId": null,
+        "currentStepSeq": null,
+        "lastReportedAt": "2026-10-31T00:11:29.382518",
+        "enabledCapabilities": [],
+        "offlineInfo": {
+          "agentCode": "AGT-9C2FF6F2",
+          "offlineAt": "2026-10-31T01:33:08.736546",
+          "reasonCode": "ERR_HEARTBEAT_TIMEOUT",
+          "detail": "设备代理AGT-9C2FF6F2超过30秒未上报，判定离线",
+          "affectsTask": false
+        }
+      },
+      {
+        "agentId": "AGT-803437A3",
+        "deviceCode": "G126_ROBOT",
+        "deviceName": "GPT F007 robot fixture",
+        "agentStatus": "ENABLED",
+        "onlineStatus": "ONLINE",
+        "workStatus": "IDLE",
+        "currentTaskId": null,
+        "currentStepSeq": null,
+        "lastReportedAt": "2026-11-04T08:14:53.848735",
+        "enabledCapabilities": [
+          {
+            "capabilityCode": "CAP_ESCORT",
+            "capabilityName": "陪同服务"
+          },
+          {
+            "capabilityCode": "CAP_NOTIFICATION",
+            "capabilityName": "现场通知"
+          },
+          {
+            "capabilityCode": "CAP_NAVIGATION",
+            "capabilityName": "空间引导"
+          }
+        ],
+        "offlineInfo": null
+      },
+      {
+        "agentId": "AGT-F8CA3C99",
+        "deviceCode": "G145_F013_SCAN",
+        "deviceName": "GPT F013 SCAN fixture",
+        "agentStatus": "DISABLED",
+        "onlineStatus": "OFFLINE",
+        "workStatus": "IDLE",
+        "currentTaskId": null,
+        "currentStepSeq": null,
+        "lastReportedAt": "2026-11-03T22:20:38.884764",
+        "enabledCapabilities": [],
+        "offlineInfo": {
+          "agentCode": "AGT-F8CA3C99",
+          "offlineAt": "2026-11-03T22:14:46.920657",
+          "reasonCode": "DEVICE_REPORTED_OFFLINE",
+          "detail": "设备代理AGT-F8CA3C99主动上报离线",
+          "affectsTask": false
+        }
+      },
+      {
+        "agentId": "AGT-95E1692F",
+        "deviceCode": "G145_F013_DISPLAY",
+        "deviceName": "GPT F013 DISPLAY fixture",
+        "agentStatus": "DISABLED",
+        "onlineStatus": "OFFLINE",
+        "workStatus": "IDLE",
+        "currentTaskId": null,
+        "currentStepSeq": null,
+        "lastReportedAt": "2026-11-04T08:14:50.16514",
+        "enabledCapabilities": [],
+        "offlineInfo": {
+          "agentCode": "AGT-95E1692F",
+          "offlineAt": null,
+          "reasonCode": null,
+          "detail": null,
+          "affectsTask": false
+        }
+      }
+    ],
+    "totalElements": 5,
+    "page": 1,
+    "size": 100
+  },
+  "syntheticUiUserDisabled": true,
+  "activeTestAssignments": "0",
+  "health": {
+    "status": "UP"
+  },
+  "jarSha256": "d4357d26b0ad70eff80e97a8eb231b7d9371afd35b4916b877dca5d5595afe74",
+  "gitHead": "f2e70c872ac2e53f77cacf03d60fae7d2dc2056f",
+  "tagCommit": "69b841fbc10afd1c4c1f944cc0cd5a647bed66f7",
+  "productDiff": "",
+  "stopped": [
+    {
+      "fixture": "vite-v150-runtime",
+      "pid": 11292,
+      "exitCode": 0
+    },
+    {
+      "fixture": "display-v150-runtime",
+      "pid": 12460,
+      "exitCode": 0
+    },
+    {
+      "fixture": "robot-v150-runtime",
+      "pid": 4704,
+      "exitCode": 0
+    },
+    {
+      "fixture": "runtime-v150",
+      "pid": 12976,
+      "exitCode": 0
+    },
+    {
+      "fixture": "model-v150-runtime",
+      "pid": 6900,
+      "exitCode": 0
+    }
+  ],
+  "portsReleased": {
+    "18129": true,
+    "18117": true,
+    "18132": true,
+    "18134": true,
+    "15179": true
+  }
+}
