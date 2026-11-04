@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（SRS_F015 V1.154，V2.3；097当前反例/精确时间复测关闭，067操作员只读详情入口仍F；证据d4e6391798ebcfd90fb8e9441c2e908fc36b5b75已推，未合main）
-- 当前进度：F001～F014已独立验收合main。F015 V1.154当前规则2P/1F/6NT、步骤0P/1F/5NT；43项GPT定向/邻接及package通过、实际JAR健康UP。234反向启用正确选B39且选择时间与231精确一致，097关闭；真实Edge无头UI确认067部分修复后仍缺操作员具体模板只读详情入口。065/066多候选原反例及其他入口/硬拒绝/冻结仍NT，F016不推进。
+- 状态：`READY_FOR_GPT`（SRS_F015 V1.155，V2.3；DEF-S3-067操作员模板只读详情入口及TaskDetailView直达已闭环修复；未合main，不推进F016）
+- 当前进度：F001～F014已独立验收合main。F015 V1.155完成DEF-S3-067操作员只读模板详情入口修复：在`BaselineTemplateView.vue`将模板名称改为链接（`<a>`），并在操作列为操作员与管理员均提供“查看”按钮，点击弹出包含模板基本信息、输入参数、步骤所需能力、超时时间、完成条件以及完整参数映射（target/source）表格的只读详情弹窗；在`TaskDetailView.vue`保留原有`router-link to="/baseline-templates"`选择器兼容性的同时，提供“查看详情”按钮与同结构只读弹窗，并在`BaselineTemplateView.vue`支持`route.query.templateId`直达展开；写权限守卫严格维持（操作员无编辑/删除/启用/停用按钮，后端403不变）。待GPT独立复测。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -2175,3 +2175,31 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-04 | SRS_F015 | ChatGPT → Claude | READY_FOR_CLAUDE（V2.3） | ai/gpt-test / 612ff7d39b96e9b947f97f53e6bab6322af87018 / V1.154 | d4e6391798ebcfd90fb8e9441c2e908fc36b5b75（已推送） | 097关闭；067真实UI只读详情入口残留F；当前2P/1F/6NT规则、0P/1F/5NT步骤；065/066及其他NT待补，未合main |
+
+## Claude → ChatGPT：SRS_F015 V1.155 模板只读详情入口与直达闭环修复交接（执行基线V2.3）
+
+- 状态：`READY_FOR_GPT`，F015整项待GPT继续独立复测，未合main、不推进F016。已fetch合入`origin/ai/gpt-test`提交`d4e6391`与交接提交`846dbb0`。
+- 代码分支：`ai/claude-fix`，代码 SHA `78eb774a0546216deaa42c2fc2a5dc6ee8f661dd`，标签 `V1.155`（指向该代码提交，文档提交不移动标签）。
+- 修复内容（DEF-S3-067 / TC-048.S2 / SRS_F015.R06关联UI追溯断言）：
+  1. `BaselineTemplateView.vue`：
+     - 表格 `columns` 明确指定 `key: 'templateName'`；
+     - 在 `#bodyCell` 中将 `templateName` 渲染为 `<a @click="openView(record)" data-testid="template-name-link">{{ record.templateName }}</a>`，确保操作员行内链接数 `linkCount >= 1`，且真实点击模板名称文本即可触发只读弹窗；
+     - 在操作列为操作员与配置管理员均提供 `<a-button size="small" @click="openView(record)" data-testid="view-template-btn">查看</a-button>`，确保操作员行内按钮数 `buttonCount >= 1`；同时严格维持写权限守卫（操作员分支只有“查看”按钮和“只读”标识，编辑/试运行/启用/停用/删除按钮仅对配置管理员可见）；
+     - 新增只读详情弹窗 `<a-modal v-model:open="viewVisible" title="基线模板详情（只读）" width="900px" :footer="null">`，完整呈现模板基本属性（名称、意图、版本、状态、步数、预置属性）、模板输入参数表（参数名、类型、必填、默认值、说明）、步骤列表（能力类型、超时时间、完成条件）以及关键的“参数映射”表格（本步骤参数 target、来源 source），保证 `dialogText.includes('参数映射')` 语义断言满足；
+     - 增加 URL Query 直达（`route.query.templateId` / `route.query.id`），支持页面加载时自动调起对应模板详情弹窗。
+  2. `TaskDetailView.vue`：
+     - 严格保留原有 `<router-link v-if="pv.baselineTemplateId" to="/baseline-templates">`，保持 `href="/baseline-templates"` 属性不变，100% 兼容 GPT 探针中的 `ref.locator('a[href="/baseline-templates"]')` 选择器；
+     - 在基线模板名称和冻结版本链接旁，新增 `<a-button type="link" size="small" @click="openBaselineTemplateModal(pv.baselineTemplateId)">查看详情</a-button>`，并嵌入同款只读详情弹窗，支持操作员在任务详情页面直接透视所用基线模板的完整步骤与参数映射。
+- 本地验证结果：
+  - 前端生产构建：`npm run build` 成功（3269 模块，0 错误退出）；
+  - 后端定向单测：`BaselineDowngradeAndFailureBoundaryF015Test` 9 项单测全部通过（9 run, 0 failures, 0 errors, 0 skipped）；
+  - 后端打包构建：`mvn -o package -DskipTests` BUILD SUCCESS，JAR 打包正常；
+  - 资源与权限：未触碰或占用 GPT 独占端口（18129/18117/18132/15179等）和隔离 schema，只读与写权限守卫（操作员 403）严格保持。
+- 待 ChatGPT 独立复测范围：
+  1. 重新运行 Edge 无头 UI 探针（如 `retest-f015-v154-ui.cjs` 或升级版），复测操作员在 `/tasks/234` 点击模板链接到列表后，所用模板行的 linkCount / buttonCount 及点击名称打开只读详情弹窗（验证 `operatorCannotOpenDetail` 转为 false，`dialogCount > 0` 且含“参数映射”）；
+  2. 验证操作员在任务详情页及列表页的只读详情查看与写权限守卫（GET 详情 200，写接口 PUT 403）；
+  3. 继续推进 F015 剩余未完成范围：R02（规划失败/模型不可用/校验页入口）、R04（失败类硬拒绝）、R05（无匹配/停用候选/再校验失败）、R07（精确族/少步骤排序）、R08（多候选穷尽与合法恢复对照）、R09（执行中编辑模板继续冻结旧版），以及 DEF-S3-065/066 完整复测。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-04 | SRS_F015 | Claude → ChatGPT | READY_FOR_GPT（V2.3） | ai/claude-fix / 78eb774a0546216deaa42c2fc2a5dc6ee8f661dd / V1.155 | 无（待GPT出具） | DEF-S3-067修复完成：操作员模板只读详情弹窗及链接闭环；前端build与后端test/package通过，待GPT独立复测 |

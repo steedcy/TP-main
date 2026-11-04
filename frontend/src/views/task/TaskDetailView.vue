@@ -86,12 +86,32 @@
                 <router-link v-if="pv.baselineTemplateId" to="/baseline-templates">
                   {{ templateRefOf(pv)?.name || ('模板#' + pv.baselineTemplateId) }}
                 </router-link>
+                <a-button
+                  v-if="pv.baselineTemplateId"
+                  type="link"
+                  size="small"
+                  style="margin-left: 8px"
+                  @click="openBaselineTemplateModal(pv.baselineTemplateId)"
+                  data-testid="view-baseline-template-btn"
+                >
+                  查看详情
+                </a-button>
                 <span v-else>—</span>
               </a-descriptions-item>
               <a-descriptions-item label="模板版本（冻结时）">
                 <router-link v-if="pv.baselineTemplateId" to="/baseline-templates">
                   {{ templateRefOf(pv)?.version || '—' }}
                 </router-link>
+                <a-button
+                  v-if="pv.baselineTemplateId"
+                  type="link"
+                  size="small"
+                  style="margin-left: 8px"
+                  @click="openBaselineTemplateModal(pv.baselineTemplateId)"
+                  data-testid="view-frozen-template-btn"
+                >
+                  查看详情
+                </a-button>
                 <span v-else>{{ templateRefOf(pv)?.version || '—' }}</span>
                 <span v-if="templateRefOf(pv)?.currentVersion && templateRefOf(pv).currentVersion !== templateRefOf(pv).version"
                       style="color: #999">（模板当前为 {{ templateRefOf(pv).currentVersion }}）</span>
@@ -216,6 +236,74 @@
         </a-form-item>
       </a-form>
     </a-modal>
+
+    <!-- 基线模板只读详情弹窗（DEF-S3-067） -->
+    <a-modal
+      v-model:open="templateModalVisible"
+      title="基线模板详情（只读）"
+      width="900px"
+      :footer="null"
+    >
+      <div v-if="templateModalLoading" style="text-align: center; padding: 32px">
+        <a-spin />
+      </div>
+      <template v-else-if="templateModalTarget">
+        <a-descriptions bordered :column="2" size="small" style="margin-bottom: 16px">
+          <a-descriptions-item label="模板名称">{{ templateModalTarget.templateName }}</a-descriptions-item>
+          <a-descriptions-item label="模板意图">{{ templateModalTarget.templateIntent }}</a-descriptions-item>
+          <a-descriptions-item label="模板版本">V{{ templateModalTarget.templateVersion }}</a-descriptions-item>
+          <a-descriptions-item label="模板状态">{{ templateModalTarget.templateStatus }}</a-descriptions-item>
+          <a-descriptions-item label="步骤数量">{{ (templateModalTarget.steps || []).length }} / 5</a-descriptions-item>
+          <a-descriptions-item label="模板属性">{{ templateModalTarget.isPreset ? '预置任务族模板' : '自定义模板' }}</a-descriptions-item>
+        </a-descriptions>
+
+        <a-divider orientation="left">模板输入参数</a-divider>
+        <a-table
+          :dataSource="templateModalTarget.inputParams || []"
+          :columns="[
+            { title: '参数名称', dataIndex: 'name' },
+            { title: '类型', dataIndex: 'type' },
+            { title: '必填', dataIndex: 'required', customRender: ({ text }) => text ? '是' : '否' },
+            { title: '默认值', dataIndex: 'defaultValue', customRender: ({ text }) => text ?? '—' },
+            { title: '取值范围/说明', dataIndex: 'range', customRender: ({ text }) => text || '—' }
+          ]"
+          :pagination="false"
+          size="small"
+          :rowKey="(r, idx) => r.name || idx"
+          style="margin-bottom: 16px"
+        />
+
+        <a-divider orientation="left">步骤（顺序执行，最多5个）</a-divider>
+        <div
+          v-for="(step, idx) in (templateModalTarget.steps || [])"
+          :key="step.stepSeq || idx"
+          style="border: 1px solid #f0f0f0; border-radius: 4px; padding: 12px; margin-bottom: 12px; background: #fafafa"
+        >
+          <div style="font-weight: bold; margin-bottom: 8px">步骤 {{ step.stepSeq || (idx + 1) }}</div>
+          <a-descriptions size="small" :column="2" bordered style="margin-bottom: 8px">
+            <a-descriptions-item label="步骤所需能力">{{ capabilityLabel(step.capabilityType) || step.capabilityType }}</a-descriptions-item>
+            <a-descriptions-item label="步骤超时时间（10~600秒）">{{ step.stepTimeout }} 秒</a-descriptions-item>
+            <a-descriptions-item label="步骤完成条件" :span="2">{{ step.completionCondition }}</a-descriptions-item>
+          </a-descriptions>
+
+          <div style="font-weight: bold; margin: 8px 0 4px 0">参数映射：</div>
+          <a-table
+            :dataSource="step.paramMapping || []"
+            :columns="[
+              { title: '本步骤参数(target)', dataIndex: 'target' },
+              { title: '来源(source)', dataIndex: 'source' }
+            ]"
+            :pagination="false"
+            size="small"
+            :rowKey="(r, i) => r.target || i"
+          />
+        </div>
+
+        <div style="text-align: right; margin-top: 16px">
+          <a-button @click="templateModalVisible = false">关闭</a-button>
+        </div>
+      </template>
+    </a-modal>
   </div>
 </template>
 
@@ -227,6 +315,7 @@ import { message } from 'ant-design-vue'
 import { taskProgress, progressText } from '../../utils/taskProgress'
 import { templateReference, matchBasis } from '../../utils/downgradeMatch'
 import { getBaselineTemplate } from '../../api/baseline'
+import { capabilityLabel } from '../../constants/capability'
 import { getTask, getTaskEvents, getPlanVersions, getContextSnapshots, getStepAssignments, clarifyTask, manualAction, terminateTask } from '../../api/task'
 
 const authStore = useAuthStore()
@@ -459,6 +548,29 @@ async function handleClarify() {
     message.success(task.value?.missingInfoQuestions?.length ? '补充已保存，请继续回答新问题' : '补充已保存')
   } finally {
     clarifying.value = false
+  }
+}
+
+const templateModalVisible = ref(false)
+const templateModalTarget = ref(null)
+const templateModalLoading = ref(false)
+
+async function openBaselineTemplateModal(templateId) {
+  if (!templateId) return
+  if (templates.value[templateId]) {
+    templateModalTarget.value = templates.value[templateId]
+    templateModalVisible.value = true
+    return
+  }
+  templateModalLoading.value = true
+  templateModalVisible.value = true
+  try {
+    const resp = await getBaselineTemplate(templateId)
+    templateModalTarget.value = resp.data
+  } catch (err) {
+    message.error('获取基线模板详情失败')
+  } finally {
+    templateModalLoading.value = false
   }
 }
 
