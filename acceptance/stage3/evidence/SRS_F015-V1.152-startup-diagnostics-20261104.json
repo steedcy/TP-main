@@ -1,0 +1,145 @@
+{
+  "observedAt": "2026-11-04T14:08:02.183278+08:00",
+  "timezone": "Asia/Shanghai",
+  "worktree": "C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013",
+  "branch": "ai/gpt-test",
+  "handoffCommit": "ed6e9061db944c6b6c61eba03ba50630e58a8fc2",
+  "productSha": "d86a722e2e56869f279ae25c82bcb6ab6d8ee30d",
+  "tag": "V1.152",
+  "originMain": "7d772f83f81d0cd589dc2db6fd622a65658810a5",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "redisDb": 10,
+  "productDiff": "",
+  "historyReused": [],
+  "currentBusinessObservations": 0,
+  "currentRules": {
+    "P": 0,
+    "F": 0,
+    "NT": 9
+  },
+  "currentSteps": {
+    "P": 0,
+    "F": 0,
+    "NT": 6
+  },
+  "releaseStartup": {
+    "P": 0,
+    "F": 1,
+    "NT": 0,
+    "attempts": 2,
+    "issue": "DEF-S3-096"
+  },
+  "stopped": [
+    {
+      "pid": 2128,
+      "fixture": "model-v152",
+      "verifiedCommandMatch": true,
+      "stopped": true
+    },
+    {
+      "pid": 16140,
+      "fixture": "robot-v152",
+      "verifiedCommandMatch": true,
+      "stopped": true
+    }
+  ],
+  "databaseReadOnlyChecks": {
+    "maxTaskId": "222",
+    "newRoundActiveAssignments": "0",
+    "legacyActiveAssignmentRows": "3|2|EXECUTING\n9|8|PENDING_ASSIGNMENT\n15|14|PENDING_ASSIGNMENT\n21|20|PENDING_ASSIGNMENT\n25|24|PENDING_ASSIGNMENT\n26|25|PENDING_ASSIGNMENT\n29|28|PENDING_ASSIGNMENT",
+    "agentsWithCurrentTask": "",
+    "migrations": "27|t"
+  },
+  "databaseChanges": "No test data/config writes; Flyway validated existing V27. No HTTP business request succeeded. Seven older task assignment rows remain in EXECUTING/PENDING_ASSIGNMENT (tasks3/9/15/21/25/26/29); preserved as historical records, not created or cleaned by this round.",
+  "portsReleased": {
+    "18129": true,
+    "18117": true,
+    "18132": true,
+    "18134": true,
+    "18135": true,
+    "15179": true
+  },
+  "jarSha256": "18ed0cc45b1e1a628f4ed934972fe518b516c9f0e8a05d3d5ebbd34adac95409",
+  "jarClassMatchesCompiledClass": true,
+  "packagedTaskExceptionClassSha256": "f55b021e3869e31088367bbc045089a708c71323b8b5c62e7880f505e3b005b7",
+  "compiledConstructorInspection": "Compiled from \"TaskExceptionService.java\"\npublic class com.airport.ai.task.TaskExceptionService {\n  private static final com.fasterxml.jackson.databind.ObjectMapper MAPPER;\n  private com.airport.ai.baseline.BaselineDryRunLifecycle dryRunLifecycle;\n  private final com.airport.ai.task.TaskMapper taskMapper;\n  private final com.airport.ai.task.TaskStepAssignmentMapper assignmentMapper;\n  private final com.airport.ai.task.TaskExceptionMapper taskExceptionMapper;\n  private final com.airport.ai.device.DeviceAgentMapper deviceAgentMapper;\n  private final com.airport.ai.event.TaskEventService taskEventService;\n  private final com.airport.ai.task.TaskExecutionOrchestrator taskExecutionOrchestrator;\n  private final com.airport.ai.task.ReplanningService replanningService;\n  private final com.airport.ai.task.PlanVersionMapper planVersionMapper;\n  public com.airport.ai.task.TaskExceptionService(com.airport.ai.task.TaskMapper, com.airport.ai.task.TaskStepAssignmentMapper, com.airport.ai.task.TaskExceptionMapper, com.airport.ai.device.DeviceAgentMapper, com.airport.ai.event.TaskEventService, com.airport.ai.task.TaskExecutionOrchestrator, com.airport.ai.task.ReplanningService);\n  public com.airport.ai.task.TaskExceptionService(com.airport.ai.task.TaskMapper, com.airport.ai.task.TaskStepAssignmentMapper, com.airport.ai.task.TaskExceptionMapper, com.airport.ai.device.DeviceAgentMapper, com.airport.ai.event.TaskEventService, com.airport.ai.task.TaskExecutionOrchestrator, com.airport.ai.task.ReplanningService, com.airport.ai.task.PlanVersionMapper);\n  public void handleException(java.lang.Long, java.lang.Integer, java.lang.String, java.lang.String);\n  public void handleAgentOffline(com.airport.ai.device.DeviceAgent);\n  public int handleAgentDisabled(com.airport.ai.device.DeviceAgent);\n  private int recoverAssignments(com.airport.ai.device.DeviceAgent, java.lang.String);\n  private void handleUnrecoverable(com.airport.ai.task.Task, com.airport.ai.task.TaskException, java.lang.Integer);\n  private boolean currentPlanIsBaseline(com.airport.ai.task.Task);\n  private void markUnresolvable(com.airport.ai.task.Task, com.airport.ai.task.TaskException, java.lang.String);\n  private void freezeRemainingSteps(java.lang.Long, java.lang.Integer);\n  private java.lang.String findOfflineAgentCode(java.lang.Long, java.lang.Integer);\n  private boolean isTerminalOrManual(com.airport.ai.task.TaskStatus);\n  public java.util.List<com.airport.ai.task.TaskException> listByTask(java.lang.Long);\n  public java.util.List<com.airport.ai.task.TaskException> search(java.lang.String, java.lang.String);\n  public long countPending();\n  private static java.lang.Boolean lambda$currentPlanIsBaseline$0(com.airport.ai.task.PlanVersion);\n  static {};\n}\n",
+  "sourceDiffFromPreviousValidatedProduct": "diff --git a/backend/src/main/java/com/airport/ai/task/TaskExceptionService.java b/backend/src/main/java/com/airport/ai/task/TaskExceptionService.java\nindex 0e40ef7..a2e0911 100644\n--- a/backend/src/main/java/com/airport/ai/task/TaskExceptionService.java\n+++ b/backend/src/main/java/com/airport/ai/task/TaskExceptionService.java\n@@ -31,6 +31,7 @@ public class TaskExceptionService {\n     private final TaskEventService taskEventService;\n     private final TaskExecutionOrchestrator taskExecutionOrchestrator;\n     private final ReplanningService replanningService;\n+    private final PlanVersionMapper planVersionMapper;\n \n     public TaskExceptionService(TaskMapper taskMapper,\n                                  TaskStepAssignmentMapper assignmentMapper,\n@@ -39,6 +40,18 @@ public class TaskExceptionService {\n                                  TaskEventService taskEventService,\n                                  @Lazy TaskExecutionOrchestrator taskExecutionOrchestrator,\n                                  @Lazy ReplanningService replanningService) {\n+        this(taskMapper, assignmentMapper, taskExceptionMapper, deviceAgentMapper, taskEventService,\n+                taskExecutionOrchestrator, replanningService, null);\n+    }\n+\n+    public TaskExceptionService(TaskMapper taskMapper,\n+                                 TaskStepAssignmentMapper assignmentMapper,\n+                                 TaskExceptionMapper taskExceptionMapper,\n+                                 DeviceAgentMapper deviceAgentMapper,\n+                                 TaskEventService taskEventService,\n+                                 @Lazy TaskExecutionOrchestrator taskExecutionOrchestrator,\n+                                 @Lazy ReplanningService replanningService,\n+                                 @Lazy PlanVersionMapper planVersionMapper) {\n         this.taskMapper = taskMapper;\n         this.assignmentMapper = assignmentMapper;\n         this.taskExceptionMapper = taskExceptionMapper;\n@@ -46,6 +59,7 @@ public class TaskExceptionService {\n         this.taskEventService = taskEventService;\n         this.taskExecutionOrchestrator = taskExecutionOrchestrator;\n         this.replanningService = replanningService;\n+        this.planVersionMapper = planVersionMapper;\n     }\n \n     /**\n@@ -97,7 +111,8 @@ public class TaskExceptionService {\n                 exception.setResolvedBy(\"SYSTEM\");\n                 taskExceptionMapper.update(exception);\n                 taskEventService.append(taskId, \"EXCEPTION_RECOVERY_FAILED\", \"SYSTEM\", exceptionType,\n-                        \"恢复动作: 候选设备切换，结果: 失败（重新分配后任务状态为\" + after.getStatus() + \"）\");\n+                        \"恢复动作: 候选设备切换，结果: 失败（重新分配后任务状态为\" + after.getStatus() + \"），异常类型: \" + exceptionType\n+                                + \"，影响结论: \" + exception.getImpactConclusion());\n                 return;\n             }\n             exception.setRecoveryResult(\"SUCCESS\");\n@@ -115,7 +130,8 @@ public class TaskExceptionService {\n         exception.setRecoveryResult(\"FAILED\");\n         taskExceptionMapper.update(exception);\n         taskEventService.append(taskId, \"EXCEPTION_RECOVERY_FAILED\", \"SYSTEM\", exceptionType,\n-                \"恢复动作: \" + exception.getRecoveryAction() + \"，结果: 失败，判断计划是否可继续\");\n+                \"恢复动作: \" + exception.getRecoveryAction() + \"，结果: 失败，异常类型: \" + exceptionType\n+                        + \"，影响结论: 候选设备切换恢复失败，判断计划是否可继续\");\n \n         handleUnrecoverable(task, exception, stepSeq);\n     }\n@@ -171,7 +187,9 @@ public class TaskExceptionService {\n \n         // 降级任务的判断不能只看状态：基线首步被承接后任务已转EXECUTING，状态不再是DOWNGRADING；\n         // 以当前计划版本的来源为准，基线模板计划执行失败恢复穷尽后直接待人工，不再局部重规划（DEF-S3-065、F015.R08）\n-        boolean isDowngradedTask = task.getStatus() == TaskStatus.DOWNGRADING || currentPlanIsBaseline(task);\n+        boolean isDowngradedTask = task.getStatus() == TaskStatus.DOWNGRADING\n+                || currentPlanIsBaseline(task)\n+                || task.getDowngradeReason() != null;\n         if (Boolean.TRUE.equals(task.getReplanUsed()) || isDowngradedTask) {\n             String reason = isDowngradedTask\n                     ? \"基线降级任务执行异常且恢复失败，按业务规则不再二次自动降级\"\n@@ -189,9 +207,6 @@ public class TaskExceptionService {\n         replanningService.replan(task.getId(), stepSeq, exception.getExceptionType() + \": \" + exception.getReasonCode());\n     }\n \n-    @org.springframework.beans.factory.annotation.Autowired(required = false)\n-    private PlanVersionMapper planVersionMapper;\n-\n     private boolean currentPlanIsBaseline(Task task) {\n         if (planVersionMapper == null || task.getCurrentPlanVersionId() == null) return false;\n         return planVersionMapper.findById(task.getCurrentPlanVersionId())",
+  "directedTestSuites": [
+    {
+      "name": "com.airport.ai.task.BaselineDowngradeAndFailureBoundaryF015Test",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "1.228"
+    },
+    {
+      "name": "com.airport.ai.baseline.BaselineDryRunLifecycleTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "6.811"
+    },
+    {
+      "name": "com.airport.ai.baseline.BaselineTemplateF008Test",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "1.086"
+    },
+    {
+      "name": "com.airport.ai.task.BaselineDowngradeBindingF008Test",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.252"
+    },
+    {
+      "name": "com.airport.ai.task.BaselineFailureNoReplanF015Test",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.084"
+    },
+    {
+      "name": "com.airport.ai.task.RecoveryEventTruthF015Test",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.061"
+    },
+    {
+      "name": "com.airport.ai.task.ReplanningHighRiskDowngradeTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.3"
+    }
+  ],
+  "directedTotal": {
+    "tests": 41,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "commands": [
+    "mvn -o -Dtest=BaselineDowngradeAndFailureBoundaryF015Test,BaselineDryRunLifecycleTest,BaselineTemplateF008Test,BaselineDowngradeBindingF008Test,BaselineFailureNoReplanF015Test,RecoveryEventTruthF015Test,ReplanningHighRiskDowngradeTest,TaskExceptionServiceTest test",
+    "mvn -o package -DskipTests",
+    "npm run build",
+    "python .local-test/start152.py",
+    "python acceptance/stage3/retest-f015-jar-startup.py --schema tip_gpt_f006_v118_20261030"
+  ],
+  "commandNote": "TaskExceptionServiceTest selector matches no existing suite; actual 7 executed suites and 41 tests are listed above. No additional suite claimed.",
+  "fixtureDiagnostics": [
+    "Simulator started while backend health was being collected; login connection refused; no test business operation executed; owned simulator was stopped.",
+    "Probe output filename suffix handling fixed; two new raw files renamed without editing content. No extra startup counted.",
+    "Global active assignment zero assertion was incorrect: seven early historical rows exist. This round has no new tasks/active assignments. Prior rows preserved and listed; no business defect assigned for the evidence query scope error."
+  ],
+  "unverifiedReviewLead": "Template updatedAt changes on enable as well as successful dry-run, but is used for latest successful dry-run sorting/event text. Opposite dry-run/enabling order test remains NT due startup failure; no separate runtime defect claimed."
+}
