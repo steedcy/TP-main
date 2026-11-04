@@ -1,0 +1,876 @@
+{
+  "at": "2026-11-04T22:45:42.199792+08:00",
+  "timezone": "Asia/Shanghai",
+  "tag": "V1.155",
+  "productSha": "78eb774a0546216deaa42c2fc2a5dc6ee8f661dd",
+  "executionBaseline": "V2.4",
+  "receivedHandoff": "be72400ab258e6749a00e930d213851eb9c5935c",
+  "mergeCommit": "f7e515db50892e2cc66403a5f7d427612f888986",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "redisDb": 10,
+  "jarSha256": "55661b76bb762738215e93f2567ab818ec19db493df3c63b00cf14b0a7bf91ea",
+  "health": {
+    "status": "UP"
+  },
+  "currentCoreSmoke": {
+    "taskList": true,
+    "dashboard": true,
+    "agents": true
+  },
+  "currentRuleAssessment": {
+    "P": [
+      "SRS_F015.R01",
+      "SRS_F015.R02",
+      "SRS_F015.R03",
+      "SRS_F015.R04",
+      "SRS_F015.R05",
+      "SRS_F015.R07",
+      "SRS_F015.R09"
+    ],
+    "F": [
+      "SRS_F015.R06",
+      "SRS_F015.R08"
+    ],
+    "NT": []
+  },
+  "currentStepAssessment": {
+    "P": [
+      "TC-047.S1",
+      "TC-047.S2",
+      "TC-048.S1",
+      "TC-049.S1"
+    ],
+    "F": [
+      "TC-048.S2",
+      "TC-050.S1"
+    ],
+    "NT": []
+  },
+  "caseFiles": [
+    "SRS_F015-V1.155-full-round-20261104.json",
+    "SRS_F015-V1.155-full-round-20261104-supplement.json",
+    "SRS_F015-V1.155-full-round-20261104-recovery-stable.json",
+    "SRS_F015-V1.155-full-round-20261104-prefix-control.json"
+  ],
+  "completedIndependentCases": [
+    {
+      "name": "high-valid",
+      "taskId": 236,
+      "result": "P"
+    },
+    {
+      "name": "malformed-plan",
+      "taskId": 237,
+      "result": "P"
+    },
+    {
+      "name": "planning-unavailable",
+      "taskId": 238,
+      "result": "P"
+    },
+    {
+      "name": "understanding-unavailable",
+      "taskId": 239,
+      "result": "P"
+    },
+    {
+      "name": "capability-hard-fail",
+      "taskId": 240,
+      "result": "P"
+    },
+    {
+      "name": "constraint-hard-fail-corrected",
+      "taskId": 257,
+      "result": "P"
+    },
+    {
+      "name": "structure-hard-fail-six",
+      "taskId": 255,
+      "result": "P"
+    },
+    {
+      "name": "valid-five-steps",
+      "taskId": 254,
+      "result": "P"
+    },
+    {
+      "name": "true-empty-family-no-match",
+      "taskId": 258,
+      "result": "P"
+    },
+    {
+      "name": "disabled-template",
+      "taskId": 241,
+      "result": "P"
+    },
+    {
+      "name": "manual-ui-switch",
+      "taskId": 243,
+      "result": "P"
+    },
+    {
+      "name": "fewer-steps",
+      "taskId": 247,
+      "result": "P"
+    },
+    {
+      "name": "exact-family",
+      "taskId": 249,
+      "result": "P"
+    },
+    {
+      "name": "recent-trial-reversed-enable",
+      "taskId": 252,
+      "result": "P"
+    },
+    {
+      "name": "non-exact-eligible-control",
+      "taskId": 265,
+      "result": "P"
+    },
+    {
+      "name": "multi-candidate-recovered",
+      "taskId": 260,
+      "result": "P"
+    },
+    {
+      "name": "multi-candidate-exhausted",
+      "taskId": 261,
+      "result": "F"
+    },
+    {
+      "name": "frozen-live-edit",
+      "taskId": 262,
+      "result": "P"
+    },
+    {
+      "name": "autonomous-replan-neighbor",
+      "taskId": 263,
+      "result": "P"
+    }
+  ],
+  "tasks": {
+    "all": [
+      235,
+      236,
+      237,
+      238,
+      239,
+      240,
+      241,
+      242,
+      243,
+      244,
+      245,
+      246,
+      247,
+      248,
+      249,
+      250,
+      251,
+      252,
+      253,
+      254,
+      255,
+      256,
+      257,
+      258,
+      259,
+      260,
+      261,
+      262,
+      263,
+      264,
+      265
+    ],
+    "trials": [
+      235,
+      244,
+      245,
+      246,
+      248,
+      250,
+      251,
+      253,
+      256,
+      259,
+      264
+    ],
+    "formal": [
+      236,
+      237,
+      238,
+      239,
+      240,
+      241,
+      242,
+      243,
+      247,
+      249,
+      252,
+      254,
+      255,
+      257,
+      258,
+      260,
+      261,
+      262,
+      263,
+      265
+    ],
+    "note": "31 real tasks: 11 real successful trials, 20 formal task submissions including semantic duplicate242. 19 distinct formal semantic observations; UI roles/actions and 43 unit tests are separate layers, not added to task count.",
+    "aliases": {
+      "no-template242": "Task242 repeats disabled-matching-template equivalence class of241; retained actual task, no additional semantic coverage. Proper zero-template family observed258."
+    }
+  },
+  "staticBounds": {
+    "zero": {
+      "http": 400,
+      "body": {
+        "code": 3001,
+        "message": "请添加至少1个步骤",
+        "timestamp": "2026-11-04T22:30:07.059989900+08:00",
+        "path": "/api/v1/baseline-templates",
+        "method": "POST"
+      }
+    },
+    "six": {
+      "http": 400,
+      "body": {
+        "code": 4403,
+        "message": "模板步骤总数超过5",
+        "timestamp": "2026-11-04T22:30:07.087208400+08:00",
+        "path": "/api/v1/baseline-templates",
+        "method": "POST"
+      }
+    },
+    "countBefore": "41",
+    "countAfter": "41",
+    "checks": {
+      "zeroRejected": true,
+      "sixRejected": true,
+      "noInvalidTemplateWritten": true
+    }
+  },
+  "historyBusinessReuse": [],
+  "issues": {
+    "closedThisRound": [
+      "DEF-S3-065",
+      "DEF-S3-067"
+    ],
+    "previousClosuresCurrentSmoke": [
+      "DEF-S3-096",
+      "DEF-S3-097"
+    ],
+    "residual": [
+      "DEF-S3-066"
+    ],
+    "new": [
+      "DEF-S3-098"
+    ]
+  },
+  "ui": {
+    "browser": "156.0.4314.58",
+    "layer": "Actual Edge headless/Vite on current source; no native Windows browser or physical device claim",
+    "functionalEntryAndReadonlyChecks": {
+      "fixedSource": true,
+      "matchBasis": true,
+      "priorPlanLink": true,
+      "taskDirectReadOnly": true,
+      "nameLinkOpensReadonly": true,
+      "viewButtonOpensReadonly": true,
+      "frozenVersionEntryCanView": true,
+      "queryDirect": true,
+      "original39Readonly": true,
+      "configReadonly": true,
+      "configCanEdit": true
+    },
+    "actualTaskModalVersion": "VV1.0",
+    "actualListModalVersion": "VV1.0",
+    "expected": "V1.0",
+    "currentEditedModalVersion": "VV1.1",
+    "expectedEditedVersion": "V1.1",
+    "frozenCurrentDistinguished": true
+  },
+  "productUnmodified": true,
+  "operatorPermissions": {
+    "getTemplate": {
+      "id": 40,
+      "templateName": "G155 base-one 222459782048",
+      "templateIntent": "EXT_E9F6CAC5",
+      "isPreset": false,
+      "inputParams": [
+        {
+          "name": "targetLocation",
+          "type": "String",
+          "required": true,
+          "defaultValue": "F2_TEST_GATE",
+          "range": null
+        }
+      ],
+      "steps": [
+        {
+          "stepSeq": 1,
+          "capabilityType": "CAP_NAVIGATION",
+          "paramMapping": [
+            {
+              "target": "targetLocation",
+              "source": "TEMPLATE_INPUT.targetLocation"
+            }
+          ],
+          "stepTimeout": 60,
+          "completionCondition": "routeGenerated=true"
+        }
+      ],
+      "templateVersion": "V1.0",
+      "templateStatus": "DISABLED",
+      "updatedAt": "2026-11-04T22:25:41.095343",
+      "updatedBy": "set"
+    },
+    "putResponse": {
+      "http": 403,
+      "body": {
+        "code": 2003,
+        "message": "无权限访问",
+        "timestamp": "2026-11-04T22:45:42.740760800+08:00",
+        "path": "/api/v1/baseline-templates/40",
+        "method": "PUT"
+      }
+    }
+  },
+  "restoredStorageFault": {
+    "templateId": 47,
+    "stepsExact": true
+  },
+  "cleanupBeforeStop": {
+    "templates": [
+      {
+        "id": 40,
+        "status": "DISABLED"
+      },
+      {
+        "id": 41,
+        "status": "DISABLED"
+      },
+      {
+        "id": 42,
+        "status": "DISABLED"
+      },
+      {
+        "id": 43,
+        "status": "DISABLED"
+      },
+      {
+        "id": 44,
+        "status": "DISABLED"
+      },
+      {
+        "id": 45,
+        "status": "DISABLED"
+      },
+      {
+        "id": 46,
+        "status": "DISABLED"
+      },
+      {
+        "id": 47,
+        "status": "DISABLED"
+      },
+      {
+        "id": 48,
+        "status": "DISABLED"
+      },
+      {
+        "id": 49,
+        "status": "DISABLED"
+      },
+      {
+        "id": 50,
+        "status": "DISABLED"
+      }
+    ],
+    "definitions": [
+      {
+        "id": 18,
+        "status": "DISABLED"
+      },
+      {
+        "id": 19,
+        "status": "DISABLED"
+      },
+      {
+        "id": 20,
+        "status": "DISABLED"
+      }
+    ],
+    "activeAssignments": "0",
+    "agentsAllocated": "0",
+    "robotB": {
+      "id": 8,
+      "deviceCode": "G155_F015_ROBOT_B",
+      "deviceName": "Synthetic F015 recovery robot B",
+      "deviceTypeCode": "SIMULATOR",
+      "isSimulator": true,
+      "simulatedDeviceType": "MOBILE_ROBOT",
+      "areaCode": "F2_TEST",
+      "positionX": 815.0,
+      "positionY": 4600.0,
+      "accessEndpoint": "http://127.0.0.1:18133",
+      "accessCredentialRefMasked": "gp****-b",
+      "statusReportInterval": 5,
+      "connectionTestStatus": "PASSED",
+      "connectionTestResult": "身份、协议版本及状态快照校验通过",
+      "remark": null,
+      "deviceStatus": "INACTIVE",
+      "agentStatus": null,
+      "onlineStatus": null,
+      "createdAt": "2026-11-04T22:28:33.102891",
+      "updatedAt": "2026-11-04T22:35:14.896921"
+    },
+    "primaryCaps": [
+      {
+        "id": 20,
+        "capabilityCode": "CAP_SIM_STATUS",
+        "capabilityName": "仿真状态生成",
+        "capabilityType": "CAP_SIM_STATUS",
+        "inputParams": [],
+        "outputParams": [],
+        "applicableConditions": null,
+        "capabilityStatus": "UNTESTED",
+        "testResult": null,
+        "lastTestAt": null,
+        "testRequest": null,
+        "testResponse": null,
+        "testDurationMs": null,
+        "capabilityDescription": "仿真体生成并上报模拟设备状态"
+      },
+      {
+        "id": 22,
+        "capabilityCode": "CAP_INFO_DISPLAY",
+        "capabilityName": "综合信息展示",
+        "capabilityType": "CAP_INFO_DISPLAY",
+        "inputParams": [
+          {
+            "name": "contentType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEXT",
+            "range": "TEXT/IMAGE/VIDEO/HTML"
+          },
+          {
+            "name": "contentData",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试信息：请前往F2服务点",
+            "range": null
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "5~300"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "displayStatus",
+            "type": "String",
+            "required": true,
+            "defaultValue": null,
+            "range": null
+          },
+          {
+            "name": "actualDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": null,
+            "range": null
+          },
+          {
+            "name": "errorMessage",
+            "type": "String",
+            "required": false,
+            "defaultValue": null,
+            "range": null
+          }
+        ],
+        "applicableConditions": null,
+        "capabilityStatus": "UNTESTED",
+        "testResult": null,
+        "lastTestAt": null,
+        "testRequest": null,
+        "testResponse": null,
+        "testDurationMs": null,
+        "capabilityDescription": "标准能力模板：综合信息展示"
+      },
+      {
+        "id": 21,
+        "capabilityCode": "CAP_ESCORT",
+        "capabilityName": "陪同服务",
+        "capabilityType": "CAP_ESCORT",
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "F2_TEST_GATE",
+            "range": null
+          },
+          {
+            "name": "escortMode",
+            "type": "String",
+            "required": true,
+            "defaultValue": "LEAD",
+            "range": "LEAD/FOLLOW"
+          },
+          {
+            "name": "maxDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "600",
+            "range": "60~1800"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "arrivalStatus",
+            "type": "String",
+            "required": true,
+            "defaultValue": null,
+            "range": null
+          },
+          {
+            "name": "actualDistance",
+            "type": "Double",
+            "required": true,
+            "defaultValue": null,
+            "range": null
+          },
+          {
+            "name": "actualDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": null,
+            "range": null
+          }
+        ],
+        "applicableConditions": null,
+        "capabilityStatus": "ENABLED",
+        "testResult": "实际设备代理调用通过，指令 TEST-2902c00f935d4490b68608613b",
+        "lastTestAt": "2026-11-01T21:42:03.440375",
+        "testRequest": null,
+        "testResponse": null,
+        "testDurationMs": null,
+        "capabilityDescription": "标准能力模板：陪同服务"
+      },
+      {
+        "id": 24,
+        "capabilityCode": "CAP_NOTIFICATION",
+        "capabilityName": "现场通知",
+        "capabilityType": "CAP_NOTIFICATION",
+        "inputParams": [
+          {
+            "name": "notificationType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "BOTH",
+            "range": "VOICE/TEXT/BOTH"
+          },
+          {
+            "name": "notificationContent",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试旅客需要轮椅陪同，请现场服务人员协助",
+            "range": null
+          },
+          {
+            "name": "repeatCount",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "1",
+            "range": "1~5"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "notificationStatus",
+            "type": "String",
+            "required": true,
+            "defaultValue": null,
+            "range": null
+          },
+          {
+            "name": "actualRepeatCount",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": null,
+            "range": null
+          }
+        ],
+        "applicableConditions": null,
+        "capabilityStatus": "ENABLED",
+        "testResult": "实际设备代理调用通过，指令 TEST-c77e43a8f7a045519acdd0ffef",
+        "lastTestAt": "2026-11-01T21:42:03.511667",
+        "testRequest": null,
+        "testResponse": null,
+        "testDurationMs": null,
+        "capabilityDescription": "标准能力模板：现场通知"
+      },
+      {
+        "id": 23,
+        "capabilityCode": "CAP_NAVIGATION",
+        "capabilityName": "空间引导",
+        "capabilityType": "CAP_NAVIGATION",
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "F2_TEST_GATE",
+            "range": null
+          },
+          {
+            "name": "routePreference",
+            "type": "String",
+            "required": true,
+            "defaultValue": "BARRIER_FREE",
+            "range": "SHORTEST/BARRIER_FREE"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "routeGenerated",
+            "type": "Boolean",
+            "required": true,
+            "defaultValue": null,
+            "range": null
+          },
+          {
+            "name": "estimatedDistance",
+            "type": "Double",
+            "required": true,
+            "defaultValue": null,
+            "range": null
+          },
+          {
+            "name": "estimatedDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": null,
+            "range": null
+          },
+          {
+            "name": "waypointCount",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": null,
+            "range": null
+          }
+        ],
+        "applicableConditions": null,
+        "capabilityStatus": "ENABLED",
+        "testResult": "实际设备代理调用通过，指令 TEST-955819e9fa88409b8c93f24eb4",
+        "lastTestAt": "2026-11-04T22:25:41.023901",
+        "testRequest": null,
+        "testResponse": null,
+        "testDurationMs": null,
+        "capabilityDescription": "标准能力模板：空间引导"
+      }
+    ],
+    "currentRules": [
+      {
+        "id": 1,
+        "ruleCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+        "ruleContent": "移动机器人会合或陪同服务对象为特殊旅客时判定为高风险；普通空间引导场景不命中",
+        "ruleVersion": "V1.2",
+        "enabled": true,
+        "createdAt": "2026-10-30T13:40:48.586219",
+        "updatedAt": "2026-11-04T10:29:06.080757",
+        "updatedBy": "set"
+      },
+      {
+        "id": 2,
+        "ruleCode": "RULE_CROSS_ZONE",
+        "ruleContent": "仅移动服务机器人适用；同一任务链条中跨越预定义区域边界1次及以上命中",
+        "ruleVersion": "V1.2",
+        "enabled": true,
+        "createdAt": "2026-10-30T13:40:48.586219",
+        "updatedAt": "2026-11-04T10:29:00.250949",
+        "updatedBy": "set"
+      },
+      {
+        "id": 3,
+        "ruleCode": "RULE_RESOURCE_CRITICAL",
+        "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+        "ruleVersion": "V3.6",
+        "enabled": true,
+        "createdAt": "2026-10-30T13:40:48.586219",
+        "updatedAt": "2026-11-04T10:31:33.457227",
+        "updatedBy": "set"
+      },
+      {
+        "id": 4,
+        "ruleCode": "GPT_F014_150_API",
+        "ruleContent": "Synthetic F014 validation fixture revised",
+        "ruleVersion": "V1.2",
+        "enabled": false,
+        "createdAt": "2026-11-04T08:07:33.779259",
+        "updatedAt": "2026-11-04T08:07:33.967337",
+        "updatedBy": "set"
+      },
+      {
+        "id": 5,
+        "ruleCode": "GPT_F014_150_UI",
+        "ruleContent": "Synthetic F014 browser-created rule revised",
+        "ruleVersion": "V1.1",
+        "enabled": false,
+        "createdAt": "2026-11-04T08:09:47.309055",
+        "updatedAt": "2026-11-04T08:10:48.202617",
+        "updatedBy": "gpt_f014_ui_150"
+      }
+    ],
+    "legacySevenRowsPreserved": "3|2|EXECUTING\n9|8|PENDING_ASSIGNMENT\n15|14|PENDING_ASSIGNMENT\n21|20|PENDING_ASSIGNMENT\n25|24|PENDING_ASSIGNMENT\n26|25|PENDING_ASSIGNMENT\n29|28|PENDING_ASSIGNMENT"
+  },
+  "directedSuites": [
+    {
+      "name": "com.airport.ai.task.BaselineDowngradeAndFailureBoundaryF015Test",
+      "tests": "9",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.airport.ai.baseline.BaselineDryRunLifecycleTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.airport.ai.baseline.BaselineTemplateF008Test",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.airport.ai.task.BaselineDowngradeBindingF008Test",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.airport.ai.task.BaselineFailureNoReplanF015Test",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.airport.ai.task.RecoveryEventTruthF015Test",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.airport.ai.task.ReplanningHighRiskDowngradeTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.airport.ai.task.TaskExceptionServiceSpringContextTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  ],
+  "directedTotal": {
+    "tests": 43,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "resolvedProbeDiagnostics": [
+    {
+      "initial": "definition update incorrectly included immutable taskName; rejected before update",
+      "resolvedBy": "Corrected payload and current constraint case257 P; original log retained"
+    },
+    {
+      "initial": "task242 no-template case shared disabled matching-template fixture with241",
+      "resolvedBy": "New zero-template family case258 P, do not count242 as distinct semantic coverage"
+    },
+    {
+      "initial": "second simulator not yet ready and inactive: initial HTTP200 connection result not PASSED, then activation/agent readiness ordering wrong",
+      "resolvedBy": "Verified connection PASSED -> ACTIVE -> create/bind actual agent ONLINE -> real capability TESTED_PASSED. Stable recovery260/261, frozen262, neighbor263 completed. Empty recovery file and failed probe logs retained, no product defect assigned."
+    }
+  ],
+  "diagnosticOnlyFiles": [
+    "SRS_F015-V1.155-full-round-20261104-recovery.json"
+  ],
+  "unresolvedFixtureGaps": [],
+  "commands": [
+    "mvn -o -Dtest=TaskExceptionServiceSpringContextTest,BaselineDowngradeAndFailureBoundaryF015Test,BaselineDryRunLifecycleTest,BaselineTemplateF008Test,BaselineDowngradeBindingF008Test,BaselineFailureNoReplanF015Test,RecoveryEventTruthF015Test,ReplanningHighRiskDowngradeTest test",
+    "mvn -o package -DskipTests",
+    "npm run build",
+    "python .local-test/start155.py",
+    "python acceptance/stage3/probe-f015-v155.py",
+    "python acceptance/stage3/probe-f015-v155-supplement.py",
+    "python acceptance/stage3/probe-f015-v155-recovery.py stable",
+    "python acceptance/stage3/probe-f015-v155-prefix-control.py",
+    "node acceptance/stage3/retest-f015-v155-ui.cjs details|manual|frozen (per-case arguments in probe scripts)"
+  ],
+  "logRedaction": "Console GB18030 decoded to UTF8; generated Spring development password line redacted; original log retained locally only.",
+  "processCleanup": {
+    "resources": [
+      {
+        "file": "vite-v155-runtime.json",
+        "pid": 8940,
+        "verifiedCommand": "node --max-old-space-size=384 C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\frontend\\node_modules\\vite\\bin\\vite.js --config C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\.local-test\\vite-v142.mjs",
+        "stopped": true
+      },
+      {
+        "file": "robot-b-v155-runtime.json",
+        "pid": 11888,
+        "verifiedCommand": "java -Xmx96m -XX:+UseSerialGC -jar C:\\Users\\savy\\Desktop\\TIP-main\\tip\\.local-test\\gpt-f007-v123-simulator-build\\target\\device-simulator-runtime.jar",
+        "stopped": true
+      },
+      {
+        "file": "robot-v155-runtime.json",
+        "pid": 5388,
+        "verifiedCommand": "java -Xmx128m -XX:+UseSerialGC -jar C:\\Users\\savy\\Desktop\\TIP-main\\tip\\.local-test\\gpt-f007-v123-simulator-build\\target\\device-simulator-runtime.jar",
+        "stopped": true
+      },
+      {
+        "file": "runtime-v155.json",
+        "pid": 15740,
+        "verifiedCommand": "java -Xms32m -Xmx192m -XX:TieredStopAtLevel=1 -XX:+UseSerialGC -jar C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\backend\\target\\airport-ai-app-1.0.0.jar",
+        "stopped": true
+      },
+      {
+        "file": "model-v155-runtime.json",
+        "pid": 12636,
+        "verifiedCommand": "python C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\fixtures\\f015-v155-controlled-model.py",
+        "stopped": true
+      }
+    ],
+    "checkedPorts": [
+      18129,
+      18117,
+      18132,
+      18133,
+      18134,
+      18135,
+      15179
+    ],
+    "stoppedAt": "2026-11-04T22:46:05.7203972+08:00",
+    "listeners": [],
+    "headlessEdge": []
+  },
+  "cleanupPlaceholderEvidence": "acceptance/stage3/evidence/SRS_F015-V1.155-cleanup-placeholder-20261104.json"
+}
