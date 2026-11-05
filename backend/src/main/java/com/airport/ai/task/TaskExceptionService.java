@@ -240,19 +240,29 @@ public class TaskExceptionService {
     public void onStepRecovered(Long taskId, Integer stepSeq) {
         List<TaskException> list = getTaskExceptions(taskId);
         Task task = taskMapper.findById(taskId).orElse(null);
-        boolean isRetrySuccess = false;
+        boolean hasCandidateSwitched = false;
+        boolean isOriginalRetrySuccess = false;
         if (task != null && task.getCurrentPlanVersionId() != null) {
             TaskStepAssignment assignment = assignmentMapper.findByPlanVersionIdOrderByStepSeqAsc(task.getCurrentPlanVersionId())
                     .stream()
                     .filter(a -> stepSeq != null && stepSeq.equals(a.getStepSeq()) && "COMPLETED".equals(a.getStepStatus()))
                     .findFirst().orElse(null);
-            if (assignment != null && assignment.getRetryCount() != null && assignment.getRetryCount() > 0) {
-                isRetrySuccess = true;
+            if (assignment != null) {
+                if (assignment.getRejectedAgentIds() != null
+                        && !assignment.getRejectedAgentIds().isBlank()
+                        && !"[]".equals(assignment.getRejectedAgentIds().trim())) {
+                    hasCandidateSwitched = true;
+                } else if (assignment.getRetryCount() != null && assignment.getRetryCount() > 0) {
+                    isOriginalRetrySuccess = true;
+                }
             }
         }
         for (TaskException ex : list) {
             if (stepSeq != null && stepSeq.equals(ex.getStepSeq()) && !"RESOLVED".equals(ex.getExceptionStatus())) {
-                boolean isRetry = isRetrySuccess || (ex.getRecoveryAction() != null && ex.getRecoveryAction().contains("重试"));
+                boolean switched = hasCandidateSwitched
+                        || (ex.getImpactConclusion() != null && ex.getImpactConclusion().contains("候选设备切换"))
+                        || (ex.getRecoveryAction() != null && ex.getRecoveryAction().contains("候选设备切换"));
+                boolean isRetry = !switched && (isOriginalRetrySuccess || (ex.getRecoveryAction() != null && ex.getRecoveryAction().contains("重试")));
                 ex.setRecoveryResult("SUCCESS");
                 ex.setExceptionStatus("RESOLVED");
                 ex.setResolvedAt(LocalDateTime.now());
@@ -397,16 +407,32 @@ public class TaskExceptionService {
             if (currentStep == null) return false;
             String failureHandling = String.valueOf(currentStep.getOrDefault("failureHandling", ""));
             if (failureHandling == null || failureHandling.isBlank()) return false;
-            // 否定与严格规则判定（DEF-S3-106: 解决539中"关键步骤，不可跳过"被误跳过问题）
+            // 否定与严格规则判定（DEF-S3-106: 拦截"不可跳过"、"禁止跳过"、"不得跳过"、"严禁跳过"等明确否定与人工/重规划要求）
             if (failureHandling.contains("不可跳过") || failureHandling.contains("不能跳过")
-                    || failureHandling.contains("必须重规划") || failureHandling.contains("必须转人工")) {
+                    || failureHandling.contains("禁止跳过") || failureHandling.contains("不得跳过")
+                    || failureHandling.contains("严禁跳过") || failureHandling.contains("不准跳过")
+                    || failureHandling.contains("不跳过") || failureHandling.contains("勿跳过")
+                    || failureHandling.contains("不予跳过")
+                    || failureHandling.matches(".*(不可|不能|禁止|不得|严禁|不准|勿|不予|不)\\s*跳过.*")
+                    || failureHandling.matches(".*(不可|不能|禁止|不得|严禁|不准|勿|不予|不)\\s*忽略.*")
+                    || failureHandling.matches(".*(不可|不能|禁止|不得|严禁|不准|勿|不予|不)\\s*省略.*")) {
                 return false;
             }
             if (failureHandling.contains("关键") && !failureHandling.contains("非关键")) {
                 return false;
             }
-            boolean skippable = failureHandling.contains("非关键") || failureHandling.contains("可跳过")
-                    || failureHandling.contains("允许跳过") || failureHandling.contains("跳过")
+            if (failureHandling.contains("必须重规划") || failureHandling.contains("必须重新规划")
+                    || failureHandling.contains("需重规划") || failureHandling.contains("应重规划")
+                    || failureHandling.contains("必须转人工") || failureHandling.contains("需转人工")
+                    || failureHandling.contains("应交人工") || failureHandling.contains("需交人工")
+                    || failureHandling.contains("应转人工") || failureHandling.contains("交人工处理")
+                    || failureHandling.contains("转人工处理")) {
+                return false;
+            }
+            boolean skippable = failureHandling.contains("非关键")
+                    || failureHandling.contains("可跳过")
+                    || failureHandling.contains("允许跳过")
+                    || failureHandling.contains("可以跳过")
                     || failureHandling.contains("可选");
             if (!skippable) {
                 return false;
