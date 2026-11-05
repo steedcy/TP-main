@@ -356,7 +356,7 @@ class DeviceMatchingAndTaskAcceptanceF016Test {
         when(deviceAgentMapper.findById(10L)).thenReturn(Optional.of(a1));
 
         // releaseAgent 释放占用
-        orchestrator.releaseAgent(10L);
+        orchestrator.releaseAgent(10L, 100L);
 
         assertEquals("IDLE", a1.getWorkStatus());
         assertNull(a1.getCurrentTaskId());
@@ -481,5 +481,46 @@ class DeviceMatchingAndTaskAcceptanceF016Test {
         com.airport.ai.task.dto.TaskStepAssignmentView view = com.airport.ai.task.dto.TaskStepAssignmentView.from(testAssignment);
         assertNotNull(view.getAcceptanceResponseTime());
         assertTrue(view.getAcceptanceResponseTime().endsWith("ms"));
+    }
+
+    @Test
+    @DisplayName("SRS_F016.R08 / DEF-S3-103: releaseAgent 传入 expectedTaskId 时，拒绝释放归属于其他任务的代理")
+    void testR08_releaseAgentPreservesOtherTaskOccupation_DEF_S3_103() {
+        DeviceAgent a1 = createAgent(10L, "AGT-01", 1L, "ONLINE", "BUSY", null);
+        a1.setCurrentTaskId(200L); // 属于任务 200
+        a1.setCurrentStepSeq(1);
+        when(deviceAgentMapper.findById(10L)).thenReturn(Optional.of(a1));
+
+        // 任务 100 尝试释放（例如其后续步骤冻结）
+        orchestrator.releaseAgent(10L, 100L);
+
+        // 验证代理状态保持不变，绝不被清空
+        assertEquals("BUSY", a1.getWorkStatus());
+        assertEquals(200L, a1.getCurrentTaskId());
+        assertEquals(1, a1.getCurrentStepSeq());
+        verify(deviceAgentMapper, never()).update(a1);
+    }
+
+    @Test
+    @DisplayName("SRS_F016.R08 / DEF-S3-103: releaseAgent 未传 expectedTaskId 时，若代理正处于活跃任务中，拒绝清空")
+    void testR08_releaseAgentWithoutExpectedTaskIdProtectsActiveTaskOccupation_DEF_S3_103() {
+        DeviceAgent a1 = createAgent(10L, "AGT-01", 1L, "ONLINE", "BUSY", null);
+        a1.setCurrentTaskId(200L);
+        a1.setCurrentStepSeq(1);
+        when(deviceAgentMapper.findById(10L)).thenReturn(Optional.of(a1));
+
+        Task activeTask = new Task();
+        activeTask.setId(200L);
+        activeTask.setStatus(TaskStatus.EXECUTING);
+        when(taskMapper.findById(200L)).thenReturn(Optional.of(activeTask));
+
+        // 未传 expectedTaskId 调用 releaseAgent(10L)
+        orchestrator.releaseAgent(10L);
+
+        // 验证由于所属任务正在 EXECUTING，代理占用绝不被清空
+        assertEquals("BUSY", a1.getWorkStatus());
+        assertEquals(200L, a1.getCurrentTaskId());
+        assertEquals(1, a1.getCurrentStepSeq());
+        verify(deviceAgentMapper, never()).update(a1);
     }
 }

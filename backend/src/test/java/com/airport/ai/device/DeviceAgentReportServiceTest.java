@@ -90,4 +90,35 @@ class DeviceAgentReportServiceTest {
         response.setRejectReason("DEVICE_BUSY");
         assertThrows(com.airport.ai.common.BusinessException.class, () -> service.accept("AGT-41", report));
     }
+
+    @Test
+    void locksAgentRowBeforeReportInsertToPreventConcurrentDeadlock_DEF_S3_100() {
+        DeviceAgentService deviceAgentService = mock(DeviceAgentService.class);
+        DeviceCommandMapper commandMapper = mock(DeviceCommandMapper.class);
+        DeviceCommandReportMapper reportMapper = mock(DeviceCommandReportMapper.class);
+        TaskExecutionOrchestrator orchestrator = mock(TaskExecutionOrchestrator.class);
+        DeviceAgentMapper agentMapper = mock(DeviceAgentMapper.class);
+
+        when(reportMapper.insertIfAbsent(anyString(), anyString(), anyString(), anyInt(), anyString())).thenReturn(1);
+        when(agentMapper.findByAgentCodeForUpdate("AGT-41")).thenReturn(java.util.Optional.of(new DeviceAgent()));
+
+        DeviceAgentReportService service = new DeviceAgentReportService(deviceAgentService, commandMapper,
+                reportMapper, orchestrator, new ObjectMapper().findAndRegisterModules(), agentMapper);
+
+        DeviceAgentReportRequest report = new DeviceAgentReportRequest();
+        report.setReportType("TASK_RESPONSE");
+        report.setReportedAt("2026-10-13T05:00:00+08:00");
+        TaskResponseRequest response = new TaskResponseRequest();
+        response.setCommandId("CMD-41");
+        response.setAccepted(true);
+        report.setResponse(response);
+
+        assertDoesNotThrow(() -> service.accept("AGT-41", report));
+
+        // 验证调用顺序：必须先以 FOR UPDATE 锁定代理行，再插入 device_command_reports
+        org.mockito.InOrder inOrder = inOrder(agentMapper, reportMapper, orchestrator);
+        inOrder.verify(agentMapper).findByAgentCodeForUpdate("AGT-41");
+        inOrder.verify(reportMapper).insertIfAbsent(eq("AGT-41"), eq("CMD-41"), eq("TASK_RESPONSE"), eq(0), anyString());
+        inOrder.verify(orchestrator).onTaskResponse("AGT-41", "CMD-41", true, null);
+    }
 }

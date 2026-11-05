@@ -21,17 +21,29 @@ public class DeviceAgentReportService {
     private final DeviceCommandReportMapper reportMapper;
     private final TaskExecutionOrchestrator taskExecutionOrchestrator;
     private final ObjectMapper objectMapper;
+    private final DeviceAgentMapper deviceAgentMapper;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public DeviceAgentReportService(DeviceAgentService deviceAgentService,
+                                    DeviceCommandMapper commandMapper,
+                                    DeviceCommandReportMapper reportMapper,
+                                    TaskExecutionOrchestrator taskExecutionOrchestrator,
+                                    ObjectMapper objectMapper,
+                                    DeviceAgentMapper deviceAgentMapper) {
+        this.deviceAgentService = deviceAgentService;
+        this.commandMapper = commandMapper;
+        this.reportMapper = reportMapper;
+        this.taskExecutionOrchestrator = taskExecutionOrchestrator;
+        this.objectMapper = objectMapper;
+        this.deviceAgentMapper = deviceAgentMapper;
+    }
 
     public DeviceAgentReportService(DeviceAgentService deviceAgentService,
                                     DeviceCommandMapper commandMapper,
                                     DeviceCommandReportMapper reportMapper,
                                     TaskExecutionOrchestrator taskExecutionOrchestrator,
                                     ObjectMapper objectMapper) {
-        this.deviceAgentService = deviceAgentService;
-        this.commandMapper = commandMapper;
-        this.reportMapper = reportMapper;
-        this.taskExecutionOrchestrator = taskExecutionOrchestrator;
-        this.objectMapper = objectMapper;
+        this(deviceAgentService, commandMapper, reportMapper, taskExecutionOrchestrator, objectMapper, null);
     }
 
     @Transactional
@@ -47,6 +59,11 @@ public class DeviceAgentReportService {
                         status.getBusinessStatus() == null ? null : toJson(status.getBusinessStatus()), zone);
             }
             case "TASK_RESPONSE" -> {
+                // DEF-S3-100: 在向device_command_reports插入(触发外键FOR KEY SHARE)之前，
+                // 优先以FOR UPDATE排他行级锁锁定对应代理行，串行化并发回调，杜绝死锁环路
+                if (deviceAgentMapper != null) {
+                    deviceAgentMapper.findByAgentCodeForUpdate(agentCode);
+                }
                 var response = request.getResponse();
                 boolean fresh = record(agentCode, response.getCommandId(), "TASK_RESPONSE", 0, request);
                 if (!fresh) return;
@@ -56,6 +73,9 @@ public class DeviceAgentReportService {
                         Boolean.TRUE.equals(response.getAccepted()) ? "ACCEPTED" : "REJECTED", toJson(response));
             }
             case "EXECUTION_FEEDBACK" -> {
+                if (deviceAgentMapper != null) {
+                    deviceAgentMapper.findByAgentCodeForUpdate(agentCode);
+                }
                 var feedback = request.getFeedback();
                 int attemptNo = feedback.getAttemptNo();
                 boolean fresh = record(agentCode, feedback.getCommandId(), "EXECUTION_FEEDBACK", attemptNo, request);

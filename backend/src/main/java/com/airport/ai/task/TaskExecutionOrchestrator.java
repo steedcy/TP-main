@@ -589,6 +589,13 @@ public class TaskExecutionOrchestrator {
                 // DEF-S3-103: 代理当前归属于其他任务，严禁清空其他任务的占用与工作状态
                 return;
             }
+            if (expectedTaskId == null && agent.getCurrentTaskId() != null) {
+                Task current = taskMapper.findById(agent.getCurrentTaskId()).orElse(null);
+                if (current != null && current.getStatus() == TaskStatus.EXECUTING) {
+                    // DEF-S3-103: 未指定expectedTaskId时，若代理正在为执行中任务工作，拒绝清空其占用
+                    return;
+                }
+            }
             agent.setWorkStatus("IDLE");
             agent.setCurrentTaskId(null);
             agent.setCurrentStepSeq(null);

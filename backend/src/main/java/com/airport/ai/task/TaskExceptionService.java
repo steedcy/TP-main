@@ -293,7 +293,7 @@ public class TaskExceptionService {
                 a.setUpdatedAt(LocalDateTime.now());
                 assignmentMapper.update(a);
                 if (a.getDeviceAgentId() != null) {
-                    taskExecutionOrchestrator.releaseAgent(a.getDeviceAgentId());
+                    taskExecutionOrchestrator.releaseAgent(a.getDeviceAgentId(), taskId);
                 }
             }
         }

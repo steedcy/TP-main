@@ -65,4 +65,37 @@ class TaskExceptionDisableTest {
         assertEquals(0, service.handleAgentDisabled(agent()));
         verifyNoInteractions(exceptionMapper);
     }
+
+    @Test
+    void freezeRemainingStepsPassesTaskIdToReleaseAgent_DEF_S3_103() {
+        long taskId = 50L;
+        Task t = new Task();
+        t.setId(taskId);
+        t.setStatus(TaskStatus.EXECUTING);
+        t.setCurrentPlanVersionId(250L);
+        when(taskMapper.findById(taskId)).thenReturn(Optional.of(t));
+
+        TaskStepAssignment step1 = new TaskStepAssignment();
+        step1.setTaskId(taskId);
+        step1.setPlanVersionId(250L);
+        step1.setStepSeq(1);
+        step1.setStepStatus("FAILED");
+
+        TaskStepAssignment step2 = new TaskStepAssignment();
+        step2.setTaskId(taskId);
+        step2.setPlanVersionId(250L);
+        step2.setStepSeq(2);
+        step2.setStepStatus("PENDING_ASSIGNMENT");
+        step2.setDeviceAgentId(99L);
+
+        when(assignmentMapper.findByPlanVersionIdOrderByStepSeqAsc(250L)).thenReturn(List.of(step1, step2));
+        when(orchestrator.hasAvailableCandidate(anyLong(), anyInt(), anyList())).thenReturn(false);
+
+        service.handleException(taskId, 1, "STEP_FAILED", "step failed");
+
+        assertEquals("FROZEN", step2.getStepStatus());
+        verify(assignmentMapper).update(step2);
+        // DEF-S3-103: 必须携带 taskId 调用 releaseAgent(agentId, taskId)
+        verify(orchestrator).releaseAgent(eq(99L), eq(taskId));
+    }
 }
