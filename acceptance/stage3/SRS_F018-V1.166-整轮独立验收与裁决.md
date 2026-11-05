@@ -75,3 +75,6 @@ BL-007先登记BASELINE_CHANGES，再同步stage0补充/矩阵并补验：保留
 ## 提交与接续
 
 先提交推送本报告、证据、台账与受控补充，再由GPT单写入者更新HANDOFF/ROADMAP/EXECUTION_BASELINE并记录实际证据SHA；通过后安全同步main并实核远端。main-integration JSON与最终交接记录实际合入，本节不提前宣称尚未发生的推送。下一需求SRS_F019从最终main接续；旧暂存/预研不等于验收。
+
+
+F018最终合入实证：完整证据`50ace8102cf2ada8e82586a3dcd09322804d8713`先推送，正式验收交接`3dbc00b991829cd21f0d55584f2a4dc55530a983`随后推送并安全快进合main，远端实际锚点同为`3dbc00b991829cd21f0d55584f2a4dc55530a983`。40用户文件清单及哈希不变，无PR，标签未移动；main-integration JSON及最终交接随本提交同步main。下一F019，后续/三核心/95项不因此通过。
