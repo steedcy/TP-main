@@ -1,0 +1,193 @@
+{
+  "tag": "V1.158",
+  "productSha": "4f0b4d8e0ab2a2f0e4027d3ee21b20fe487dcadc",
+  "handoffSha": "845c8e674c9a8f3c8ff8bcb7540ab080f80cf898",
+  "executionBaseline": "V2.4",
+  "startedAt": "2026-11-05T11:19:26.959096+08:00",
+  "timezone": "Asia/Shanghai",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "redisDb": 10,
+  "cases": [],
+  "health": {
+    "status": "UP"
+  },
+  "diagnostics": [
+    {
+      "name": "baseline-all-rejected",
+      "at": "2026-11-05T11:19:29.667315+08:00",
+      "error": "HTTP 400: 仅草稿状态的模板可试运行，请先编辑模板生成新版本",
+      "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f016-v158.py\", line 86, in run\n    try:fn()\n        ~~^^\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f016-v158-extra.py\", line 13, in all_rejected\n    q.family=next(r for r in main['cases'] if r['name']=='all-reject')['request']['taskFamily'];definition=main['definitionIds'][0];template=main['templateIds'][0];q.definitions.append(definition);q.templates.append(template);q.save();q.cfg(f'/task-definitions/{definition}/enable','POST');q.reset();res=q.cfg(f'/baseline-templates/{template}/dry-run','POST',{'inputParams':{'targetLocation':'F2_TEST_GATE'},'simulatedDevices':[{'stepSeq':1,'agentId':q.devices[0].agent}]})\n                                                                                                                                                                                                                                                                                                                ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip\\scripts\\local-test-environment.py\", line 54, in __call__\n    result=request(BASE+path,method,data,self.token)\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip\\scripts\\local-test-environment.py\", line 46, in request\n    raise RuntimeError(f'HTTP {ex.code}: {message}') from None\nRuntimeError: HTTP 400: 仅草稿状态的模板可试运行，请先编辑模板生成新版本\n"
+    }
+  ],
+  "taskIds": [],
+  "templateIds": [
+    62
+  ],
+  "definitionIds": [
+    30,
+    28
+  ],
+  "rulesBefore": [
+    {
+      "id": 1,
+      "ruleCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+      "ruleContent": "移动机器人会合或陪同服务对象为特殊旅客时判定为高风险；普通空间引导场景不命中",
+      "ruleVersion": "V1.2",
+      "enabled": true,
+      "createdAt": "2026-10-30T13:40:48.586219",
+      "updatedAt": "2026-11-04T10:29:06.080757",
+      "updatedBy": "set"
+    },
+    {
+      "id": 2,
+      "ruleCode": "RULE_CROSS_ZONE",
+      "ruleContent": "仅移动服务机器人适用；同一任务链条中跨越预定义区域边界1次及以上命中",
+      "ruleVersion": "V1.2",
+      "enabled": true,
+      "createdAt": "2026-10-30T13:40:48.586219",
+      "updatedAt": "2026-11-04T10:29:00.250949",
+      "updatedBy": "set"
+    },
+    {
+      "id": 3,
+      "ruleCode": "RULE_RESOURCE_CRITICAL",
+      "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+      "ruleVersion": "V4.4",
+      "enabled": true,
+      "createdAt": "2026-10-30T13:40:48.586219",
+      "updatedAt": "2026-11-05T11:18:46.92768",
+      "updatedBy": "set"
+    },
+    {
+      "id": 4,
+      "ruleCode": "GPT_F014_150_API",
+      "ruleContent": "Synthetic F014 validation fixture revised",
+      "ruleVersion": "V1.2",
+      "enabled": false,
+      "createdAt": "2026-11-04T08:07:33.779259",
+      "updatedAt": "2026-11-04T08:07:33.967337",
+      "updatedBy": "set"
+    },
+    {
+      "id": 5,
+      "ruleCode": "GPT_F014_150_UI",
+      "ruleContent": "Synthetic F014 browser-created rule revised",
+      "ruleVersion": "V1.1",
+      "enabled": false,
+      "createdAt": "2026-11-04T08:09:47.309055",
+      "updatedAt": "2026-11-04T08:10:48.202617",
+      "updatedBy": "gpt_f014_ui_150"
+    }
+  ],
+  "rulesAfter": [
+    {
+      "id": 1,
+      "ruleCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+      "ruleContent": "移动机器人会合或陪同服务对象为特殊旅客时判定为高风险；普通空间引导场景不命中",
+      "ruleVersion": "V1.2",
+      "enabled": true,
+      "createdAt": "2026-10-30T13:40:48.586219",
+      "updatedAt": "2026-11-04T10:29:06.080757",
+      "updatedBy": "set"
+    },
+    {
+      "id": 2,
+      "ruleCode": "RULE_CROSS_ZONE",
+      "ruleContent": "仅移动服务机器人适用；同一任务链条中跨越预定义区域边界1次及以上命中",
+      "ruleVersion": "V1.2",
+      "enabled": true,
+      "createdAt": "2026-10-30T13:40:48.586219",
+      "updatedAt": "2026-11-04T10:29:00.250949",
+      "updatedBy": "set"
+    },
+    {
+      "id": 3,
+      "ruleCode": "RULE_RESOURCE_CRITICAL",
+      "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+      "ruleVersion": "V4.6",
+      "enabled": true,
+      "createdAt": "2026-10-30T13:40:48.586219",
+      "updatedAt": "2026-11-05T11:19:29.679303",
+      "updatedBy": "set"
+    },
+    {
+      "id": 4,
+      "ruleCode": "GPT_F014_150_API",
+      "ruleContent": "Synthetic F014 validation fixture revised",
+      "ruleVersion": "V1.2",
+      "enabled": false,
+      "createdAt": "2026-11-04T08:07:33.779259",
+      "updatedAt": "2026-11-04T08:07:33.967337",
+      "updatedBy": "set"
+    },
+    {
+      "id": 5,
+      "ruleCode": "GPT_F014_150_UI",
+      "ruleContent": "Synthetic F014 browser-created rule revised",
+      "ruleVersion": "V1.1",
+      "enabled": false,
+      "createdAt": "2026-11-04T08:09:47.309055",
+      "updatedAt": "2026-11-04T08:10:48.202617",
+      "updatedBy": "gpt_f014_ui_150"
+    }
+  ],
+  "cleanup": {
+    "at": "2026-11-05T11:19:30.349118+08:00",
+    "errors": [],
+    "ownedAgentRows": [
+      {
+        "id": 12,
+        "agent_code": "AGT-038D8379",
+        "device_id": 13,
+        "agent_status": "DISABLED",
+        "online_status": "OFFLINE",
+        "work_status": "IDLE",
+        "current_task_id": null,
+        "current_step_seq": null,
+        "last_reported_at": "2026-11-05T11:19:29.175889",
+        "created_at": "2026-11-05T11:14:18.349416",
+        "updated_at": "2026-11-05T11:14:18.349416",
+        "business_status": {
+          "workloadScore": 0,
+          "capabilityMatch": 1
+        }
+      },
+      {
+        "id": 13,
+        "agent_code": "AGT-EB646E9E",
+        "device_id": 14,
+        "agent_status": "DISABLED",
+        "online_status": "OFFLINE",
+        "work_status": "IDLE",
+        "current_task_id": null,
+        "current_step_seq": null,
+        "last_reported_at": "2026-11-05T11:19:29.400116",
+        "created_at": "2026-11-05T11:14:19.372712",
+        "updated_at": "2026-11-05T11:14:19.372712",
+        "business_status": {
+          "workloadScore": 0,
+          "capabilityMatch": 1
+        }
+      },
+      {
+        "id": 14,
+        "agent_code": "AGT-4653D48B",
+        "device_id": 15,
+        "agent_status": "DISABLED",
+        "online_status": "OFFLINE",
+        "work_status": "IDLE",
+        "current_task_id": null,
+        "current_step_seq": null,
+        "last_reported_at": "2026-11-05T11:19:29.65034",
+        "created_at": "2026-11-05T11:14:19.929163",
+        "updated_at": "2026-11-05T11:14:19.929163",
+        "business_status": {
+          "workloadScore": 0,
+          "capabilityMatch": 1
+        }
+      }
+    ],
+    "activeAssignments": "0"
+  },
+  "endedAt": "2026-11-05T11:19:30.705743+08:00"
+}

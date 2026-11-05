@@ -1,0 +1,188 @@
+{
+  "at": "2026-11-05T11:26:15.646823+08:00",
+  "steps": [
+    {
+      "stepId": "TC-051.S1",
+      "caseId": "TC-051",
+      "action": "在三个受控候选组中依次核对能力匹配度、区域距离、负载排序；让首个拒绝、下一候选接受。",
+      "expected": "仅能力匹配、在线空闲设备可候选；依能力匹配度、区域距离、负载依次排序并记依据；拒绝原因可见，按顺序切换。",
+      "status": "P",
+      "observedAt": "2026-11-05 Asia/Shanghai / V1.157",
+      "actual": "V1.157/V2.4本轮：299/300/301三组排序、六类准入排除、323同分、327inputParams坐标、307首拒后下一候选接受；正常与326降级前态实测。 原历史事实保留，本轮未复用历史P。",
+      "evidence": "acceptance/stage3/SRS_F016-V1.157-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F016-V1.157-http-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-supplement-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-boundaries-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-ui-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-final-environment-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-process-cleanup-20261105.json",
+      "issue": ""
+    },
+    {
+      "stepId": "TC-051.S2",
+      "caseId": "TC-051",
+      "action": "查看接受后的设备与步骤状态及消息。",
+      "expected": "绑定最终设备、显示响应时间，设备占用、步骤执行中；分配阶段仅确认承接，不下发业务指令；响应及分配入时间线。",
+      "status": "F",
+      "observedAt": "2026-11-05 Asia/Shanghai / V1.157",
+      "actual": "V1.157/V2.4本轮：承接前仅TASK_ACCEPT，接受后绑定/占用/执行态及时间线通过；Edge299/307无承接响应时间/耗时展示（仅下发/执行反馈时间），DEF102。 原历史事实保留，本轮未复用历史P。",
+      "evidence": "acceptance/stage3/SRS_F016-V1.157-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F016-V1.157-http-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-supplement-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-boundaries-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-ui-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-final-environment-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-process-cleanup-20261105.json",
+      "issue": "DEF-S3-102"
+    },
+    {
+      "stepId": "TC-052.S1",
+      "caseId": "TC-052",
+      "action": "两个步骤同时请求同一设备承接。",
+      "expected": "同设备同时最多占用一个步骤，已占用设备不再成为新候选；分配阶段仅确认承接，不下业务指令。",
+      "status": "F",
+      "observedAt": "2026-11-05 Asia/Shanghai / V1.157",
+      "actual": "任务78的步骤1绑定SIM_F2_DISPLAY并处于BUSY时，再以相同代理请求另一试运行步骤返回HTTP400；任务总数不变、占用仍属78、命令数不变。任务78事件按分配请求→承接→步骤下发排序；命令记录一条TASK_ACCEPT和随后一条EXECUTE_CAPABILITY。独立尝试的SIM_F2_FLIGHT因任务族物理通道不匹配而无候选，未把它视为可替代显示设备。测试结束模板停用、延时恢复、六代理空闲。；V1.157/V2.4本轮：316/317已占用对照通过；318与319均在待响应阶段得到同代理承接请求，先后接受后两个EXECUTING/执行指令重叠，设备引用被覆盖。 原历史事实保留，本轮未复用历史P。",
+      "evidence": "acceptance/stage3/evidence/TC-052-concurrent-claim-20261027T040409Z.json;acceptance/stage3/evidence/TC-052-concurrent-followup-20261027T040459Z.json;acceptance/stage3/SRS_F016-V1.157-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F016-V1.157-http-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-supplement-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-boundaries-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-ui-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-final-environment-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-process-cleanup-20261105.json",
+      "issue": "DEF-S3-100"
+    },
+    {
+      "stepId": "TC-052.S2",
+      "caseId": "TC-052",
+      "action": "分别执行无候选及全部候选拒绝的分配。",
+      "expected": "无候选生成能力缺口，全部拒绝生成分配失败异常；均进入5.5.3判断，响应时间、拒绝原因及分配过程入事件。",
+      "status": "F",
+      "observedAt": "2026-11-05 Asia/Shanghai / V1.157",
+      "actual": "V1.157/V2.4本轮：328无候选分流当前实测P；315全拒绝末回调500/API1000，ASSIGNMENT_FAILED受DB约束拒绝，末拒绝/失败事件回滚，缺响应耗时展示。 原历史事实保留，本轮未复用历史P。",
+      "evidence": "acceptance/stage3/SRS_F016-V1.157-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F016-V1.157-http-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-supplement-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-boundaries-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-ui-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-final-environment-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-process-cleanup-20261105.json",
+      "issue": "DEF-S3-099;DEF-S3-102"
+    },
+    {
+      "stepId": "TC-053.S1",
+      "caseId": "TC-053",
+      "action": "在接受后下发前让设备离线；再终止任务或冻结步骤。",
+      "expected": "离线释放占用按恢复流程处理；终止或冻结立即释放相关占用，不分配新业务给离线/占用设备。",
+      "status": "F",
+      "observedAt": "2026-11-05 Asia/Shanghai / V1.157",
+      "actual": "V1.157/V2.4本轮：324真实HTTP离线回调保护、独立服务精确承接后下发前离线、312冻结释放、330冻结迟到响应保护通过；321在线终止不立即释放，322离线终止后上线IDLE仍不解除。 原历史事实保留，本轮未复用历史P。",
+      "evidence": "acceptance/stage3/SRS_F016-V1.157-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F016-V1.157-http-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-supplement-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-boundaries-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-ui-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-final-environment-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-process-cleanup-20261105.json",
+      "issue": "DEF-S3-101"
+    }
+  ],
+  "rules": [
+    {
+      "ruleId": "SRS_F016.R01",
+      "requirement": "SRS_F016",
+      "text": "只有具备所需能力、在线且空闲的设备可作为候选",
+      "candidateStep": "TC-051.S1",
+      "status": "P",
+      "verifiedBy": "V1.157/V2.4 当前实测；六类不合格候选302～306/329被排除；在线空闲启用且能力启用的合法候选执行成功。",
+      "evidence": "acceptance/stage3/SRS_F016-V1.157-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F016-V1.157-http-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-supplement-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-boundaries-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-ui-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-final-environment-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-process-cleanup-20261105.json",
+      "issue": ""
+    },
+    {
+      "ruleId": "SRS_F016.R02",
+      "requirement": "SRS_F016",
+      "text": "同一设备同一时刻只执行一个任务步骤；已占用设备不得被分配新步骤",
+      "candidateStep": "TC-052.S1",
+      "status": "F",
+      "verifiedBy": "V1.157/V2.4 当前实测；316占用后317正确排除；318/319在两承接请求均待响应时先后接受，均产生EXECUTE_CAPABILITY且两步骤EXECUTING，同代理current_task_id被后者覆盖。",
+      "evidence": "acceptance/stage3/evidence/TC-052-concurrent-claim-20261027T040409Z.json;acceptance/stage3/evidence/TC-052-concurrent-followup-20261027T040459Z.json;acceptance/stage3/SRS_F016-V1.157-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F016-V1.157-http-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-supplement-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-boundaries-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-ui-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-final-environment-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-process-cleanup-20261105.json",
+      "issue": "DEF-S3-100"
+    },
+    {
+      "ruleId": "SRS_F016.R03",
+      "requirement": "SRS_F016",
+      "text": "设备拒绝时按候选顺序选择下一候选，并记录拒绝原因",
+      "candidateStep": "TC-051.S1",
+      "status": "F",
+      "verifiedBy": "V1.157/V2.4 当前实测；307首拒带原因后顺位接受完成；315最后拒绝HTTP500回滚，最后拒绝原因/AGENT_REJECTED未持久化，故整条F。",
+      "evidence": "acceptance/stage3/SRS_F016-V1.157-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F016-V1.157-http-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-supplement-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-boundaries-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-ui-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-final-environment-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-process-cleanup-20261105.json",
+      "issue": "DEF-S3-099"
+    },
+    {
+      "ruleId": "SRS_F016.R04",
+      "requirement": "SRS_F016",
+      "text": "候选顺序按能力匹配度、与步骤目标区域的距离、当前负载依次排序，排序依据写入事件",
+      "candidateStep": "TC-051.S1",
+      "status": "P",
+      "verifiedBy": "V1.157/V2.4 当前实测；299匹配度优先于距离/负载、300距离优先于负载、301负载、323编号破同分、327inputParams坐标；排序三指标写入事件。",
+      "evidence": "acceptance/stage3/SRS_F016-V1.157-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F016-V1.157-http-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-supplement-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-boundaries-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-ui-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-final-environment-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-process-cleanup-20261105.json",
+      "issue": ""
+    },
+    {
+      "ruleId": "SRS_F016.R05",
+      "requirement": "SRS_F016",
+      "text": "全部候选均拒绝或无候选时，生成能力缺口或分配失败异常，进入5.5.3判断",
+      "candidateStep": "TC-052.S2",
+      "status": "F",
+      "verifiedBy": "V1.157/V2.4 当前实测；328真实下一步无候选CAPABILITY_GAP/ERR_NO_CANDIDATE_AVAILABLE、无重复切候选、进入5.5.3通过；315全部拒绝ASSIGNMENT_FAILED插入违反chk_exception_type，HTTP500、未正常异常流转。",
+      "evidence": "acceptance/stage3/SRS_F016-V1.157-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F016-V1.157-http-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-supplement-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-boundaries-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-ui-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-final-environment-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-process-cleanup-20261105.json",
+      "issue": "DEF-S3-099"
+    },
+    {
+      "ruleId": "SRS_F016.R06",
+      "requirement": "SRS_F016",
+      "text": "步骤分配与设备响应写入任务事件时间线",
+      "candidateStep": "TC-051.S2",
+      "status": "F",
+      "verifiedBy": "V1.157/V2.4 当前实测；正常请求/接受/首拒/无候选失败均有时间线；315最后拒绝及STEP_ASSIGNMENT_FAILED随事务回滚而丢失，整条不能P。",
+      "evidence": "acceptance/stage3/evidence/TC-052-concurrent-claim-20261027T040409Z.json;acceptance/stage3/evidence/TC-052-concurrent-followup-20261027T040459Z.json;acceptance/stage3/SRS_F016-V1.157-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F016-V1.157-http-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-supplement-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-boundaries-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-ui-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-final-environment-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-process-cleanup-20261105.json",
+      "issue": "DEF-S3-099"
+    },
+    {
+      "ruleId": "SRS_F016.R07",
+      "requirement": "SRS_F016",
+      "text": "分配阶段不下发业务指令，仅确认承接关系；指令下发见5.5.2",
+      "candidateStep": "TC-051.S2",
+      "status": "P",
+      "verifiedBy": "V1.157/V2.4 当前实测；299～301/326承接前仅TASK_ACCEPT；接受后才有EXECUTE_CAPABILITY；324离线回调与330冻结迟到响应零业务传输，精确承接后下发前离线独立服务1项通过。",
+      "evidence": "acceptance/stage3/evidence/TC-052-concurrent-claim-20261027T040409Z.json;acceptance/stage3/evidence/TC-052-concurrent-followup-20261027T040459Z.json;acceptance/stage3/SRS_F016-V1.157-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F016-V1.157-http-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-supplement-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-boundaries-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-ui-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-final-environment-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-process-cleanup-20261105.json",
+      "issue": ""
+    },
+    {
+      "ruleId": "SRS_F016.R08",
+      "requirement": "SRS_F016",
+      "text": "任务被人工终止或计划步骤被冻结时，立即释放相关设备占用",
+      "candidateStep": "TC-053.S1",
+      "status": "F",
+      "verifiedBy": "V1.157/V2.4 当前实测；312受控未来步骤冻结释放通过；321终止后仍BUSY/任务引用直到ONLINE IDLE才释放，322离线终止后ONLINE IDLE仍BUSY/引用；不满足立即释放及离线恢复解除。",
+      "evidence": "acceptance/stage3/SRS_F016-V1.157-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F016-V1.157-http-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-supplement-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-boundaries-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-ui-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-final-environment-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-process-cleanup-20261105.json",
+      "issue": "DEF-S3-101"
+    }
+  ],
+  "issues": [
+    {
+      "编号": "DEF-S3-099",
+      "类型": "缺陷",
+      "级别": "高",
+      "关联用例步骤": "TC-051.S1;TC-052.S2",
+      "关联需求规则": "SRS_F016.R03;SRS_F016.R05;SRS_F016.R06",
+      "状态": "V1.157独立整轮实测F，READY_FOR_CLAUDE；原始及合法对照保留",
+      "事实": "315两候选按序拒绝：第一次正常；最后拒绝HTTP500/API1000，数据库chk_exception_type只允许旧五类型，拒绝ASSIGNMENT_FAILED。末拒绝、STEP_ASSIGNMENT_FAILED及异常插入整事务回滚；315即时仍PENDING_ASSIGNMENT，无异常行。原308同根失败保留，328无候选合法对照通过。",
+      "证据": "acceptance/stage3/SRS_F016-V1.157-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F016-V1.157-http-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-supplement-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-boundaries-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-ui-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-final-environment-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-process-cleanup-20261105.json",
+      "阶段4动作": "补齐受控异常类型/迁移/展示映射；最后拒绝应正常持久化原因、失败事件及ASSIGNMENT_FAILED并进入5.5.3，不能重复重试。真实PostgreSQL/JAR重测，不以mock单测替代。"
+    },
+    {
+      "编号": "DEF-S3-100",
+      "类型": "缺陷",
+      "级别": "高",
+      "关联用例步骤": "TC-052.S1",
+      "关联需求规则": "SRS_F016.R02",
+      "状态": "V1.157独立整轮实测F，READY_FOR_CLAUDE；原始及合法对照保留",
+      "事实": "318/319均在首个承接响应前得到同一AGT-2C20C5AD的TASK_ACCEPT；分别接受后两任务均EXECUTING且各有EXECUTE_CAPABILITY，代理current_task_id从318被覆盖为319。316已占用再申请317会被排除，证明是待承接窗口缺口。",
+      "证据": "acceptance/stage3/SRS_F016-V1.157-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F016-V1.157-http-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-supplement-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-boundaries-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-ui-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-final-environment-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-process-cleanup-20261105.json",
+      "阶段4动作": "在请求/接受边界实施原子占用或二次互斥校验，拒绝过期承接，避免覆盖原任务及重复业务下发；保留重放幂等、拒绝顺位、取消及释放，补真实并发/原反例与合法对照。"
+    },
+    {
+      "编号": "DEF-S3-101",
+      "类型": "缺陷",
+      "级别": "高",
+      "关联用例步骤": "TC-053.S1",
+      "关联需求规则": "SRS_F016.R08",
+      "状态": "V1.157独立整轮实测F，READY_FOR_CLAUDE；原始及合法对照保留",
+      "事实": "321在线执行终止HTTP200/MANUAL_TERMINATED但立即仍BUSY/current_task_id=321，ONLINE IDLE后才清；322离线终止未生成可匹配取消指令，ONLINE IDLE后仍BUSY/任务与步骤引用。312冻结后续占用、330迟到响应忽略合法对照通过。",
+      "证据": "acceptance/stage3/SRS_F016-V1.157-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F016-V1.157-http-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-supplement-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-boundaries-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-ui-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-final-environment-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-process-cleanup-20261105.json",
+      "阶段4动作": "协调R08立即释放与已有取消确认安全门，不能以盲目开放仍执行设备来伪修复；补齐离线取消失败后的关联确认与恢复释放，保留证据，不追溯放宽标准。在线/离线、接受前后、冻结/迟到反馈均回归。"
+    },
+    {
+      "编号": "DEF-S3-102",
+      "类型": "缺陷",
+      "级别": "中",
+      "关联用例步骤": "TC-051.S2;TC-052.S2",
+      "关联需求规则": "SRS_F016.R06",
+      "状态": "V1.157独立整轮实测F，READY_FOR_CLAUDE；原始及合法对照保留",
+      "事实": "Edge299与307分配表仅下发时间/执行反馈时间；事件有时间戳和原因但无承接响应时间/时长展示。task_step_assignments响应也无承接响应耗时字段。正常/首拒切换两页面PNG及DOM保留。",
+      "证据": "acceptance/stage3/SRS_F016-V1.157-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F016-V1.157-http-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-supplement-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-boundaries-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-ui-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-final-environment-20261105.json;acceptance/stage3/evidence/SRS_F016-V1.157-process-cleanup-20261105.json",
+      "阶段4动作": "按原步骤口径展示承接请求至设备接受/拒绝的响应时间，保留独立执行反馈时间语义；补正常、拒绝切换、全拒绝时序与真实UI/API证据。"
+    }
+  ]
+}
