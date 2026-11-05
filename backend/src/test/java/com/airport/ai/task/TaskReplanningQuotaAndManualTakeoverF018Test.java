@@ -559,6 +559,214 @@ class TaskReplanningQuotaAndManualTakeoverF018Test {
         verify(taskExceptionMapper).countUnhandledExceptions();
     }
 
+    @Test
+    @DisplayName("DEF-S3-106: 非关键步骤恢复失败且原目标完成条件(布尔false/任意等值)已满足时继续执行原计划")
+    void testNonCriticalStepWithFalseCompletionConditionSatisfiedContinuesPlan() {
+        Task task = new Task();
+        task.setId(538L);
+        task.setStatus(TaskStatus.EXECUTING);
+        task.setCurrentPlanVersionId(38L);
+        task.setReplanUsed(false);
+        task.setGoalParsingResult("{\"completionCondition\":\"routeGenerated=false\"}");
+        when(taskMapper.findById(538L)).thenReturn(Optional.of(task));
+
+        PlanVersion plan = new PlanVersion();
+        plan.setId(38L);
+        plan.setSource("AUTONOMOUS");
+        String planStepsJson = """
+                [
+                  {"stepSeq": 1, "stepGoal": "路径规划与航路计算", "completionCondition": "routeGenerated=false"},
+                  {"stepSeq": 2, "stepGoal": "辅助确认", "failureHandling": "非关键步骤，失败可跳过；原目标完成条件已满足时继续后续步骤"},
+                  {"stepSeq": 3, "stepGoal": "最终确认", "completionCondition": "routeGenerated=false"}
+                ]
+                """;
+        plan.setPlanSteps(planStepsJson);
+        when(planVersionMapper.findById(38L)).thenReturn(Optional.of(plan));
+
+        TaskStepAssignment step1 = new TaskStepAssignment();
+        step1.setStepSeq(1);
+        step1.setStepStatus("COMPLETED");
+        step1.setOutputParams("{\"routeGenerated\":false}");
+
+        TaskStepAssignment step2 = new TaskStepAssignment();
+        step2.setStepSeq(2);
+        step2.setStepStatus("FAILED");
+
+        TaskStepAssignment step3 = new TaskStepAssignment();
+        step3.setStepSeq(3);
+        step3.setStepStatus("FROZEN");
+
+        when(assignmentMapper.findByPlanVersionIdOrderByStepSeqAsc(38L)).thenReturn(List.of(step1, step2, step3));
+        when(orchestrator.hasAvailableCandidate(eq(38L), eq(2), anyList())).thenReturn(false);
+
+        exceptionService.handleException(538L, 2, "STEP_FAILED", "执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE");
+
+        // 绝不触发局部重规划，不消耗重规划额度
+        verify(replanningService, never()).replan(anyLong(), anyInt(), anyString());
+        verify(taskEventService, never()).append(eq(538L), eq("REPLANNING_TRIGGERED"), any(), any(), any());
+        assertFalse(Boolean.TRUE.equals(task.getReplanUsed()));
+
+        // 步骤2跳过，步骤3解冻
+        assertEquals("SKIPPED", step2.getStepStatus());
+        assertEquals("NON_CRITICAL_SKIPPED", step2.getReasonCode());
+        assertEquals("PENDING_ASSIGNMENT", step3.getStepStatus());
+
+        verify(taskEventService).append(eq(538L), eq("PLAN_CONTINUATION_JUDGED"), eq("SYSTEM"), eq("STEP_SKIPPED"), contains("可继续执行"));
+        verify(orchestrator).advanceAfterStepCompleted(eq(538L), eq(38L), eq(2));
+    }
+
+    @Test
+    @DisplayName("DEF-S3-106: 声明不可跳过的关键步骤恢复失败后严禁跳过，直接触发重规划")
+    void testProhibitedSkipCriticalStepFailureTriggersReplanning() {
+        Task task = new Task();
+        task.setId(539L);
+        task.setStatus(TaskStatus.EXECUTING);
+        task.setCurrentPlanVersionId(39L);
+        task.setReplanUsed(false);
+        when(taskMapper.findById(539L)).thenReturn(Optional.of(task));
+
+        PlanVersion plan = new PlanVersion();
+        plan.setId(39L);
+        plan.setSource("AUTONOMOUS");
+        // failureHandling 包含"关键步骤，不可跳过；恢复失败必须重规划或转人工"
+        String planStepsJson = """
+                [
+                  {"stepSeq": 1, "stepGoal": "前序步骤", "completionCondition": "status=SUCCESS"},
+                  {"stepSeq": 2, "stepGoal": "核心分拣作业", "failureHandling": "关键步骤，不可跳过；恢复失败必须重规划或转人工"},
+                  {"stepSeq": 3, "stepGoal": "后续交付", "completionCondition": "status=SUCCESS"}
+                ]
+                """;
+        plan.setPlanSteps(planStepsJson);
+        when(planVersionMapper.findById(39L)).thenReturn(Optional.of(plan));
+
+        TaskStepAssignment step1 = new TaskStepAssignment();
+        step1.setStepSeq(1);
+        step1.setStepStatus("COMPLETED");
+        step1.setOutputParams("{\"status\":\"SUCCESS\"}");
+
+        TaskStepAssignment step2 = new TaskStepAssignment();
+        step2.setStepSeq(2);
+        step2.setStepStatus("FAILED");
+
+        TaskStepAssignment step3 = new TaskStepAssignment();
+        step3.setStepSeq(3);
+        step3.setStepStatus("FROZEN");
+
+        when(assignmentMapper.findByPlanVersionIdOrderByStepSeqAsc(39L)).thenReturn(List.of(step1, step2, step3));
+        when(orchestrator.hasAvailableCandidate(eq(39L), eq(2), anyList())).thenReturn(false);
+
+        exceptionService.handleException(539L, 2, "STEP_FAILED", "执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE");
+
+        // 步骤2不得被跳过
+        assertNotEquals("SKIPPED", step2.getStepStatus());
+        // 触发局部重规划（由 ReplanningService.replan 执行时置 replanUsed=true）
+        verify(replanningService).replan(eq(539L), eq(2), anyString());
+        verify(taskEventService).append(eq(539L), eq("REPLANNING_TRIGGERED"), eq("SYSTEM"), any(), contains("触发5.5.4局部重新规划"));
+    }
+
+    @Test
+    @DisplayName("DEF-S3-106: 步骤跳过归档时收口该步骤所有处于未完成状态的历史异常行")
+    void testAllUnresolvedExceptionsAreArchivedWhenStepIsSkipped() {
+        Task task = new Task();
+        task.setId(529L);
+        task.setStatus(TaskStatus.EXECUTING);
+        task.setCurrentPlanVersionId(29L);
+        task.setReplanUsed(false);
+        when(taskMapper.findById(529L)).thenReturn(Optional.of(task));
+
+        PlanVersion plan = new PlanVersion();
+        plan.setId(29L);
+        plan.setSource("AUTONOMOUS");
+        String planStepsJson = """
+                [
+                  {"stepSeq": 1, "stepGoal": "初始化", "completionCondition": "status=SUCCESS"},
+                  {"stepSeq": 2, "stepGoal": "辅助确认", "failureHandling": "非关键步骤，失败可跳过；原目标完成条件已满足时继续后续步骤"}
+                ]
+                """;
+        plan.setPlanSteps(planStepsJson);
+        when(planVersionMapper.findById(29L)).thenReturn(Optional.of(plan));
+
+        TaskStepAssignment step1 = new TaskStepAssignment();
+        step1.setStepSeq(1);
+        step1.setStepStatus("COMPLETED");
+        step1.setOutputParams("{\"status\":\"SUCCESS\"}");
+
+        TaskStepAssignment step2 = new TaskStepAssignment();
+        step2.setStepSeq(2);
+        step2.setStepStatus("FAILED");
+
+        TaskStepAssignment step3 = new TaskStepAssignment();
+        step3.setStepSeq(3);
+        step3.setStepStatus("FROZEN");
+
+        when(assignmentMapper.findByPlanVersionIdOrderByStepSeqAsc(29L)).thenReturn(List.of(step1, step2, step3));
+        when(orchestrator.hasAvailableCandidate(eq(29L), eq(2), anyList())).thenReturn(false);
+
+        // 步骤2存在两条未完成异常（例如设备A失败行206与设备B失败行207）
+        TaskException ex1 = new TaskException();
+        ex1.setId(206L);
+        ex1.setTaskId(529L);
+        ex1.setStepSeq(2);
+        ex1.setExceptionStatus("PROCESSING");
+        ex1.setRecoveryResult(null);
+
+        TaskException ex2 = new TaskException();
+        ex2.setId(207L);
+        ex2.setTaskId(529L);
+        ex2.setStepSeq(2);
+        ex2.setExceptionStatus("PROCESSING");
+        ex2.setRecoveryResult(null);
+
+        when(taskExceptionMapper.findByTaskIdOrderByOccurredAtDesc(529L)).thenReturn(List.of(ex2, ex1));
+
+        exceptionService.handleException(529L, 2, "STEP_FAILED", "执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE");
+
+        // 两条异常均应被收口为 RESOLVED / FAILED
+        assertEquals("RESOLVED", ex1.getExceptionStatus());
+        assertEquals("FAILED", ex1.getRecoveryResult());
+        assertNotNull(ex1.getImpactConclusion());
+
+        assertEquals("RESOLVED", ex2.getExceptionStatus());
+        assertEquals("FAILED", ex2.getRecoveryResult());
+        assertNotNull(ex2.getImpactConclusion());
+    }
+
+    @Test
+    @DisplayName("DEF-S3-108: 首次恢复动作不可变，后续候选切换或穷尽不得覆盖初始动作")
+    void testFirstRecoveryActionIsImmutableNotOverwritten() {
+        Task task = new Task();
+        task.setId(536L);
+        task.setStatus(TaskStatus.EXECUTING);
+        task.setCurrentPlanVersionId(36L);
+        when(taskMapper.findById(536L)).thenReturn(Optional.of(task));
+
+        // 步骤2首次失败：创建并记录首次恢复动作"指令重试"
+        exceptionService.onStepFirstFailure(536L, 2, "STEP_FAILED", "ERR_HW", "首次失败");
+
+        ArgumentCaptor<TaskException> captor = ArgumentCaptor.forClass(TaskException.class);
+        verify(taskExceptionMapper).insert(captor.capture());
+        TaskException initialEx = captor.getValue();
+        assertEquals("指令重试", initialEx.getRecoveryAction());
+
+        // 重试失败后进入 handleException，此时尝试候选设备切换（有可用候选）
+        when(taskExceptionMapper.findByTaskIdOrderByOccurredAtDesc(536L)).thenReturn(List.of(initialEx));
+        when(orchestrator.hasAvailableCandidate(eq(36L), eq(2), anyList())).thenReturn(true);
+
+        exceptionService.handleException(536L, 2, "STEP_FAILED", "ERR_HW", "重试后仍失败");
+
+        // recoveryAction 依然必须保持不可变的"指令重试"，绝不被覆盖为"候选设备切换"
+        assertEquals("指令重试", initialEx.getRecoveryAction());
+
+        // 再次调用 handleException（假设候选也耗尽）
+        when(orchestrator.hasAvailableCandidate(eq(36L), eq(2), anyList())).thenReturn(false);
+        when(planVersionMapper.findById(36L)).thenReturn(Optional.of(new PlanVersion()));
+        when(assignmentMapper.findByPlanVersionIdOrderByStepSeqAsc(36L)).thenReturn(List.of());
+        exceptionService.handleException(536L, 2, "STEP_FAILED", "ERR_HW", "候选亦失败");
+
+        // recoveryAction 仍保持"指令重试"，绝不被覆盖为"无可用候选设备..."
+        assertEquals("指令重试", initialEx.getRecoveryAction());
+    }
+
     private TaskStepAssignment createAssignment(int seq, String status) {
         TaskStepAssignment a = new TaskStepAssignment();
         a.setStepSeq(seq);

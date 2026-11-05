@@ -3,6 +3,7 @@ package com.airport.ai.task;
 import com.airport.ai.device.DeviceAgent;
 import com.airport.ai.device.DeviceAgentMapper;
 import com.airport.ai.event.TaskEventService;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -150,11 +151,13 @@ public class TaskExceptionService {
                 : taskExecutionOrchestrator.hasAvailableCandidate(task.getCurrentPlanVersionId(), stepSeq,
                         excludeAgentCode == null ? List.of() : List.of(excludeAgentCode));
 
-        exception.setRecoveryAction(canRetry ? "候选设备切换"
-                : ("ASSIGNMENT_FAILED".equals(exceptionType) ? "全部候选设备均拒绝，恢复动作未执行" : "无可用候选设备，恢复动作未执行"));
+        // DEF-S3-108: "首次恢复动作"保持不可变，绝不被后续候选切换或无候选覆盖
+        if (exception.getRecoveryAction() == null) {
+            exception.setRecoveryAction(canRetry ? "候选设备切换"
+                    : ("ASSIGNMENT_FAILED".equals(exceptionType) ? "全部候选设备均拒绝，恢复动作未执行" : "无可用候选设备，恢复动作未执行"));
+        }
 
         if (canRetry) {
-            exception.setRecoveryAction("候选设备切换");
             exception.setRecoveryResult(null);
             exception.setExceptionStatus("PROCESSING");
             exception.setImpactConclusion("已尝试候选设备切换，等待新设备承接与执行反馈以确认最终恢复结果");
@@ -236,9 +239,20 @@ public class TaskExceptionService {
     @Transactional
     public void onStepRecovered(Long taskId, Integer stepSeq) {
         List<TaskException> list = getTaskExceptions(taskId);
+        Task task = taskMapper.findById(taskId).orElse(null);
+        boolean isRetrySuccess = false;
+        if (task != null && task.getCurrentPlanVersionId() != null) {
+            TaskStepAssignment assignment = assignmentMapper.findByPlanVersionIdOrderByStepSeqAsc(task.getCurrentPlanVersionId())
+                    .stream()
+                    .filter(a -> stepSeq != null && stepSeq.equals(a.getStepSeq()) && "COMPLETED".equals(a.getStepStatus()))
+                    .findFirst().orElse(null);
+            if (assignment != null && assignment.getRetryCount() != null && assignment.getRetryCount() > 0) {
+                isRetrySuccess = true;
+            }
+        }
         for (TaskException ex : list) {
             if (stepSeq != null && stepSeq.equals(ex.getStepSeq()) && !"RESOLVED".equals(ex.getExceptionStatus())) {
-                boolean isRetry = "指令重试".equals(ex.getRecoveryAction()) || "自动重试1次".equals(ex.getRecoveryAction());
+                boolean isRetry = isRetrySuccess || (ex.getRecoveryAction() != null && ex.getRecoveryAction().contains("重试"));
                 ex.setRecoveryResult("SUCCESS");
                 ex.setExceptionStatus("RESOLVED");
                 ex.setResolvedAt(LocalDateTime.now());
@@ -268,7 +282,26 @@ public class TaskExceptionService {
                 ex.setExceptionStatus("RESOLVED");
                 ex.setResolvedAt(LocalDateTime.now());
                 ex.setResolvedBy("SYSTEM");
-                ex.setImpactConclusion("候选设备切换后重新分配仍失败（候选设备穷尽），任务转入人工处理，恢复未成功");
+                ex.setImpactConclusion(reason != null ? reason : "候选设备切换后重新分配仍失败（候选设备穷尽），任务转入人工处理，恢复未成功");
+                taskExceptionMapper.update(ex);
+            }
+        }
+    }
+
+    @Transactional
+    public void archiveAllUnresolvedOnTaskComplete(Long taskId) {
+        List<TaskException> list = getTaskExceptions(taskId);
+        for (TaskException ex : list) {
+            if (!"RESOLVED".equals(ex.getExceptionStatus()) && !"IGNORED".equals(ex.getExceptionStatus())) {
+                if (ex.getRecoveryResult() == null) {
+                    ex.setRecoveryResult("FAILED");
+                }
+                ex.setExceptionStatus("RESOLVED");
+                ex.setResolvedAt(LocalDateTime.now());
+                ex.setResolvedBy("SYSTEM");
+                if (ex.getImpactConclusion() == null) {
+                    ex.setImpactConclusion("任务已完成，异常自动归档");
+                }
                 taskExceptionMapper.update(ex);
             }
         }
@@ -283,13 +316,19 @@ public class TaskExceptionService {
     private void handleUnrecoverable(Task task, TaskException exception, Integer stepSeq) {
         // 先评估当前或后续计划是否可继续执行（TC-058.S1 / SRS_F018.R03/R06/R08 / DEF-S3-106）
         if (isPlanContinuable(task, stepSeq)) {
-            if (exception != null) {
-                exception.setRecoveryResult("FAILED");
-                exception.setExceptionStatus("RESOLVED");
-                exception.setResolvedAt(LocalDateTime.now());
-                exception.setResolvedBy("SYSTEM");
-                exception.setImpactConclusion("非关键步骤恢复失败但原目标完成条件已满足，步骤跳过，计划可继续执行，不触发重新规划");
-                taskExceptionMapper.update(exception);
+            // 收口该步骤所有处于未完成状态的异常（DEF-S3-106: 解决529/540中旧异常206/224遗留PROCESSING问题）
+            List<TaskException> list = getTaskExceptions(task.getId());
+            for (TaskException ex : list) {
+                if (stepSeq != null && stepSeq.equals(ex.getStepSeq()) && !"RESOLVED".equals(ex.getExceptionStatus()) && !"IGNORED".equals(ex.getExceptionStatus())) {
+                    if (ex.getRecoveryResult() == null) {
+                        ex.setRecoveryResult("FAILED");
+                    }
+                    ex.setExceptionStatus("RESOLVED");
+                    ex.setResolvedAt(LocalDateTime.now());
+                    ex.setResolvedBy("SYSTEM");
+                    ex.setImpactConclusion("非关键步骤恢复失败但原目标完成条件已满足，步骤跳过，计划可继续执行，不触发重新规划");
+                    taskExceptionMapper.update(ex);
+                }
             }
             // 标记失败步骤为 SKIPPED
             assignmentMapper.findByPlanVersionIdOrderByStepSeqAsc(task.getCurrentPlanVersionId()).stream()
@@ -357,18 +396,71 @@ public class TaskExceptionService {
                     .findFirst().orElse(null);
             if (currentStep == null) return false;
             String failureHandling = String.valueOf(currentStep.getOrDefault("failureHandling", ""));
-            if (!failureHandling.contains("非关键") && !failureHandling.contains("可跳过")) {
+            if (failureHandling == null || failureHandling.isBlank()) return false;
+            // 否定与严格规则判定（DEF-S3-106: 解决539中"关键步骤，不可跳过"被误跳过问题）
+            if (failureHandling.contains("不可跳过") || failureHandling.contains("不能跳过")
+                    || failureHandling.contains("必须重规划") || failureHandling.contains("必须转人工")) {
                 return false;
             }
+            if (failureHandling.contains("关键") && !failureHandling.contains("非关键")) {
+                return false;
+            }
+            boolean skippable = failureHandling.contains("非关键") || failureHandling.contains("可跳过")
+                    || failureHandling.contains("允许跳过") || failureHandling.contains("跳过")
+                    || failureHandling.contains("可选");
+            if (!skippable) {
+                return false;
+            }
+
             // 检查原目标或前序步骤是否已产生满足条件的结果
             List<TaskStepAssignment> completedList = assignmentMapper.findByPlanVersionIdOrderByStepSeqAsc(task.getCurrentPlanVersionId())
                     .stream()
                     .filter(a -> "COMPLETED".equals(a.getStepStatus()) && a.getStepSeq() < stepSeq)
                     .toList();
+            if (completedList.isEmpty()) {
+                return false;
+            }
+
+            // 解析期望任务目标完成条件
+            String targetCondition = null;
+            if (task.getGoalParsingResult() != null && !task.getGoalParsingResult().isBlank()) {
+                try {
+                    JsonNode node = MAPPER.readTree(task.getGoalParsingResult());
+                    if (node.hasNonNull("completionCondition")) {
+                        targetCondition = node.get("completionCondition").asText(null);
+                    }
+                } catch (Exception ignored) {}
+            }
+
             for (TaskStepAssignment ca : completedList) {
-                if (ca.getOutputParams() != null && (ca.getOutputParams().contains("\"routeGenerated\":true")
-                        || ca.getOutputParams().contains("\"routeGenerated\":\"true\"")
-                        || ca.getOutputParams().contains("\"completed\":true"))) {
+                if (ca.getOutputParams() == null || ca.getOutputParams().isBlank()) continue;
+                Map<String, Object> output = MAPPER.readValue(
+                        ca.getOutputParams(), new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {});
+                if (output == null || output.isEmpty()) continue;
+
+                // 1. 若任务定义或目标解析有明确的完成条件，使用 CompletionConditionEvaluator 校验
+                if (targetCondition != null && !targetCondition.isBlank()) {
+                    Map<String, Object> spec = Map.of("completionCondition", targetCondition);
+                    if (CompletionConditionEvaluator.satisfied(spec, output)) {
+                        return true;
+                    }
+                }
+
+                // 2. 检查前序已完成步骤自身的 completionCondition 是否被满足
+                Map<String, Object> caStep = steps.stream()
+                        .filter(s -> ca.getStepSeq().equals(s.get("stepSeq") instanceof Number n ? n.intValue() : Integer.parseInt(String.valueOf(s.get("stepSeq")))))
+                        .findFirst().orElse(null);
+                if (caStep != null) {
+                    if (CompletionConditionEvaluator.satisfied(caStep, output)) {
+                        return true;
+                    }
+                }
+
+                // 3. 兜底检查业务成功输出标记
+                if (Boolean.TRUE.equals(output.get("completed"))
+                        || "SUCCESS".equals(output.get("status"))
+                        || "SUCCESS".equals(output.get("measureStatus"))
+                        || (output.containsKey("routeGenerated") && (targetCondition == null || !targetCondition.contains("routeGenerated")))) {
                     return true;
                 }
             }

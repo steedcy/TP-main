@@ -501,6 +501,7 @@ public class TaskExecutionOrchestrator {
         task.setStatus(TaskStatus.COMPLETED);
         task.setUpdatedAt(LocalDateTime.now());
         taskMapper.update(task);
+        taskExceptionService.archiveAllUnresolvedOnTaskComplete(task.getId());
         taskEventService.append(task.getId(), "TASK_COMPLETED", "SYSTEM", "BAGGAGE_WITHIN_LIMIT",
                 "行李未超规，结束处置；三边和" + outputParams.get("totalDimensionCm") + "cm（阈值"
                         + outputParams.get("dimensionThresholdCm") + "cm），重量" + outputParams.get("weight")
@@ -565,6 +566,7 @@ public class TaskExecutionOrchestrator {
             task.setStatus(TaskStatus.COMPLETED);
             task.setUpdatedAt(LocalDateTime.now());
             taskMapper.update(task);
+            taskExceptionService.archiveAllUnresolvedOnTaskComplete(taskId);
             taskEventService.append(taskId, "TASK_COMPLETED", "SYSTEM", null,
                     "航班变更可用渠道执行完成；已覆盖: " + covered + "；未覆盖: " + uncovered);
             return;
@@ -573,6 +575,7 @@ public class TaskExecutionOrchestrator {
         task.setStatus(TaskStatus.COMPLETED);
         task.setUpdatedAt(LocalDateTime.now());
         taskMapper.update(task);
+        taskExceptionService.archiveAllUnresolvedOnTaskComplete(taskId);
         taskEventService.append(taskId, "TASK_COMPLETED", "SYSTEM", null, "全部步骤完成条件均已满足，任务完成");
         if (Boolean.TRUE.equals(task.getIsDryRun())) dryRunLifecycle.finish(taskId, true, "所有步骤均收到实际设备成功反馈");
     }
