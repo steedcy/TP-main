@@ -1,0 +1,198 @@
+{
+  "tag": "V1.157",
+  "productSha": "ea6901eb4e35448ca91773f8ea1424fa797d88e5",
+  "at": "2026-11-05T09:38:03.903302+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "issue": "DEF-S3-099",
+  "expected": "All rejected: ASSIGNMENT_FAILED persisted and enters 5.5.3, HTTP 200 callback",
+  "observed": "Last rejection HTTP 500; chk_exception_type rejects ASSIGNMENT_FAILED",
+  "source": "SRS_F016-V1.157-http-20261105.json, all-reject task308 diagnostic",
+  "constraint": "CHECK (((exception_type)::text = ANY ((ARRAY['AGENT_OFFLINE'::character varying, 'CAPABILITY_GAP'::character varying, 'EXECUTION_TIMEOUT'::character varying, 'STEP_FAILED'::character varying, 'REPLAN_FAILED'::character varying])::text[])))",
+  "task308": [
+    {
+      "id": 308,
+      "task_code": "TASK-20261105-0308",
+      "task_goal": "F157_ALL_REJECT synthetic navigation to F2_TEST_GATE",
+      "task_family": "EXT_88CC8391",
+      "scene_params": {
+        "targetLocation": "F2_TEST_GATE"
+      },
+      "goal_parsing_result": {
+        "completionCondition": "routeGenerated=true",
+        "origin": "F2_SERVICE_POINT",
+        "destination": "F2_TEST_GATE",
+        "originalGoal": "F157_ALL_REJECT synthetic navigation to F2_TEST_GATE",
+        "constraints": [
+          "synthetic test"
+        ]
+      },
+      "status": "MANUAL_TERMINATED",
+      "current_plan_version_id": 328,
+      "replan_used": true,
+      "replanning_reason": "STEP_FAILED: ERR_CAPABILITY_DISABLED: 能力CAP_NAVIGATION被停用，正占用该能力的步骤按异常恢复处理",
+      "manual_terminate_reason": "Synthetic probe correction cleanup",
+      "failure_reason": "局部重新规划失败：新计划版本三类校验未通过: ERR_NO_ONLINE_CANDIDATE",
+      "created_at": "2026-11-05T09:35:59.060501",
+      "updated_at": "2026-11-05T09:37:36.629417",
+      "created_by": "oprator",
+      "is_dry_run": false,
+      "missing_info_questions": null,
+      "downgrade_reason": null
+    }
+  ],
+  "events308": [
+    {
+      "id": 3100,
+      "task_id": 308,
+      "event_type": "GOAL_SUBMITTED",
+      "occurred_at": "2026-11-05T09:35:59.062712",
+      "trigger": "OPERATOR",
+      "reason_code": null,
+      "detail_summary": "运行操作员oprator提交任务目标: F157_ALL_REJECT synthetic navigation to F2_TEST_GATE"
+    },
+    {
+      "id": 3101,
+      "task_id": 308,
+      "event_type": "GOAL_CLARIFIED",
+      "occurred_at": "2026-11-05T09:35:59.085073",
+      "trigger": "SYSTEM",
+      "reason_code": null,
+      "detail_summary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+    },
+    {
+      "id": 3102,
+      "task_id": 308,
+      "event_type": "CONTEXT_SNAPSHOT_GENERATED",
+      "occurred_at": "2026-11-05T09:35:59.092153",
+      "trigger": "SYSTEM",
+      "reason_code": null,
+      "detail_summary": "生成规划上下文快照CTX-20261105-0300"
+    },
+    {
+      "id": 3103,
+      "task_id": 308,
+      "event_type": "PLAN_GENERATED",
+      "occurred_at": "2026-11-05T09:35:59.103901",
+      "trigger": "SYSTEM",
+      "reason_code": null,
+      "detail_summary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+    },
+    {
+      "id": 3104,
+      "task_id": 308,
+      "event_type": "PLAN_VALIDATED",
+      "occurred_at": "2026-11-05T09:35:59.106581",
+      "trigger": "SYSTEM",
+      "reason_code": null,
+      "detail_summary": "候选计划三类校验全部通过，已冻结版本"
+    },
+    {
+      "id": 3105,
+      "task_id": 308,
+      "event_type": "SUPERVISION_JUDGED",
+      "occurred_at": "2026-11-05T09:35:59.1116",
+      "trigger": "SYSTEM",
+      "reason_code": null,
+      "detail_summary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.35；推荐处置=AUTO_EXECUTE（自动执行）"
+    },
+    {
+      "id": 3106,
+      "task_id": 308,
+      "event_type": "AGENT_ASSIGNMENT_REQUESTED",
+      "occurred_at": "2026-11-05T09:35:59.124454",
+      "trigger": "SYSTEM",
+      "reason_code": null,
+      "detail_summary": "步骤1候选排序（能力匹配->距离->负载）: AGT-2C20C5AD(匹配度1.0,距离0.0,负载0)；AGT-3D9DA51B(匹配度0.9,距离0.0,负载0)，向候选AGT-2C20C5AD发起承接请求"
+    },
+    {
+      "id": 3107,
+      "task_id": 308,
+      "event_type": "AGENT_REJECTED",
+      "occurred_at": "2026-11-05T09:35:59.381592",
+      "trigger": "SYSTEM",
+      "reason_code": null,
+      "detail_summary": "设备代理AGT-2C20C5AD拒绝步骤1承接请求，原因: SYNTHETIC_CAPACITY_REJECTED"
+    },
+    {
+      "id": 3108,
+      "task_id": 308,
+      "event_type": "AGENT_ASSIGNMENT_REQUESTED",
+      "occurred_at": "2026-11-05T09:35:59.388787",
+      "trigger": "SYSTEM",
+      "reason_code": null,
+      "detail_summary": "步骤1候选排序（能力匹配->距离->负载）: AGT-3D9DA51B(匹配度0.9,距离0.0,负载0)，向候选AGT-3D9DA51B发起承接请求"
+    },
+    {
+      "id": 3138,
+      "task_id": 308,
+      "event_type": "EXCEPTION_DETECTED",
+      "occurred_at": "2026-11-05T09:36:33.33579",
+      "trigger": "SYSTEM",
+      "reason_code": "STEP_FAILED",
+      "detail_summary": "识别到异常: STEP_FAILED，步骤1，详情: ERR_CAPABILITY_DISABLED: 能力CAP_NAVIGATION被停用，正占用该能力的步骤按异常恢复处理"
+    },
+    {
+      "id": 3139,
+      "task_id": 308,
+      "event_type": "EXCEPTION_RECOVERY_FAILED",
+      "occurred_at": "2026-11-05T09:36:33.343445",
+      "trigger": "SYSTEM",
+      "reason_code": "STEP_FAILED",
+      "detail_summary": "恢复动作: 无可用候选设备，恢复动作未执行，结果: 失败，异常类型: STEP_FAILED，影响结论: 候选设备切换恢复失败，判断计划是否可继续"
+    },
+    {
+      "id": 3140,
+      "task_id": 308,
+      "event_type": "REPLANNING_TRIGGERED",
+      "occurred_at": "2026-11-05T09:36:33.348545",
+      "trigger": "SYSTEM",
+      "reason_code": null,
+      "detail_summary": "步骤1恢复失败且计划不可继续，重新规划机会未用，触发5.5.4局部重新规划"
+    },
+    {
+      "id": 3141,
+      "task_id": 308,
+      "event_type": "CONTEXT_SNAPSHOT_GENERATED",
+      "occurred_at": "2026-11-05T09:36:33.363018",
+      "trigger": "SYSTEM",
+      "reason_code": null,
+      "detail_summary": "局部重新规划重建上下文快照CTX-20261105-0304"
+    },
+    {
+      "id": 3142,
+      "task_id": 308,
+      "event_type": "REPLAN_FAILED",
+      "occurred_at": "2026-11-05T09:36:33.385926",
+      "trigger": "SYSTEM",
+      "reason_code": "ERR_NO_ONLINE_CANDIDATE",
+      "detail_summary": "重新规划后新计划版本2三类校验未通过: 1项错误 [CAPABILITY 步骤1: 能力类型CAP_NAVIGATION无在线候选代理(ERR_NO_ONLINE_CANDIDATE)]"
+    },
+    {
+      "id": 3143,
+      "task_id": 308,
+      "event_type": "TASK_PENDING_MANUAL",
+      "occurred_at": "2026-11-05T09:36:33.388011",
+      "trigger": "SYSTEM",
+      "reason_code": "ERR_REPLAN_FAILED",
+      "detail_summary": "局部重新规划失败：新计划版本三类校验未通过: ERR_NO_ONLINE_CANDIDATE"
+    },
+    {
+      "id": 3212,
+      "task_id": 308,
+      "event_type": "TASK_CANCEL_DELIVERY_FAILED",
+      "occurred_at": "2026-11-05T09:37:36.629417",
+      "trigger": "OPERATOR",
+      "reason_code": "DEVICE_API_ERROR",
+      "detail_summary": "向设备代理AGT-3D9DA51B发送业务任务取消请求失败: 设备离线"
+    },
+    {
+      "id": 3213,
+      "task_id": 308,
+      "event_type": "MANUAL_TERMINATED",
+      "occurred_at": "2026-11-05T09:37:36.632069",
+      "trigger": "OPERATOR",
+      "reason_code": null,
+      "detail_summary": "运行操作员oprator人工终止任务，原因: Synthetic probe correction cleanup，涉及设备: [AGT-3D9DA51B]"
+    }
+  ]
+}
