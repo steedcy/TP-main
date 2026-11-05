@@ -4,6 +4,7 @@ import com.airport.ai.device.DeviceCommandMapper;
 import com.airport.ai.event.TaskEventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.Nullable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,32 +20,30 @@ import java.util.List;
 @Component
 public class StepTimeoutMonitorTask {
 
-    @Autowired(required = false)
-    private PlanVersionMapper plans;
-    @Autowired(required = false)
-    private DeviceCommandMapper deviceCommandMapper;
-
     private final TaskStepAssignmentMapper assignmentMapper;
     private final com.airport.ai.device.DeviceAgentMapper deviceAgentMapper;
     private final TaskEventService taskEventService;
     private final TaskExceptionService taskExceptionService;
     private final int stepTimeoutSeconds;
+    private final PlanVersionMapper plans;
+    private final DeviceCommandMapper deviceCommandMapper;
 
     public StepTimeoutMonitorTask(TaskStepAssignmentMapper assignmentMapper,
                                    com.airport.ai.device.DeviceAgentMapper deviceAgentMapper,
                                    TaskEventService taskEventService,
                                    TaskExceptionService taskExceptionService,
-                                   @Value("${app.task.step-timeout-default-seconds:60}") int stepTimeoutSeconds) {
+                                   int stepTimeoutSeconds) {
         this(assignmentMapper, deviceAgentMapper, taskEventService, taskExceptionService, stepTimeoutSeconds, null, null);
     }
 
+    @Autowired
     public StepTimeoutMonitorTask(TaskStepAssignmentMapper assignmentMapper,
                                    com.airport.ai.device.DeviceAgentMapper deviceAgentMapper,
                                    TaskEventService taskEventService,
                                    TaskExceptionService taskExceptionService,
-                                   int stepTimeoutSeconds,
-                                   PlanVersionMapper plans,
-                                   DeviceCommandMapper deviceCommandMapper) {
+                                   @Value("${app.task.step-timeout-default-seconds:60}") int stepTimeoutSeconds,
+                                   @Nullable PlanVersionMapper plans,
+                                   @Nullable DeviceCommandMapper deviceCommandMapper) {
         this.assignmentMapper = assignmentMapper;
         this.deviceAgentMapper = deviceAgentMapper;
         this.taskEventService = taskEventService;
