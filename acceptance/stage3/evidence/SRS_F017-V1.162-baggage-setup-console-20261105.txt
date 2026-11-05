@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "C:\Users\savy\Desktop\TIP-main\tip-gpt-f013\acceptance\stage3\probe-f017-v162-baggage.py", line 42, in <module>
+    try:setup();q.run('oversize-four-channels',lambda:run_case(True));q.run('normal-skip',lambda:run_case(False))
+        ~~~~~^^
+  File "C:\Users\savy\Desktop\TIP-main\tip-gpt-f013\acceptance\stage3\probe-f017-v162-baggage.py", line 20, in setup
+    d=m.Device(code,port);d.simtype=typ;d.healthcaps=types;q.devices.append(d);d.token=q.cfg(f'/devices/{code}/device-token/rotate','POST')['accessToken'];q.cfg(f'/devices/{code}/status','POST',{'status':'ACTIVE'});q.cfg(f'/devices/{code}/connection-test','POST');d.agent=next(a['agentId'] for a in q.cfg('/device-agents?page=1&size=100')['content'] if a['deviceCode']==code);d.heartbeat();threading.Thread(target=d.loop,daemon=True).start()
+                                                                                                                                                           ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\savy\Desktop\TIP-main\tip\scripts\local-test-environment.py", line 54, in __call__
+    result=request(BASE+path,method,data,self.token)
+  File "C:\Users\savy\Desktop\TIP-main\tip\scripts\local-test-environment.py", line 46, in request
+    raise RuntimeError(f'HTTP {ex.code}: {message}') from None
+RuntimeError: HTTP 400: ����ǰ�����Ӳ���ͨ��

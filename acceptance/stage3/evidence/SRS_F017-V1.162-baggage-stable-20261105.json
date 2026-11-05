@@ -1,0 +1,1337 @@
+{
+  "tag": "V1.162",
+  "productSha": "b2623730a0c85622091e6e18bcb1207e23ecdd42",
+  "handoffSha": "d4bdab45c05fb0fc595f3dbf13ae6e9726521408",
+  "executionBaseline": "V2.4",
+  "startedAt": "2026-11-05T16:18:30.184338+08:00",
+  "timezone": "Asia/Shanghai",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "redisDb": 10,
+  "cases": [
+    {
+      "name": "F162_BAGGAGE_OVERSIZE",
+      "taskId": 489,
+      "request": {
+        "taskGoal": "F162_BAGGAGE_OVERSIZE synthetic baggage to F2_TEST_GATE",
+        "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE",
+          "dimensionThresholdCm": 158,
+          "weightThresholdKg": 23,
+          "baggageInfo": "synthetic baggage fixture"
+        }
+      },
+      "response": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 489,
+            "taskCode": "TASK-20261105-0489",
+            "taskGoal": "F162_BAGGAGE_OVERSIZE synthetic baggage to F2_TEST_GATE",
+            "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE",
+              "dimensionThresholdCm": 158,
+              "weightThresholdKg": 23,
+              "baggageInfo": "synthetic baggage fixture"
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=true",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F162_BAGGAGE_OVERSIZE synthetic baggage to F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "PLANNING",
+            "currentPlanVersionId": null,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": null,
+            "failureReason": null,
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-05T16:18:33.6298215",
+            "updatedAt": "2026-11-05T16:18:33.6298215",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-05T16:18:33.789916200+08:00"
+        }
+      },
+      "steps": [
+        {
+          "stepSeq": 1,
+          "stepGoal": "Synthetic baggage action CAP_BAGGAGE_MEASURE",
+          "capabilityType": "CAP_BAGGAGE_MEASURE",
+          "inputParams": {
+            "measureMode": "AUTO",
+            "timeout": 30
+          },
+          "precondition": "device online",
+          "completionCondition": "measureStatus=SUCCESS",
+          "failureHandling": "manual handling",
+          "stepTimeout": 180
+        },
+        {
+          "stepSeq": 2,
+          "stepGoal": "Synthetic baggage action CAP_OVERSIZE_ALERT",
+          "capabilityType": "CAP_OVERSIZE_ALERT",
+          "inputParams": {
+            "baggageInfo": "{\"length\": 80, \"width\": 55, \"height\": 35, \"weight\": 35}",
+            "alertLevel": "WARNING"
+          },
+          "precondition": "device online",
+          "completionCondition": "reportStatus=SUCCESS",
+          "failureHandling": "manual handling",
+          "stepTimeout": 180
+        },
+        {
+          "stepSeq": 3,
+          "stepGoal": "Synthetic baggage action CAP_INFO_DISPLAY",
+          "capabilityType": "CAP_INFO_DISPLAY",
+          "inputParams": {
+            "contentType": "TEXT",
+            "contentData": "测试信息：请前往F2服务点",
+            "displayDuration": 60
+          },
+          "precondition": "device online",
+          "completionCondition": "displayStatus=SUCCESS",
+          "failureHandling": "manual handling",
+          "stepTimeout": 180
+        },
+        {
+          "stepSeq": 4,
+          "stepGoal": "Synthetic baggage action CAP_NAVIGATION",
+          "capabilityType": "CAP_NAVIGATION",
+          "inputParams": {
+            "targetLocation": "F2_TEST_GATE",
+            "routePreference": "BARRIER_FREE",
+            "targetX": 0.0,
+            "targetY": 0.0
+          },
+          "precondition": "device online",
+          "completionCondition": "routeGenerated=true",
+          "failureHandling": "manual handling",
+          "stepTimeout": 180
+        }
+      ],
+      "frozen": {
+        "task": {
+          "id": 489,
+          "taskCode": "TASK-20261105-0489",
+          "taskGoal": "F162_BAGGAGE_OVERSIZE synthetic baggage to F2_TEST_GATE",
+          "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE",
+            "dimensionThresholdCm": 158,
+            "weightThresholdKg": 23,
+            "baggageInfo": "synthetic baggage fixture"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F162_BAGGAGE_OVERSIZE synthetic baggage to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 563,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_NO_ONLINE_CANDIDATE；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-05T16:18:33.629822",
+          "updatedAt": "2026-11-05T16:18:33.780985",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 563,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261105-0529",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic baggage action CAP_BAGGAGE_MEASURE",
+                "capabilityType": "CAP_BAGGAGE_MEASURE",
+                "inputParams": {
+                  "measureMode": "AUTO",
+                  "timeout": 30
+                },
+                "precondition": "device online",
+                "completionCondition": "measureStatus=SUCCESS",
+                "failureHandling": "manual handling",
+                "stepTimeout": 180
+              },
+              {
+                "stepSeq": 2,
+                "stepGoal": "Synthetic baggage action CAP_OVERSIZE_ALERT",
+                "capabilityType": "CAP_OVERSIZE_ALERT",
+                "inputParams": {
+                  "baggageInfo": "{\"length\": 80, \"width\": 55, \"height\": 35, \"weight\": 35}",
+                  "alertLevel": "WARNING"
+                },
+                "precondition": "device online",
+                "completionCondition": "reportStatus=SUCCESS",
+                "failureHandling": "manual handling",
+                "stepTimeout": 180
+              },
+              {
+                "stepSeq": 3,
+                "stepGoal": "Synthetic baggage action CAP_INFO_DISPLAY",
+                "capabilityType": "CAP_INFO_DISPLAY",
+                "inputParams": {
+                  "contentType": "TEXT",
+                  "contentData": "测试信息：请前往F2服务点",
+                  "displayDuration": 60
+                },
+                "precondition": "device online",
+                "completionCondition": "displayStatus=SUCCESS",
+                "failureHandling": "manual handling",
+                "stepTimeout": 180
+              },
+              {
+                "stepSeq": 4,
+                "stepGoal": "Synthetic baggage action CAP_NAVIGATION",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 180
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "FAIL",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [
+              {
+                "errorType": "CAPABILITY",
+                "description": "能力类型CAP_INFO_DISPLAY无在线候选代理（要求渠道SMART_DISPLAY）",
+                "stepSeq": 3,
+                "reasonCode": "ERR_NO_ONLINE_CANDIDATE"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-05T16:18:33.761719"
+          }
+        ],
+        "events": [
+          {
+            "id": 5719,
+            "taskId": 489,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-05T16:18:33.63081",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F162_BAGGAGE_OVERSIZE synthetic baggage to F2_TEST_GATE"
+          },
+          {
+            "id": 5720,
+            "taskId": 489,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-05T16:18:33.67817",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 5721,
+            "taskId": 489,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-05T16:18:33.695547",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261105-0529"
+          },
+          {
+            "id": 5722,
+            "taskId": 489,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-05T16:18:33.766812",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 5723,
+            "taskId": 489,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-05T16:18:33.772016",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_ONLINE_CANDIDATE",
+            "detailSummary": "候选计划三类校验未通过: 1项错误 [CAPABILITY 步骤3: 能力类型CAP_INFO_DISPLAY无在线候选代理（要求渠道SMART_DISPLAY）(ERR_NO_ONLINE_CANDIDATE)]"
+          },
+          {
+            "id": 5724,
+            "taskId": 489,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-05T16:18:33.779354",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_NO_ONLINE_CANDIDATE"
+          },
+          {
+            "id": 5725,
+            "taskId": 489,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-05T16:18:33.787174",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_NO_ONLINE_CANDIDATE；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": [],
+        "agentRows": [
+          {
+            "id": 18,
+            "agent_code": "AGT-386E8C30",
+            "device_id": 19,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T16:18:35.956634",
+            "created_at": "2026-11-05T13:04:16.81064",
+            "updated_at": "2026-11-05T13:04:16.81064",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 19,
+            "agent_code": "AGT-8519A3B6",
+            "device_id": 20,
+            "agent_status": "DISABLED",
+            "online_status": "OFFLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T16:14:41.70456",
+            "created_at": "2026-11-05T13:04:17.772513",
+            "updated_at": "2026-11-05T13:04:17.772513",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 20,
+            "agent_code": "AGT-D20379F3",
+            "device_id": 21,
+            "agent_status": "DISABLED",
+            "online_status": "OFFLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T16:14:41.815628",
+            "created_at": "2026-11-05T13:05:21.137216",
+            "updated_at": "2026-11-05T13:05:21.137216",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          }
+        ],
+        "exceptions": [],
+        "commandRows": [],
+        "transport": {
+          "G160_F016_A": [],
+          "G145_F013_SCAN": []
+        }
+      }
+    },
+    {
+      "name": "F162_BAGGAGE_NORMAL",
+      "taskId": 490,
+      "request": {
+        "taskGoal": "F162_BAGGAGE_NORMAL synthetic baggage to F2_TEST_GATE",
+        "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE",
+          "dimensionThresholdCm": 158,
+          "weightThresholdKg": 23,
+          "baggageInfo": "synthetic baggage fixture"
+        }
+      },
+      "response": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 490,
+            "taskCode": "TASK-20261105-0490",
+            "taskGoal": "F162_BAGGAGE_NORMAL synthetic baggage to F2_TEST_GATE",
+            "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE",
+              "dimensionThresholdCm": 158,
+              "weightThresholdKg": 23,
+              "baggageInfo": "synthetic baggage fixture"
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=true",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F162_BAGGAGE_NORMAL synthetic baggage to F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "PLANNING",
+            "currentPlanVersionId": null,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": null,
+            "failureReason": null,
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-05T16:18:52.5956234",
+            "updatedAt": "2026-11-05T16:18:52.5956234",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-05T16:18:52.721568800+08:00"
+        }
+      },
+      "steps": [
+        {
+          "stepSeq": 1,
+          "stepGoal": "Synthetic baggage action CAP_BAGGAGE_MEASURE",
+          "capabilityType": "CAP_BAGGAGE_MEASURE",
+          "inputParams": {
+            "measureMode": "AUTO",
+            "timeout": 30
+          },
+          "precondition": "device online",
+          "completionCondition": "measureStatus=SUCCESS",
+          "failureHandling": "manual handling",
+          "stepTimeout": 180
+        },
+        {
+          "stepSeq": 2,
+          "stepGoal": "Synthetic baggage action CAP_OVERSIZE_ALERT",
+          "capabilityType": "CAP_OVERSIZE_ALERT",
+          "inputParams": {
+            "baggageInfo": "{\"length\": 80, \"width\": 55, \"height\": 35, \"weight\": 35}",
+            "alertLevel": "WARNING"
+          },
+          "precondition": "device online",
+          "completionCondition": "reportStatus=SUCCESS",
+          "failureHandling": "manual handling",
+          "stepTimeout": 180
+        },
+        {
+          "stepSeq": 3,
+          "stepGoal": "Synthetic baggage action CAP_INFO_DISPLAY",
+          "capabilityType": "CAP_INFO_DISPLAY",
+          "inputParams": {
+            "contentType": "TEXT",
+            "contentData": "测试信息：请前往F2服务点",
+            "displayDuration": 60
+          },
+          "precondition": "device online",
+          "completionCondition": "displayStatus=SUCCESS",
+          "failureHandling": "manual handling",
+          "stepTimeout": 180
+        },
+        {
+          "stepSeq": 4,
+          "stepGoal": "Synthetic baggage action CAP_NAVIGATION",
+          "capabilityType": "CAP_NAVIGATION",
+          "inputParams": {
+            "targetLocation": "F2_TEST_GATE",
+            "routePreference": "BARRIER_FREE",
+            "targetX": 0.0,
+            "targetY": 0.0
+          },
+          "precondition": "device online",
+          "completionCondition": "routeGenerated=true",
+          "failureHandling": "manual handling",
+          "stepTimeout": 180
+        }
+      ],
+      "frozen": {
+        "task": {
+          "id": 490,
+          "taskCode": "TASK-20261105-0490",
+          "taskGoal": "F162_BAGGAGE_NORMAL synthetic baggage to F2_TEST_GATE",
+          "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE",
+            "dimensionThresholdCm": 158,
+            "weightThresholdKg": 23,
+            "baggageInfo": "synthetic baggage fixture"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F162_BAGGAGE_NORMAL synthetic baggage to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 564,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_NO_ONLINE_CANDIDATE；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-05T16:18:52.595623",
+          "updatedAt": "2026-11-05T16:18:52.716527",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 564,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261105-0530",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic baggage action CAP_BAGGAGE_MEASURE",
+                "capabilityType": "CAP_BAGGAGE_MEASURE",
+                "inputParams": {
+                  "measureMode": "AUTO",
+                  "timeout": 30
+                },
+                "precondition": "device online",
+                "completionCondition": "measureStatus=SUCCESS",
+                "failureHandling": "manual handling",
+                "stepTimeout": 180
+              },
+              {
+                "stepSeq": 2,
+                "stepGoal": "Synthetic baggage action CAP_OVERSIZE_ALERT",
+                "capabilityType": "CAP_OVERSIZE_ALERT",
+                "inputParams": {
+                  "baggageInfo": "{\"length\": 80, \"width\": 55, \"height\": 35, \"weight\": 35}",
+                  "alertLevel": "WARNING"
+                },
+                "precondition": "device online",
+                "completionCondition": "reportStatus=SUCCESS",
+                "failureHandling": "manual handling",
+                "stepTimeout": 180
+              },
+              {
+                "stepSeq": 3,
+                "stepGoal": "Synthetic baggage action CAP_INFO_DISPLAY",
+                "capabilityType": "CAP_INFO_DISPLAY",
+                "inputParams": {
+                  "contentType": "TEXT",
+                  "contentData": "测试信息：请前往F2服务点",
+                  "displayDuration": 60
+                },
+                "precondition": "device online",
+                "completionCondition": "displayStatus=SUCCESS",
+                "failureHandling": "manual handling",
+                "stepTimeout": 180
+              },
+              {
+                "stepSeq": 4,
+                "stepGoal": "Synthetic baggage action CAP_NAVIGATION",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 180
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "FAIL",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [
+              {
+                "errorType": "CAPABILITY",
+                "description": "能力类型CAP_INFO_DISPLAY无在线候选代理（要求渠道SMART_DISPLAY）",
+                "stepSeq": 3,
+                "reasonCode": "ERR_NO_ONLINE_CANDIDATE"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-05T16:18:52.704222"
+          }
+        ],
+        "events": [
+          {
+            "id": 5726,
+            "taskId": 490,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-05T16:18:52.600632",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F162_BAGGAGE_NORMAL synthetic baggage to F2_TEST_GATE"
+          },
+          {
+            "id": 5727,
+            "taskId": 490,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-05T16:18:52.652936",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 5728,
+            "taskId": 490,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-05T16:18:52.670184",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261105-0530"
+          },
+          {
+            "id": 5730,
+            "taskId": 490,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-05T16:18:52.704222",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_ONLINE_CANDIDATE",
+            "detailSummary": "候选计划三类校验未通过: 1项错误 [CAPABILITY 步骤3: 能力类型CAP_INFO_DISPLAY无在线候选代理（要求渠道SMART_DISPLAY）(ERR_NO_ONLINE_CANDIDATE)]"
+          },
+          {
+            "id": 5729,
+            "taskId": 490,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-05T16:18:52.704222",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 5731,
+            "taskId": 490,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-05T16:18:52.714189",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_NO_ONLINE_CANDIDATE"
+          },
+          {
+            "id": 5732,
+            "taskId": 490,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-05T16:18:52.718423",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_NO_ONLINE_CANDIDATE；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": [],
+        "agentRows": [
+          {
+            "id": 18,
+            "agent_code": "AGT-386E8C30",
+            "device_id": 19,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T16:18:52.555647",
+            "created_at": "2026-11-05T13:04:16.81064",
+            "updated_at": "2026-11-05T13:04:16.81064",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 19,
+            "agent_code": "AGT-8519A3B6",
+            "device_id": 20,
+            "agent_status": "DISABLED",
+            "online_status": "OFFLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T16:14:41.70456",
+            "created_at": "2026-11-05T13:04:17.772513",
+            "updated_at": "2026-11-05T13:04:17.772513",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 20,
+            "agent_code": "AGT-D20379F3",
+            "device_id": 21,
+            "agent_status": "DISABLED",
+            "online_status": "OFFLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T16:14:41.815628",
+            "created_at": "2026-11-05T13:05:21.137216",
+            "updated_at": "2026-11-05T13:05:21.137216",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          }
+        ],
+        "exceptions": [],
+        "commandRows": [],
+        "transport": {
+          "G160_F016_A": [],
+          "G145_F013_SCAN": []
+        }
+      }
+    }
+  ],
+  "health": {
+    "status": "UP"
+  },
+  "diagnostics": [
+    {
+      "name": "oversize-four-channels",
+      "at": "2026-11-05T16:18:52.530831+08:00",
+      "error": "missing step 1 TASK_ACCEPT",
+      "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f017-v162.py\", line 91, in run\n    try:fn()\n        ~~^^\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f017-v162-baggage.py\", line 42, in <lambda>\n    try:setup();q.run('oversize-four-channels',lambda:run_case(True));q.run('normal-skip',lambda:run_case(False))\n                                                      ~~~~~~~~^^^^^^\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f017-v162-baggage.py\", line 40, in run_case\n    d,a=wait_msg(row,'TASK_ACCEPT',seq);q.response(d,a);d,msg=wait_msg(row,'EXECUTE_CAPABILITY',seq);output={'measureStatus':'SUCCESS','isOversize':oversize,'baggageInfo':'synthetic baggage fixture','reportStatus':'SUCCESS','displayStatus':'SUCCESS','routeGenerated':True};res=d.report('EXECUTION_FEEDBACK',{'commandId':msg['commandId'],'attemptNo':0,'executionResult':'SUCCESS','outputParams':output});row.setdefault('feedbackCalls',[]).append({'step':seq,'response':res});d.state['workStatus']='IDLE'\n        ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f017-v162-baggage.py\", line 15, in wait_msg\n    raise TimeoutError('missing step '+str(seq)+' '+typ)\nTimeoutError: missing step 1 TASK_ACCEPT\n"
+    },
+    {
+      "name": "normal-skip",
+      "at": "2026-11-05T16:19:10.269652+08:00",
+      "error": "missing step 1 TASK_ACCEPT",
+      "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f017-v162.py\", line 91, in run\n    try:fn()\n        ~~^^\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f017-v162-baggage.py\", line 42, in <lambda>\n    try:setup();q.run('oversize-four-channels',lambda:run_case(True));q.run('normal-skip',lambda:run_case(False))\n                                                                                                 ~~~~~~~~^^^^^^^\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f017-v162-baggage.py\", line 40, in run_case\n    d,a=wait_msg(row,'TASK_ACCEPT',seq);q.response(d,a);d,msg=wait_msg(row,'EXECUTE_CAPABILITY',seq);output={'measureStatus':'SUCCESS','isOversize':oversize,'baggageInfo':'synthetic baggage fixture','reportStatus':'SUCCESS','displayStatus':'SUCCESS','routeGenerated':True};res=d.report('EXECUTION_FEEDBACK',{'commandId':msg['commandId'],'attemptNo':0,'executionResult':'SUCCESS','outputParams':output});row.setdefault('feedbackCalls',[]).append({'step':seq,'response':res});d.state['workStatus']='IDLE'\n        ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f017-v162-baggage.py\", line 15, in wait_msg\n    raise TimeoutError('missing step '+str(seq)+' '+typ)\nTimeoutError: missing step 1 TASK_ACCEPT\n"
+    }
+  ],
+  "taskIds": [
+    489,
+    490
+  ],
+  "templateIds": [],
+  "definitionIds": [],
+  "rulesBefore": [
+    {
+      "id": 1,
+      "ruleCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+      "ruleContent": "移动机器人会合或陪同服务对象为特殊旅客时判定为高风险；普通空间引导场景不命中",
+      "ruleVersion": "V1.2",
+      "enabled": true,
+      "createdAt": "2026-10-30T13:40:48.586219",
+      "updatedAt": "2026-11-04T10:29:06.080757",
+      "updatedBy": "set"
+    },
+    {
+      "id": 2,
+      "ruleCode": "RULE_CROSS_ZONE",
+      "ruleContent": "仅移动服务机器人适用；同一任务链条中跨越预定义区域边界1次及以上命中",
+      "ruleVersion": "V1.2",
+      "enabled": true,
+      "createdAt": "2026-10-30T13:40:48.586219",
+      "updatedAt": "2026-11-04T10:29:00.250949",
+      "updatedBy": "set"
+    },
+    {
+      "id": 3,
+      "ruleCode": "RULE_RESOURCE_CRITICAL",
+      "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+      "ruleVersion": "V6.8",
+      "enabled": true,
+      "createdAt": "2026-10-30T13:40:48.586219",
+      "updatedAt": "2026-11-05T16:14:40.856223",
+      "updatedBy": "set"
+    },
+    {
+      "id": 4,
+      "ruleCode": "GPT_F014_150_API",
+      "ruleContent": "Synthetic F014 validation fixture revised",
+      "ruleVersion": "V1.2",
+      "enabled": false,
+      "createdAt": "2026-11-04T08:07:33.779259",
+      "updatedAt": "2026-11-04T08:07:33.967337",
+      "updatedBy": "set"
+    },
+    {
+      "id": 5,
+      "ruleCode": "GPT_F014_150_UI",
+      "ruleContent": "Synthetic F014 browser-created rule revised",
+      "ruleVersion": "V1.1",
+      "enabled": false,
+      "createdAt": "2026-11-04T08:09:47.309055",
+      "updatedAt": "2026-11-04T08:10:48.202617",
+      "updatedBy": "gpt_f014_ui_150"
+    }
+  ],
+  "resourcesBefore": {
+    "G160_F016_A": {
+      "device": {
+        "id": 19,
+        "device_code": "G160_F016_A",
+        "device_name": "Synthetic F016 0",
+        "device_type_code": "SIMULATOR",
+        "is_simulator": true,
+        "simulated_device_type": "MOBILE_ROBOT",
+        "area_code": "F2_TEST",
+        "position_x": 0.0,
+        "position_y": 0.0,
+        "access_endpoint": "http://127.0.0.1:18132",
+        "access_credential_ref": "synthetic-f016",
+        "status_report_interval": 5,
+        "connection_test_status": "UNTESTED",
+        "connection_test_result": null,
+        "remark": null,
+        "created_at": "2026-11-05T13:04:16.53021",
+        "updated_at": "2026-11-05T16:18:01.93891",
+        "created_by": "set",
+        "updated_by": "set",
+        "device_status": "INACTIVE",
+        "device_token_hash": "[REDACTED]",
+        "device_token_ciphertext": "[REDACTED]",
+        "device_token_issued_at": "2026-11-05T16:18:01.881914"
+      },
+      "capabilities": [
+        {
+          "id": 92,
+          "capabilityCode": "CAP_INFO_DISPLAY",
+          "capabilityName": "综合信息展示",
+          "capabilityType": "CAP_INFO_DISPLAY",
+          "inputParams": [
+            {
+              "name": "contentType",
+              "type": "String",
+              "required": true,
+              "defaultValue": "TEXT",
+              "range": "TEXT/IMAGE/VIDEO/HTML"
+            },
+            {
+              "name": "contentData",
+              "type": "String",
+              "required": true,
+              "defaultValue": "测试信息：请前往F2服务点",
+              "range": null
+            },
+            {
+              "name": "displayDuration",
+              "type": "Integer",
+              "required": true,
+              "defaultValue": "60",
+              "range": "5~300"
+            }
+          ],
+          "outputParams": [
+            {
+              "name": "displayStatus",
+              "type": "String",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            },
+            {
+              "name": "actualDuration",
+              "type": "Integer",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            },
+            {
+              "name": "errorMessage",
+              "type": "String",
+              "required": false,
+              "defaultValue": null,
+              "range": null
+            }
+          ],
+          "applicableConditions": null,
+          "capabilityStatus": "UNTESTED",
+          "testResult": null,
+          "lastTestAt": null,
+          "testRequest": null,
+          "testResponse": null,
+          "testDurationMs": null,
+          "capabilityDescription": "标准能力模板：综合信息展示"
+        },
+        {
+          "id": 94,
+          "capabilityCode": "CAP_ESCORT",
+          "capabilityName": "陪同服务",
+          "capabilityType": "CAP_ESCORT",
+          "inputParams": [
+            {
+              "name": "targetLocation",
+              "type": "String",
+              "required": true,
+              "defaultValue": "F2_TEST_GATE",
+              "range": null
+            },
+            {
+              "name": "escortMode",
+              "type": "String",
+              "required": true,
+              "defaultValue": "LEAD",
+              "range": "LEAD/FOLLOW"
+            },
+            {
+              "name": "maxDuration",
+              "type": "Integer",
+              "required": true,
+              "defaultValue": "600",
+              "range": "60~1800"
+            }
+          ],
+          "outputParams": [
+            {
+              "name": "arrivalStatus",
+              "type": "String",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            },
+            {
+              "name": "actualDistance",
+              "type": "Double",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            },
+            {
+              "name": "actualDuration",
+              "type": "Integer",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            }
+          ],
+          "applicableConditions": null,
+          "capabilityStatus": "ENABLED",
+          "testResult": "实际设备代理调用通过，指令 TEST-55dc53f2ec154422951dc8b6da",
+          "lastTestAt": "2026-11-05T16:12:04.91966",
+          "testRequest": null,
+          "testResponse": null,
+          "testDurationMs": null,
+          "capabilityDescription": "标准能力模板：陪同服务"
+        },
+        {
+          "id": 95,
+          "capabilityCode": "CAP_NOTIFICATION",
+          "capabilityName": "现场通知",
+          "capabilityType": "CAP_NOTIFICATION",
+          "inputParams": [
+            {
+              "name": "notificationType",
+              "type": "String",
+              "required": true,
+              "defaultValue": "BOTH",
+              "range": "VOICE/TEXT/BOTH"
+            },
+            {
+              "name": "notificationContent",
+              "type": "String",
+              "required": true,
+              "defaultValue": "测试旅客需要轮椅陪同，请现场服务人员协助",
+              "range": null
+            },
+            {
+              "name": "repeatCount",
+              "type": "Integer",
+              "required": true,
+              "defaultValue": "1",
+              "range": "1~5"
+            }
+          ],
+          "outputParams": [
+            {
+              "name": "notificationStatus",
+              "type": "String",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            },
+            {
+              "name": "actualRepeatCount",
+              "type": "Integer",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            }
+          ],
+          "applicableConditions": null,
+          "capabilityStatus": "ENABLED",
+          "testResult": "实际设备代理调用通过，指令 TEST-089366170f624887b0e8ad81db",
+          "lastTestAt": "2026-11-05T16:12:05.014947",
+          "testRequest": null,
+          "testResponse": null,
+          "testDurationMs": null,
+          "capabilityDescription": "标准能力模板：现场通知"
+        },
+        {
+          "id": 91,
+          "capabilityCode": "CAP_SIM_STATUS",
+          "capabilityName": "仿真状态生成",
+          "capabilityType": "CAP_SIM_STATUS",
+          "inputParams": [],
+          "outputParams": [],
+          "applicableConditions": null,
+          "capabilityStatus": "UNTESTED",
+          "testResult": null,
+          "lastTestAt": null,
+          "testRequest": null,
+          "testResponse": null,
+          "testDurationMs": null,
+          "capabilityDescription": "仿真体生成并上报模拟设备状态"
+        },
+        {
+          "id": 93,
+          "capabilityCode": "CAP_NAVIGATION",
+          "capabilityName": "空间引导",
+          "capabilityType": "CAP_NAVIGATION",
+          "inputParams": [
+            {
+              "name": "targetLocation",
+              "type": "String",
+              "required": true,
+              "defaultValue": "F2_TEST_GATE",
+              "range": null
+            },
+            {
+              "name": "routePreference",
+              "type": "String",
+              "required": true,
+              "defaultValue": "BARRIER_FREE",
+              "range": "SHORTEST/BARRIER_FREE"
+            },
+            {
+              "name": "targetX",
+              "type": "Double",
+              "required": false,
+              "defaultValue": "0",
+              "range": null
+            },
+            {
+              "name": "targetY",
+              "type": "Double",
+              "required": false,
+              "defaultValue": "0",
+              "range": null
+            }
+          ],
+          "outputParams": [
+            {
+              "name": "routeGenerated",
+              "type": "Boolean",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            },
+            {
+              "name": "estimatedDistance",
+              "type": "Double",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            },
+            {
+              "name": "estimatedDuration",
+              "type": "Integer",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            },
+            {
+              "name": "waypointCount",
+              "type": "Integer",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            }
+          ],
+          "applicableConditions": null,
+          "capabilityStatus": "ENABLED",
+          "testResult": "实际设备代理调用通过，指令 TEST-6c037b23c06a4be58b5a048bc0",
+          "lastTestAt": "2026-11-05T16:13:21.500938",
+          "testRequest": null,
+          "testResponse": null,
+          "testDurationMs": null,
+          "capabilityDescription": "标准能力模板：空间引导"
+        }
+      ]
+    },
+    "G145_F013_SCAN": {
+      "device": {
+        "id": 5,
+        "device_code": "G145_F013_SCAN",
+        "device_name": "GPT F013 SCAN fixture",
+        "device_type_code": "SIMULATOR",
+        "is_simulator": true,
+        "simulated_device_type": "BAGGAGE_SCANNER",
+        "area_code": "F2_TEST",
+        "position_x": 5.0,
+        "position_y": 6.0,
+        "access_endpoint": "http://127.0.0.1:18133",
+        "access_credential_ref": "gpt-f013-synthetic-SCAN",
+        "status_report_interval": 5,
+        "connection_test_status": "PASSED",
+        "connection_test_result": "身份、协议版本及状态快照校验通过",
+        "remark": null,
+        "created_at": "2026-11-03T22:09:33.404838",
+        "updated_at": "2026-11-03T22:20:41.253937",
+        "created_by": "set",
+        "updated_by": "set",
+        "device_status": "INACTIVE",
+        "device_token_hash": "[REDACTED]",
+        "device_token_ciphertext": "[REDACTED]",
+        "device_token_issued_at": "2026-11-03T22:09:33.48903"
+      },
+      "capabilities": [
+        {
+          "id": 25,
+          "capabilityCode": "CAP_SIM_STATUS",
+          "capabilityName": "仿真状态生成",
+          "capabilityType": "CAP_SIM_STATUS",
+          "inputParams": [],
+          "outputParams": [],
+          "applicableConditions": null,
+          "capabilityStatus": "UNTESTED",
+          "testResult": null,
+          "lastTestAt": null,
+          "testRequest": null,
+          "testResponse": null,
+          "testDurationMs": null,
+          "capabilityDescription": "仿真体生成并上报模拟设备状态"
+        },
+        {
+          "id": 27,
+          "capabilityCode": "CAP_OVERSIZE_ALERT",
+          "capabilityName": "超规行李上报",
+          "capabilityType": "CAP_OVERSIZE_ALERT",
+          "inputParams": [
+            {
+              "name": "baggageInfo",
+              "type": "String",
+              "required": true,
+              "defaultValue": "{\"length\": 80, \"width\": 55, \"height\": 35, \"weight\": 35}",
+              "range": null
+            },
+            {
+              "name": "alertLevel",
+              "type": "String",
+              "required": true,
+              "defaultValue": "WARNING",
+              "range": "WARNING/ERROR"
+            }
+          ],
+          "outputParams": [
+            {
+              "name": "alertId",
+              "type": "String",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            },
+            {
+              "name": "reportStatus",
+              "type": "String",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            },
+            {
+              "name": "reportTime",
+              "type": "String",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            }
+          ],
+          "applicableConditions": null,
+          "capabilityStatus": "DISABLED",
+          "testResult": "实际设备代理调用通过，指令 TEST-d6641451a1ac43148d41cde81d",
+          "lastTestAt": "2026-11-03T22:13:10.539691",
+          "testRequest": null,
+          "testResponse": null,
+          "testDurationMs": null,
+          "capabilityDescription": "标准能力模板：超规行李上报"
+        },
+        {
+          "id": 26,
+          "capabilityCode": "CAP_BAGGAGE_MEASURE",
+          "capabilityName": "行李尺寸重量测量",
+          "capabilityType": "CAP_BAGGAGE_MEASURE",
+          "inputParams": [
+            {
+              "name": "measureMode",
+              "type": "String",
+              "required": true,
+              "defaultValue": "AUTO",
+              "range": "AUTO/MANUAL"
+            },
+            {
+              "name": "timeout",
+              "type": "Integer",
+              "required": true,
+              "defaultValue": "30",
+              "range": "10~60"
+            }
+          ],
+          "outputParams": [
+            {
+              "name": "length",
+              "type": "Double",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            },
+            {
+              "name": "width",
+              "type": "Double",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            },
+            {
+              "name": "height",
+              "type": "Double",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            },
+            {
+              "name": "weight",
+              "type": "Double",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            },
+            {
+              "name": "isOversize",
+              "type": "Boolean",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            },
+            {
+              "name": "measureStatus",
+              "type": "String",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            },
+            {
+              "name": "baggageInfo",
+              "type": "String",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            }
+          ],
+          "applicableConditions": null,
+          "capabilityStatus": "DISABLED",
+          "testResult": "实际设备代理调用通过，指令 TEST-31471ee7c23f4e4fbbed9ee88c",
+          "lastTestAt": "2026-11-03T22:13:10.614474",
+          "testRequest": null,
+          "testResponse": null,
+          "testDurationMs": null,
+          "capabilityDescription": "标准能力模板：行李尺寸重量测量"
+        }
+      ]
+    }
+  },
+  "cleanup": {
+    "at": "2026-11-05T16:19:12.979792+08:00",
+    "errors": [],
+    "ownedAgentRows": [
+      {
+        "id": 18,
+        "agent_code": "AGT-386E8C30",
+        "device_id": 19,
+        "agent_status": "DISABLED",
+        "online_status": "OFFLINE",
+        "work_status": "IDLE",
+        "current_task_id": null,
+        "current_step_seq": null,
+        "last_reported_at": "2026-11-05T16:19:12.049587",
+        "created_at": "2026-11-05T13:04:16.81064",
+        "updated_at": "2026-11-05T13:04:16.81064",
+        "business_status": {
+          "workloadScore": 0,
+          "capabilityMatch": 1
+        }
+      },
+      {
+        "id": 19,
+        "agent_code": "AGT-8519A3B6",
+        "device_id": 20,
+        "agent_status": "DISABLED",
+        "online_status": "OFFLINE",
+        "work_status": "IDLE",
+        "current_task_id": null,
+        "current_step_seq": null,
+        "last_reported_at": "2026-11-05T16:14:41.70456",
+        "created_at": "2026-11-05T13:04:17.772513",
+        "updated_at": "2026-11-05T13:04:17.772513",
+        "business_status": {
+          "workloadScore": 0,
+          "capabilityMatch": 1
+        }
+      },
+      {
+        "id": 20,
+        "agent_code": "AGT-D20379F3",
+        "device_id": 21,
+        "agent_status": "DISABLED",
+        "online_status": "OFFLINE",
+        "work_status": "IDLE",
+        "current_task_id": null,
+        "current_step_seq": null,
+        "last_reported_at": "2026-11-05T16:14:41.815628",
+        "created_at": "2026-11-05T13:05:21.137216",
+        "updated_at": "2026-11-05T13:05:21.137216",
+        "business_status": {
+          "workloadScore": 0,
+          "capabilityMatch": 1
+        }
+      }
+    ],
+    "activeAssignments": "0"
+  },
+  "capabilityStatusesRestored": true,
+  "endedAt": "2026-11-05T16:19:18.802870+08:00",
+  "credentialRedaction": "Device token hash/ciphertext redacted before any commit; no authentication secrets retained"
+}
