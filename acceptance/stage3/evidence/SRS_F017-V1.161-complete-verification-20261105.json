@@ -1,0 +1,92 @@
+{
+  "finishedAt": "2026-11-05T15:07:45.390793+08:00",
+  "tag": "V1.161",
+  "productSha": "283a1b8925bdd0e5647913374d652c1556807f81",
+  "handoffSha": "08841fcb44f0913946b633e58ef15eb5a78acf1f",
+  "checkpointSha": "49a5ce4b70b9dd02650f11606ee53ee79382bb62",
+  "result": "READY_FOR_CLAUDE",
+  "businessRules": {
+    "P": 0,
+    "F": 0,
+    "NT": 10
+  },
+  "businessSteps": {
+    "P": 0,
+    "F": 0,
+    "NT": 6
+  },
+  "packagedJarStartupGate": {
+    "P": 0,
+    "F": 1,
+    "issue": "DEF-S3-104"
+  },
+  "repositoryTests": {
+    "reported": 370,
+    "passed": 368,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 2
+  },
+  "independentUniqueValidTests": {
+    "count": 37,
+    "passed": 36,
+    "productStartupErrors": 1,
+    "fixtureErrorsExcluded": 2,
+    "repeatedValidPassObservationsNotCountedAgain": 19
+  },
+  "fixtureCorrection": "Initial and expanded Spring test errored while Spring autowired fields of a mock; not valid constructor evidence. Prebuilt singleton mocks correct this boundary; only corrected isolated Spring result reproduces StepTimeoutMonitorTask No default constructor found. Production JAR independently exhibits same error.",
+  "historicalBusinessPassReuse": 0,
+  "productSourceDiff": "",
+  "mainActual": "75c3bf97ea8df90d462b99035de3a8e4dd2587d5\trefs/heads/main",
+  "noMainMergeOrPR": true,
+  "testsCompleteToAvailableLayer": true,
+  "remainingBusinessAssertions": "scope-and-blocking JSON: every rule/step depends on healthy actual JAR. All independent component branches/builds complete. No bypass/old backend used.",
+  "rawEvidenceSha256": {
+    "acceptance/stage3/evidence/SRS_F017-V1.161-backend-build-20261105.txt": "bae6375ffd11ad9238a545031794e2164386559f6038d08e889bf4779f61849c",
+    "acceptance/stage3/evidence/SRS_F017-V1.161-environment-and-cleanup-20261105.json": "2b804bff48ede4129f0156dbbf3bd6f3890fee30d962f4e44415a0c8c8cee141",
+    "acceptance/stage3/evidence/SRS_F017-V1.161-frontend-build-20261105.txt": "8ff3ea532c4db5129513ea66378a34dec685c5a7a029a0b2f3de2ccdb856af91",
+    "acceptance/stage3/evidence/SRS_F017-V1.161-independent-expanded-20261105.txt": "5fcc2ad15f62959ca1db0b25dae21f6f203e58bb90c49bab9c3f7880fcaa473b",
+    "acceptance/stage3/evidence/SRS_F017-V1.161-independent-initial-20261105.txt": "035c0be97f5fd02589a3ab07ca5fee498b3c958cc7982990e8d8bf7c96aaa22d",
+    "acceptance/stage3/evidence/SRS_F017-V1.161-jar-startup-20261105.txt": "a13a32f66ece9c29d9c264f24c04f697b2c4c84572069387c48da4e3bd9448f8",
+    "acceptance/stage3/evidence/SRS_F017-V1.161-ledger-before-20261105.json": "1e48b49904431ee2cc84dbec21705166ad76ee4e9ec4a7dc2b2295596082a88f",
+    "acceptance/stage3/evidence/SRS_F017-V1.161-scope-and-blocking-20261105.json": "5eb9c76b3252c41b0ac9e3845ee3e440aa37d42c1af644185cc92e0d37ac0de0",
+    "acceptance/stage3/evidence/SRS_F017-V1.161-spring-corrected-20261105.txt": "7f80e6ab7c0c52fb96fa89faae10563e53ae3fe8b8984d0883fb37cf03f40843",
+    "acceptance/stage3/evidence/SRS_F017-V1.161-startup-driver-20261105.txt": "fae6bb85d2bd2d5b876ab2f54b12e1d108870ea85bae7483d6e60fedb421e84b",
+    "acceptance/stage3/evidence/SRS_F017-V1.161-version-and-startup-20261105.json": "5741ead990aa3b957d9e2042492c1a28a2d593b308671c11cfc07a4103a78353"
+  },
+  "commands": [
+    {
+      "cwd": "backend",
+      "command": "mvn -o test package",
+      "result": "BUILD SUCCESS; 370 reports / 368 pass / 2 skipped"
+    },
+    {
+      "cwd": "frontend",
+      "command": "npm run build",
+      "result": "BUILD SUCCESS; 3269 modules"
+    },
+    {
+      "cwd": "repository",
+      "command": "python acceptance/stage3/fixtures/start-f017-v161-jar.py",
+      "result": "actual packaged JAR exits before health UP"
+    },
+    {
+      "cwd": "backend",
+      "command": "mvn -o test -Dtest=IndependentF017V161Test,IndependentF016TimeoutOwnershipV160Test,IndependentF016AcceptanceGapV160Test",
+      "fixtureSetup": "copy named Java fixtures into test source, remove after execution",
+      "result": "23 / 22 pass / 1 invalid fixture error"
+    },
+    {
+      "cwd": "repository",
+      "command": "mvn -o -f backend/pom.xml test -Dtest=IndependentF017V161Test",
+      "result": "34 / 33 pass / 1 invalid fixture error"
+    },
+    {
+      "cwd": "repository",
+      "command": "mvn -o -f backend/pom.xml test -Dtest=IndependentF017V161Test#productionComponentCanBeCreatedBySpring",
+      "result": "1 / real product constructor BeanCreation error"
+    }
+  ],
+  "temporaryTestSourcesRemoved": true,
+  "sensitiveFilesStaged": false
+}

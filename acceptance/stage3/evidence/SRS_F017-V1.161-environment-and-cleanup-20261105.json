@@ -1,0 +1,115 @@
+{
+  "at": "2026-11-05T15:02:46.853662+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "redisDb": 10,
+  "portsListening": {
+    "18129": false,
+    "18117": false,
+    "18132": false,
+    "18133": false,
+    "18134": false,
+    "15179": false
+  },
+  "readOnlySql": {
+    "schemaVersion": {
+      "query": "select version from tip_gpt_f006_v118_20261030.flyway_schema_history where success order by installed_rank desc limit 1",
+      "result": "29"
+    },
+    "activeCurrentAssignments": {
+      "query": "select count(*) from tip_gpt_f006_v118_20261030.task_step_assignments a join tip_gpt_f006_v118_20261030.tasks t on t.id=a.task_id and t.current_plan_version_id=a.plan_version_id where a.step_status in ('PENDING_ASSIGNMENT','EXECUTING') and t.status not in ('COMPLETED','FAILED','MANUAL_TERMINATED')",
+      "result": "7"
+    },
+    "latestTaskId": {
+      "query": "select max(id) from tip_gpt_f006_v118_20261030.tasks",
+      "result": "432"
+    },
+    "occupiedAgents": {
+      "query": "select count(*) from tip_gpt_f006_v118_20261030.device_agents where current_task_id is not null",
+      "result": "0"
+    }
+  },
+  "startedModelOrDevices": false,
+  "newBusinessTasks": 0,
+  "configurationMutations": 0,
+  "noFailureInjection": true,
+  "/actuator/health": {
+    "unavailable": "<urlopen error timed out>"
+  },
+  "/api/v1/auth/login": {
+    "unavailable": "<urlopen error timed out>"
+  },
+  "/api/v1/tasks": {
+    "unavailable": "<urlopen error timed out>"
+  },
+  "/api/v1/device-agents": {
+    "unavailable": "<urlopen error timed out>"
+  },
+  "jarClassMatchesCompiledSource": true,
+  "productSourceDiff": "",
+  "preExistingPendingRows": [
+    {
+      "id": 3,
+      "task_code": "G121_NO_CAND",
+      "status": "PENDING_MANUAL",
+      "created_at": "2026-10-30T21:01:56.61527",
+      "step_seq": 1,
+      "step_status": "EXECUTING",
+      "device_agent_id": 1
+    },
+    {
+      "id": 9,
+      "task_code": "G124_TIMEOUT",
+      "status": "PENDING_MANUAL",
+      "created_at": "2026-10-31T02:13:41.495784",
+      "step_seq": 1,
+      "step_status": "PENDING_ASSIGNMENT",
+      "device_agent_id": 1
+    },
+    {
+      "id": 15,
+      "task_code": "G125_RAW",
+      "status": "PENDING_MANUAL",
+      "created_at": "2026-10-31T02:48:24.199433",
+      "step_seq": 1,
+      "step_status": "PENDING_ASSIGNMENT",
+      "device_agent_id": 1
+    },
+    {
+      "id": 21,
+      "task_code": "G125_REJECT",
+      "status": "PENDING_MANUAL",
+      "created_at": "2026-10-31T02:49:58.816614",
+      "step_seq": 1,
+      "step_status": "PENDING_ASSIGNMENT",
+      "device_agent_id": null
+    },
+    {
+      "id": 25,
+      "task_code": "G125_LEGACY",
+      "status": "PENDING_MANUAL",
+      "created_at": "2026-10-31T02:52:21.708462",
+      "step_seq": 1,
+      "step_status": "PENDING_ASSIGNMENT",
+      "device_agent_id": 1
+    },
+    {
+      "id": 26,
+      "task_code": "G125_LEGACY2",
+      "status": "PENDING_MANUAL",
+      "created_at": "2026-10-31T02:52:49.901736",
+      "step_seq": 1,
+      "step_status": "PENDING_ASSIGNMENT",
+      "device_agent_id": 1
+    },
+    {
+      "id": 29,
+      "task_code": "G126_REJECT",
+      "status": "PENDING_MANUAL",
+      "created_at": "2026-11-01T21:28:37.786888",
+      "step_seq": 1,
+      "step_status": "PENDING_ASSIGNMENT",
+      "device_agent_id": null
+    }
+  ],
+  "cleanupNote": "7 legacy current pending rows predate this round (latest task432 from V1.160); no agents occupied, no F017 tasks/allocations created. Preserve old tasks and evidence; do not blanket-update historical rows."
+}
