@@ -1,0 +1,2077 @@
+{
+  "tag": "V1.165",
+  "productSha": "fca58c91254c49c4ae6f66bd4a95c07997578982",
+  "handoffSha": "c4eda88b76a83127f6c1eec4e42b824cc57a577d",
+  "status": "GPT_TESTING, remaining independent branches continue",
+  "issue": "DEF-S3-109 candidate recovery falsely recorded as original instruction retry success; R08/R09 TC057S1/S2",
+  "expected": "Preserve first action 指令重试, record that those retries failed and candidate device actually succeeded; no false recovery reason.",
+  "actual": "A attempt0/1 FAILED then B attempt0 SUCCESS; EXCEPTION_RECOVERED detail and impact claim 指令重试/重试成功.",
+  "observations": [
+    {
+      "name": "recovered-failure",
+      "taskId": 542,
+      "request": {
+        "taskGoal": "F165_RECOVERED_FAILURE synthetic navigation to F2_TEST_GATE",
+        "taskFamily": "EXT_951DE4A0",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "response": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 542,
+            "taskCode": "TASK-20261105-0542",
+            "taskGoal": "F165_RECOVERED_FAILURE synthetic navigation to F2_TEST_GATE",
+            "taskFamily": "EXT_951DE4A0",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=true",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F165_RECOVERED_FAILURE synthetic navigation to F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "PLANNING",
+            "currentPlanVersionId": null,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": null,
+            "failureReason": null,
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-05T22:02:38.8594512",
+            "updatedAt": "2026-11-05T22:02:38.8594512",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-05T22:02:38.959800900+08:00"
+        }
+      },
+      "accepts": [
+        {
+          "request": {
+            "commandId": "CMD-20261105220238-D3420006",
+            "commandType": "TASK_ACCEPT",
+            "attemptNo": 0,
+            "taskId": "TASK-20261105-0542",
+            "stepSeq": 1,
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE",
+              "routePreference": "BARRIER_FREE",
+              "targetX": 0.0,
+              "targetY": 0.0
+            },
+            "issuedAt": 1793887358.9574947,
+            "deadline": 1793887418.9574947
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-05T22:02:39.279141200+08:00"
+            }
+          }
+        },
+        {
+          "request": {
+            "commandId": "CMD-20261105220239-D3420008",
+            "commandType": "TASK_ACCEPT",
+            "attemptNo": 0,
+            "taskId": "TASK-20261105-0542",
+            "stepSeq": 2,
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE",
+              "routePreference": "BARRIER_FREE",
+              "targetX": 0.0,
+              "targetY": 0.0
+            },
+            "issuedAt": 1793887359.554824,
+            "deadline": 1793887419.554824
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-05T22:02:40.979772900+08:00"
+            }
+          }
+        },
+        {
+          "request": {
+            "commandId": "CMD-20261105220242-D342000A",
+            "commandType": "TASK_ACCEPT",
+            "attemptNo": 0,
+            "taskId": "TASK-20261105-0542",
+            "stepSeq": 2,
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE",
+              "routePreference": "BARRIER_FREE",
+              "targetX": 0.0,
+              "targetY": 0.0
+            },
+            "issuedAt": 1793887362.6488943,
+            "deadline": 1793887422.6488943
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-05T22:02:44.053814300+08:00"
+            }
+          }
+        },
+        {
+          "request": {
+            "commandId": "CMD-20261105220245-D342000C",
+            "commandType": "TASK_ACCEPT",
+            "attemptNo": 0,
+            "taskId": "TASK-20261105-0542",
+            "stepSeq": 3,
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE",
+              "routePreference": "BARRIER_FREE",
+              "targetX": 0.0,
+              "targetY": 0.0
+            },
+            "issuedAt": 1793887365.6580102,
+            "deadline": 1793887425.6580102
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-05T22:02:45.780976200+08:00"
+            }
+          }
+        }
+      ],
+      "feedbacks": [
+        {
+          "agent": "AGT-386E8C30",
+          "request": {
+            "commandId": "CMD-20261105220239-D3420007",
+            "attemptNo": 0,
+            "executionResult": "SUCCESS",
+            "outputParams": {
+              "routeGenerated": true
+            }
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-05T22:02:39.557367100+08:00"
+            }
+          }
+        },
+        {
+          "agent": "AGT-386E8C30",
+          "request": {
+            "commandId": "CMD-20261105220240-D3420009",
+            "attemptNo": 0,
+            "executionResult": "FAILED",
+            "outputParams": {
+              "routeGenerated": true
+            },
+            "reasonCode": "ERR_SYNTHETIC_HARDWARE"
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-05T22:02:42.549471+08:00"
+            }
+          }
+        },
+        {
+          "agent": "AGT-386E8C30",
+          "request": {
+            "commandId": "CMD-20261105220240-D3420009",
+            "attemptNo": 1,
+            "executionResult": "FAILED",
+            "outputParams": {
+              "routeGenerated": true
+            },
+            "reasonCode": "ERR_SYNTHETIC_HARDWARE"
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-05T22:02:42.655682300+08:00"
+            }
+          }
+        },
+        {
+          "agent": "AGT-8519A3B6",
+          "request": {
+            "commandId": "CMD-20261105220244-D342000B",
+            "attemptNo": 0,
+            "executionResult": "SUCCESS",
+            "outputParams": {
+              "routeGenerated": true
+            }
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-05T22:02:45.664663+08:00"
+            }
+          }
+        },
+        {
+          "agent": "AGT-386E8C30",
+          "request": {
+            "commandId": "CMD-20261105220245-D342000D",
+            "attemptNo": 0,
+            "executionResult": "SUCCESS",
+            "outputParams": {
+              "routeGenerated": true
+            }
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-05T22:02:46.248810800+08:00"
+            }
+          }
+        }
+      ],
+      "checks": {
+        "recognized": true,
+        "futureFrozen": true,
+        "prefixPreserved": true,
+        "candidateChanged": true,
+        "notPrematureSuccess": true,
+        "sameVersion": true,
+        "completed": true,
+        "resolvedAfterActualSuccess": true,
+        "noFutureEarlyCommands": true,
+        "candidateFinalActionTruth": false
+      },
+      "result": "F",
+      "observed": {
+        "task": {
+          "id": 542,
+          "taskCode": "TASK-20261105-0542",
+          "taskGoal": "F165_RECOVERED_FAILURE synthetic navigation to F2_TEST_GATE",
+          "taskFamily": "EXT_951DE4A0",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F165_RECOVERED_FAILURE synthetic navigation to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "COMPLETED",
+          "currentPlanVersionId": 629,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": null,
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-05T22:02:38.859451",
+          "updatedAt": "2026-11-05T22:02:46.2396",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 629,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261105-0601",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "前往区域",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 180
+              },
+              {
+                "stepSeq": 2,
+                "stepGoal": "前往区域",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 180
+              },
+              {
+                "stepSeq": 3,
+                "stepGoal": "前往区域",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 180
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "LOW",
+            "riskReasonCode": null,
+            "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.84",
+            "frozenAt": "2026-11-05T22:02:38.916112",
+            "createdAt": "2026-11-05T22:02:38.906996"
+          }
+        ],
+        "events": [
+          {
+            "id": 7094,
+            "taskId": 542,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-05T22:02:38.859451",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F165_RECOVERED_FAILURE synthetic navigation to F2_TEST_GATE"
+          },
+          {
+            "id": 7095,
+            "taskId": 542,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-05T22:02:38.888137",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 7096,
+            "taskId": 542,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-05T22:02:38.895004",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261105-0601"
+          },
+          {
+            "id": 7097,
+            "taskId": 542,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-05T22:02:38.913958",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 7098,
+            "taskId": 542,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-05T22:02:38.916112",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 7099,
+            "taskId": 542,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-05T22:02:38.92263",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.84；推荐处置=AUTO_EXECUTE（自动执行）"
+          },
+          {
+            "id": 7100,
+            "taskId": 542,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-05T22:02:38.950423",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)；AGT-8519A3B6(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求"
+          },
+          {
+            "id": 7101,
+            "taskId": 542,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-05T22:02:39.252085",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-386E8C30接受步骤1承接请求"
+          },
+          {
+            "id": 7102,
+            "taskId": 542,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-05T22:02:39.258135",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261105220239-D3420007已下发至设备代理AGT-386E8C30，业务意图: 前往区域"
+          },
+          {
+            "id": 7103,
+            "taskId": 542,
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "occurredAt": "2026-11-05T22:02:39.531941",
+            "trigger": "SYSTEM",
+            "reasonCode": "DEVICE_SUCCESS",
+            "detailSummary": "指令CMD-20261105220239-D3420007收到设备代理AGT-386E8C30执行反馈: SUCCESS"
+          },
+          {
+            "id": 7104,
+            "taskId": 542,
+            "eventType": "STEP_COMPLETED",
+            "occurredAt": "2026-11-05T22:02:39.53721",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1完成条件已满足: routeGenerated=true"
+          },
+          {
+            "id": 7105,
+            "taskId": 542,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-05T22:02:39.546949",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤2候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)；AGT-8519A3B6(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求"
+          },
+          {
+            "id": 7106,
+            "taskId": 542,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-05T22:02:40.964616",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-386E8C30接受步骤2承接请求"
+          },
+          {
+            "id": 7107,
+            "taskId": 542,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-05T22:02:40.96917",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261105220240-D3420009已下发至设备代理AGT-386E8C30，业务意图: 前往区域"
+          },
+          {
+            "id": 7108,
+            "taskId": 542,
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "occurredAt": "2026-11-05T22:02:42.530169",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_SYNTHETIC_HARDWARE",
+            "detailSummary": "指令CMD-20261105220240-D3420009收到设备代理AGT-386E8C30执行反馈: FAILED"
+          },
+          {
+            "id": 7109,
+            "taskId": 542,
+            "eventType": "STEP_RETRY_DISPATCHED",
+            "occurredAt": "2026-11-05T22:02:42.535118",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_SYNTHETIC_HARDWARE",
+            "detailSummary": "步骤2自动重试1次，沿用执行指令编号CMD-20261105220240-D3420009，尝试序号1，原因: 执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE"
+          },
+          {
+            "id": 7110,
+            "taskId": 542,
+            "eventType": "EXCEPTION_DETECTED",
+            "occurredAt": "2026-11-05T22:02:42.537413",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_SYNTHETIC_HARDWARE",
+            "detailSummary": "识别到异常: STEP_FAILED，步骤2，详情: 执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE"
+          },
+          {
+            "id": 7111,
+            "taskId": 542,
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "occurredAt": "2026-11-05T22:02:42.61629",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_SYNTHETIC_HARDWARE",
+            "detailSummary": "指令CMD-20261105220240-D3420009收到设备代理AGT-386E8C30执行反馈: FAILED"
+          },
+          {
+            "id": 7112,
+            "taskId": 542,
+            "eventType": "STEP_FAILED",
+            "occurredAt": "2026-11-05T22:02:42.62072",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_SYNTHETIC_HARDWARE",
+            "detailSummary": "步骤2重试后仍失败: 执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE"
+          },
+          {
+            "id": 7113,
+            "taskId": 542,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-05T22:02:42.641832",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤2候选排序（能力匹配->距离->负载）: AGT-8519A3B6(匹配度1.0,距离0.0,负载0)，向候选AGT-8519A3B6发起承接请求"
+          },
+          {
+            "id": 7114,
+            "taskId": 542,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-05T22:02:44.038824",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-8519A3B6接受步骤2承接请求"
+          },
+          {
+            "id": 7115,
+            "taskId": 542,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-05T22:02:44.043895",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261105220244-D342000B已下发至设备代理AGT-8519A3B6，业务意图: 前往区域"
+          },
+          {
+            "id": 7116,
+            "taskId": 542,
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "occurredAt": "2026-11-05T22:02:45.631489",
+            "trigger": "SYSTEM",
+            "reasonCode": "DEVICE_SUCCESS",
+            "detailSummary": "指令CMD-20261105220244-D342000B收到设备代理AGT-8519A3B6执行反馈: SUCCESS"
+          },
+          {
+            "id": 7117,
+            "taskId": 542,
+            "eventType": "STEP_COMPLETED",
+            "occurredAt": "2026-11-05T22:02:45.636179",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤2完成条件已满足: routeGenerated=true"
+          },
+          {
+            "id": 7118,
+            "taskId": 542,
+            "eventType": "EXCEPTION_RECOVERED",
+            "occurredAt": "2026-11-05T22:02:45.641288",
+            "trigger": "SYSTEM",
+            "reasonCode": "STEP_FAILED",
+            "detailSummary": "恢复动作: 指令重试，结果: 成功，步骤2重试成功，异常类型: STEP_FAILED，影响结论: 计划可继续执行，不触发重新规划"
+          },
+          {
+            "id": 7119,
+            "taskId": 542,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-05T22:02:45.650482",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤3候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)；AGT-8519A3B6(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求"
+          },
+          {
+            "id": 7120,
+            "taskId": 542,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-05T22:02:45.741838",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-386E8C30接受步骤3承接请求"
+          },
+          {
+            "id": 7121,
+            "taskId": 542,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-05T22:02:45.747828",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261105220245-D342000D已下发至设备代理AGT-386E8C30，业务意图: 前往区域"
+          },
+          {
+            "id": 7122,
+            "taskId": 542,
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "occurredAt": "2026-11-05T22:02:46.229413",
+            "trigger": "SYSTEM",
+            "reasonCode": "DEVICE_SUCCESS",
+            "detailSummary": "指令CMD-20261105220245-D342000D收到设备代理AGT-386E8C30执行反馈: SUCCESS"
+          },
+          {
+            "id": 7123,
+            "taskId": 542,
+            "eventType": "STEP_COMPLETED",
+            "occurredAt": "2026-11-05T22:02:46.234519",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤3完成条件已满足: routeGenerated=true"
+          },
+          {
+            "id": 7124,
+            "taskId": 542,
+            "eventType": "TASK_COMPLETED",
+            "occurredAt": "2026-11-05T22:02:46.242119",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "全部步骤完成条件均已满足，任务完成"
+          }
+        ],
+        "assignments": [
+          {
+            "id": 566,
+            "stepSeq": 1,
+            "deviceAgentCode": "AGT-386E8C30",
+            "commandId": "CMD-20261105220238-D3420006",
+            "stepStatus": "COMPLETED",
+            "retryCount": 0,
+            "executionResult": "SUCCESS",
+            "reasonCode": "DEVICE_SUCCESS",
+            "outputParams": {
+              "routeGenerated": true
+            },
+            "dispatchedAt": "2026-11-05T22:02:39.256879",
+            "feedbackAt": "2026-11-05T22:02:39.531941",
+            "rejectedAgentIds": [],
+            "acceptanceRequestedAt": "2026-11-05T22:02:38.950423",
+            "acceptedAt": "2026-11-05T22:02:39.249436",
+            "acceptanceDurationMs": 299,
+            "acceptanceResponseTime": "299ms"
+          },
+          {
+            "id": 567,
+            "stepSeq": 2,
+            "deviceAgentCode": "AGT-8519A3B6",
+            "commandId": "CMD-20261105220242-D342000A",
+            "stepStatus": "COMPLETED",
+            "retryCount": 0,
+            "executionResult": "SUCCESS",
+            "reasonCode": "DEVICE_SUCCESS",
+            "outputParams": {
+              "routeGenerated": true
+            },
+            "dispatchedAt": "2026-11-05T22:02:44.041332",
+            "feedbackAt": "2026-11-05T22:02:45.631489",
+            "rejectedAgentIds": [
+              "AGT-386E8C30"
+            ],
+            "acceptanceRequestedAt": "2026-11-05T22:02:42.641832",
+            "acceptedAt": "2026-11-05T22:02:44.036278",
+            "acceptanceDurationMs": 1394,
+            "acceptanceResponseTime": "1394ms"
+          },
+          {
+            "id": 568,
+            "stepSeq": 3,
+            "deviceAgentCode": "AGT-386E8C30",
+            "commandId": "CMD-20261105220245-D342000C",
+            "stepStatus": "COMPLETED",
+            "retryCount": 0,
+            "executionResult": "SUCCESS",
+            "reasonCode": "DEVICE_SUCCESS",
+            "outputParams": {
+              "routeGenerated": true
+            },
+            "dispatchedAt": "2026-11-05T22:02:45.745867",
+            "feedbackAt": "2026-11-05T22:02:46.229413",
+            "rejectedAgentIds": [],
+            "acceptanceRequestedAt": "2026-11-05T22:02:45.650482",
+            "acceptedAt": "2026-11-05T22:02:45.738398",
+            "acceptanceDurationMs": 87,
+            "acceptanceResponseTime": "87ms"
+          }
+        ],
+        "exceptions": [
+          {
+            "id": 229,
+            "task_id": 542,
+            "step_seq": 2,
+            "exception_type": "STEP_FAILED",
+            "occurred_at": "2026-11-05T22:02:42.537413",
+            "recovery_action": "指令重试",
+            "recovery_result": "SUCCESS",
+            "impact_conclusion": "自动重试成功，计划可继续执行，不触发重新规划",
+            "reason_code": "ERR_SYNTHETIC_HARDWARE",
+            "exception_status": "RESOLVED",
+            "resolved_at": "2026-11-05T22:02:45.638747",
+            "resolved_by": "SYSTEM"
+          }
+        ],
+        "commandRows": [
+          {
+            "id": 1370,
+            "command_id": "CMD-20261105220238-D3420006",
+            "agent_code": "AGT-386E8C30",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 542,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105220238-D3420006\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0542\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-05T22:02:38.9574948+08:00\",\"deadline\":\"2026-11-05T22:03:38.9574948+08:00\"}",
+            "command_status": "ACCEPTED",
+            "response_payload": "{\"commandId\":\"CMD-20261105220238-D3420006\",\"accepted\":true,\"rejectReason\":null}",
+            "created_at": "2026-11-05T22:02:38.957495",
+            "updated_at": "2026-11-05T22:02:39.247949"
+          },
+          {
+            "id": 1371,
+            "command_id": "CMD-20261105220239-D3420007",
+            "agent_code": "AGT-386E8C30",
+            "command_type": "EXECUTE_CAPABILITY",
+            "attempt_no": 0,
+            "task_id": 542,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105220239-D3420007\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0542\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-05T22:02:39.2765571+08:00\",\"deadline\":\"2026-11-05T22:03:39.2765571+08:00\"}",
+            "command_status": "SUCCEEDED",
+            "response_payload": "{\"commandId\":\"CMD-20261105220239-D3420007\",\"attemptNo\":0,\"executionResult\":\"SUCCESS\",\"reasonCode\":\"DEVICE_SUCCESS\",\"outputParams\":{\"routeGenerated\":true}}",
+            "created_at": "2026-11-05T22:02:39.276557",
+            "updated_at": "2026-11-05T22:02:39.529829"
+          },
+          {
+            "id": 1372,
+            "command_id": "CMD-20261105220239-D3420008",
+            "agent_code": "AGT-386E8C30",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 542,
+            "step_seq": 2,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105220239-D3420008\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0542\",\"stepSeq\":2,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-05T22:02:39.5548241+08:00\",\"deadline\":\"2026-11-05T22:03:39.5548241+08:00\"}",
+            "command_status": "ACCEPTED",
+            "response_payload": "{\"commandId\":\"CMD-20261105220239-D3420008\",\"accepted\":true,\"rejectReason\":null}",
+            "created_at": "2026-11-05T22:02:39.554824",
+            "updated_at": "2026-11-05T22:02:40.960362"
+          },
+          {
+            "id": 1373,
+            "command_id": "CMD-20261105220240-D3420009",
+            "agent_code": "AGT-386E8C30",
+            "command_type": "EXECUTE_CAPABILITY",
+            "attempt_no": 0,
+            "task_id": 542,
+            "step_seq": 2,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105220240-D3420009\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0542\",\"stepSeq\":2,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-05T22:02:40.9756942+08:00\",\"deadline\":\"2026-11-05T22:03:40.9756942+08:00\"}",
+            "command_status": "FAILED",
+            "response_payload": "{\"commandId\":\"CMD-20261105220240-D3420009\",\"attemptNo\":0,\"executionResult\":\"FAILED\",\"reasonCode\":\"ERR_SYNTHETIC_HARDWARE\",\"outputParams\":{\"routeGenerated\":true}}",
+            "created_at": "2026-11-05T22:02:40.975694",
+            "updated_at": "2026-11-05T22:02:42.52883"
+          },
+          {
+            "id": 1374,
+            "command_id": "CMD-20261105220240-D3420009",
+            "agent_code": "AGT-386E8C30",
+            "command_type": "EXECUTE_CAPABILITY",
+            "attempt_no": 1,
+            "task_id": 542,
+            "step_seq": 2,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105220240-D3420009\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":1,\"taskId\":\"TASK-20261105-0542\",\"stepSeq\":2,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-05T22:02:42.5449977+08:00\",\"deadline\":\"2026-11-05T22:03:42.5449977+08:00\"}",
+            "command_status": "FAILED",
+            "response_payload": "{\"commandId\":\"CMD-20261105220240-D3420009\",\"attemptNo\":1,\"executionResult\":\"FAILED\",\"reasonCode\":\"ERR_SYNTHETIC_HARDWARE\",\"outputParams\":{\"routeGenerated\":true}}",
+            "created_at": "2026-11-05T22:02:42.544998",
+            "updated_at": "2026-11-05T22:02:42.61294"
+          },
+          {
+            "id": 1375,
+            "command_id": "CMD-20261105220242-D342000A",
+            "agent_code": "AGT-8519A3B6",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 542,
+            "step_seq": 2,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105220242-D342000A\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0542\",\"stepSeq\":2,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-05T22:02:42.6488943+08:00\",\"deadline\":\"2026-11-05T22:03:42.6488943+08:00\"}",
+            "command_status": "ACCEPTED",
+            "response_payload": "{\"commandId\":\"CMD-20261105220242-D342000A\",\"accepted\":true,\"rejectReason\":null}",
+            "created_at": "2026-11-05T22:02:42.648894",
+            "updated_at": "2026-11-05T22:02:44.033755"
+          },
+          {
+            "id": 1376,
+            "command_id": "CMD-20261105220244-D342000B",
+            "agent_code": "AGT-8519A3B6",
+            "command_type": "EXECUTE_CAPABILITY",
+            "attempt_no": 0,
+            "task_id": 542,
+            "step_seq": 2,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105220244-D342000B\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0542\",\"stepSeq\":2,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-05T22:02:44.0489713+08:00\",\"deadline\":\"2026-11-05T22:03:44.0489713+08:00\"}",
+            "command_status": "SUCCEEDED",
+            "response_payload": "{\"commandId\":\"CMD-20261105220244-D342000B\",\"attemptNo\":0,\"executionResult\":\"SUCCESS\",\"reasonCode\":\"DEVICE_SUCCESS\",\"outputParams\":{\"routeGenerated\":true}}",
+            "created_at": "2026-11-05T22:02:44.051252",
+            "updated_at": "2026-11-05T22:02:45.626808"
+          },
+          {
+            "id": 1377,
+            "command_id": "CMD-20261105220245-D342000C",
+            "agent_code": "AGT-386E8C30",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 542,
+            "step_seq": 3,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105220245-D342000C\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0542\",\"stepSeq\":3,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-05T22:02:45.6580102+08:00\",\"deadline\":\"2026-11-05T22:03:45.6580102+08:00\"}",
+            "command_status": "ACCEPTED",
+            "response_payload": "{\"commandId\":\"CMD-20261105220245-D342000C\",\"accepted\":true,\"rejectReason\":null}",
+            "created_at": "2026-11-05T22:02:45.65801",
+            "updated_at": "2026-11-05T22:02:45.736273"
+          },
+          {
+            "id": 1378,
+            "command_id": "CMD-20261105220245-D342000D",
+            "agent_code": "AGT-386E8C30",
+            "command_type": "EXECUTE_CAPABILITY",
+            "attempt_no": 0,
+            "task_id": 542,
+            "step_seq": 3,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105220245-D342000D\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0542\",\"stepSeq\":3,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-05T22:02:45.763521+08:00\",\"deadline\":\"2026-11-05T22:03:45.763521+08:00\"}",
+            "command_status": "SUCCEEDED",
+            "response_payload": "{\"commandId\":\"CMD-20261105220245-D342000D\",\"attemptNo\":0,\"executionResult\":\"SUCCESS\",\"reasonCode\":\"DEVICE_SUCCESS\",\"outputParams\":{\"routeGenerated\":true}}",
+            "created_at": "2026-11-05T22:02:45.764635",
+            "updated_at": "2026-11-05T22:02:46.225382"
+          }
+        ],
+        "transport": {
+          "G160_F016_A": [
+            {
+              "at": "2026-11-05T22:02:38.966973+08:00",
+              "message": {
+                "commandId": "CMD-20261105220238-D3420006",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0542",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "issuedAt": 1793887358.9574947,
+                "deadline": 1793887418.9574947
+              }
+            },
+            {
+              "at": "2026-11-05T22:02:39.285634+08:00",
+              "message": {
+                "commandId": "CMD-20261105220239-D3420007",
+                "commandType": "EXECUTE_CAPABILITY",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0542",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "issuedAt": 1793887359.2765572,
+                "deadline": 1793887419.2765572
+              }
+            },
+            {
+              "at": "2026-11-05T22:02:39.564360+08:00",
+              "message": {
+                "commandId": "CMD-20261105220239-D3420008",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0542",
+                "stepSeq": 2,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "issuedAt": 1793887359.554824,
+                "deadline": 1793887419.554824
+              }
+            },
+            {
+              "at": "2026-11-05T22:02:40.985706+08:00",
+              "message": {
+                "commandId": "CMD-20261105220240-D3420009",
+                "commandType": "EXECUTE_CAPABILITY",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0542",
+                "stepSeq": 2,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "issuedAt": 1793887360.9756942,
+                "deadline": 1793887420.9756942
+              }
+            },
+            {
+              "at": "2026-11-05T22:02:42.556241+08:00",
+              "message": {
+                "commandId": "CMD-20261105220240-D3420009",
+                "commandType": "EXECUTE_CAPABILITY",
+                "attemptNo": 1,
+                "taskId": "TASK-20261105-0542",
+                "stepSeq": 2,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "issuedAt": 1793887362.5449977,
+                "deadline": 1793887422.5449977
+              }
+            },
+            {
+              "at": "2026-11-05T22:02:45.678292+08:00",
+              "message": {
+                "commandId": "CMD-20261105220245-D342000C",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0542",
+                "stepSeq": 3,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "issuedAt": 1793887365.6580102,
+                "deadline": 1793887425.6580102
+              }
+            },
+            {
+              "at": "2026-11-05T22:02:45.787888+08:00",
+              "message": {
+                "commandId": "CMD-20261105220245-D342000D",
+                "commandType": "EXECUTE_CAPABILITY",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0542",
+                "stepSeq": 3,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "issuedAt": 1793887365.763521,
+                "deadline": 1793887425.763521
+              }
+            }
+          ],
+          "G160_F016_B": [
+            {
+              "at": "2026-11-05T22:02:42.663076+08:00",
+              "message": {
+                "commandId": "CMD-20261105220242-D342000A",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0542",
+                "stepSeq": 2,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "issuedAt": 1793887362.6488943,
+                "deadline": 1793887422.6488943
+              }
+            },
+            {
+              "at": "2026-11-05T22:02:44.059960+08:00",
+              "message": {
+                "commandId": "CMD-20261105220244-D342000B",
+                "commandType": "EXECUTE_CAPABILITY",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0542",
+                "stepSeq": 2,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "issuedAt": 1793887364.0489714,
+                "deadline": 1793887424.0489714
+              }
+            }
+          ],
+          "G160_F016_C": []
+        }
+      }
+    },
+    {
+      "name": "recovered-reported-timeout",
+      "taskId": 543,
+      "request": {
+        "taskGoal": "F165_RECOVERED_REPORTED_TIMEOUT synthetic navigation to F2_TEST_GATE",
+        "taskFamily": "EXT_951DE4A0",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "response": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 543,
+            "taskCode": "TASK-20261105-0543",
+            "taskGoal": "F165_RECOVERED_REPORTED_TIMEOUT synthetic navigation to F2_TEST_GATE",
+            "taskFamily": "EXT_951DE4A0",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=true",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F165_RECOVERED_REPORTED_TIMEOUT synthetic navigation to F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "PLANNING",
+            "currentPlanVersionId": null,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": null,
+            "failureReason": null,
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-05T22:02:48.5410016",
+            "updatedAt": "2026-11-05T22:02:48.5410016",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-05T22:02:48.624317300+08:00"
+        }
+      },
+      "accepts": [
+        {
+          "request": {
+            "commandId": "CMD-20261105220248-D342000E",
+            "commandType": "TASK_ACCEPT",
+            "attemptNo": 0,
+            "taskId": "TASK-20261105-0543",
+            "stepSeq": 1,
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE",
+              "routePreference": "BARRIER_FREE",
+              "targetX": 0.0,
+              "targetY": 0.0
+            },
+            "issuedAt": 1793887368.6220436,
+            "deadline": 1793887428.6220436
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-05T22:02:48.966264700+08:00"
+            }
+          }
+        },
+        {
+          "request": {
+            "commandId": "CMD-20261105220249-D3420010",
+            "commandType": "TASK_ACCEPT",
+            "attemptNo": 0,
+            "taskId": "TASK-20261105-0543",
+            "stepSeq": 2,
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE",
+              "routePreference": "BARRIER_FREE",
+              "targetX": 0.0,
+              "targetY": 0.0
+            },
+            "issuedAt": 1793887369.2789836,
+            "deadline": 1793887429.2789836
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-05T22:02:50.639433+08:00"
+            }
+          }
+        },
+        {
+          "request": {
+            "commandId": "CMD-20261105220252-D3420012",
+            "commandType": "TASK_ACCEPT",
+            "attemptNo": 0,
+            "taskId": "TASK-20261105-0543",
+            "stepSeq": 2,
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE",
+              "routePreference": "BARRIER_FREE",
+              "targetX": 0.0,
+              "targetY": 0.0
+            },
+            "issuedAt": 1793887372.217161,
+            "deadline": 1793887432.217161
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-05T22:02:53.598525300+08:00"
+            }
+          }
+        },
+        {
+          "request": {
+            "commandId": "CMD-20261105220255-D3420014",
+            "commandType": "TASK_ACCEPT",
+            "attemptNo": 0,
+            "taskId": "TASK-20261105-0543",
+            "stepSeq": 3,
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE",
+              "routePreference": "BARRIER_FREE",
+              "targetX": 0.0,
+              "targetY": 0.0
+            },
+            "issuedAt": 1793887375.2670019,
+            "deadline": 1793887435.2670019
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-05T22:02:55.379833+08:00"
+            }
+          }
+        }
+      ],
+      "feedbacks": [
+        {
+          "agent": "AGT-386E8C30",
+          "request": {
+            "commandId": "CMD-20261105220248-D342000F",
+            "attemptNo": 0,
+            "executionResult": "SUCCESS",
+            "outputParams": {
+              "routeGenerated": true
+            }
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-05T22:02:49.283532700+08:00"
+            }
+          }
+        },
+        {
+          "agent": "AGT-386E8C30",
+          "request": {
+            "commandId": "CMD-20261105220250-D3420011",
+            "attemptNo": 0,
+            "executionResult": "TIMEOUT",
+            "outputParams": {
+              "routeGenerated": true
+            },
+            "reasonCode": "ERR_EXECUTION_TIMEOUT"
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-05T22:02:52.149806+08:00"
+            }
+          }
+        },
+        {
+          "agent": "AGT-386E8C30",
+          "request": {
+            "commandId": "CMD-20261105220250-D3420011",
+            "attemptNo": 1,
+            "executionResult": "TIMEOUT",
+            "outputParams": {
+              "routeGenerated": true
+            },
+            "reasonCode": "ERR_EXECUTION_TIMEOUT"
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-05T22:02:52.221908600+08:00"
+            }
+          }
+        },
+        {
+          "agent": "AGT-8519A3B6",
+          "request": {
+            "commandId": "CMD-20261105220253-D3420013",
+            "attemptNo": 0,
+            "executionResult": "SUCCESS",
+            "outputParams": {
+              "routeGenerated": true
+            }
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-05T22:02:55.270958900+08:00"
+            }
+          }
+        },
+        {
+          "agent": "AGT-386E8C30",
+          "request": {
+            "commandId": "CMD-20261105220255-D3420015",
+            "attemptNo": 0,
+            "executionResult": "SUCCESS",
+            "outputParams": {
+              "routeGenerated": true
+            }
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-05T22:02:55.685890900+08:00"
+            }
+          }
+        }
+      ],
+      "checks": {
+        "recognized": true,
+        "futureFrozen": true,
+        "prefixPreserved": true,
+        "candidateChanged": true,
+        "notPrematureSuccess": true,
+        "sameVersion": true,
+        "completed": true,
+        "resolvedAfterActualSuccess": true,
+        "noFutureEarlyCommands": true,
+        "candidateFinalActionTruth": false
+      },
+      "result": "F",
+      "observed": {
+        "task": {
+          "id": 543,
+          "taskCode": "TASK-20261105-0543",
+          "taskGoal": "F165_RECOVERED_REPORTED_TIMEOUT synthetic navigation to F2_TEST_GATE",
+          "taskFamily": "EXT_951DE4A0",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F165_RECOVERED_REPORTED_TIMEOUT synthetic navigation to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "COMPLETED",
+          "currentPlanVersionId": 630,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": null,
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-05T22:02:48.541002",
+          "updatedAt": "2026-11-05T22:02:55.680813",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 630,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261105-0602",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "前往区域",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 180
+              },
+              {
+                "stepSeq": 2,
+                "stepGoal": "前往区域",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 180
+              },
+              {
+                "stepSeq": 3,
+                "stepGoal": "前往区域",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 180
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "LOW",
+            "riskReasonCode": null,
+            "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.84",
+            "frozenAt": "2026-11-05T22:02:48.597203",
+            "createdAt": "2026-11-05T22:02:48.592686"
+          }
+        ],
+        "events": [
+          {
+            "id": 7125,
+            "taskId": 543,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-05T22:02:48.543579",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F165_RECOVERED_REPORTED_TIMEOUT synthetic navigation to F2_TEST_GATE"
+          },
+          {
+            "id": 7126,
+            "taskId": 543,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-05T22:02:48.567671",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 7127,
+            "taskId": 543,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-05T22:02:48.576303",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261105-0602"
+          },
+          {
+            "id": 7128,
+            "taskId": 543,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-05T22:02:48.594993",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 7129,
+            "taskId": 543,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-05T22:02:48.597203",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 7130,
+            "taskId": 543,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-05T22:02:48.60274",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.84；推荐处置=AUTO_EXECUTE（自动执行）"
+          },
+          {
+            "id": 7131,
+            "taskId": 543,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-05T22:02:48.614602",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)；AGT-8519A3B6(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求"
+          },
+          {
+            "id": 7132,
+            "taskId": 543,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-05T22:02:48.949843",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-386E8C30接受步骤1承接请求"
+          },
+          {
+            "id": 7133,
+            "taskId": 543,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-05T22:02:48.954599",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261105220248-D342000F已下发至设备代理AGT-386E8C30，业务意图: 前往区域"
+          },
+          {
+            "id": 7134,
+            "taskId": 543,
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "occurredAt": "2026-11-05T22:02:49.245697",
+            "trigger": "SYSTEM",
+            "reasonCode": "DEVICE_SUCCESS",
+            "detailSummary": "指令CMD-20261105220248-D342000F收到设备代理AGT-386E8C30执行反馈: SUCCESS"
+          },
+          {
+            "id": 7135,
+            "taskId": 543,
+            "eventType": "STEP_COMPLETED",
+            "occurredAt": "2026-11-05T22:02:49.247944",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1完成条件已满足: routeGenerated=true"
+          },
+          {
+            "id": 7136,
+            "taskId": 543,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-05T22:02:49.25895",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤2候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)；AGT-8519A3B6(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求"
+          },
+          {
+            "id": 7137,
+            "taskId": 543,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-05T22:02:50.624277",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-386E8C30接受步骤2承接请求"
+          },
+          {
+            "id": 7138,
+            "taskId": 543,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-05T22:02:50.62695",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261105220250-D3420011已下发至设备代理AGT-386E8C30，业务意图: 前往区域"
+          },
+          {
+            "id": 7139,
+            "taskId": 543,
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "occurredAt": "2026-11-05T22:02:52.125794",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_EXECUTION_TIMEOUT",
+            "detailSummary": "指令CMD-20261105220250-D3420011收到设备代理AGT-386E8C30执行反馈: TIMEOUT"
+          },
+          {
+            "id": 7140,
+            "taskId": 543,
+            "eventType": "STEP_RETRY_DISPATCHED",
+            "occurredAt": "2026-11-05T22:02:52.133619",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_EXECUTION_TIMEOUT",
+            "detailSummary": "步骤2自动重试1次，沿用执行指令编号CMD-20261105220250-D3420011，尝试序号1，原因: 执行结果: TIMEOUT，原因: ERR_EXECUTION_TIMEOUT"
+          },
+          {
+            "id": 7141,
+            "taskId": 543,
+            "eventType": "EXCEPTION_DETECTED",
+            "occurredAt": "2026-11-05T22:02:52.14055",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_EXECUTION_TIMEOUT",
+            "detailSummary": "识别到异常: EXECUTION_TIMEOUT，步骤2，详情: 执行结果: TIMEOUT，原因: ERR_EXECUTION_TIMEOUT"
+          },
+          {
+            "id": 7142,
+            "taskId": 543,
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "occurredAt": "2026-11-05T22:02:52.190281",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_EXECUTION_TIMEOUT",
+            "detailSummary": "指令CMD-20261105220250-D3420011收到设备代理AGT-386E8C30执行反馈: TIMEOUT"
+          },
+          {
+            "id": 7143,
+            "taskId": 543,
+            "eventType": "STEP_TIMEOUT_DETECTED",
+            "occurredAt": "2026-11-05T22:02:52.195103",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_EXECUTION_TIMEOUT",
+            "detailSummary": "步骤2重试后仍失败: 执行结果: TIMEOUT，原因: ERR_EXECUTION_TIMEOUT"
+          },
+          {
+            "id": 7144,
+            "taskId": 543,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-05T22:02:52.209365",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤2候选排序（能力匹配->距离->负载）: AGT-8519A3B6(匹配度1.0,距离0.0,负载0)，向候选AGT-8519A3B6发起承接请求"
+          },
+          {
+            "id": 7145,
+            "taskId": 543,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-05T22:02:53.58181",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-8519A3B6接受步骤2承接请求"
+          },
+          {
+            "id": 7146,
+            "taskId": 543,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-05T22:02:53.588715",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261105220253-D3420013已下发至设备代理AGT-8519A3B6，业务意图: 前往区域"
+          },
+          {
+            "id": 7147,
+            "taskId": 543,
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "occurredAt": "2026-11-05T22:02:55.243409",
+            "trigger": "SYSTEM",
+            "reasonCode": "DEVICE_SUCCESS",
+            "detailSummary": "指令CMD-20261105220253-D3420013收到设备代理AGT-8519A3B6执行反馈: SUCCESS"
+          },
+          {
+            "id": 7148,
+            "taskId": 543,
+            "eventType": "STEP_COMPLETED",
+            "occurredAt": "2026-11-05T22:02:55.248725",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤2完成条件已满足: routeGenerated=true"
+          },
+          {
+            "id": 7149,
+            "taskId": 543,
+            "eventType": "EXCEPTION_RECOVERED",
+            "occurredAt": "2026-11-05T22:02:55.253271",
+            "trigger": "SYSTEM",
+            "reasonCode": "EXECUTION_TIMEOUT",
+            "detailSummary": "恢复动作: 指令重试，结果: 成功，步骤2重试成功，异常类型: EXECUTION_TIMEOUT，影响结论: 计划可继续执行，不触发重新规划"
+          },
+          {
+            "id": 7150,
+            "taskId": 543,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-05T22:02:55.259402",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤3候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)；AGT-8519A3B6(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求"
+          },
+          {
+            "id": 7151,
+            "taskId": 543,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-05T22:02:55.360573",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-386E8C30接受步骤3承接请求"
+          },
+          {
+            "id": 7152,
+            "taskId": 543,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-05T22:02:55.364858",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261105220255-D3420015已下发至设备代理AGT-386E8C30，业务意图: 前往区域"
+          },
+          {
+            "id": 7153,
+            "taskId": 543,
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "occurredAt": "2026-11-05T22:02:55.673141",
+            "trigger": "SYSTEM",
+            "reasonCode": "DEVICE_SUCCESS",
+            "detailSummary": "指令CMD-20261105220255-D3420015收到设备代理AGT-386E8C30执行反馈: SUCCESS"
+          },
+          {
+            "id": 7154,
+            "taskId": 543,
+            "eventType": "STEP_COMPLETED",
+            "occurredAt": "2026-11-05T22:02:55.678268",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤3完成条件已满足: routeGenerated=true"
+          },
+          {
+            "id": 7155,
+            "taskId": 543,
+            "eventType": "TASK_COMPLETED",
+            "occurredAt": "2026-11-05T22:02:55.68338",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "全部步骤完成条件均已满足，任务完成"
+          }
+        ],
+        "assignments": [
+          {
+            "id": 569,
+            "stepSeq": 1,
+            "deviceAgentCode": "AGT-386E8C30",
+            "commandId": "CMD-20261105220248-D342000E",
+            "stepStatus": "COMPLETED",
+            "retryCount": 0,
+            "executionResult": "SUCCESS",
+            "reasonCode": "DEVICE_SUCCESS",
+            "outputParams": {
+              "routeGenerated": true
+            },
+            "dispatchedAt": "2026-11-05T22:02:48.954599",
+            "feedbackAt": "2026-11-05T22:02:49.245697",
+            "rejectedAgentIds": [],
+            "acceptanceRequestedAt": "2026-11-05T22:02:48.614602",
+            "acceptedAt": "2026-11-05T22:02:48.947774",
+            "acceptanceDurationMs": 333,
+            "acceptanceResponseTime": "333ms"
+          },
+          {
+            "id": 570,
+            "stepSeq": 2,
+            "deviceAgentCode": "AGT-8519A3B6",
+            "commandId": "CMD-20261105220252-D3420012",
+            "stepStatus": "COMPLETED",
+            "retryCount": 0,
+            "executionResult": "SUCCESS",
+            "reasonCode": "DEVICE_SUCCESS",
+            "outputParams": {
+              "routeGenerated": true
+            },
+            "dispatchedAt": "2026-11-05T22:02:53.586937",
+            "feedbackAt": "2026-11-05T22:02:55.243409",
+            "rejectedAgentIds": [
+              "AGT-386E8C30"
+            ],
+            "acceptanceRequestedAt": "2026-11-05T22:02:52.211986",
+            "acceptedAt": "2026-11-05T22:02:53.57927",
+            "acceptanceDurationMs": 1367,
+            "acceptanceResponseTime": "1367ms"
+          },
+          {
+            "id": 571,
+            "stepSeq": 3,
+            "deviceAgentCode": "AGT-386E8C30",
+            "commandId": "CMD-20261105220255-D3420014",
+            "stepStatus": "COMPLETED",
+            "retryCount": 0,
+            "executionResult": "SUCCESS",
+            "reasonCode": "DEVICE_SUCCESS",
+            "outputParams": {
+              "routeGenerated": true
+            },
+            "dispatchedAt": "2026-11-05T22:02:55.362692",
+            "feedbackAt": "2026-11-05T22:02:55.673141",
+            "rejectedAgentIds": [],
+            "acceptanceRequestedAt": "2026-11-05T22:02:55.260526",
+            "acceptedAt": "2026-11-05T22:02:55.358323",
+            "acceptanceDurationMs": 97,
+            "acceptanceResponseTime": "97ms"
+          }
+        ],
+        "exceptions": [
+          {
+            "id": 230,
+            "task_id": 543,
+            "step_seq": 2,
+            "exception_type": "EXECUTION_TIMEOUT",
+            "occurred_at": "2026-11-05T22:02:52.135892",
+            "recovery_action": "指令重试",
+            "recovery_result": "SUCCESS",
+            "impact_conclusion": "自动重试成功，计划可继续执行，不触发重新规划",
+            "reason_code": "ERR_EXECUTION_TIMEOUT",
+            "exception_status": "RESOLVED",
+            "resolved_at": "2026-11-05T22:02:55.251013",
+            "resolved_by": "SYSTEM"
+          }
+        ],
+        "commandRows": [
+          {
+            "id": 1379,
+            "command_id": "CMD-20261105220248-D342000E",
+            "agent_code": "AGT-386E8C30",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 543,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105220248-D342000E\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0543\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-05T22:02:48.6220437+08:00\",\"deadline\":\"2026-11-05T22:03:48.6220437+08:00\"}",
+            "command_status": "ACCEPTED",
+            "response_payload": "{\"commandId\":\"CMD-20261105220248-D342000E\",\"accepted\":true,\"rejectReason\":null}",
+            "created_at": "2026-11-05T22:02:48.622044",
+            "updated_at": "2026-11-05T22:02:48.944934"
+          },
+          {
+            "id": 1380,
+            "command_id": "CMD-20261105220248-D342000F",
+            "agent_code": "AGT-386E8C30",
+            "command_type": "EXECUTE_CAPABILITY",
+            "attempt_no": 0,
+            "task_id": 543,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105220248-D342000F\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0543\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-05T22:02:48.9617005+08:00\",\"deadline\":\"2026-11-05T22:03:48.9617005+08:00\"}",
+            "command_status": "SUCCEEDED",
+            "response_payload": "{\"commandId\":\"CMD-20261105220248-D342000F\",\"attemptNo\":0,\"executionResult\":\"SUCCESS\",\"reasonCode\":\"DEVICE_SUCCESS\",\"outputParams\":{\"routeGenerated\":true}}",
+            "created_at": "2026-11-05T22:02:48.961701",
+            "updated_at": "2026-11-05T22:02:49.243324"
+          },
+          {
+            "id": 1381,
+            "command_id": "CMD-20261105220249-D3420010",
+            "agent_code": "AGT-386E8C30",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 543,
+            "step_seq": 2,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105220249-D3420010\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0543\",\"stepSeq\":2,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-05T22:02:49.2789837+08:00\",\"deadline\":\"2026-11-05T22:03:49.2789837+08:00\"}",
+            "command_status": "ACCEPTED",
+            "response_payload": "{\"commandId\":\"CMD-20261105220249-D3420010\",\"accepted\":true,\"rejectReason\":null}",
+            "created_at": "2026-11-05T22:02:49.278984",
+            "updated_at": "2026-11-05T22:02:50.62034"
+          },
+          {
+            "id": 1382,
+            "command_id": "CMD-20261105220250-D3420011",
+            "agent_code": "AGT-386E8C30",
+            "command_type": "EXECUTE_CAPABILITY",
+            "attempt_no": 0,
+            "task_id": 543,
+            "step_seq": 2,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105220250-D3420011\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0543\",\"stepSeq\":2,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-05T22:02:50.6343616+08:00\",\"deadline\":\"2026-11-05T22:03:50.6343616+08:00\"}",
+            "command_status": "TIMED_OUT",
+            "response_payload": "{\"commandId\":\"CMD-20261105220250-D3420011\",\"attemptNo\":0,\"executionResult\":\"TIMEOUT\",\"reasonCode\":\"ERR_EXECUTION_TIMEOUT\",\"outputParams\":{\"routeGenerated\":true}}",
+            "created_at": "2026-11-05T22:02:50.634362",
+            "updated_at": "2026-11-05T22:02:52.122512"
+          },
+          {
+            "id": 1383,
+            "command_id": "CMD-20261105220250-D3420011",
+            "agent_code": "AGT-386E8C30",
+            "command_type": "EXECUTE_CAPABILITY",
+            "attempt_no": 1,
+            "task_id": 543,
+            "step_seq": 2,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105220250-D3420011\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":1,\"taskId\":\"TASK-20261105-0543\",\"stepSeq\":2,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-05T22:02:52.1449806+08:00\",\"deadline\":\"2026-11-05T22:03:52.1449806+08:00\"}",
+            "command_status": "TIMED_OUT",
+            "response_payload": "{\"commandId\":\"CMD-20261105220250-D3420011\",\"attemptNo\":1,\"executionResult\":\"TIMEOUT\",\"reasonCode\":\"ERR_EXECUTION_TIMEOUT\",\"outputParams\":{\"routeGenerated\":true}}",
+            "created_at": "2026-11-05T22:02:52.144981",
+            "updated_at": "2026-11-05T22:02:52.18795"
+          },
+          {
+            "id": 1384,
+            "command_id": "CMD-20261105220252-D3420012",
+            "agent_code": "AGT-8519A3B6",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 543,
+            "step_seq": 2,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105220252-D3420012\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0543\",\"stepSeq\":2,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-05T22:02:52.2171609+08:00\",\"deadline\":\"2026-11-05T22:03:52.2171609+08:00\"}",
+            "command_status": "ACCEPTED",
+            "response_payload": "{\"commandId\":\"CMD-20261105220252-D3420012\",\"accepted\":true,\"rejectReason\":null}",
+            "created_at": "2026-11-05T22:02:52.217161",
+            "updated_at": "2026-11-05T22:02:53.578027"
+          },
+          {
+            "id": 1385,
+            "command_id": "CMD-20261105220253-D3420013",
+            "agent_code": "AGT-8519A3B6",
+            "command_type": "EXECUTE_CAPABILITY",
+            "attempt_no": 0,
+            "task_id": 543,
+            "step_seq": 2,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105220253-D3420013\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0543\",\"stepSeq\":2,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-05T22:02:53.5958852+08:00\",\"deadline\":\"2026-11-05T22:03:53.5958852+08:00\"}",
+            "command_status": "SUCCEEDED",
+            "response_payload": "{\"commandId\":\"CMD-20261105220253-D3420013\",\"attemptNo\":0,\"executionResult\":\"SUCCESS\",\"reasonCode\":\"DEVICE_SUCCESS\",\"outputParams\":{\"routeGenerated\":true}}",
+            "created_at": "2026-11-05T22:02:53.595885",
+            "updated_at": "2026-11-05T22:02:55.243737"
+          },
+          {
+            "id": 1386,
+            "command_id": "CMD-20261105220255-D3420014",
+            "agent_code": "AGT-386E8C30",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 543,
+            "step_seq": 3,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105220255-D3420014\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0543\",\"stepSeq\":3,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-05T22:02:55.2670019+08:00\",\"deadline\":\"2026-11-05T22:03:55.2670019+08:00\"}",
+            "command_status": "ACCEPTED",
+            "response_payload": "{\"commandId\":\"CMD-20261105220255-D3420014\",\"accepted\":true,\"rejectReason\":null}",
+            "created_at": "2026-11-05T22:02:55.268201",
+            "updated_at": "2026-11-05T22:02:55.35675"
+          },
+          {
+            "id": 1387,
+            "command_id": "CMD-20261105220255-D3420015",
+            "agent_code": "AGT-386E8C30",
+            "command_type": "EXECUTE_CAPABILITY",
+            "attempt_no": 0,
+            "task_id": 543,
+            "step_seq": 3,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105220255-D3420015\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0543\",\"stepSeq\":3,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-05T22:02:55.3722929+08:00\",\"deadline\":\"2026-11-05T22:03:55.3722929+08:00\"}",
+            "command_status": "SUCCEEDED",
+            "response_payload": "{\"commandId\":\"CMD-20261105220255-D3420015\",\"attemptNo\":0,\"executionResult\":\"SUCCESS\",\"reasonCode\":\"DEVICE_SUCCESS\",\"outputParams\":{\"routeGenerated\":true}}",
+            "created_at": "2026-11-05T22:02:55.372293",
+            "updated_at": "2026-11-05T22:02:55.671467"
+          }
+        ],
+        "transport": {
+          "G160_F016_A": [
+            {
+              "at": "2026-11-05T22:02:48.629903+08:00",
+              "message": {
+                "commandId": "CMD-20261105220248-D342000E",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0543",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "issuedAt": 1793887368.6220436,
+                "deadline": 1793887428.6220436
+              }
+            },
+            {
+              "at": "2026-11-05T22:02:48.971159+08:00",
+              "message": {
+                "commandId": "CMD-20261105220248-D342000F",
+                "commandType": "EXECUTE_CAPABILITY",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0543",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "issuedAt": 1793887368.9617004,
+                "deadline": 1793887428.9617004
+              }
+            },
+            {
+              "at": "2026-11-05T22:02:49.292764+08:00",
+              "message": {
+                "commandId": "CMD-20261105220249-D3420010",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0543",
+                "stepSeq": 2,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "issuedAt": 1793887369.2789836,
+                "deadline": 1793887429.2789836
+              }
+            },
+            {
+              "at": "2026-11-05T22:02:50.642917+08:00",
+              "message": {
+                "commandId": "CMD-20261105220250-D3420011",
+                "commandType": "EXECUTE_CAPABILITY",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0543",
+                "stepSeq": 2,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "issuedAt": 1793887370.6343615,
+                "deadline": 1793887430.6343615
+              }
+            },
+            {
+              "at": "2026-11-05T22:02:52.161075+08:00",
+              "message": {
+                "commandId": "CMD-20261105220250-D3420011",
+                "commandType": "EXECUTE_CAPABILITY",
+                "attemptNo": 1,
+                "taskId": "TASK-20261105-0543",
+                "stepSeq": 2,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "issuedAt": 1793887372.1449807,
+                "deadline": 1793887432.1449807
+              }
+            },
+            {
+              "at": "2026-11-05T22:02:55.278612+08:00",
+              "message": {
+                "commandId": "CMD-20261105220255-D3420014",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0543",
+                "stepSeq": 3,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "issuedAt": 1793887375.2670019,
+                "deadline": 1793887435.2670019
+              }
+            },
+            {
+              "at": "2026-11-05T22:02:55.385215+08:00",
+              "message": {
+                "commandId": "CMD-20261105220255-D3420015",
+                "commandType": "EXECUTE_CAPABILITY",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0543",
+                "stepSeq": 3,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "issuedAt": 1793887375.372293,
+                "deadline": 1793887435.372293
+              }
+            }
+          ],
+          "G160_F016_B": [
+            {
+              "at": "2026-11-05T22:02:52.229819+08:00",
+              "message": {
+                "commandId": "CMD-20261105220252-D3420012",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0543",
+                "stepSeq": 2,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "issuedAt": 1793887372.217161,
+                "deadline": 1793887432.217161
+              }
+            },
+            {
+              "at": "2026-11-05T22:02:53.603818+08:00",
+              "message": {
+                "commandId": "CMD-20261105220253-D3420013",
+                "commandType": "EXECUTE_CAPABILITY",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0543",
+                "stepSeq": 2,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "issuedAt": 1793887373.5958853,
+                "deadline": 1793887433.5958853
+              }
+            }
+          ],
+          "G160_F016_C": []
+        }
+      }
+    }
+  ]
+}
