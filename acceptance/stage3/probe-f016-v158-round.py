@@ -52,7 +52,7 @@ def simultaneous():
    one['acceptResponse']=f1.result(timeout=15);two['acceptResponse']=f2.result(timeout=15)
   time.sleep(.3);one['overlap']=q.observe(one['taskId']);two['overlap']=q.observe(two['taskId'])
   count=sum(any(c['command_type']=='EXECUTE_CAPABILITY' for c in r['overlap']['commandRows']) for r in [one,two]);one['executionTaskCount']=count
-  for row in [one,two]:q.record(row,{'atMostOneExecution':count<=1,'barrierEstablished':blocked>=2})
+  for row in [one,two]:q.record(row,{'exactlyOneExecution':count==1,'barrierEstablished':blocked>=2})
  finally:
   if proc.poll() is None:proc.stdin.write('ROLLBACK;\n\\q\n');proc.stdin.flush();proc.wait(timeout=10)
   for dev in q.devices:dev.paused=False

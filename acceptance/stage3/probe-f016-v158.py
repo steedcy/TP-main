@@ -143,7 +143,7 @@ class Probe:
   row['secondResponse']=self.response(d2,msg2,not all_reject)
   if not all_reject:self.complete(row,d2)
   time.sleep(.1);row['after']=self.observe(row['taskId'])
-  o=row['after'];events=o['events'];self.record(row,{'orderedSwitch':row['first']==self.devices[0].agent and row['second']==self.devices[1].agent,'reasonPreserved':any('SYNTHETIC_CAPACITY_REJECTED' in json.dumps(e) for e in events),'rightTerminal':o['task']['status'] in (['PENDING_MANUAL'] if all_reject else ['COMPLETED']),'rightException':not all_reject or any(e['exception_type']=='ASSIGNMENT_FAILED' and e['recovery_action']=='全部候选设备均拒绝，恢复动作未执行' for e in o['exceptions']),'acceptsExactlyTwo':sum(c['command_type']=='TASK_ACCEPT' for c in o['commandRows'])==2,'noBusinessWhenAllRejected':not all_reject or not any(c['command_type']=='EXECUTE_CAPABILITY' for c in o['commandRows'])})
+  o=row['after'];events=o['events'];cutoff=next((e['occurredAt'] for e in events if e['eventType']=='REPLANNING_TRIGGERED'),None);initialOffers=[c for c in o['commandRows'] if c['command_type']=='TASK_ACCEPT' and (cutoff is None or c['created_at']<cutoff)];self.record(row,{'orderedSwitch':row['first']==self.devices[0].agent and row['second']==self.devices[1].agent,'reasonPreserved':any('SYNTHETIC_CAPACITY_REJECTED' in json.dumps(e) for e in events),'rightTerminal':(o['task']['status']=='PENDING_MANUAL' or (o['task']['status']=='PENDING_ASSIGNMENT' and o['task']['replanUsed'] and sum(e['eventType']=='REPLANNING_TRIGGERED' for e in events)==1)) if all_reject else o['task']['status']=='COMPLETED','rightException':not all_reject or any(e['exception_type']=='ASSIGNMENT_FAILED' and e['recovery_action']=='全部候选设备均拒绝，恢复动作未执行' for e in o['exceptions']),'acceptsExactlyTwo':len(initialOffers)==2,'noBusinessWhenAllRejected':not all_reject or not any(c['command_type']=='EXECUTE_CAPABILITY' for c in o['commandRows'])})
  def eligibility(self,name,kind):
   self.reset();a,b,c=self.devices;a.configure(match=.9);b.configure(match=.8);c.configure(match=2)
   if kind=='offline':c.configure(match=2,online='OFFLINE')
@@ -158,8 +158,8 @@ class Probe:
   # Both independently pending offers are now acknowledged; transport does not enforce server ownership.
   one['acceptResponse']=self.response(d,msg);two['acceptResponse']=self.response(d2,msg2);time.sleep(.2)
   one['overlap']=self.observe(one['taskId']);two['overlap']=self.observe(two['taskId'])
-  both=all(any(c['command_type']=='EXECUTE_CAPABILITY' for c in r['overlap']['commandRows']) for r in [one,two])
-  for r in [one,two]:self.record(r,{'atMostOneTaskExecutes':not both})
+  executionCount=sum(any(c['command_type']=='EXECUTE_CAPABILITY' for c in r['overlap']['commandRows']) for r in [one,two])
+  for r in [one,two]:self.record(r,{'exactlyOneTaskExecutes':executionCount==1})
   self.terminate(one);self.terminate(two)
  def busy_control(self):
   self.reset();self.devices[1].configure(online='OFFLINE');one=self.submit('busy-holder');d,msg=self.wait_message(one);self.response(d,msg);one['during']=self.observe(one['taskId']);two=self.submit('busy-excluded');time.sleep(.1);two['after']=self.observe(two['taskId']);self.record(two,{'busyNotOffered':not two['after']['commandRows'],'notExecuting':two['after']['task']['status']=='PENDING_MANUAL'});self.complete(one,d);one['after']=self.observe(one['taskId']);self.record(one,{'completed':one['after']['task']['status']=='COMPLETED'})
@@ -207,4 +207,4 @@ class Probe:
    self.run('busy-control',self.busy_control);self.run('concurrent',self.concurrent);self.run('no-candidate',self.no_candidate)
    self.run('freeze',self.freeze);self.run('terminate-online',self.terminate_case);self.run('terminate-offline',lambda:self.terminate_case(True))
   finally:self.cleanup();self.ev['endedAt']=now();self.save()
-if __name__=='__main__':Probe().main()
+if __name__=='__main__':raise SystemExit('Use probe-f016-v158-round.py for the V2.4+BL006 round; this file supplies fixtures only.')
