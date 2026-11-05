@@ -82,3 +82,7 @@ JAR、模型、Vite进程树均核对PID/命令归属后停止；18129/18117/181
 可重跑代码：`probe-f017-v162.py`公共夹具，`round.py`/`supplement.py`保留最初探针版本便于解释诊断，稳定业务边界见`final.py`、`extra.py`、`baggage.py`及真实UI脚本；`fixtures/start-f017-v162-jar.py`、`f017-v162-controlled-model.py`、`IndependentF017V162Test.java`。运行依赖本机既有私有环境，必须使用声明的自有schema/端口并顺序执行；现有证据路径存在时探针拒绝覆盖，应选新输出标签。
 
 下一需求为SRS_F018，由后续独立启动；本次只裁定F017，不代表后续需求、三核心场景或95项整体验收完成。
+
+## 最终main实际合入
+
+验收交接`ccaed0f4e6c1fdd695c95fcca0947801992cdbf8`已安全快进合main并普通推送，远端实际SHA核对一致。证据提交`6db8a6a498a8d8a8555ec65dd5a0f688c494387c`在先；40用户未跟踪文件哈希前后不变，无PR/强推/reset，产品V1.162标签不移动。合入证明见`evidence/SRS_F017-V1.162-main-integration-20261105.json`；本最终记录提交后再同步两分支。

@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`REQUIREMENT_PASSED`（SRS_F017 V1.162 / V2.4：10规则10P/0F/0NT、6步骤6P/0F/0NT；104/068/B07关闭，证据6db8a6a498a8d8a8555ec65dd5a0f688c494387c已先推送；下一步安全同步main，实际合入随后核对）
-- 当前进度：F001～F016已验收合main；F017本轮全部适用项当前独立实测通过、无历史业务P替代，待随后实际安全同步main。下一需求SRS_F018另启动，不代表后续需求/三核心场景/95项通过。
+- 状态：`REQUIREMENT_PASSED`（SRS_F017 V1.162：10规则10P/0F/0NT、6步骤6P/0F/0NT；104/068/B07关闭，证据6db8a6a498a8d8a8555ec65dd5a0f688c494387c先推送；已安全快进合main并实际推送ccaed0f4e6c1fdd695c95fcca0947801992cdbf8，最终合入记录随本提交同步）
+- 当前进度：F001～F017已独立验收合main，F017全部当前实测，无本需求F/NT。下一需求SRS_F018另启动，Claude从最终最新origin/main同步；后续需求、三核心场景及95项未因此通过。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -2716,3 +2716,9 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 产品 SHA / 标签 | 证据提交 SHA | main |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-05 | SRS_F017 | ChatGPT → main / Claude | REQUIREMENT_PASSED | b2623730a0c85622091e6e18bcb1207e23ecdd42 / V1.162 | 6db8a6a498a8d8a8555ec65dd5a0f688c494387c | 实际安全同步待随后核对 |
+
+## 2026-11-05 F017 V1.162最终main合入核对
+
+- **已实际合main并推送：`ccaed0f4e6c1fdd695c95fcca0947801992cdbf8`**。主工作区main无已跟踪用户改动，40个未跟踪用户文件逐一哈希前后相同。执行安全`git merge --ff-only origin/ai/gpt-test`和普通`git push origin main`，远端实际SHA核对一致；无强推/reset/PR，未覆盖用户文件。
+- 完整证据已先推送`6db8a6a498a8d8a8555ec65dd5a0f688c494387c`，随后验收交接`ccaed0f4e6c1fdd695c95fcca0947801992cdbf8`先推送ai/gpt-test再安全同步main。合入证明`acceptance/stage3/evidence/SRS_F017-V1.162-main-integration-20261105.json`；本最终记录再同步两分支，不移动V1.162产品标签。
+- 最终REQUIREMENT_PASSED：10规则/6步骤全部当前P，F/NT0，历史业务P复用0。104/068/B07关闭；066/069只登记F017关联通过，其他需求各自裁决保留。下一F018后续独立启动，Claude先fetch最终origin/main并读取正式规则/台账及暂存映射，不整支移植staging；本轮不执行F018，不代表三核心场景或95项通过。
