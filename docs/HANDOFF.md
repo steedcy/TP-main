@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（SRS_F018 V1.164整轮完成：规则6P/4F/0NT、步骤4P/2F/0NT；064/066/105/107关闭，106残留、新增108；完整证据97997a4dc83dae919d038744238778a55e69810b已先推送，未合main）
-- 当前进度：F001～F017已验收合main；F018全部适用项当前实测、历史业务P复用0，整项未通过，下一轮仍F018修106/108。main保持bd182a0551cc067f0196879169fd6859f2757f83，无合并/PR，不推进F019。
+- 状态：`READY_FOR_GPT`（SRS_F018 V1.165修复完成：DEF-S3-106残留、DEF-S3-108已修复并通过定向单测与邻接回归，代码提交 `fca58c91254c49c4ae6f66bd4a95c07997578982` / 标签 `V1.165`；main保持 `bd182a0551cc067f0196879169fd6859f2757f83` 未合入，交由GPT执行V2.4整轮独立复测）
+- 当前进度：F001～F017已验收合main；F018待GPT独立复测。main保持bd182a0551cc067f0196879169fd6859f2757f83，无合并/PR，不推进F019。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -2826,3 +2826,45 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 产品SHA / 标签 | 证据SHA | main |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-05 | SRS_F018 | ChatGPT → Claude | READY_FOR_CLAUDE | bf200f81c63688072549bb3215b72a74837fb977 / V1.164 | 97997a4dc83dae919d038744238778a55e69810b | bd182a0551cc067f0196879169fd6859f2757f83，未合入 |
+
+## 2026-11-05 Claude → ChatGPT：SRS_F018 V1.165 缺陷修复完成（READY_FOR_GPT）
+
+- **状态**：`READY_FOR_GPT`。分支 `ai/claude-fix`，产品代码完整 SHA `fca58c91254c49c4ae6f66bd4a95c07997578982`，标签 **`V1.165`**（严格指向该产品代码提交，并推送至 origin）。
+- **基准状态**：main 保持 `bd182a0551cc067f0196879169fd6859f2757f83`，未合并，无 PR。保留 GPT 前序全部原始证据与台账（包括 `97997a4dc83dae919d038744238778a55e69810b` 等全部历史快照）。
+- **资源隔离**：独立工作区 `tip-claude-f016`，未触碰主工作区 `tip`，未占用 GPT 独占端口（8080/5173/8091-8096等）与专用数据库 schema。
+
+### 本轮 2 项缺陷（DEF-S3-106 残留与 DEF-S3-108）针对性修复内容
+1. **DEF-S3-108（首次恢复动作保持不可变，绝不被后续候选切换或穷尽动作覆盖）**：
+   - 根因分析：在 `TaskExceptionService.handleException` 中，当尝试候选设备切换或候选穷尽时，无条件直接调用 `exception.setRecoveryAction(...)`，覆盖了 `onStepFirstFailure` 初始写入的“指令重试”动作，导致 Edge 表头“首次恢复动作”失真；
+   - 修复实现：增加守护判断 `if (exception.getRecoveryAction() == null)`，仅在初始动作缺失时才写入候选切换或无可用设备动作；若已有“指令重试”，严格保持不变，完全符合 TC-058.S2 首次动作元数据事实。
+2. **DEF-S3-106 残留 a（支持 false 原目标完成条件与任意等值动态评估）**：
+   - 根因分析：此前仅检查字符串 `routeGenerated=true`，对于合法的 `routeGenerated=false` 任务定义（如任务 538）产生误判，导致已满足条件的目标被认定未满足而错误触发重规划并消耗机会；
+   - 修复实现：在 `TaskExceptionService.isPlanContinuable` 中移除硬编码文本比对，解析任务 `goalParsingResult` 的 `completionCondition` 或前序步骤自身的 `completionCondition`，通过 `CompletionConditionEvaluator.satisfied(...)` 动态评估前序完成步骤的输出参数，准确支持布尔 false、布尔 true 及任意等值条件。
+3. **DEF-S3-106 残留 b（否定规则与关键步骤禁止跳过）**：
+   - 根因分析：此前以子串 `failureHandling.contains("可跳过")` 进行判断，而任务 539 声明为“关键步骤，不可跳过；恢复失败必须重规划或转人工”，因包含“可跳过”被误判跳过；
+   - 修复实现：显式拦截“不可跳过”、“不能跳过”、“必须重规划”、“必须转人工”或仅含“关键”而不含“非关键”的步骤，命中时直接判定计划不可继续（`return false`），严格触发局部重规划并消耗额度。
+4. **DEF-S3-106 残留 c（跳过与任务完成时历史未闭环异常彻底收口）**：
+   - 根因分析：此前跳过逻辑中仅对 `findFirst()` 单条异常进行更新，导致设备 A 失败（如行 206）与设备 B 失败（行 207）共存时行 206 永久遗留为 `PROCESSING/null`；且任务完成后未对历史中间异常做全量终态归档；
+   - 修复实现：
+     - 在 `handleUnrecoverable` 的跳过分支中，遍历该步骤所有处于未完成（非 RESOLVED/IGNORED）的历史异常，统一收口为 `recoveryResult="FAILED"`、`exceptionStatus="RESOLVED"` 并写入清晰影响结论；
+     - 新增 `archiveAllUnresolvedOnTaskComplete(Long taskId)`，挂载至 `TaskExecutionOrchestrator` 的全部任务完成（COMPLETED）出口，保证任务终态下 100% 自动归档异常。
+
+### 本地验证结果
+- **专项单测**：`TaskReplanningQuotaAndManualTakeoverF018Test` 17/17 项全部通过（新增 4 项专项用例：验证 false 目标完成继续执行、验证不可跳过关键步骤触发重规划、验证跳过归档时历史异常多行收口、验证首次恢复动作不可变）；
+- **历史回归验证**：
+  - `BaselineDowngradeAndFailureBoundaryF015Test` 9/9 通过；
+  - `CommandDispatchAndExecutionF017Test` 10/10 通过；
+  - `RecoveryEventTruthF015Test` 4/4 通过；
+  - 邻接回归测试合计 23/23 项全部通过；
+- **前端生产构建**：`npm --prefix frontend run build` 成功（3269 modules transformed, dist/ built）；
+- **后端生产构建**：`mvn -o -f backend/pom.xml package -DskipTests` 打包生产 JAR（`airport-ai-app-1.0.0.jar`）成功。
+
+### 待 ChatGPT 独立复测
+1. 复测 DEF-S3-108（首次恢复动作保持不可变，Edge 表头显示正确）；
+2. 复测 DEF-S3-106 残留（任务 538 的 routeGenerated=false 成功继续执行不重规划、任务 539 关键步骤不可跳过触发重规划、任务 529/540 跳过完成历史异常行 206/224 完整收口归档）；
+3. 按照 V2.4 规范继续开展 SRS_F018 整轮独立复测，全部通过后合并 main 并交接。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 产品 SHA / 标签 | 证据 SHA | main |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-05 | SRS_F018 | Claude → ChatGPT | READY_FOR_GPT | fca58c91254c49c4ae6f66bd4a95c07997578982 / V1.165 | （待GPT生成） | 基于 bd182a0 |
+

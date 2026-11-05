@@ -277,3 +277,25 @@ F017最终实际合main并推送`ccaed0f4e6c1fdd695c95fcca0947801992cdbf8`，远
 完整证据`97997a4dc83dae919d038744238778a55e69810b`已先推送，首F检查点57aafb9；报告`acceptance/stage3/SRS_F018-V1.164-整轮独立复测与统一交修.md`。规则6P/4F/0NT、步骤4P/2F/0NT，全部当前实测、历史业务P复用0。064/066/105/107原始反例关闭；106残留false原目标满足仍重规划、明确不可跳过却跳过及529/540任务完成旧异常未归档；新增108首次动作被后续覆盖。全部可执行项完成后统一交修，无首F提前收口。
 
 24任务=22正式+2试运行，无业务诊断；25有效HTTP/SQL/协议组20P/5F，385后端报告383通过/2跳过、独立40P、构建/生产JAR/认证HTTP/真实Edge完成。卡片异步读取错误由GPT修正，稳定探针P，原诊断保留。实际文档交接0ebe23c040875d79d49a1ddf43352509b99c7849，消息完整SHA笔误已实核。无产品/业务基线修改；配置与自有进程/端口/分配已清理，真实失败异常原样保留。main仍`bd182a0551cc067f0196879169fd6859f2757f83`，无合并/PR；下一轮仍F018修106/108，不推进F019或宣称三核心/95项通过。
+
+## 2026-11-05 F018 V1.165 缺陷修复完成（READY_FOR_GPT）
+
+针对 ChatGPT 在 V1.164 复测中提出的 DEF-S3-106 残留与 DEF-S3-108 新增缺陷完成彻底修复：
+1. **DEF-S3-108（首次恢复动作不可变）**：
+   - 在 `TaskExceptionService.handleException` 中增加动作保护：仅当 `exception.getRecoveryAction() == null` 时才写入后续候选切换或无候选动作；若已有“指令重试”等初始恢复动作，严格保持不可变，绝不被后续设备切换或无候选动作覆盖，保证 Edge 表头“首次恢复动作”语义与事实完全一致；
+2. **DEF-S3-106 残留 a（支持 false 原目标完成条件与任意等值判定）**：
+   - 移除 `TaskExceptionService.isPlanContinuable` 中的硬编码 `routeGenerated=true` 字符串匹配；引入任务目标解析条件与步骤自身的 `completionCondition` 动态评估机制，通过 `CompletionConditionEvaluator.satisfied(...)` 评估前序已完成步骤输出，准确支持任务 538 的 `routeGenerated=false` 及任意等值条件，避免合法的 false 目标误判为未完成而消耗重规划额度；
+3. **DEF-S3-106 残留 b（否定规则与关键步骤禁止跳过）**：
+   - 完善 `isPlanContinuable` 拦截逻辑：显式拦截包含“不可跳过”、“不能跳过”、“必须重规划”、“必须转人工”或仅含“关键”而非“非关键”的步骤定义，彻底解决任务 539 中“关键步骤，不可跳过”因包含子串“可跳过”被误判跳过的缺陷，严格驱动局部重规划并消耗额度；
+4. **DEF-S3-106 残留 c（跳过与任务完成时历史未闭环异常彻底收口）**：
+   - 在 `handleUnrecoverable` 的跳过分支中，收口该步骤所有处于未完成（非 RESOLVED/IGNORED）的历史异常（解决任务 529/540 中较早异常行如 206/224 遗留 PROCESSING/null 的缺陷），统一标记为 `FAILED` / `RESOLVED`；
+   - 新增 `archiveAllUnresolvedOnTaskComplete(Long taskId)`，并在 `TaskExecutionOrchestrator` 全部任务完成终态分支挂载，确保任务在步骤跳过完成后剩余的所有非终态异常自动闭环归档；
+   - 在 `onStepRecovered` 中，通过检查完成步骤分配的 `retryCount > 0` 及初始恢复动作包含重试，精确区分重试成功与设备切换成功恢复闭环。
+
+**验证结果**：
+- 专项单测：`TaskReplanningQuotaAndManualTakeoverF018Test` 17/17 项全部通过（新增 4 项专项用例）；
+- 邻接回归：`BaselineDowngradeAndFailureBoundaryF015Test`(9/9)、`CommandDispatchAndExecutionF017Test`(10/10)、`RecoveryEventTruthF015Test`(4/4) 全部通过（23/23通过）；
+- 前端构建：`npm --prefix frontend run build` 成功（3269 modules transformed, dist/ built）；
+- 生产 JAR 构建：`mvn -o -f backend/pom.xml package -DskipTests` 打包生产 JAR（`airport-ai-app-1.0.0.jar`）成功。
+
+产品代码提交 `fca58c91254c49c4ae6f66bd4a95c07997578982`，版本标签 **`V1.165`**，交由 ChatGPT 按照 V2.4 规范开展整轮独立复测。main 保持 `bd182a0551cc067f0196879169fd6859f2757f83`，未合并。
