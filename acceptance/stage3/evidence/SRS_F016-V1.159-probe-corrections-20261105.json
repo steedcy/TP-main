@@ -1,0 +1,21 @@
+{
+  "productSha": "a893e944b868e666ab165eb7e6ea40f1ccadaa7d",
+  "originalFile": "SRS_F016-V1.159-http-20261105.json",
+  "rawSafetyOnlyPTasks": [
+    378,
+    379
+  ],
+  "correctedCompleteGroup": "F",
+  "observedWinner": 379,
+  "observedFailedCallback": {
+    "taskId": 378,
+    "http": 500,
+    "businessCode": 1000,
+    "status": "PENDING_ASSIGNMENT",
+    "missingEvent": "AGENT_ASSIGNMENT_CONFLICTED",
+    "database": "DeadlockLoserDataAccessException / PostgreSQL device_agents SELECT FOR UPDATE"
+  },
+  "correction": "Only exactly-one execution was checked by the original parallel probe. Final HTTP+events audit caught the failure; original rawP retained, no repeat run or retrospective P. Final stable probe now requires both callbacks200 and conflict event. Preliminary user update that100passed is superseded.",
+  "foreignKeysToOwnedAgentTable": "tip_gpt_f006_v118_20261030.device_commands|FOREIGN KEY (agent_code) REFERENCES tip_gpt_f006_v118_20261030.device_agents(agent_code)\ntip_gpt_f006_v118_20261030.device_events|FOREIGN KEY (device_agent_id) REFERENCES tip_gpt_f006_v118_20261030.device_agents(id)\ntip_gpt_f006_v118_20261030.device_command_reports|FOREIGN KEY (agent_code) REFERENCES tip_gpt_f006_v118_20261030.device_agents(agent_code)\ntip_gpt_f006_v118_20261030.dry_run_device_selections|FOREIGN KEY (device_agent_id) REFERENCES tip_gpt_f006_v118_20261030.device_agents(id)\ntip_gpt_f006_v118_20261030.task_step_assignments|FOREIGN KEY (device_agent_id) REFERENCES tip_gpt_f006_v118_20261030.device_agents(id)",
+  "environment": "External barrier10872 committed and exited. Deadlock cycle is product sessions4708 and14828; artificial barrier forces legal callback overlap without locking shared/user data."
+}
