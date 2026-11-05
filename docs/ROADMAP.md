@@ -305,3 +305,26 @@ F017最终实际合main并推送`ccaed0f4e6c1fdd695c95fcca0947801992cdbf8`，远
 完整证据`8d2575d822a91975ec3aeb375a4e302df57982ae`已先推送，首F检查点a194a4e；报告`acceptance/stage3/SRS_F018-V1.165-整轮独立复测与统一交修.md`。规则6P/4F/0NT、步骤2P/4F/0NT，全适用项当前实测、历史业务P复用0。108关闭；106原四反例和数字条件通过，禁止/不得跳过仍残留；新增109候选切换实际成功却写原设备自动重试成功，V1.164对照与当前真实Edge/协议/SQL证据齐全。首次动作与最终路径须分开，保留108修复。
 
 30任务含2成功试运行和1夹具诊断549；570修正夹具并发后完成配额分支，原诊断保留不计P。30有效观察26P/4F，389报告387通过/2跳过、独立44P、构建/JAR/认证HTTP/Edge、两行李真实邻接完成，航班出口仅服务级。所有自有资源清理、活跃分配/占用0；无产品或业务基线修改。实际文档交接c4eda88b76a83127f6c1eec4e42b824cc57a577d，消息另一SHA错误已查明。main仍`bd182a0551cc067f0196879169fd6859f2757f83`，无合并/PR。下一轮仍F018修106/109，不推进F019或宣称三核心/95项通过。
+
+## 2026-11-05 F018 V1.166 缺陷修复完成（READY_FOR_GPT）
+
+针对 ChatGPT 在 V1.165 复测中提出的 DEF-S3-106 显式否定措辞残留与 DEF-S3-109 候选切换成功恢复结论失真完成修复：
+1. **DEF-S3-106 显式否定措辞与人工拦截**：
+   - 彻底修复任务 565（“禁止跳过；恢复失败需转人工处理”）与任务 566（“不得跳过；异常后应交人工处理”）误跳过缺陷；
+   - 在 `TaskExceptionService.isPlanContinuable` 中扩充否定判定：拦截 `禁止跳过`、`不得跳过`、`严禁跳过`、`不准跳过`、`不跳过`、`勿跳过`、`不予跳过`，以及正则 `.*(不可|不能|禁止|不得|严禁|不准|勿|不予|不)\s*跳过.*` 等；
+   - 拦截包含 `需转人工`、`应交人工`、`需交人工`、`应转人工`、`转人工处理`、`交人工处理` 等强制人工/重规划要求；
+   - 移除裸词 `failureHandling.contains("跳过")`，仅匹配明确积极表述（`非关键`、`可跳过`、`允许跳过`、`可以跳过`、`可选`），确保禁止跳过的步骤严格触发局部重规划并消耗额度；
+2. **DEF-S3-109 候选设备成功恢复事实与首次恢复动作解耦**：
+   - 根因分析：此前为修复 DEF-S3-108 锁定了初始动作“指令重试”，但在 `onStepRecovered` 中使用了 `ex.getRecoveryAction().contains("重试")` 来推断恢复结果，导致候选设备接手成功时仍被误判为原设备“自动重试成功”；
+   - 修复实现：在 `onStepRecovered` 中，通过检查 `assignment.getRejectedAgentIds()`（非空且非 "[]" 即曾切换候选）、`ex.getImpactConclusion()` 是否包含“候选设备切换”或 `ex.getRecoveryAction()` 是否包含“候选设备切换”，严格判定 `switched` 状态；
+   - 若 `switched` 为 true，记录“候选设备切换”成功结论（`impactConclusion="已切换候选设备重新分配，计划可继续执行，不触发重新规划"`，事件 `恢复动作: 候选设备切换，结果: 成功，步骤X已重新分配...`）；
+   - 仅当未曾切换候选且为原设备重试时才记录“自动重试成功”；
+   - 严格保持 `ex.getRecoveryAction()` 初始动作不变，完美兼顾 DEF-S3-108（首次恢复动作不可变）与 DEF-S3-109（实际恢复结论保真）。
+
+**验证结果**：
+- 专项单测：`TaskReplanningQuotaAndManualTakeoverF018Test` 19/19 项全部通过（新增 2 项用例验证显式否定措辞与候选切换成功结论）；
+- 邻接回归：`BaselineDowngradeAndFailureBoundaryF015Test`(9/9)、`CommandDispatchAndExecutionF017Test`(10/10)、`RecoveryEventTruthF015Test`(4/4) 全部通过（23/23通过）；
+- 前端生产构建：`npm --prefix frontend run build` 成功（3269 modules transformed, dist/ built in 5m 13s）；
+- 后端生产构建：`mvn -o -f backend/pom.xml package -DskipTests` 打包生产 JAR（`airport-ai-app-1.0.0.jar`）成功。
+
+产品代码提交 `4ad7ccb27a6cbc29c1c83a33d61bf05e3aa67452`，版本标签 **`V1.166`**，交由 ChatGPT 按照 V2.4 规范开展整轮独立复测。main 保持 `bd182a0551cc067f0196879169fd6859f2757f83`，未合并。

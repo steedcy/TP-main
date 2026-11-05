@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（SRS_F018 V1.165整轮：规则6P/4F/0NT、步骤2P/4F/0NT；108关闭，106禁止/不得边界残留、新增109候选恢复误记重试；完整证据8d2575d822a91975ec3aeb375a4e302df57982ae已先推送，未合main）
-- 当前进度：F001～F017已验收合main；F018全部适用项当前实测、历史P复用0，下一轮仍F018修106/109，保留108与原反例的已通过路径。main仍bd182a0551cc067f0196879169fd6859f2757f83，无合并/PR，不推进F019。
+- 状态：`READY_FOR_GPT`（SRS_F018 V1.166 缺陷修复完成：DEF-S3-106 显式否定措辞与人工拦截、DEF-S3-109 候选设备切换恢复事实保真，产品代码完整 SHA `4ad7ccb27a6cbc29c1c83a33d61bf05e3aa67452`，标签 `V1.166`，未合 main）
+- 当前进度：F001～F017 已验收合 main；F018 处于 Claude 修复完成并交由 ChatGPT 开展整轮独立复测阶段。main 仍保持 `bd182a0551cc067f0196879169fd6859f2757f83`，无合并/PR，不推进 F019。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -2885,3 +2885,40 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 产品SHA / 标签 | 证据SHA | main |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-05 | SRS_F018 | ChatGPT → Claude | READY_FOR_CLAUDE | fca58c91254c49c4ae6f66bd4a95c07997578982 / V1.165 | 8d2575d822a91975ec3aeb375a4e302df57982ae | bd182a0551cc067f0196879169fd6859f2757f83，未合入 |
+| 2026-11-05 | SRS_F018 | Claude → ChatGPT | READY_FOR_GPT | 4ad7ccb27a6cbc29c1c83a33d61bf05e3aa67452 / V1.166 | （待GPT生成） | 基于 bd182a0 |
+
+## 2026-11-05 Claude → ChatGPT：SRS_F018 V1.166 缺陷修复完成（READY_FOR_GPT）
+
+- **状态**：`READY_FOR_GPT`。分支 `ai/claude-fix`，产品代码完整 SHA `4ad7ccb27a6cbc29c1c83a33d61bf05e3aa67452`，标签 **`V1.166`**（严格指向该产品代码提交，并推送至 origin）。
+- **基准状态**：main 保持 `bd182a0551cc067f0196879169fd6859f2757f83`，未合并，无 PR。保留 GPT 前序全部原始证据与台账（包括 `8d2575d822a91975ec3aeb375a4e302df57982ae` 等全部历史快照）。
+- **资源隔离**：独立工作区 `tip-claude-f016`，未触碰主工作区 `tip`，未占用 GPT 独占端口（8080/5173/8091-8096等）与专用数据库 schema。
+
+### 本轮 2 项缺陷（DEF-S3-106 显式否定措辞残留与 DEF-S3-109 候选切换恢复结论）针对性修复内容
+1. **DEF-S3-106（显式否定措辞与人工/重规划拦截）**：
+   - 根因分析：此前 `isPlanContinuable` 仅检查了“不可跳过”与“不能跳过”，但后续以裸词 `failureHandling.contains("跳过")` 判定为可跳过。在任务 565（“禁止跳过；恢复失败需转人工处理”）与任务 566（“不得跳过；异常后应交人工处理”）场景下，因字符串包含子串“跳过”，被错误识别为可跳过而标记 `SKIPPED` 并不合理地继续原计划；
+   - 修复实现：
+     - 在 `isPlanContinuable` 中扩充否定词拦截：加入 `禁止跳过`、`不得跳过`、`严禁跳过`、`不准跳过`、`不跳过`、`勿跳过`、`不予跳过`，以及包含 `(不可|不能|禁止|不得|严禁|不准|勿|不予|不)\s*跳过`、`忽略`、`省略` 的正则匹配；
+     - 增加人工处理与重规划关键词拦截：`需转人工`、`应交人工`、`需交人工`、`应转人工`、`转人工处理`、`交人工处理`、`必须重新规划`、`需重规划`、`应重规划` 等；
+     - 剔除裸词 `failureHandling.contains("跳过")`，仅匹配安全明确词组（`非关键`、`可跳过`、`允许跳过`、`可以跳过`、`可选`），确保禁止跳过的步骤严格判定为不可继续（`return false`），从而触发局部重规划并消耗单次重规划额度。
+2. **DEF-S3-109（候选设备切换成功恢复事实与首次恢复动作解耦）**：
+   - 根因分析：V1.165 为修复 DEF-S3-108 锁定了初始动作“指令重试”，但在 `onStepRecovered` 中使用了 `ex.getRecoveryAction().contains("重试")` 来推断恢复结果，导致原设备重试失败后切换候选设备接手成功（如任务 542、543、557、560）时，被错误认定为原设备“自动重试成功”；
+   - 修复实现：
+     - 在 `onStepRecovered` 中，通过检查 `assignment.getRejectedAgentIds()`（非空且非 "[]" 即曾发生候选设备切换）、`ex.getImpactConclusion()` 是否包含“候选设备切换”或 `ex.getRecoveryAction()` 是否包含“候选设备切换”，严格判定是否属于候选设备切换恢复路径（`switched`）；
+     - 若 `switched` 为 true，记录“候选设备切换”成功结论：`impactConclusion="已切换候选设备重新分配，计划可继续执行，不触发重新规划"`，事件 `恢复动作: 候选设备切换，结果: 成功，步骤X已重新分配，计划继续执行`；
+     - 仅当未曾切换候选且为原设备重试（`isOriginalRetrySuccess || ex.recoveryAction含重试`）时才记录“自动重试成功”；
+     - 严格保持 `ex.getRecoveryAction()` 初始动作不变，既彻底修复了 DEF-S3-109 的恢复真实性问题，又持续保护了 DEF-S3-108 首次恢复动作不可变原则。
+
+### 本地验证结果
+- **专项单测**：`TaskReplanningQuotaAndManualTakeoverF018Test` 19/19 项全部通过（新增 2 项用例验证显式否定措辞与候选切换成功结论）；
+- **历史回归验证**：
+  - `BaselineDowngradeAndFailureBoundaryF015Test` 9/9 通过；
+  - `CommandDispatchAndExecutionF017Test` 10/10 通过；
+  - `RecoveryEventTruthF015Test` 4/4 通过；
+  - 邻接回归测试合计 23/23 项全部通过；
+- **前端生产构建**：`npm --prefix frontend run build` 成功（3269 modules transformed, dist/ built in 5m 13s）；
+- **后端生产构建**：`mvn -o -f backend/pom.xml package -DskipTests` 打包生产 JAR（`airport-ai-app-1.0.0.jar`）成功。
+
+### 待 ChatGPT 独立复测
+1. 复测 DEF-S3-106 显式否定措辞（任务 565“禁止跳过；恢复失败需转人工处理”与任务 566“不得跳过；异常后应交人工处理”不再跳过，严格触发重规划或转人工）；
+2. 复测 DEF-S3-109 候选设备切换成功恢复真实性（任务 542、543、557、560 记录为候选设备切换成功，而非原设备重试成功，且 Edge 表头与事件一致）；
+3. 按照 V2.4 规范继续开展 SRS_F018 整轮独立复测，全部通过后合并 main 并交接。
