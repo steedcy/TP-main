@@ -1,0 +1,138 @@
+{
+  "tag": "V1.164",
+  "productSha": "bf200f81c63688072549bb3215b72a74837fb977",
+  "handoffSha": "0ebe23c040875d79d49a1ddf43352509b99c7849",
+  "suppliedWrongHandoffSha": "0ebe23c7c2dd4c653d9e4879685938d2aa2cffbe",
+  "baseline": "V2.4",
+  "conclusion": "READY_FOR_CLAUDE",
+  "rules": {
+    "R01": {
+      "status": "P",
+      "actual": "517～521真实失败/上报TIMEOUT/实际离线/30秒静默超时均进入恢复，523待承接离线、537能力缺口补分支。",
+      "issues": ""
+    },
+    "R02": {
+      "status": "P",
+      "actual": "518～521步骤1完成结果保持、步骤3恢复期间FROZEN且零提前下发，524/525新版本保留前缀。",
+      "issues": ""
+    },
+    "R03": {
+      "status": "F",
+      "actual": "关键一般分支一次恢复/配额P；538合法false目标已满足仍错误重规划，539明确不可跳过却跳过，106残留。",
+      "issues": "DEF-S3-106"
+    },
+    "R04": {
+      "status": "P",
+      "actual": "520执行中/523待承接离线先换候选、原版本完成；531无候选仅一次规划后人工。",
+      "issues": ""
+    },
+    "R05": {
+      "status": "P",
+      "actual": "522真实无关离线仅ERR_AGENT_OFFLINE_UNRELATED判断，不冻结/重规划。",
+      "issues": ""
+    },
+    "R06": {
+      "status": "F",
+      "actual": "517一次重试、518候选恢复、524穷尽重规划/525已用人工P；538/539影响判断的有效正反边界F，106。",
+      "issues": "DEF-S3-106"
+    },
+    "R07": {
+      "status": "P",
+      "actual": "519设备TIMEOUT分类、521实际30秒超时与候选恢复P；530无候选才一次规划/人工，超时原因码UI可见。",
+      "issues": ""
+    },
+    "R08": {
+      "status": "P",
+      "actual": "517首次重试成功有PROCESSING到SUCCESS/RESOLVED、完整影响判断；518～521实际候选成功才归档，原版本、不耗配额。105原反例关闭。",
+      "issues": ""
+    },
+    "R09": {
+      "status": "F",
+      "actual": "517恢复留痕及真实Edge硬件/超时原因码均P，066原残留关闭；529/540非关键跳过完成后较早异常仍PROCESSING/null，缺最终恢复结果闭环。列表首次恢复动作另有108元数据偏差。",
+      "issues": "DEF-S3-106;DEF-S3-108"
+    },
+    "R10": {
+      "status": "F",
+      "actual": "107真实PROCESSING计数/API/Edge卡片17与active同时包含两状态P；529/540任务完成但早先异常不自动归档，106非关键新分支残留。",
+      "issues": "DEF-S3-106"
+    }
+  },
+  "steps": {
+    "TC-057.S1": {
+      "status": "P",
+      "actual": "518～521三类异常，保留前缀/冻结后步/候选优先及最终结果完整；521真实Edge显示ERR_EXECUTION_TIMEOUT，518硬件原因码可见。",
+      "issues": ""
+    },
+    "TC-057.S2": {
+      "status": "P",
+      "actual": "517首次重试成功闭环及518～521候选恢复均继续原版本、不耗配额；事件含类型/动作/结果/判断与原因，占用释放。",
+      "issues": ""
+    },
+    "TC-058.S1": {
+      "status": "F",
+      "actual": "522无关离线P；529原非关键true目标跳过续跑已修，但538合法false目标被拒续跑、539明确不可跳过却跳过，106残留。",
+      "issues": "DEF-S3-106"
+    },
+    "TC-058.S2": {
+      "status": "F",
+      "actual": "064默认全部/历史/步骤链接与五类四状态筛选、107计数和active跳转均当前P；529/540跳过完成异常未归档（106），536实际首次指令重试被后续动作覆盖而列表误标首次候选切换（108）。",
+      "issues": "DEF-S3-106;DEF-S3-108"
+    },
+    "TC-059.S1": {
+      "status": "P",
+      "actual": "524首次局部规划成功、525再失败无第二次、526模型503/527校验拒绝/528超额均一次机会后人工与归档；前缀保留；独立服务0/4/5额度及已用边界4P。",
+      "issues": ""
+    },
+    "TC-059.S2": {
+      "status": "P",
+      "actual": "533基线合法恢复/535双候选穷尽人工，初始自主候选+单个基线版本，无局部重规划或二次降级，最终归档与时间线真实。",
+      "issues": ""
+    }
+  },
+  "counts": {
+    "rules": {
+      "P": 6,
+      "F": 4,
+      "NT": 0
+    },
+    "steps": {
+      "P": 4,
+      "F": 2,
+      "NT": 0
+    },
+    "tasks": 24,
+    "formalTasks": 22,
+    "dryRuns": 2,
+    "diagnosticTasks": 0,
+    "httpSqlProtocolGroups": 25,
+    "groupsP": 20,
+    "groupsF": 5,
+    "independentServiceTests": 40,
+    "fullBackendReported": 385,
+    "fullBackendPassed": 383,
+    "fullBackendSkipped": 2,
+    "historicalBusinessPReuse": 0
+  },
+  "closed": [
+    "DEF-S3-064",
+    "DEF-S3-066",
+    "DEF-S3-105",
+    "DEF-S3-107"
+  ],
+  "remaining": [
+    "DEF-S3-106",
+    "DEF-S3-108"
+  ],
+  "probeTimingDiagnostics": "Original UI flags and first card TypeError retained; stable explicit DOM/API wait proves correct card linkage. No product failure attributed to these diagnostics.",
+  "rawEvidence": [
+    "SRS_F018-V1.164-http-20261105.json",
+    "SRS_F018-V1.164-http-20261105-supplement.json",
+    "SRS_F018-V1.164-http-20261105-boundaries.json",
+    "SRS_F018-V1.164-ui-catalog-20261105.json",
+    "SRS_F018-V1.164-ui-task-timelines-20261105.json",
+    "SRS_F018-V1.164-ui-card-stable-20261105.json"
+  ],
+  "firstFailureCheckpoint": "57aafb9",
+  "mainUnchanged": "bd182a0551cc067f0196879169fd6859f2757f83",
+  "noPR": true
+}
