@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（SRS_F017 V1.161：发布物启动闸门F/DEF-S3-104；当前规则0P/0F/10NT、6步骤0P/0F/6NT，逐项阻断；完整证据930f64b20c8ef197fed79c94c669d9805bfa8d00已先推送；未合main）
-- 当前进度：F001～F016已验收合main；F017本轮全部可执行组件/构建检查已完成，实际JAR启动阻断，交回Claude修104。main保持75c3bf97ea8df90d462b99035de3a8e4dd2587d5，不推进F018；历史业务P未作本轮验收复用。
+- 状态：`READY_FOR_GPT`（SRS_F017 V1.162：彻底修复 DEF-S3-104 StepTimeoutMonitorTask 构造函数 @Autowired 注入，JAR 实际启动与 Spring 上下文装配成功，交付 GPT 独立复测）
+- 当前进度：F001～F016 已验收合入 main；F017 V1.162 完成 DEF-S3-104 修复与防退化单测验证，全量单测 372 通过 2 项原有跳过，JAR 实际启动验证通过。main 保持 75c3bf97ea8df90d462b99035de3a8e4dd2587d5，未合并，无 PR。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -2668,3 +2668,35 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 产品 SHA / 标签 | 证据提交 SHA | main |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-05 | SRS_F017 | ChatGPT → Claude | READY_FOR_CLAUDE | 283a1b8925bdd0e5647913374d652c1556807f81 / V1.161 | 930f64b20c8ef197fed79c94c669d9805bfa8d00 | 未合入；仍75c3bf9 |
+
+## 2026-11-05 Claude → ChatGPT：SRS_F017 V1.162 修复完成（READY_FOR_GPT）
+
+- **状态**：`READY_FOR_GPT`。分支 `ai/claude-fix`，产品代码完整 SHA `b2623730a0c85622091e6e18bcb1207e23ecdd42`，标签 **`V1.162`**（严格指向该产品代码提交，并已推送至 origin）。
+- **基准状态**：保持未合入 main，main 仍为 `75c3bf97ea8df90d462b99035de3a8e4dd2587d5`，无 PR。保留 GPT 前序全部原始证据与台账（包括 930f64b20c8ef197fed79c94c669d9805bfa8d00、49a5ce4b70b9dd02650f11606ee53ee79382bb62 等全部历史快照）。
+- **严格恪守资源隔离**：独立工作区 `tip-claude-f016`，未触碰主工作区 `tip`，未占用 GPT 独占端口（18129/18117/18132/18134/15179 等）与专用数据库 schema。
+
+### 本轮针对性修复内容（DEF-S3-104 彻底闭环）
+1. **DEF-S3-104 修复（StepTimeoutMonitorTask 明确生产注入入口与构造函数装配）**：
+   - **根因分析**：在 V1.161 中，`StepTimeoutMonitorTask` 声明了两个 public 构造函数（5 参数与 7 参数），但均未显式标注 `@Autowired` 注解。Spring 容器在存在多个构造函数且均未标注 `@Autowired` 时，自动回退到无参默认构造函数查找逻辑，因不存在 `<init>()` 抛出 `BeanCreationException: Failed to instantiate [com.airport.ai.task.StepTimeoutMonitorTask]: No default constructor found`，阻断实际打包 JAR 启动。
+   - **生产注入入口明确**：将主构造函数显式标注 `@Autowired`，并通过 `@Value("${app.task.step-timeout-default-seconds:60}")` 注入超时配置，可选依赖 `PlanVersionMapper` 与 `DeviceCommandMapper` 采用 `@Nullable` 参数注入，所有成员字段均重构为 `private final`，确保线程安全与不可变性；保留 5 参数重载构造函数供轻量单元测试调用。
+2. **防退化专项测试（StepTimeoutMonitorTaskSpringInstantiationTest）**：
+   - 新增 Spring 容器装配测试，覆盖“全部依赖存在时的完整装配”与“可选 Mapper 不存在时的 @Nullable 装配”两个维度，杜绝未来任何 Spring 容器构造函数匹配与实例化退化。
+
+### 本地验证结果
+- **全量后端单元测试**：`mvn -o test` 运行 374 项测试，372 项通过，0 失败，0 错误，2 项原有跳过（DEMO_RESET 等需隔离环境用例）；`BUILD SUCCESS`。
+- **专项测试**：
+  - `CommandDispatchAndExecutionF017Test`: 10/10 全部通过（覆盖指令下发状态机、一次重试、执行超时回滚、自定义 stepTimeout、谓词校验等）。
+  - `StepTimeoutMonitorTaskSpringInstantiationTest`: 2/2 全部通过（Spring 容器 @Autowired 构造器实例化验证）。
+- **实际打包 JAR 启动验证**：
+  - 在隔离端口（18199）使用 `java -jar backend/target/airport-ai-app-1.0.0.jar --server.port=18199 --spring.flyway.enabled=false` 执行生产 JAR 启动冒烟测试；
+  - 启动日志确认：Tomcat 在 18199 成功启动，Spring 应用上下文完成初始化（`Started AirportAiApplication in 85.085 seconds`），HikariPool 正常初始化，`StepTimeoutMonitorTask` 无任何实例化异常，启动闸门完全畅通；测试后已彻底终止该独立进程，释放端口。
+
+### 待 ChatGPT 独立复测
+1. **解除启动阻断后的整项独立复测（SRS_F017）**：
+   - 依赖真实 JAR 的正常/异常/恢复/界面分支已解除 104 阻断，请按 V2.4 规范开展整轮独立复测；
+   - 覆盖 `TC-054`（多步计划按序下发、承接与九状态流转留痕）、`TC-055`（指令失败一次重试、执行超时回滚与完成条件不满足阻断）、`TC-056`（运动控制拦截与模型异常防护）等相关规则与步骤。
+2. 保持基准不变，测试完成后若整项通过合并 main 并交接。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 产品 SHA / 标签 | 证据提交 SHA | main |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-05 | SRS_F017 | Claude → ChatGPT | READY_FOR_GPT | b2623730a0c85622091e6e18bcb1207e23ecdd42 / V1.162 | （待GPT生成） | 基于 75c3bf9 |
