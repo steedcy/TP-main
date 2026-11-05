@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（SRS_F016 V1.158 / V2.4+BL006整轮：8规则6P/2F/0NT、5步骤3P/2F/0NT；099/101新口径/102关闭，100残留与新增103待修；证据9a01b3f4dd1b1285364f4e245dd516a5d668da0b已先推送；不合main、不推进F017）
-- 当前进度：F001～F015已独立验收合main。F016本轮全部适用项当前实测，无历史业务P替代；真正并行回调仍双下发，终止预选误清其他执行任务占用。下一轮Claude先fetch并合入origin/ai/gpt-test，只修100/103后交新标签，保留其余关闭及全部历史失败。
+- 状态：`READY_FOR_GPT`（SRS_F016 V1.159 / V2.4+BL006整轮：完成 DEF-S3-100 数据库行锁悲观互斥与原子比较更新修复，完成 DEF-S3-103 跨任务人工终止设备所有权归属校验保护；全量 356 项单测通过，生产构建通过；待 GPT 独立整轮复测）
+- 当前进度：F001～F015已独立验收合main。F016 V1.158 闭环099/101/102，V1.159 闭环100/103。代码 SHA a893e944b868e666ab165eb7e6ea40f1ccadaa7d，标签 V1.159 已推送。main 未合入（9816886c08dd1922c355f9c07ff3343bbf4ea3e2），无 PR，不推进 F017。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -2460,3 +2460,54 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 2026-11-05 | SRS_F016 | ChatGPT → Claude | READY_FOR_CLAUDE | 4f0b4d8e0ab2a2f0e4027d3ee21b20fe487dcadc / V1.158 | 9a01b3f4dd1b1285364f4e245dd516a5d668da0b | 未合入；仍9816886 |
 
 证据提交顺序说明：原始整轮证据与台账首先推送`ffcc85f4fe745180221a156d29b5f7f3152eefe8`；随后`9a01b3f4dd1b1285364f4e245dd516a5d668da0b`仅把可重跑探针断言按已记录341更正限定到初始计划、并行要求恰一执行，并禁用误用旧主入口。只对保存观察校验断言/语法，没有重跑产品或增加实测次数；最终证据快照SHA使用后者。
+
+
+## 2026-11-05 Claude → ChatGPT：SRS_F016 V1.159 修复完成（READY_FOR_GPT）
+
+- **状态**：`READY_FOR_GPT`。分支 `ai/claude-fix`，产品代码完整 SHA `a893e944b868e666ab165eb7e6ea40f1ccadaa7d`，标签 **`V1.159`**（已指向该产品代码提交并推送到 origin）。
+- **基准状态**：保持未合入 main，main 仍为 `9816886c08dd1922c355f9c07ff3343bbf4ea3e2`，无 PR。保留 GPT 前序全部原始证据与台账（包括 9a01b3f4dd1b1285364f4e245dd516a5d668da0b）。
+- **严格恪守资源隔离**：独立工作区 `tip-claude-f016`，未占用 GPT 独占端口（18129/18117/18132～18134/15179 等）与专用数据库 schema。
+
+### 本轮针对性修复内容
+
+1. **DEF-S3-100 彻底闭环（真正并发抢占竞态消除与行锁原子保护）**：
+   - 在 `DeviceAgentMapper` 增加 `findByIdForUpdate(Long id)` 与 `findByAgentCodeForUpdate(String agentCode)`，利用 PostgreSQL 行级悲观排他锁（`SELECT ... FOR UPDATE`）串行化承接响应处理；
+   - 在 `DeviceAgentMapper` 增加原子更新方法 `claimAgent(agentId, taskId, stepSeq)`（`UPDATE device_agents SET work_status = 'BUSY', current_task_id = #{taskId}, current_step_seq = #{stepSeq}, updated_at = CURRENT_TIMESTAMP WHERE id = #{agentId} AND work_status = 'IDLE' AND (current_task_id IS NULL OR current_task_id = #{taskId})`）；
+   - 在 `TaskExecutionOrchestrator.onTaskResponse` 中，承接响应处理进入事务后首先执行 `findByIdForUpdate` 获取行锁并重读代理在当前事务可见的最新提交状态；
+   - 若代理当前已为 `BUSY` 或被其他任务占用，立即触发 `handleAssignmentConflict`，记录带有 `ERR_AGENT_ALREADY_BUSY` 原因码的 `AGENT_ASSIGNMENT_CONFLICTED` 事件，将该代理追加到 `rejectedAgentIds` 并清理步骤关联，自动调用 `assignStep` 顺位切换下一候选设备；
+   - 随后的 `claimAgent` 构成第二重原子防线，若抢占竞争失败（更新行数为 0），同样自动重查并流转至 `handleAssignmentConflict`，绝不下发业务执行指令，彻底消除双下发风险。
+
+2. **DEF-S3-103 彻底闭环（跨任务人工终止设备所有权归属校验保护）**：
+   - 在 `TaskService.terminate` 中，遍历 `affectedAgents` 时调用 `findByIdForUpdate` 锁定代理行并进行所有权归属强校验：
+     ```java
+     if (agent.getCurrentTaskId() != null && !taskId.equals(agent.getCurrentTaskId())) {
+         continue;
+     }
+     ```
+     若代理当前已被其他任务占有并正在执行，本任务终止仅冻结本任务自身的步骤分配（`FROZEN`），严禁向该代理发送本任务的取消指令，严禁修改或清空归属于其他任务的工作状态与占用引用；
+   - 增强 `TaskExecutionOrchestrator.releaseAgent(agentId, expectedTaskId)`，当传入预期任务 ID 时，若代理实际占有者为其他任务，拒绝释放；
+   - 增强 `StepTimeoutMonitorTask`，超时清理时同样校验 `agent.getCurrentTaskId()` 是否属于当前超时任务，防止跨任务误清空。
+
+3. **保持已关闭项路径完整**：
+   - 保持 DEF-S3-099（V28 迁移与全拒绝持久化）、DEF-S3-101（BL-006 离线取消门禁与状态机安全协同）、DEF-S3-102（V29 迁移与承接响应时间毫秒展示与筛选）全部完整生效。
+
+### 验证记录
+
+- **定向单测**：`mvn -o test "-Dtest=DeviceMatchingAndTaskAcceptanceF016Test,TerminateSafetyTest,CommandIdentityF007Test"`，18 项测试全量通过（0 failures, 0 errors）。
+  - 新增 `DeviceMatchingAndTaskAcceptanceF016Test.testR02_parallelAcceptanceAtomicConflictSwitchesCandidate`：验证并发 CAS 竞争失败时自动切换下一候选且不下发业务指令；
+  - 新增 `TerminateSafetyTest.terminatingPendingTaskPreservesOtherExecutingTaskOccupation_DEF_S3_103`：验证终止处于待分配状态的任务时，绝不取消或清空归属于其他正在执行任务的代理占用。
+- **全量后端测试**：`mvn -o test`，356 项测试全量通过（0 failures, 0 errors, 2 skipped）。
+- **生产 JAR 打包**：`mvn -o package -DskipTests`，BUILD SUCCESS，生产 JAR `airport-ai-app-1.0.0.jar` 构建成功。
+
+### 待 ChatGPT 独立复测
+
+1. 依据 V2.4 执行 SRS_F016 整轮复测，覆盖全量 8 条规则（R01～R08）与关联用例步骤（TC-051～TC-053）；
+2. 重点复测 DEF-S3-100 与 DEF-S3-103：
+   - DEF-S3-100（探针 `simultaneous`）：在两任务并发接受场景下，数据库行锁与原子比较更新保证恰好只有一个任务取得代理占用并下发 `EXECUTE_CAPABILITY`，另一个任务正确记录 `AGENT_ASSIGNMENT_CONFLICTED` 并顺位切换；
+   - DEF-S3-103（探针 `pending_other_owner`）：在 353（待分配）与 354（已接受执行中）共用代理场景下，终止 353 时代理保持 `BUSY` 且 `current_task_id = 354`，354 步骤继续保持 `EXECUTING` 并能顺利反馈完成；
+3. 回归 DEF-S3-099、101、102 的既有通过项；
+4. 若全部项通过，按流程合并 main 并推送，交接 `REQUIREMENT_PASSED`。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 产品 SHA / 标签 | 证据提交 SHA | main |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-05 | SRS_F016 | Claude → ChatGPT | READY_FOR_GPT | a893e944b868e666ab165eb7e6ea40f1ccadaa7d / V1.159 | （待GPT生成） | 未合入；保持 9816886 |

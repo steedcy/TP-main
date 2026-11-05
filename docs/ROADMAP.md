@@ -2,8 +2,8 @@
 
 > **当前基准**：V2.4（2026-11-04 用户追加整轮复测授权；继承V2.3，见BL-005；下方既有产品验收/交接记录保留原执行版本）
 > **主干验收合入提交**：F015验收合入 `949c3b3e110bae95f27833f7ca82b00b716aadfe`；当前远端main `9816886c08dd1922c355f9c07ff3343bbf4ea3e2`（含最终交接）；F016未合入。
-> **最新产品代码提交**：`4f0b4d8`（真实完整SHA：`4f0b4d8e0ab2a2f0e4027d3ee21b20fe487dcadc`，标签`V1.158`）
-> **交接状态**：`READY_FOR_CLAUDE`（F016 V1.158 / V2.4+BL006：6P/2F/0NT规则、3P/2F/0NT步骤；099/101新口径/102关闭，100残留与103新增待修；证据9a01b3f4dd1b1285364f4e245dd516a5d668da0b已推送，不推进F017）
+> **最新产品代码提交**：`a893e94`（真实完整SHA：`a893e944b868e666ab165eb7e6ea40f1ccadaa7d`，标签`V1.159`）
+> **交接状态**：`READY_FOR_GPT`（F016 V1.159：解决 DEF-S3-100 数据库并发抢占行锁互斥/原子比较更新与 DEF-S3-103 跨任务终止设备所有权归属保护；单测 356 项全过，生产构建通过）
 > **文档定位**：本文件为跨会话、跨需求修复推进的**唯一全景进度与依据底账**。每轮需求修复与复测验收后必须同步更新本文件。
 
 ---
@@ -70,7 +70,7 @@
 
 | 需求编号 | 需求名称 | 规则状态 (P/F/NT) | 关联用例步骤 | 待修缺陷 / 攻坚重点 | 目标版本 | 当前状态 |
 |---|---|:---:|---|---|:---:|:---:|
-| **SRS_F016** | 步骤设备匹配与任务接受 | **P:6 F:2 NT:0（V1.158当前实测）** | TC-051～TC-053，5步骤3P/2F/0NT | 099/101（BL006新口径）/102关闭；100真并行双下发残留、103终止预选误清另一执行任务占用新增；全部原反例/合法对照与邻接已实测。 | V1.158（下一修复用新标签） | **READY_FOR_CLAUDE；未通过，不合main、不推进F017** |
+| **SRS_F016** | 步骤设备匹配与任务接受 | **P:6 F:2 NT:0（V1.158实测，V1.159待复测）** | TC-051～TC-053，5步骤3P/2F/0NT | 099/101（BL006新口径）/102保持关闭；100增加行锁`findByIdForUpdate`与原子`claimAgent`互斥；103增加跨任务终止归属校验，保留他任务占用与状态。 | V1.159 | **Claude 修复完成待复测 (READY_FOR_GPT)** |
 | **SRS_F017** | 业务指令下发与状态流转 | P:4 F:1 NT:5 | TC-054.S2, TC-055 | DEF-S3-068（任务进度）已在 main（`107da41`），勿重修；DEF-S3-066 的事件真实性部分已在 `06448d6`，仅余复测。 | V1.144 | 待启动（修复已在 main，待复测） |
 | **SRS_F018** | 任务异常识别与单次重规划 | P:0 F:2 NT:8 | TC-058.S2, TC-059 | DEF-S3-064（异常列表原因码/历史归档）已在 main（`107da41`）、DEF-S3-066 已在 `06448d6`，勿重修；其余为 NOT_RUN 规则，等 GPT 测试结果。 | V1.145 | 待启动（修复已在 main，待复测） |
 | **SRS_F019** | 局部重规划与上下文继承 | P:0 F:0 NT:9 | TC-060, TC-062 | 台账无缺陷记录，也无修复提交；9 条规则全部 NOT_RUN，等 GPT 测到失败项再修，不做推测性改动。 | V1.146 | 待启动 |
@@ -187,3 +187,13 @@
 - 32真实任务=30正式+2试运行，归并28观察组26P/2F；354后端报告352执行通过/2跳过、独立精确离线服务1P，package/前端build/实际JAR/迁移/认证HTTP及Edge5页通过。341一次合法5.5.3重规划旧探针断言已更正，模板准备与UI选择器错误自行修正并保留诊断。
 - **证据已先推送 9a01b3f4dd1b1285364f4e245dd516a5d668da0b**；最小F检查点93f99bf。报告`acceptance/stage3/SRS_F016-V1.158-整轮独立复测与统一交修.md`。BL006正文及本轮首次GPT裁决已同步stage0/BASELINE，未追溯修改V1.157失败。
 - 资源清理完成，活跃分配0，341旧失败计划的历史行保留；main仍9816886、无合并/PR。下一轮仍F016修100/103，保留其余关闭行为，交新标签再整轮复测；F017和95项均未因此通过。
+
+## 2026-11-05 F016 V1.159 Claude修复完成待GPT复测
+
+- 产品与单测提交：`a893e944b868e666ab165eb7e6ea40f1ccadaa7d`，版本标签 `V1.159`（严格指向该产品代码提交，已推送至 origin）。
+- 缺陷修复闭环：
+  1. DEF-S3-100（真正并发抢占竞态双下发）：在 `DeviceAgentMapper` 增加 `findByIdForUpdate` / `findByAgentCodeForUpdate`（`SELECT ... FOR UPDATE` 行级悲观锁）与 `claimAgent` 原子更新（`WHERE work_status = 'IDLE' AND (current_task_id IS NULL OR current_task_id = #{taskId})`）。在 `TaskExecutionOrchestrator.onTaskResponse` 接受分支，在行锁内重读代理最新提交态；任一竞争失败均触发 `AGENT_ASSIGNMENT_CONFLICTED`（原因码 `ERR_AGENT_ALREADY_BUSY`），将代理加入 `rejectedAgentIds`，清理步骤关联并顺位切换下一候选设备，绝不下发业务执行指令；
+  2. DEF-S3-103（跨任务人工终止误清其他执行任务占用）：在 `TaskService.terminate` 中获取并锁定受影响代理行时增加所有权归属校验：若 `agent.getCurrentTaskId() != null && !taskId.equals(agent.getCurrentTaskId())`，严格跳过（不向该代理发送当前任务的取消指令，严禁清空归属于其他任务的工作状态与占用引用）；同步增强 `TaskExecutionOrchestrator.releaseAgent(agentId, expectedTaskId)` 与 `StepTimeoutMonitorTask` 的所有权保护；
+  3. 保留 V1.158 中已关闭的 DEF-S3-099（全拒绝迁移/持久化）、DEF-S3-101（BL-006 新口径下安全取消确认释放）及 DEF-S3-102（承接响应时间毫秒展示与追溯筛选）。
+- 验证情况：后端全量 356 项单测通过（0 failures, 0 errors, 2 skipped）；生产 JAR `mvn -o package -DskipTests` 构建成功。
+- 交接状态：更新为 `READY_FOR_GPT`，交由 ChatGPT 独立复测。
