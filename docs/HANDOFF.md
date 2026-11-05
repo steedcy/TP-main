@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`REQUIREMENT_PASSED`（SRS_F018 V1.166：10P/0F/0NT、六步骤6P/0F/0NT；证据`50ace8102cf2ada8e82586a3dcd09322804d8713`、正式验收交接`3dbc00b991829cd21f0d55584f2a4dc55530a983`已推送；已安全合main并核对远端，最终合入证明随本提交同步）
-- 当前进度：F001～F018已验收合main；F018验收合入锚点`3dbc00b991829cd21f0d55584f2a4dc55530a983`，无PR，40用户文件哈希不变。产品V1.166标签固定；下一SRS_F019由Claude从最终main接续。
+- 状态：`READY_FOR_GPT`（SRS_F019 局部重新规划与上下文继承交接，产品代码 SHA `75790d9396e95b00cb369165b44087e504c5521b`，标签 `V1.167`，基于 main `620c166`，未合并）
+- 当前进度：F001～F018 已验收合 main；F019 处于 Claude 代码与单测就绪并正式交由 ChatGPT 开展整轮独立复测阶段。产品 V1.167 标签固定；待 GPT 独立复测。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -2886,6 +2886,8 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-05 | SRS_F018 | ChatGPT → Claude | READY_FOR_CLAUDE | fca58c91254c49c4ae6f66bd4a95c07997578982 / V1.165 | 8d2575d822a91975ec3aeb375a4e302df57982ae | bd182a0551cc067f0196879169fd6859f2757f83，未合入 |
 | 2026-11-05 | SRS_F018 | Claude → ChatGPT | READY_FOR_GPT | 4ad7ccb27a6cbc29c1c83a33d61bf05e3aa67452 / V1.166 | （待GPT生成） | 基于 bd182a0 |
+| 2026-11-05 | SRS_F018 | ChatGPT → main | REQUIREMENT_PASSED | 4ad7ccb27a6cbc29c1c83a33d61bf05e3aa67452 / V1.166 | 50ace8102cf2ada8e82586a3dcd09322804d8713 | 620c166 已安全合入 |
+| 2026-11-06 | SRS_F019 | Claude → ChatGPT | READY_FOR_GPT | 75790d9396e95b00cb369165b44087e504c5521b / V1.167 | （待GPT生成） | 基于 620c166 |
 
 ## 2026-11-05 Claude → ChatGPT：SRS_F018 V1.166 缺陷修复完成（READY_FOR_GPT）
 
@@ -2940,3 +2942,66 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 ### F018最终main实际同步（2026-11-05）
 
 已在主工作区安全`git merge --ff-only origin/ai/gpt-test`并推送main，远端验收合入锚点`3dbc00b991829cd21f0d55584f2a4dc55530a983`核对一致；正式验收交接同为该SHA，完整证据`50ace8102cf2ada8e82586a3dcd09322804d8713`已先推送。40用户未跟踪文件清单/哈希不变，主工作区受控文件纯净，标签V1.166仍指向4ad7ccb27a6cbc29c1c83a33d61bf05e3aa67452，无强推/reset、无PR。原始合入证明`acceptance/stage3/evidence/SRS_F018-V1.166-main-integration-20261105.json`随本次最终记录提交再次同步main，最终main HEAD可由本提交及远端直接核对。下一F019由Claude从最新main准备新交接；三核心及95项尚未整体验收通过。
+
+
+## 2026-11-06 Claude → ChatGPT：SRS_F019 局部重新规划与上下文继承交接（READY_FOR_GPT）
+
+- **状态**：`READY_FOR_GPT`。分支 `ai/claude-fix`，产品代码完整 SHA `75790d9396e95b00cb369165b44087e504c5521b`，标签 **`V1.167`**（严格指向该产品代码提交，并推送至 origin）。
+- **基准状态**：main 保持 `620c166`（已合并 F018 验收通过结果），未合并，无 PR。
+- **资源隔离**：独立工作区 `tip-claude-f016`，未触碰主工作区 `tip`，未占用 GPT 独占端口（8080/5173/8091-8096等）与专用数据库 schema。
+
+### 一、代码审查与业务规则核对（TC-054.S2, TC-055, TC-060～TC-062）
+1. **台账与基线核对**：
+   - 查阅 `docs/CLAUDE_STAGED_FIXES.md` 与历史提交，确认 SRS_F019 无新增暂存代码，核心依赖（DEF-S3-068 任务进度卡片、DEF-S3-066 事件真实性）早已在 commit `107da41` 与 `06448d6` 中并入 `main`；
+   - 本轮不重写既有成熟逻辑，聚焦状态机闭环核对与规则约束落地。
+2. **状态机与超时回滚机制（TC-054.S2, TC-055）**：
+   - `StepTimeoutMonitorTask` 监控超时步骤（默认 60s 或 planStep 自定义超时），将超时步骤置为 `FAILED`（错误码 `ERR_EXECUTION_TIMEOUT`），指令表状态置 `TIMED_OUT`，原子释放设备（BUSY -> IDLE，解绑任务）；
+   - `TaskExceptionService.freezeRemainingSteps` 立即冻结当前计划版本后续处于 `PENDING_ASSIGNMENT` 的步骤为 `FROZEN`，杜绝旧计划被错误继续下发；
+   - 尝试切换同类型候选设备，若切换失败严格记录 `EXCEPTION_RECOVERY_FAILED`，杜绝虚假恢复事件（DEF-S3-066）；
+   - 在重规划配额未消耗（`replanUsed == false`）且未降级情况下，调用 `ReplanningService.replan` 局部重规划。
+3. **局部重规划规则落地（SRS_F019.R01～R09）**：
+   - **R01（单次限制）**：`TaskMapper.claimReplan` CAS 防重保证单次重规划，已用过重规划的任务再次发生异常直接转 `PENDING_MANUAL`（TC-060.S1, TC-062.S2）；
+   - **R02 & R03（目标保留与步骤部分替换）**：原始任务目标在模型请求中脱敏（`SceneParamsPrivacyGuard.sanitizeGoal`），但数据库 tasks 表原始任务目标完整保留；已完成（COMPLETED）步骤原样保留输出参数与执行结果，仅将触发点及后续步骤生成新版本（TC-060.S1）；
+   - **R04（五步配额与剩余额度）**：严格约束 `剩余额度 = 5 - 已完成可执行步骤数`，模型返回替换步骤超过剩余额度或最终路径超 5 步直接拒绝并转 `PENDING_MANUAL`（TC-061.S1）；
+   - **R05（重试/失败事件不占步骤）**：指令重试与失败事件记录到事件时间线，不生成新计划步骤，不占用步骤配额；分支动作计数，条件节点不计数、不下发（TC-061.S2）；
+   - **R06（重新构建上下文与三类校验/监督）**：重新调用 `ContextSnapshotService.buildSnapshot` 生成上下文快照，并通过结构、能力、约束三类校验与监督判定（TC-062.S1）；
+   - **R07（完整时间线留痕）**：重规划原因、触发前恢复动作、影响判断和计划版本均写入完整任务事件时间线（TC-062.S2）；
+   - **R08（异常降级待人工）**：重规划调用模型失败、超时或三类校验未通过时，任务自动回滚并转为 `PENDING_MANUAL`（TC-062.S1）；
+   - **R09（高风险监督降级）**：新计划版本若被监督判定为高风险，自动按 5.4.6 降级至匹配的基线模板执行（TC-060.S2）。
+
+### 二、补齐单测与本地验证结果
+- **专项单测**：新增 [`backend/src/test/java/com/airport/ai/task/InstructionTimeoutAndRollbackF019Test.java`](file:///backend/src/test/java/com/airport/ai/task/InstructionTimeoutAndRollbackF019Test.java)，包含 8 组测试用例：
+  1. `testExecutionTimeout_freezesDownstreamSteps_releasesDevice_andTriggersReplanning`
+  2. `testDeviceNack_rollsBackAndRoutesToNextCandidate`
+  3. `testExecutionFailure_singleRetryIdempotent_thenTimeoutRollback`
+  4. `testCandidateSwitchRecoveryFails_preservesEventTruth`
+  5. `testSecondaryTimeoutAfterReplanning_rollsBackStraightToManualTakeover`
+  6. `testReplanningModelCallTimeout_rollsBackToPendingManualAndPreservesGoal`
+  7. `testReplanningOverQuota_rollsBackToPendingManual`
+  8. `testLateExecutionFeedbackAfterTimeout_isSafelyIgnored`
+  - 运行命令：`mvn -o test -Dtest=InstructionTimeoutAndRollbackF019Test`
+  - 结果：**8/8 全部通过，0 失败，0 错误**。
+- **历史回归测试**：
+  - `TaskReplanningQuotaAndManualTakeoverF018Test`（19/19 通过）；
+  - `BaselineDowngradeAndFailureBoundaryF015Test`（9/9 通过）；
+  - `CommandDispatchAndExecutionF017Test`（10/10 通过）；
+  - `RecoveryEventTruthF015Test`（4/4 通过）；
+  - `PlanStepLimitAndReplanningF012Test`（3/3 通过）；
+  - 核心回归测试合计 **45/45 项全部通过**。
+- **全量后端测试**：
+  - `mvn -o test`：Tests run: **390, Failures: 0, Errors: 0, Skipped: 2**，**BUILD SUCCESS**。
+- **后端生产构建**：
+  - `mvn -o -f backend/pom.xml package -DskipTests`：成功生成 `airport-ai-app-1.0.0.jar`，BUILD SUCCESS。
+
+### 三、待 ChatGPT 独立复测清单
+请 ChatGPT 基于代码提交 `75790d9396e95b00cb369165b44087e504c5521b`（标签 `V1.167`）开展 SRS_F019 的整轮独立复测：
+1. **TC-060（局部重规划触发与版本替换对比）**：
+   - TC-060.S1：触发局部重规划，核验保留原目标及已完成步骤结果，仅替换失败及后续步骤，剩余额度为 3，重试/失败事件不计动作；
+   - TC-060.S2：新方案通过三类校验和监督后继续执行；验证高风险方案自动基线降级；验证版本对比视图包含触发前恢复、影响结论、原/新版本链接、已完成结果及重规划次数；
+2. **TC-061（五步剩余配额约束）**：
+   - TC-061.S1：剩余额度 0 时直接转待人工；超过剩余额度拦截并不截断、不改变已完成结果；
+   - TC-061.S2：重复下发重试与失败事件不增加步骤；替换步骤加已完成步骤不超过 5 步（条件节点不计、分支动作计数）；
+3. **TC-062（重规划异常处理与二次故障降级）**：
+   - TC-062.S1：重规划请求失败、超时（60s）、模型不可用或三类校验不通过时，生成重新规划失败异常并转待人工处理，不下发新方案，保留原目标、历史版本和已完成结果；
+   - TC-062.S2：已消耗单次重规划配额的任务再次恢复失败且不可继续时，坚决不触发第二次重规划，直接转待人工处理，完整留存原因码与影响判断；
+4. **规则全覆盖**：覆盖 `SRS_F019.R01` 至 `SRS_F019.R09` 全部 9 条规则。
