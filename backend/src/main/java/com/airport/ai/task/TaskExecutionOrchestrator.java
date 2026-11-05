@@ -476,9 +476,14 @@ public class TaskExecutionOrchestrator {
         assignment.setStepStatus("FAILED");
         assignmentMapper.update(assignment);
         releaseAgent(assignment.getDeviceAgentId(), assignment.getTaskId());
-        taskEventService.append(assignment.getTaskId(), "STEP_FAILED", "SYSTEM", reasonCode,
+        boolean isTimeout = "TIMEOUT".equalsIgnoreCase(executionResult)
+                || "ERR_EXECUTION_TIMEOUT".equals(reasonCode)
+                || (reasonCode != null && reasonCode.contains("TIMEOUT"));
+        String exceptionType = isTimeout ? "EXECUTION_TIMEOUT" : "STEP_FAILED";
+        String eventType = isTimeout ? "STEP_TIMEOUT_DETECTED" : "STEP_FAILED";
+        taskEventService.append(assignment.getTaskId(), eventType, "SYSTEM", reasonCode,
                 "步骤" + assignment.getStepSeq() + "重试后仍失败: " + failureDetail);
-        taskExceptionService.handleException(assignment.getTaskId(), assignment.getStepSeq(), "STEP_FAILED", failureDetail);
+        taskExceptionService.handleException(assignment.getTaskId(), assignment.getStepSeq(), exceptionType, failureDetail);
     }
 
     private void completeNormalBaggageBranch(Task task, Long planVersionId, Integer measuredStepSeq,

@@ -32,6 +32,9 @@ public class ReplanningService {
     @org.springframework.beans.factory.annotation.Autowired
     private com.airport.ai.taskdef.TaskDefinitionMapper definitions;
 
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private TaskExceptionMapper taskExceptionMapper;
+
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final int MAX_STEPS = 5;
 
@@ -77,7 +80,7 @@ public class ReplanningService {
     public void replan(Long taskId, Integer failedStepSeq, String reason) {
         Task task = taskMapper.findById(taskId).orElseThrow();
         if (Boolean.TRUE.equals(task.getReplanUsed())) {
-            toPendingManual(task, "重新规划机会已使用，不允许第二次请求");
+            toPendingManual(task, failedStepSeq, "ERR_REPLAN_LIMIT_EXCEEDED", "重新规划机会已使用，不允许第二次请求");
             return;
         }
         // 备选路径2a：剩余额度为0直接判无法重规划（异常发生步骤本身即占用了一个步骤名额，
@@ -88,9 +91,11 @@ public class ReplanningService {
                 && a.getStepSeq() != null && a.getStepSeq() < failedStepSeq).count();
         int remainingQuota = MAX_STEPS - (int) completedCount;
         if (remainingQuota <= 0) {
+            task.setReplanUsed(true);
+            task.setReplanningReason(reason);
             taskEventService.append(taskId, "REPLAN_FAILED", "SYSTEM", "ERR_STEP_QUOTA_EXHAUSTED",
                     "已完成步骤数达到5步上限，无剩余步骤额度，无法重新规划");
-            toPendingManual(task, "重新规划失败：已完成步骤数达到5步上限，无剩余额度");
+            toPendingManual(task, failedStepSeq, "ERR_STEP_QUOTA_EXHAUSTED", "重新规划失败：已完成步骤数达到5步上限，无剩余额度");
             return;
         }
 
@@ -105,7 +110,7 @@ public class ReplanningService {
             if (seq == null || seq >= failedStepSeq) continue;
             TaskStepAssignment completed = completedAssignments.get(seq);
             if (completed == null) {
-                toPendingManual(task, "重规划前序步骤缺少实际完成记录，不允许假定为已完成");
+                toPendingManual(task, failedStepSeq, "ERR_PREVIOUS_STEPS_INCOMPLETE", "重规划前序步骤缺少实际完成记录，不允许假定为已完成");
                 return;
             }
             Map<String, Object> preserved = new java.util.LinkedHashMap<>(original);
@@ -123,7 +128,7 @@ public class ReplanningService {
                 String description=definition.get().getConstraintDescription();
                 definitionConstraint=description;
                 try { allowedTypes=MAPPER.readValue(definition.get().getAvailableCapabilityTypes(),List.class); }
-                catch (Exception ex) { toPendingManual(task,"任务定义能力范围无法解析，禁止重新规划执行"); return; }
+                catch (Exception ex) { toPendingManual(task, failedStepSeq, "ERR_TASK_DEFINITION_INVALID", "任务定义能力范围无法解析，禁止重新规划执行"); return; }
             }
         }
 
@@ -171,7 +176,7 @@ public class ReplanningService {
         if (response == null || !response.isSuccess()) {
             taskEventService.append(taskId, "REPLAN_FAILED", "SYSTEM", "ERR_REPLANNING_MODEL_FAILED",
                     "局部重新规划调用模型失败: " + (response == null ? "响应为空" : response.getErrorMessage()));
-            toPendingManual(task, "局部重新规划失败：规划模型服务不可用或超时");
+            toPendingManual(task, failedStepSeq, "ERR_REPLANNING_MODEL_FAILED", "局部重新规划失败：规划模型服务不可用或超时");
             return;
         }
 
@@ -180,7 +185,7 @@ public class ReplanningService {
             taskEventService.append(taskId, "REPLAN_FAILED", "SYSTEM", "ERR_STEP_LIMIT_EXCEEDED",
                     "新计划替换的可执行步骤数" + PlanStepRules.executableCount(newTailSteps) + "超过剩余额度" + remainingQuota + "或为空（已完成"
                             + completedSteps.size() + "步，条件节点不计数、分支动作计数）");
-            toPendingManual(task, "局部重新规划失败：新计划步骤数超过剩余额度");
+            toPendingManual(task, failedStepSeq, "ERR_STEP_LIMIT_EXCEEDED", "局部重新规划失败：新计划步骤数超过剩余额度");
             return;
         }
 
@@ -249,7 +254,7 @@ public class ReplanningService {
                 summary.append("]");
             }
             taskEventService.append(taskId, "REPLAN_FAILED", "SYSTEM", primaryReason, summary.toString());
-            toPendingManual(task, "局部重新规划失败：新计划版本三类校验未通过: " + primaryReason);
+            toPendingManual(task, failedStepSeq, primaryReason, "局部重新规划失败：新计划版本三类校验未通过: " + primaryReason);
             return;
         }
 
@@ -269,7 +274,7 @@ public class ReplanningService {
         } catch (Exception e) {
             taskEventService.append(taskId, "SUPERVISION_JUDGED", "SYSTEM", "ERR_SUPERVISION_UNAVAILABLE",
                     "重新规划后监督服务不可用: " + e.getMessage());
-            toPendingManual(task, "局部重新规划后监督判定失败：" + e.getMessage());
+            toPendingManual(task, failedStepSeq, "ERR_SUPERVISION_UNAVAILABLE", "局部重新规划后监督判定失败：" + e.getMessage());
             return;
         }
 
@@ -289,7 +294,7 @@ public class ReplanningService {
         if (!"LOW".equals(riskResult.getRiskLevel())) {
             taskEventService.append(taskId, "REPLAN_FAILED", "SYSTEM", "ERR_REPLAN_RISK_UNDETERMINED",
                     "重新规划后新计划版本风险无法确定，转人工处理");
-            toPendingManual(task, "局部重新规划后监督风险无法确定");
+            toPendingManual(task, failedStepSeq, "ERR_REPLAN_RISK_UNDETERMINED", "局部重新规划后监督风险无法确定");
             return;
         }
 
@@ -430,7 +435,7 @@ public class ReplanningService {
 
     private void baselineUnavailable(Task task, String detail) {
         taskEventService.append(task.getId(), "REPLAN_FAILED", "SYSTEM", "ERR_REPLAN_BASELINE_UNAVAILABLE", detail);
-        toPendingManual(task, "局部重规划高风险降级失败：" + detail);
+        toPendingManual(task, null, "ERR_REPLAN_BASELINE_UNAVAILABLE", "局部重规划高风险降级失败：" + detail);
     }
 
     private List<Map<String, Object>> normalizeTemplateSteps(List<Map<String, Object>> steps) {
@@ -450,12 +455,32 @@ public class ReplanningService {
     }
 
     private void toPendingManual(Task task, String reason) {
+        toPendingManual(task, null, "ERR_REPLAN_FAILED", reason);
+    }
+
+    private void toPendingManual(Task task, Integer stepSeq, String reasonCode, String reason) {
         task.setStatus(TaskStatus.PENDING_MANUAL);
         task.setFailureReason(reason);
         task.setUpdatedAt(LocalDateTime.now());
         taskMapper.update(task);
         // 状态转移须在时间线可见（DEF-S3-066、F015.R08/F020.R01）
-        taskEventService.append(task.getId(), "TASK_PENDING_MANUAL", "SYSTEM", "ERR_REPLAN_FAILED", reason);
+        taskEventService.append(task.getId(), "TASK_PENDING_MANUAL", "SYSTEM",
+                reasonCode != null ? reasonCode : "ERR_REPLAN_FAILED", reason);
+        if (taskExceptionMapper != null) {
+            TaskException ex = new TaskException();
+            ex.setTaskId(task.getId());
+            ex.setStepSeq(stepSeq);
+            ex.setExceptionType("REPLAN_FAILED");
+            ex.setReasonCode(reasonCode != null ? reasonCode : "ERR_REPLAN_FAILED");
+            ex.setOccurredAt(LocalDateTime.now());
+            ex.setRecoveryAction("局部重新规划");
+            ex.setRecoveryResult("FAILED");
+            ex.setImpactConclusion("局部重新规划失败，转人工处理");
+            ex.setExceptionStatus("RESOLVED");
+            ex.setResolvedAt(LocalDateTime.now());
+            ex.setResolvedBy("SYSTEM");
+            taskExceptionMapper.insert(ex);
+        }
     }
 
     @SuppressWarnings("unchecked")
