@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.Map;
 
@@ -103,6 +104,21 @@ public class DeviceAgentMessagingService {
         DeviceAgent agent = agentMapper.findByAgentCode(agentCode)
                 .orElseThrow(() -> new BusinessException(ErrorCode.DEVICE_AGENT_NOT_FOUND));
         if (!"ENABLED".equals(agent.getAgentStatus()) || !"ONLINE".equals(agent.getOnlineStatus())) {
+            if ("TASK_CANCEL".equals(commandType)) {
+                DeviceCommandRecord record = new DeviceCommandRecord();
+                record.setCommandId(commandId);
+                record.setAgentCode(agentCode);
+                record.setCommandType("TASK_CANCEL");
+                record.setAttemptNo(attemptNo == null ? 0 : attemptNo);
+                record.setTaskId(taskId);
+                record.setStepSeq(stepSeq);
+                record.setCapabilityType(capabilityType);
+                record.setCommandPayload("{}");
+                record.setCommandStatus("DELIVERY_FAILED");
+                record.setCreatedAt(LocalDateTime.now());
+                record.setUpdatedAt(record.getCreatedAt());
+                commandMapper.insertIfAbsent(record);
+            }
             throw new BusinessException(ErrorCode.DEVICE_OFFLINE);
         }
         Device device = deviceMapper.findById(agent.getDeviceId())

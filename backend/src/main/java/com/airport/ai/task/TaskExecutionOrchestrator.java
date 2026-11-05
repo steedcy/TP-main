@@ -205,6 +205,7 @@ public class TaskExecutionOrchestrator {
         String commandId = assignment.getCommandId() != null ? assignment.getCommandId() : generateCommandId();
         assignment.setCommandId(commandId);
         assignment.setDeviceAgentId(chosen.agent.getId());
+        assignment.setAcceptanceRequestedAt(LocalDateTime.now());
         assignment.setUpdatedAt(LocalDateTime.now());
         assignmentMapper.update(assignment);
 
@@ -242,7 +243,34 @@ public class TaskExecutionOrchestrator {
             throw new BusinessException(ErrorCode.STEP_STATUS_NOT_ALLOWED, "步骤当前状态不是待分配，不接受任务响应");
         }
 
+        LocalDateTime now = LocalDateTime.now();
+        assignment.setAcceptedAt(now);
+        if (assignment.getAcceptanceRequestedAt() != null) {
+            long duration = java.time.Duration.between(assignment.getAcceptanceRequestedAt(), now).toMillis();
+            assignment.setAcceptanceDurationMs(Math.max(0, duration));
+        }
+
         if (accepted) {
+            // DEF-S3-100: 待承接窗口互斥与占用原子性校验，后到接受响应不可覆盖已有执行任务
+            if ("BUSY".equals(agent.getWorkStatus()) || (agent.getCurrentTaskId() != null && !agent.getCurrentTaskId().equals(assignment.getTaskId()))) {
+                taskEventService.append(assignment.getTaskId(), "AGENT_ASSIGNMENT_CONFLICTED", "SYSTEM", "ERR_AGENT_ALREADY_BUSY",
+                        "设备代理" + agentCode + "已被任务" + agent.getCurrentTaskId() + "占用，拒绝该冲突承接响应，顺位切换候选设备");
+
+                List<String> rejected = parseRejectedIds(assignment.getRejectedAgentIds());
+                if (!rejected.contains(agentCode)) {
+                    rejected.add(agentCode);
+                }
+                assignment.setRejectedAgentIds(toJson(rejected));
+                assignment.setDeviceAgentId(null);
+                assignment.setCommandId(null);
+                assignment.setExecuteCommandId(null);
+                assignment.setUpdatedAt(LocalDateTime.now());
+                assignmentMapper.update(assignment);
+
+                assignStep(assignment.getTaskId(), assignment.getPlanVersionId(), assignment.getStepSeq());
+                return;
+            }
+
             agent.setWorkStatus("BUSY");
             agent.setCurrentTaskId(assignment.getTaskId());
             agent.setCurrentStepSeq(assignment.getStepSeq());

@@ -6,6 +6,7 @@
       <a-select-option value="EXECUTION_TIMEOUT">执行超时</a-select-option>
       <a-select-option value="STEP_FAILED">步骤失败</a-select-option>
       <a-select-option value="REPLAN_FAILED">重新规划失败</a-select-option>
+      <a-select-option value="ASSIGNMENT_FAILED">分配失败</a-select-option>
     </a-select>
     <a-select v-model:value="filterStatus" placeholder="处置状态" style="width: 150px" allow-clear @change="onStatusChange">
       <a-select-option value="PENDING">待处置</a-select-option>
@@ -82,7 +83,7 @@ const columns = [
 function typeLabel(type) {
   const map = {
     AGENT_OFFLINE: '设备离线', CAPABILITY_GAP: '能力缺口', EXECUTION_TIMEOUT: '执行超时',
-    STEP_FAILED: '步骤失败', REPLAN_FAILED: '重新规划失败'
+    STEP_FAILED: '步骤失败', REPLAN_FAILED: '重新规划失败', ASSIGNMENT_FAILED: '分配失败'
   }
   return map[type] || type
 }

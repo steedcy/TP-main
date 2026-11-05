@@ -359,4 +359,83 @@ class DeviceMatchingAndTaskAcceptanceF016Test {
         assertNull(a1.getCurrentStepSeq());
         verify(deviceAgentMapper).update(a1);
     }
+
+
+
+    @Test
+    @DisplayName("SRS_F016.R02 / DEF-S3-100: 待承接窗口期被其他任务抢占，响应到达时检测到冲突并自动切换下一候选")
+    void testR02_acceptanceWindowConflictSwitchesCandidate() {
+        Device d1 = createDevice(1L, "DEV-01", "FLIGHT_DELAY_BOARD", null, 800.0, 4000.0);
+        DeviceAgent a1 = createAgent(10L, "AGT-01", 1L, "ONLINE", "IDLE", null);
+
+        Device d2 = createDevice(2L, "DEV-02", "FLIGHT_DELAY_BOARD", null, 810.0, 4000.0);
+        DeviceAgent a2 = createAgent(20L, "AGT-02", 2L, "ONLINE", "IDLE", null);
+
+        when(deviceAgentMapper.findByAgentStatusAndOnlineStatus("ENABLED", "ONLINE"))
+                .thenReturn(List.of(a1, a2));
+        when(deviceMapper.findByIds(anyList())).thenReturn(List.of(d1, d2));
+        when(deviceCapabilityMapper.existsByDeviceIdAndCapabilityTypeAndCapabilityStatus(anyLong(), eq("CAP_FLIGHT_UPDATE"), eq("ENABLED")))
+                .thenReturn(true);
+        when(deviceAgentMapper.findByAgentCode("AGT-01")).thenReturn(Optional.of(a1));
+        when(deviceAgentMapper.findByAgentCode("AGT-02")).thenReturn(Optional.of(a2));
+        when(deviceAgentMapper.findById(10L)).thenReturn(Optional.of(a1));
+        when(deviceAgentMapper.findById(20L)).thenReturn(Optional.of(a2));
+        when(assignmentMapper.findByCommandId(anyString())).thenReturn(Optional.of(testAssignment));
+
+        // 步骤1发起分配
+        orchestrator.assignStep(100L, 200L, 1);
+        assertEquals(10L, testAssignment.getDeviceAgentId());
+        String commandId = testAssignment.getCommandId();
+        assertNotNull(commandId);
+
+        // 模拟待承接窗口期：AGT-01 在响应到达前被其他任务抢占（变 BUSY，currentTaskId=999）
+        a1.setWorkStatus("BUSY");
+        a1.setCurrentTaskId(999L);
+
+        // AGT-01 返回 accepted=true 响应
+        orchestrator.onTaskResponse("AGT-01", commandId, true, null);
+
+        // 验证检测到冲突，记录冲突事件，且不下发业务指令给 a1
+        verify(taskEventService).append(eq(100L), eq("AGENT_ASSIGNMENT_CONFLICTED"), eq("SYSTEM"),
+                eq("ERR_AGENT_ALREADY_BUSY"), contains("已被任务999占用"));
+        verify(deviceAgentMessagingService, never()).executeCapability(eq("AGT-01"), any(), any(), any(), any(), anyInt(), any());
+
+        // 验证自动切换到下一候选 a2 发起承接请求
+        verify(deviceAgentMessagingService).requestTaskAcceptance(eq("AGT-02"), anyString(), eq(100L), eq(1), eq("CAP_FLIGHT_UPDATE"), any());
+        assertTrue(testAssignment.getRejectedAgentIds().contains("AGT-01"));
+    }
+
+    @Test
+    @DisplayName("SRS_F016.R06 / DEF-S3-102: 步骤承接请求记录发起时间，接受时记录完成时间与耗时毫秒数")
+    void testR06_acceptanceTimingRecorded() {
+        Device d1 = createDevice(1L, "DEV-01", "FLIGHT_DELAY_BOARD", null, 800.0, 4000.0);
+        DeviceAgent a1 = createAgent(10L, "AGT-01", 1L, "ONLINE", "IDLE", null);
+
+        when(deviceAgentMapper.findByAgentStatusAndOnlineStatus("ENABLED", "ONLINE"))
+                .thenReturn(List.of(a1));
+        when(deviceMapper.findByIds(anyList())).thenReturn(List.of(d1));
+        when(deviceCapabilityMapper.existsByDeviceIdAndCapabilityTypeAndCapabilityStatus(anyLong(), eq("CAP_FLIGHT_UPDATE"), eq("ENABLED")))
+                .thenReturn(true);
+        when(deviceAgentMapper.findByAgentCode("AGT-01")).thenReturn(Optional.of(a1));
+        when(deviceAgentMapper.findById(10L)).thenReturn(Optional.of(a1));
+        when(assignmentMapper.findByCommandId(anyString())).thenReturn(Optional.of(testAssignment));
+
+        orchestrator.assignStep(100L, 200L, 1);
+
+        assertNotNull(testAssignment.getAcceptanceRequestedAt());
+        assertNull(testAssignment.getAcceptedAt());
+        assertNull(testAssignment.getAcceptanceDurationMs());
+
+        String commandId = testAssignment.getCommandId();
+        orchestrator.onTaskResponse("AGT-01", commandId, true, null);
+
+        assertNotNull(testAssignment.getAcceptedAt());
+        assertNotNull(testAssignment.getAcceptanceDurationMs());
+        assertTrue(testAssignment.getAcceptanceDurationMs() >= 0);
+
+        // 验证 DTO 视图格式化承接响应时间
+        com.airport.ai.task.dto.TaskStepAssignmentView view = com.airport.ai.task.dto.TaskStepAssignmentView.from(testAssignment);
+        assertNotNull(view.getAcceptanceResponseTime());
+        assertTrue(view.getAcceptanceResponseTime().endsWith("ms"));
+    }
 }

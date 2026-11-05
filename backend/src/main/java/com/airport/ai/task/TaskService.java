@@ -413,10 +413,17 @@ public class TaskService {
                         "向设备代理" + agentCode + "发送业务任务取消请求失败: " + ex.getMessage());
                 deviceResults.add(Map.of("agentId", agentCode, "result", "CANCEL_FAILED"));
             }
-            // A queued cancellation does not prove the device stopped. Keep it unavailable
-            // until an IDLE status report confirms release (or an operator resolves it).
-            agent.setWorkStatus("BUSY");
-            agent.setCurrentTaskId(taskId);
+            if (taskId.equals(agent.getCurrentTaskId())) {
+                // A queued cancellation does not prove the device stopped. Keep it unavailable
+                // until an IDLE status report confirms release (or an operator resolves it).
+                agent.setWorkStatus("BUSY");
+                agent.setCurrentTaskId(taskId);
+            } else {
+                // Not actively occupied by this task: release immediately to avoid false BUSY lock
+                agent.setWorkStatus("IDLE");
+                agent.setCurrentTaskId(null);
+                agent.setCurrentStepSeq(null);
+            }
             deviceAgentMapper.update(agent);
         }
 

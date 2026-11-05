@@ -159,6 +159,9 @@
           <template v-else-if="column.dataIndex === 'stepStatus'">
             <a-tag>{{ stepStatusLabel(record.stepStatus) }}</a-tag>
           </template>
+          <template v-else-if="column.dataIndex === 'acceptanceResponseTime'">
+            <span>{{ formatAcceptanceTime(record) }}</span>
+          </template>
         </template>
       </a-table>
     </a-card>
@@ -372,9 +375,22 @@ const stepAssignmentColumns = [
   { title: '步骤状态', dataIndex: 'stepStatus' },
   { title: '重试次数', dataIndex: 'retryCount' },
   { title: '执行结果', dataIndex: 'executionResult' },
+  { title: '承接响应时间', dataIndex: 'acceptanceResponseTime' },
   { title: '下发时间', dataIndex: 'dispatchedAt' },
   { title: '反馈时间', dataIndex: 'feedbackAt' }
 ]
+
+function formatAcceptanceTime(record) {
+  if (record.acceptanceResponseTime) return record.acceptanceResponseTime
+  if (record.acceptanceDurationMs != null) return record.acceptanceDurationMs + 'ms'
+  const reqEvent = (events.value || []).find(e => e.eventType === 'AGENT_ASSIGNMENT_REQUESTED' && e.detailSummary && e.detailSummary.includes(`步骤${record.stepSeq}`))
+  const accEvent = (events.value || []).find(e => (e.eventType === 'AGENT_ASSIGNED' || e.eventType === 'AGENT_REJECTED') && e.detailSummary && e.detailSummary.includes(`步骤${record.stepSeq}`))
+  if (reqEvent && accEvent) {
+    const diff = Math.max(0, new Date(accEvent.occurredAt).getTime() - new Date(reqEvent.occurredAt).getTime())
+    return diff + 'ms'
+  }
+  return '-'
+}
 
 const statusOptions = [
   { key: 'PLANNING', label: '待规划' }, { key: 'SUPERVISING', label: '监督判定中' },

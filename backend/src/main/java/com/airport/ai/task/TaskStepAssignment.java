@@ -30,6 +30,9 @@ public class TaskStepAssignment {
     private LocalDateTime feedbackAt;
     /** 对应5.5.1候选轮询：已询问过并被拒绝的候选代理编码清单（JSON数组），下一次挑选候选时须排除 */
     private String rejectedAgentIds = "[]";
+    private LocalDateTime acceptanceRequestedAt;
+    private LocalDateTime acceptedAt;
+    private Long acceptanceDurationMs;
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime updatedAt = LocalDateTime.now();
 
@@ -61,6 +64,12 @@ public class TaskStepAssignment {
     public void setDispatchedAt(LocalDateTime dispatchedAt) { this.dispatchedAt = dispatchedAt; }
     public LocalDateTime getFeedbackAt() { return feedbackAt; }
     public void setFeedbackAt(LocalDateTime feedbackAt) { this.feedbackAt = feedbackAt; }
+    public LocalDateTime getAcceptanceRequestedAt() { return acceptanceRequestedAt; }
+    public void setAcceptanceRequestedAt(LocalDateTime acceptanceRequestedAt) { this.acceptanceRequestedAt = acceptanceRequestedAt; }
+    public LocalDateTime getAcceptedAt() { return acceptedAt; }
+    public void setAcceptedAt(LocalDateTime acceptedAt) { this.acceptedAt = acceptedAt; }
+    public Long getAcceptanceDurationMs() { return acceptanceDurationMs; }
+    public void setAcceptanceDurationMs(Long acceptanceDurationMs) { this.acceptanceDurationMs = acceptanceDurationMs; }
     public String getRejectedAgentIds() { return rejectedAgentIds; }
     public void setRejectedAgentIds(String rejectedAgentIds) { this.rejectedAgentIds = rejectedAgentIds; }
     public LocalDateTime getCreatedAt() { return createdAt; }

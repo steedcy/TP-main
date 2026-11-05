@@ -28,6 +28,14 @@ public class TaskStepAssignmentView {
     private LocalDateTime dispatchedAt;
     private LocalDateTime feedbackAt;
     private List<String> rejectedAgentIds;
+    private LocalDateTime acceptanceRequestedAt;
+    private LocalDateTime acceptedAt;
+    private Long acceptanceDurationMs;
+    private String acceptanceResponseTime;
+
+    public static TaskStepAssignmentView from(TaskStepAssignment a) {
+        return from(a, null);
+    }
 
     public static TaskStepAssignmentView from(TaskStepAssignment a, DeviceAgent agent) {
         TaskStepAssignmentView v = new TaskStepAssignmentView();
@@ -43,6 +51,16 @@ public class TaskStepAssignmentView {
         v.dispatchedAt = a.getDispatchedAt();
         v.feedbackAt = a.getFeedbackAt();
         v.rejectedAgentIds = parseList(a.getRejectedAgentIds());
+        v.acceptanceRequestedAt = a.getAcceptanceRequestedAt();
+        v.acceptedAt = a.getAcceptedAt();
+        v.acceptanceDurationMs = a.getAcceptanceDurationMs();
+        if (v.acceptanceDurationMs != null) {
+            v.acceptanceResponseTime = v.acceptanceDurationMs + "ms";
+        } else if (v.acceptanceRequestedAt != null && v.acceptedAt != null) {
+            long ms = java.time.Duration.between(v.acceptanceRequestedAt, v.acceptedAt).toMillis();
+            v.acceptanceDurationMs = Math.max(0, ms);
+            v.acceptanceResponseTime = v.acceptanceDurationMs + "ms";
+        }
         return v;
     }
 
@@ -67,6 +85,10 @@ public class TaskStepAssignmentView {
     public String getExecutionResult() { return executionResult; }
     public String getReasonCode() { return reasonCode; }
     public Map<String, Object> getOutputParams() { return outputParams; }
+    public LocalDateTime getAcceptanceRequestedAt() { return acceptanceRequestedAt; }
+    public LocalDateTime getAcceptedAt() { return acceptedAt; }
+    public Long getAcceptanceDurationMs() { return acceptanceDurationMs; }
+    public String getAcceptanceResponseTime() { return acceptanceResponseTime; }
     public LocalDateTime getDispatchedAt() { return dispatchedAt; }
     public LocalDateTime getFeedbackAt() { return feedbackAt; }
     public List<String> getRejectedAgentIds() { return rejectedAgentIds; }

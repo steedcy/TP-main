@@ -160,7 +160,7 @@ const filteredEvents = computed(() => {
   return events.value.filter((e) => eventTypeFilter.value.includes(e.eventType))
 })
 const replanRecoveryEvents = computed(() => events.value.filter(e =>
-  ['STEP_FAILED', 'CAPABILITY_GAP', 'REPLANNING_TRIGGERED', 'REPLAN_FAILED', 'REPLAN_SUCCEEDED'].includes(e.eventType)))
+  ['STEP_FAILED', 'CAPABILITY_GAP', 'ASSIGNMENT_FAILED', 'REPLANNING_TRIGGERED', 'REPLAN_FAILED', 'REPLAN_SUCCEEDED'].includes(e.eventType)))
 const preservedResults = computed(() => (planVersions.value.at(-1)?.planSteps || [])
   .filter(step => step.executionResult != null)
   .map(step => ({ stepSeq: step.stepSeq, capabilityType: step.capabilityType,
