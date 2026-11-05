@@ -21,7 +21,7 @@ public interface DashboardMapper {
     @Select("SELECT COUNT(*) FROM tasks WHERE is_dry_run = FALSE AND status = 'PENDING_MANUAL'")
     long countPendingManualTasks();
 
-    @Select("SELECT COUNT(*) FROM task_exceptions e JOIN tasks t ON t.id = e.task_id WHERE t.is_dry_run = FALSE AND e.exception_status = 'PENDING'")
+    @Select("SELECT COUNT(*) FROM task_exceptions e JOIN tasks t ON t.id = e.task_id WHERE t.is_dry_run = FALSE AND e.exception_status IN ('PENDING', 'PROCESSING')")
     long countPendingExceptions();
 
     @Select("SELECT COUNT(*) FROM task_events ev JOIN tasks t ON t.id = ev.task_id WHERE t.is_dry_run = FALSE AND ev.event_type = 'REPLANNING_TRIGGERED' AND ev.occurred_at >= #{since}")

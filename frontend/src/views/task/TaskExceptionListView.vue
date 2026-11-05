@@ -14,11 +14,11 @@
       <a-select-option value="RESOLVED">已处置</a-select-option>
       <a-select-option value="IGNORED">已忽略</a-select-option>
     </a-select>
-    <!-- 待处置与历史归档分开看：默认只显示待处置/处置中，已处置、已忽略进入历史（DEF-S3-064） -->
-    <a-radio-group v-model:value="scope" button-style="solid" @change="fetchList" data-testid="exception-scope">
+    <!-- 待处置与历史归档分开看：默认显示全部（TC-058.S2 / DEF-S3-064），可切换待处理/历史归档 -->
+    <a-radio-group v-model:value="scope" button-style="solid" @change="onScopeChange" data-testid="exception-scope">
+      <a-radio-button value="all">全部（{{ counts.all }}）</a-radio-button>
       <a-radio-button value="active">待处理（{{ counts.active }}）</a-radio-button>
       <a-radio-button value="history">历史归档（{{ counts.history }}）</a-radio-button>
-      <a-radio-button value="all">全部（{{ counts.all }}）</a-radio-button>
     </a-radio-group>
   </a-space>
 
@@ -55,12 +55,20 @@ import { useRoute } from 'vue-router'
 import { listTaskExceptions } from '../../api/task'
 import { inScope, scopeCounts, scopeForStatus } from '../../utils/exceptionScope'
 
+const route = useRoute()
 const exceptions = ref([])
 const filterType = ref(undefined)
-const filterStatus = ref(useRoute().query.exceptionStatus || undefined)
-// 默认只看待处理；总览带状态跳转时，范围跟着状态走
-const scope = ref(scopeForStatus(filterStatus.value))
+const filterStatus = ref(route.query.exceptionStatus || undefined)
+// 默认全部（TC-058.S2 / DEF-S3-064）；若路由携带 scope 或 exceptionStatus 查询参数则自动跟随
+const scope = ref(route.query.scope || (filterStatus.value ? scopeForStatus(filterStatus.value) : 'all'))
 const counts = ref({ active: 0, history: 0, all: 0 })
+
+function onScopeChange() {
+  if (filterStatus.value && scope.value !== 'all' && scopeForStatus(filterStatus.value) !== scope.value) {
+    filterStatus.value = undefined
+  }
+  fetchList()
+}
 
 function onStatusChange() {
   // 选了具体处置状态就切到对应范围，避免“选了已处置却因范围为待处理而什么都看不到”

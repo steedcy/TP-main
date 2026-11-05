@@ -188,6 +188,7 @@
       <a-timeline>
         <a-timeline-item v-for="e in events" :key="e.id">
           {{ e.occurredAt }} - {{ e.eventType }}
+          <span v-if="e.reasonCode" style="margin-left: 6px; color: #fa8c16">（原因码: {{ e.reasonCode }}）</span>
           <span v-if="e.detailSummary">：{{ e.detailSummary }}</span>
         </a-timeline-item>
       </a-timeline>

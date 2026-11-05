@@ -13,6 +13,7 @@ public interface TaskExceptionMapper {
     List<TaskException> searchPaged(@Param("exceptionType") String exceptionType,
                                      @Param("exceptionStatus") String exceptionStatus);
     long countByExceptionStatus(String exceptionStatus);
+    long countUnhandledExceptions();
     int insert(TaskException exception);
     int update(TaskException exception);
 }

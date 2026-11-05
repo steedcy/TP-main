@@ -78,22 +78,64 @@ public class TaskExceptionService {
      * 尝试候选设备切换（恢复动作） -&gt; 恢复成功则续跑，失败则判断计划是否可继续。
      */
     @Transactional
-    public void handleException(Long taskId, Integer stepSeq, String exceptionType, String detail) {
-        Task task = taskMapper.findById(taskId).orElseThrow();
-        if (isTerminalOrManual(task.getStatus())) {
-            return; // 任务已终止/待人工/终态，异常记录仍写但不再驱动流程
-        }
+    public void onStepFirstFailure(Long taskId, Integer stepSeq, String exceptionType, String reasonCode, String failureDetail) {
+        Task task = taskMapper.findById(taskId).orElse(null);
+        if (task == null || isTerminalOrManual(task.getStatus())) return;
 
         TaskException exception = new TaskException();
         exception.setTaskId(taskId);
         exception.setStepSeq(stepSeq);
         exception.setExceptionType(exceptionType);
-        exception.setReasonCode(detail);
+        exception.setReasonCode(reasonCode != null ? reasonCode : "ERR_STEP_FAILED");
+        exception.setRecoveryAction("指令重试");
+        exception.setRecoveryResult(null);
         exception.setExceptionStatus("PROCESSING");
+        exception.setOccurredAt(LocalDateTime.now());
+        exception.setImpactConclusion("尝试指令重试1次，若成功则计划继续执行");
         taskExceptionMapper.insert(exception);
         activeExceptions.computeIfAbsent(taskId, k -> new java.util.concurrent.CopyOnWriteArrayList<>()).add(exception);
-        taskEventService.append(taskId, "EXCEPTION_DETECTED", "SYSTEM", exceptionType,
-                "识别到异常: " + exceptionType + "，步骤" + stepSeq + "，详情: " + detail);
+
+        taskEventService.append(taskId, "EXCEPTION_DETECTED", "SYSTEM", reasonCode != null ? reasonCode : exceptionType,
+                "识别到异常: " + exceptionType + "，步骤" + stepSeq + "，详情: " + failureDetail);
+    }
+
+    @Transactional
+    public void handleException(Long taskId, Integer stepSeq, String exceptionType, String detail) {
+        String code = null;
+        if (detail != null && detail.contains("原因: ")) {
+            code = detail.substring(detail.indexOf("原因: ") + "原因: ".length()).trim();
+        }
+        handleException(taskId, stepSeq, exceptionType, code, detail);
+    }
+
+    @Transactional
+    public void handleException(Long taskId, Integer stepSeq, String exceptionType, String reasonCode, String detail) {
+        Task task = taskMapper.findById(taskId).orElseThrow();
+        if (isTerminalOrManual(task.getStatus())) {
+            return; // 任务已终止/待人工/终态，异常记录仍写但不再驱动流程
+        }
+
+        // 优先查找该步骤是否已有重试产生的 PROCESSING 异常记录；若无则新建
+        TaskException exception = taskExceptionMapper.findByTaskIdOrderByOccurredAtDesc(taskId).stream()
+                .filter(e -> stepSeq != null && stepSeq.equals(e.getStepSeq()) && "PROCESSING".equals(e.getExceptionStatus()))
+                .findFirst().orElse(null);
+
+        if (exception == null) {
+            exception = new TaskException();
+            exception.setTaskId(taskId);
+            exception.setStepSeq(stepSeq);
+            exception.setExceptionType(exceptionType);
+            exception.setReasonCode(reasonCode != null ? reasonCode : detail);
+            exception.setExceptionStatus("PROCESSING");
+            exception.setOccurredAt(LocalDateTime.now());
+            taskExceptionMapper.insert(exception);
+            activeExceptions.computeIfAbsent(taskId, k -> new java.util.concurrent.CopyOnWriteArrayList<>()).add(exception);
+            taskEventService.append(taskId, "EXCEPTION_DETECTED", "SYSTEM", reasonCode != null ? reasonCode : exceptionType,
+                    "识别到异常: " + exceptionType + "，步骤" + stepSeq + "，详情: " + detail);
+        } else {
+            exception.setExceptionType(exceptionType);
+            if (reasonCode != null) exception.setReasonCode(reasonCode);
+        }
 
         if (Boolean.TRUE.equals(task.getIsDryRun())) {
             dryRunLifecycle.finish(taskId, false, detail);
@@ -188,23 +230,32 @@ public class TaskExceptionService {
      * 额度已用或任务本身即为降级执行（DOWNGRADING）则直接转人工处理，不再自动降级。
      */
     /**
-     * 对应DEF-S3-066：候选设备切换后，等待新设备承接并实际执行成功（完成条件满足）后，
-     * 再确认恢复成功并写入EXCEPTION_RECOVERED。
+     * 对应DEF-S3-066与DEF-S3-105：指令重试成功或候选设备切换执行成功（完成条件满足）后，
+     * 确认恢复成功并写入EXCEPTION_RECOVERED，补全恢复闭环与影响留痕。
      */
     @Transactional
     public void onStepRecovered(Long taskId, Integer stepSeq) {
         List<TaskException> list = getTaskExceptions(taskId);
         for (TaskException ex : list) {
             if (stepSeq != null && stepSeq.equals(ex.getStepSeq()) && !"RESOLVED".equals(ex.getExceptionStatus())) {
+                boolean isRetry = "指令重试".equals(ex.getRecoveryAction()) || "自动重试1次".equals(ex.getRecoveryAction());
                 ex.setRecoveryResult("SUCCESS");
                 ex.setExceptionStatus("RESOLVED");
                 ex.setResolvedAt(LocalDateTime.now());
                 ex.setResolvedBy("SYSTEM");
-                ex.setImpactConclusion("已切换候选设备重新分配，计划可继续执行，不触发重新规划");
+                String impact = isRetry
+                        ? "自动重试成功，计划可继续执行，不触发重新规划"
+                        : "已切换候选设备重新分配，计划可继续执行，不触发重新规划";
+                ex.setImpactConclusion(impact);
                 taskExceptionMapper.update(ex);
-                taskEventService.append(taskId, "EXCEPTION_RECOVERED", "SYSTEM", ex.getExceptionType(),
-                        "恢复动作: 候选设备切换，结果: 成功，步骤" + stepSeq + "已重新分配，异常类型: " + ex.getExceptionType()
-                                + "，影响结论: 计划可继续执行");
+                String detail = isRetry
+                        ? "恢复动作: 指令重试，结果: 成功，步骤" + stepSeq + "重试成功，异常类型: " + ex.getExceptionType()
+                                + "，影响结论: 计划可继续执行，不触发重新规划"
+                        : "恢复动作: 候选设备切换，结果: 成功，步骤" + stepSeq + "已重新分配，异常类型: " + ex.getExceptionType()
+                                + "，影响结论: 计划可继续执行";
+                taskEventService.append(taskId, "EXCEPTION_RECOVERED", "SYSTEM",
+                        ex.getExceptionType(),
+                        detail);
             }
         }
     }
@@ -226,9 +277,44 @@ public class TaskExceptionService {
     /**
      * 对应异常路径4a/4b、5.5.3业务规则1a（降级任务基线执行失败不再二次自动降级）：
      * 恢复失败且判定计划不可继续，若重规划额度未用则触发5.5.4局部重新规划；
-     * 额度已用或任务本身即为降级执行（DOWNGRADING）则直接转人工处理，不再自动降级。
+     * 额度已用或任务本身即为降级执行（DOWNGRADING）则直接转人工处理，不再自动降级；
+     * 对应DEF-S3-106：若恢复失败但为非关键步骤且原目标完成条件已满足，则步骤跳过、计划可继续执行，不触发重新规划。
      */
     private void handleUnrecoverable(Task task, TaskException exception, Integer stepSeq) {
+        // 先评估当前或后续计划是否可继续执行（TC-058.S1 / SRS_F018.R03/R06/R08 / DEF-S3-106）
+        if (isPlanContinuable(task, stepSeq)) {
+            if (exception != null) {
+                exception.setRecoveryResult("FAILED");
+                exception.setExceptionStatus("RESOLVED");
+                exception.setResolvedAt(LocalDateTime.now());
+                exception.setResolvedBy("SYSTEM");
+                exception.setImpactConclusion("非关键步骤恢复失败但原目标完成条件已满足，步骤跳过，计划可继续执行，不触发重新规划");
+                taskExceptionMapper.update(exception);
+            }
+            // 标记失败步骤为 SKIPPED
+            assignmentMapper.findByPlanVersionIdOrderByStepSeqAsc(task.getCurrentPlanVersionId()).stream()
+                    .filter(a -> stepSeq != null && stepSeq.equals(a.getStepSeq()))
+                    .findFirst()
+                    .ifPresent(a -> {
+                        a.setStepStatus("SKIPPED");
+                        a.setReasonCode("NON_CRITICAL_SKIPPED");
+                        a.setUpdatedAt(LocalDateTime.now());
+                        assignmentMapper.update(a);
+                    });
+            // 解冻后续步骤
+            for (TaskStepAssignment a : assignmentMapper.findByPlanVersionIdOrderByStepSeqAsc(task.getCurrentPlanVersionId())) {
+                if (a.getStepSeq() > stepSeq && "FROZEN".equals(a.getStepStatus())) {
+                    a.setStepStatus("PENDING_ASSIGNMENT");
+                    a.setUpdatedAt(LocalDateTime.now());
+                    assignmentMapper.update(a);
+                }
+            }
+            taskEventService.append(task.getId(), "PLAN_CONTINUATION_JUDGED", "SYSTEM", "STEP_SKIPPED",
+                    "步骤" + stepSeq + "为非关键步骤且原目标完成条件已满足，影响结论: 计划可继续执行，步骤跳过，不触发重新规划");
+            taskExecutionOrchestrator.advanceAfterStepCompleted(task.getId(), task.getCurrentPlanVersionId(), stepSeq);
+            return;
+        }
+
         exception.setRecoveryResult("FAILED");
         exception.setImpactConclusion("候选设备切换恢复失败，当前计划不可继续执行");
         exception.setExceptionStatus("PROCESSING");
@@ -256,6 +342,40 @@ public class TaskExceptionService {
         taskEventService.append(task.getId(), "REPLANNING_TRIGGERED", "SYSTEM", null,
                 "步骤" + stepSeq + "恢复失败且计划不可继续，重新规划机会未用，触发5.5.4局部重新规划");
         replanningService.replan(task.getId(), stepSeq, exception.getExceptionType() + ": " + exception.getReasonCode());
+    }
+
+    private boolean isPlanContinuable(Task task, Integer stepSeq) {
+        if (task == null || task.getCurrentPlanVersionId() == null || stepSeq == null) return false;
+        if (planVersionMapper == null) return false;
+        PlanVersion planVersion = planVersionMapper.findById(task.getCurrentPlanVersionId()).orElse(null);
+        if (planVersion == null || planVersion.getPlanSteps() == null) return false;
+        try {
+            List<Map<String, Object>> steps = MAPPER.readValue(
+                    planVersion.getPlanSteps(), new com.fasterxml.jackson.core.type.TypeReference<List<Map<String, Object>>>() {});
+            Map<String, Object> currentStep = steps.stream()
+                    .filter(s -> stepSeq.equals(s.get("stepSeq") instanceof Number n ? n.intValue() : Integer.parseInt(String.valueOf(s.get("stepSeq")))))
+                    .findFirst().orElse(null);
+            if (currentStep == null) return false;
+            String failureHandling = String.valueOf(currentStep.getOrDefault("failureHandling", ""));
+            if (!failureHandling.contains("非关键") && !failureHandling.contains("可跳过")) {
+                return false;
+            }
+            // 检查原目标或前序步骤是否已产生满足条件的结果
+            List<TaskStepAssignment> completedList = assignmentMapper.findByPlanVersionIdOrderByStepSeqAsc(task.getCurrentPlanVersionId())
+                    .stream()
+                    .filter(a -> "COMPLETED".equals(a.getStepStatus()) && a.getStepSeq() < stepSeq)
+                    .toList();
+            for (TaskStepAssignment ca : completedList) {
+                if (ca.getOutputParams() != null && (ca.getOutputParams().contains("\"routeGenerated\":true")
+                        || ca.getOutputParams().contains("\"routeGenerated\":\"true\"")
+                        || ca.getOutputParams().contains("\"completed\":true"))) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (Exception ex) {
+            return false;
+        }
     }
 
     private boolean currentPlanIsBaseline(Task task) {
@@ -324,6 +444,6 @@ public class TaskExceptionService {
     }
 
     public long countPending() {
-        return taskExceptionMapper.countByExceptionStatus("PENDING");
+        return taskExceptionMapper.countUnhandledExceptions();
     }
 }

@@ -44,6 +44,11 @@
         SELECT COUNT(*) FROM task_exceptions WHERE exception_status = #{exceptionStatus}
     </select>
 
+    <select id="countUnhandledExceptions" resultType="long">
+        SELECT COUNT(*) FROM task_exceptions e JOIN tasks t ON t.id = e.task_id
+        WHERE t.is_dry_run = FALSE AND e.exception_status IN ('PENDING', 'PROCESSING')
+    </select>
+
     <insert id="insert" parameterType="com.airport.ai.task.TaskException" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO task_exceptions (task_id, step_seq, exception_type, occurred_at, recovery_action,
                                       recovery_result, impact_conclusion, reason_code, exception_status,

@@ -451,6 +451,114 @@ class TaskReplanningQuotaAndManualTakeoverF018Test {
         assertEquals(TaskStatus.PENDING_MANUAL, task.getStatus());
     }
 
+    @Test
+    @DisplayName("DEF-S3-105: 首次失败后重试成功留痕，异常表记录指令重试并RESOLVED，发出EXCEPTION_RECOVERED事件")
+    void testStepFirstFailureRetrySuccessRecordsExceptionAndRecoveredEvent() {
+        Task task = new Task();
+        task.setId(493L);
+        task.setStatus(TaskStatus.EXECUTING);
+        task.setCurrentPlanVersionId(10L);
+        when(taskMapper.findById(493L)).thenReturn(Optional.of(task));
+
+        // 模拟步骤2首次执行失败，触发指令重试
+        exceptionService.onStepFirstFailure(493L, 2, "STEP_FAILED", "ERR_SYNTHETIC_HARDWARE", "执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE");
+
+        ArgumentCaptor<TaskException> exCaptor = ArgumentCaptor.forClass(TaskException.class);
+        verify(taskExceptionMapper).insert(exCaptor.capture());
+        TaskException inserted = exCaptor.getValue();
+        assertEquals(493L, inserted.getTaskId());
+        assertEquals(2, inserted.getStepSeq());
+        assertEquals("STEP_FAILED", inserted.getExceptionType());
+        assertEquals("ERR_SYNTHETIC_HARDWARE", inserted.getReasonCode());
+        assertEquals("指令重试", inserted.getRecoveryAction());
+        assertEquals("PROCESSING", inserted.getExceptionStatus());
+        assertNull(inserted.getRecoveryResult());
+
+        verify(taskEventService).append(eq(493L), eq("EXCEPTION_DETECTED"), any(), eq("ERR_SYNTHETIC_HARDWARE"), contains("ERR_SYNTHETIC_HARDWARE"));
+
+        // 模拟同号指令重试成功反馈到达，触发 onStepRecovered
+        when(taskExceptionMapper.findByTaskIdOrderByOccurredAtDesc(493L)).thenReturn(List.of(inserted));
+        exceptionService.onStepRecovered(493L, 2);
+
+        assertEquals("SUCCESS", inserted.getRecoveryResult());
+        assertEquals("RESOLVED", inserted.getExceptionStatus());
+        assertTrue(inserted.getImpactConclusion().contains("自动重试成功"));
+        verify(taskExceptionMapper).update(inserted);
+
+        verify(taskEventService).append(eq(493L), eq("EXCEPTION_RECOVERED"), eq("SYSTEM"), eq("STEP_FAILED"), contains("重试成功"));
+    }
+
+    @Test
+    @DisplayName("DEF-S3-106: 可继续的非关键失败不触发重规划，原目标已满足时步骤跳过并继续原计划")
+    void testNonCriticalStepFailureContinuesOriginalPlanWithoutReplan() {
+        Task task = new Task();
+        task.setId(505L);
+        task.setStatus(TaskStatus.EXECUTING);
+        task.setCurrentPlanVersionId(20L);
+        task.setReplanUsed(false);
+        when(taskMapper.findById(505L)).thenReturn(Optional.of(task));
+
+        PlanVersion plan = new PlanVersion();
+        plan.setId(20L);
+        plan.setSource("AUTONOMOUS");
+        // 步骤2配置为非关键步骤
+        String planStepsJson = """
+                [
+                  {"stepSeq": 1, "stepGoal": "前往区域", "completionCondition": "routeGenerated=true"},
+                  {"stepSeq": 2, "stepGoal": "辅助确认", "failureHandling": "非关键步骤，失败可跳过；原目标完成条件已满足时继续后续步骤"},
+                  {"stepSeq": 3, "stepGoal": "到达目标", "completionCondition": "routeGenerated=true"}
+                ]
+                """;
+        plan.setPlanSteps(planStepsJson);
+        when(planVersionMapper.findById(20L)).thenReturn(Optional.of(plan));
+
+        // 步骤1已成功且输出满足 routeGenerated=true
+        TaskStepAssignment step1 = new TaskStepAssignment();
+        step1.setStepSeq(1);
+        step1.setStepStatus("COMPLETED");
+        step1.setOutputParams("{\"routeGenerated\":true}");
+
+        TaskStepAssignment step2 = new TaskStepAssignment();
+        step2.setStepSeq(2);
+        step2.setStepStatus("FAILED");
+
+        TaskStepAssignment step3 = new TaskStepAssignment();
+        step3.setStepSeq(3);
+        step3.setStepStatus("FROZEN");
+
+        when(assignmentMapper.findByPlanVersionIdOrderByStepSeqAsc(20L)).thenReturn(List.of(step1, step2, step3));
+        when(orchestrator.hasAvailableCandidate(eq(20L), eq(2), anyList())).thenReturn(false);
+
+        // 触发异常处理，两候选穷尽
+        exceptionService.handleException(505L, 2, "STEP_FAILED", "执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE");
+
+        // 绝不触发局部重规划，不消耗重规划额度
+        verify(replanningService, never()).replan(anyLong(), anyInt(), anyString());
+        verify(taskEventService, never()).append(eq(505L), eq("REPLANNING_TRIGGERED"), any(), any(), any());
+        assertFalse(Boolean.TRUE.equals(task.getReplanUsed()));
+
+        // 验证步骤2标记为 SKIPPED
+        assertEquals("SKIPPED", step2.getStepStatus());
+        assertEquals("NON_CRITICAL_SKIPPED", step2.getReasonCode());
+
+        // 验证步骤3解冻为 PENDING_ASSIGNMENT
+        assertEquals("PENDING_ASSIGNMENT", step3.getStepStatus());
+
+        // 验证事件明确记录了“可继续”影响结论
+        verify(taskEventService).append(eq(505L), eq("PLAN_CONTINUATION_JUDGED"), eq("SYSTEM"), eq("STEP_SKIPPED"), contains("可继续"));
+
+        // 验证推进下一步
+        verify(orchestrator).advanceAfterStepCompleted(eq(505L), eq(20L), eq(2));
+    }
+
+    @Test
+    @DisplayName("DEF-S3-107: TaskExceptionService.countPending 统计未处置异常覆盖 PENDING 与 PROCESSING")
+    void testCountPendingIncludesPendingAndProcessing() {
+        when(taskExceptionMapper.countUnhandledExceptions()).thenReturn(15L);
+        assertEquals(15L, exceptionService.countPending());
+        verify(taskExceptionMapper).countUnhandledExceptions();
+    }
+
     private TaskStepAssignment createAssignment(int seq, String status) {
         TaskStepAssignment a = new TaskStepAssignment();
         a.setStepSeq(seq);

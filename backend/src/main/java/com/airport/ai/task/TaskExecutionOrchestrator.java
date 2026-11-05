@@ -460,6 +460,9 @@ public class TaskExecutionOrchestrator {
             assignmentMapper.update(assignment);
             taskEventService.append(assignment.getTaskId(), "STEP_RETRY_DISPATCHED", "SYSTEM", reasonCode,
                     "步骤" + assignment.getStepSeq() + "自动重试1次，沿用执行指令编号" + commandId + "，尝试序号" + assignment.getRetryCount() + "，原因: " + failureDetail);
+            taskExceptionService.onStepFirstFailure(assignment.getTaskId(), assignment.getStepSeq(),
+                    "TIMEOUT".equalsIgnoreCase(executionResult) || "ERR_EXECUTION_TIMEOUT".equals(reasonCode) || (reasonCode != null && reasonCode.contains("TIMEOUT")) ? "EXECUTION_TIMEOUT" : "STEP_FAILED",
+                    reasonCode, failureDetail);
 
             try {
                 deviceAgentMessagingService.executeCapability(agentCode, commandId, assignment.getTaskId(),
@@ -506,7 +509,7 @@ public class TaskExecutionOrchestrator {
     }
 
     /** 对应5.5.2业务规则8/9：全部步骤完成条件满足后置任务完成，否则按顺序取下一步骤分配设备 */
-    private void advanceAfterStepCompleted(Long taskId, Long planVersionId, Integer completedStepSeq) {
+    public void advanceAfterStepCompleted(Long taskId, Long planVersionId, Integer completedStepSeq) {
         List<TaskStepAssignment> all = assignmentMapper.findByPlanVersionIdOrderByStepSeqAsc(planVersionId);
         Optional<TaskStepAssignment> next = all.stream()
                 .filter(a -> a.getStepSeq() > completedStepSeq)

@@ -109,7 +109,7 @@ async function fetchOverview() {
 // 在线代理数=启用且在线，跳转带同样的筛选条件，使卡片数与列表总数一致（DEF-S3-074）
 function goAgents(onlineStatus, agentStatus) { router.push({ path: '/device-agents', query: { ...(onlineStatus ? { onlineStatus } : {}), ...(agentStatus ? { agentStatus } : {}) } }) }
 function goTasks(status) { router.push({ path: '/tasks', query: status ? { status } : {} }) }
-function goExceptions() { router.push({ path: '/task-exceptions', query: { exceptionStatus: 'PENDING' } }) }
+function goExceptions() { router.push({ path: '/task-exceptions', query: { scope: 'active' } }) }
 
 let refreshTimer = null
 onMounted(() => { fetchOverview(); refreshTimer = setInterval(fetchOverview, 30000) })
