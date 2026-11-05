@@ -1,0 +1,130 @@
+{
+  "tag": "V1.163",
+  "productSha": "0732fb7bcc72728e4a48c2d70b920b301ef99589",
+  "handoffSha": "34b0e81c01e335edc5c522a0f827da6e29cfb464",
+  "baseline": "V2.4",
+  "conclusion": "READY_FOR_CLAUDE",
+  "rules": {
+    "R01": {
+      "status": "P",
+      "actual": "493～497、499、506、510真实失败/超时/当前离线进入恢复判断；514受控能力丢失追加覆盖。",
+      "issues": ""
+    },
+    "R02": {
+      "status": "P",
+      "actual": "494～497三步任务：步骤1实际完成结果保留、步骤3恢复期间FROZEN且零提前下发；507/508重规划保留前缀。",
+      "issues": ""
+    },
+    "R03": {
+      "status": "F",
+      "actual": "恢复优先、一次配额正反对照通过；505完成条件已由步骤1满足、步骤2明确非关键仍在候选穷尽后触发局部重规划，缺少可继续判断。",
+      "issues": "DEF-S3-106"
+    },
+    "R04": {
+      "status": "P",
+      "actual": "496执行中/499待承接离线均先切换、原版本继续；510无候选时仅一次重规划，模型失败转人工。",
+      "issues": ""
+    },
+    "R05": {
+      "status": "P",
+      "actual": "498真实停报导致无关设备离线，只写ERR_AGENT_OFFLINE_UNRELATED判断、不冻结/不重规划，任务完成。",
+      "issues": ""
+    },
+    "R06": {
+      "status": "F",
+      "actual": "493一次重试成功、494重试后候选切换、507穷尽才重规划/508已用不再规划均通过；505非关键失败仍无条件判不可继续，完整规则F。",
+      "issues": "DEF-S3-106"
+    },
+    "R07": {
+      "status": "P",
+      "actual": "495设备TIMEOUT/ERR_EXECUTION_TIMEOUT和497实际30秒静默超时识别EXECUTION_TIMEOUT，先候选恢复；506无候选才单次重规划并人工。",
+      "issues": ""
+    },
+    "R08": {
+      "status": "F",
+      "actual": "494～497候选恢复仅原版本且实际成功才归档通过；493重试成功虽无重规划，却无异常持久记录/恢复结果及不重规划影响判断。",
+      "issues": "DEF-S3-105"
+    },
+    "R09": {
+      "status": "F",
+      "actual": "493重试恢复无完整异常/影响闭环；497 API事件含ERR_EXECUTION_TIMEOUT但真实Edge时间线不展示该原因码。旧066假成功在512/516已通过，保留F018原因码展示残留。",
+      "issues": "DEF-S3-105;DEF-S3-066"
+    },
+    "R10": {
+      "status": "F",
+      "actual": "新异常成功/失败自动RESOLVED与历史入口通过；513真实PROCESSING在DB/异常API可见，总览仅算PENDING而报0（全schema未结束15条），漏计处置中。",
+      "issues": "DEF-S3-107"
+    }
+  },
+  "steps": {
+    "TC-057.S1": {
+      "status": "F",
+      "actual": "494～497离线/失败/超时的保留前缀、冻结与切换均P；497真实UI未显示API中的超时原因码ERR_EXECUTION_TIMEOUT，展示完整性F。",
+      "issues": "DEF-S3-066"
+    },
+    "TC-057.S2": {
+      "status": "F",
+      "actual": "候选恢复494～497继续原版本且占用正确、实际成功后归档P；重试成功493无异常/恢复影响判断闭环，整步F。",
+      "issues": "DEF-S3-105"
+    },
+    "TC-058.S1": {
+      "status": "F",
+      "actual": "498无关离线不冻结/重规划P；505原完成条件已满足、非关键步骤恢复失败仍重规划，未按可继续影响判断续跑。",
+      "issues": "DEF-S3-106"
+    },
+    "TC-058.S2": {
+      "status": "F",
+      "actual": "真实Edge五类/四状态筛选、原因码列、步骤链接高亮、历史归档P；默认待处理与受控用例默认全部不一致（064残留），PROCESSING未处置总览漏计（107）。PENDING/IGNORED仅显式合成筛选样本，不冒称生产状态流转。",
+      "issues": "DEF-S3-064;DEF-S3-107"
+    },
+    "TC-059.S1": {
+      "status": "P",
+      "actual": "507恢复穷尽首次重规划成功保留结果；508新版本再穷尽直接人工、无第二次；502/503/504模型故障/校验失败/超额均一次机会后人工并持久REPLAN_FAILED；独立服务0/4/5完成额度及已用边界4P。",
+      "issues": ""
+    },
+    "TC-059.S2": {
+      "status": "P",
+      "actual": "512基线恢复合法成功与516两候选穷尽直接人工，仅保留初始自主候选+一个基线版本，无局部重规划/二次降级；中间态PROCESSING/null，最终对应SUCCESS/FAILED归档，无假恢复成功。",
+      "issues": ""
+    }
+  },
+  "counts": {
+    "rules": {
+      "P": 5,
+      "F": 5,
+      "NT": 0
+    },
+    "steps": {
+      "P": 2,
+      "F": 4,
+      "NT": 0
+    },
+    "tasks": 24,
+    "formalTasks": 22,
+    "dryRuns": 2,
+    "diagnosticTasks": [
+      500,
+      501,
+      509
+    ],
+    "effectiveObservationGroups": 22,
+    "effectiveGroupsP": 19,
+    "effectiveGroupsF": 3,
+    "independentServiceTests": 4,
+    "fullBackendReported": 382,
+    "fullBackendPassed": 380,
+    "fullBackendSkipped": 2,
+    "historicalBusinessPReuse": 0
+  },
+  "redactions": "Secret-shaped fields in raw snapshots redacted in place before commit; original failures/diagnostics/results preserved. Backend generated security password redacted. Console Windows codepage rendering differs; UTF8 JSON and browser checked. Base64 transport recapture equals prior SQL domain values.",
+  "rawEvidence": [
+    "SRS_F018-V1.163-http-20261105.json",
+    "SRS_F018-V1.163-http-20261105-supplement.json",
+    "SRS_F018-V1.163-http-20261105-final.json",
+    "SRS_F018-V1.163-ui-catalog-20261105.json",
+    "SRS_F018-V1.163-ui-task-timelines-20261105.json"
+  ],
+  "firstFailureCheckpoint": "4a2d400",
+  "mainUnchanged": "bd182a0551cc067f0196879169fd6859f2757f83",
+  "noPR": true
+}

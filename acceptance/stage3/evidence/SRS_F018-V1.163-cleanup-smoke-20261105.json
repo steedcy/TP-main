@@ -1,0 +1,468 @@
+{
+  "tag": "V1.163",
+  "productSha": "0732fb7bcc72728e4a48c2d70b920b301ef99589",
+  "at": "2026-11-05T19:26:07.230335+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "redisDb": 10,
+  "health": {
+    "status": "UP"
+  },
+  "authenticatedSmoke": {
+    "/tasks?page=1&size=1": {
+      "content": [
+        {
+          "id": 516,
+          "taskCode": "TASK-20261105-0516",
+          "taskGoal": "F163_BASELINE_EXHAUSTED synthetic navigation to F2_TEST_GATE",
+          "taskFamily": "EXT_A369EDBE",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F163_BASELINE_EXHAUSTED synthetic navigation to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "MANUAL_TERMINATED",
+          "currentPlanVersionId": 597,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": "Synthetic F018 cleanup",
+          "failureReason": "基线降级任务执行异常且恢复失败，按业务规则不再二次自动降级",
+          "missingInfoQuestions": null,
+          "downgradeReason": "监督判定高风险: RISK_SIGNAL_COMBINATION",
+          "isDryRun": false,
+          "createdAt": "2026-11-05T19:21:34.857128",
+          "updatedAt": "2026-11-05T19:21:38.664725",
+          "createdBy": "oprator"
+        }
+      ],
+      "totalElements": 463,
+      "page": 1,
+      "size": 1
+    },
+    "/device-agents?page=1&size=1": {
+      "content": [
+        {
+          "agentId": "AGT-D68FD3AB",
+          "deviceCode": "G6_UNTESTED_134145",
+          "deviceName": "GPT F006 untested enable fixture",
+          "agentStatus": "ENABLED",
+          "onlineStatus": "OFFLINE",
+          "workStatus": "IDLE",
+          "currentTaskId": null,
+          "currentStepSeq": null,
+          "lastReportedAt": "2026-11-01T21:43:39.146079",
+          "enabledCapabilities": [
+            {
+              "capabilityName": "GPT V120 live",
+              "capabilityCode": "G120_TEMPLATE"
+            }
+          ],
+          "offlineInfo": {
+            "agentCode": "AGT-D68FD3AB",
+            "offlineAt": "2026-11-03T01:17:45.41812",
+            "reasonCode": "ERR_HEARTBEAT_TIMEOUT",
+            "detail": "设备代理AGT-D68FD3AB超过30秒未上报，判定离线",
+            "affectsTask": false
+          }
+        }
+      ],
+      "totalElements": 17,
+      "page": 1,
+      "size": 1
+    },
+    "/dashboard/overview": {
+      "metrics": {
+        "agentTotal": 17,
+        "agentOnline": 0,
+        "taskInProgress": 0,
+        "pendingManual": 110,
+        "unhandledExceptions": 0,
+        "replanningCount": 57,
+        "statusCounts": {
+          "PLANNING": 1,
+          "SUPERVISING": 0,
+          "PENDING_ASSIGNMENT": 0,
+          "DOWNGRADING": 0,
+          "EXECUTING": 0,
+          "COMPLETED": 163,
+          "FAILED": 4,
+          "PENDING_MANUAL": 110,
+          "MANUAL_TERMINATED": 185
+        }
+      },
+      "latestExceptions": [
+        {
+          "id": 184,
+          "taskId": 516,
+          "taskCode": "TASK-20261105-0516",
+          "exceptionType": "STEP_FAILED",
+          "occurredAt": "2026-11-05T19:21:37.276384",
+          "exceptionStatus": "RESOLVED",
+          "reasonCode": "执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE",
+          "impactConclusion": "候选设备切换恢复失败，当前计划不可继续执行"
+        },
+        {
+          "id": 183,
+          "taskId": 516,
+          "taskCode": "TASK-20261105-0516",
+          "exceptionType": "STEP_FAILED",
+          "occurredAt": "2026-11-05T19:21:35.576431",
+          "exceptionStatus": "RESOLVED",
+          "reasonCode": "执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE",
+          "impactConclusion": "候选设备切换后重新分配仍失败（候选设备穷尽），任务转入人工处理，恢复未成功"
+        },
+        {
+          "id": 182,
+          "taskId": 514,
+          "taskCode": "TASK-20261105-0514",
+          "exceptionType": "REPLAN_FAILED",
+          "occurredAt": "2026-11-05T19:21:28.891621",
+          "exceptionStatus": "RESOLVED",
+          "reasonCode": "ERR_REPLANNING_MODEL_FAILED",
+          "impactConclusion": "局部重新规划失败，转人工处理"
+        },
+        {
+          "id": 181,
+          "taskId": 514,
+          "taskCode": "TASK-20261105-0514",
+          "exceptionType": "CAPABILITY_GAP",
+          "occurredAt": "2026-11-05T19:21:28.840204",
+          "exceptionStatus": "RESOLVED",
+          "reasonCode": "步骤2无可用候选设备",
+          "impactConclusion": "候选设备切换恢复失败，当前计划不可继续执行"
+        },
+        {
+          "id": 180,
+          "taskId": 513,
+          "taskCode": "TASK-20261105-0513",
+          "exceptionType": "STEP_FAILED",
+          "occurredAt": "2026-11-05T19:19:44.988045",
+          "exceptionStatus": "RESOLVED",
+          "reasonCode": "SYNTHETIC_UI_IGNORED",
+          "impactConclusion": "已切换候选设备重新分配，计划可继续执行，不触发重新规划"
+        }
+      ],
+      "failedMetrics": [],
+      "period": "TODAY"
+    }
+  },
+  "settings": {
+    "min": 10,
+    "seconds": 30,
+    "max": 120
+  },
+  "rules": [
+    {
+      "id": 1,
+      "ruleCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+      "ruleContent": "移动机器人会合或陪同服务对象为特殊旅客时判定为高风险；普通空间引导场景不命中",
+      "ruleVersion": "V1.2",
+      "enabled": true,
+      "createdAt": "2026-10-30T13:40:48.586219",
+      "updatedAt": "2026-11-04T10:29:06.080757",
+      "updatedBy": "set"
+    },
+    {
+      "id": 2,
+      "ruleCode": "RULE_CROSS_ZONE",
+      "ruleContent": "仅移动服务机器人适用；同一任务链条中跨越预定义区域边界1次及以上命中",
+      "ruleVersion": "V1.2",
+      "enabled": true,
+      "createdAt": "2026-10-30T13:40:48.586219",
+      "updatedAt": "2026-11-04T10:29:00.250949",
+      "updatedBy": "set"
+    },
+    {
+      "id": 3,
+      "ruleCode": "RULE_RESOURCE_CRITICAL",
+      "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+      "ruleVersion": "V7.8",
+      "enabled": true,
+      "createdAt": "2026-10-30T13:40:48.586219",
+      "updatedAt": "2026-11-05T19:21:38.927242",
+      "updatedBy": "set"
+    },
+    {
+      "id": 4,
+      "ruleCode": "GPT_F014_150_API",
+      "ruleContent": "Synthetic F014 validation fixture revised",
+      "ruleVersion": "V1.2",
+      "enabled": false,
+      "createdAt": "2026-11-04T08:07:33.779259",
+      "updatedAt": "2026-11-04T08:07:33.967337",
+      "updatedBy": "set"
+    },
+    {
+      "id": 5,
+      "ruleCode": "GPT_F014_150_UI",
+      "ruleContent": "Synthetic F014 browser-created rule revised",
+      "ruleVersion": "V1.1",
+      "enabled": false,
+      "createdAt": "2026-11-04T08:09:47.309055",
+      "updatedAt": "2026-11-04T08:10:48.202617",
+      "updatedBy": "gpt_f014_ui_150"
+    }
+  ],
+  "diagnosticExceptionCleanupNote": "Own task509 probe-diagnostic PROCESSING row174 was changed to IGNORED/GPT_DIAGNOSTIC_CLEANUP after preserving original snapshot in supplement. This is explicit fixture cleanup, no production P derives from it.",
+  "diagnosticExceptionAfter": [
+    {
+      "id": 174,
+      "task_id": 509,
+      "step_seq": 1,
+      "exception_type": "AGENT_OFFLINE",
+      "occurred_at": "2026-11-05T19:19:09.204084",
+      "recovery_action": "候选设备切换",
+      "recovery_result": null,
+      "impact_conclusion": "已尝试候选设备切换，等待新设备承接与执行反馈以确认最终恢复结果",
+      "reason_code": "设备代理AGT-386E8C30心跳超时离线，正占用该任务步骤",
+      "exception_status": "IGNORED",
+      "resolved_at": "2026-11-05T19:25:05.749341",
+      "resolved_by": "GPT_DIAGNOSTIC_CLEANUP"
+    }
+  ],
+  "tasks": [
+    {
+      "id": 493,
+      "status": "COMPLETED",
+      "current_plan_version_id": 567,
+      "replan_used": false,
+      "is_dry_run": false
+    },
+    {
+      "id": 494,
+      "status": "COMPLETED",
+      "current_plan_version_id": 568,
+      "replan_used": false,
+      "is_dry_run": false
+    },
+    {
+      "id": 495,
+      "status": "COMPLETED",
+      "current_plan_version_id": 569,
+      "replan_used": false,
+      "is_dry_run": false
+    },
+    {
+      "id": 496,
+      "status": "COMPLETED",
+      "current_plan_version_id": 570,
+      "replan_used": false,
+      "is_dry_run": false
+    },
+    {
+      "id": 497,
+      "status": "COMPLETED",
+      "current_plan_version_id": 571,
+      "replan_used": false,
+      "is_dry_run": false
+    },
+    {
+      "id": 498,
+      "status": "COMPLETED",
+      "current_plan_version_id": 572,
+      "replan_used": false,
+      "is_dry_run": false
+    },
+    {
+      "id": 499,
+      "status": "COMPLETED",
+      "current_plan_version_id": 573,
+      "replan_used": false,
+      "is_dry_run": false
+    },
+    {
+      "id": 500,
+      "status": "MANUAL_TERMINATED",
+      "current_plan_version_id": 574,
+      "replan_used": false,
+      "is_dry_run": false
+    },
+    {
+      "id": 501,
+      "status": "MANUAL_TERMINATED",
+      "current_plan_version_id": 576,
+      "replan_used": true,
+      "is_dry_run": false
+    },
+    {
+      "id": 502,
+      "status": "MANUAL_TERMINATED",
+      "current_plan_version_id": 577,
+      "replan_used": true,
+      "is_dry_run": false
+    },
+    {
+      "id": 503,
+      "status": "MANUAL_TERMINATED",
+      "current_plan_version_id": 578,
+      "replan_used": true,
+      "is_dry_run": false
+    },
+    {
+      "id": 504,
+      "status": "MANUAL_TERMINATED",
+      "current_plan_version_id": 580,
+      "replan_used": true,
+      "is_dry_run": false
+    },
+    {
+      "id": 505,
+      "status": "MANUAL_TERMINATED",
+      "current_plan_version_id": 582,
+      "replan_used": true,
+      "is_dry_run": false
+    },
+    {
+      "id": 506,
+      "status": "MANUAL_TERMINATED",
+      "current_plan_version_id": 583,
+      "replan_used": true,
+      "is_dry_run": false
+    },
+    {
+      "id": 507,
+      "status": "COMPLETED",
+      "current_plan_version_id": 585,
+      "replan_used": true,
+      "is_dry_run": false
+    },
+    {
+      "id": 508,
+      "status": "MANUAL_TERMINATED",
+      "current_plan_version_id": 587,
+      "replan_used": true,
+      "is_dry_run": false
+    },
+    {
+      "id": 509,
+      "status": "MANUAL_TERMINATED",
+      "current_plan_version_id": 588,
+      "replan_used": false,
+      "is_dry_run": false
+    },
+    {
+      "id": 510,
+      "status": "MANUAL_TERMINATED",
+      "current_plan_version_id": 589,
+      "replan_used": true,
+      "is_dry_run": false
+    },
+    {
+      "id": 511,
+      "status": "COMPLETED",
+      "current_plan_version_id": 590,
+      "replan_used": false,
+      "is_dry_run": true
+    },
+    {
+      "id": 512,
+      "status": "COMPLETED",
+      "current_plan_version_id": 592,
+      "replan_used": false,
+      "is_dry_run": false
+    },
+    {
+      "id": 513,
+      "status": "COMPLETED",
+      "current_plan_version_id": 593,
+      "replan_used": false,
+      "is_dry_run": false
+    },
+    {
+      "id": 514,
+      "status": "MANUAL_TERMINATED",
+      "current_plan_version_id": 594,
+      "replan_used": true,
+      "is_dry_run": false
+    },
+    {
+      "id": 515,
+      "status": "COMPLETED",
+      "current_plan_version_id": 595,
+      "replan_used": false,
+      "is_dry_run": true
+    },
+    {
+      "id": 516,
+      "status": "MANUAL_TERMINATED",
+      "current_plan_version_id": 597,
+      "replan_used": false,
+      "is_dry_run": false
+    }
+  ],
+  "activeAssignments": 0,
+  "ownedDevices": [
+    {
+      "device_code": "G160_F016_A",
+      "device_status": "INACTIVE",
+      "agent_code": "AGT-386E8C30",
+      "agent_status": "DISABLED",
+      "online_status": "OFFLINE",
+      "work_status": "IDLE",
+      "current_task_id": null
+    },
+    {
+      "device_code": "G160_F016_B",
+      "device_status": "INACTIVE",
+      "agent_code": "AGT-8519A3B6",
+      "agent_status": "DISABLED",
+      "online_status": "OFFLINE",
+      "work_status": "IDLE",
+      "current_task_id": null
+    },
+    {
+      "device_code": "G160_F016_C",
+      "device_status": "INACTIVE",
+      "agent_code": "AGT-D20379F3",
+      "agent_status": "DISABLED",
+      "online_status": "OFFLINE",
+      "work_status": "IDLE",
+      "current_task_id": null
+    }
+  ],
+  "definitions": [
+    {
+      "id": 43,
+      "definition_code": "EXT_221C2E9C",
+      "definition_status": "DISABLED"
+    },
+    {
+      "id": 42,
+      "definition_code": "EXT_70F9247D",
+      "definition_status": "DISABLED"
+    },
+    {
+      "id": 44,
+      "definition_code": "EXT_A369EDBE",
+      "definition_status": "DISABLED"
+    }
+  ],
+  "templates": [
+    {
+      "id": 70,
+      "template_name": "G163 F018 baseline",
+      "template_status": "DISABLED"
+    },
+    {
+      "id": 71,
+      "template_name": "G163 F018 baseline 1793877691934140100",
+      "template_status": "DISABLED"
+    }
+  ],
+  "checks": {
+    "noActiveAssignments": true,
+    "noOwnedOccupancy": true,
+    "ownedDevicesInactive": true,
+    "heartbeatRestored30": true,
+    "ownedDefinitionsDisabled": true,
+    "ownedTemplatesDisabled": true
+  },
+  "jarSha256": "b81b9f9d7ed8b4c411f25a8d6bd4e9518c165dec711e7587cf2e28bd7004f3d8",
+  "productSourceDiff": ""
+}
