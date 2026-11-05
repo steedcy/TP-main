@@ -1,0 +1,4406 @@
+{
+  "tag": "V1.159",
+  "productSha": "a893e944b868e666ab165eb7e6ea40f1ccadaa7d",
+  "baseline": "V2.4+BL006",
+  "issue": "DEF-S3-103 residual in TaskExceptionService.freezeRemainingSteps -> releaseAgent(agentId) -> expectedTaskId null",
+  "scope": "Controlled future pending association seeded on one owned fixture step only; owner independently accepted/executing via real HTTP. Actual freeze/recovery HTTP path and PostgreSQL persistence, not unseeded end-to-end scheduling.",
+  "cases": [
+    {
+      "name": "parallel-one",
+      "taskId": 378,
+      "request": {
+        "taskGoal": "F159_PARALLEL_ONE synthetic navigation to F2_TEST_GATE",
+        "taskFamily": "EXT_70D1E436",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "response": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 378,
+            "taskCode": "TASK-20261105-0378",
+            "taskGoal": "F159_PARALLEL_ONE synthetic navigation to F2_TEST_GATE",
+            "taskFamily": "EXT_70D1E436",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=true",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F159_PARALLEL_ONE synthetic navigation to F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "PLANNING",
+            "currentPlanVersionId": null,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": null,
+            "failureReason": null,
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-05T12:06:18.9567043",
+            "updatedAt": "2026-11-05T12:06:18.9567043",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-05T12:06:19.014119200+08:00"
+        }
+      },
+      "bothPending": {
+        "task": {
+          "id": 378,
+          "taskCode": "TASK-20261105-0378",
+          "taskGoal": "F159_PARALLEL_ONE synthetic navigation to F2_TEST_GATE",
+          "taskFamily": "EXT_70D1E436",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F159_PARALLEL_ONE synthetic navigation to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_ASSIGNMENT",
+          "currentPlanVersionId": 416,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": null,
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-05T12:06:18.956704",
+          "updatedAt": "2026-11-05T12:06:19.000735",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 416,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261105-0385",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "LOW",
+            "riskReasonCode": null,
+            "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.48",
+            "frozenAt": "2026-11-05T12:06:18.995598",
+            "createdAt": "2026-11-05T12:06:18.991437"
+          }
+        ],
+        "events": [
+          {
+            "id": 4049,
+            "taskId": 378,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-05T12:06:18.956704",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F159_PARALLEL_ONE synthetic navigation to F2_TEST_GATE"
+          },
+          {
+            "id": 4050,
+            "taskId": 378,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-05T12:06:18.977414",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 4051,
+            "taskId": 378,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-05T12:06:18.981887",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261105-0385"
+          },
+          {
+            "id": 4052,
+            "taskId": 378,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-05T12:06:18.993999",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 4053,
+            "taskId": 378,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-05T12:06:18.995598",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 4054,
+            "taskId": 378,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-05T12:06:18.998195",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.48；推荐处置=AUTO_EXECUTE（自动执行）"
+          },
+          {
+            "id": 4055,
+            "taskId": 378,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-05T12:06:19.007444",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-95E68594(匹配度1.0,距离0.0,负载0)，向候选AGT-95E68594发起承接请求"
+          }
+        ],
+        "assignments": [
+          {
+            "id": 294,
+            "stepSeq": 1,
+            "deviceAgentCode": "AGT-95E68594",
+            "commandId": "CMD-20261105120619-719FA99D",
+            "stepStatus": "PENDING_ASSIGNMENT",
+            "retryCount": 0,
+            "executionResult": null,
+            "reasonCode": null,
+            "outputParams": null,
+            "dispatchedAt": null,
+            "feedbackAt": null,
+            "rejectedAgentIds": [],
+            "acceptanceRequestedAt": "2026-11-05T12:06:19.007444",
+            "acceptedAt": null,
+            "acceptanceDurationMs": null,
+            "acceptanceResponseTime": null
+          }
+        ],
+        "commands": [
+          "677|TASK_ACCEPT|SENT"
+        ],
+        "bypassAuditRows": [],
+        "agentRows": [
+          {
+            "id": 15,
+            "agent_code": "AGT-95E68594",
+            "device_id": 16,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T12:06:18.820764",
+            "created_at": "2026-11-05T12:05:09.53993",
+            "updated_at": "2026-11-05T12:05:09.53993",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 16,
+            "agent_code": "AGT-E1791735",
+            "device_id": 17,
+            "agent_status": "ENABLED",
+            "online_status": "OFFLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T12:06:18.923398",
+            "created_at": "2026-11-05T12:05:10.844151",
+            "updated_at": "2026-11-05T12:05:10.844151",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 17,
+            "agent_code": "AGT-27561154",
+            "device_id": 18,
+            "agent_status": "ENABLED",
+            "online_status": "OFFLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T12:06:18.913484",
+            "created_at": "2026-11-05T12:05:11.879713",
+            "updated_at": "2026-11-05T12:05:11.879713",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          }
+        ],
+        "exceptions": [],
+        "commandRows": [
+          {
+            "id": 677,
+            "command_id": "CMD-20261105120619-719FA99D",
+            "agent_code": "AGT-95E68594",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 378,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105120619-719FA99D\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0378\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\"},\"issuedAt\":\"2026-11-05T12:06:19.01196+08:00\",\"deadline\":\"2026-11-05T12:07:19.01196+08:00\"}",
+            "command_status": "SENT",
+            "response_payload": null,
+            "created_at": "2026-11-05T12:06:19.01196",
+            "updated_at": "2026-11-05T12:06:19.02006"
+          }
+        ],
+        "transport": {
+          "G159_F016_A": [
+            {
+              "at": "2026-11-05T12:06:19.019051+08:00",
+              "message": {
+                "commandId": "CMD-20261105120619-719FA99D",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0378",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE"
+                },
+                "issuedAt": 1793851579.01196,
+                "deadline": 1793851639.01196
+              }
+            }
+          ],
+          "G159_F016_B": [],
+          "G159_F016_C": []
+        }
+      },
+      "barrier": {
+        "scope": "tip_gpt_f006_v118_20261030.device_agents / AGT-95E68594",
+        "blockedCallbackSessionsIncludingLockQueue": 2,
+        "externalLockPid": 10872,
+        "purpose": "Queue both real callbacks at the owned row lock, including transitive PostgreSQL waiters"
+      },
+      "acceptResponse": {
+        "http": 500,
+        "body": {
+          "code": 1000,
+          "message": "系统繁忙，请稍后重试",
+          "timestamp": "2026-11-05T12:06:23.391825300+08:00",
+          "path": "/device-api/v1/agents/AGT-95E68594/report",
+          "method": "POST"
+        }
+      },
+      "overlap": {
+        "task": {
+          "id": 378,
+          "taskCode": "TASK-20261105-0378",
+          "taskGoal": "F159_PARALLEL_ONE synthetic navigation to F2_TEST_GATE",
+          "taskFamily": "EXT_70D1E436",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F159_PARALLEL_ONE synthetic navigation to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_ASSIGNMENT",
+          "currentPlanVersionId": 416,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": null,
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-05T12:06:18.956704",
+          "updatedAt": "2026-11-05T12:06:19.000735",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 416,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261105-0385",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "LOW",
+            "riskReasonCode": null,
+            "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.48",
+            "frozenAt": "2026-11-05T12:06:18.995598",
+            "createdAt": "2026-11-05T12:06:18.991437"
+          }
+        ],
+        "events": [
+          {
+            "id": 4049,
+            "taskId": 378,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-05T12:06:18.956704",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F159_PARALLEL_ONE synthetic navigation to F2_TEST_GATE"
+          },
+          {
+            "id": 4050,
+            "taskId": 378,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-05T12:06:18.977414",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 4051,
+            "taskId": 378,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-05T12:06:18.981887",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261105-0385"
+          },
+          {
+            "id": 4052,
+            "taskId": 378,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-05T12:06:18.993999",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 4053,
+            "taskId": 378,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-05T12:06:18.995598",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 4054,
+            "taskId": 378,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-05T12:06:18.998195",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.48；推荐处置=AUTO_EXECUTE（自动执行）"
+          },
+          {
+            "id": 4055,
+            "taskId": 378,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-05T12:06:19.007444",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-95E68594(匹配度1.0,距离0.0,负载0)，向候选AGT-95E68594发起承接请求"
+          }
+        ],
+        "assignments": [
+          {
+            "id": 294,
+            "stepSeq": 1,
+            "deviceAgentCode": "AGT-95E68594",
+            "commandId": "CMD-20261105120619-719FA99D",
+            "stepStatus": "PENDING_ASSIGNMENT",
+            "retryCount": 0,
+            "executionResult": null,
+            "reasonCode": null,
+            "outputParams": null,
+            "dispatchedAt": null,
+            "feedbackAt": null,
+            "rejectedAgentIds": [],
+            "acceptanceRequestedAt": "2026-11-05T12:06:19.007444",
+            "acceptedAt": null,
+            "acceptanceDurationMs": null,
+            "acceptanceResponseTime": null
+          }
+        ],
+        "commands": [
+          "677|TASK_ACCEPT|SENT"
+        ],
+        "bypassAuditRows": [],
+        "agentRows": [
+          {
+            "id": 15,
+            "agent_code": "AGT-95E68594",
+            "device_id": 16,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "BUSY",
+            "current_task_id": 379,
+            "current_step_seq": 1,
+            "last_reported_at": "2026-11-05T12:06:18.820764",
+            "created_at": "2026-11-05T12:05:09.53993",
+            "updated_at": "2026-11-05T12:05:09.53993",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 16,
+            "agent_code": "AGT-E1791735",
+            "device_id": 17,
+            "agent_status": "ENABLED",
+            "online_status": "OFFLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T12:06:18.923398",
+            "created_at": "2026-11-05T12:05:10.844151",
+            "updated_at": "2026-11-05T12:05:10.844151",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 17,
+            "agent_code": "AGT-27561154",
+            "device_id": 18,
+            "agent_status": "ENABLED",
+            "online_status": "OFFLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T12:06:18.913484",
+            "created_at": "2026-11-05T12:05:11.879713",
+            "updated_at": "2026-11-05T12:05:11.879713",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          }
+        ],
+        "exceptions": [],
+        "commandRows": [
+          {
+            "id": 677,
+            "command_id": "CMD-20261105120619-719FA99D",
+            "agent_code": "AGT-95E68594",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 378,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105120619-719FA99D\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0378\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\"},\"issuedAt\":\"2026-11-05T12:06:19.01196+08:00\",\"deadline\":\"2026-11-05T12:07:19.01196+08:00\"}",
+            "command_status": "SENT",
+            "response_payload": null,
+            "created_at": "2026-11-05T12:06:19.01196",
+            "updated_at": "2026-11-05T12:06:19.02006"
+          }
+        ],
+        "transport": {
+          "G159_F016_A": [
+            {
+              "at": "2026-11-05T12:06:19.019051+08:00",
+              "message": {
+                "commandId": "CMD-20261105120619-719FA99D",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0378",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE"
+                },
+                "issuedAt": 1793851579.01196,
+                "deadline": 1793851639.01196
+              }
+            }
+          ],
+          "G159_F016_B": [],
+          "G159_F016_C": []
+        }
+      },
+      "executionTaskCount": 1,
+      "checks": {
+        "exactlyOneExecution": true,
+        "barrierEstablished": true
+      },
+      "result": "P",
+      "terminateResponse": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 378,
+            "taskCode": "TASK-20261105-0378",
+            "taskGoal": "F159_PARALLEL_ONE synthetic navigation to F2_TEST_GATE",
+            "taskFamily": "EXT_70D1E436",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=true",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F159_PARALLEL_ONE synthetic navigation to F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "MANUAL_TERMINATED",
+            "currentPlanVersionId": 416,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": "Synthetic F016 cleanup",
+            "failureReason": null,
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-05T12:06:18.956704",
+            "updatedAt": "2026-11-05T12:06:26.1592155",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-05T12:06:26.161738800+08:00"
+        }
+      }
+    },
+    {
+      "name": "parallel-two",
+      "taskId": 379,
+      "request": {
+        "taskGoal": "F159_PARALLEL_TWO synthetic navigation to F2_TEST_GATE",
+        "taskFamily": "EXT_70D1E436",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "response": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 379,
+            "taskCode": "TASK-20261105-0379",
+            "taskGoal": "F159_PARALLEL_TWO synthetic navigation to F2_TEST_GATE",
+            "taskFamily": "EXT_70D1E436",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=true",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F159_PARALLEL_TWO synthetic navigation to F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "PLANNING",
+            "currentPlanVersionId": null,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": null,
+            "failureReason": null,
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-05T12:06:19.2260033",
+            "updatedAt": "2026-11-05T12:06:19.2260033",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-05T12:06:19.287763100+08:00"
+        }
+      },
+      "bothPending": {
+        "task": {
+          "id": 379,
+          "taskCode": "TASK-20261105-0379",
+          "taskGoal": "F159_PARALLEL_TWO synthetic navigation to F2_TEST_GATE",
+          "taskFamily": "EXT_70D1E436",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F159_PARALLEL_TWO synthetic navigation to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_ASSIGNMENT",
+          "currentPlanVersionId": 417,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": null,
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-05T12:06:19.226003",
+          "updatedAt": "2026-11-05T12:06:19.271357",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 417,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261105-0386",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "LOW",
+            "riskReasonCode": null,
+            "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.48",
+            "frozenAt": "2026-11-05T12:06:19.266792",
+            "createdAt": "2026-11-05T12:06:19.261758"
+          }
+        ],
+        "events": [
+          {
+            "id": 4056,
+            "taskId": 379,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-05T12:06:19.228547",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F159_PARALLEL_TWO synthetic navigation to F2_TEST_GATE"
+          },
+          {
+            "id": 4057,
+            "taskId": 379,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-05T12:06:19.247323",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 4058,
+            "taskId": 379,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-05T12:06:19.252917",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261105-0386"
+          },
+          {
+            "id": 4059,
+            "taskId": 379,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-05T12:06:19.26403",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 4060,
+            "taskId": 379,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-05T12:06:19.266792",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 4061,
+            "taskId": 379,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-05T12:06:19.271357",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.48；推荐处置=AUTO_EXECUTE（自动执行）"
+          },
+          {
+            "id": 4062,
+            "taskId": 379,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-05T12:06:19.278727",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-95E68594(匹配度1.0,距离0.0,负载0)，向候选AGT-95E68594发起承接请求"
+          }
+        ],
+        "assignments": [
+          {
+            "id": 295,
+            "stepSeq": 1,
+            "deviceAgentCode": "AGT-95E68594",
+            "commandId": "CMD-20261105120619-AA358049",
+            "stepStatus": "PENDING_ASSIGNMENT",
+            "retryCount": 0,
+            "executionResult": null,
+            "reasonCode": null,
+            "outputParams": null,
+            "dispatchedAt": null,
+            "feedbackAt": null,
+            "rejectedAgentIds": [],
+            "acceptanceRequestedAt": "2026-11-05T12:06:19.278727",
+            "acceptedAt": null,
+            "acceptanceDurationMs": null,
+            "acceptanceResponseTime": null
+          }
+        ],
+        "commands": [
+          "678|TASK_ACCEPT|SENT"
+        ],
+        "bypassAuditRows": [],
+        "agentRows": [
+          {
+            "id": 15,
+            "agent_code": "AGT-95E68594",
+            "device_id": 16,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T12:06:18.820764",
+            "created_at": "2026-11-05T12:05:09.53993",
+            "updated_at": "2026-11-05T12:05:09.53993",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 16,
+            "agent_code": "AGT-E1791735",
+            "device_id": 17,
+            "agent_status": "ENABLED",
+            "online_status": "OFFLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T12:06:18.923398",
+            "created_at": "2026-11-05T12:05:10.844151",
+            "updated_at": "2026-11-05T12:05:10.844151",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 17,
+            "agent_code": "AGT-27561154",
+            "device_id": 18,
+            "agent_status": "ENABLED",
+            "online_status": "OFFLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T12:06:18.913484",
+            "created_at": "2026-11-05T12:05:11.879713",
+            "updated_at": "2026-11-05T12:05:11.879713",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          }
+        ],
+        "exceptions": [],
+        "commandRows": [
+          {
+            "id": 678,
+            "command_id": "CMD-20261105120619-AA358049",
+            "agent_code": "AGT-95E68594",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 379,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105120619-AA358049\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0379\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\"},\"issuedAt\":\"2026-11-05T12:06:19.2835197+08:00\",\"deadline\":\"2026-11-05T12:07:19.2835197+08:00\"}",
+            "command_status": "SENT",
+            "response_payload": null,
+            "created_at": "2026-11-05T12:06:19.28352",
+            "updated_at": "2026-11-05T12:06:19.292553"
+          }
+        ],
+        "transport": {
+          "G159_F016_A": [
+            {
+              "at": "2026-11-05T12:06:19.291557+08:00",
+              "message": {
+                "commandId": "CMD-20261105120619-AA358049",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0379",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE"
+                },
+                "issuedAt": 1793851579.2835197,
+                "deadline": 1793851639.2835197
+              }
+            }
+          ],
+          "G159_F016_B": [],
+          "G159_F016_C": []
+        }
+      },
+      "acceptResponse": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "timestamp": "2026-11-05T12:06:23.143701700+08:00"
+        }
+      },
+      "overlap": {
+        "task": {
+          "id": 379,
+          "taskCode": "TASK-20261105-0379",
+          "taskGoal": "F159_PARALLEL_TWO synthetic navigation to F2_TEST_GATE",
+          "taskFamily": "EXT_70D1E436",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F159_PARALLEL_TWO synthetic navigation to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "EXECUTING",
+          "currentPlanVersionId": 417,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": null,
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-05T12:06:19.226003",
+          "updatedAt": "2026-11-05T12:06:23.133971",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 417,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261105-0386",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "LOW",
+            "riskReasonCode": null,
+            "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.48",
+            "frozenAt": "2026-11-05T12:06:19.266792",
+            "createdAt": "2026-11-05T12:06:19.261758"
+          }
+        ],
+        "events": [
+          {
+            "id": 4056,
+            "taskId": 379,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-05T12:06:19.228547",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F159_PARALLEL_TWO synthetic navigation to F2_TEST_GATE"
+          },
+          {
+            "id": 4057,
+            "taskId": 379,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-05T12:06:19.247323",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 4058,
+            "taskId": 379,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-05T12:06:19.252917",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261105-0386"
+          },
+          {
+            "id": 4059,
+            "taskId": 379,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-05T12:06:19.26403",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 4060,
+            "taskId": 379,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-05T12:06:19.266792",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 4061,
+            "taskId": 379,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-05T12:06:19.271357",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.48；推荐处置=AUTO_EXECUTE（自动执行）"
+          },
+          {
+            "id": 4062,
+            "taskId": 379,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-05T12:06:19.278727",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-95E68594(匹配度1.0,距离0.0,负载0)，向候选AGT-95E68594发起承接请求"
+          },
+          {
+            "id": 4063,
+            "taskId": 379,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-05T12:06:23.133971",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-95E68594接受步骤1承接请求"
+          },
+          {
+            "id": 4064,
+            "taskId": 379,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-05T12:06:23.136115",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261105120623-39396FA9已下发至设备代理AGT-95E68594，业务意图: Synthetic passenger service"
+          }
+        ],
+        "assignments": [
+          {
+            "id": 295,
+            "stepSeq": 1,
+            "deviceAgentCode": "AGT-95E68594",
+            "commandId": "CMD-20261105120619-AA358049",
+            "stepStatus": "EXECUTING",
+            "retryCount": 0,
+            "executionResult": null,
+            "reasonCode": null,
+            "outputParams": null,
+            "dispatchedAt": "2026-11-05T12:06:23.136115",
+            "feedbackAt": null,
+            "rejectedAgentIds": [],
+            "acceptanceRequestedAt": "2026-11-05T12:06:19.278727",
+            "acceptedAt": "2026-11-05T12:06:22.114629",
+            "acceptanceDurationMs": 2835,
+            "acceptanceResponseTime": "2835ms"
+          }
+        ],
+        "commands": [
+          "678|TASK_ACCEPT|ACCEPTED",
+          "679|EXECUTE_CAPABILITY|SENT"
+        ],
+        "bypassAuditRows": [],
+        "agentRows": [
+          {
+            "id": 15,
+            "agent_code": "AGT-95E68594",
+            "device_id": 16,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "BUSY",
+            "current_task_id": 379,
+            "current_step_seq": 1,
+            "last_reported_at": "2026-11-05T12:06:18.820764",
+            "created_at": "2026-11-05T12:05:09.53993",
+            "updated_at": "2026-11-05T12:05:09.53993",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 16,
+            "agent_code": "AGT-E1791735",
+            "device_id": 17,
+            "agent_status": "ENABLED",
+            "online_status": "OFFLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T12:06:18.923398",
+            "created_at": "2026-11-05T12:05:10.844151",
+            "updated_at": "2026-11-05T12:05:10.844151",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 17,
+            "agent_code": "AGT-27561154",
+            "device_id": 18,
+            "agent_status": "ENABLED",
+            "online_status": "OFFLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T12:06:18.913484",
+            "created_at": "2026-11-05T12:05:11.879713",
+            "updated_at": "2026-11-05T12:05:11.879713",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          }
+        ],
+        "exceptions": [],
+        "commandRows": [
+          {
+            "id": 678,
+            "command_id": "CMD-20261105120619-AA358049",
+            "agent_code": "AGT-95E68594",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 379,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105120619-AA358049\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0379\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\"},\"issuedAt\":\"2026-11-05T12:06:19.2835197+08:00\",\"deadline\":\"2026-11-05T12:07:19.2835197+08:00\"}",
+            "command_status": "ACCEPTED",
+            "response_payload": "{\"commandId\":\"CMD-20261105120619-AA358049\",\"accepted\":true,\"rejectReason\":null}",
+            "created_at": "2026-11-05T12:06:19.28352",
+            "updated_at": "2026-11-05T12:06:21.909707"
+          },
+          {
+            "id": 679,
+            "command_id": "CMD-20261105120623-39396FA9",
+            "agent_code": "AGT-95E68594",
+            "command_type": "EXECUTE_CAPABILITY",
+            "attempt_no": 0,
+            "task_id": 379,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105120623-39396FA9\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0379\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\"},\"issuedAt\":\"2026-11-05T12:06:23.1411895+08:00\",\"deadline\":\"2026-11-05T12:07:23.1411895+08:00\"}",
+            "command_status": "SENT",
+            "response_payload": null,
+            "created_at": "2026-11-05T12:06:23.14119",
+            "updated_at": "2026-11-05T12:06:23.148813"
+          }
+        ],
+        "transport": {
+          "G159_F016_A": [
+            {
+              "at": "2026-11-05T12:06:19.291557+08:00",
+              "message": {
+                "commandId": "CMD-20261105120619-AA358049",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0379",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE"
+                },
+                "issuedAt": 1793851579.2835197,
+                "deadline": 1793851639.2835197
+              }
+            },
+            {
+              "at": "2026-11-05T12:06:23.147883+08:00",
+              "message": {
+                "commandId": "CMD-20261105120623-39396FA9",
+                "commandType": "EXECUTE_CAPABILITY",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0379",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE"
+                },
+                "issuedAt": 1793851583.1411896,
+                "deadline": 1793851643.1411896
+              }
+            }
+          ],
+          "G159_F016_B": [],
+          "G159_F016_C": []
+        }
+      },
+      "checks": {
+        "exactlyOneExecution": true,
+        "barrierEstablished": true
+      },
+      "result": "P",
+      "terminateResponse": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 379,
+            "taskCode": "TASK-20261105-0379",
+            "taskGoal": "F159_PARALLEL_TWO synthetic navigation to F2_TEST_GATE",
+            "taskFamily": "EXT_70D1E436",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=true",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F159_PARALLEL_TWO synthetic navigation to F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "MANUAL_TERMINATED",
+            "currentPlanVersionId": 417,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": "Synthetic F016 cleanup",
+            "failureReason": null,
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-05T12:06:19.226003",
+            "updatedAt": "2026-11-05T12:06:26.4232565",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-05T12:06:26.427541300+08:00"
+        }
+      }
+    },
+    {
+      "name": "pending-cancel-owner",
+      "taskId": 385,
+      "request": {
+        "taskGoal": "F159_PENDING_CANCEL_OWNER synthetic navigation to F2_TEST_GATE",
+        "taskFamily": "EXT_70D1E436",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "response": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 385,
+            "taskCode": "TASK-20261105-0385",
+            "taskGoal": "F159_PENDING_CANCEL_OWNER synthetic navigation to F2_TEST_GATE",
+            "taskFamily": "EXT_70D1E436",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=true",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F159_PENDING_CANCEL_OWNER synthetic navigation to F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "PLANNING",
+            "currentPlanVersionId": null,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": null,
+            "failureReason": null,
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-05T12:06:57.1522792",
+            "updatedAt": "2026-11-05T12:06:57.1522792",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-05T12:06:57.216789400+08:00"
+        }
+      },
+      "otherBefore": {
+        "task": {
+          "id": 386,
+          "taskCode": "TASK-20261105-0386",
+          "taskGoal": "F159_OTHER_EXECUTING_OWNER synthetic navigation to F2_TEST_GATE",
+          "taskFamily": "EXT_70D1E436",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F159_OTHER_EXECUTING_OWNER synthetic navigation to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "EXECUTING",
+          "currentPlanVersionId": 425,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": null,
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-05T12:06:57.431713",
+          "updatedAt": "2026-11-05T12:06:57.733962",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 425,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261105-0394",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "LOW",
+            "riskReasonCode": null,
+            "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.48",
+            "frozenAt": "2026-11-05T12:06:57.469154",
+            "createdAt": "2026-11-05T12:06:57.466567"
+          }
+        ],
+        "events": [
+          {
+            "id": 4150,
+            "taskId": 386,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-05T12:06:57.431713",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F159_OTHER_EXECUTING_OWNER synthetic navigation to F2_TEST_GATE"
+          },
+          {
+            "id": 4151,
+            "taskId": 386,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-05T12:06:57.450012",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 4152,
+            "taskId": 386,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-05T12:06:57.455122",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261105-0394"
+          },
+          {
+            "id": 4153,
+            "taskId": 386,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-05T12:06:57.469154",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 4154,
+            "taskId": 386,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-05T12:06:57.471697",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 4155,
+            "taskId": 386,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-05T12:06:57.474166",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.48；推荐处置=AUTO_EXECUTE（自动执行）"
+          },
+          {
+            "id": 4156,
+            "taskId": 386,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-05T12:06:57.484337",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-95E68594(匹配度1.0,距离0.0,负载0)；AGT-E1791735(匹配度1.0,距离0.0,负载0)，向候选AGT-95E68594发起承接请求"
+          },
+          {
+            "id": 4157,
+            "taskId": 386,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-05T12:06:57.731333",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-95E68594接受步骤1承接请求"
+          },
+          {
+            "id": 4158,
+            "taskId": 386,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-05T12:06:57.74034",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261105120657-7D6C2E42已下发至设备代理AGT-95E68594，业务意图: Synthetic passenger service"
+          }
+        ],
+        "assignments": [
+          {
+            "id": 304,
+            "stepSeq": 1,
+            "deviceAgentCode": "AGT-95E68594",
+            "commandId": "CMD-20261105120657-74E1FAF0",
+            "stepStatus": "EXECUTING",
+            "retryCount": 0,
+            "executionResult": null,
+            "reasonCode": null,
+            "outputParams": null,
+            "dispatchedAt": "2026-11-05T12:06:57.736517",
+            "feedbackAt": null,
+            "rejectedAgentIds": [],
+            "acceptanceRequestedAt": "2026-11-05T12:06:57.484337",
+            "acceptedAt": "2026-11-05T12:06:57.728811",
+            "acceptanceDurationMs": 244,
+            "acceptanceResponseTime": "244ms"
+          }
+        ],
+        "commands": [
+          "699|TASK_ACCEPT|ACCEPTED",
+          "700|EXECUTE_CAPABILITY|SENT"
+        ],
+        "bypassAuditRows": [],
+        "agentRows": [
+          {
+            "id": 15,
+            "agent_code": "AGT-95E68594",
+            "device_id": 16,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "BUSY",
+            "current_task_id": 386,
+            "current_step_seq": 1,
+            "last_reported_at": "2026-11-05T12:06:56.645862",
+            "created_at": "2026-11-05T12:05:09.53993",
+            "updated_at": "2026-11-05T12:05:09.53993",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 16,
+            "agent_code": "AGT-E1791735",
+            "device_id": 17,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T12:06:56.911291",
+            "created_at": "2026-11-05T12:05:10.844151",
+            "updated_at": "2026-11-05T12:05:10.844151",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 17,
+            "agent_code": "AGT-27561154",
+            "device_id": 18,
+            "agent_status": "ENABLED",
+            "online_status": "OFFLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T12:06:57.135454",
+            "created_at": "2026-11-05T12:05:11.879713",
+            "updated_at": "2026-11-05T12:05:11.879713",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          }
+        ],
+        "exceptions": [],
+        "commandRows": [
+          {
+            "id": 699,
+            "command_id": "CMD-20261105120657-74E1FAF0",
+            "agent_code": "AGT-95E68594",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 386,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105120657-74E1FAF0\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0386\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\"},\"issuedAt\":\"2026-11-05T12:06:57.4893852+08:00\",\"deadline\":\"2026-11-05T12:07:57.4893852+08:00\"}",
+            "command_status": "ACCEPTED",
+            "response_payload": "{\"commandId\":\"CMD-20261105120657-74E1FAF0\",\"accepted\":true,\"rejectReason\":null}",
+            "created_at": "2026-11-05T12:06:57.491882",
+            "updated_at": "2026-11-05T12:06:57.722137"
+          },
+          {
+            "id": 700,
+            "command_id": "CMD-20261105120657-7D6C2E42",
+            "agent_code": "AGT-95E68594",
+            "command_type": "EXECUTE_CAPABILITY",
+            "attempt_no": 0,
+            "task_id": 386,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105120657-7D6C2E42\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0386\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\"},\"issuedAt\":\"2026-11-05T12:06:57.7451264+08:00\",\"deadline\":\"2026-11-05T12:07:57.7451264+08:00\"}",
+            "command_status": "SENT",
+            "response_payload": null,
+            "created_at": "2026-11-05T12:06:57.745126",
+            "updated_at": "2026-11-05T12:06:57.755903"
+          }
+        ],
+        "transport": {
+          "G159_F016_A": [
+            {
+              "at": "2026-11-05T12:06:57.497499+08:00",
+              "message": {
+                "commandId": "CMD-20261105120657-74E1FAF0",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0386",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE"
+                },
+                "issuedAt": 1793851617.4893851,
+                "deadline": 1793851677.4893851
+              }
+            },
+            {
+              "at": "2026-11-05T12:06:57.753924+08:00",
+              "message": {
+                "commandId": "CMD-20261105120657-7D6C2E42",
+                "commandType": "EXECUTE_CAPABILITY",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0386",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE"
+                },
+                "issuedAt": 1793851617.7451265,
+                "deadline": 1793851677.7451265
+              }
+            }
+          ],
+          "G159_F016_B": [],
+          "G159_F016_C": []
+        }
+      },
+      "termination": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 385,
+            "taskCode": "TASK-20261105-0385",
+            "taskGoal": "F159_PENDING_CANCEL_OWNER synthetic navigation to F2_TEST_GATE",
+            "taskFamily": "EXT_70D1E436",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=true",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F159_PENDING_CANCEL_OWNER synthetic navigation to F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "MANUAL_TERMINATED",
+            "currentPlanVersionId": 424,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": "Cancel only pending task, preserve executing task",
+            "failureReason": null,
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-05T12:06:57.152279",
+            "updatedAt": "2026-11-05T12:06:58.8314987",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-05T12:06:58.834054200+08:00"
+        }
+      },
+      "after": {
+        "task": {
+          "id": 385,
+          "taskCode": "TASK-20261105-0385",
+          "taskGoal": "F159_PENDING_CANCEL_OWNER synthetic navigation to F2_TEST_GATE",
+          "taskFamily": "EXT_70D1E436",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F159_PENDING_CANCEL_OWNER synthetic navigation to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "MANUAL_TERMINATED",
+          "currentPlanVersionId": 424,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": "Cancel only pending task, preserve executing task",
+          "failureReason": null,
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-05T12:06:57.152279",
+          "updatedAt": "2026-11-05T12:06:58.831499",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 424,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261105-0393",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "LOW",
+            "riskReasonCode": null,
+            "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.48",
+            "frozenAt": "2026-11-05T12:06:57.192896",
+            "createdAt": "2026-11-05T12:06:57.190329"
+          }
+        ],
+        "events": [
+          {
+            "id": 4143,
+            "taskId": 385,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-05T12:06:57.154851",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F159_PENDING_CANCEL_OWNER synthetic navigation to F2_TEST_GATE"
+          },
+          {
+            "id": 4144,
+            "taskId": 385,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-05T12:06:57.172471",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 4145,
+            "taskId": 385,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-05T12:06:57.180169",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261105-0393"
+          },
+          {
+            "id": 4146,
+            "taskId": 385,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-05T12:06:57.192896",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 4147,
+            "taskId": 385,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-05T12:06:57.195434",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 4148,
+            "taskId": 385,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-05T12:06:57.197653",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.48；推荐处置=AUTO_EXECUTE（自动执行）"
+          },
+          {
+            "id": 4149,
+            "taskId": 385,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-05T12:06:57.207595",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-95E68594(匹配度1.0,距离0.0,负载0)；AGT-E1791735(匹配度1.0,距离0.0,负载0)，向候选AGT-95E68594发起承接请求"
+          },
+          {
+            "id": 4159,
+            "taskId": 385,
+            "eventType": "MANUAL_TERMINATED",
+            "occurredAt": "2026-11-05T12:06:58.831499",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator人工终止任务，原因: Cancel only pending task, preserve executing task，涉及设备: []"
+          }
+        ],
+        "assignments": [
+          {
+            "id": 303,
+            "stepSeq": 1,
+            "deviceAgentCode": "AGT-95E68594",
+            "commandId": "CMD-20261105120657-4E43A3BD",
+            "stepStatus": "FROZEN",
+            "retryCount": 0,
+            "executionResult": null,
+            "reasonCode": null,
+            "outputParams": null,
+            "dispatchedAt": null,
+            "feedbackAt": null,
+            "rejectedAgentIds": [],
+            "acceptanceRequestedAt": "2026-11-05T12:06:57.209131",
+            "acceptedAt": null,
+            "acceptanceDurationMs": null,
+            "acceptanceResponseTime": null
+          }
+        ],
+        "commands": [
+          "698|TASK_ACCEPT|SENT"
+        ],
+        "bypassAuditRows": [],
+        "agentRows": [
+          {
+            "id": 15,
+            "agent_code": "AGT-95E68594",
+            "device_id": 16,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "BUSY",
+            "current_task_id": 386,
+            "current_step_seq": 1,
+            "last_reported_at": "2026-11-05T12:06:58.966035",
+            "created_at": "2026-11-05T12:05:09.53993",
+            "updated_at": "2026-11-05T12:05:09.53993",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 16,
+            "agent_code": "AGT-E1791735",
+            "device_id": 17,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T12:06:56.911291",
+            "created_at": "2026-11-05T12:05:10.844151",
+            "updated_at": "2026-11-05T12:05:10.844151",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 17,
+            "agent_code": "AGT-27561154",
+            "device_id": 18,
+            "agent_status": "ENABLED",
+            "online_status": "OFFLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T12:06:57.135454",
+            "created_at": "2026-11-05T12:05:11.879713",
+            "updated_at": "2026-11-05T12:05:11.879713",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          }
+        ],
+        "exceptions": [],
+        "commandRows": [
+          {
+            "id": 698,
+            "command_id": "CMD-20261105120657-4E43A3BD",
+            "agent_code": "AGT-95E68594",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 385,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105120657-4E43A3BD\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0385\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\"},\"issuedAt\":\"2026-11-05T12:06:57.2140449+08:00\",\"deadline\":\"2026-11-05T12:07:57.2140449+08:00\"}",
+            "command_status": "SENT",
+            "response_payload": null,
+            "created_at": "2026-11-05T12:06:57.214045",
+            "updated_at": "2026-11-05T12:06:57.222811"
+          }
+        ],
+        "transport": {
+          "G159_F016_A": [
+            {
+              "at": "2026-11-05T12:06:57.221754+08:00",
+              "message": {
+                "commandId": "CMD-20261105120657-4E43A3BD",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0385",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE"
+                },
+                "issuedAt": 1793851617.2140448,
+                "deadline": 1793851677.2140448
+              }
+            }
+          ],
+          "G159_F016_B": [],
+          "G159_F016_C": []
+        }
+      },
+      "checks": {
+        "pendingTerminated": true,
+        "otherOccupationPreserved": true,
+        "otherStillExecuting": true,
+        "noCancelToOtherOwner": true
+      },
+      "result": "P"
+    },
+    {
+      "name": "other-executing-owner",
+      "taskId": 386,
+      "request": {
+        "taskGoal": "F159_OTHER_EXECUTING_OWNER synthetic navigation to F2_TEST_GATE",
+        "taskFamily": "EXT_70D1E436",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "response": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 386,
+            "taskCode": "TASK-20261105-0386",
+            "taskGoal": "F159_OTHER_EXECUTING_OWNER synthetic navigation to F2_TEST_GATE",
+            "taskFamily": "EXT_70D1E436",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=true",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F159_OTHER_EXECUTING_OWNER synthetic navigation to F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "PLANNING",
+            "currentPlanVersionId": null,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": null,
+            "failureReason": null,
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-05T12:06:57.4317131",
+            "updatedAt": "2026-11-05T12:06:57.4317131",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-05T12:06:57.494053800+08:00"
+        }
+      },
+      "afterPendingOtherTerminated": {
+        "task": {
+          "id": 386,
+          "taskCode": "TASK-20261105-0386",
+          "taskGoal": "F159_OTHER_EXECUTING_OWNER synthetic navigation to F2_TEST_GATE",
+          "taskFamily": "EXT_70D1E436",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F159_OTHER_EXECUTING_OWNER synthetic navigation to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "EXECUTING",
+          "currentPlanVersionId": 425,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": null,
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-05T12:06:57.431713",
+          "updatedAt": "2026-11-05T12:06:57.733962",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 425,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261105-0394",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "LOW",
+            "riskReasonCode": null,
+            "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.48",
+            "frozenAt": "2026-11-05T12:06:57.469154",
+            "createdAt": "2026-11-05T12:06:57.466567"
+          }
+        ],
+        "events": [
+          {
+            "id": 4150,
+            "taskId": 386,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-05T12:06:57.431713",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F159_OTHER_EXECUTING_OWNER synthetic navigation to F2_TEST_GATE"
+          },
+          {
+            "id": 4151,
+            "taskId": 386,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-05T12:06:57.450012",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 4152,
+            "taskId": 386,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-05T12:06:57.455122",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261105-0394"
+          },
+          {
+            "id": 4153,
+            "taskId": 386,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-05T12:06:57.469154",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 4154,
+            "taskId": 386,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-05T12:06:57.471697",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 4155,
+            "taskId": 386,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-05T12:06:57.474166",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.48；推荐处置=AUTO_EXECUTE（自动执行）"
+          },
+          {
+            "id": 4156,
+            "taskId": 386,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-05T12:06:57.484337",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-95E68594(匹配度1.0,距离0.0,负载0)；AGT-E1791735(匹配度1.0,距离0.0,负载0)，向候选AGT-95E68594发起承接请求"
+          },
+          {
+            "id": 4157,
+            "taskId": 386,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-05T12:06:57.731333",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-95E68594接受步骤1承接请求"
+          },
+          {
+            "id": 4158,
+            "taskId": 386,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-05T12:06:57.74034",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261105120657-7D6C2E42已下发至设备代理AGT-95E68594，业务意图: Synthetic passenger service"
+          }
+        ],
+        "assignments": [
+          {
+            "id": 304,
+            "stepSeq": 1,
+            "deviceAgentCode": "AGT-95E68594",
+            "commandId": "CMD-20261105120657-74E1FAF0",
+            "stepStatus": "EXECUTING",
+            "retryCount": 0,
+            "executionResult": null,
+            "reasonCode": null,
+            "outputParams": null,
+            "dispatchedAt": "2026-11-05T12:06:57.736517",
+            "feedbackAt": null,
+            "rejectedAgentIds": [],
+            "acceptanceRequestedAt": "2026-11-05T12:06:57.484337",
+            "acceptedAt": "2026-11-05T12:06:57.728811",
+            "acceptanceDurationMs": 244,
+            "acceptanceResponseTime": "244ms"
+          }
+        ],
+        "commands": [
+          "699|TASK_ACCEPT|ACCEPTED",
+          "700|EXECUTE_CAPABILITY|SENT"
+        ],
+        "bypassAuditRows": [],
+        "agentRows": [
+          {
+            "id": 15,
+            "agent_code": "AGT-95E68594",
+            "device_id": 16,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "BUSY",
+            "current_task_id": 386,
+            "current_step_seq": 1,
+            "last_reported_at": "2026-11-05T12:06:58.966035",
+            "created_at": "2026-11-05T12:05:09.53993",
+            "updated_at": "2026-11-05T12:05:09.53993",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 16,
+            "agent_code": "AGT-E1791735",
+            "device_id": 17,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T12:07:00.369802",
+            "created_at": "2026-11-05T12:05:10.844151",
+            "updated_at": "2026-11-05T12:05:10.844151",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 17,
+            "agent_code": "AGT-27561154",
+            "device_id": 18,
+            "agent_status": "ENABLED",
+            "online_status": "OFFLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T12:06:57.135454",
+            "created_at": "2026-11-05T12:05:11.879713",
+            "updated_at": "2026-11-05T12:05:11.879713",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          }
+        ],
+        "exceptions": [],
+        "commandRows": [
+          {
+            "id": 699,
+            "command_id": "CMD-20261105120657-74E1FAF0",
+            "agent_code": "AGT-95E68594",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 386,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105120657-74E1FAF0\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0386\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\"},\"issuedAt\":\"2026-11-05T12:06:57.4893852+08:00\",\"deadline\":\"2026-11-05T12:07:57.4893852+08:00\"}",
+            "command_status": "ACCEPTED",
+            "response_payload": "{\"commandId\":\"CMD-20261105120657-74E1FAF0\",\"accepted\":true,\"rejectReason\":null}",
+            "created_at": "2026-11-05T12:06:57.491882",
+            "updated_at": "2026-11-05T12:06:57.722137"
+          },
+          {
+            "id": 700,
+            "command_id": "CMD-20261105120657-7D6C2E42",
+            "agent_code": "AGT-95E68594",
+            "command_type": "EXECUTE_CAPABILITY",
+            "attempt_no": 0,
+            "task_id": 386,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105120657-7D6C2E42\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0386\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\"},\"issuedAt\":\"2026-11-05T12:06:57.7451264+08:00\",\"deadline\":\"2026-11-05T12:07:57.7451264+08:00\"}",
+            "command_status": "SENT",
+            "response_payload": null,
+            "created_at": "2026-11-05T12:06:57.745126",
+            "updated_at": "2026-11-05T12:06:57.755903"
+          }
+        ],
+        "transport": {
+          "G159_F016_A": [
+            {
+              "at": "2026-11-05T12:06:57.497499+08:00",
+              "message": {
+                "commandId": "CMD-20261105120657-74E1FAF0",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0386",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE"
+                },
+                "issuedAt": 1793851617.4893851,
+                "deadline": 1793851677.4893851
+              }
+            },
+            {
+              "at": "2026-11-05T12:06:57.753924+08:00",
+              "message": {
+                "commandId": "CMD-20261105120657-7D6C2E42",
+                "commandType": "EXECUTE_CAPABILITY",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0386",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE"
+                },
+                "issuedAt": 1793851617.7451265,
+                "deadline": 1793851677.7451265
+              }
+            }
+          ],
+          "G159_F016_B": [],
+          "G159_F016_C": []
+        }
+      },
+      "after": {
+        "task": {
+          "id": 386,
+          "taskCode": "TASK-20261105-0386",
+          "taskGoal": "F159_OTHER_EXECUTING_OWNER synthetic navigation to F2_TEST_GATE",
+          "taskFamily": "EXT_70D1E436",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F159_OTHER_EXECUTING_OWNER synthetic navigation to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "COMPLETED",
+          "currentPlanVersionId": 425,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": null,
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-05T12:06:57.431713",
+          "updatedAt": "2026-11-05T12:07:00.828559",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 425,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261105-0394",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "LOW",
+            "riskReasonCode": null,
+            "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.48",
+            "frozenAt": "2026-11-05T12:06:57.469154",
+            "createdAt": "2026-11-05T12:06:57.466567"
+          }
+        ],
+        "events": [
+          {
+            "id": 4150,
+            "taskId": 386,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-05T12:06:57.431713",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F159_OTHER_EXECUTING_OWNER synthetic navigation to F2_TEST_GATE"
+          },
+          {
+            "id": 4151,
+            "taskId": 386,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-05T12:06:57.450012",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 4152,
+            "taskId": 386,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-05T12:06:57.455122",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261105-0394"
+          },
+          {
+            "id": 4153,
+            "taskId": 386,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-05T12:06:57.469154",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 4154,
+            "taskId": 386,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-05T12:06:57.471697",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 4155,
+            "taskId": 386,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-05T12:06:57.474166",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.48；推荐处置=AUTO_EXECUTE（自动执行）"
+          },
+          {
+            "id": 4156,
+            "taskId": 386,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-05T12:06:57.484337",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-95E68594(匹配度1.0,距离0.0,负载0)；AGT-E1791735(匹配度1.0,距离0.0,负载0)，向候选AGT-95E68594发起承接请求"
+          },
+          {
+            "id": 4157,
+            "taskId": 386,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-05T12:06:57.731333",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-95E68594接受步骤1承接请求"
+          },
+          {
+            "id": 4158,
+            "taskId": 386,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-05T12:06:57.74034",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261105120657-7D6C2E42已下发至设备代理AGT-95E68594，业务意图: Synthetic passenger service"
+          },
+          {
+            "id": 4160,
+            "taskId": 386,
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "occurredAt": "2026-11-05T12:07:00.816763",
+            "trigger": "SYSTEM",
+            "reasonCode": "DEVICE_SUCCESS",
+            "detailSummary": "指令CMD-20261105120657-7D6C2E42收到设备代理AGT-95E68594执行反馈: SUCCESS"
+          },
+          {
+            "id": 4161,
+            "taskId": 386,
+            "eventType": "STEP_COMPLETED",
+            "occurredAt": "2026-11-05T12:07:00.819243",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1完成条件已满足: routeGenerated=true"
+          },
+          {
+            "id": 4162,
+            "taskId": 386,
+            "eventType": "TASK_COMPLETED",
+            "occurredAt": "2026-11-05T12:07:00.828559",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "全部步骤完成条件均已满足，任务完成"
+          }
+        ],
+        "assignments": [
+          {
+            "id": 304,
+            "stepSeq": 1,
+            "deviceAgentCode": "AGT-95E68594",
+            "commandId": "CMD-20261105120657-74E1FAF0",
+            "stepStatus": "COMPLETED",
+            "retryCount": 0,
+            "executionResult": "SUCCESS",
+            "reasonCode": "DEVICE_SUCCESS",
+            "outputParams": {
+              "routeGenerated": true
+            },
+            "dispatchedAt": "2026-11-05T12:06:57.736517",
+            "feedbackAt": "2026-11-05T12:07:00.816763",
+            "rejectedAgentIds": [],
+            "acceptanceRequestedAt": "2026-11-05T12:06:57.484337",
+            "acceptedAt": "2026-11-05T12:06:57.728811",
+            "acceptanceDurationMs": 244,
+            "acceptanceResponseTime": "244ms"
+          }
+        ],
+        "commands": [
+          "699|TASK_ACCEPT|ACCEPTED",
+          "700|EXECUTE_CAPABILITY|SUCCEEDED"
+        ],
+        "bypassAuditRows": [],
+        "agentRows": [
+          {
+            "id": 15,
+            "agent_code": "AGT-95E68594",
+            "device_id": 16,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T12:06:58.966035",
+            "created_at": "2026-11-05T12:05:09.53993",
+            "updated_at": "2026-11-05T12:05:09.53993",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 16,
+            "agent_code": "AGT-E1791735",
+            "device_id": 17,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T12:07:00.369802",
+            "created_at": "2026-11-05T12:05:10.844151",
+            "updated_at": "2026-11-05T12:05:10.844151",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 17,
+            "agent_code": "AGT-27561154",
+            "device_id": 18,
+            "agent_status": "ENABLED",
+            "online_status": "OFFLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T12:07:00.876961",
+            "created_at": "2026-11-05T12:05:11.879713",
+            "updated_at": "2026-11-05T12:05:11.879713",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          }
+        ],
+        "exceptions": [],
+        "commandRows": [
+          {
+            "id": 699,
+            "command_id": "CMD-20261105120657-74E1FAF0",
+            "agent_code": "AGT-95E68594",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 386,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105120657-74E1FAF0\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0386\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\"},\"issuedAt\":\"2026-11-05T12:06:57.4893852+08:00\",\"deadline\":\"2026-11-05T12:07:57.4893852+08:00\"}",
+            "command_status": "ACCEPTED",
+            "response_payload": "{\"commandId\":\"CMD-20261105120657-74E1FAF0\",\"accepted\":true,\"rejectReason\":null}",
+            "created_at": "2026-11-05T12:06:57.491882",
+            "updated_at": "2026-11-05T12:06:57.722137"
+          },
+          {
+            "id": 700,
+            "command_id": "CMD-20261105120657-7D6C2E42",
+            "agent_code": "AGT-95E68594",
+            "command_type": "EXECUTE_CAPABILITY",
+            "attempt_no": 0,
+            "task_id": 386,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105120657-7D6C2E42\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0386\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\"},\"issuedAt\":\"2026-11-05T12:06:57.7451264+08:00\",\"deadline\":\"2026-11-05T12:07:57.7451264+08:00\"}",
+            "command_status": "SUCCEEDED",
+            "response_payload": "{\"commandId\":\"CMD-20261105120657-7D6C2E42\",\"attemptNo\":0,\"executionResult\":\"SUCCESS\",\"reasonCode\":\"DEVICE_SUCCESS\",\"outputParams\":{\"routeGenerated\":true}}",
+            "created_at": "2026-11-05T12:06:57.745126",
+            "updated_at": "2026-11-05T12:07:00.815432"
+          }
+        ],
+        "transport": {
+          "G159_F016_A": [
+            {
+              "at": "2026-11-05T12:06:57.497499+08:00",
+              "message": {
+                "commandId": "CMD-20261105120657-74E1FAF0",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0386",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE"
+                },
+                "issuedAt": 1793851617.4893851,
+                "deadline": 1793851677.4893851
+              }
+            },
+            {
+              "at": "2026-11-05T12:06:57.753924+08:00",
+              "message": {
+                "commandId": "CMD-20261105120657-7D6C2E42",
+                "commandType": "EXECUTE_CAPABILITY",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0386",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE"
+                },
+                "issuedAt": 1793851617.7451265,
+                "deadline": 1793851677.7451265
+              }
+            }
+          ],
+          "G159_F016_B": [],
+          "G159_F016_C": []
+        }
+      },
+      "checks": {
+        "otherCanComplete": true
+      },
+      "result": "P"
+    },
+    {
+      "name": "freeze-pending-other-owner",
+      "taskId": 387,
+      "request": {
+        "taskGoal": "F159_FREEZE_PENDING_OTHER_OWNER synthetic navigation to F2_TEST_GATE",
+        "taskFamily": "EXT_70D1E436",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "response": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 387,
+            "taskCode": "TASK-20261105-0387",
+            "taskGoal": "F159_FREEZE_PENDING_OTHER_OWNER synthetic navigation to F2_TEST_GATE",
+            "taskFamily": "EXT_70D1E436",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=true",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F159_FREEZE_PENDING_OTHER_OWNER synthetic navigation to F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "PLANNING",
+            "currentPlanVersionId": null,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": null,
+            "failureReason": null,
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-05T12:07:02.8005166",
+            "updatedAt": "2026-11-05T12:07:02.8005166",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-05T12:07:02.863359900+08:00"
+        }
+      },
+      "fixture": "Only future pending association seeded to B; B occupation belongs to independently accepted/executing other task. Mirrors owned-freeze positive control without changing actual owner.",
+      "beforeException": {
+        "task": {
+          "id": 387,
+          "taskCode": "TASK-20261105-0387",
+          "taskGoal": "F159_FREEZE_PENDING_OTHER_OWNER synthetic navigation to F2_TEST_GATE",
+          "taskFamily": "EXT_70D1E436",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F159_FREEZE_PENDING_OTHER_OWNER synthetic navigation to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "EXECUTING",
+          "currentPlanVersionId": 426,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": null,
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-05T12:07:02.800517",
+          "updatedAt": "2026-11-05T12:07:03.109114",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 426,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261105-0395",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              },
+              {
+                "stepSeq": 2,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "LOW",
+            "riskReasonCode": null,
+            "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.48",
+            "frozenAt": "2026-11-05T12:07:02.840608",
+            "createdAt": "2026-11-05T12:07:02.835504"
+          }
+        ],
+        "events": [
+          {
+            "id": 4163,
+            "taskId": 387,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-05T12:07:02.800517",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F159_FREEZE_PENDING_OTHER_OWNER synthetic navigation to F2_TEST_GATE"
+          },
+          {
+            "id": 4164,
+            "taskId": 387,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-05T12:07:02.820664",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 4165,
+            "taskId": 387,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-05T12:07:02.825711",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261105-0395"
+          },
+          {
+            "id": 4166,
+            "taskId": 387,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-05T12:07:02.838049",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 4167,
+            "taskId": 387,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-05T12:07:02.840608",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 4168,
+            "taskId": 387,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-05T12:07:02.84458",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.48；推荐处置=AUTO_EXECUTE（自动执行）"
+          },
+          {
+            "id": 4169,
+            "taskId": 387,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-05T12:07:02.854053",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-95E68594(匹配度1.0,距离0.0,负载0)；AGT-E1791735(匹配度1.0,距离0.0,负载0)，向候选AGT-95E68594发起承接请求"
+          },
+          {
+            "id": 4170,
+            "taskId": 387,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-05T12:07:03.10653",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-95E68594接受步骤1承接请求"
+          },
+          {
+            "id": 4171,
+            "taskId": 387,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-05T12:07:03.111671",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261105120703-AB951F9A已下发至设备代理AGT-95E68594，业务意图: Synthetic passenger service"
+          }
+        ],
+        "assignments": [
+          {
+            "id": 305,
+            "stepSeq": 1,
+            "deviceAgentCode": "AGT-95E68594",
+            "commandId": "CMD-20261105120702-120D6C44",
+            "stepStatus": "EXECUTING",
+            "retryCount": 0,
+            "executionResult": null,
+            "reasonCode": null,
+            "outputParams": null,
+            "dispatchedAt": "2026-11-05T12:07:03.109114",
+            "feedbackAt": null,
+            "rejectedAgentIds": [],
+            "acceptanceRequestedAt": "2026-11-05T12:07:02.854053",
+            "acceptedAt": "2026-11-05T12:07:03.104256",
+            "acceptanceDurationMs": 250,
+            "acceptanceResponseTime": "250ms"
+          },
+          {
+            "id": 306,
+            "stepSeq": 2,
+            "deviceAgentCode": "AGT-E1791735",
+            "commandId": null,
+            "stepStatus": "PENDING_ASSIGNMENT",
+            "retryCount": 0,
+            "executionResult": null,
+            "reasonCode": null,
+            "outputParams": null,
+            "dispatchedAt": null,
+            "feedbackAt": null,
+            "rejectedAgentIds": [],
+            "acceptanceRequestedAt": null,
+            "acceptedAt": null,
+            "acceptanceDurationMs": null,
+            "acceptanceResponseTime": null
+          }
+        ],
+        "commands": [
+          "701|TASK_ACCEPT|ACCEPTED",
+          "702|EXECUTE_CAPABILITY|SENT"
+        ],
+        "bypassAuditRows": [],
+        "agentRows": [
+          {
+            "id": 15,
+            "agent_code": "AGT-95E68594",
+            "device_id": 16,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "BUSY",
+            "current_task_id": 387,
+            "current_step_seq": 1,
+            "last_reported_at": "2026-11-05T12:07:02.974969",
+            "created_at": "2026-11-05T12:05:09.53993",
+            "updated_at": "2026-11-05T12:05:09.53993",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 16,
+            "agent_code": "AGT-E1791735",
+            "device_id": 17,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "BUSY",
+            "current_task_id": 388,
+            "current_step_seq": 1,
+            "last_reported_at": "2026-11-05T12:07:04.37946",
+            "created_at": "2026-11-05T12:05:10.844151",
+            "updated_at": "2026-11-05T12:05:10.844151",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 17,
+            "agent_code": "AGT-27561154",
+            "device_id": 18,
+            "agent_status": "ENABLED",
+            "online_status": "OFFLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T12:07:02.767953",
+            "created_at": "2026-11-05T12:05:11.879713",
+            "updated_at": "2026-11-05T12:05:11.879713",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          }
+        ],
+        "exceptions": [],
+        "commandRows": [
+          {
+            "id": 701,
+            "command_id": "CMD-20261105120702-120D6C44",
+            "agent_code": "AGT-95E68594",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 387,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105120702-120D6C44\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0387\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\"},\"issuedAt\":\"2026-11-05T12:07:02.8609759+08:00\",\"deadline\":\"2026-11-05T12:08:02.8609759+08:00\"}",
+            "command_status": "ACCEPTED",
+            "response_payload": "{\"commandId\":\"CMD-20261105120702-120D6C44\",\"accepted\":true,\"rejectReason\":null}",
+            "created_at": "2026-11-05T12:07:02.860976",
+            "updated_at": "2026-11-05T12:07:03.10445"
+          },
+          {
+            "id": 702,
+            "command_id": "CMD-20261105120703-AB951F9A",
+            "agent_code": "AGT-95E68594",
+            "command_type": "EXECUTE_CAPABILITY",
+            "attempt_no": 0,
+            "task_id": 387,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105120703-AB951F9A\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0387\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\"},\"issuedAt\":\"2026-11-05T12:07:03.1160051+08:00\",\"deadline\":\"2026-11-05T12:08:03.1160051+08:00\"}",
+            "command_status": "SENT",
+            "response_payload": null,
+            "created_at": "2026-11-05T12:07:03.116005",
+            "updated_at": "2026-11-05T12:07:03.125598"
+          }
+        ],
+        "transport": {
+          "G159_F016_A": [
+            {
+              "at": "2026-11-05T12:07:02.867116+08:00",
+              "message": {
+                "commandId": "CMD-20261105120702-120D6C44",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0387",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE"
+                },
+                "issuedAt": 1793851622.860976,
+                "deadline": 1793851682.860976
+              }
+            },
+            {
+              "at": "2026-11-05T12:07:03.124668+08:00",
+              "message": {
+                "commandId": "CMD-20261105120703-AB951F9A",
+                "commandType": "EXECUTE_CAPABILITY",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0387",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE"
+                },
+                "issuedAt": 1793851623.1160052,
+                "deadline": 1793851683.1160052
+              }
+            }
+          ],
+          "G159_F016_B": [],
+          "G159_F016_C": []
+        }
+      },
+      "after": {
+        "task": {
+          "id": 387,
+          "taskCode": "TASK-20261105-0387",
+          "taskGoal": "F159_FREEZE_PENDING_OTHER_OWNER synthetic navigation to F2_TEST_GATE",
+          "taskFamily": "EXT_70D1E436",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F159_FREEZE_PENDING_OTHER_OWNER synthetic navigation to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "EXECUTING",
+          "currentPlanVersionId": 426,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": null,
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-05T12:07:02.800517",
+          "updatedAt": "2026-11-05T12:07:03.109114",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 426,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261105-0395",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              },
+              {
+                "stepSeq": 2,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "LOW",
+            "riskReasonCode": null,
+            "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.48",
+            "frozenAt": "2026-11-05T12:07:02.840608",
+            "createdAt": "2026-11-05T12:07:02.835504"
+          }
+        ],
+        "events": [
+          {
+            "id": 4163,
+            "taskId": 387,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-05T12:07:02.800517",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F159_FREEZE_PENDING_OTHER_OWNER synthetic navigation to F2_TEST_GATE"
+          },
+          {
+            "id": 4164,
+            "taskId": 387,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-05T12:07:02.820664",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 4165,
+            "taskId": 387,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-05T12:07:02.825711",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261105-0395"
+          },
+          {
+            "id": 4166,
+            "taskId": 387,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-05T12:07:02.838049",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 4167,
+            "taskId": 387,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-05T12:07:02.840608",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 4168,
+            "taskId": 387,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-05T12:07:02.84458",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.48；推荐处置=AUTO_EXECUTE（自动执行）"
+          },
+          {
+            "id": 4169,
+            "taskId": 387,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-05T12:07:02.854053",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-95E68594(匹配度1.0,距离0.0,负载0)；AGT-E1791735(匹配度1.0,距离0.0,负载0)，向候选AGT-95E68594发起承接请求"
+          },
+          {
+            "id": 4170,
+            "taskId": 387,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-05T12:07:03.10653",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-95E68594接受步骤1承接请求"
+          },
+          {
+            "id": 4171,
+            "taskId": 387,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-05T12:07:03.111671",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261105120703-AB951F9A已下发至设备代理AGT-95E68594，业务意图: Synthetic passenger service"
+          },
+          {
+            "id": 4181,
+            "taskId": 387,
+            "eventType": "EXCEPTION_DETECTED",
+            "occurredAt": "2026-11-05T12:07:05.826071",
+            "trigger": "SYSTEM",
+            "reasonCode": "AGENT_OFFLINE",
+            "detailSummary": "识别到异常: AGENT_OFFLINE，步骤1，详情: 设备代理AGT-95E68594心跳超时离线，正占用该任务步骤"
+          },
+          {
+            "id": 4182,
+            "taskId": 387,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-05T12:07:05.839977",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-E1791735(匹配度1.0,距离0.0,负载0)，向候选AGT-E1791735发起承接请求"
+          }
+        ],
+        "assignments": [
+          {
+            "id": 305,
+            "stepSeq": 1,
+            "deviceAgentCode": "AGT-E1791735",
+            "commandId": "CMD-20261105120705-39012D3B",
+            "stepStatus": "PENDING_ASSIGNMENT",
+            "retryCount": 0,
+            "executionResult": null,
+            "reasonCode": null,
+            "outputParams": null,
+            "dispatchedAt": "2026-11-05T12:07:03.109114",
+            "feedbackAt": null,
+            "rejectedAgentIds": [
+              "AGT-95E68594"
+            ],
+            "acceptanceRequestedAt": "2026-11-05T12:07:05.842544",
+            "acceptedAt": "2026-11-05T12:07:03.104256",
+            "acceptanceDurationMs": 250,
+            "acceptanceResponseTime": "250ms"
+          },
+          {
+            "id": 306,
+            "stepSeq": 2,
+            "deviceAgentCode": "AGT-E1791735",
+            "commandId": null,
+            "stepStatus": "FROZEN",
+            "retryCount": 0,
+            "executionResult": null,
+            "reasonCode": null,
+            "outputParams": null,
+            "dispatchedAt": null,
+            "feedbackAt": null,
+            "rejectedAgentIds": [],
+            "acceptanceRequestedAt": null,
+            "acceptedAt": null,
+            "acceptanceDurationMs": null,
+            "acceptanceResponseTime": null
+          }
+        ],
+        "commands": [
+          "701|TASK_ACCEPT|ACCEPTED",
+          "702|EXECUTE_CAPABILITY|SENT",
+          "705|TASK_ACCEPT|SENT"
+        ],
+        "bypassAuditRows": [],
+        "agentRows": [
+          {
+            "id": 15,
+            "agent_code": "AGT-95E68594",
+            "device_id": 16,
+            "agent_status": "ENABLED",
+            "online_status": "OFFLINE",
+            "work_status": "BUSY",
+            "current_task_id": 387,
+            "current_step_seq": 1,
+            "last_reported_at": "2026-11-05T12:07:05.821338",
+            "created_at": "2026-11-05T12:05:09.53993",
+            "updated_at": "2026-11-05T12:05:09.53993",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 16,
+            "agent_code": "AGT-E1791735",
+            "device_id": 17,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T12:07:04.37946",
+            "created_at": "2026-11-05T12:05:10.844151",
+            "updated_at": "2026-11-05T12:05:10.844151",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 17,
+            "agent_code": "AGT-27561154",
+            "device_id": 18,
+            "agent_status": "ENABLED",
+            "online_status": "OFFLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T12:07:04.902318",
+            "created_at": "2026-11-05T12:05:11.879713",
+            "updated_at": "2026-11-05T12:05:11.879713",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          }
+        ],
+        "exceptions": [
+          {
+            "id": 74,
+            "task_id": 387,
+            "step_seq": 1,
+            "exception_type": "AGENT_OFFLINE",
+            "occurred_at": "2026-11-05T12:07:05.826071",
+            "recovery_action": "候选设备切换",
+            "recovery_result": null,
+            "impact_conclusion": "已尝试候选设备切换，等待新设备承接与执行反馈以确认最终恢复结果",
+            "reason_code": "设备代理AGT-95E68594心跳超时离线，正占用该任务步骤",
+            "exception_status": "PROCESSING",
+            "resolved_at": null,
+            "resolved_by": null
+          }
+        ],
+        "commandRows": [
+          {
+            "id": 701,
+            "command_id": "CMD-20261105120702-120D6C44",
+            "agent_code": "AGT-95E68594",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 387,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105120702-120D6C44\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0387\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\"},\"issuedAt\":\"2026-11-05T12:07:02.8609759+08:00\",\"deadline\":\"2026-11-05T12:08:02.8609759+08:00\"}",
+            "command_status": "ACCEPTED",
+            "response_payload": "{\"commandId\":\"CMD-20261105120702-120D6C44\",\"accepted\":true,\"rejectReason\":null}",
+            "created_at": "2026-11-05T12:07:02.860976",
+            "updated_at": "2026-11-05T12:07:03.10445"
+          },
+          {
+            "id": 702,
+            "command_id": "CMD-20261105120703-AB951F9A",
+            "agent_code": "AGT-95E68594",
+            "command_type": "EXECUTE_CAPABILITY",
+            "attempt_no": 0,
+            "task_id": 387,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105120703-AB951F9A\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0387\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\"},\"issuedAt\":\"2026-11-05T12:07:03.1160051+08:00\",\"deadline\":\"2026-11-05T12:08:03.1160051+08:00\"}",
+            "command_status": "SENT",
+            "response_payload": null,
+            "created_at": "2026-11-05T12:07:03.116005",
+            "updated_at": "2026-11-05T12:07:03.125598"
+          },
+          {
+            "id": 705,
+            "command_id": "CMD-20261105120705-39012D3B",
+            "agent_code": "AGT-E1791735",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 387,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105120705-39012D3B\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0387\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\"},\"issuedAt\":\"2026-11-05T12:07:05.8451932+08:00\",\"deadline\":\"2026-11-05T12:08:05.8451932+08:00\"}",
+            "command_status": "SENT",
+            "response_payload": null,
+            "created_at": "2026-11-05T12:07:05.845193",
+            "updated_at": "2026-11-05T12:07:05.854809"
+          }
+        ],
+        "transport": {
+          "G159_F016_A": [
+            {
+              "at": "2026-11-05T12:07:02.867116+08:00",
+              "message": {
+                "commandId": "CMD-20261105120702-120D6C44",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0387",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE"
+                },
+                "issuedAt": 1793851622.860976,
+                "deadline": 1793851682.860976
+              }
+            },
+            {
+              "at": "2026-11-05T12:07:03.124668+08:00",
+              "message": {
+                "commandId": "CMD-20261105120703-AB951F9A",
+                "commandType": "EXECUTE_CAPABILITY",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0387",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE"
+                },
+                "issuedAt": 1793851623.1160052,
+                "deadline": 1793851683.1160052
+              }
+            }
+          ],
+          "G159_F016_B": [
+            {
+              "at": "2026-11-05T12:07:05.853521+08:00",
+              "message": {
+                "commandId": "CMD-20261105120705-39012D3B",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0387",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE"
+                },
+                "issuedAt": 1793851625.8451931,
+                "deadline": 1793851685.8451931
+              }
+            }
+          ],
+          "G159_F016_C": []
+        }
+      },
+      "checks": {
+        "futureFrozen": true,
+        "otherOwnerPreserved": false,
+        "otherStillExecuting": true,
+        "noFutureBusiness": true
+      },
+      "result": "F",
+      "terminateResponse": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 387,
+            "taskCode": "TASK-20261105-0387",
+            "taskGoal": "F159_FREEZE_PENDING_OTHER_OWNER synthetic navigation to F2_TEST_GATE",
+            "taskFamily": "EXT_70D1E436",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=true",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F159_FREEZE_PENDING_OTHER_OWNER synthetic navigation to F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "MANUAL_TERMINATED",
+            "currentPlanVersionId": 426,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": "Synthetic F016 cleanup",
+            "failureReason": null,
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-05T12:07:02.800517",
+            "updatedAt": "2026-11-05T12:07:08.8787643",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-05T12:07:08.883251200+08:00"
+        }
+      }
+    },
+    {
+      "name": "freeze-other-executing",
+      "taskId": 388,
+      "request": {
+        "taskGoal": "F159_FREEZE_OTHER_EXECUTING synthetic navigation to F2_TEST_GATE",
+        "taskFamily": "EXT_70D1E436",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "response": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 388,
+            "taskCode": "TASK-20261105-0388",
+            "taskGoal": "F159_FREEZE_OTHER_EXECUTING synthetic navigation to F2_TEST_GATE",
+            "taskFamily": "EXT_70D1E436",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=true",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F159_FREEZE_OTHER_EXECUTING synthetic navigation to F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "PLANNING",
+            "currentPlanVersionId": null,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": null,
+            "failureReason": null,
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-05T12:07:03.1396934",
+            "updatedAt": "2026-11-05T12:07:03.1396934",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-05T12:07:03.204924400+08:00"
+        }
+      },
+      "beforeOtherFreeze": {
+        "task": {
+          "id": 388,
+          "taskCode": "TASK-20261105-0388",
+          "taskGoal": "F159_FREEZE_OTHER_EXECUTING synthetic navigation to F2_TEST_GATE",
+          "taskFamily": "EXT_70D1E436",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F159_FREEZE_OTHER_EXECUTING synthetic navigation to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "EXECUTING",
+          "currentPlanVersionId": 427,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": null,
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-05T12:07:03.139693",
+          "updatedAt": "2026-11-05T12:07:03.446229",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 427,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261105-0396",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "LOW",
+            "riskReasonCode": null,
+            "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.48",
+            "frozenAt": "2026-11-05T12:07:03.184",
+            "createdAt": "2026-11-05T12:07:03.179401"
+          }
+        ],
+        "events": [
+          {
+            "id": 4172,
+            "taskId": 388,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-05T12:07:03.139693",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F159_FREEZE_OTHER_EXECUTING synthetic navigation to F2_TEST_GATE"
+          },
+          {
+            "id": 4173,
+            "taskId": 388,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-05T12:07:03.160828",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 4174,
+            "taskId": 388,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-05T12:07:03.169681",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261105-0396"
+          },
+          {
+            "id": 4175,
+            "taskId": 388,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-05T12:07:03.181451",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 4176,
+            "taskId": 388,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-05T12:07:03.184",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 4177,
+            "taskId": 388,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-05T12:07:03.188977",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.48；推荐处置=AUTO_EXECUTE（自动执行）"
+          },
+          {
+            "id": 4178,
+            "taskId": 388,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-05T12:07:03.196441",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-E1791735(匹配度1.0,距离0.0,负载0)，向候选AGT-E1791735发起承接请求"
+          },
+          {
+            "id": 4179,
+            "taskId": 388,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-05T12:07:03.446229",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-E1791735接受步骤1承接请求"
+          },
+          {
+            "id": 4180,
+            "taskId": 388,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-05T12:07:03.448752",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261105120703-C4363C14已下发至设备代理AGT-E1791735，业务意图: Synthetic passenger service"
+          }
+        ],
+        "assignments": [
+          {
+            "id": 307,
+            "stepSeq": 1,
+            "deviceAgentCode": "AGT-E1791735",
+            "commandId": "CMD-20261105120703-AA41B684",
+            "stepStatus": "EXECUTING",
+            "retryCount": 0,
+            "executionResult": null,
+            "reasonCode": null,
+            "outputParams": null,
+            "dispatchedAt": "2026-11-05T12:07:03.448752",
+            "feedbackAt": null,
+            "rejectedAgentIds": [],
+            "acceptanceRequestedAt": "2026-11-05T12:07:03.198177",
+            "acceptedAt": "2026-11-05T12:07:03.443705",
+            "acceptanceDurationMs": 245,
+            "acceptanceResponseTime": "245ms"
+          }
+        ],
+        "commands": [
+          "703|TASK_ACCEPT|ACCEPTED",
+          "704|EXECUTE_CAPABILITY|SENT"
+        ],
+        "bypassAuditRows": [],
+        "agentRows": [
+          {
+            "id": 15,
+            "agent_code": "AGT-95E68594",
+            "device_id": 16,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "BUSY",
+            "current_task_id": 387,
+            "current_step_seq": 1,
+            "last_reported_at": "2026-11-05T12:07:02.974969",
+            "created_at": "2026-11-05T12:05:09.53993",
+            "updated_at": "2026-11-05T12:05:09.53993",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 16,
+            "agent_code": "AGT-E1791735",
+            "device_id": 17,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "BUSY",
+            "current_task_id": 388,
+            "current_step_seq": 1,
+            "last_reported_at": "2026-11-05T12:07:04.37946",
+            "created_at": "2026-11-05T12:05:10.844151",
+            "updated_at": "2026-11-05T12:05:10.844151",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 17,
+            "agent_code": "AGT-27561154",
+            "device_id": 18,
+            "agent_status": "ENABLED",
+            "online_status": "OFFLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T12:07:04.902318",
+            "created_at": "2026-11-05T12:05:11.879713",
+            "updated_at": "2026-11-05T12:05:11.879713",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          }
+        ],
+        "exceptions": [],
+        "commandRows": [
+          {
+            "id": 703,
+            "command_id": "CMD-20261105120703-AA41B684",
+            "agent_code": "AGT-E1791735",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 388,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105120703-AA41B684\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0388\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\"},\"issuedAt\":\"2026-11-05T12:07:03.2025426+08:00\",\"deadline\":\"2026-11-05T12:08:03.2025426+08:00\"}",
+            "command_status": "ACCEPTED",
+            "response_payload": "{\"commandId\":\"CMD-20261105120703-AA41B684\",\"accepted\":true,\"rejectReason\":null}",
+            "created_at": "2026-11-05T12:07:03.202543",
+            "updated_at": "2026-11-05T12:07:03.443313"
+          },
+          {
+            "id": 704,
+            "command_id": "CMD-20261105120703-C4363C14",
+            "agent_code": "AGT-E1791735",
+            "command_type": "EXECUTE_CAPABILITY",
+            "attempt_no": 0,
+            "task_id": 388,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105120703-C4363C14\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0388\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\"},\"issuedAt\":\"2026-11-05T12:07:03.4552307+08:00\",\"deadline\":\"2026-11-05T12:08:03.4552307+08:00\"}",
+            "command_status": "SENT",
+            "response_payload": null,
+            "created_at": "2026-11-05T12:07:03.455231",
+            "updated_at": "2026-11-05T12:07:03.464216"
+          }
+        ],
+        "transport": {
+          "G159_F016_A": [],
+          "G159_F016_B": [
+            {
+              "at": "2026-11-05T12:07:03.209173+08:00",
+              "message": {
+                "commandId": "CMD-20261105120703-AA41B684",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0388",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE"
+                },
+                "issuedAt": 1793851623.2025425,
+                "deadline": 1793851683.2025425
+              }
+            },
+            {
+              "at": "2026-11-05T12:07:03.462895+08:00",
+              "message": {
+                "commandId": "CMD-20261105120703-C4363C14",
+                "commandType": "EXECUTE_CAPABILITY",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0388",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE"
+                },
+                "issuedAt": 1793851623.4552307,
+                "deadline": 1793851683.4552307
+              }
+            }
+          ],
+          "G159_F016_C": []
+        }
+      },
+      "afterOtherFreeze": {
+        "task": {
+          "id": 388,
+          "taskCode": "TASK-20261105-0388",
+          "taskGoal": "F159_FREEZE_OTHER_EXECUTING synthetic navigation to F2_TEST_GATE",
+          "taskFamily": "EXT_70D1E436",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F159_FREEZE_OTHER_EXECUTING synthetic navigation to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "EXECUTING",
+          "currentPlanVersionId": 427,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": null,
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-05T12:07:03.139693",
+          "updatedAt": "2026-11-05T12:07:03.446229",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 427,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261105-0396",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "LOW",
+            "riskReasonCode": null,
+            "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.48",
+            "frozenAt": "2026-11-05T12:07:03.184",
+            "createdAt": "2026-11-05T12:07:03.179401"
+          }
+        ],
+        "events": [
+          {
+            "id": 4172,
+            "taskId": 388,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-05T12:07:03.139693",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F159_FREEZE_OTHER_EXECUTING synthetic navigation to F2_TEST_GATE"
+          },
+          {
+            "id": 4173,
+            "taskId": 388,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-05T12:07:03.160828",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 4174,
+            "taskId": 388,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-05T12:07:03.169681",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261105-0396"
+          },
+          {
+            "id": 4175,
+            "taskId": 388,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-05T12:07:03.181451",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 4176,
+            "taskId": 388,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-05T12:07:03.184",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 4177,
+            "taskId": 388,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-05T12:07:03.188977",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.48；推荐处置=AUTO_EXECUTE（自动执行）"
+          },
+          {
+            "id": 4178,
+            "taskId": 388,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-05T12:07:03.196441",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-E1791735(匹配度1.0,距离0.0,负载0)，向候选AGT-E1791735发起承接请求"
+          },
+          {
+            "id": 4179,
+            "taskId": 388,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-05T12:07:03.446229",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-E1791735接受步骤1承接请求"
+          },
+          {
+            "id": 4180,
+            "taskId": 388,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-05T12:07:03.448752",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261105120703-C4363C14已下发至设备代理AGT-E1791735，业务意图: Synthetic passenger service"
+          }
+        ],
+        "assignments": [
+          {
+            "id": 307,
+            "stepSeq": 1,
+            "deviceAgentCode": "AGT-E1791735",
+            "commandId": "CMD-20261105120703-AA41B684",
+            "stepStatus": "EXECUTING",
+            "retryCount": 0,
+            "executionResult": null,
+            "reasonCode": null,
+            "outputParams": null,
+            "dispatchedAt": "2026-11-05T12:07:03.448752",
+            "feedbackAt": null,
+            "rejectedAgentIds": [],
+            "acceptanceRequestedAt": "2026-11-05T12:07:03.198177",
+            "acceptedAt": "2026-11-05T12:07:03.443705",
+            "acceptanceDurationMs": 245,
+            "acceptanceResponseTime": "245ms"
+          }
+        ],
+        "commands": [
+          "703|TASK_ACCEPT|ACCEPTED",
+          "704|EXECUTE_CAPABILITY|SENT"
+        ],
+        "bypassAuditRows": [],
+        "agentRows": [
+          {
+            "id": 15,
+            "agent_code": "AGT-95E68594",
+            "device_id": 16,
+            "agent_status": "ENABLED",
+            "online_status": "OFFLINE",
+            "work_status": "BUSY",
+            "current_task_id": 387,
+            "current_step_seq": 1,
+            "last_reported_at": "2026-11-05T12:07:06.984",
+            "created_at": "2026-11-05T12:05:09.53993",
+            "updated_at": "2026-11-05T12:05:09.53993",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 16,
+            "agent_code": "AGT-E1791735",
+            "device_id": 17,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T12:07:04.37946",
+            "created_at": "2026-11-05T12:05:10.844151",
+            "updated_at": "2026-11-05T12:05:10.844151",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 17,
+            "agent_code": "AGT-27561154",
+            "device_id": 18,
+            "agent_status": "ENABLED",
+            "online_status": "OFFLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T12:07:04.902318",
+            "created_at": "2026-11-05T12:05:11.879713",
+            "updated_at": "2026-11-05T12:05:11.879713",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          }
+        ],
+        "exceptions": [],
+        "commandRows": [
+          {
+            "id": 703,
+            "command_id": "CMD-20261105120703-AA41B684",
+            "agent_code": "AGT-E1791735",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 388,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105120703-AA41B684\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0388\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\"},\"issuedAt\":\"2026-11-05T12:07:03.2025426+08:00\",\"deadline\":\"2026-11-05T12:08:03.2025426+08:00\"}",
+            "command_status": "ACCEPTED",
+            "response_payload": "{\"commandId\":\"CMD-20261105120703-AA41B684\",\"accepted\":true,\"rejectReason\":null}",
+            "created_at": "2026-11-05T12:07:03.202543",
+            "updated_at": "2026-11-05T12:07:03.443313"
+          },
+          {
+            "id": 704,
+            "command_id": "CMD-20261105120703-C4363C14",
+            "agent_code": "AGT-E1791735",
+            "command_type": "EXECUTE_CAPABILITY",
+            "attempt_no": 0,
+            "task_id": 388,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105120703-C4363C14\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0388\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\"},\"issuedAt\":\"2026-11-05T12:07:03.4552307+08:00\",\"deadline\":\"2026-11-05T12:08:03.4552307+08:00\"}",
+            "command_status": "SENT",
+            "response_payload": null,
+            "created_at": "2026-11-05T12:07:03.455231",
+            "updated_at": "2026-11-05T12:07:03.464216"
+          }
+        ],
+        "transport": {
+          "G159_F016_A": [],
+          "G159_F016_B": [
+            {
+              "at": "2026-11-05T12:07:03.209173+08:00",
+              "message": {
+                "commandId": "CMD-20261105120703-AA41B684",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0388",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE"
+                },
+                "issuedAt": 1793851623.2025425,
+                "deadline": 1793851683.2025425
+              }
+            },
+            {
+              "at": "2026-11-05T12:07:03.462895+08:00",
+              "message": {
+                "commandId": "CMD-20261105120703-C4363C14",
+                "commandType": "EXECUTE_CAPABILITY",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0388",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE"
+                },
+                "issuedAt": 1793851623.4552307,
+                "deadline": 1793851683.4552307
+              }
+            }
+          ],
+          "G159_F016_C": []
+        }
+      },
+      "after": {
+        "task": {
+          "id": 388,
+          "taskCode": "TASK-20261105-0388",
+          "taskGoal": "F159_FREEZE_OTHER_EXECUTING synthetic navigation to F2_TEST_GATE",
+          "taskFamily": "EXT_70D1E436",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F159_FREEZE_OTHER_EXECUTING synthetic navigation to F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "COMPLETED",
+          "currentPlanVersionId": 427,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": null,
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-05T12:07:03.139693",
+          "updatedAt": "2026-11-05T12:07:07.795293",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 427,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261105-0396",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic passenger service",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 60
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "LOW",
+            "riskReasonCode": null,
+            "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.48",
+            "frozenAt": "2026-11-05T12:07:03.184",
+            "createdAt": "2026-11-05T12:07:03.179401"
+          }
+        ],
+        "events": [
+          {
+            "id": 4172,
+            "taskId": 388,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-05T12:07:03.139693",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F159_FREEZE_OTHER_EXECUTING synthetic navigation to F2_TEST_GATE"
+          },
+          {
+            "id": 4173,
+            "taskId": 388,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-05T12:07:03.160828",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 4174,
+            "taskId": 388,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-05T12:07:03.169681",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261105-0396"
+          },
+          {
+            "id": 4175,
+            "taskId": 388,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-05T12:07:03.181451",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 4176,
+            "taskId": 388,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-05T12:07:03.184",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 4177,
+            "taskId": 388,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-05T12:07:03.188977",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.48；推荐处置=AUTO_EXECUTE（自动执行）"
+          },
+          {
+            "id": 4178,
+            "taskId": 388,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-05T12:07:03.196441",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-E1791735(匹配度1.0,距离0.0,负载0)，向候选AGT-E1791735发起承接请求"
+          },
+          {
+            "id": 4179,
+            "taskId": 388,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-05T12:07:03.446229",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-E1791735接受步骤1承接请求"
+          },
+          {
+            "id": 4180,
+            "taskId": 388,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-05T12:07:03.448752",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261105120703-C4363C14已下发至设备代理AGT-E1791735，业务意图: Synthetic passenger service"
+          },
+          {
+            "id": 4184,
+            "taskId": 388,
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "occurredAt": "2026-11-05T12:07:07.789066",
+            "trigger": "SYSTEM",
+            "reasonCode": "DEVICE_SUCCESS",
+            "detailSummary": "指令CMD-20261105120703-C4363C14收到设备代理AGT-E1791735执行反馈: SUCCESS"
+          },
+          {
+            "id": 4185,
+            "taskId": 388,
+            "eventType": "STEP_COMPLETED",
+            "occurredAt": "2026-11-05T12:07:07.79294",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1完成条件已满足: routeGenerated=true"
+          },
+          {
+            "id": 4186,
+            "taskId": 388,
+            "eventType": "TASK_COMPLETED",
+            "occurredAt": "2026-11-05T12:07:07.795293",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "全部步骤完成条件均已满足，任务完成"
+          }
+        ],
+        "assignments": [
+          {
+            "id": 307,
+            "stepSeq": 1,
+            "deviceAgentCode": "AGT-E1791735",
+            "commandId": "CMD-20261105120703-AA41B684",
+            "stepStatus": "COMPLETED",
+            "retryCount": 0,
+            "executionResult": "SUCCESS",
+            "reasonCode": "DEVICE_SUCCESS",
+            "outputParams": {
+              "routeGenerated": true
+            },
+            "dispatchedAt": "2026-11-05T12:07:03.448752",
+            "feedbackAt": "2026-11-05T12:07:07.789066",
+            "rejectedAgentIds": [],
+            "acceptanceRequestedAt": "2026-11-05T12:07:03.198177",
+            "acceptedAt": "2026-11-05T12:07:03.443705",
+            "acceptanceDurationMs": 245,
+            "acceptanceResponseTime": "245ms"
+          }
+        ],
+        "commands": [
+          "703|TASK_ACCEPT|ACCEPTED",
+          "704|EXECUTE_CAPABILITY|SUCCEEDED"
+        ],
+        "bypassAuditRows": [],
+        "agentRows": [
+          {
+            "id": 15,
+            "agent_code": "AGT-95E68594",
+            "device_id": 16,
+            "agent_status": "ENABLED",
+            "online_status": "OFFLINE",
+            "work_status": "BUSY",
+            "current_task_id": 387,
+            "current_step_seq": 1,
+            "last_reported_at": "2026-11-05T12:07:06.984",
+            "created_at": "2026-11-05T12:05:09.53993",
+            "updated_at": "2026-11-05T12:05:09.53993",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 16,
+            "agent_code": "AGT-E1791735",
+            "device_id": 17,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T12:07:08.409873",
+            "created_at": "2026-11-05T12:05:10.844151",
+            "updated_at": "2026-11-05T12:05:10.844151",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 17,
+            "agent_code": "AGT-27561154",
+            "device_id": 18,
+            "agent_status": "ENABLED",
+            "online_status": "OFFLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-05T12:07:04.902318",
+            "created_at": "2026-11-05T12:05:11.879713",
+            "updated_at": "2026-11-05T12:05:11.879713",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          }
+        ],
+        "exceptions": [],
+        "commandRows": [
+          {
+            "id": 703,
+            "command_id": "CMD-20261105120703-AA41B684",
+            "agent_code": "AGT-E1791735",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 388,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105120703-AA41B684\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0388\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\"},\"issuedAt\":\"2026-11-05T12:07:03.2025426+08:00\",\"deadline\":\"2026-11-05T12:08:03.2025426+08:00\"}",
+            "command_status": "ACCEPTED",
+            "response_payload": "{\"commandId\":\"CMD-20261105120703-AA41B684\",\"accepted\":true,\"rejectReason\":null}",
+            "created_at": "2026-11-05T12:07:03.202543",
+            "updated_at": "2026-11-05T12:07:03.443313"
+          },
+          {
+            "id": 704,
+            "command_id": "CMD-20261105120703-C4363C14",
+            "agent_code": "AGT-E1791735",
+            "command_type": "EXECUTE_CAPABILITY",
+            "attempt_no": 0,
+            "task_id": 388,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261105120703-C4363C14\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261105-0388\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\"},\"issuedAt\":\"2026-11-05T12:07:03.4552307+08:00\",\"deadline\":\"2026-11-05T12:08:03.4552307+08:00\"}",
+            "command_status": "SUCCEEDED",
+            "response_payload": "{\"commandId\":\"CMD-20261105120703-C4363C14\",\"attemptNo\":0,\"executionResult\":\"SUCCESS\",\"reasonCode\":\"DEVICE_SUCCESS\",\"outputParams\":{\"routeGenerated\":true}}",
+            "created_at": "2026-11-05T12:07:03.455231",
+            "updated_at": "2026-11-05T12:07:07.789466"
+          }
+        ],
+        "transport": {
+          "G159_F016_A": [],
+          "G159_F016_B": [
+            {
+              "at": "2026-11-05T12:07:03.209173+08:00",
+              "message": {
+                "commandId": "CMD-20261105120703-AA41B684",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0388",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE"
+                },
+                "issuedAt": 1793851623.2025425,
+                "deadline": 1793851683.2025425
+              }
+            },
+            {
+              "at": "2026-11-05T12:07:03.462895+08:00",
+              "message": {
+                "commandId": "CMD-20261105120703-C4363C14",
+                "commandType": "EXECUTE_CAPABILITY",
+                "attemptNo": 0,
+                "taskId": "TASK-20261105-0388",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE"
+                },
+                "issuedAt": 1793851623.4552307,
+                "deadline": 1793851683.4552307
+              }
+            }
+          ],
+          "G159_F016_C": []
+        }
+      },
+      "checks": {
+        "otherCanComplete": true
+      },
+      "result": "P"
+    }
+  ],
+  "sourceDiff": ""
+}
