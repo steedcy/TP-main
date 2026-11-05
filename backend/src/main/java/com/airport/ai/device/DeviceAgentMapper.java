@@ -11,8 +11,10 @@ import java.util.Optional;
 @Mapper
 public interface DeviceAgentMapper {
     Optional<DeviceAgent> findById(Long id);
+    Optional<DeviceAgent> findByIdForUpdate(@Param("id") Long id);
     Optional<DeviceAgent> findByDeviceId(Long deviceId);
     Optional<DeviceAgent> findByAgentCode(String agentCode);
+    Optional<DeviceAgent> findByAgentCodeForUpdate(@Param("agentCode") String agentCode);
     boolean existsByDeviceId(Long deviceId);
     List<DeviceAgent> findByOnlineStatusAndLastReportedAtBefore(@Param("onlineStatus") String onlineStatus,
                                                                  @Param("threshold") LocalDateTime threshold);
@@ -26,4 +28,6 @@ public interface DeviceAgentMapper {
     long countActiveTaskAssignments(@Param("agentId") Long agentId);
     int insert(DeviceAgent agent);
     int update(DeviceAgent agent);
+    /** DEF-S3-100: 数据库原子比较更新，确保并发抢占时恰好只有一个任务能原子获取空闲代理 */
+    int claimAgent(@Param("agentId") Long agentId, @Param("taskId") Long taskId, @Param("stepSeq") Integer stepSeq);
 }

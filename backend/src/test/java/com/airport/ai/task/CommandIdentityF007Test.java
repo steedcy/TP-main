@@ -67,7 +67,10 @@ class CommandIdentityF007Test {
         agent.setOnlineStatus("ONLINE");
         agent.setWorkStatus("IDLE");
         when(agents.findByAgentCode("AGT-9")).thenReturn(Optional.of(agent));
+        when(agents.findByAgentCodeForUpdate("AGT-9")).thenReturn(Optional.of(agent));
         when(agents.findById(9L)).thenReturn(Optional.of(agent));
+        when(agents.findByIdForUpdate(9L)).thenReturn(Optional.of(agent));
+        when(agents.claimAgent(anyLong(), anyLong(), anyInt())).thenReturn(1);
         when(agents.findByAgentStatusAndOnlineStatus("ENABLED", "ONLINE")).thenReturn(List.of(agent));
         Device device = new Device();
         device.setId(10L);

@@ -227,11 +227,6 @@ public class TaskExecutionOrchestrator {
     public void onTaskResponse(String agentCode, String commandId, boolean accepted, String rejectReason) {
         TaskStepAssignment assignment = assignmentMapper.findByCommandId(commandId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.STEP_ASSIGNMENT_NOT_FOUND));
-        DeviceAgent agent = deviceAgentMapper.findByAgentCode(agentCode)
-                .orElseThrow(() -> new BusinessException(ErrorCode.DEVICE_AGENT_NOT_FOUND));
-        if (assignment.getDeviceAgentId() == null || !assignment.getDeviceAgentId().equals(agent.getId())) {
-            throw new BusinessException(ErrorCode.STEP_STATUS_NOT_ALLOWED, "响应代理与当前步骤分配不匹配");
-        }
         if (!"PENDING_ASSIGNMENT".equals(assignment.getStepStatus())) {
             // Device-side retries may replay an already accepted response. A matching replay is a no-op.
             if ("EXECUTING".equals(assignment.getStepStatus()) || "COMPLETED".equals(assignment.getStepStatus())) return;
@@ -251,24 +246,32 @@ public class TaskExecutionOrchestrator {
         }
 
         if (accepted) {
-            // DEF-S3-100: 待承接窗口互斥与占用原子性校验，后到接受响应不可覆盖已有执行任务
+            // DEF-S3-100: 使用数据库行锁获取代理最新原子状态，彻底杜绝并发抢占时的竞态窗口
+            DeviceAgent agent = (assignment.getDeviceAgentId() != null
+                    ? deviceAgentMapper.findByIdForUpdate(assignment.getDeviceAgentId()).or(() -> deviceAgentMapper.findById(assignment.getDeviceAgentId()))
+                    : deviceAgentMapper.findByAgentCodeForUpdate(agentCode).or(() -> deviceAgentMapper.findByAgentCode(agentCode)))
+                    .orElseThrow(() -> new BusinessException(ErrorCode.DEVICE_AGENT_NOT_FOUND));
+
+            if (assignment.getDeviceAgentId() == null || !assignment.getDeviceAgentId().equals(agent.getId())
+                    || !agent.getAgentCode().equals(agentCode)) {
+                throw new BusinessException(ErrorCode.STEP_STATUS_NOT_ALLOWED, "响应代理与当前步骤分配不匹配");
+            }
+
             if ("BUSY".equals(agent.getWorkStatus()) || (agent.getCurrentTaskId() != null && !agent.getCurrentTaskId().equals(assignment.getTaskId()))) {
-                taskEventService.append(assignment.getTaskId(), "AGENT_ASSIGNMENT_CONFLICTED", "SYSTEM", "ERR_AGENT_ALREADY_BUSY",
-                        "设备代理" + agentCode + "已被任务" + agent.getCurrentTaskId() + "占用，拒绝该冲突承接响应，顺位切换候选设备");
-
-                List<String> rejected = parseRejectedIds(assignment.getRejectedAgentIds());
-                if (!rejected.contains(agentCode)) {
-                    rejected.add(agentCode);
-                }
-                assignment.setRejectedAgentIds(toJson(rejected));
-                assignment.setDeviceAgentId(null);
-                assignment.setCommandId(null);
-                assignment.setExecuteCommandId(null);
-                assignment.setUpdatedAt(LocalDateTime.now());
-                assignmentMapper.update(assignment);
-
-                assignStep(assignment.getTaskId(), assignment.getPlanVersionId(), assignment.getStepSeq());
+                handleAssignmentConflict(assignment, agentCode, agent.getCurrentTaskId());
                 return;
+            }
+
+            // DEF-S3-100: 数据库原子比较更新抢占代理所有权
+            int claimed = deviceAgentMapper.claimAgent(agent.getId(), assignment.getTaskId(), assignment.getStepSeq());
+            if (claimed == 0) {
+                // 重新查证代理当前最新占用状态
+                Optional<DeviceAgent> recheck = deviceAgentMapper.findById(agent.getId());
+                if (recheck.isPresent() && ("BUSY".equals(recheck.get().getWorkStatus())
+                        || (recheck.get().getCurrentTaskId() != null && !recheck.get().getCurrentTaskId().equals(assignment.getTaskId())))) {
+                    handleAssignmentConflict(assignment, agentCode, recheck.get().getCurrentTaskId());
+                    return;
+                }
             }
 
             agent.setWorkStatus("BUSY");
@@ -288,6 +291,12 @@ public class TaskExecutionOrchestrator {
 
             dispatchCommand(assignment);
         } else {
+            DeviceAgent agent = deviceAgentMapper.findByAgentCode(agentCode)
+                    .orElseThrow(() -> new BusinessException(ErrorCode.DEVICE_AGENT_NOT_FOUND));
+            if (assignment.getDeviceAgentId() == null || !assignment.getDeviceAgentId().equals(agent.getId())) {
+                throw new BusinessException(ErrorCode.STEP_STATUS_NOT_ALLOWED, "响应代理与当前步骤分配不匹配");
+            }
+
             List<String> rejected = parseRejectedIds(assignment.getRejectedAgentIds());
             rejected.add(agentCode);
             assignment.setRejectedAgentIds(toJson(rejected));
@@ -304,6 +313,26 @@ public class TaskExecutionOrchestrator {
         }
     }
 
+    private void handleAssignmentConflict(TaskStepAssignment assignment, String agentCode, Long occupiedTaskId) {
+        String detail = occupiedTaskId != null
+                ? "设备代理" + agentCode + "已被任务" + occupiedTaskId + "占用，拒绝该冲突承接响应，顺位切换候选设备"
+                : "设备代理" + agentCode + "已被并发任务占用，拒绝该冲突承接响应，顺位切换候选设备";
+        taskEventService.append(assignment.getTaskId(), "AGENT_ASSIGNMENT_CONFLICTED", "SYSTEM", "ERR_AGENT_ALREADY_BUSY", detail);
+
+        List<String> rejected = parseRejectedIds(assignment.getRejectedAgentIds());
+        if (!rejected.contains(agentCode)) {
+            rejected.add(agentCode);
+        }
+        assignment.setRejectedAgentIds(toJson(rejected));
+        assignment.setDeviceAgentId(null);
+        assignment.setCommandId(null);
+        assignment.setExecuteCommandId(null);
+        assignment.setUpdatedAt(LocalDateTime.now());
+        assignmentMapper.update(assignment);
+
+        assignStep(assignment.getTaskId(), assignment.getPlanVersionId(), assignment.getStepSeq());
+    }
+
     /**
      * 对应5.5.2基本路径1~2、业务规则3/5：生成全局唯一指令编号，指令下发前对拼装后的
      * inputParams再次做运动安全控制字段拦截（异常路径2a）——5.4.4三类校验只检查计划模板本身，
@@ -316,7 +345,7 @@ public class TaskExecutionOrchestrator {
             taskEventService.append(assignment.getTaskId(), "COMMAND_DISPATCH_BLOCKED", "SYSTEM",
                     "ERR_MOTION_SAFETY_FIELD",
                     "步骤" + assignment.getStepSeq() + "指令内容检出运动安全控制字段: " + motionSafetyHits + "，已拦截下发");
-            releaseAgent(assignment.getDeviceAgentId());
+            releaseAgent(assignment.getDeviceAgentId(), assignment.getTaskId());
             markStepFailed(assignment, "ERR_MOTION_SAFETY_FIELD", "指令内容检出运动安全控制字段，已拦截");
             return;
         }
@@ -396,7 +425,7 @@ public class TaskExecutionOrchestrator {
         if (completionSatisfied) {
             assignment.setStepStatus("COMPLETED");
             assignmentMapper.update(assignment);
-            releaseAgent(assignment.getDeviceAgentId());
+            releaseAgent(assignment.getDeviceAgentId(), assignment.getTaskId());
             taskEventService.append(assignment.getTaskId(), "STEP_COMPLETED", "SYSTEM", null,
                     "步骤" + assignment.getStepSeq() + "完成条件已满足: " + step.get("completionCondition"));
             taskExceptionService.onStepRecovered(assignment.getTaskId(), assignment.getStepSeq());
@@ -418,7 +447,7 @@ public class TaskExecutionOrchestrator {
 
         if (Boolean.TRUE.equals(taskMapper.findById(assignment.getTaskId()).orElseThrow().getIsDryRun())) {
             assignment.setStepStatus("FAILED"); assignmentMapper.update(assignment);
-            releaseAgent(assignment.getDeviceAgentId());
+            releaseAgent(assignment.getDeviceAgentId(), assignment.getTaskId());
             dryRunLifecycle.finish(assignment.getTaskId(), false, failureDetail);
             return;
         }
@@ -446,7 +475,7 @@ public class TaskExecutionOrchestrator {
         // 异常路径3b：重试后仍失败，释放占用并转5.5.3异常识别与恢复
         assignment.setStepStatus("FAILED");
         assignmentMapper.update(assignment);
-        releaseAgent(assignment.getDeviceAgentId());
+        releaseAgent(assignment.getDeviceAgentId(), assignment.getTaskId());
         taskEventService.append(assignment.getTaskId(), "STEP_FAILED", "SYSTEM", reasonCode,
                 "步骤" + assignment.getStepSeq() + "重试后仍失败: " + failureDetail);
         taskExceptionService.handleException(assignment.getTaskId(), assignment.getStepSeq(), "STEP_FAILED", failureDetail);
@@ -550,8 +579,16 @@ public class TaskExecutionOrchestrator {
     }
 
     public void releaseAgent(Long deviceAgentId) {
+        releaseAgent(deviceAgentId, null);
+    }
+
+    public void releaseAgent(Long deviceAgentId, Long expectedTaskId) {
         if (deviceAgentId == null) return;
         deviceAgentMapper.findById(deviceAgentId).ifPresent(agent -> {
+            if (expectedTaskId != null && agent.getCurrentTaskId() != null && !expectedTaskId.equals(agent.getCurrentTaskId())) {
+                // DEF-S3-103: 代理当前归属于其他任务，严禁清空其他任务的占用与工作状态
+                return;
+            }
             agent.setWorkStatus("IDLE");
             agent.setCurrentTaskId(null);
             agent.setCurrentStepSeq(null);

@@ -398,7 +398,17 @@ public class TaskService {
                 deviceAgentMapper.findById(assignedAgentId).ifPresent(affectedAgents::add);
             }
         }
-        for (var agent : affectedAgents) {
+        for (var agentRef : affectedAgents) {
+            com.airport.ai.device.DeviceAgent agent = deviceAgentMapper.findByIdForUpdate(agentRef.getId())
+                    .or(() -> deviceAgentMapper.findById(agentRef.getId()))
+                    .orElse(agentRef);
+
+            // DEF-S3-103: 若该代理当前已被其他任务占有，本任务终止仅能冻结/解除本任务自身的步骤，
+            // 严禁向该代理发送取消指令，严禁修改或清空归属于其他任务的工作状态与占用引用！
+            if (agent.getCurrentTaskId() != null && !taskId.equals(agent.getCurrentTaskId())) {
+                continue;
+            }
+
             String agentCode = agent.getAgentCode();
             TaskStepAssignment assignment = activeAssignmentsByAgent.get(agent.getId());
             String cancelCommandId = generateCancelCommandId();

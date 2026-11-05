@@ -123,6 +123,10 @@ class DeviceMatchingAndTaskAcceptanceF016Test {
         when(taskMapper.findById(100L)).thenReturn(Optional.of(testTask));
         when(planVersionMapper.findById(200L)).thenReturn(Optional.of(testPlanVersion));
         when(assignmentMapper.findByPlanVersionIdAndStepSeq(200L, 1)).thenReturn(Optional.of(testAssignment));
+
+        when(deviceAgentMapper.findByIdForUpdate(anyLong())).thenAnswer(inv -> deviceAgentMapper.findById(inv.getArgument(0)));
+        when(deviceAgentMapper.findByAgentCodeForUpdate(anyString())).thenAnswer(inv -> deviceAgentMapper.findByAgentCode(inv.getArgument(0)));
+        when(deviceAgentMapper.claimAgent(anyLong(), anyLong(), anyInt())).thenReturn(1);
     }
 
     private Device createDevice(Long id, String code, String typeCode, String simType, double x, double y) {
@@ -403,6 +407,46 @@ class DeviceMatchingAndTaskAcceptanceF016Test {
         // 验证自动切换到下一候选 a2 发起承接请求
         verify(deviceAgentMessagingService).requestTaskAcceptance(eq("AGT-02"), anyString(), eq(100L), eq(1), eq("CAP_FLIGHT_UPDATE"), any());
         assertTrue(testAssignment.getRejectedAgentIds().contains("AGT-01"));
+    }
+
+    @Test
+    @DisplayName("SRS_F016.R02 / DEF-S3-100: 并发抢占原子CAS失败时，自动切换下一候选且不下发业务指令")
+    void testR02_parallelAcceptanceAtomicConflictSwitchesCandidate() {
+        Device d1 = createDevice(1L, "DEV-01", "FLIGHT_DELAY_BOARD", null, 800.0, 4000.0);
+        DeviceAgent a1 = createAgent(10L, "AGT-01", 1L, "ONLINE", "IDLE", null);
+
+        Device d2 = createDevice(2L, "DEV-02", "FLIGHT_DELAY_BOARD", null, 810.0, 4000.0);
+        DeviceAgent a2 = createAgent(20L, "AGT-02", 2L, "ONLINE", "IDLE", null);
+
+        when(deviceAgentMapper.findByAgentStatusAndOnlineStatus("ENABLED", "ONLINE"))
+                .thenReturn(List.of(a1, a2));
+        when(deviceMapper.findByIds(anyList())).thenReturn(List.of(d1, d2));
+        when(deviceCapabilityMapper.existsByDeviceIdAndCapabilityTypeAndCapabilityStatus(anyLong(), eq("CAP_FLIGHT_UPDATE"), eq("ENABLED")))
+                .thenReturn(true);
+        when(deviceAgentMapper.findByAgentCode("AGT-01")).thenReturn(Optional.of(a1));
+        when(deviceAgentMapper.findByAgentCode("AGT-02")).thenReturn(Optional.of(a2));
+        when(deviceAgentMapper.findById(10L)).thenReturn(Optional.of(a1));
+        when(deviceAgentMapper.findById(20L)).thenReturn(Optional.of(a2));
+        when(assignmentMapper.findByCommandId(anyString())).thenReturn(Optional.of(testAssignment));
+
+        orchestrator.assignStep(100L, 200L, 1);
+        String commandId = testAssignment.getCommandId();
+
+        // 模拟并发抢占：claimAgent 返回 0（已被其他并发事务先一步更新），recheck 查出已被任务 888 抢占
+        when(deviceAgentMapper.claimAgent(10L, 100L, 1)).thenReturn(0);
+        DeviceAgent claimedAgent = createAgent(10L, "AGT-01", 1L, "ONLINE", "BUSY", null);
+        claimedAgent.setCurrentTaskId(888L);
+        when(deviceAgentMapper.findById(10L)).thenReturn(Optional.of(claimedAgent));
+
+        orchestrator.onTaskResponse("AGT-01", commandId, true, null);
+
+        // 验证记录冲突事件
+        verify(taskEventService).append(eq(100L), eq("AGENT_ASSIGNMENT_CONFLICTED"), eq("SYSTEM"),
+                eq("ERR_AGENT_ALREADY_BUSY"), contains("已被任务888占用"));
+        // 绝不下发业务指令给 a1
+        verify(deviceAgentMessagingService, never()).executeCapability(eq("AGT-01"), any(), any(), any(), any(), anyInt(), any());
+        // 自动切换至下一候选 a2
+        verify(deviceAgentMessagingService).requestTaskAcceptance(eq("AGT-02"), anyString(), eq(100L), eq(1), eq("CAP_FLIGHT_UPDATE"), any());
     }
 
     @Test

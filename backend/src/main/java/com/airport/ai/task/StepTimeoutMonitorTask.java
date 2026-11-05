@@ -63,6 +63,9 @@ public class StepTimeoutMonitorTask {
 
             if (assignment.getDeviceAgentId() != null) {
                 deviceAgentMapper.findById(assignment.getDeviceAgentId()).ifPresent(agent -> {
+                    if (agent.getCurrentTaskId() != null && !assignment.getTaskId().equals(agent.getCurrentTaskId())) {
+                        return;
+                    }
                     agent.setWorkStatus("IDLE");
                     agent.setCurrentTaskId(null);
                     agent.setCurrentStepSeq(null);

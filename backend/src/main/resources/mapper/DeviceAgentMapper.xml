@@ -26,12 +26,20 @@
         SELECT <include refid="Columns"/> FROM device_agents WHERE id = #{id}
     </select>
 
+    <select id="findByIdForUpdate" resultMap="DeviceAgentResult">
+        SELECT <include refid="Columns"/> FROM device_agents WHERE id = #{id} FOR UPDATE
+    </select>
+
     <select id="findByDeviceId" resultMap="DeviceAgentResult">
         SELECT <include refid="Columns"/> FROM device_agents WHERE device_id = #{deviceId}
     </select>
 
     <select id="findByAgentCode" resultMap="DeviceAgentResult">
         SELECT <include refid="Columns"/> FROM device_agents WHERE agent_code = #{agentCode}
+    </select>
+
+    <select id="findByAgentCodeForUpdate" resultMap="DeviceAgentResult">
+        SELECT <include refid="Columns"/> FROM device_agents WHERE agent_code = #{agentCode} FOR UPDATE
     </select>
 
     <select id="existsByDeviceId" resultType="boolean">
@@ -91,6 +99,18 @@
             last_reported_at = #{lastReportedAt},
             updated_at = #{updatedAt}
         WHERE id = #{id}
+    </update>
+
+    <!-- DEF-S3-100: 数据库原子比较更新，确保并发抢占时恰好只有一个任务能原子获取空闲代理 -->
+    <update id="claimAgent">
+        UPDATE device_agents SET
+            work_status = 'BUSY',
+            current_task_id = #{taskId},
+            current_step_seq = #{stepSeq},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{agentId}
+          AND work_status = 'IDLE'
+          AND (current_task_id IS NULL OR current_task_id = #{taskId})
     </update>
 
 </mapper>
