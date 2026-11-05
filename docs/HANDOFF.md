@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`REQUIREMENT_PASSED`（SRS_F016 V1.160 / V2.4+BL006：8规则8P/0F/0NT、5步骤5P/0F/0NT；100/103关闭，099/101/102保持关闭；证据af6d1a42fd24c7c68f2ac53934047cd96927d008先推送；已安全快进合main并推送c1844a9b191d711900f80701d1b4793c3598b0e0，最终交接随本提交同步）
-- 当前进度：F001～F016已独立验收合main。F016全部当前实测，36任务归并30观察全P；无本需求F/NT，旧失败完整保留。下一需求SRS_F017待另启动，Claude从最终最新origin/main同步；不代表后续需求、三核心场景或95项整体验收。
+- 状态：`READY_FOR_GPT`（SRS_F017 V1.161 / V2.4：代码提交 `283a1b8925bdd0e5647913374d652c1556807f81`，标签 `V1.161`）
+- 当前进度：F001～F016已独立验收合main。本轮推进 SRS_F017（业务指令下发与状态流转），基于最新 main（`75c3bf9`）完成指令状态机流转、ACK/NACK 与单次同号幂等重试、完成条件判定与阻断、超时状态回滚逻辑及专项测试补齐；全量单测通过。不代表后续需求、三核心场景或95项整体验收。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -2600,3 +2600,56 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 - **已实际合main并推送：`c1844a9b191d711900f80701d1b4793c3598b0e0`**。主工作区main无已跟踪用户改动，40个未跟踪用户文件逐一哈希前后相同；执行`git merge --ff-only origin/ai/gpt-test`及普通`git push origin main`，远端实际SHA核对一致。无强推/reset/PR，未覆盖用户文件。
 - 证据已先推送`af6d1a42fd24c7c68f2ac53934047cd96927d008`，随后验收文档`c1844a9b191d711900f80701d1b4793c3598b0e0`亦先推送ai/gpt-test再安全同步main。合入证明`acceptance/stage3/evidence/SRS_F016-V1.160-main-integration-20261105.json`；本次最终交接文档再同步两分支，不移动V1.160产品标签。
 - 最终结论REQUIREMENT_PASSED，8规则/5步骤全部P，F/NT0；100/103关闭，099/101/102保持关闭。下一SRS_F017由后续独立启动，Claude先fetch最新origin/main并读取正式规则/台账/暂存清单，不复测方对话记忆、不整支移植暂存。当前本轮不执行F017，95项及三核心场景尚未因此验收。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 产品 SHA / 标签 | 证据提交 SHA | main |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-05 | SRS_F017 | Claude → ChatGPT | READY_FOR_GPT | 283a1b8925bdd0e5647913374d652c1556807f81 / V1.161 | （待GPT生成） | 基于 75c3bf9 |
+
+## 2026-11-05 Claude → ChatGPT：SRS_F017 V1.161 修复与单测完成交接（READY_FOR_GPT）
+
+- **状态**：`READY_FOR_GPT`。分支 `ai/claude-fix`，产品代码完整 SHA `283a1b8925bdd0e5647913374d652c1556807f81`，标签 **`V1.161`**（严格指向该产品代码提交，并推送至 origin）。
+- **基准状态**：基于已合入 F016 的最新 main（`75c3bf9`）对齐推进。保持资源隔离，独立 worktree，未触碰主工作区 `tip` 或 GPT 端口与数据库资源。
+- **关联需求与用例**：
+  - 需求：`SRS_F017`（业务指令下发与执行反馈，覆盖规则 `SRS_F017.R01 ~ R10`）
+  - 核心用例：`TC-054`（TC-054.S1, TC-054.S2）、`TC-055`（TC-055.S1, TC-055.S2）、`TC-056`（TC-056.S1, TC-056.S2）
+  - 关联已知项：`DEF-S3-068`（已在 `107da41` 具备前端进度指标）、`DEF-S3-066`（已在 `06448d6` 保证待人工状态转移事件与真实性）、`DEF-B07-001`（已在 `17a342e` 显式完成谓词比较）
+
+### 本轮修复与增强内容
+
+1. **核对与复用已有实现（防重复修改）**：
+   - `DEF-S3-068`（TC-054.S2）：任务列表与详情明确呈现完成数/总数及当前步骤执行进度条，已在 commit `107da41` 中完备。
+   - `DEF-S3-066`（TC-054.S2 / SRS_F017.R10）：时间线真实性保证，转待人工时明确记录 `TASK_PENDING_MANUAL` 状态流转事件，已在 commit `06448d6` 中完备。
+   - `DEF-B07-001`（TC-055.S2 / SRS_F017.R08）：通过 `CompletionConditionEvaluator.satisfied(...)` 逐项比对计划定义完成条件，设备上报 HTTP 200/SUCCESS 但完成条件未满足时（如航显未成功/路线未生成），绝不标记步骤完成，禁止提前下发后续步骤。
+
+2. **指令下发超时与状态回滚逻辑增强（`StepTimeoutMonitorTask`）**：
+   - 改进构造函数支持显式注入 `PlanVersionMapper` 与 `DeviceCommandMapper`，消除纯单测下对 Spring 字段反射的隐式依赖。
+   - 移除不必要的固定阈值门槛，支持精确识别计划步骤内自定义的 `stepTimeout`（如 30 秒）。
+   - 超时检测后执行完备回滚：
+     - 步骤状态置为 `FAILED`，执行结果为 `TIMEOUT`，原因码为 `ERR_EXECUTION_TIMEOUT`；
+     - 同步更新指令记录表 `device_commands` 为 `TIMED_OUT` 终态，杜绝指令长期悬挂在 `SENT` 状态；
+     - 释放设备代理占用（工作状态恢复 `IDLE`，清除 `currentTaskId`/`currentStepSeq`）；
+     - 写入 `STEP_TIMEOUT_DETECTED` 事件，并上报 `EXECUTION_TIMEOUT` 异常触发候选重选或转人工处理。
+
+3. **指令流水唯一性与单次幂等重试（`CommandIds` & `TaskExecutionOrchestrator`）**：
+   - 统一设备指令生成器 `CommandIds.next()` 增加高并发原子递增计数保护，确保在单秒高频突发场景下严格 100% 唯一，严格保持 27 字符（`CMD-yyyyMMddHHmmss-8位大写十六进制`），杜绝生日悖论碰撞。
+   - 保证首次失败（attempt 0）只自动重试 1 次（SRS_F017.R02），沿用同一 `executeCommandId`，`attemptNo` 递增为 1（保证幂等）；重试仍失败置 `FAILED`、释放占用并进入异常影响判断（SRS_F017.R03）。
+
+4. **运动安全控制拦截与意图隔离（SRS_F017.R05, R06 / TC-056）**：
+   - `MotionSafetyGuard` 检出速度、加速度、姿态、路径点、避障、急停、限速等运动安全控制字段时，立即在下发前拦截，记录 `COMMAND_DISPATCH_BLOCKED`（原因码 `ERR_MOTION_SAFETY_FIELD`），严禁透传给物理/仿真设备。
+
+5. **全量补齐专项单测（`CommandDispatchAndExecutionF017Test`）**：
+   - 补齐包含 10 个测试用例的端到端专项测试套件，覆盖 R01 ~ R10 全部规则与分支。
+   - 本地运行 `mvn -o test` 全量通过（370 项全部通过，0 失败，0 错误，2 项原有跳过，BUILD SUCCESS）。
+
+### 给 ChatGPT 的独立复测建议
+
+1. **测试用例覆盖**：
+   - `TC-054.S1`：执行多步计划，验证承接 `TASK_ACCEPT` 不等于完成，前步满足后步才下发；
+   - `TC-054.S2`：验证九状态流转，进度指标（完成数/总数/当前步）与事件时间线全量留痕（`DEF-S3-068` 验收闭环）；
+   - `TC-055.S1`：首次下发失败自动重试 1 次（同指令编号幂等），重试仍失败生成 `STEP_FAILED` 异常并进入影响判断；
+   - `TC-055.S2`：分别验证静默无反馈超时（触发 `EXECUTION_TIMEOUT` 并回滚）与设备上报 SUCCESS 但完成条件未满足（按失败处理并阻断后步）；
+   - `TC-056.S1`：指令掺杂运动控制字段时检出并拦截；
+   - `TC-056.S2`：模型异常/校验失败不触发设备指令。
+2. **复测完成标准**：
+   - 按照 V2.4 整轮复测要求完成相关步骤独立验证并记录证据；
+   - 全部通过后合入 main 并更新交接文档。
