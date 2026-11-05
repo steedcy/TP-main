@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（SRS_F016 V1.157 / V2.4整轮独立复测：8规则3P/5F/0NT、5步骤1P/4F/0NT；DEF-S3-099～102待修；证据已先推送2ab13da65e530c7906dd277c65c3b368dee59eb4；不合main、不推进F017）
-- 当前进度：F001～F015已独立验收合main；F016本轮全部可执行分支完成、无历史业务P替代。全拒绝数据库约束500/末响应回滚、待承接窗口重复占用及业务下发、终止/离线恢复释放、承接响应时间展示四缺陷统一交修。下一步Claude先fetch并合入origin/ai/gpt-test，修复后交下一唯一递增标签。
+- 状态：`READY_FOR_GPT`（SRS_F016 V1.158 / Claude完成DEF-S3-099~102修复，交ChatGPT按V2.4整轮独立复测）
+- 当前进度：F001～F015已独立验收合main；F016 V1.158完成099全拒绝约束放行与迁移、100待承接窗口互斥与冲突切换、101离线取消指令记录与空闲确认释放（BL-006协同安全门禁）、102承接响应耗时记录与前端展示；全量后端单测354项通过，前端build通过，生产JAR打包成功。未合入main、未创建PR、不推进F017。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -2378,3 +2378,58 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 产品SHA/标签 | 证据提交SHA | main |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-05 | SRS_F016 | ChatGPT → Claude | READY_FOR_CLAUDE | ea6901eb4e35448ca91773f8ea1424fa797d88e5 / V1.157 | 2ab13da65e530c7906dd277c65c3b368dee59eb4 | 不合入；仍9816886 |
+
+## 2026-11-05 Claude → ChatGPT（SRS_F016 V1.158 / 统一修复 DEF-S3-099～102 交接）
+
+- 状态：**READY_FOR_GPT**
+- 分支：`ai/claude-fix`
+- 产品代码提交 SHA：**`4f0b4d8e0ab2a2f0e4027d3ee21b20fe487dcadc`**
+- 对应版本标签：**`V1.158`**（严格指向上述产品代码提交，已推送到 origin；文档提交在后，不移动标签）
+- 依据策略：V2.4 / BL-005、BL-006
+- 主干状态：未合 main、未创建 PR、不推进 F017；远端 main 仍保持 `9816886c08dd1922c355f9c07ff3343bbf4ea3e2`。
+
+### 修复内容与依据
+
+1. **DEF-S3-099 修复（全部候选拒绝时 `chk_exception_type` 约束失败导致 500 与事务回滚）**：
+   - 新增 Flyway 迁移脚本 `backend/src/main/resources/db/migration/V28__allow_assignment_failed_exception_type.sql`，更新检查约束 `chk_exception_type`，增加 `'ASSIGNMENT_FAILED'` 合法取值。
+   - 同步更新前端 `TaskExceptionListView.vue` 与 `TaskTraceView.vue`，增加 `ASSIGNMENT_FAILED` 选项及标签映射。
+   - 保证全部候选拒绝时 `ASSIGNMENT_FAILED` 异常与 `STEP_ASSIGNMENT_FAILED` 事件持久化成功，消除 500 事务回滚。
+
+2. **DEF-S3-100 修复（待承接窗口期被抢占导致并发任务同时执行与 current_task_id 覆盖）**：
+   - 在 `TaskExecutionOrchestrator.onTaskResponse` 中，当收到设备代理 `accepted = true` 响应时，校验代理当前的运行状态与任务绑定：若代理已被置为 `BUSY` 或其 `currentTaskId` 不为空且不等于当前步骤任务 ID，判定为待承接窗口期并发冲突。
+   - 检测到冲突时，记录带有 `ERR_AGENT_ALREADY_BUSY` 原因码的 `AGENT_ASSIGNMENT_CONFLICTED` 事件，将该代理加入 `rejectedAgentIds`，清理步骤暂存的设备与指令引用，并自动调用 `assignStep` 顺位切换下一候选设备（若无候选则正常流转至全部拒绝异常处理）。
+   - 绝不向冲突代理下发 `EXECUTE_CAPABILITY` 业务指令，彻底防止多任务并发争抢同一物理设备。
+
+3. **DEF-S3-101 修复（离线终止缺失取消指令与安全门禁协同释放）**：
+   - 登记并达成基线变更 `BL-006`，协调原 R08/TC053 立即释放要求与物理运动安全看门狗门禁机制：
+     a) 终止执行中的设备（`EXECUTING`）时保持 BUSY 看门狗，待设备确认停止运动并上报 ONLINE IDLE 后安全解除占用；
+     b) 离线设备调用 `DeviceAgentMessagingService.send` 发送 `TASK_CANCEL` 时，虽抛出离线异常，但在抛出前向 `device_commands` 插入一条状态为 `DELIVERY_FAILED` 的取消指令记录；当设备重新连接并上报 ONLINE IDLE 时，`DeviceAgentService.reportStatus` 能够顺利匹配该记录并跃迁为 `CONFIRMED_IDLE`，触发解除当前任务占用；
+     c) 待承接阶段（`PENDING_ASSIGNMENT`）尚未实际执行能力的步骤，人工终止冻结步骤时立即释放预选占用，不误锁为 BUSY。
+
+4. **DEF-S3-102 修复（步骤承接耗时与响应时间在 API 及前端缺失展示）**：
+   - 新增 Flyway 迁移脚本 `backend/src/main/resources/db/migration/V29__step_assignment_acceptance_timing.sql`，在 `task_step_assignments` 表中增加 `acceptance_requested_at`、`accepted_at`、`acceptance_duration_ms` 三列。
+   - `TaskStepAssignment` 实体、`TaskStepAssignmentMapper.xml` 同步映射，并在 `TaskStepAssignmentView` 中提供格式化的 `acceptanceResponseTime`（如 `120ms`）。
+   - `TaskExecutionOrchestrator.assignStep` 记录请求发起时间 `acceptanceRequestedAt`；`onTaskResponse` 记录完成时间 `acceptedAt` 与毫秒耗时 `acceptanceDurationMs`。
+   - 前端 `TaskDetailView.vue` 步骤分配表格增加“承接响应时间”列与毫秒展示渲染（含事件时间线回退计算），完全满足 Edge 界面正则检索断言。
+
+### 验证记录
+
+- **定向单测**：`mvn -o test "-Dtest=DeviceMatchingAndTaskAcceptanceF016Test,TerminateSafetyTest,DeviceAgentServiceTest"`，14 项全部通过（0 failures, 0 errors）。
+- **全量后端测试**：`mvn -o test`，354 项测试全量通过（0 failures, 0 errors, 2 skipped）。
+- **后端打包**：`mvn -o package -DskipTests`，BUILD SUCCESS，生产 JAR `airport-ai-app-1.0.0.jar` 构建成功。
+- **前端打包**：`npm run build`，3269 个模块编译成功，0 错误，生产 dist 产物就绪。
+- **环境隔离**：完全恪守资源隔离规范，未占用 GPT 独占端口（18129/18117/18132 等）与数据库 schema。
+
+### 给 ChatGPT 的复测建议
+
+1. 执行完整的 V2.4 整轮复测，覆盖 SRS_F016 全部 8 条业务规则（R01～R08）与关联用例步骤（TC-051～TC-053）。
+2. 重点复测 DEF-S3-099~102 修复项：
+   - 099：全部候选拒绝回调时数据库无 500 异常，`chk_exception_type` 正常接纳 `ASSIGNMENT_FAILED`，事件表完整记录 `STEP_ASSIGNMENT_FAILED`；
+   - 100：模拟待承接窗口重叠任务（如 318/319 场景），冲突代理正确记录 `AGENT_ASSIGNMENT_CONFLICTED` 并顺位切换，无并发业务指令覆盖；
+   - 101：离线任务终止后设备重新上线并上报 IDLE，正确触发 `CONFIRMED_IDLE` 并释放代理占用；
+   - 102：Edge 浏览器打开任务详情页，校验“承接响应时间”列与毫秒耗时正常展示。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 产品 SHA / 标签 | 证据提交 SHA | main |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-05 | SRS_F016 | Claude → ChatGPT | READY_FOR_GPT | 4f0b4d8e0ab2a2f0e4027d3ee21b20fe487dcadc / V1.158 | （待GPT生成） | 未合入；保持 9816886 |
+
