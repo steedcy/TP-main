@@ -1,0 +1,145 @@
+{
+  "tag": "V1.165",
+  "productSha": "fca58c91254c49c4ae6f66bd4a95c07997578982",
+  "handoffSha": "c4eda88b76a83127f6c1eec4e42b824cc57a577d",
+  "suppliedWrongHandoffSha": "c4eda88746df3c25ba40c2efdf4f1143896dfa42",
+  "baseline": "V2.4",
+  "conclusion": "READY_FOR_CLAUDE",
+  "rules": {
+    "R01": {
+      "status": "P",
+      "actual": "541～545三类异常均入恢复；547待承接离线、561受控能力缺口补分支。",
+      "issues": ""
+    },
+    "R02": {
+      "status": "P",
+      "actual": "542～545前缀保持、后步冻结及零提前下发；548/570重规划保留结果，553/562/564/567续跑解冻正确。",
+      "issues": ""
+    },
+    "R03": {
+      "status": "F",
+      "actual": "原562 false完成、563关键不可跳过、553/564归档均已修，数字567P；565禁止跳过/566不得跳过仍SKIPPED、不重规划/人工，106否定边界残留。",
+      "issues": "DEF-S3-106"
+    },
+    "R04": {
+      "status": "P",
+      "actual": "544执行中/547待承接离线先候选恢复；555无候选才一次规划/人工。",
+      "issues": ""
+    },
+    "R05": {
+      "status": "P",
+      "actual": "546无关设备实际离线仅记录ERR_AGENT_OFFLINE_UNRELATED，无冻结/重规划。",
+      "issues": ""
+    },
+    "R06": {
+      "status": "F",
+      "actual": "541一次重试、542候选实际成功、548首次规划/570已用人工物理路径P；565/566明确禁止跳过仍被跳过，106残留。",
+      "issues": "DEF-S3-106"
+    },
+    "R07": {
+      "status": "P",
+      "actual": "543设备TIMEOUT、545实际30秒静默超时分类与恢复正确；554无候选后一次规划/人工，Edge超时码可见。",
+      "issues": ""
+    },
+    "R08": {
+      "status": "F",
+      "actual": "541原设备重试成功闭环P；542/543实际A两败后B首次执行成功，却把不重规划原因写为自动重试成功，与真实候选恢复路径不符，109。",
+      "issues": "DEF-S3-109"
+    },
+    "R09": {
+      "status": "F",
+      "actual": "108首次动作字段不可变已P；542/543/557/560最终恢复事件及影响结论误记指令重试成功，候选恢复事实失真，109；原原因码展示保持P。",
+      "issues": "DEF-S3-109"
+    },
+    "R10": {
+      "status": "P",
+      "actual": "553/562/564/567跳过后全部异常FAILED/RESOLVED，当前真实业务无未归档残留；560 PROCESSING计数与Edge PENDING/PROCESSING联动正确。549夹具诊断单独隔离，不算自动归档P。",
+      "issues": ""
+    }
+  },
+  "steps": {
+    "TC-057.S1": {
+      "status": "F",
+      "actual": "三类恢复/冻结/前缀与原因码展示P；542/543候选真实成功的动作和判断说明被写为原设备重试成功，109。",
+      "issues": "DEF-S3-109"
+    },
+    "TC-057.S2": {
+      "status": "F",
+      "actual": "原版本继续、释放占用与541原设备重试闭环P；542/543候选完成时最终恢复动作/影响原因不真实，109。",
+      "issues": "DEF-S3-109"
+    },
+    "TC-058.S1": {
+      "status": "F",
+      "actual": "546无关离线、553原true续跑/562 false续跑/567数字条件续跑及归档P，563原不可跳过P；565禁止、566不得仍错误跳过，106。",
+      "issues": "DEF-S3-106"
+    },
+    "TC-058.S2": {
+      "status": "F",
+      "actual": "108首次动作保持、默认全部/五类四状态/链接/归档/计数联动P；557/560列表影响结论和关联恢复事件误称自动重试成功，109。",
+      "issues": "DEF-S3-109"
+    },
+    "TC-059.S1": {
+      "status": "P",
+      "actual": "548一次局部规划成功、570修正夹具后已用再失败直接人工，无二次请求，550模型503/551拒绝/552超额人工归档；完成前缀保持，服务额度4P。549原诊断保留，不冒写P。",
+      "issues": ""
+    },
+    "TC-059.S2": {
+      "status": "P",
+      "actual": "559基线双候选穷尽直接人工，无局部规划或二次降级，首次动作保持、失败结果及影响结论真实；557实际恢复成功作正对照，但其恢复动作说明错误另归109。",
+      "issues": ""
+    }
+  },
+  "counts": {
+    "rules": {
+      "P": 6,
+      "F": 4,
+      "NT": 0
+    },
+    "steps": {
+      "P": 2,
+      "F": 4,
+      "NT": 0
+    },
+    "tasks": 30,
+    "formalTasks": 28,
+    "dryRuns": 2,
+    "diagnosticTasks": [
+      549
+    ],
+    "effectiveHttpSqlProtocolGroups": 30,
+    "groupsP": 26,
+    "groupsF": 4,
+    "fullBackendReported": 389,
+    "fullBackendPassed": 387,
+    "fullBackendSkipped": 2,
+    "independentServiceTests": 44,
+    "historicalBusinessPReuse": 0
+  },
+  "closed": [
+    "DEF-S3-108"
+  ],
+  "maintainedClosed": [
+    "DEF-S3-064",
+    "DEF-S3-066",
+    "DEF-S3-105",
+    "DEF-S3-107"
+  ],
+  "remaining": [
+    "DEF-S3-106",
+    "DEF-S3-109"
+  ],
+  "diagnostic549": "Observed DEVICE_API_ERROR/occupation guard mismatch while synthetic heartbeat and acceptance were concurrent; fixture sequencing race inferred, exact interleaving not separately traced. Serialized570 passes full used-quota branch. Original549 remains diagnostic, never P; only diagnostic exception236 explicitly ignored during cleanup.",
+  "firstFailureCheckpoint": "a194a4e",
+  "rawEvidence": [
+    "SRS_F018-V1.165-http-20261105.json",
+    "SRS_F018-V1.165-http-20261105-supplement.json",
+    "SRS_F018-V1.165-http-20261105-boundaries.json",
+    "SRS_F018-V1.165-http-20261105-retry-stable.json",
+    "SRS_F018-V1.165-baggage-adjacency-20261105.json",
+    "SRS_F018-V1.165-ui-catalog-20261105.json",
+    "SRS_F018-V1.165-ui-task-timelines-20261105.json",
+    "SRS_F018-V1.165-cross-evidence-audit-20261105.json"
+  ],
+  "mainUnchanged": "bd182a0551cc067f0196879169fd6859f2757f83",
+  "noPR": true
+}
