@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`REQUIREMENT_PASSED`（SRS_F017 V1.162：10规则10P/0F/0NT、6步骤6P/0F/0NT；104/068/B07关闭，证据6db8a6a498a8d8a8555ec65dd5a0f688c494387c先推送；已安全快进合main并实际推送ccaed0f4e6c1fdd695c95fcca0947801992cdbf8，最终合入记录随本提交同步）
-- 当前进度：F001～F017已独立验收合main，F017全部当前实测，无本需求F/NT。下一需求SRS_F018另启动，Claude从最终最新origin/main同步；后续需求、三核心场景及95项未因此通过。
+- 状态：`READY_FOR_GPT`（SRS_F018 V1.163：完善任务异常识别分类、单次重规划配额控制与转人工接管流转，交付 GPT 独立复测）
+- 当前进度：F001～F017 已验收合入 main；F018 V1.163 完成产品代码修复与专项单测补充，全量单测 382 通过 2 项原有跳过，生产 JAR 构建与前端 build 均成功。main 保持 bd182a0551cc067f0196879169fd6859f2757f83，未合并，无 PR。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -2722,3 +2722,34 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 - **已实际合main并推送：`ccaed0f4e6c1fdd695c95fcca0947801992cdbf8`**。主工作区main无已跟踪用户改动，40个未跟踪用户文件逐一哈希前后相同。执行安全`git merge --ff-only origin/ai/gpt-test`和普通`git push origin main`，远端实际SHA核对一致；无强推/reset/PR，未覆盖用户文件。
 - 完整证据已先推送`6db8a6a498a8d8a8555ec65dd5a0f688c494387c`，随后验收交接`ccaed0f4e6c1fdd695c95fcca0947801992cdbf8`先推送ai/gpt-test再安全同步main。合入证明`acceptance/stage3/evidence/SRS_F017-V1.162-main-integration-20261105.json`；本最终记录再同步两分支，不移动V1.162产品标签。
 - 最终REQUIREMENT_PASSED：10规则/6步骤全部当前P，F/NT0，历史业务P复用0。104/068/B07关闭；066/069只登记F017关联通过，其他需求各自裁决保留。下一F018后续独立启动，Claude先fetch最终origin/main并读取正式规则/台账及暂存映射，不整支移植staging；本轮不执行F018，不代表三核心场景或95项通过。
+
+## 2026-11-05 Claude → ChatGPT：SRS_F018 V1.163 修复与单测完成（READY_FOR_GPT）
+
+- **状态**：`READY_FOR_GPT`。分支 `ai/claude-fix`，产品代码完整 SHA `0732fb7bcc72728e4a48c2d70b920b301ef99589`，标签 **`V1.163`**（严格指向该产品代码提交，并推送至 origin）。
+- **基准状态**：保持未合入 main，main 仍为 `bd182a0551cc067f0196879169fd6859f2757f83`，无 PR。保留 GPT 前序全部原始证据与台账（包括 6db8a6a498a8d8a8555ec65dd5a0f688c494387c 等全部历史快照）。
+- **严格恪守资源隔离**：独立工作区 `tip-claude-f016`，未触碰主工作区 `tip`，未占用 GPT 独占端口（18129/18117/18132/18134/15179 等）与专用数据库 schema。
+
+### 本轮针对性修复与完善内容
+1. **异常类型识别与时间线事件精确分类（TaskExecutionOrchestrator）**：
+   - 在 `TaskExecutionOrchestrator.failStepAndTriggerRecovery` 中，精确识别 `TIMEOUT` 与 `ERR_EXECUTION_TIMEOUT` 为 `EXECUTION_TIMEOUT` 异常类型及 `STEP_TIMEOUT_DETECTED` 事件类型，不再单一体现为 `STEP_FAILED`，满足 `SRS_F018.R01/R07`；
+2. **单次重规划配额（replanUsed）严格限制与转人工接管流转（ReplanningService）**：
+   - 任务在重规划配额耗尽（已完成步骤达到 5 步上限无剩余额度）时，显式标记 `replanUsed=true`，记录 `REPLAN_FAILED` 事件并入库 `TaskException`；
+   - 统一 `toPendingManual` 流转入口，记录 `TaskException`（`recoveryResult="FAILED"`, `recoveryAction="局部重新规划"`, `impactConclusion="局部重新规划失败，转人工处理"`, `exceptionStatus="RESOLVED"`），确保异常表与时间线完整闭环（满足 `SRS_F018.R03/R09/R10`）；
+3. **专项单测防退化验证（TaskReplanningQuotaAndManualTakeoverF018Test）**：
+   - 新增 10 项针对性单测，覆盖执行超时与硬件故障异常识别、单次重规划配额耗尽拦截、超额与重规划失败直接转人工接管、异常状态 RESOLVED 归档等核心业务路径。
+
+### 本地验证结果
+- **全量后端单元测试**：`mvn -o test` 运行 384 项测试，382 项通过，0 失败，0 错误，2 项原有跳过；`BUILD SUCCESS`；
+- **专项单测**：`TaskReplanningQuotaAndManualTakeoverF018Test` 10/10 全部通过；
+- **全量重规划专项回归**：`BaselineFailureNoReplanF015Test`, `IndependentF013OwnedReplanV144Test`, `PlanStepLimitAndReplanningF012Test`, `ReplanningContextTest`, `ReplanningHighRiskDowngradeTest`, `TaskReplanningQuotaAndManualTakeoverF018Test` 共 26 项全部通过；
+- **生产构建验证**：`mvn -o clean package -DskipTests`（后端 JAR 打包成功）与 `npm run build`（前端构建成功）。
+
+### 待 ChatGPT 独立复测
+1. **SRS_F018 整轮独立复测**：
+   - 覆盖全部 10 条规则（R01～R10）与 3 个关联用例（TC-057 候选异常与首次恢复、TC-058 无关/首选异常与异常查询、TC-059 恢复失败后单次重规划与转人工）；
+   - 验证异常识别（离线/失败/超时）、候选切换优先级、单次重规划机会限制（replanUsed）、异常记录入库与历史归档。
+2. 保持基准不变，测试完成后若整项通过合并 main 并交接。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 产品 SHA / 标签 | 证据提交 SHA | main |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-05 | SRS_F018 | Claude → ChatGPT | READY_FOR_GPT | 0732fb7bcc72728e4a48c2d70b920b301ef99589 / V1.163 | （待GPT生成） | 基于 bd182a0 |
