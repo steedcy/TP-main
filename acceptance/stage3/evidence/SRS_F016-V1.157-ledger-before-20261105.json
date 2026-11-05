@@ -1,0 +1,143 @@
+{
+  "at": "2026-11-05T09:47:03.954585+08:00",
+  "steps": [
+    {
+      "stepId": "TC-051.S1",
+      "caseId": "TC-051",
+      "action": "在三个受控候选组中依次核对能力匹配度、区域距离、负载排序；让首个拒绝、下一候选接受。",
+      "expected": "仅能力匹配、在线空闲设备可候选；依能力匹配度、区域距离、负载依次排序并记依据；拒绝原因可见，按顺序切换。",
+      "status": "NOT_RUN",
+      "observedAt": "",
+      "actual": "",
+      "evidence": "",
+      "issue": ""
+    },
+    {
+      "stepId": "TC-051.S2",
+      "caseId": "TC-051",
+      "action": "查看接受后的设备与步骤状态及消息。",
+      "expected": "绑定最终设备、显示响应时间，设备占用、步骤执行中；分配阶段仅确认承接，不下发业务指令；响应及分配入时间线。",
+      "status": "NOT_RUN",
+      "observedAt": "",
+      "actual": "",
+      "evidence": "",
+      "issue": ""
+    },
+    {
+      "stepId": "TC-052.S1",
+      "caseId": "TC-052",
+      "action": "两个步骤同时请求同一设备承接。",
+      "expected": "同设备同时最多占用一个步骤，已占用设备不再成为新候选；分配阶段仅确认承接，不下业务指令。",
+      "status": "P",
+      "observedAt": "2026-10-27",
+      "actual": "任务78的步骤1绑定SIM_F2_DISPLAY并处于BUSY时，再以相同代理请求另一试运行步骤返回HTTP400；任务总数不变、占用仍属78、命令数不变。任务78事件按分配请求→承接→步骤下发排序；命令记录一条TASK_ACCEPT和随后一条EXECUTE_CAPABILITY。独立尝试的SIM_F2_FLIGHT因任务族物理通道不匹配而无候选，未把它视为可替代显示设备。测试结束模板停用、延时恢复、六代理空闲。",
+      "evidence": "acceptance/stage3/evidence/TC-052-concurrent-claim-20261027T040409Z.json;acceptance/stage3/evidence/TC-052-concurrent-followup-20261027T040459Z.json",
+      "issue": ""
+    },
+    {
+      "stepId": "TC-052.S2",
+      "caseId": "TC-052",
+      "action": "分别执行无候选及全部候选拒绝的分配。",
+      "expected": "无候选生成能力缺口，全部拒绝生成分配失败异常；均进入5.5.3判断，响应时间、拒绝原因及分配过程入事件。",
+      "status": "NOT_RUN",
+      "observedAt": "",
+      "actual": "",
+      "evidence": "",
+      "issue": ""
+    },
+    {
+      "stepId": "TC-053.S1",
+      "caseId": "TC-053",
+      "action": "在接受后下发前让设备离线；再终止任务或冻结步骤。",
+      "expected": "离线释放占用按恢复流程处理；终止或冻结立即释放相关占用，不分配新业务给离线/占用设备。",
+      "status": "NOT_RUN",
+      "observedAt": "",
+      "actual": "",
+      "evidence": "",
+      "issue": ""
+    }
+  ],
+  "rules": [
+    {
+      "ruleId": "SRS_F016.R01",
+      "requirement": "SRS_F016",
+      "text": "只有具备所需能力、在线且空闲的设备可作为候选",
+      "candidateStep": "TC-051.S1",
+      "status": "NOT_RUN",
+      "verifiedBy": "",
+      "evidence": "",
+      "issue": ""
+    },
+    {
+      "ruleId": "SRS_F016.R02",
+      "requirement": "SRS_F016",
+      "text": "同一设备同一时刻只执行一个任务步骤；已占用设备不得被分配新步骤",
+      "candidateStep": "TC-052.S1",
+      "status": "P",
+      "verifiedBy": "TC-052.S1",
+      "evidence": "acceptance/stage3/evidence/TC-052-concurrent-claim-20261027T040409Z.json;acceptance/stage3/evidence/TC-052-concurrent-followup-20261027T040459Z.json",
+      "issue": ""
+    },
+    {
+      "ruleId": "SRS_F016.R03",
+      "requirement": "SRS_F016",
+      "text": "设备拒绝时按候选顺序选择下一候选，并记录拒绝原因",
+      "candidateStep": "TC-051.S1",
+      "status": "NOT_RUN",
+      "verifiedBy": "",
+      "evidence": "",
+      "issue": ""
+    },
+    {
+      "ruleId": "SRS_F016.R04",
+      "requirement": "SRS_F016",
+      "text": "候选顺序按能力匹配度、与步骤目标区域的距离、当前负载依次排序，排序依据写入事件",
+      "candidateStep": "TC-051.S1",
+      "status": "NOT_RUN",
+      "verifiedBy": "",
+      "evidence": "",
+      "issue": ""
+    },
+    {
+      "ruleId": "SRS_F016.R05",
+      "requirement": "SRS_F016",
+      "text": "全部候选均拒绝或无候选时，生成能力缺口或分配失败异常，进入5.5.3判断",
+      "candidateStep": "TC-052.S2",
+      "status": "NOT_RUN",
+      "verifiedBy": "",
+      "evidence": "",
+      "issue": ""
+    },
+    {
+      "ruleId": "SRS_F016.R06",
+      "requirement": "SRS_F016",
+      "text": "步骤分配与设备响应写入任务事件时间线",
+      "candidateStep": "TC-051.S2",
+      "status": "P",
+      "verifiedBy": "TC-052.S1",
+      "evidence": "acceptance/stage3/evidence/TC-052-concurrent-claim-20261027T040409Z.json;acceptance/stage3/evidence/TC-052-concurrent-followup-20261027T040459Z.json",
+      "issue": ""
+    },
+    {
+      "ruleId": "SRS_F016.R07",
+      "requirement": "SRS_F016",
+      "text": "分配阶段不下发业务指令，仅确认承接关系；指令下发见5.5.2",
+      "candidateStep": "TC-051.S2",
+      "status": "P",
+      "verifiedBy": "TC-052.S1",
+      "evidence": "acceptance/stage3/evidence/TC-052-concurrent-claim-20261027T040409Z.json;acceptance/stage3/evidence/TC-052-concurrent-followup-20261027T040459Z.json",
+      "issue": ""
+    },
+    {
+      "ruleId": "SRS_F016.R08",
+      "requirement": "SRS_F016",
+      "text": "任务被人工终止或计划步骤被冻结时，立即释放相关设备占用",
+      "candidateStep": "TC-053.S1",
+      "status": "NOT_RUN",
+      "verifiedBy": "",
+      "evidence": "",
+      "issue": ""
+    }
+  ],
+  "issues": []
+}
