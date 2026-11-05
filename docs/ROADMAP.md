@@ -2,8 +2,8 @@
 
 > **当前基准**：V2.4（2026-11-04 用户追加整轮复测授权；继承V2.3，见BL-005；下方既有产品验收/交接记录保留原执行版本）
 > **主干验收合入提交**：F015验收合入 `949c3b3e110bae95f27833f7ca82b00b716aadfe`；当前远端main `9816886c08dd1922c355f9c07ff3343bbf4ea3e2`（含最终交接）；F016未合入。
-> **最新产品代码提交**：`a893e94`（真实完整SHA：`a893e944b868e666ab165eb7e6ea40f1ccadaa7d`，标签`V1.159`）
-> **交接状态**：`READY_FOR_CLAUDE`（F016 V1.159 / V2.4+BL006：5P/3F/0NT规则、3P/2F/0NT步骤；100并发死锁500与103冻结误释放仍F；099/101/102当前保持关闭；证据482cff015fb2bb6ea19645f350fcc72540dbea17已推送，不合main、不推进F017）
+> **最新产品代码提交**：`8c8a1c0`（真实完整SHA：`8c8a1c09c1776d95cde8bef002b0f0723de0801e`，标签`V1.160`）
+> **交接状态**：`READY_FOR_GPT`（F016 V1.160 Claude修复完成待独立复测；DEF-S3-100消除并发回调外键锁升级死锁；DEF-S3-103闭环步骤冻结跨任务所有权保护；099/101/102保持关闭；待GPT独立整轮复测，不合main、不推进F017）
 > **文档定位**：本文件为跨会话、跨需求修复推进的**唯一全景进度与依据底账**。每轮需求修复与复测验收后必须同步更新本文件。
 
 ---
@@ -70,7 +70,7 @@
 
 | 需求编号 | 需求名称 | 规则状态 (P/F/NT) | 关联用例步骤 | 待修缺陷 / 攻坚重点 | 目标版本 | 当前状态 |
 |---|---|:---:|---|---|:---:|:---:|
-| **SRS_F016** | 步骤设备匹配与任务接受 | **P:5 F:3 NT:0（V1.159当前实测）** | TC-051～TC-053，5步骤3P/2F/0NT | 100并发只一执行但378死锁500/无冲突收口；103原终止/超时保护P，387冻结旧入口仍清388所有权；099/101/102保持关闭。 | V1.159（下一修复用新标签） | **READY_FOR_CLAUDE；未通过，不合main、不推进F017** |
+| **SRS_F016** | 步骤设备匹配与任务接受 | **P:5 F:3 NT:0（V1.159实测待V1.160整轮复测）** | TC-051～TC-053，5步骤3P/2F/0NT | 100并发回调外键锁升级死锁已前置行锁消除；103步骤冻结旧释放入口漏归属已修复；099/101/102保持关闭。 | V1.160 | **READY_FOR_GPT；待独立整轮复测，未合main、不推进F017** |
 | **SRS_F017** | 业务指令下发与状态流转 | P:4 F:1 NT:5 | TC-054.S2, TC-055 | DEF-S3-068（任务进度）已在 main（`107da41`），勿重修；DEF-S3-066 的事件真实性部分已在 `06448d6`，仅余复测。 | V1.144 | 待启动（修复已在 main，待复测） |
 | **SRS_F018** | 任务异常识别与单次重规划 | P:0 F:2 NT:8 | TC-058.S2, TC-059 | DEF-S3-064（异常列表原因码/历史归档）已在 main（`107da41`）、DEF-S3-066 已在 `06448d6`，勿重修；其余为 NOT_RUN 规则，等 GPT 测试结果。 | V1.145 | 待启动（修复已在 main，待复测） |
 | **SRS_F019** | 局部重规划与上下文继承 | P:0 F:0 NT:9 | TC-060, TC-062 | 台账无缺陷记录，也无修复提交；9 条规则全部 NOT_RUN，等 GPT 测到失败项再修，不做推测性改动。 | V1.146 | 待启动 |
@@ -204,3 +204,14 @@
 - 34任务=32正式+2成功试运行，归并29观察组27P/2F；356后端报告354执行通过/2跳过、独立服务3P，生产构建/JAR/认证HTTP/Edge5页完成。原安全-only并发P不足已保留并有说明更正，稳定探针加入回调/事件完整断言。
 - **完整证据已先推送482cff015fb2bb6ea19645f350fcc72540dbea17**；检查点8d2585e/10a13b9。报告`acceptance/stage3/SRS_F016-V1.159-整轮独立复测与统一交修.md`；无新增规则/基线变更或缺陷编号。
 - 自有资源清理、活跃分配0，历史失败行保留，主工作区40用户文件哈希不变；main仍9816886，无合并/PR。下一轮仍F016修100死锁/回调收口与103冻结归属，保留已通过路径，交新标签后再整轮。F017及95项没有因此通过。
+
+## 2026-11-05 F016 V1.160 Claude修复完成待GPT复测
+
+- 产品与单测提交：`8c8a1c09c1776d95cde8bef002b0f0723de0801e`，版本标签 `V1.160`（严格指向该产品代码提交，已推送至 origin）。
+- 缺陷修复闭环：
+  1. DEF-S3-100（并发回调外键锁升级死锁彻底消除）：分析表明，`TASK_RESPONSE` 回调时先调用 `record(...)` 插入 `device_command_reports` 会隐式获取 `device_agents` 外键 `FOR KEY SHARE` 共享锁，随后在 `onTaskResponse` 升级获取 `device_agents FOR UPDATE` 排他锁；两并发回调各自持有共享锁互相等待排他锁即产生 Postgres 死锁（500/`DeadlockLoserDataAccessException`）。在 `DeviceAgentReportService.accept` 中，在 `record` 插入前先行调用 `deviceAgentMapper.findByAgentCodeForUpdate(agentCode)`，以一致顺序前置排他行锁，彻底消除共享锁升级死锁环路；竞争方在排他锁内顺畅读取最新 `BUSY` 态，平稳触发 `handleAssignmentConflict`、记录 `AGENT_ASSIGNMENT_CONFLICTED`（原因码 `ERR_AGENT_ALREADY_BUSY`）、自动切换下一候选设备并返回 HTTP 200，保证双回调均 200 且冲突收口。
+  2. DEF-S3-103（步骤冻结跨任务所有权保护彻底闭环）：在 `TaskExceptionService.freezeRemainingSteps` 中，将历史单参调用 `taskExecutionOrchestrator.releaseAgent(a.getDeviceAgentId())` 修复为携带本任务 ID 的 `taskExecutionOrchestrator.releaseAgent(a.getDeviceAgentId(), taskId)`；并在 `TaskExecutionOrchestrator.releaseAgent` 中增加兜底防线，即使未传 `expectedTaskId`，若代理当前所属任务处于 `EXECUTING` 活跃状态亦拒绝清空其占用，彻底杜绝冻结未执行步骤误释放其他任务设备。
+  3. 保持 DEF-S3-099、DEF-S3-101、DEF-S3-102 全部通过路径完好有效。
+- 验证情况：全量 360 项单测通过（0 failures, 0 errors, 2 skipped）；生产 JAR `mvn -o package -DskipTests` BUILD SUCCESS。
+- 交接状态：更新为 `READY_FOR_GPT`，交由 ChatGPT 依据 V2.4 执行整轮独立复测。
+

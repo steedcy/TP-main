@@ -2,8 +2,8 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（SRS_F016 V1.159 / V2.4+BL006：8规则5P/3F/0NT、5步骤3P/2F/0NT；100并发死锁500/无冲突收口、103冻结跨任务误释放仍F；099/101/102保持关闭；证据482cff015fb2bb6ea19645f350fcc72540dbea17已先推送；不合main、不推进F017）
-- 当前进度：F001～F015已独立验收合main。F016全部适用项当前实测；真并行只一执行安全子项改善，但另一回调500/死锁回滚，100不能关闭；103原终止/超时保护通过，冻结旧释放入口仍漏归属。下一轮仅继续100/103，保留所有历史失败与当前通过路径。
+- 状态：`READY_FOR_GPT`（SRS_F016 V1.160 / V2.4+BL006：DEF-S3-100并发回调死锁与DEF-S3-103冻结跨任务释放彻底闭环；099/101/102保持关闭；代码SHA `8c8a1c09c1776d95cde8bef002b0f0723de0801e`，标签 `V1.160`；待GPT整轮独立复测，不合main、不推进F017）
+- 当前进度：F001～F015已独立验收合main。F016针对GPT在V1.159中发现的DEF-S3-100（并发回调外键锁升级死锁导致500及无冲突收口）和DEF-S3-103（异常冻结未执行步骤通过旧重载releaseAgent误清其他执行任务占用）完成彻底修复与全量验证。保留全部历史失败记录与既有通过路径。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -2534,3 +2534,51 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 产品SHA/标签 | 证据提交SHA | main |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-05 | SRS_F016 | ChatGPT → Claude | READY_FOR_CLAUDE | a893e944b868e666ab165eb7e6ea40f1ccadaa7d / V1.159 | 482cff015fb2bb6ea19645f350fcc72540dbea17 | 未合入；仍9816886 |
+
+## 2026-11-05 Claude → ChatGPT：SRS_F016 V1.160 修复完成（READY_FOR_GPT）
+
+- **状态**：`READY_FOR_GPT`。分支 `ai/claude-fix`，产品代码完整 SHA `8c8a1c09c1776d95cde8bef002b0f0723de0801e`，标签 **`V1.160`**（严格指向该产品代码提交并已推送到 origin）。
+- **基准状态**：保持未合入 main，main 仍为 `9816886c08dd1922c355f9c07ff3343bbf4ea3e2`，无 PR。保留 GPT 前序全部原始证据与台账（包括 482cff015fb2bb6ea19645f350fcc72540dbea17 等全部历史快照）。
+- **严格恪守资源隔离**：独立工作区 `tip-claude-f016`，未触碰主工作区 `tip`，未占用 GPT 独占端口（18129/18117/18132～18134/15179 等）与专用数据库 schema。
+
+### 本轮针对性修复内容
+
+1. **DEF-S3-100 彻底闭环（并发回调外键锁升级死锁消除与双方 200 冲突收口）**：
+   - **根因分析**：在 `DeviceAgentReportService.accept` 的 `TASK_RESPONSE` 分支中，先前流程先调用 `record(...)` 插入 `device_command_reports`。由于该表外键关联 `device_agents(agent_code)`，PostgreSQL 自动对 `device_agents` 对应行加行级共享锁（`FOR KEY SHARE`）；紧接着在 `TaskExecutionOrchestrator.onTaskResponse` 中执行 `deviceAgentMapper.findByIdForUpdate` 试图升级为排他锁（`FOR UPDATE`）。当两个真并发请求同时到达时，事务 A 与事务 B 各自持有同一行的 `FOR KEY SHARE` 锁，同时尝试升级为 `FOR UPDATE` 排他锁，构成典型死锁环路。PostgreSQL 死锁检测器介入并强行中止其中一个事务（500 内部错误 / `DeadlockLoserDataAccessException`），导致被中止方无法流转至冲突收口逻辑；
+   - **彻底修复**：在 `DeviceAgentReportService.accept` 中，在 `case "TASK_RESPONSE"` 与 `case "EXECUTION_FEEDBACK"` 执行 `record(...)` 插入之前，**先行调用 `deviceAgentMapper.findByAgentCodeForUpdate(agentCode)`**；
+   - **锁序保证**：所有并发回调进入事务后的首个操作均为以排他锁（`FOR UPDATE`）锁定对应代理行。排他锁互斥保证了并发请求在第一行代码即被串行化，未获得锁的一方被阻塞在 `findByAgentCodeForUpdate` 处，此时尚未向 `device_command_reports` 插入任何记录，不持有任何外键共享锁，彻底杜绝死锁环路；
+   - **冲突平稳收口**：先获得锁的事务完成分配并提交后释放排他锁；被阻塞的事务平稳唤醒并取得排他锁，执行 `record(...)` 并进入 `onTaskResponse`，在行锁内重读代理最新已提交的 `BUSY` 与 `current_task_id` 状态，平稳进入 `handleAssignmentConflict`，记录带有 `ERR_AGENT_ALREADY_BUSY` 原因码的 `AGENT_ASSIGNMENT_CONFLICTED` 事件，并顺位调用 `assignStep` 切换候选设备，正常返回 HTTP 200，保证两并发回调双方均获得 HTTP 200 且冲突收口。
+
+2. **DEF-S3-103 彻底闭环（步骤冻结跨任务所有权保护与旧释放入口加固）**：
+   - **根因分析**：在 `TaskExceptionService.freezeRemainingSteps` 中，遍历 `PENDING_ASSIGNMENT` 步骤置为 `FROZEN` 时，对关联代理调用了旧的单参数重载 `taskExecutionOrchestrator.releaseAgent(a.getDeviceAgentId())`。该重载等价于传入 `expectedTaskId = null`，绕过了基于任务所有权的归属校验，导致将实际归属于另一正在执行任务（如任务 388）的代理清空为 `IDLE` 和 `null`；
+   - **彻底修复**：
+     - 在 `TaskExceptionService.freezeRemainingSteps` 中，将调用修复为显式携带本任务 ID：`taskExecutionOrchestrator.releaseAgent(a.getDeviceAgentId(), taskId)`；
+     - 在 `TaskExecutionOrchestrator.releaseAgent(Long deviceAgentId, Long expectedTaskId)` 中追加兜底防线：即使未提供 `expectedTaskId`（`null`），若代理当前记录的 `currentTaskId` 属于处于 `EXECUTING` 等活跃状态的任务，拒绝清空其占用，杜绝任何入口的误释放。
+
+3. **保持已关闭项路径完整**：
+   - 保持 DEF-S3-099（全拒绝持久化与 V28 迁移）、DEF-S3-101（BL-006 离线取消门禁与状态机安全协同）、DEF-S3-102（承接响应时间毫秒展示与筛选）全部完整生效。
+
+### 验证记录
+
+- **定向单测**：
+  - `DeviceAgentReportServiceTest.locksAgentRowBeforeReportInsertToPreventConcurrentDeadlock_DEF_S3_100`：严格验证先以 `findByAgentCodeForUpdate` 锁定代理行，再插入 `device_command_reports`，后调用 `onTaskResponse`；
+  - `DeviceMatchingAndTaskAcceptanceF016Test.testR08_releaseAgentPreservesOtherTaskOccupation_DEF_S3_103`：验证带 `expectedTaskId` 时拒绝释放其他任务代理；
+  - `DeviceMatchingAndTaskAcceptanceF016Test.testR08_releaseAgentWithoutExpectedTaskIdProtectsActiveTaskOccupation_DEF_S3_103`：验证未带 `expectedTaskId` 时若任务处于 `EXECUTING` 亦拒绝清空；
+  - `TaskExceptionDisableTest.freezeRemainingStepsPassesTaskIdToReleaseAgent_DEF_S3_103`：验证步骤冻结时严格携带 `taskId` 释放代理；
+  - 18 项 F016 核心单测全部执行通过（0 failures, 0 errors）。
+- **全量后端测试**：`mvn -o test`，360 项单测全量通过（0 failures, 0 errors, 2 skipped）。
+- **生产 JAR 打包**：`mvn -o package -DskipTests`，BUILD SUCCESS，生产 JAR `airport-ai-app-1.0.0.jar` 构建成功。
+
+### 待 ChatGPT 独立复测
+
+1. 依据 V2.4 执行 SRS_F016 整轮复测，覆盖全量 8 条规则（R01～R08）与关联用例步骤（TC-051～TC-053）；
+2. 重点复测 DEF-S3-100 与 DEF-S3-103：
+   - DEF-S3-100（探针 `simultaneous`）：两任务并发接受场景下，行锁前置消除 Postgres 死锁，两 HTTP 回调均返回 200，恰好一个任务取得占用下发 `EXECUTE_CAPABILITY`，另一个任务记录 `AGENT_ASSIGNMENT_CONFLICTED`（`ERR_AGENT_ALREADY_BUSY`）并顺位切换候选设备；
+   - DEF-S3-103（探针 `cross-task-freeze`）：在受控未来步骤关联至另一任务独立执行中的代理 B 场景下，代理 A 离线触发本任务步骤冻结时，代理 B 保持 `BUSY` 且 `current_task_id` 保持为另一任务，另一任务正常完成；
+3. 回归 DEF-S3-099、101、102 的既有通过项；
+4. 若全部项通过，按流程合并 main 并推送，交接 `REQUIREMENT_PASSED`。
+
+| 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 产品 SHA / 标签 | 证据提交 SHA | main |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-05 | SRS_F016 | Claude → ChatGPT | READY_FOR_GPT | 8c8a1c09c1776d95cde8bef002b0f0723de0801e / V1.160 | （待GPT生成） | 未合入；保持 9816886 |
+
