@@ -1,0 +1,143 @@
+{
+  "requirement": "SRS_F018",
+  "tag": "V1.166",
+  "productSha": "4ad7ccb27a6cbc29c1c83a33d61bf05e3aa67452",
+  "claudeHandoffSha": "a5cafdfff6155041df188eeaaad1076639c514ed",
+  "baseline": "V2.4 + BL-007",
+  "conclusion": "REQUIREMENT_PASSED",
+  "rules": {
+    "R01": {
+      "status": "P",
+      "actual": "571～575步骤失败/上报超时/实际离线/静默超时均识别恢复；577待承接离线、591分配能力缺口。"
+    },
+    "R02": {
+      "status": "P",
+      "actual": "572～575完成前缀保留、后续冻结且零提前指令，578局部版本继承；583/592/594/597合法续跑。"
+    },
+    "R03": {
+      "status": "P",
+      "actual": "571先重试、572先候选、578不可继续后才重规划；593/595/596禁止跳过均不跳过用一次配额，583/592/597合法可选不耗配额。"
+    },
+    "R04": {
+      "status": "P",
+      "actual": "574执行中及577待承接心跳离线先下一候选，585无候选后一次规划转人工。"
+    },
+    "R05": {
+      "status": "P",
+      "actual": "576无关实际离线仅记录ERR_AGENT_OFFLINE_UNRELATED，不冻结/重规划，原计划完成。"
+    },
+    "R06": {
+      "status": "P",
+      "actual": "571同号attempt1成功；572 A两败后B成功、598 B自身重试成功；578/579穷尽后单次规划/已用不再规划；595/596否定约束正确。"
+    },
+    "R07": {
+      "status": "P",
+      "actual": "573设备TIMEOUT、575实际30秒静默超时先候选恢复，584无候选一次规划/人工，Edge575可见ERR_EXECUTION_TIMEOUT。"
+    },
+    "R08": {
+      "status": "P",
+      "actual": "571原设备重试、572～575/587/590/598候选成功均原版本继续不重规划；首次动作保持，最终事件真实，109关闭。"
+    },
+    "R09": {
+      "status": "P",
+      "actual": "571～575/587/590/598类型/首次动作/结果/真实影响/原因码与HTTP/SQL/事件一致，Edge五时间线/异常表可见，108保持、109关闭。"
+    },
+    "R10": {
+      "status": "P",
+      "actual": "本轮47真实业务异常归档，无当前活动异常；590真实PROCESSING SQL/API17，加合成PENDING后卡片18及active两状态联动。默认值/筛选/真实迁移按BL-007分层验证。"
+    }
+  },
+  "steps": {
+    "TC-057.S1": {
+      "status": "P",
+      "actual": "571～575三类异常与上报TIMEOUT、实际离线/静默阈值，冻结/前缀/刷新/恢复及原因码P；候选最终恢复事实真实。"
+    },
+    "TC-057.S2": {
+      "status": "P",
+      "actual": "571原设备一次重试、572～575/598候选恢复原版本续跑，不耗重规划、占用释放，首次与真实最终动作分别留痕。"
+    },
+    "TC-058.S1": {
+      "status": "P",
+      "actual": "576无关离线不影响原计划；583 true/592 false/597数值目标满足后可选失败跳过继续，594末步完成归档；593/595/596禁止跳过对照P。"
+    },
+    "TC-058.S2": {
+      "status": "P",
+      "actual": "五类/四状态/默认全部/历史/任务步骤链接/原因码/首次动作/结果/影响P；卡片18联动。BL-007默认组件P、真实PROCESSING到RESOLVED迁移P，合成两行仅筛选证据。"
+    },
+    "TC-059.S1": {
+      "status": "P",
+      "actual": "578一次局部规划成功继承前缀，579已用再失败不重复规划；580模型503/581非法能力/582超额人工归档，585无候选离线/591缺口；完成步数3/4/5与已用额度服务4P。"
+    },
+    "TC-059.S2": {
+      "status": "P",
+      "actual": "587基线双候选恢复、589双候选穷尽人工对照，未提前SUCCESS/局部规划/二次降级，持久事件结果一致；试运行586/588完成。"
+    }
+  },
+  "counts": {
+    "rules": {
+      "P": 10,
+      "F": 0,
+      "NT": 0
+    },
+    "steps": {
+      "P": 6,
+      "F": 0,
+      "NT": 0
+    },
+    "tasks": 30,
+    "formalTasks": 28,
+    "dryRuns": 2,
+    "effectiveHttpSqlProtocolGroups": 31,
+    "groupsP": 31,
+    "groupsF": 0,
+    "businessAssertions": 189,
+    "diagnosticTasks": 0,
+    "backendReported": 391,
+    "backendPassed": 389,
+    "backendSkipped": 2,
+    "independentComponentTests": 45,
+    "edgeViews": 21,
+    "historicalBusinessPReuse": 0
+  },
+  "closed": [
+    "DEF-S3-106",
+    "DEF-S3-109"
+  ],
+  "maintainedClosed": [
+    "DEF-S3-064",
+    "DEF-S3-065 (TC059S2 scope)",
+    "DEF-S3-066",
+    "DEF-S3-105",
+    "DEF-S3-107",
+    "DEF-S3-108"
+  ],
+  "remaining": [],
+  "unexecutedCurrentRequirement": [],
+  "rawEvidence": [
+    "SRS_F018-V1.166-http-20261105.json",
+    "SRS_F018-V1.166-http-20261105-supplement.json",
+    "SRS_F018-V1.166-http-20261105-boundaries.json",
+    "SRS_F018-V1.166-baggage-adjacency-20261105.json",
+    "SRS_F018-V1.166-ui-catalog-20261105.json",
+    "SRS_F018-V1.166-ui-task-timelines-20261105.json",
+    "SRS_F018-V1.166-cross-evidence-audit-20261105.json",
+    "SRS_F018-V1.166-process-cleanup-20261105.json"
+  ],
+  "mainBeforeAcceptance": "bd182a0551cc067f0196879169fd6859f2757f83",
+  "integrationProof": "SRS_F018-V1.166-main-integration-20261105.json (added after actual push)",
+  "evidenceLayers": {
+    "productionJar": true,
+    "realHttpSqlEventsCommands": true,
+    "headlessEdge": true,
+    "syntheticAdapterProtocol": true,
+    "commercialModel": false,
+    "realPhysicalDevices": false,
+    "pendingDefault": "component only",
+    "pendingIgnoredFilter": "two synthetic DB rows only",
+    "flightArchiveExit": "service only"
+  },
+  "skippedProductTests": {
+    "DemoResetIntegrationTest": "opt-in dedicated demo reset schema not enabled; shared reset forbidden",
+    "MoonshotReadinessProbeTest": "opt-in commercial model live probe not enabled; controlled external HTTP fixture used"
+  }
+}

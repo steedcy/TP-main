@@ -1,0 +1,1789 @@
+{
+  "tag": "V1.166",
+  "productSha": "4ad7ccb27a6cbc29c1c83a33d61bf05e3aa67452",
+  "handoffSha": "a5cafdfff6155041df188eeaaad1076639c514ed",
+  "at": "2026-11-05T23:36:40.388270+08:00",
+  "timezone": "Asia/Shanghai",
+  "inputFiles": [
+    "SRS_F018-V1.166-http-20261105.json",
+    "SRS_F018-V1.166-http-20261105-supplement.json",
+    "SRS_F018-V1.166-http-20261105-boundaries.json",
+    "SRS_F018-V1.166-baggage-adjacency-20261105.json"
+  ],
+  "groups": 31,
+  "assertions": 189,
+  "results": {
+    "P": 31,
+    "F": 0,
+    "NT": 0
+  },
+  "diagnostics": [],
+  "taskIds": [
+    571,
+    572,
+    573,
+    574,
+    575,
+    576,
+    577,
+    578,
+    579,
+    580,
+    581,
+    582,
+    583,
+    584,
+    585,
+    586,
+    587,
+    588,
+    589,
+    590,
+    591,
+    592,
+    593,
+    594,
+    595,
+    596,
+    597,
+    598,
+    599,
+    600
+  ],
+  "definitionIds": [
+    55,
+    56,
+    57,
+    58,
+    59
+  ],
+  "templateIds": [
+    76,
+    77
+  ],
+  "recoveryTruth": [
+    {
+      "taskId": 571,
+      "name": "retry-success",
+      "events": [
+        {
+          "id": 7916,
+          "taskId": 571,
+          "eventType": "EXCEPTION_RECOVERED",
+          "occurredAt": "2026-11-05T23:20:32.384903",
+          "trigger": "SYSTEM",
+          "reasonCode": "STEP_FAILED",
+          "detailSummary": "恢复动作: 指令重试，结果: 成功，步骤2重试成功，异常类型: STEP_FAILED，影响结论: 计划可继续执行，不触发重新规划"
+        }
+      ],
+      "exceptions": [
+        {
+          "id": 276,
+          "task_id": 571,
+          "step_seq": 2,
+          "exception_type": "STEP_FAILED",
+          "occurred_at": "2026-11-05T23:20:30.359055",
+          "recovery_action": "指令重试",
+          "recovery_result": "SUCCESS",
+          "impact_conclusion": "自动重试成功，计划可继续执行，不触发重新规划",
+          "reason_code": "ERR_SYNTHETIC_HARDWARE",
+          "exception_status": "RESOLVED",
+          "resolved_at": "2026-11-05T23:20:32.382758",
+          "resolved_by": "SYSTEM"
+        }
+      ],
+      "checks": {
+        "oneRetry": true,
+        "sameCommand": true,
+        "completed": true,
+        "noReplan": true,
+        "failureJudgmentRecorded": true,
+        "retryInitiallyProcessing": true,
+        "archivedWithRetryJudgment": true,
+        "prefixPreserved": true
+      }
+    },
+    {
+      "taskId": 572,
+      "name": "recovered-failure",
+      "events": [
+        {
+          "id": 7947,
+          "taskId": 572,
+          "eventType": "EXCEPTION_RECOVERED",
+          "occurredAt": "2026-11-05T23:20:48.783967",
+          "trigger": "SYSTEM",
+          "reasonCode": "STEP_FAILED",
+          "detailSummary": "恢复动作: 候选设备切换，结果: 成功，步骤2已重新分配，异常类型: STEP_FAILED，影响结论: 计划可继续执行"
+        }
+      ],
+      "exceptions": [
+        {
+          "id": 277,
+          "task_id": 572,
+          "step_seq": 2,
+          "exception_type": "STEP_FAILED",
+          "occurred_at": "2026-11-05T23:20:44.193355",
+          "recovery_action": "指令重试",
+          "recovery_result": "SUCCESS",
+          "impact_conclusion": "已切换候选设备重新分配，计划可继续执行，不触发重新规划",
+          "reason_code": "ERR_SYNTHETIC_HARDWARE",
+          "exception_status": "RESOLVED",
+          "resolved_at": "2026-11-05T23:20:48.781503",
+          "resolved_by": "SYSTEM"
+        }
+      ],
+      "checks": {
+        "recognized": true,
+        "futureFrozen": true,
+        "prefixPreserved": true,
+        "candidateChanged": true,
+        "notPrematureSuccess": true,
+        "sameVersion": true,
+        "completed": true,
+        "resolvedAfterActualSuccess": true,
+        "noFutureEarlyCommands": true,
+        "candidateFinalActionTruth": true
+      }
+    },
+    {
+      "taskId": 573,
+      "name": "recovered-reported-timeout",
+      "events": [
+        {
+          "id": 7978,
+          "taskId": 573,
+          "eventType": "EXCEPTION_RECOVERED",
+          "occurredAt": "2026-11-05T23:20:58.333367",
+          "trigger": "SYSTEM",
+          "reasonCode": "EXECUTION_TIMEOUT",
+          "detailSummary": "恢复动作: 候选设备切换，结果: 成功，步骤2已重新分配，异常类型: EXECUTION_TIMEOUT，影响结论: 计划可继续执行"
+        }
+      ],
+      "exceptions": [
+        {
+          "id": 278,
+          "task_id": 573,
+          "step_seq": 2,
+          "exception_type": "EXECUTION_TIMEOUT",
+          "occurred_at": "2026-11-05T23:20:55.405479",
+          "recovery_action": "指令重试",
+          "recovery_result": "SUCCESS",
+          "impact_conclusion": "已切换候选设备重新分配，计划可继续执行，不触发重新规划",
+          "reason_code": "ERR_EXECUTION_TIMEOUT",
+          "exception_status": "RESOLVED",
+          "resolved_at": "2026-11-05T23:20:58.333367",
+          "resolved_by": "SYSTEM"
+        }
+      ],
+      "checks": {
+        "recognized": true,
+        "futureFrozen": true,
+        "prefixPreserved": true,
+        "candidateChanged": true,
+        "notPrematureSuccess": true,
+        "sameVersion": true,
+        "completed": true,
+        "resolvedAfterActualSuccess": true,
+        "noFutureEarlyCommands": true,
+        "candidateFinalActionTruth": true
+      }
+    },
+    {
+      "taskId": 574,
+      "name": "recovered-offline",
+      "events": [
+        {
+          "id": 8006,
+          "taskId": 574,
+          "eventType": "EXCEPTION_RECOVERED",
+          "occurredAt": "2026-11-05T23:21:23.268331",
+          "trigger": "SYSTEM",
+          "reasonCode": "AGENT_OFFLINE",
+          "detailSummary": "恢复动作: 候选设备切换，结果: 成功，步骤2已重新分配，异常类型: AGENT_OFFLINE，影响结论: 计划可继续执行"
+        }
+      ],
+      "exceptions": [
+        {
+          "id": 279,
+          "task_id": 574,
+          "step_seq": 2,
+          "exception_type": "AGENT_OFFLINE",
+          "occurred_at": "2026-11-05T23:21:17.295924",
+          "recovery_action": "候选设备切换",
+          "recovery_result": "SUCCESS",
+          "impact_conclusion": "已切换候选设备重新分配，计划可继续执行，不触发重新规划",
+          "reason_code": "设备代理AGT-386E8C30心跳超时离线，正占用该任务步骤",
+          "exception_status": "RESOLVED",
+          "resolved_at": "2026-11-05T23:21:23.268331",
+          "resolved_by": "SYSTEM"
+        }
+      ],
+      "checks": {
+        "recognized": true,
+        "futureFrozen": true,
+        "prefixPreserved": true,
+        "candidateChanged": true,
+        "notPrematureSuccess": true,
+        "sameVersion": true,
+        "completed": true,
+        "resolvedAfterActualSuccess": true,
+        "noFutureEarlyCommands": true,
+        "candidateFinalActionTruth": true
+      }
+    },
+    {
+      "taskId": 575,
+      "name": "recovered-timeout",
+      "events": [
+        {
+          "id": 8034,
+          "taskId": 575,
+          "eventType": "EXCEPTION_RECOVERED",
+          "occurredAt": "2026-11-05T23:22:10.784448",
+          "trigger": "SYSTEM",
+          "reasonCode": "EXECUTION_TIMEOUT",
+          "detailSummary": "恢复动作: 候选设备切换，结果: 成功，步骤2已重新分配，异常类型: EXECUTION_TIMEOUT，影响结论: 计划可继续执行"
+        }
+      ],
+      "exceptions": [
+        {
+          "id": 280,
+          "task_id": 575,
+          "step_seq": 2,
+          "exception_type": "EXECUTION_TIMEOUT",
+          "occurred_at": "2026-11-05T23:22:07.304785",
+          "recovery_action": "候选设备切换",
+          "recovery_result": "SUCCESS",
+          "impact_conclusion": "已切换候选设备重新分配，计划可继续执行，不触发重新规划",
+          "reason_code": "指令CMD-20261105232127-68E20021执行超时未收到",
+          "exception_status": "RESOLVED",
+          "resolved_at": "2026-11-05T23:22:10.784448",
+          "resolved_by": "SYSTEM"
+        }
+      ],
+      "checks": {
+        "recognized": true,
+        "futureFrozen": true,
+        "prefixPreserved": true,
+        "candidateChanged": true,
+        "notPrematureSuccess": true,
+        "sameVersion": true,
+        "completed": true,
+        "resolvedAfterActualSuccess": true,
+        "noFutureEarlyCommands": true,
+        "candidateFinalActionTruth": true
+      }
+    },
+    {
+      "taskId": 587,
+      "name": "baseline-recovered",
+      "events": [
+        {
+          "id": 8373,
+          "taskId": 587,
+          "eventType": "EXCEPTION_RECOVERED",
+          "occurredAt": "2026-11-05T23:25:15.911618",
+          "trigger": "SYSTEM",
+          "reasonCode": "STEP_FAILED",
+          "detailSummary": "恢复动作: 候选设备切换，结果: 成功，步骤1已重新分配，异常类型: STEP_FAILED，影响结论: 计划可继续执行"
+        }
+      ],
+      "exceptions": [
+        {
+          "id": 303,
+          "task_id": 587,
+          "step_seq": 1,
+          "exception_type": "STEP_FAILED",
+          "occurred_at": "2026-11-05T23:25:13.995052",
+          "recovery_action": "指令重试",
+          "recovery_result": "SUCCESS",
+          "impact_conclusion": "已切换候选设备重新分配，计划可继续执行，不触发重新规划",
+          "reason_code": "ERR_SYNTHETIC_HARDWARE",
+          "exception_status": "RESOLVED",
+          "resolved_at": "2026-11-05T23:25:15.911618",
+          "resolved_by": "SYSTEM"
+        }
+      ],
+      "checks": {
+        "baselineOnly": true,
+        "noReplan": true,
+        "noPrematureSuccess": true,
+        "rightOutcome": true,
+        "finalResults": true,
+        "noFalseRecovered": true,
+        "candidateFinalActionTruth": true
+      }
+    },
+    {
+      "taskId": 598,
+      "name": "candidate-retry-success",
+      "events": [
+        {
+          "id": 8697,
+          "taskId": 598,
+          "eventType": "EXCEPTION_RECOVERED",
+          "occurredAt": "2026-11-05T23:29:13.508463",
+          "trigger": "SYSTEM",
+          "reasonCode": "STEP_FAILED",
+          "detailSummary": "恢复动作: 候选设备切换，结果: 成功，步骤2已重新分配，异常类型: STEP_FAILED，影响结论: 计划可继续执行"
+        },
+        {
+          "id": 8698,
+          "taskId": 598,
+          "eventType": "EXCEPTION_RECOVERED",
+          "occurredAt": "2026-11-05T23:29:13.510374",
+          "trigger": "SYSTEM",
+          "reasonCode": "STEP_FAILED",
+          "detailSummary": "恢复动作: 候选设备切换，结果: 成功，步骤2已重新分配，异常类型: STEP_FAILED，影响结论: 计划可继续执行"
+        }
+      ],
+      "exceptions": [
+        {
+          "id": 323,
+          "task_id": 598,
+          "step_seq": 2,
+          "exception_type": "STEP_FAILED",
+          "occurred_at": "2026-11-05T23:29:11.707102",
+          "recovery_action": "指令重试",
+          "recovery_result": "SUCCESS",
+          "impact_conclusion": "已切换候选设备重新分配，计划可继续执行，不触发重新规划",
+          "reason_code": "ERR_SYNTHETIC_HARDWARE",
+          "exception_status": "RESOLVED",
+          "resolved_at": "2026-11-05T23:29:13.509177",
+          "resolved_by": "SYSTEM"
+        },
+        {
+          "id": 324,
+          "task_id": 598,
+          "step_seq": 2,
+          "exception_type": "STEP_FAILED",
+          "occurred_at": "2026-11-05T23:29:12.152133",
+          "recovery_action": "指令重试",
+          "recovery_result": "SUCCESS",
+          "impact_conclusion": "已切换候选设备重新分配，计划可继续执行，不触发重新规划",
+          "reason_code": "ERR_SYNTHETIC_SECOND_DEVICE",
+          "exception_status": "RESOLVED",
+          "resolved_at": "2026-11-05T23:29:13.507024",
+          "resolved_by": "SYSTEM"
+        }
+      ],
+      "checks": {
+        "candidateDifferent": true,
+        "candidateRetrySameId": true,
+        "candidateRetryPending": true,
+        "completedOriginal": true,
+        "prefixPreserved": true,
+        "firstActionImmutable": true,
+        "candidateFinalActionTruth": true,
+        "allResolvedSuccess": true,
+        "allFeedbackHttp200": true
+      }
+    }
+  ],
+  "prohibitionControls": [
+    {
+      "taskId": 583,
+      "name": "noncritical-satisfied",
+      "result": "P",
+      "checks": {
+        "firstAlreadySatisfied": true,
+        "noReplanWhenGoalSatisfied": true,
+        "continuesOriginal": true,
+        "skippedNoncritical": true,
+        "explicitImpactJudgment": true,
+        "allArchived": true,
+        "failedRecoveryNotInventedSuccess": true
+      }
+    },
+    {
+      "taskId": 592,
+      "name": "noncritical-false-goal",
+      "result": "P",
+      "checks": {
+        "prefixActuallySatisfiedFalse": true,
+        "noReplanForSatisfiedFalseGoal": true,
+        "optionalSkipped": true,
+        "originalVersionCompletes": true
+      }
+    },
+    {
+      "taskId": 593,
+      "name": "critical-prohibited-skip",
+      "result": "P",
+      "checks": {
+        "notSkipped": true,
+        "criticalFailureUsesReplan": true,
+        "noFalseContinuability": true
+      }
+    },
+    {
+      "taskId": 594,
+      "name": "last-noncritical",
+      "result": "P",
+      "checks": {
+        "completed": true,
+        "noReplan": true,
+        "optionalSkipped": true,
+        "allArchived": true,
+        "noOccupancy": true
+      }
+    },
+    {
+      "taskId": 595,
+      "name": "prohibited-forbidden",
+      "result": "P",
+      "checks": {
+        "explicitProhibitionNotSkipped": true,
+        "prohibitionUsesReplan": true,
+        "noFalseContinuability": true
+      }
+    },
+    {
+      "taskId": 596,
+      "name": "prohibited-must-not",
+      "result": "P",
+      "checks": {
+        "explicitProhibitionNotSkipped": true,
+        "prohibitionUsesReplan": true,
+        "noFalseContinuability": true
+      }
+    },
+    {
+      "taskId": 597,
+      "name": "noncritical-numeric-goal",
+      "result": "P",
+      "checks": {
+        "typedNumericPrefixSatisfied": true,
+        "noReplan": true,
+        "skipped": true,
+        "originalVersionComplete": true,
+        "allArchived": true
+      }
+    }
+  ],
+  "health": {
+    "status": "UP"
+  },
+  "entrySmoke": {
+    "/tasks?page=1&size=1": {
+      "http": 200,
+      "body": {
+        "code": 200,
+        "message": "success",
+        "data": {
+          "content": [
+            {
+              "id": 600,
+              "taskCode": "TASK-20261105-0600",
+              "taskGoal": "F166_BAGGAGE_NORMAL synthetic baggage to F2_TEST_GATE",
+              "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE",
+                "dimensionThresholdCm": 158,
+                "weightThresholdKg": 23,
+                "baggageInfo": "synthetic baggage fixture"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F166_BAGGAGE_NORMAL synthetic baggage to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "COMPLETED",
+              "currentPlanVersionId": 701,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": null,
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-05T23:29:25.595376",
+              "updatedAt": "2026-11-05T23:29:28.300964",
+              "createdBy": "oprator"
+            }
+          ],
+          "totalElements": 541,
+          "page": 1,
+          "size": 1
+        },
+        "timestamp": "2026-11-05T23:36:40.448731100+08:00"
+      }
+    },
+    "/device-agents?page=1&size=1": {
+      "http": 200,
+      "body": {
+        "code": 200,
+        "message": "success",
+        "data": {
+          "content": [
+            {
+              "agentId": "AGT-D68FD3AB",
+              "deviceCode": "G6_UNTESTED_134145",
+              "deviceName": "GPT F006 untested enable fixture",
+              "agentStatus": "ENABLED",
+              "onlineStatus": "OFFLINE",
+              "workStatus": "IDLE",
+              "currentTaskId": null,
+              "currentStepSeq": null,
+              "lastReportedAt": "2026-11-01T21:43:39.146079",
+              "enabledCapabilities": [
+                {
+                  "capabilityCode": "G120_TEMPLATE",
+                  "capabilityName": "GPT V120 live"
+                }
+              ],
+              "offlineInfo": {
+                "agentCode": "AGT-D68FD3AB",
+                "offlineAt": "2026-11-03T01:17:45.41812",
+                "reasonCode": "ERR_HEARTBEAT_TIMEOUT",
+                "detail": "设备代理AGT-D68FD3AB超过30秒未上报，判定离线",
+                "affectsTask": false
+              }
+            }
+          ],
+          "totalElements": 17,
+          "page": 1,
+          "size": 1
+        },
+        "timestamp": "2026-11-05T23:36:40.466251100+08:00"
+      }
+    },
+    "/dashboard/overview": {
+      "http": 200,
+      "body": {
+        "code": 200,
+        "message": "success",
+        "data": {
+          "metrics": {
+            "agentTotal": 17,
+            "agentOnline": 0,
+            "taskInProgress": 0,
+            "pendingManual": 110,
+            "unhandledExceptions": 16,
+            "replanningCount": 86,
+            "statusCounts": {
+              "PLANNING": 1,
+              "SUPERVISING": 0,
+              "PENDING_ASSIGNMENT": 0,
+              "DOWNGRADING": 0,
+              "EXECUTING": 0,
+              "COMPLETED": 208,
+              "FAILED": 4,
+              "PENDING_MANUAL": 110,
+              "MANUAL_TERMINATED": 218
+            }
+          },
+          "latestExceptions": [
+            {
+              "id": 324,
+              "taskId": 598,
+              "taskCode": "TASK-20261105-0598",
+              "exceptionType": "STEP_FAILED",
+              "occurredAt": "2026-11-05T23:29:12.152133",
+              "exceptionStatus": "RESOLVED",
+              "reasonCode": "ERR_SYNTHETIC_SECOND_DEVICE",
+              "impactConclusion": "已切换候选设备重新分配，计划可继续执行，不触发重新规划"
+            },
+            {
+              "id": 323,
+              "taskId": 598,
+              "taskCode": "TASK-20261105-0598",
+              "exceptionType": "STEP_FAILED",
+              "occurredAt": "2026-11-05T23:29:11.707102",
+              "exceptionStatus": "RESOLVED",
+              "reasonCode": "ERR_SYNTHETIC_HARDWARE",
+              "impactConclusion": "已切换候选设备重新分配，计划可继续执行，不触发重新规划"
+            },
+            {
+              "id": 322,
+              "taskId": 597,
+              "taskCode": "TASK-20261105-0597",
+              "exceptionType": "STEP_FAILED",
+              "occurredAt": "2026-11-05T23:29:03.564021",
+              "exceptionStatus": "RESOLVED",
+              "reasonCode": "ERR_SYNTHETIC_HARDWARE",
+              "impactConclusion": "非关键步骤恢复失败但原目标完成条件已满足，步骤跳过，计划可继续执行，不触发重新规划"
+            },
+            {
+              "id": 321,
+              "taskId": 597,
+              "taskCode": "TASK-20261105-0597",
+              "exceptionType": "STEP_FAILED",
+              "occurredAt": "2026-11-05T23:29:02.658262",
+              "exceptionStatus": "RESOLVED",
+              "reasonCode": "ERR_SYNTHETIC_HARDWARE",
+              "impactConclusion": "非关键步骤恢复失败但原目标完成条件已满足，步骤跳过，计划可继续执行，不触发重新规划"
+            },
+            {
+              "id": 320,
+              "taskId": 596,
+              "taskCode": "TASK-20261105-0596",
+              "exceptionType": "STEP_FAILED",
+              "occurredAt": "2026-11-05T23:28:54.179066",
+              "exceptionStatus": "RESOLVED",
+              "reasonCode": "ERR_SYNTHETIC_HARDWARE",
+              "impactConclusion": "候选设备切换恢复失败，当前计划不可继续执行"
+            }
+          ],
+          "failedMetrics": [],
+          "period": "TODAY"
+        },
+        "timestamp": "2026-11-05T23:36:40.493984+08:00"
+      }
+    }
+  },
+  "settingsAfter": {
+    "max": 120,
+    "seconds": 30,
+    "min": 10
+  },
+  "rulesAfter": [
+    {
+      "id": 1,
+      "ruleCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+      "ruleContent": "移动机器人会合或陪同服务对象为特殊旅客时判定为高风险；普通空间引导场景不命中",
+      "ruleVersion": "V1.2",
+      "enabled": true,
+      "createdAt": "2026-10-30T13:40:48.586219",
+      "updatedAt": "2026-11-04T10:29:06.080757",
+      "updatedBy": "set"
+    },
+    {
+      "id": 2,
+      "ruleCode": "RULE_CROSS_ZONE",
+      "ruleContent": "仅移动服务机器人适用；同一任务链条中跨越预定义区域边界1次及以上命中",
+      "ruleVersion": "V1.2",
+      "enabled": true,
+      "createdAt": "2026-10-30T13:40:48.586219",
+      "updatedAt": "2026-11-04T10:29:00.250949",
+      "updatedBy": "set"
+    },
+    {
+      "id": 3,
+      "ruleCode": "RULE_RESOURCE_CRITICAL",
+      "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+      "ruleVersion": "V10.2",
+      "enabled": true,
+      "createdAt": "2026-10-30T13:40:48.586219",
+      "updatedAt": "2026-11-05T23:29:30.449102",
+      "updatedBy": "set"
+    },
+    {
+      "id": 4,
+      "ruleCode": "GPT_F014_150_API",
+      "ruleContent": "Synthetic F014 validation fixture revised",
+      "ruleVersion": "V1.2",
+      "enabled": false,
+      "createdAt": "2026-11-04T08:07:33.779259",
+      "updatedAt": "2026-11-04T08:07:33.967337",
+      "updatedBy": "set"
+    },
+    {
+      "id": 5,
+      "ruleCode": "GPT_F014_150_UI",
+      "ruleContent": "Synthetic F014 browser-created rule revised",
+      "ruleVersion": "V1.1",
+      "enabled": false,
+      "createdAt": "2026-11-04T08:09:47.309055",
+      "updatedAt": "2026-11-04T08:10:48.202617",
+      "updatedBy": "gpt_f014_ui_150"
+    }
+  ],
+  "tasksAfter": [
+    {
+      "id": 571,
+      "status": "COMPLETED",
+      "is_dry_run": false,
+      "replan_used": false
+    },
+    {
+      "id": 572,
+      "status": "COMPLETED",
+      "is_dry_run": false,
+      "replan_used": false
+    },
+    {
+      "id": 573,
+      "status": "COMPLETED",
+      "is_dry_run": false,
+      "replan_used": false
+    },
+    {
+      "id": 574,
+      "status": "COMPLETED",
+      "is_dry_run": false,
+      "replan_used": false
+    },
+    {
+      "id": 575,
+      "status": "COMPLETED",
+      "is_dry_run": false,
+      "replan_used": false
+    },
+    {
+      "id": 576,
+      "status": "COMPLETED",
+      "is_dry_run": false,
+      "replan_used": false
+    },
+    {
+      "id": 577,
+      "status": "COMPLETED",
+      "is_dry_run": false,
+      "replan_used": false
+    },
+    {
+      "id": 578,
+      "status": "COMPLETED",
+      "is_dry_run": false,
+      "replan_used": true
+    },
+    {
+      "id": 579,
+      "status": "MANUAL_TERMINATED",
+      "is_dry_run": false,
+      "replan_used": true
+    },
+    {
+      "id": 580,
+      "status": "MANUAL_TERMINATED",
+      "is_dry_run": false,
+      "replan_used": true
+    },
+    {
+      "id": 581,
+      "status": "MANUAL_TERMINATED",
+      "is_dry_run": false,
+      "replan_used": true
+    },
+    {
+      "id": 582,
+      "status": "MANUAL_TERMINATED",
+      "is_dry_run": false,
+      "replan_used": true
+    },
+    {
+      "id": 583,
+      "status": "COMPLETED",
+      "is_dry_run": false,
+      "replan_used": false
+    },
+    {
+      "id": 584,
+      "status": "MANUAL_TERMINATED",
+      "is_dry_run": false,
+      "replan_used": true
+    },
+    {
+      "id": 585,
+      "status": "MANUAL_TERMINATED",
+      "is_dry_run": false,
+      "replan_used": true
+    },
+    {
+      "id": 586,
+      "status": "COMPLETED",
+      "is_dry_run": true,
+      "replan_used": false
+    },
+    {
+      "id": 587,
+      "status": "COMPLETED",
+      "is_dry_run": false,
+      "replan_used": false
+    },
+    {
+      "id": 588,
+      "status": "COMPLETED",
+      "is_dry_run": true,
+      "replan_used": false
+    },
+    {
+      "id": 589,
+      "status": "MANUAL_TERMINATED",
+      "is_dry_run": false,
+      "replan_used": false
+    },
+    {
+      "id": 590,
+      "status": "COMPLETED",
+      "is_dry_run": false,
+      "replan_used": false
+    },
+    {
+      "id": 591,
+      "status": "MANUAL_TERMINATED",
+      "is_dry_run": false,
+      "replan_used": true
+    },
+    {
+      "id": 592,
+      "status": "COMPLETED",
+      "is_dry_run": false,
+      "replan_used": false
+    },
+    {
+      "id": 593,
+      "status": "MANUAL_TERMINATED",
+      "is_dry_run": false,
+      "replan_used": true
+    },
+    {
+      "id": 594,
+      "status": "COMPLETED",
+      "is_dry_run": false,
+      "replan_used": false
+    },
+    {
+      "id": 595,
+      "status": "MANUAL_TERMINATED",
+      "is_dry_run": false,
+      "replan_used": true
+    },
+    {
+      "id": 596,
+      "status": "MANUAL_TERMINATED",
+      "is_dry_run": false,
+      "replan_used": true
+    },
+    {
+      "id": 597,
+      "status": "COMPLETED",
+      "is_dry_run": false,
+      "replan_used": false
+    },
+    {
+      "id": 598,
+      "status": "COMPLETED",
+      "is_dry_run": false,
+      "replan_used": false
+    },
+    {
+      "id": 599,
+      "status": "COMPLETED",
+      "is_dry_run": false,
+      "replan_used": false
+    },
+    {
+      "id": 600,
+      "status": "COMPLETED",
+      "is_dry_run": false,
+      "replan_used": false
+    }
+  ],
+  "definitionsAfter": [
+    {
+      "id": 55,
+      "definitionCode": "EXT_C7AB133B",
+      "taskName": "G166 F018 acceptance 232023",
+      "goalTemplate": "Synthetic navigation",
+      "sceneParams": [
+        {
+          "name": "targetLocation",
+          "type": "String",
+          "required": true,
+          "defaultValue": "F2_TEST_GATE",
+          "range": null
+        }
+      ],
+      "availableCapabilityTypes": [
+        "CAP_NAVIGATION"
+      ],
+      "constraintDescription": "Synthetic isolated navigation",
+      "completionCondition": "routeGenerated=true",
+      "isPreset": false,
+      "definitionStatus": "DISABLED",
+      "updatedAt": "2026-11-05T23:24:40.25644",
+      "updatedBy": "set"
+    },
+    {
+      "id": 56,
+      "definitionCode": "EXT_8DB1D536",
+      "taskName": "G166 F018 acceptance 232446",
+      "goalTemplate": "Synthetic navigation",
+      "sceneParams": [
+        {
+          "name": "targetLocation",
+          "type": "String",
+          "required": true,
+          "defaultValue": "F2_TEST_GATE",
+          "range": null
+        }
+      ],
+      "availableCapabilityTypes": [
+        "CAP_NAVIGATION"
+      ],
+      "constraintDescription": "Synthetic isolated navigation",
+      "completionCondition": "routeGenerated=true",
+      "isPreset": false,
+      "definitionStatus": "DISABLED",
+      "updatedAt": "2026-11-05T23:26:18.126096",
+      "updatedBy": "set"
+    },
+    {
+      "id": 57,
+      "definitionCode": "EXT_42BEBFF8",
+      "taskName": "G166 F018 acceptance 232623",
+      "goalTemplate": "Synthetic navigation",
+      "sceneParams": [
+        {
+          "name": "targetLocation",
+          "type": "String",
+          "required": true,
+          "defaultValue": "F2_TEST_GATE",
+          "range": null
+        }
+      ],
+      "availableCapabilityTypes": [
+        "CAP_NAVIGATION"
+      ],
+      "constraintDescription": "Synthetic isolated navigation",
+      "completionCondition": "routeGenerated=true",
+      "isPreset": false,
+      "definitionStatus": "DISABLED",
+      "updatedAt": "2026-11-05T23:29:16.863624",
+      "updatedBy": "set"
+    },
+    {
+      "id": 58,
+      "definitionCode": "EXT_BCC44F73",
+      "taskName": "G166 false goal 1793892389425607000",
+      "goalTemplate": "Synthetic navigation",
+      "sceneParams": [
+        {
+          "name": "targetLocation",
+          "type": "String",
+          "required": true,
+          "defaultValue": "F2_TEST_GATE",
+          "range": null
+        }
+      ],
+      "availableCapabilityTypes": [
+        "CAP_NAVIGATION"
+      ],
+      "constraintDescription": "Synthetic isolated navigation",
+      "completionCondition": "routeGenerated=false",
+      "isPreset": false,
+      "definitionStatus": "DISABLED",
+      "updatedAt": "2026-11-05T23:29:16.886222",
+      "updatedBy": "set"
+    },
+    {
+      "id": 59,
+      "definitionCode": "EXT_F31AE848",
+      "taskName": "G166 numeric goal 1793892539104698800",
+      "goalTemplate": "Synthetic navigation",
+      "sceneParams": [
+        {
+          "name": "targetLocation",
+          "type": "String",
+          "required": true,
+          "defaultValue": "F2_TEST_GATE",
+          "range": null
+        }
+      ],
+      "availableCapabilityTypes": [
+        "CAP_NAVIGATION"
+      ],
+      "constraintDescription": "Synthetic isolated navigation",
+      "completionCondition": "waypointCount=2",
+      "isPreset": false,
+      "definitionStatus": "DISABLED",
+      "updatedAt": "2026-11-05T23:29:16.896279",
+      "updatedBy": "set"
+    }
+  ],
+  "templatesAfter": [
+    {
+      "id": 76,
+      "templateName": "G166 F018 baseline 1793892310168357400",
+      "templateIntent": "EXT_8DB1D536",
+      "isPreset": false,
+      "inputParams": [
+        {
+          "name": "targetLocation",
+          "type": "String",
+          "required": true,
+          "defaultValue": "F2_TEST_GATE",
+          "range": null
+        }
+      ],
+      "steps": [
+        {
+          "stepSeq": 1,
+          "capabilityType": "CAP_NAVIGATION",
+          "paramMapping": [
+            {
+              "target": "targetLocation",
+              "source": "TEMPLATE_INPUT.targetLocation"
+            }
+          ],
+          "stepTimeout": 180,
+          "completionCondition": "routeGenerated=true"
+        }
+      ],
+      "templateVersion": "V1.0",
+      "templateStatus": "DISABLED",
+      "updatedAt": "2026-11-05T23:26:16.722935",
+      "updatedBy": "set"
+    },
+    {
+      "id": 77,
+      "templateName": "G166 F018 baseline 1793892318648023100",
+      "templateIntent": "EXT_8DB1D536",
+      "isPreset": false,
+      "inputParams": [
+        {
+          "name": "targetLocation",
+          "type": "String",
+          "required": true,
+          "defaultValue": "F2_TEST_GATE",
+          "range": null
+        }
+      ],
+      "steps": [
+        {
+          "stepSeq": 1,
+          "capabilityType": "CAP_NAVIGATION",
+          "paramMapping": [
+            {
+              "target": "targetLocation",
+              "source": "TEMPLATE_INPUT.targetLocation"
+            }
+          ],
+          "stepTimeout": 180,
+          "completionCondition": "routeGenerated=true"
+        }
+      ],
+      "templateVersion": "V1.0",
+      "templateStatus": "DISABLED",
+      "updatedAt": "2026-11-05T23:26:16.746669",
+      "updatedBy": "set"
+    }
+  ],
+  "ownedDevicesAfter": [
+    {
+      "device_code": "G145_F013_DISPLAY",
+      "status": "INACTIVE",
+      "agent_code": "AGT-95E1692F",
+      "online_status": "OFFLINE",
+      "work_status": "IDLE",
+      "current_task_id": null,
+      "current_step_seq": null
+    },
+    {
+      "device_code": "G145_F013_SCAN",
+      "status": "INACTIVE",
+      "agent_code": "AGT-F8CA3C99",
+      "online_status": "OFFLINE",
+      "work_status": "IDLE",
+      "current_task_id": null,
+      "current_step_seq": null
+    },
+    {
+      "device_code": "G160_F016_A",
+      "status": "INACTIVE",
+      "agent_code": "AGT-386E8C30",
+      "online_status": "OFFLINE",
+      "work_status": "IDLE",
+      "current_task_id": null,
+      "current_step_seq": null
+    },
+    {
+      "device_code": "G160_F016_B",
+      "status": "INACTIVE",
+      "agent_code": "AGT-8519A3B6",
+      "online_status": "OFFLINE",
+      "work_status": "IDLE",
+      "current_task_id": null,
+      "current_step_seq": null
+    },
+    {
+      "device_code": "G160_F016_C",
+      "status": "INACTIVE",
+      "agent_code": "AGT-D20379F3",
+      "online_status": "OFFLINE",
+      "work_status": "IDLE",
+      "current_task_id": null,
+      "current_step_seq": null
+    }
+  ],
+  "activeAssignments": 0,
+  "exceptionsAfter": [
+    {
+      "id": 276,
+      "task_id": 571,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "SUCCESS",
+      "impact_conclusion": "自动重试成功，计划可继续执行，不触发重新规划",
+      "resolved_at": "2026-11-05T23:20:32.382758"
+    },
+    {
+      "id": 277,
+      "task_id": 572,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "SUCCESS",
+      "impact_conclusion": "已切换候选设备重新分配，计划可继续执行，不触发重新规划",
+      "resolved_at": "2026-11-05T23:20:48.781503"
+    },
+    {
+      "id": 278,
+      "task_id": 573,
+      "exception_type": "EXECUTION_TIMEOUT",
+      "reason_code": "ERR_EXECUTION_TIMEOUT",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "SUCCESS",
+      "impact_conclusion": "已切换候选设备重新分配，计划可继续执行，不触发重新规划",
+      "resolved_at": "2026-11-05T23:20:58.333367"
+    },
+    {
+      "id": 279,
+      "task_id": 574,
+      "exception_type": "AGENT_OFFLINE",
+      "reason_code": "设备代理AGT-386E8C30心跳超时离线，正占用该任务步骤",
+      "exception_status": "RESOLVED",
+      "recovery_action": "候选设备切换",
+      "recovery_result": "SUCCESS",
+      "impact_conclusion": "已切换候选设备重新分配，计划可继续执行，不触发重新规划",
+      "resolved_at": "2026-11-05T23:21:23.268331"
+    },
+    {
+      "id": 280,
+      "task_id": 575,
+      "exception_type": "EXECUTION_TIMEOUT",
+      "reason_code": "指令CMD-20261105232127-68E20021执行超时未收到",
+      "exception_status": "RESOLVED",
+      "recovery_action": "候选设备切换",
+      "recovery_result": "SUCCESS",
+      "impact_conclusion": "已切换候选设备重新分配，计划可继续执行，不触发重新规划",
+      "resolved_at": "2026-11-05T23:22:10.784448"
+    },
+    {
+      "id": 281,
+      "task_id": 577,
+      "exception_type": "AGENT_OFFLINE",
+      "reason_code": "设备代理AGT-386E8C30心跳超时离线，正占用该任务步骤",
+      "exception_status": "RESOLVED",
+      "recovery_action": "候选设备切换",
+      "recovery_result": "SUCCESS",
+      "impact_conclusion": "已切换候选设备重新分配，计划可继续执行，不触发重新规划",
+      "resolved_at": "2026-11-05T23:22:50.002792"
+    },
+    {
+      "id": 282,
+      "task_id": 578,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "步骤2恢复失败且计划不可继续，触发重新规划",
+      "resolved_at": "2026-11-05T23:22:57.256632"
+    },
+    {
+      "id": 283,
+      "task_id": 578,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "候选设备切换恢复失败，当前计划不可继续执行",
+      "resolved_at": "2026-11-05T23:22:57.256632"
+    },
+    {
+      "id": 284,
+      "task_id": 579,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "步骤2恢复失败且计划不可继续，触发重新规划",
+      "resolved_at": "2026-11-05T23:23:05.5609"
+    },
+    {
+      "id": 285,
+      "task_id": 579,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "候选设备切换恢复失败，当前计划不可继续执行",
+      "resolved_at": "2026-11-05T23:23:05.558389"
+    },
+    {
+      "id": 286,
+      "task_id": 579,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "重新规划机会已用，恢复失败，转人工处理",
+      "resolved_at": "2026-11-05T23:23:09.318082"
+    },
+    {
+      "id": 287,
+      "task_id": 579,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "候选设备切换恢复失败，当前计划不可继续执行",
+      "resolved_at": "2026-11-05T23:23:09.316574"
+    },
+    {
+      "id": 288,
+      "task_id": 580,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "步骤2恢复失败且计划不可继续，触发重新规划",
+      "resolved_at": "2026-11-05T23:23:15.806719"
+    },
+    {
+      "id": 289,
+      "task_id": 580,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "候选设备切换恢复失败，当前计划不可继续执行",
+      "resolved_at": "2026-11-05T23:23:15.805394"
+    },
+    {
+      "id": 290,
+      "task_id": 580,
+      "exception_type": "REPLAN_FAILED",
+      "reason_code": "ERR_REPLANNING_MODEL_FAILED",
+      "exception_status": "RESOLVED",
+      "recovery_action": "局部重新规划",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "局部重新规划失败，转人工处理",
+      "resolved_at": "2026-11-05T23:23:15.855088"
+    },
+    {
+      "id": 291,
+      "task_id": 581,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "步骤2恢复失败且计划不可继续，触发重新规划",
+      "resolved_at": "2026-11-05T23:23:23.359984"
+    },
+    {
+      "id": 292,
+      "task_id": 581,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "候选设备切换恢复失败，当前计划不可继续执行",
+      "resolved_at": "2026-11-05T23:23:23.35126"
+    },
+    {
+      "id": 293,
+      "task_id": 581,
+      "exception_type": "REPLAN_FAILED",
+      "reason_code": "ERR_CAPABILITY_GAP",
+      "exception_status": "RESOLVED",
+      "recovery_action": "局部重新规划",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "局部重新规划失败，转人工处理",
+      "resolved_at": "2026-11-05T23:23:23.523326"
+    },
+    {
+      "id": 294,
+      "task_id": 582,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "步骤2恢复失败且计划不可继续，触发重新规划",
+      "resolved_at": "2026-11-05T23:23:35.665017"
+    },
+    {
+      "id": 295,
+      "task_id": 582,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "候选设备切换恢复失败，当前计划不可继续执行",
+      "resolved_at": "2026-11-05T23:23:35.662207"
+    },
+    {
+      "id": 296,
+      "task_id": 582,
+      "exception_type": "REPLAN_FAILED",
+      "reason_code": "ERR_STEP_LIMIT_EXCEEDED",
+      "exception_status": "RESOLVED",
+      "recovery_action": "局部重新规划",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "局部重新规划失败，转人工处理",
+      "resolved_at": "2026-11-05T23:23:35.715108"
+    },
+    {
+      "id": 297,
+      "task_id": 583,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "非关键步骤恢复失败但原目标完成条件已满足，步骤跳过，计划可继续执行，不触发重新规划",
+      "resolved_at": "2026-11-05T23:23:43.581772"
+    },
+    {
+      "id": 298,
+      "task_id": 583,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "非关键步骤恢复失败但原目标完成条件已满足，步骤跳过，计划可继续执行，不触发重新规划",
+      "resolved_at": "2026-11-05T23:23:43.581376"
+    },
+    {
+      "id": 299,
+      "task_id": 584,
+      "exception_type": "EXECUTION_TIMEOUT",
+      "reason_code": "指令CMD-20261105232350-68E2005C执行超时未收到",
+      "exception_status": "RESOLVED",
+      "recovery_action": "无可用候选设备，恢复动作未执行",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "候选设备切换恢复失败，当前计划不可继续执行",
+      "resolved_at": "2026-11-05T23:24:27.318918"
+    },
+    {
+      "id": 300,
+      "task_id": 584,
+      "exception_type": "REPLAN_FAILED",
+      "reason_code": "ERR_REPLANNING_MODEL_FAILED",
+      "exception_status": "RESOLVED",
+      "recovery_action": "局部重新规划",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "局部重新规划失败，转人工处理",
+      "resolved_at": "2026-11-05T23:24:27.357274"
+    },
+    {
+      "id": 301,
+      "task_id": 585,
+      "exception_type": "AGENT_OFFLINE",
+      "reason_code": "设备代理AGT-386E8C30心跳超时离线，正占用该任务步骤",
+      "exception_status": "RESOLVED",
+      "recovery_action": "无可用候选设备，恢复动作未执行",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "候选设备切换恢复失败，当前计划不可继续执行",
+      "resolved_at": "2026-11-05T23:25:07.291139"
+    },
+    {
+      "id": 302,
+      "task_id": 585,
+      "exception_type": "REPLAN_FAILED",
+      "reason_code": "ERR_REPLANNING_MODEL_FAILED",
+      "exception_status": "RESOLVED",
+      "recovery_action": "局部重新规划",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "局部重新规划失败，转人工处理",
+      "resolved_at": "2026-11-05T23:25:07.320288"
+    },
+    {
+      "id": 303,
+      "task_id": 587,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "SUCCESS",
+      "impact_conclusion": "已切换候选设备重新分配，计划可继续执行，不触发重新规划",
+      "resolved_at": "2026-11-05T23:25:15.911618"
+    },
+    {
+      "id": 304,
+      "task_id": 589,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "基线降级任务执行异常且恢复失败，按业务规则不再二次自动降级",
+      "resolved_at": "2026-11-05T23:25:25.580167"
+    },
+    {
+      "id": 305,
+      "task_id": 589,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "候选设备切换恢复失败，当前计划不可继续执行",
+      "resolved_at": "2026-11-05T23:25:25.579186"
+    },
+    {
+      "id": 306,
+      "task_id": 590,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "SUCCESS",
+      "impact_conclusion": "已切换候选设备重新分配，计划可继续执行，不触发重新规划",
+      "resolved_at": "2026-11-05T23:26:12.400872"
+    },
+    {
+      "id": 307,
+      "task_id": 590,
+      "exception_type": "CAPABILITY_GAP",
+      "reason_code": "SYNTHETIC_UI_PENDING",
+      "exception_status": "RESOLVED",
+      "recovery_action": "UI fixture only",
+      "recovery_result": "SUCCESS",
+      "impact_conclusion": "已切换候选设备重新分配，计划可继续执行，不触发重新规划",
+      "resolved_at": "2026-11-05T23:26:15.297085"
+    },
+    {
+      "id": 308,
+      "task_id": 590,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "SYNTHETIC_UI_IGNORED",
+      "exception_status": "RESOLVED",
+      "recovery_action": "UI fixture only",
+      "recovery_result": "SUCCESS",
+      "impact_conclusion": "已切换候选设备重新分配，计划可继续执行，不触发重新规划",
+      "resolved_at": "2026-11-05T23:26:15.297085"
+    },
+    {
+      "id": 309,
+      "task_id": 591,
+      "exception_type": "CAPABILITY_GAP",
+      "reason_code": "步骤2无可用候选设备",
+      "exception_status": "RESOLVED",
+      "recovery_action": "无可用候选设备，恢复动作未执行",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "候选设备切换恢复失败，当前计划不可继续执行",
+      "resolved_at": "2026-11-05T23:26:25.809192"
+    },
+    {
+      "id": 310,
+      "task_id": 591,
+      "exception_type": "REPLAN_FAILED",
+      "reason_code": "ERR_REPLANNING_MODEL_FAILED",
+      "exception_status": "RESOLVED",
+      "recovery_action": "局部重新规划",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "局部重新规划失败，转人工处理",
+      "resolved_at": "2026-11-05T23:26:25.845738"
+    },
+    {
+      "id": 311,
+      "task_id": 592,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "非关键步骤恢复失败但原目标完成条件已满足，步骤跳过，计划可继续执行，不触发重新规划",
+      "resolved_at": "2026-11-05T23:26:48.745897"
+    },
+    {
+      "id": 312,
+      "task_id": 592,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "非关键步骤恢复失败但原目标完成条件已满足，步骤跳过，计划可继续执行，不触发重新规划",
+      "resolved_at": "2026-11-05T23:26:48.742729"
+    },
+    {
+      "id": 313,
+      "task_id": 593,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "步骤2恢复失败且计划不可继续，触发重新规划",
+      "resolved_at": "2026-11-05T23:27:39.601366"
+    },
+    {
+      "id": 314,
+      "task_id": 593,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "候选设备切换恢复失败，当前计划不可继续执行",
+      "resolved_at": "2026-11-05T23:27:39.59912"
+    },
+    {
+      "id": 315,
+      "task_id": 594,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "非关键步骤恢复失败但原目标完成条件已满足，步骤跳过，计划可继续执行，不触发重新规划",
+      "resolved_at": "2026-11-05T23:28:37.943929"
+    },
+    {
+      "id": 316,
+      "task_id": 594,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "非关键步骤恢复失败但原目标完成条件已满足，步骤跳过，计划可继续执行，不触发重新规划",
+      "resolved_at": "2026-11-05T23:28:37.942184"
+    },
+    {
+      "id": 317,
+      "task_id": 595,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "步骤2恢复失败且计划不可继续，触发重新规划",
+      "resolved_at": "2026-11-05T23:28:46.25217"
+    },
+    {
+      "id": 318,
+      "task_id": 595,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "候选设备切换恢复失败，当前计划不可继续执行",
+      "resolved_at": "2026-11-05T23:28:46.250566"
+    },
+    {
+      "id": 319,
+      "task_id": 596,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "步骤2恢复失败且计划不可继续，触发重新规划",
+      "resolved_at": "2026-11-05T23:28:54.402787"
+    },
+    {
+      "id": 320,
+      "task_id": 596,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "候选设备切换恢复失败，当前计划不可继续执行",
+      "resolved_at": "2026-11-05T23:28:54.401702"
+    },
+    {
+      "id": 321,
+      "task_id": 597,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "非关键步骤恢复失败但原目标完成条件已满足，步骤跳过，计划可继续执行，不触发重新规划",
+      "resolved_at": "2026-11-05T23:29:03.801173"
+    },
+    {
+      "id": 322,
+      "task_id": 597,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "FAILED",
+      "impact_conclusion": "非关键步骤恢复失败但原目标完成条件已满足，步骤跳过，计划可继续执行，不触发重新规划",
+      "resolved_at": "2026-11-05T23:29:03.801173"
+    },
+    {
+      "id": 323,
+      "task_id": 598,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_HARDWARE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "SUCCESS",
+      "impact_conclusion": "已切换候选设备重新分配，计划可继续执行，不触发重新规划",
+      "resolved_at": "2026-11-05T23:29:13.509177"
+    },
+    {
+      "id": 324,
+      "task_id": 598,
+      "exception_type": "STEP_FAILED",
+      "reason_code": "ERR_SYNTHETIC_SECOND_DEVICE",
+      "exception_status": "RESOLVED",
+      "recovery_action": "指令重试",
+      "recovery_result": "SUCCESS",
+      "impact_conclusion": "已切换候选设备重新分配，计划可继续执行，不触发重新规划",
+      "resolved_at": "2026-11-05T23:29:13.507024"
+    }
+  ],
+  "restorationChecks": {
+    "ruleContentAndEnabledRestored": true,
+    "heartbeatTimeoutRestored": true,
+    "noActiveAssignments": true,
+    "noOccupiedOwnedDevices": true,
+    "devicesInactive": true,
+    "allProbeCleanupWithoutErrors": true,
+    "allTaskExceptionsArchived": true,
+    "definitionsDisabled": true,
+    "templatesDisabled": true,
+    "baggageCapabilityStatusesRestored": true
+  },
+  "ui": {
+    "catalogViews": 16,
+    "timelinePages": 5,
+    "checks": {
+      "reasonColumn": true,
+      "actionResultImpactColumns": true,
+      "stepLinks": true,
+      "defaultAllAsControlledCase": true,
+      "stepNavigation": true,
+      "overviewActiveScope": true,
+      "overviewShowsProcessing": true,
+      "overviewShowsPending": true,
+      "noJsErrors": true
+    },
+    "javascriptErrors": [],
+    "visualReview": [
+      "default list shows all/first action/actual processing",
+      "task572 timeline shows failed A retry and successful candidate B, no original retry success"
+    ],
+    "statusFilterChecks": {
+      "status-PENDING": true,
+      "status-PROCESSING": true,
+      "status-RESOLVED": true,
+      "status-IGNORED": true
+    },
+    "typeFilterChecks": {
+      "type-设备离线": true,
+      "type-能力缺口": true,
+      "type-执行超时": true,
+      "type-步骤失败": true,
+      "type-重新规划失败": true
+    },
+    "overviewCount": {
+      "realProcessingSqlAndApiBeforeFixture": 17,
+      "syntheticPendingAdded": 1,
+      "expected": 18,
+      "actualCard": 18,
+      "correct": true
+    },
+    "timelineChecks": {
+      "originalRetry571": true,
+      "candidate572NoOriginalRetrySuccess": true,
+      "timeout575Code": true,
+      "candidateRetry598NoOriginalRetrySuccess": true
+    },
+    "historyOnlyArchived": true,
+    "allChecksPass": true
+  },
+  "capabilityStatusComparisons": {
+    "G160_F016_A": {
+      "before": {
+        "CAP_INFO_DISPLAY": "UNTESTED",
+        "CAP_NOTIFICATION": "UNTESTED",
+        "CAP_SIM_STATUS": "UNTESTED",
+        "CAP_ESCORT": "UNTESTED",
+        "CAP_NAVIGATION": "ENABLED"
+      },
+      "after": {
+        "CAP_INFO_DISPLAY": "UNTESTED",
+        "CAP_NOTIFICATION": "UNTESTED",
+        "CAP_SIM_STATUS": "UNTESTED",
+        "CAP_ESCORT": "UNTESTED",
+        "CAP_NAVIGATION": "ENABLED"
+      },
+      "restored": true
+    },
+    "G145_F013_SCAN": {
+      "before": {
+        "CAP_SIM_STATUS": "UNTESTED",
+        "CAP_BAGGAGE_MEASURE": "DISABLED",
+        "CAP_OVERSIZE_ALERT": "DISABLED"
+      },
+      "after": {
+        "CAP_SIM_STATUS": "UNTESTED",
+        "CAP_BAGGAGE_MEASURE": "DISABLED",
+        "CAP_OVERSIZE_ALERT": "DISABLED"
+      },
+      "restored": true
+    },
+    "G145_F013_DISPLAY": {
+      "before": {
+        "CAP_FLIGHT_UPDATE": "UNTESTED",
+        "CAP_NAVIGATION": "UNTESTED",
+        "CAP_SIM_STATUS": "UNTESTED",
+        "CAP_INFO_DISPLAY": "DISABLED",
+        "G6_134143": "DISABLED"
+      },
+      "after": {
+        "CAP_NAVIGATION": "UNTESTED",
+        "CAP_SIM_STATUS": "UNTESTED",
+        "CAP_FLIGHT_UPDATE": "UNTESTED",
+        "CAP_INFO_DISPLAY": "DISABLED",
+        "G6_134143": "DISABLED"
+      },
+      "restored": true
+    }
+  },
+  "archiveEvidenceLayers": {
+    "totalRows": 49,
+    "uiFixtureRows": 2,
+    "businessRows": 47,
+    "uiFixtureCleanup": "two synthetic UI rows explicitly resolved by probe; excluded from business automatic archive assertions",
+    "ignoredPreservation": "IndependentF018ArchiveHooksV166Test only; no live production ignore-operation claim"
+  },
+  "productSourceDiff": "",
+  "productJarSha256": "acd1c3f5de8ab2ef92ed19676d4929b7c5e1efb04229dc566e9176ce4c845f69",
+  "commands": [
+    "mvn -o package",
+    "npm run build",
+    "mvn -o -Dtest=IndependentF018V166Test,IndependentF017V162Test,IndependentF016TimeoutOwnershipV160Test,IndependentF018ArchiveHooksV166Test test",
+    "mvn -o -Dtest=IndependentF018StateDefaultV166Test test",
+    "python acceptance/stage3/fixtures/start-f018-v166-jar.py",
+    "python acceptance/stage3/probe-f018-v166-round.py",
+    "python acceptance/stage3/probe-f018-v166-supplement.py",
+    "python acceptance/stage3/probe-f018-v166-final.py",
+    "python acceptance/stage3/probe-f018-v166-baggage.py",
+    "node acceptance/stage3/retest-f018-v166-timelines.cjs 571 572 575 580 598",
+    "python acceptance/stage3/probe-f018-v166-audit.py"
+  ]
+}
