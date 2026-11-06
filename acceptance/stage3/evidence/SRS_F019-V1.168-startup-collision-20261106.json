@@ -1,0 +1,37 @@
+{
+  "tag": "V1.168",
+  "productSha": "d3b1a8996368a19eb1829860dab8a07b8474e709",
+  "issue": "DEF-S3-113",
+  "timezone": "Asia/Shanghai",
+  "serverStart": "2026-11-06T10:18:11.722",
+  "preStartupPersistedCount": 733,
+  "firstCounterCodeExpectedFromCount": "CTX-20261106-0734",
+  "collisionCodesInRuntimeLog": [
+    "CTX-20261106-0734",
+    "CTX-20261106-0737",
+    "CTX-20261106-0738"
+  ],
+  "preexistingConflictingRows": [
+    {
+      "snapshot_code": "CTX-20261106-0734",
+      "task_id": 629,
+      "generated_at": "2026-11-06T08:48:55.435841",
+      "task_goal": "F167_CONDITIONAL_REPLAY synthetic navigation to F2_TEST_GATE"
+    },
+    {
+      "snapshot_code": "CTX-20261106-0737",
+      "task_id": 630,
+      "generated_at": "2026-11-06T08:50:54.653793",
+      "task_goal": "F167_ACTION_BEFORE_CONDITION synthetic navigation to F2_TEST_GATE"
+    },
+    {
+      "snapshot_code": "CTX-20261106-0738",
+      "task_id": 630,
+      "generated_at": "2026-11-06T08:51:04.062518",
+      "task_goal": "F167_ACTION_BEFORE_CONDITION synthetic navigation to F2_TEST_GATE"
+    }
+  ],
+  "sourceInference": "ContextSnapshotService resets sequence from count(), then increments; persisted snapshot-code numeric suffixes can have gaps after previous rollback (DEF111), so count+1 can collide after restart. This run used unchanged GPT-owned historical schema, no resets/deletions; requests failed before task transaction committed.",
+  "effect": "F168_NORMAL_THREE, OVERQUOTA_FOUR, BRANCH_OVERQUOTA_FOUR create requests500; model goal/plan requests and duplicate snapshot key in JAR log retained; subsequent requests pass once process counter moves beyond existing numbers.",
+  "cleanup": "No DB edits/counter rewrites/workaround. Missing branches rerun with new markers; failures retained, not called environment P."
+}
