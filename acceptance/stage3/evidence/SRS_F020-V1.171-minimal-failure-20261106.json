@@ -1,0 +1,88 @@
+{
+  "productSha": "7ef206287e69de350e2bd3c53d480a6bc36bb019",
+  "tag": "V1.171",
+  "timezone": "Asia/Shanghai",
+  "status": "GPT_TESTING continues full round; not handoff",
+  "issue": "DEF-S3-062 residual; no duplicate issue ID",
+  "taskId": 723,
+  "expected": "All manual dispositions record operator, time, reason and outcome (F020.R08/TC064S2).",
+  "actual": "RETRY_PLANNING with omitted reason succeeds, new autonomous plan passes all validators/supervision and completes; TASK_MANUAL_ACTION.detail.reason is null.",
+  "request": [
+    {
+      "request": {
+        "action": "RETRY_PLANNING"
+      },
+      "response": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 723,
+            "taskCode": "TASK-20261106-0716",
+            "taskGoal": "F171_RETRY_NO_REASON synthetic navigation to F2_TEST_GATE",
+            "taskFamily": "EXT_5BFC331D",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=true",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F171_RETRY_NO_REASON synthetic navigation to F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "PENDING_ASSIGNMENT",
+            "currentPlanVersionId": 884,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": null,
+            "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-06T14:29:35.512409",
+            "updatedAt": "2026-11-06T14:29:36.880201",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-06T14:29:36.902891200+08:00"
+        }
+      }
+    }
+  ],
+  "audit": [
+    {
+      "id": 5591,
+      "user_id": 3,
+      "username": "oprator",
+      "role": "OPERATOR",
+      "operation_type": "TASK_SUBMIT",
+      "operation_target": "TASK-20261106-0716",
+      "operation_result": "SUCCESS",
+      "source_ip": "127.0.0.1",
+      "detail": null,
+      "created_at": "2026-11-06T14:29:35.514643"
+    },
+    {
+      "id": 5592,
+      "user_id": 3,
+      "username": "oprator",
+      "role": "OPERATOR",
+      "operation_type": "TASK_MANUAL_ACTION",
+      "operation_target": "TASK-20261106-0716 -> RETRY_PLANNING",
+      "operation_result": "SUCCESS",
+      "source_ip": "127.0.0.1",
+      "detail": {
+        "resultStatus": "PENDING_ASSIGNMENT",
+        "reason": null,
+        "action": "RETRY_PLANNING"
+      },
+      "created_at": "2026-11-06T14:29:36.898637"
+    }
+  ],
+  "source": "SRS_F020-V1.171-http-20261106.json",
+  "probeCorrection": "Initial auditActorTimeResult used wrong DB column aliases operator_id/operator_name; actual user_id/username/created_at are populated. This is a probe assertion error, not product defect; raw initial retained, corrected derived verdict follows at final.",
+  "fixtureCorrection": "Disable->enable template setup failed because enabled state must follow DRY_RUN_PASSED; preserve diagnostics and complete missing switch/UI observations with pending tasks prepared before real trial publication. No product change."
+}
