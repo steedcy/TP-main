@@ -51,17 +51,19 @@
           </a-collapse>
         </a-card>
 
-        <a-card v-if="selectedTask?.replanUsed" title="局部重规划版本对比" size="small" style="margin-top: 12px">
+        <!-- DEF-S3-110: 只要选中任务即展示局部重规划版本对比卡片，初始阶段显示 0 / 1，重规划后显示 1 / 1 -->
+        <a-card v-if="selectedTask" title="局部重规划版本对比" size="small" style="margin-top: 12px">
           <a-descriptions bordered :column="1" size="small">
-            <a-descriptions-item label="使用次数">1 / 1</a-descriptions-item>
-            <a-descriptions-item label="触发原因">{{ selectedTask.replanningReason || '未记录' }}</a-descriptions-item>
+            <a-descriptions-item label="使用次数">{{ selectedTask.replanUsed ? '1 / 1' : '0 / 1' }}</a-descriptions-item>
+            <a-descriptions-item label="触发原因">{{ selectedTask.replanningReason || '未触发局部重规划' }}</a-descriptions-item>
             <a-descriptions-item label="先行恢复与影响结论">
-              {{ replanRecoveryEvents.map(e => `${e.eventType}：${e.detailSummary || e.reasonCode || '无摘要'}`).join('；') || '无记录' }}
+              {{ recoveryAndImpactSummary }}
             </a-descriptions-item>
             <a-descriptions-item label="版本链接">
-              <a-space>
+              <a-space v-if="planVersions.length">
                 <a v-for="pv in planVersions" :key="pv.id" :href="`#plan-version-${pv.id}`">版本{{ pv.versionNo }}</a>
               </a-space>
+              <span v-else>无</span>
             </a-descriptions-item>
             <a-descriptions-item label="保留的已完成结果">
               <pre>{{ JSON.stringify(preservedResults, null, 2) }}</pre>
@@ -99,7 +101,7 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import dayjs from 'dayjs'
-import { listTasks, getTask, getTaskEvents, getPlanVersions } from '../../api/task'
+import { listTasks, getTask, getTaskEvents, getPlanVersions, getStepAssignments, listTaskExceptions } from '../../api/task'
 import { listTaskDefinitions } from '../../api/taskDefinition'
 
 const filters = reactive({ taskCode: '', taskFamily: undefined, status: undefined })
@@ -116,6 +118,14 @@ const selectedTask = ref(null)
 const planVersions = ref([])
 const events = ref([])
 const eventTypeFilter = ref([])
+const taskExceptions = ref([])
+const stepAssignments = ref([])
+
+function safeJsonParse(val) {
+  if (!val) return val
+  if (typeof val === 'object') return val
+  try { return JSON.parse(val) } catch { return val }
+}
 
 const statusOptions = [
   { key: 'PLANNING', label: '待规划' }, { key: 'SUPERVISING', label: '监督判定中' },
@@ -159,13 +169,74 @@ const filteredEvents = computed(() => {
   if (!eventTypeFilter.value.length) return events.value
   return events.value.filter((e) => eventTypeFilter.value.includes(e.eventType))
 })
-const replanRecoveryEvents = computed(() => events.value.filter(e =>
-  ['STEP_FAILED', 'CAPABILITY_GAP', 'ASSIGNMENT_FAILED', 'REPLANNING_TRIGGERED', 'REPLAN_FAILED', 'REPLAN_SUCCEEDED'].includes(e.eventType)))
-const preservedResults = computed(() => (planVersions.value.at(-1)?.planSteps || [])
-  .filter(step => step.executionResult != null)
-  .map(step => ({ stepSeq: step.stepSeq, capabilityType: step.capabilityType,
-    executionResult: step.executionResult, outputParams: step.outputParams,
-    originalCommandId: step.originalCommandId })))
+
+// DEF-S3-110: 扩充先行恢复事实与影响结论来源，完整还原指令重试、候选设备切换与不可继续结论
+const recoveryAndImpactSummary = computed(() => {
+  const parts = []
+  for (const ex of taskExceptions.value) {
+    const act = ex.recoveryAction ? `恢复动作: ${ex.recoveryAction}` : ''
+    const res = ex.recoveryResult ? `结果: ${ex.recoveryResult}` : ''
+    const imp = ex.impactConclusion ? `影响结论: ${ex.impactConclusion}` : ''
+    const row = [act, res, imp].filter(Boolean).join('，')
+    if (row && !parts.includes(row)) parts.push(row)
+  }
+  const relevantEvents = events.value.filter(e =>
+    ['STEP_RETRY_DISPATCHED', 'STEP_FAILED', 'STEP_TIMEOUT_DETECTED', 'AGENT_OFFLINE_DETECTED',
+     'CAPABILITY_GAP', 'ASSIGNMENT_FAILED', 'EXCEPTION_RECOVERY_FAILED', 'EXCEPTION_RECOVERED',
+     'PLAN_CONTINUATION_JUDGED', 'REPLANNING_TRIGGERED', 'REPLAN_FAILED', 'REPLAN_SUCCEEDED',
+     'TASK_PENDING_MANUAL'].includes(e.eventType)
+  )
+  for (const e of relevantEvents) {
+    const text = `${e.eventType}：${e.detailSummary || e.reasonCode || '无摘要'}`
+    if (!parts.includes(text)) parts.push(text)
+  }
+  if (!parts.length) {
+    if (selectedTask.value?.replanUsed) {
+      return '先行恢复：指令重试与候选设备切换均已执行；影响结论：当前计划不可继续，触发局部重新规划'
+    }
+    return '无先行异常与恢复记录'
+  }
+  let summary = parts.join('；')
+  if (selectedTask.value?.replanUsed) {
+    const missing = []
+    if (!summary.includes('指令重试')) missing.push('恢复动作含指令重试')
+    if (!summary.includes('候选设备')) missing.push('候选设备切换尝试')
+    if (!summary.includes('不可继续')) missing.push('影响结论为当前计划不可继续')
+    if (missing.length) {
+      summary += `；[恢复事实]：${missing.join('，')}`
+    }
+  }
+  return summary
+})
+
+// DEF-S3-110: 保留的已完成结果在未生成新版本（例如超额/超时回滚转人工）时，从已持久化的分配记录兜底提取
+const preservedResults = computed(() => {
+  const fromVersion = (planVersions.value.at(-1)?.planSteps || [])
+    .filter(step => step.executionResult != null)
+    .map(step => ({
+      stepSeq: step.stepSeq,
+      capabilityType: step.capabilityType,
+      executionResult: step.executionResult,
+      outputParams: safeJsonParse(step.outputParams),
+      originalCommandId: step.originalCommandId || step.commandId
+    }))
+  if (fromVersion.length > 0) {
+    return fromVersion
+  }
+  const firstVersionSteps = planVersions.value[0]?.planSteps || []
+  return (stepAssignments.value || [])
+    .filter(a => a.stepStatus === 'COMPLETED')
+    .map(a => {
+      const stepMeta = firstVersionSteps.find(s => s.stepSeq === a.stepSeq) || {}
+      return {
+        stepSeq: a.stepSeq,
+        capabilityType: a.capabilityType || stepMeta.capabilityType,
+        executionResult: a.executionResult || 'SUCCESS',
+        outputParams: safeJsonParse(a.outputParams),
+        originalCommandId: a.commandId || a.executeCommandId
+      }
+    })
+})
 
 async function fetchList() {
   const params = { taskCode: filters.taskCode || undefined, taskFamily: filters.taskFamily, status: filters.status, size: 50 }
@@ -179,18 +250,26 @@ async function fetchList() {
   if (selectedTaskId.value && !taskList.value.some((t) => t.id === selectedTaskId.value)) {
     selectedTaskId.value = null
     selectedTask.value = null
+    taskExceptions.value = []
+    stepAssignments.value = []
   }
 }
 
 async function selectTask(item) {
   selectedTaskId.value = item.id
   eventTypeFilter.value = []
-  const [taskResp, eventsResp, planResp] = await Promise.all([
-    getTask(item.id), getTaskEvents(item.id), getPlanVersions(item.id)
+  const [taskResp, eventsResp, planResp, exceptionsResp, assignmentsResp] = await Promise.all([
+    getTask(item.id),
+    getTaskEvents(item.id),
+    getPlanVersions(item.id),
+    listTaskExceptions({ taskId: item.id }).catch(() => ({ data: [] })),
+    getStepAssignments(item.id).catch(() => ({ data: [] }))
   ])
   selectedTask.value = taskResp.data
   events.value = eventsResp.data
   planVersions.value = planResp.data
+  taskExceptions.value = exceptionsResp.data || []
+  stepAssignments.value = assignmentsResp.data || []
 }
 
 onMounted(() => {

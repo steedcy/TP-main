@@ -590,4 +590,116 @@ class InstructionTimeoutAndRollbackF019Test {
         verify(taskEventService, never()).append(any(), eq("STEP_COMPLETED"), any(), any(), any());
         verify(taskEventService, never()).append(any(), eq("TASK_COMPLETED"), any(), any(), any());
     }
+
+    @Test
+    @DisplayName("DEF-S3-111 / SRS_F019.R03 / TC-061.S2: 替换计划首步为条件节点时，折叠后正确从首个可执行动作节点续跑，严禁404/回滚")
+    void testLeadingConditionNodeReplanning_resumesFromFirstActionNode() throws Exception {
+        // 步骤1与步骤2已完成
+        step1.setStepStatus("COMPLETED");
+        step1.setExecutionResult("SUCCESS");
+        step1.setOutputParams("{\"displayStatus\":\"SUCCESS\"}");
+        step1.setCommandId("CMD-ORIG-1");
+
+        step2.setStepStatus("COMPLETED");
+        step2.setExecutionResult("SUCCESS");
+        step2.setOutputParams("{\"broadcastStatus\":\"SUCCESS\"}");
+        step2.setCommandId("CMD-ORIG-2");
+
+        // 步骤3执行失败，触发重规划
+        step3.setStepStatus("FAILED");
+
+        when(taskMapper.claimReplan(eq(500L), anyString())).thenReturn(1);
+
+        // 模拟模型返回：步骤1为条件节点（折叠后不计数、不下发），步骤2、3、4为分支动作
+        // 经重新编号后：3为条件节点，4、5、6为分支动作；折叠后留存动作 4、5、6
+        PlanningResponse leadingCondResp = new PlanningResponse();
+        leadingCondResp.setResultCode("0");
+        leadingCondResp.setPlanSteps(List.of(
+                Map.of("stepSeq", 1, "stepGoal", "检查环境条件", "stepType", "CONDITION", "conditionNode", true, "condition", "envReady == true"),
+                Map.of("stepSeq", 2, "stepGoal", "执行服务动作A", "capabilityType", "CAP_NOTIFICATION", "branchOf", 1,
+                        "stepTimeout", 60, "completionCondition", "notify=SUCCESS"),
+                Map.of("stepSeq", 3, "stepGoal", "执行服务动作B", "capabilityType", "CAP_CONFIRMATION", "branchOf", 1,
+                        "stepTimeout", 60, "completionCondition", "confirm=SUCCESS"),
+                Map.of("stepSeq", 4, "stepGoal", "执行服务动作C", "capabilityType", "CAP_CONFIRMATION", "branchOf", 1,
+                        "stepTimeout", 60, "completionCondition", "done=SUCCESS")
+        ));
+        when(planningModelService.generatePlan(any(PlanningRequest.class))).thenReturn(leadingCondResp);
+
+        // 模拟新版本步骤4的分配查找
+        TaskStepAssignment newStep4 = new TaskStepAssignment();
+        newStep4.setId(3004L);
+        newStep4.setTaskId(500L);
+        newStep4.setPlanVersionId(20L);
+        newStep4.setStepSeq(4);
+        newStep4.setStepStatus("PENDING_ASSIGNMENT");
+        newStep4.setRejectedAgentIds("[]");
+
+        // 模拟动态生成的 assignmentMapper 支持新版本步骤
+        java.util.Map<Integer, TaskStepAssignment> newVersionAssignments = new java.util.concurrent.ConcurrentHashMap<>();
+        doAnswer(inv -> {
+            TaskStepAssignment a = inv.getArgument(0);
+            if (Long.valueOf(20L).equals(a.getPlanVersionId())) {
+                newVersionAssignments.put(a.getStepSeq(), a);
+            }
+            return 1;
+        }).when(assignmentMapper).insert(any(TaskStepAssignment.class));
+
+        when(assignmentMapper.findByPlanVersionIdAndStepSeq(eq(20L), anyInt())).thenAnswer(inv -> {
+            Integer seq = inv.getArgument(1);
+            return Optional.ofNullable(newVersionAssignments.get(seq));
+        });
+
+        // 触发局部重规划（failedStepSeq = 3）
+        replanningService.replan(500L, 3, "ERR_EXECUTION_FAILED: step 3 failed");
+
+        // 验证重规划成功：消耗单次配额，新版本冻结，任务重新进入待分配
+        assertTrue(testTask.getReplanUsed());
+        assertEquals(TaskStatus.PENDING_ASSIGNMENT, testTask.getStatus());
+        assertEquals(20L, testTask.getCurrentPlanVersionId());
+
+        // 验证 startExecution 从首个动作节点 4 开始分配，而不是从已被折叠的条件节点 3 开始
+        verify(orchestrator).startExecution(eq(500L), eq(20L), eq(3));
+        verify(orchestrator).assignStep(eq(500L), eq(20L), eq(4));
+        verify(orchestrator, never()).assignStep(eq(500L), eq(20L), eq(3));
+    }
+
+    @Test
+    @DisplayName("DEF-S3-111 / SRS_F019.R01 / R08: 局部重规划后执行启动异常时，安全提交待人工状态，持久保留单次配额防止重复调用模型")
+    void testReplanningExecutionStartException_preservesReplanQuotaAndCommitsToPendingManual() throws Exception {
+        step1.setStepStatus("COMPLETED");
+        step1.setExecutionResult("SUCCESS");
+        step1.setOutputParams("{\"displayStatus\":\"SUCCESS\"}");
+        step1.setCommandId("CMD-ORIG-1");
+
+        when(taskMapper.claimReplan(eq(500L), anyString())).thenReturn(1);
+
+        PlanningResponse validResp = new PlanningResponse();
+        validResp.setResultCode("0");
+        validResp.setPlanSteps(List.of(
+                Map.of("stepSeq", 1, "stepGoal", "执行替换动作", "capabilityType", "CAP_NOTIFICATION",
+                        "stepTimeout", 60, "completionCondition", "notify=SUCCESS")
+        ));
+        when(planningModelService.generatePlan(any(PlanningRequest.class))).thenReturn(validResp);
+
+        // 模拟 startExecution 抛出异常（例如极端下发网络故障）
+        doThrow(new RuntimeException("Simulated dispatch failure")).when(orchestrator).startExecution(anyLong(), anyLong(), anyInt());
+
+        replanningService.replan(500L, 2, "ERR_EXECUTION_FAILED: step 2 failed");
+
+        // 验证配额仍然被持久消耗 (replanUsed = true)
+        assertTrue(testTask.getReplanUsed());
+
+        // 验证任务安全转为 PENDING_MANUAL，未发生脏回滚
+        assertEquals(TaskStatus.PENDING_MANUAL, testTask.getStatus());
+        assertTrue(testTask.getFailureReason().contains("局部重新规划后启动执行失败"));
+
+        // 验证时间线记录了失败事件与人工处置事件
+        verify(taskEventService).append(eq(500L), eq("REPLAN_FAILED"), eq("SYSTEM"), eq("ERR_REPLAN_EXECUTION_FAILED"), contains("启动执行失败"));
+        verify(taskEventService).append(eq(500L), eq("TASK_PENDING_MANUAL"), eq("SYSTEM"), eq("ERR_REPLAN_EXECUTION_FAILED"), contains("启动执行失败"));
+
+        // 验证二次调用被单次配额拦截，绝不重复调用模型
+        replanningService.replan(500L, 2, "ERR_EXECUTION_FAILED: replay feedback");
+        verify(planningModelService, times(1)).generatePlan(any());
+        assertTrue(testTask.getFailureReason().contains("重新规划机会已使用"));
+    }
 }

@@ -35,6 +35,7 @@ public class ReplanningService {
     @org.springframework.beans.factory.annotation.Autowired(required = false)
     private TaskExceptionMapper taskExceptionMapper;
 
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ReplanningService.class);
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final int MAX_STEPS = 5;
 
@@ -306,7 +307,15 @@ public class ReplanningService {
         taskEventService.append(taskId, "REPLAN_SUCCEEDED", "SYSTEM", null,
                 "局部重新规划成功，新计划版本" + newVersion.getVersionNo() + "已冻结，任务重新进入待分配");
 
-        taskExecutionOrchestrator.startExecution(taskId, newVersion.getId(), failedStepSeq);
+        // DEF-S3-111: 执行启动异常保护，防止外层事务回滚导致已消耗的单次重规划配额、新版本与快照丢失
+        try {
+            taskExecutionOrchestrator.startExecution(taskId, newVersion.getId(), failedStepSeq);
+        } catch (Exception ex) {
+            log.error("Failed to start execution after replanning for task {}: {}", taskId, ex.getMessage(), ex);
+            taskEventService.append(taskId, "REPLAN_FAILED", "SYSTEM", "ERR_REPLAN_EXECUTION_FAILED",
+                    "局部重新规划后启动执行失败: " + ex.getMessage());
+            toPendingManual(task, failedStepSeq, "ERR_REPLAN_EXECUTION_FAILED", "局部重新规划后启动执行失败: " + ex.getMessage());
+        }
     }
 
     /** High-risk replanning follows 5.4.6 while retaining actually completed actions. */
@@ -430,7 +439,15 @@ public class ReplanningService {
             downgradeDetail += "，" + matchBasis;
         }
         taskEventService.append(taskId, "BASELINE_DOWNGRADED", "SYSTEM", risk.getRiskReasonCode(), downgradeDetail);
-        taskExecutionOrchestrator.startExecution(taskId, baselineVersion.getId(), failedStepSeq);
+        // DEF-S3-111: 执行启动异常保护，防止外层事务回滚导致已消耗的单次重规划配额与快照丢失
+        try {
+            taskExecutionOrchestrator.startExecution(taskId, baselineVersion.getId(), failedStepSeq);
+        } catch (Exception ex) {
+            log.error("Failed to start execution after replanning baseline downgrade for task {}: {}", taskId, ex.getMessage(), ex);
+            taskEventService.append(taskId, "REPLAN_FAILED", "SYSTEM", "ERR_REPLAN_EXECUTION_FAILED",
+                    "局部重规划基线降级后启动执行失败: " + ex.getMessage());
+            toPendingManual(task, failedStepSeq, "ERR_REPLAN_EXECUTION_FAILED", "局部重规划基线降级后启动执行失败: " + ex.getMessage());
+        }
     }
 
     private void baselineUnavailable(Task task, String detail) {

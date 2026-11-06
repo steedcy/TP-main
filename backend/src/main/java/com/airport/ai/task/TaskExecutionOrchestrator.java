@@ -95,8 +95,23 @@ public class TaskExecutionOrchestrator {
             }
             assignmentMapper.insert(assignment);
         }
-        Integer firstStepSeq = resumeFromStepSeq != null ? resumeFromStepSeq : asInteger(steps.get(0).get("stepSeq"));
-        assignStep(taskId, planVersionId, firstStepSeq);
+        // DEF-S3-111: 当局部重规划尾部首步为条件节点时，折叠后只保留可执行动作（序号大于等于resumeFromStepSeq）；
+        // 必须从步骤列表中寻找首个 stepSeq >= resumeFromStepSeq 的可执行步骤，严禁直接使用可能不存在的 resumeFromStepSeq
+        Integer firstStepSeq = null;
+        for (Map<String, Object> step : steps) {
+            Integer sSeq = asInteger(step.get("stepSeq"));
+            if (sSeq == null) continue;
+            if (resumeFromStepSeq == null || sSeq >= resumeFromStepSeq) {
+                firstStepSeq = sSeq;
+                break;
+            }
+        }
+        if (firstStepSeq != null) {
+            assignStep(taskId, planVersionId, firstStepSeq);
+        } else {
+            List<TaskStepAssignment> all = assignmentMapper.findByPlanVersionIdOrderByStepSeqAsc(planVersionId);
+            completeAvailableChannels(taskId, planVersionId, all);
+        }
     }
 
     /**

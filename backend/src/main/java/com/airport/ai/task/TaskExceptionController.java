@@ -21,8 +21,12 @@ public class TaskExceptionController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('SYSTEM_ADMIN', 'OPERATOR')")
-    public ApiResponse<List<TaskException>> search(@RequestParam(required = false) String exceptionType,
+    public ApiResponse<List<TaskException>> search(@RequestParam(required = false) Long taskId,
+                                                    @RequestParam(required = false) String exceptionType,
                                                     @RequestParam(required = false) String exceptionStatus) {
+        if (taskId != null) {
+            return ApiResponse.ok(taskExceptionService.listByTask(taskId));
+        }
         return ApiResponse.ok(taskExceptionService.search(exceptionType, exceptionStatus));
     }
 

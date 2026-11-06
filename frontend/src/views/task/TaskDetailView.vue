@@ -5,7 +5,8 @@
       <a-descriptions-item label="状态"><a-tag>{{ statusLabel(task.status) }}</a-tag></a-descriptions-item>
       <a-descriptions-item label="任务目标" :span="2">{{ task.taskGoal }}</a-descriptions-item>
       <a-descriptions-item label="任务族">{{ task.taskFamily || '未指定' }}</a-descriptions-item>
-      <a-descriptions-item label="失败/降级原因" v-if="task.failureReason || task.downgradeReason">
+      <a-descriptions-item label="重规划次数">{{ task.replanUsed ? '1 / 1' : '0 / 1' }}</a-descriptions-item>
+      <a-descriptions-item label="失败/降级原因" v-if="task.failureReason || task.downgradeReason" :span="2">
         {{ task.failureReason || task.downgradeReason }}
       </a-descriptions-item>
     </a-descriptions>
