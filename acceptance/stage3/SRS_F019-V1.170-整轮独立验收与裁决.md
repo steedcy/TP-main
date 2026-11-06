@@ -50,3 +50,6 @@
 证据索引：complete-verification逐组断言、四份HTTP JSON、UI JSON/截图、模型journal、构建/78定向日志、JAR原始脱敏字节及UTF8查看稿、版本范围/清理/中间重启证明、三before台账和SHA256 manifest。JVM随机安全密码已脱敏，原Office、私有账号/配置/DPAPI、无关用户文件不提交。复跑顺序及完整命令见complete-verification.commands；所有输出拒绝覆盖，另批用新标签。
 
 本项通过后下一需求仅SRS_F020，由Claude从最终main按顺序正式交接；F023/F027/F028不并行启动。F019通过不表示后续需求、三核心端到端或95项整体验收通过。
+
+
+F019最终合入实证：完整证据`437217e79f414e2e5ef6cff359ab742f9e3acc59`先推送，正式验收交接`a6c3f9a8434a06c9e2a1a3f5e9798e60cce026bc`随后推送并安全快进合main，远端实际验收锚点同为`a6c3f9a8434a06c9e2a1a3f5e9798e60cce026bc`。40用户文件清单/哈希不变、无PR，标签V1.170未移动；main-integration证明与最终记录随本提交再次同步main。下一仅F020顺序正式交接，不表示后续/三核心/95项通过。
