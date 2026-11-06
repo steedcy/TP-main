@@ -2,9 +2,9 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（F019 V1.169业务9P/0F/0NT、六步骤6P/0F/0NT；110保持、111/112/113关闭，但必要创建/重启回归另有1F：新DEF-S3-114任务编号碰撞，整轮未通过；完整证据`0cdda41f796c5a1c3084d99ea6c0ec4b810a34a4`先推送）
-- 当前代码 SHA：`2fc0aa3a294d2ae8a0b5eefb33e9ddf878640bea`，唯一递增版本标签：`V1.169`（已打在代码提交上）
-- 当前进度：F001～F018已验收合main；F019业务全P，必要直接依赖114未通过，仍不推进F020。产品`2fc0aa3a294d2ae8a0b5eefb33e9ddf878640bea` / V1.169，main仍`620c16669b2bba725df54818dffb0d21ac27f627`未合本轮、无PR。Claude接收本交接修114及直接影响，保留已修110/111/112/113，仍按用户要求顺序逐项。
+- 状态：`READY_FOR_GPT`（SRS_F019 V1.170：彻底修复 DEF-S3-114 任务编号生成器重启碰撞与间隙越过问题，TaskCodeGenerator 基于库中当天最大序号初始化并在自增中查重兜底）
+- 当前代码 SHA：`b7df234eb1aa412959f15ccaabbaa10408cc5618`，唯一递增版本标签：`V1.170`（已打在代码提交上）
+- 当前进度：F001～F018已验收合main；当前仍F019整轮独立复测，产品代码SHA为 `b7df234eb1aa412959f15ccaabbaa10408cc5618` / V1.170，main仍保持 `620c16669b2bba725df54818dffb0d21ac27f627` 未合入本轮、无PR。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -3154,3 +3154,35 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交接 | 状态 | 产品SHA/标签 | 完整证据SHA | main |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-06 | SRS_F019 | GPT → Claude | READY_FOR_CLAUDE（业务9P/6P，必要启动114 F） | 2fc0aa3a294d2ae8a0b5eefb33e9ddf878640bea / V1.169 | 0cdda41f796c5a1c3084d99ea6c0ec4b810a34a4 | 620c16669b2bba725df54818dffb0d21ac27f627，未合本轮，无PR |
+| 2026-11-06 | SRS_F019 | Claude → GPT | READY_FOR_GPT（修DEF-S3-114任务编号重启防撞） | b7df234eb1aa412959f15ccaabbaa10408cc5618 / V1.170 | 无（待GPT独立复测产生） | 620c16669b2bba725df54818dffb0d21ac27f627，未合本轮，无PR |
+
+## 2026-11-06 Claude → GPT：SRS_F019 V1.170 修复 DEF-S3-114（任务编号生成器重启间隙防撞）交接
+
+- **状态**：`READY_FOR_GPT`。分支 `ai/claude-fix`，代码 SHA `b7df234eb1aa412959f15ccaabbaa10408cc5618`，唯一递增版本标签 `V1.170`（已打在代码提交上）。
+- **基准状态**：保持与 GPT 最新交接 `ad30c8d08766f0d4026e107f6d703000ecb47cdf`、完整证据 `0cdda41f796c5a1c3084d99ea6c0ec4b810a34a4` 对齐；main 保持 `620c16669b2bba725df54818dffb0d21ac27f627` 未合入本轮，无 PR。
+- **保留成果**：完全保留 DEF-S3-110（展示事实与初始次数）、DEF-S3-111（事务边界与配额/状态持久化）、DEF-S3-112（追溯页真实事实呈现）、DEF-S3-113（快照编号间隙防撞）已修复代码与行为；未改动已通过的 9 条业务规则与 6 步骤逻辑。
+
+### 修复内容（DEF-S3-114）
+- **问题根因**：原 `TaskCodeGenerator.java` 在新进程启动或跨天时直接使用 `taskMapper.count()` 初始化 AtomicLong 序号。当历史事务由于失败/回滚留下任务编号间隙时，现有总行数 `count()` 小于库中当天最大已使用序号（如 count=656，maxSeq=681），导致正常重启 JAR 后的前若干次创建任务请求碰撞已存在的编号，触发 tasks 表唯一索引冲突并返回 HTTP 500 / 业务 1000。
+- **产品代码修复**：
+  1. `TaskMapper.java` / `TaskMapper.xml`：新增方法 `findMaxTaskCodeByDate(@Param("datePart") String datePart)`，查询 `SELECT MAX(task_code) FROM tasks WHERE task_code LIKE CONCAT('TASK-', #{datePart}, '-%')`。
+  2. `TaskCodeGenerator.java`：跨天或进程初次启动时，查询库中当天最大编号并解析提取最大序号 `maxSeq`，以 `Math.max(taskMapper.count(), maxSeq)` 作为初始种子；在生成循环中通过 `while (true)` 调用 `taskMapper.findByTaskCode(candidateCode).isEmpty()` 进行唯一性兜底查重，杜绝重启碰撞与间隙冲突。普通任务创建与基线试运行共用该机制。
+  3. 新增专项单元测试 `TaskCodeGeneratorTest.java`：
+     - `handlesRestartAndGapsWithoutCollision`：模拟 count=656、maxSeq=681 且 0682 已存在的间隙重启场景，验证生成器安全跳过碰撞分配 0683；
+     - `normalInitializationWithEmptyDatabase`：空库冷启动分配 `0001`、`0002`；
+     - `handlesCountGreaterThanMaxSeqSafely`：count 超过 maxSeq 场景回退保护；
+     - `handlesConcurrencyWithoutDuplicate`：20 线程高并发生成全局唯一无重复编号。
+
+### 本地验证结论
+- **定向单测**：`TaskCodeGeneratorTest` (4项)、`ContextSnapshotSafetyTest` (5项)、`InstructionTimeoutAndRollbackF019Test` (11项)、`ReplanningHighRiskDowngradeTest` (5项) 全部通过（25/25 通过，0 失败 0 错误）；
+- **全量后端测试**：`mvn -o test` 408 项通过（0 失败，0 错误，2 原有跳过），BUILD SUCCESS；
+- **前端构建**：`npm run build` 成功完成，3269 模块转换，0 错误；
+- **后端打包**：`mvn package -DskipTests` 成功生成生产 JAR `airport-ai-app-1.0.0.jar`。
+
+### 待 ChatGPT 独立复测
+1. **DEF-S3-114 专项复测**：
+   - 验证在历史存在编号间隙（回滚记录）及正常重启 JAR 场景下，连续发起任务创建与基线试运行请求，不再发生 `tasks_task_code_key` 唯一约束冲突，HTTP 返回 200，任务成功落库；
+   - 验证重启前后分配的任务编号具备严格单调性与全局唯一性。
+2. **SRS_F019 整轮复测覆盖**：
+   - 覆盖 `SRS_F019.R01` 至 `SRS_F019.R09` 全部 9 条规则及 6 步骤（TC-060～TC-062）；
+   - 保持 DEF-S3-110、111、112、113 闭环关闭状态。
