@@ -1,0 +1,708 @@
+{
+  "status": "REQUIREMENT_PASSED",
+  "tag": "V1.170",
+  "productSha": "b7df234eb1aa412959f15ccaabbaa10408cc5618",
+  "handoffSha": "071199b749a8726e741682652a72497c3e18dfcd",
+  "executionBaseline": "V2.4",
+  "timezone": "Asia/Shanghai",
+  "rules": {
+    "P": 9,
+    "F": 0,
+    "NT": 0
+  },
+  "steps": {
+    "P": 6,
+    "F": 0,
+    "NT": 0
+  },
+  "necessaryDependencyGates": {
+    "P": 1,
+    "F": 0,
+    "NT": 0,
+    "issue": "DEF-S3-114",
+    "evidence": "Initial first creation and normal restart first ordinary creation, baseline dry-run and following creation all200, numeric monotonic and unique; sparse history retained."
+  },
+  "closed": [
+    "DEF-S3-114"
+  ],
+  "maintainedClosed": [
+    "DEF-S3-110",
+    "DEF-S3-111",
+    "DEF-S3-112",
+    "DEF-S3-113"
+  ],
+  "open": [],
+  "historicalBusinessPReuse": 0,
+  "historicalNeighborPSubstitution": 0,
+  "observations": [
+    {
+      "name": "exact-leading-replay",
+      "taskId": 717,
+      "result": "P",
+      "checks": {
+        "exactReplayAll200": true,
+        "exactlyOneModelReplan": true,
+        "consumedQuotaAndTwoPlans": true,
+        "completedFiveActions": true
+      }
+    },
+    {
+      "name": "high-no-baseline",
+      "taskId": 712,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "manual": true,
+        "replanFailedException": true,
+        "noNewPlanCommands": true,
+        "noSuccessEvent": true,
+        "preservedCurrentVersion": true
+      }
+    },
+    {
+      "name": "startup-fault",
+      "taskId": 713,
+      "result": "P",
+      "checks": {
+        "controlledFailureDoesNot500": true,
+        "consumedQuotaPersists": true,
+        "snapshotAndVersionPersist": true,
+        "failureAndManualPersist": true,
+        "noRepeatModelCall": true,
+        "prefixPreserved": true
+      }
+    },
+    {
+      "name": "no-retry-timeout-truth",
+      "taskId": 714,
+      "result": "P",
+      "checks": {
+        "noRetryActuallyDispatched": true,
+        "timeoutAndManual": true,
+        "summaryDoesNotInventRetry": true,
+        "originalGoalRetained": true
+      }
+    },
+    {
+      "name": "baseline-trial",
+      "taskId": 715,
+      "result": "P",
+      "checks": {
+        "realFiveStepTrialCompleted": true
+      }
+    },
+    {
+      "name": "base-startup-fault",
+      "taskId": 716,
+      "result": "P",
+      "checks": {
+        "controlledFailureDoesNot500": true,
+        "consumedQuotaPersists": true,
+        "snapshotAndVersionPersist": true,
+        "failureAndManualPersist": true,
+        "noRepeatModelCall": true,
+        "prefixPreserved": true
+      }
+    },
+    {
+      "name": "restart-first-create",
+      "taskId": 718,
+      "result": "P",
+      "checks": {
+        "firstHttpSuccess": true,
+        "completed": true,
+        "codeBeyondPreRestartMax": true,
+        "taskCodeUnique": true,
+        "snapshotBeyondPreRestartMax": true,
+        "snapshotUnique": true
+      }
+    },
+    {
+      "name": "baseline-trial",
+      "taskId": 719,
+      "result": "P",
+      "checks": {
+        "realFiveStepTrialCompleted": true
+      }
+    },
+    {
+      "name": "restart-following-create",
+      "taskId": 720,
+      "result": "P",
+      "checks": {
+        "firstHttpSuccess": true,
+        "completed": true,
+        "codeBeyondPreRestartMax": true,
+        "taskCodeUnique": true,
+        "snapshotBeyondPreRestartMax": true,
+        "snapshotUnique": true
+      }
+    },
+    {
+      "name": "restart-shared-generator",
+      "taskId": null,
+      "result": "P",
+      "checks": {
+        "threePersistedAcrossOrdinaryAndTrial": true,
+        "strictlyIncreasing": true,
+        "allBeyondPreRestartMax": true
+      }
+    },
+    {
+      "name": "normal-three",
+      "taskId": 693,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "newPlanFrozen": true,
+        "allThreePass": true,
+        "lowSupervision": true,
+        "prefixMerged": true,
+        "replacementOnly": true,
+        "noExtraRetrySteps": true,
+        "completed": true,
+        "physicalActionsAtMostFive": true,
+        "oneReplanFinal": true
+      }
+    },
+    {
+      "name": "conditional-three",
+      "taskId": 694,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "newPlanFrozen": true,
+        "allThreePass": true,
+        "lowSupervision": true,
+        "prefixMerged": true,
+        "replacementOnly": true,
+        "noExtraRetrySteps": true,
+        "conditionNotFrozen": true,
+        "branchConditionPreserved": true,
+        "completed": true,
+        "physicalActionsAtMostFive": true,
+        "oneReplanFinal": true
+      }
+    },
+    {
+      "name": "overquota-four",
+      "taskId": 695,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "manual": true,
+        "replanFailedException": true,
+        "noNewPlanCommands": true,
+        "noSuccessEvent": true,
+        "preservedCurrentVersion": true,
+        "noTruncation": true
+      }
+    },
+    {
+      "name": "branch-overquota-four",
+      "taskId": 696,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "manual": true,
+        "replanFailedException": true,
+        "noNewPlanCommands": true,
+        "noSuccessEvent": true,
+        "preservedCurrentVersion": true,
+        "noTruncation": true
+      }
+    },
+    {
+      "name": "one-remaining",
+      "taskId": 697,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "newPlanFrozen": true,
+        "allThreePass": true,
+        "lowSupervision": true,
+        "prefixMerged": true,
+        "replacementOnly": true,
+        "noExtraRetrySteps": true,
+        "completed": true,
+        "physicalActionsAtMostFive": true,
+        "oneReplanFinal": true
+      }
+    },
+    {
+      "name": "five-remaining",
+      "taskId": 698,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "newPlanFrozen": true,
+        "allThreePass": true,
+        "lowSupervision": true,
+        "prefixMerged": true,
+        "replacementOnly": true,
+        "noExtraRetrySteps": true,
+        "completed": true,
+        "physicalActionsAtMostFive": true,
+        "oneReplanFinal": true
+      }
+    },
+    {
+      "name": "second-failure",
+      "taskId": 699,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "secondFailureManual": true,
+        "onlyTwoPlans": true,
+        "stillOnlyOneReplanCall": true,
+        "noSecondTrigger": true,
+        "reasonAndImpactRecorded": true,
+        "noFalseRecovered": true
+      }
+    },
+    {
+      "name": "request-failure",
+      "taskId": 700,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "manual": true,
+        "replanFailedException": true,
+        "noNewPlanCommands": true,
+        "noSuccessEvent": true,
+        "preservedCurrentVersion": true
+      }
+    },
+    {
+      "name": "model-unavailable",
+      "taskId": 701,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "manual": true,
+        "replanFailedException": true,
+        "noNewPlanCommands": true,
+        "noSuccessEvent": true,
+        "preservedCurrentVersion": true
+      }
+    },
+    {
+      "name": "malformed-model",
+      "taskId": 702,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "manual": true,
+        "replanFailedException": true,
+        "noNewPlanCommands": true,
+        "noSuccessEvent": true,
+        "preservedCurrentVersion": true
+      }
+    },
+    {
+      "name": "model-error-code",
+      "taskId": 703,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "manual": true,
+        "replanFailedException": true,
+        "noNewPlanCommands": true,
+        "noSuccessEvent": true,
+        "preservedCurrentVersion": true
+      }
+    },
+    {
+      "name": "invalid-structure",
+      "taskId": 704,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "manual": true,
+        "replanFailedException": true,
+        "noNewPlanCommands": true,
+        "noSuccessEvent": true,
+        "preservedCurrentVersion": true,
+        "rejectedCandidateRetained": true,
+        "notFrozen": true
+      }
+    },
+    {
+      "name": "invalid-capability",
+      "taskId": 705,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "manual": true,
+        "replanFailedException": true,
+        "noNewPlanCommands": true,
+        "noSuccessEvent": true,
+        "preservedCurrentVersion": true,
+        "rejectedCandidateRetained": true,
+        "notFrozen": true
+      }
+    },
+    {
+      "name": "invalid-constraint",
+      "taskId": 706,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "manual": true,
+        "replanFailedException": true,
+        "noNewPlanCommands": true,
+        "noSuccessEvent": true,
+        "preservedCurrentVersion": true,
+        "rejectedCandidateRetained": true,
+        "notFrozen": true
+      }
+    },
+    {
+      "name": "empty-tail",
+      "taskId": 707,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "manual": true,
+        "replanFailedException": true,
+        "noNewPlanCommands": true,
+        "noSuccessEvent": true,
+        "preservedCurrentVersion": true,
+        "noTruncation": true
+      }
+    },
+    {
+      "name": "timeout-rollback-and-late-feedback",
+      "taskId": 708,
+      "result": "P",
+      "checks": {
+        "actualTimeoutAt30": true,
+        "timeoutRecorded": true,
+        "lateSuccessIgnored": true,
+        "prefixPreserved": true,
+        "noOldFutureCommands": true,
+        "oneReplanManual": true
+      }
+    },
+    {
+      "name": "model-timeout",
+      "taskId": 709,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "manual": true,
+        "replanFailedException": true,
+        "noNewPlanCommands": true,
+        "noSuccessEvent": true,
+        "preservedCurrentVersion": true,
+        "actual60SecondTimeout": true
+      }
+    },
+    {
+      "name": "baseline-trial",
+      "taskId": 710,
+      "result": "P",
+      "checks": {
+        "realFiveStepTrialCompleted": true
+      }
+    },
+    {
+      "name": "replan-high-risk",
+      "taskId": 711,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "highReplan": true,
+        "autoDowngrade": true,
+        "retainedTwoCompleted": true,
+        "baselineThreePass": true,
+        "completed": true,
+        "noPrefixRedispatch": true
+      }
+    }
+  ],
+  "counts": {
+    "P": 29,
+    "F": 0,
+    "NT": 0
+  },
+  "assertions": {
+    "P": 344,
+    "F": 0
+  },
+  "persistedTasks": [
+    693,
+    694,
+    695,
+    696,
+    697,
+    698,
+    699,
+    700,
+    701,
+    702,
+    703,
+    704,
+    705,
+    706,
+    707,
+    708,
+    709,
+    710,
+    711,
+    712,
+    713,
+    714,
+    715,
+    716,
+    717,
+    718,
+    719,
+    720
+  ],
+  "trials": [
+    710,
+    715,
+    719
+  ],
+  "ui": [
+    {
+      "file": "SRS_F019-V1.170-ui-exceptions-20261106.json",
+      "views": 15,
+      "javascriptErrors": []
+    },
+    {
+      "file": "SRS_F019-V1.170-ui-initial-20261106.json",
+      "views": 4,
+      "javascriptErrors": []
+    },
+    {
+      "file": "SRS_F019-V1.170-ui-normal-20261106.json",
+      "views": 14,
+      "javascriptErrors": []
+    },
+    {
+      "file": "SRS_F019-V1.170-ui-startup-20261106.json",
+      "views": 11,
+      "javascriptErrors": []
+    },
+    {
+      "file": "SRS_F019-V1.170-ui-truth-20261106.json",
+      "views": 4,
+      "javascriptErrors": []
+    }
+  ],
+  "uiViews": 48,
+  "uiGenericChecksNotApplicable": [
+    {
+      "file": "SRS_F019-V1.170-ui-normal-20261106.json",
+      "view": "TASK-20261106-0688-trace",
+      "check": "oldAndNewLinks",
+      "reason": "Overquota/model failure creates no replacement version: one original link expected; two-version generic assertion N/A. Raw observation retained."
+    }
+  ],
+  "diagnostics": [],
+  "probeCorrections": [
+    "UI selection reads actual taskCode, never task id; local selection helper two missing-key errors corrected before any browser invocation; no product F.",
+    "Normal UI no-new-version generic two-link flag retained as N/A; later probe asserts links for available versions and truth compares only actual recovery facts.",
+    "Restart probe old COUNT+1 collision is diagnostic; oracle is first HTTP success and actual allocated code unique and beyond prior numeric maximum. No history deleted or padded."
+  ],
+  "backendTestCounts": {
+    "reported": 408,
+    "passed": 406,
+    "failed": 0,
+    "skipped": 2,
+    "skipNames": [
+      "DemoResetIntegrationTest",
+      "MoonshotReadinessProbeTest"
+    ]
+  },
+  "directedTestCounts": {
+    "total": 78,
+    "independentBoundaryAndConcurrency": 8,
+    "productNeighbor": 70,
+    "passed": 78,
+    "skipped": 0
+  },
+  "commands": [
+    "mvn -o -f backend/pom.xml package",
+    "npm.cmd --prefix frontend run build",
+    "mvn -o -f backend/pom.xml test -Dtest=IndependentF019V170Test,TaskCodeGeneratorTest,TaskReplanningQuotaAndManualTakeoverF018Test,PlanStepLimitAndReplanningF012Test,BaselineDowngradeAndFailureBoundaryF015Test,CommandDispatchAndExecutionF017Test,RecoveryEventTruthF015Test,InstructionTimeoutAndRollbackF019Test,ReplanningHighRiskDowngradeTest,ContextSnapshotSafetyTest",
+    "python .local-test/launch-f170.py model / vite",
+    "python acceptance/stage3/fixtures/start-f019-v170-jar.py",
+    "python acceptance/stage3/probe-f019-v170-round.py",
+    "python acceptance/stage3/probe-f019-v170-extra.py",
+    "python acceptance/stage3/probe-f019-v170-replay-exact.py",
+    "node acceptance/stage3/retest-f019-v170-ui.cjs normal / exceptions / startup (actual taskCodes from HTTP/SQL)",
+    "normal owned JAR stop, same packaged JAR start",
+    "python acceptance/stage3/probe-f019-v170-restart.py",
+    "python acceptance/stage3/probe-f019-v170-finish.py",
+    "acceptance/stage3/fixtures/stop-f019-v170-processes.ps1"
+  ],
+  "mainBefore": "620c16669b2bba725df54818dffb0d21ac27f627",
+  "mainIntegration": "Pending evidence push and formal handoff commit; actual remote merge proof to append separately.",
+  "productSourcesDiff": "",
+  "scope": "Real packaged JAR/HTTP/SQL/events/headless Edge, synthetic HTTP model/devices. Zero quota and 64-call/16-worker allocator concurrency are independent service tests, not live HTTP concurrency or physical hardware. No commercial model/three core end-to-end/95 overall claims."
+}
