@@ -2,9 +2,9 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（SRS_F019 V1.168整轮未通过：规则5P/4F/0NT、六步骤4P/2F/0NT；110原反例通过，111启动异常事务残留，新增112恢复事实/113重启快照编号；完整证据`726cc789ae3e2ef76576dc4979c4b2bb0815e020`已先推送）
-- 当前代码 SHA：`d3b1a8996368a19eb1829860dab8a07b8474e709`，唯一递增版本标签：`V1.168`（已打在代码提交上）
-- 当前进度：F001～F018已验收合main；当前仍F019，固定产品`d3b1a8996368a19eb1829860dab8a07b8474e709` / V1.168，main仍`620c16669b2bba725df54818dffb0d21ac27f627`未合本轮、无PR。Claude接收ai/gpt-test证据及本交接后修111残留/112/113，按用户最新决定顺序逐项，不启动后续四项并行对话。
+- 状态：`READY_FOR_GPT`（SRS_F019 V1.169：彻底修复 DEF-S3-111 启动事务隔离与配额/状态持久化、DEF-S3-112 消除对比页虚构恢复动作、DEF-S3-113 杜绝重启后快照编号间隙碰撞）
+- 当前代码 SHA：`2fc0aa3a294d2ae8a0b5eefb33e9ddf878640bea`，唯一递增版本标签：`V1.169`（已打在代码提交上）
+- 当前进度：F001～F018已验收合main；当前仍F019整轮独立复测，产品代码SHA为 `2fc0aa3a294d2ae8a0b5eefb33e9ddf878640bea` / V1.169，main仍保持 `620c16669b2bba725df54818dffb0d21ac27f627` 未合入本轮、无PR。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -3085,3 +3085,53 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交接 | 状态 | 产品SHA/标签 | 完整证据SHA | main |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-06 | SRS_F019 | GPT → Claude | READY_FOR_CLAUDE | d3b1a8996368a19eb1829860dab8a07b8474e709 / V1.168 | 726cc789ae3e2ef76576dc4979c4b2bb0815e020 | 620c16669b2bba725df54818dffb0d21ac27f627，未合本轮，无PR |
+| 2026-11-06 | SRS_F019 | Claude → GPT | READY_FOR_GPT | 2fc0aa3a294d2ae8a0b5eefb33e9ddf878640bea / V1.169 | - | 620c16669b2bba725df54818dffb0d21ac27f627，未合本轮，无PR |
+
+## 2026-11-06 Claude → ChatGPT：SRS_F019 V1.169 修复交付独立复测
+
+- **状态**：`READY_FOR_GPT`。分支 `ai/claude-fix`，代码 SHA `2fc0aa3a294d2ae8a0b5eefb33e9ddf878640bea`，唯一递增版本标签：`V1.169`（已打在代码提交上）。
+- **基准状态**：main 保持 `620c16669b2bba725df54818dffb0d21ac27f627`，未合入本轮，无 PR。
+- **资源隔离**：使用独立 worktree `tip-claude-f016`，严格遵守 `AGENTS.md`，绝不触碰主工作区 `tip`，绝不改动或占用 GPT 独立端口（8080/5173/8091-8096）与 `tip_gpt_*` 库表。
+
+### 一、缺陷修复与产品代码改动核对
+1. **DEF-S3-111（高）：启动异常事务回滚导致配额、快照、版本与人工状态丢失**：
+   - **事务切分与配额稳固**：在 `ReplanningService.java` 中引入 `TransactionTemplate`，明确分离重规划持久化阶段与执行分派阶段。
+     - **Phase 1（独立事务提交）**：快照创建、模型请求/基线匹配、三类校验、版本落库、`taskMapper.claimReplan` 单次配额消耗扣减、任务状态转移（`PENDING_ASSIGNMENT` 或 `DOWNGRADING`）与时间线事件（`CONTEXT_SNAPSHOT_GENERATED`, `PLAN_VALIDATED`, `SUPERVISION_JUDGED`, `REPLAN_SUCCEEDED` / `BASELINE_DOWNGRADED`）在 `PROPAGATION_REQUIRES_NEW` 独立事务中立即提交到 PostgreSQL；
+     - **Phase 2（独立执行分派）**：在 Phase 1 事务成功提交之后，于独立的后续事务中调用 `taskExecutionOrchestrator.startExecution`；
+     - **Phase 3（故障独立提交）**：若 `startExecution` 发生任何异常（如分配行插入触发器失败等受控故障），就地捕获并在独立的全新事务中调用 `toPendingManual`，将任务状态安全更新为 `PENDING_MANUAL` 并写入 `REPLAN_FAILED` 与 `TASK_PENDING_MANUAL` 事件。异常不外抛，设备上报接口返回 200，且已消耗的单次配额（`replanUsed = true`）、新计划版本与快照真实入库，同一反馈重发时因配额耗尽绝不二次调用模型；
+     - 自主重规划与高风险基线降级重规划两条链路统一遵循此事务切分模型。
+2. **DEF-S3-112（中）：追溯对比页虚构未发生的重试恢复动作**：
+   - 彻底删除 `TaskTraceView.vue` 中对“指令重试”、“候选设备”、“不可继续”关键词的强制硬编码拼写代码；
+   - 忠实完整展示从 `taskExceptions` 与 `events` 汇总出的真实事实，彻底消除在任务 656（30s静默超时无备选设备且未重试）中虚假拼接 `[恢复事实]：恢复动作含指令重试` 的问题。
+3. **DEF-S3-113（中）：正常重启后快照编号碰撞引发 500**：
+   - 在 `ContextSnapshotMapper.java` 与 `ContextSnapshotMapper.xml` 增加 `findMaxSnapshotCodeByDate(@Param("datePart") String datePart)`（`SELECT MAX(snapshot_code) FROM context_snapshots WHERE snapshot_code LIKE CONCAT('CTX-', #{datePart}, '-%')`）；
+   - 在 `ContextSnapshotService.generateSnapshotCode` 中提取最大编号的序号部分，初始化序列号为 `Math.max(contextSnapshotMapper.count(), maxSeq)`，并在生成循环中通过 `contextSnapshotMapper.findBySnapshotCode(code).isEmpty()` 双重兜底，彻底解决历史回滚间隙导致的重启后碰撞 500。
+
+### 二、单测与本地全量验证结果
+- **针对性单测**：
+  - `ContextSnapshotSafetyTest`：5/5 全部通过（包含新增重启间隙防撞单测 `snapshotCodeGeneration_handlesGapsAndRestartWithoutCollision`）；
+  - `ReplanningHighRiskDowngradeTest`：5/5 全部通过（包含新增高风险基线执行异常保护单测 `highRiskExecutionStartExceptionPreservesReplanQuotaAndCommitsToPendingManual`）；
+  - `InstructionTimeoutAndRollbackF019Test`：11/11 全部通过（包含自主重规划与高风险基线重规划启动异常事务保护单测）；
+  - `TaskReplanningQuotaAndManualTakeoverF018Test`：19/19 全部通过；
+  - 4 组定向测试共 40 项全过：**Tests run: 40, Failures: 0, Errors: 0, Skipped: 0, BUILD SUCCESS**。
+- **全量后端测试**：
+  - `mvn -o test`：**Tests run: 404, Failures: 0, Errors: 0, Skipped: 2**，**BUILD SUCCESS**。
+- **前端生产构建**：
+  - `npm.cmd --prefix frontend run build`：Vite 生产构建成功，3269 模块转换，0 错误。
+- **后端打包构建**：
+  - `mvn -o -f backend/pom.xml package -DskipTests`：成功生成 `airport-ai-app-1.0.0.jar`，BUILD SUCCESS。
+
+### 三、待 ChatGPT 独立复测清单
+请 ChatGPT 基于产品代码提交 `2fc0aa3a294d2ae8a0b5eefb33e9ddf878640bea`（标签 `V1.169`）对 SRS_F019 开展整轮独立复测：
+1. **DEF-S3-111 验证**：
+   - 验证任务 655（自主重规划版本 2）与任务 658（高风险基线降级版本 3）在 `startExecution` 发生受控分配异常时：
+     - 单次配额真实消耗入库（`tasks.replan_used = true`）；
+     - 新快照与新计划版本（版本 2、版本 3）正常持久化；
+     - 任务安全提交转移为 `PENDING_MANUAL`，时间线事件包含 `REPLAN_FAILED` 与 `TASK_PENDING_MANUAL`；
+     - 设备反馈上报不报 HTTP 500；同一反馈重发时不会二次调用规划模型。
+2. **DEF-S3-112 验证**：
+   - 验证任务 656（静默超时无可用候选设备、未执行重试）在追溯页面真实呈现异常与恢复记录，绝不额外拼接伪造的 `[恢复事实]：恢复动作含指令重试`。
+3. **DEF-S3-113 验证**：
+   - 验证在历史数据库存在间隙或重启 JAR 场景下，创建任务与生成快照不再发生唯一约束冲突，不返回 HTTP 500。
+4. **整轮回归覆盖**：覆盖 `SRS_F019.R01` 至 `SRS_F019.R09` 全部 9 条规则及 6 步骤（TC-060～TC-062）。
+
