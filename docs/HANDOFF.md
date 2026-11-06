@@ -2,9 +2,9 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（F020 V1.171整轮独立复测未通过：规则7P/2F/0NT、TC063～065六步骤4P/2F/0NT；062重试/转基线原因残留及新增115前端分页遗漏；完整证据`8fa7b7fbbc332a0500b044ef387c9fd9d79ac7aa`已先推送，main未合本轮）
-- 当前代码 SHA：`7ef206287e69de350e2bd3c53d480a6bc36bb019`，唯一递增版本标签：`V1.171`（固定产品提交，远端已核对）
-- 当前进度：F001～F019已验收合main；F020 V1.171已按V2.4完成整轮，当前全适用项实测/历史P复用0；仅062残留/115交Claude修复后发新标签再整轮。main保持`6775491be9118e4aab33c30b4ae81362d4a096d5`，不合本轮、无PR，不推进F021。
+- 状态：`READY_FOR_GPT`（SRS_F020 V1.172：已修复 DEF-S3-062 残留全量人工处置动作原因必填与审计完整留痕、DEF-S3-115 前端服务端真实分页/筛选归1/总量127条完全可达；定向单测 22/22 通过，全量构建 0 错误，后端打包通过，标签 V1.172 已推送）
+- 当前代码 SHA：`b750cb36fc3bef10013050035de7d696ced39b5f`，唯一递增版本标签：`V1.172`（代码提交，标签固定）
+- 当前进度：F001～F019已验收合main；SRS_F020由Claude在`ai/claude-fix`分支完成 DEF-S3-062 残留与 DEF-S3-115 修复，打标签`V1.172`推送，正式交回 ChatGPT 进行整轮独立复测。main保持`6775491be9118e4aab33c30b4ae81362d4a096d5`，未合本轮，无PR。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -3274,3 +3274,53 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 时间（Asia/Shanghai） | 需求 | 交接 | 状态 | 产品SHA/标签 | 完整证据SHA | main |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-06 | SRS_F020 | GPT → Claude | READY_FOR_CLAUDE（7P/2F/0NT；步骤4P/2F/0NT） | 7ef206287e69de350e2bd3c53d480a6bc36bb019 / V1.171 | 8fa7b7fbbc332a0500b044ef387c9fd9d79ac7aa | 6775491be9118e4aab33c30b4ae81362d4a096d5 未合本轮，无PR |
+| 2026-11-06 | SRS_F020 | Claude → GPT | READY_FOR_GPT（修062全处置动作原因必填与审计留痕 + 115前端服务端分页） | b750cb36fc3bef10013050035de7d696ced39b5f / V1.172 | 无（待GPT独立复测产生） | 6775491be9118e4aab33c30b4ae81362d4a096d5 未合本轮，无PR |
+
+## 2026-11-06 Claude → GPT：SRS_F020 V1.172 修复交接（DEF-S3-062 残留全量人工处置原因留痕 + DEF-S3-115 前端服务端真实分页）
+
+- **状态**：`READY_FOR_GPT`，代码 SHA **`b750cb36fc3bef10013050035de7d696ced39b5f`**，标签 **`V1.172`**（已打标签并推送远端，标签固定指向已验证的产品代码提交）。
+- **分支与基准**：分支 `ai/claude-fix`，main 保持 `6775491be9118e4aab33c30b4ae81362d4a096d5`，未合并本轮，无 PR。已将 GPT 完整证据与交接提交快进合入。
+- **交接目标**：SRS_F020（9 规则 R01～R09，关联用例 TC-063～TC-065 六步骤及 TC-062 检索能力）整轮独立复测。
+
+### 本轮修复与闭环内容
+
+1. **DEF-S3-062 残留修复（所有人工处置动作均强制校验原因非空，且审计详情与任务事件必须完整记录实际填写的非空原因）**：
+   - **后端 API & 业务服务 (`backend/src/main/java/com/airport/ai/task/TaskService.java`)**：
+     - 人工处置方法 `manualAction` 统一前置强制校验 `cleanReason == null`（trim 后为空）。对任何处置动作（包括 `SWITCH_TO_BASELINE`、`RETRY_PLANNING`、`MARK_FAILED`、`TERMINATE`），若未传原因或为空白字符，一律拒绝并抛出 `PARAM_MISSING (3001)`；若长度超过 200 抛出 `PARAM_FORMAT_ERROR (3002)`。
+     - 修复 `SWITCH_TO_BASELINE`（转基线执行）与 `RETRY_PLANNING`（重试规划）在 `actionDetail` 中仅记录部分属性而将 `reason` 遗漏或记为 null 的问题，统一写入 `actionDetail.put("reason", cleanReason)`，并确保任务事件与审计记录完整记录操作人、时间、原状态、目标状态及实际处置原因。
+   - **前端交互界面 (`frontend/src/views/task/TaskDetailView.vue`)**：
+     - “转基线执行”按钮新增专用原因采集弹窗 `switchBaselineVisible`（含 `data-testid="switch-baseline-reason"`），未填原因时“确认转基线”按钮保持禁用；
+     - “重试规划”弹窗原因由选填升级为必填，并增加前端空校验拦截；
+     - `handleManualAction` 兜底路由缺失原因调用至对应弹窗，彻底杜绝无原因直发 API 请求。
+
+2. **DEF-S3-115 修复（前端任务列表对接服务端真实分页、筛选重置归1、127条任务完全可达）**：
+   - **后端分页 DTO (`backend/src/main/java/com/airport/ai/common/PageResult.java`)**：
+     - 新增 `public long getTotal() { return totalElements; }` 访问器，确保前端或各客户端组件无论是读取 `totalElements` 还是 `total` 均能正确获取后端实际总量（127条等）。
+   - **前端列表与工具 (`frontend/src/views/task/TaskListView.vue`, `frontend/src/utils/taskListView.js`)**：
+     - `<a-table>` 显式绑定 `:pagination="pagination"` 与 `@change="handleTableChange"`，彻底解决默认客户端分页仅显示首批 20 条（2页每页10条）无法翻页的问题；
+     - `fetchList` 统一传递 `page` 与 `size`，并动态绑定服务端返回的 `totalElements`（或 `total`）；
+     - 所有筛选控件（状态下拉、日期选择、关键字回车/失焦）以及“查询”按钮统一调用 `onFilterChange`，强制将 `pagination.current = 1` 重置归 1；新建任务成功后同样自动重置归 1；
+     - 点击分页器任意页码、上一页、下一页均触发 `@change="handleTableChange"` 向服务端发起新请求，总量 127 条任务完全可达；倒序排列与组合过滤保持稳定。
+
+### 验证与构建结果
+
+- **前端单测自检**：
+  - `node frontend/src/utils/taskListView.check.mjs`：18/18 项断言全通（覆盖查询参数构造、分页参数传递、状态映射与徽标展示）。
+- **前端生产构建**：
+  - `npm run build`：转换 3271 个模块，0 错误，耗时 7.82s，顺利生成 `dist` 静态资源产物。
+- **后端单测与定向回归**：
+  - `mvn -o test "-Dtest=TaskGoalKeywordF020Test,ManualActionAuditF020Test,ManualActionSafetyTest,ManualActionMissingInfoTest,GlobalExceptionHandlerStatusTest"`：22/22 全部通过，0 failures, 0 errors。
+- **后端打包验证**：
+  - `mvn -o package -DskipTests`：成功生成 `airport-ai-app-1.0.0.jar`，BUILD SUCCESS。
+
+### 待 ChatGPT 独立复测要点（SRS_F020 V1.172 整轮复测）
+
+1. **DEF-S3-062 残留验证**：
+   - 验证 `SWITCH_TO_BASELINE` 与 `RETRY_PLANNING` API 请求省略 `reason` 时均返回 HTTP 400（ErrorCode 3001），且数据库任务事件及 `TASK_MANUAL_ACTION` 审计日志中 `reason` 不为 null，必须为实际填写的非空字符串；
+   - 验证 Edge 前端页面点击“转基线执行”弹出必填原因对话框，未填写前不可提交；填写提交后审计中包含采集到的原因。
+2. **DEF-S3-115 分页验证**：
+   - 验证在任务总数 127 条时，页面 `<a-table>` 正确显示总条数 127 条，点击第 2 页及后续页码均能向后端发起真实分页请求并获取后续数据，全部 127 条任务可完整浏览；
+   - 验证切换关键字、状态或日期过滤条件时，分页自动重置为第 1 页。
+3. **F020 整轮相关规则与步骤全面复测**：
+   - 维持 V1.171 已通过项（006 关键字模糊搜索、007 详情不存在 404 回退、060 待人工浅橙高亮与徽标、058/061 审计/事件不可变写保护、059 单设备终止审计留痕、NT026 自主重试与监督流转等）无回归劣化。
+
