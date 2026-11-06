@@ -32,6 +32,10 @@
         SELECT COUNT(*) FROM context_snapshots
     </select>
 
+    <select id="findMaxSnapshotCodeByDate" resultType="java.lang.String">
+        SELECT MAX(snapshot_code) FROM context_snapshots WHERE snapshot_code LIKE CONCAT('CTX-', #{datePart}, '-%')
+    </select>
+
     <insert id="insert" parameterType="com.airport.ai.task.ContextSnapshot" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO context_snapshots (snapshot_code, task_id, agents, capability_coverage, failed_agent_codes, generated_at)
         VALUES (#{snapshotCode}, #{taskId}, #{agents}::json, #{capabilityCoverage}::json, #{failedAgentCodes}::json, #{generatedAt})

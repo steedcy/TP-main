@@ -161,4 +161,31 @@ class ReplanningHighRiskDowngradeTest {
                 contains("targetLocation"));
         verifyNoInteractions(execution);
     }
+
+    @Test
+    void highRiskExecutionStartExceptionPreservesReplanQuotaAndCommitsToPendingManual() throws Exception {
+        arrange("CAP_DONE");
+        doThrow(new RuntimeException("Simulated trigger assignment failure"))
+                .when(execution).startExecution(anyLong(), anyLong(), anyInt());
+
+        service.replan(1L, 2, "DEVICE_OFFLINE");
+
+        // 验证配额仍然被持久消耗 (replanUsed = true)
+        assertTrue(task.getReplanUsed());
+        // 验证当前计划版本更新为基线版本 (11L)
+        assertEquals(11L, task.getCurrentPlanVersionId());
+        // 验证任务安全转为 PENDING_MANUAL，未发生脏回滚
+        assertEquals(TaskStatus.PENDING_MANUAL, task.getStatus());
+        assertTrue(task.getFailureReason().contains("局部重新规划后启动执行失败"));
+
+        // 验证时间线记录了基线降级、失败事件与待人工处置事件
+        verify(events).append(eq(1L), eq("BASELINE_DOWNGRADED"), eq("SYSTEM"), eq("RULE_TEST"), contains("局部重规划后切换至基线模板"));
+        verify(events).append(eq(1L), eq("REPLAN_FAILED"), eq("SYSTEM"), eq("ERR_REPLAN_EXECUTION_FAILED"), contains("启动执行失败"));
+        verify(events).append(eq(1L), eq("TASK_PENDING_MANUAL"), eq("SYSTEM"), eq("ERR_REPLAN_EXECUTION_FAILED"), contains("启动执行失败"));
+
+        // 验证二次调用被单次配额拦截，绝不重复调用模型
+        service.replan(1L, 2, "DEVICE_OFFLINE_AGAIN");
+        verify(model, times(1)).generatePlan(any());
+        assertTrue(task.getFailureReason().contains("重新规划机会已使用"));
+    }
 }

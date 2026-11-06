@@ -170,7 +170,7 @@ const filteredEvents = computed(() => {
   return events.value.filter((e) => eventTypeFilter.value.includes(e.eventType))
 })
 
-// DEF-S3-110: 扩充先行恢复事实与影响结论来源，完整还原指令重试、候选设备切换与不可继续结论
+// DEF-S3-110 & DEF-S3-112: 真实呈现先行恢复事实与影响结论，严禁无中生有合成未发生的恢复动作
 const recoveryAndImpactSummary = computed(() => {
   const parts = []
   for (const ex of taskExceptions.value) {
@@ -191,22 +191,9 @@ const recoveryAndImpactSummary = computed(() => {
     if (!parts.includes(text)) parts.push(text)
   }
   if (!parts.length) {
-    if (selectedTask.value?.replanUsed) {
-      return '先行恢复：指令重试与候选设备切换均已执行；影响结论：当前计划不可继续，触发局部重新规划'
-    }
     return '无先行异常与恢复记录'
   }
-  let summary = parts.join('；')
-  if (selectedTask.value?.replanUsed) {
-    const missing = []
-    if (!summary.includes('指令重试')) missing.push('恢复动作含指令重试')
-    if (!summary.includes('候选设备')) missing.push('候选设备切换尝试')
-    if (!summary.includes('不可继续')) missing.push('影响结论为当前计划不可继续')
-    if (missing.length) {
-      summary += `；[恢复事实]：${missing.join('，')}`
-    }
-  }
-  return summary
+  return parts.join('；')
 })
 
 // DEF-S3-110: 保留的已完成结果在未生成新版本（例如超额/超时回滚转人工）时，从已持久化的分配记录兜底提取

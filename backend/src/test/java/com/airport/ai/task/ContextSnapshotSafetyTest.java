@@ -145,4 +145,29 @@ class ContextSnapshotSafetyTest {
         assertEquals("[\"CAP_A\"]", coverage.get("available").toString());
         assertEquals("[\"CAP_B\"]", coverage.get("missing").toString());
     }
+
+    @Test
+    void snapshotCodeGeneration_handlesGapsAndRestartWithoutCollision() {
+        DeviceAgentMapper agents = mock(DeviceAgentMapper.class);
+        DeviceMapper devices = mock(DeviceMapper.class);
+        DeviceCapabilityMapper capabilities = mock(DeviceCapabilityMapper.class);
+        ContextSnapshotMapper snapshots = mock(ContextSnapshotMapper.class);
+
+        String today = java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd").format(java.time.LocalDateTime.now());
+        // 模拟数据库已存在 733 行记录，但由于事务回滚留下编号间隙，最大 snapshot_code 为 CTX-yyyyMMdd-0781
+        when(snapshots.count()).thenReturn(733L);
+        when(snapshots.findMaxSnapshotCodeByDate(today)).thenReturn("CTX-" + today + "-0781");
+        // 模拟 CTX-yyyyMMdd-0782 碰撞已存在，0783 空闲
+        ContextSnapshot existing = new ContextSnapshot();
+        existing.setSnapshotCode("CTX-" + today + "-0782");
+        when(snapshots.findBySnapshotCode("CTX-" + today + "-0782")).thenReturn(java.util.Optional.of(existing));
+        when(snapshots.findBySnapshotCode("CTX-" + today + "-0783")).thenReturn(java.util.Optional.empty());
+
+        ContextSnapshotService service = new ContextSnapshotService(agents, devices, capabilities, snapshots);
+        when(agents.findByAgentStatusAndOnlineStatus("ENABLED", "ONLINE")).thenReturn(List.of());
+
+        ContextSnapshot snapshot = service.buildSnapshot(1L, List.of());
+        assertEquals("CTX-" + today + "-0783", snapshot.getSnapshotCode(),
+                "重启后应从当前日期最大序号(0781)后继续分配并跳过已存在的0782，杜绝碰撞500");
+    }
 }

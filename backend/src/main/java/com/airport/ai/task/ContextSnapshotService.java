@@ -240,10 +240,24 @@ public class ContextSnapshotService {
         String datePart = DATE_FMT.format(LocalDateTime.now());
         if (!datePart.equals(currentDatePart)) {
             currentDatePart = datePart;
-            sequence = contextSnapshotMapper.count();
+            long maxSeq = 0L;
+            try {
+                String maxCode = contextSnapshotMapper.findMaxSnapshotCodeByDate(datePart);
+                if (maxCode != null && maxCode.startsWith("CTX-" + datePart + "-")) {
+                    String seqPart = maxCode.substring(("CTX-" + datePart + "-").length());
+                    maxSeq = Long.parseLong(seqPart);
+                }
+            } catch (Exception ignored) {
+            }
+            sequence = Math.max(contextSnapshotMapper.count(), maxSeq);
         }
-        sequence++;
-        return "CTX-" + datePart + "-" + String.format("%04d", sequence);
+        while (true) {
+            sequence++;
+            String candidateCode = "CTX-" + datePart + "-" + String.format("%04d", sequence);
+            if (contextSnapshotMapper.findBySnapshotCode(candidateCode).isEmpty()) {
+                return candidateCode;
+            }
+        }
     }
 
     private String toJson(Object value) {

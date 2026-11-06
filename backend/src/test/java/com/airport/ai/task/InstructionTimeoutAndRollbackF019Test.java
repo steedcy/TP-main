@@ -1,6 +1,7 @@
 package com.airport.ai.task;
 
 import com.airport.ai.baseline.BaselineDryRunLifecycle;
+import com.airport.ai.baseline.BaselineTemplate;
 import com.airport.ai.baseline.BaselineTemplateService;
 import com.airport.ai.baseline.DryRunDeviceSelectionMapper;
 import com.airport.ai.device.Device;
@@ -694,6 +695,58 @@ class InstructionTimeoutAndRollbackF019Test {
         assertTrue(testTask.getFailureReason().contains("局部重新规划后启动执行失败"));
 
         // 验证时间线记录了失败事件与人工处置事件
+        verify(taskEventService).append(eq(500L), eq("REPLAN_FAILED"), eq("SYSTEM"), eq("ERR_REPLAN_EXECUTION_FAILED"), contains("启动执行失败"));
+        verify(taskEventService).append(eq(500L), eq("TASK_PENDING_MANUAL"), eq("SYSTEM"), eq("ERR_REPLAN_EXECUTION_FAILED"), contains("启动执行失败"));
+
+        // 验证二次调用被单次配额拦截，绝不重复调用模型
+        replanningService.replan(500L, 2, "ERR_EXECUTION_FAILED: replay feedback");
+        verify(planningModelService, times(1)).generatePlan(any());
+        assertTrue(testTask.getFailureReason().contains("重新规划机会已使用"));
+    }
+
+    @Test
+    @DisplayName("DEF-S3-111: 高风险基线降级重规划执行启动异常时，安全提交待人工状态，持久保留基线版本与单次配额防止重复调用模型")
+    void testReplanningBaselineDowngradeExecutionStartException_preservesReplanQuotaAndCommitsToPendingManual() throws Exception {
+        step1.setStepStatus("COMPLETED");
+        step1.setExecutionResult("SUCCESS");
+        step1.setOutputParams("{\"displayStatus\":\"SUCCESS\"}");
+        step1.setCommandId("CMD-ORIG-1");
+
+        when(taskMapper.claimReplan(eq(500L), anyString())).thenReturn(1);
+
+        PlanningResponse validResp = new PlanningResponse();
+        validResp.setResultCode("0");
+        validResp.setPlanSteps(List.of(
+                Map.of("stepSeq", 1, "stepGoal", "高风险动作", "capabilityType", "CAP_NOTIFICATION",
+                        "stepTimeout", 60, "completionCondition", "notify=SUCCESS")
+        ));
+        when(planningModelService.generatePlan(any(PlanningRequest.class))).thenReturn(validResp);
+
+        when(riskAssessmentService.assess(any(), any(), any(), anyBoolean(), anyInt()))
+                .thenReturn(new RiskAssessmentResult("HIGH", "RULE_HIGH_RISK", "判定高风险", java.math.BigDecimal.valueOf(0.9), "BASELINE_DOWNGRADE", "V1.0"));
+
+        BaselineTemplate template = new BaselineTemplate();
+        template.setId(99L);
+        template.setTemplateName("基线模板-降级测试");
+        template.setInputParams("[]");
+        template.setSteps("[{\"capabilityType\":\"CAP_INFO_DISPLAY\",\"completionCondition\":\"displayStatus=SUCCESS\"},"
+                + "{\"capabilityType\":\"CAP_BOARDING_BROADCAST\",\"completionCondition\":\"broadcast=SUCCESS\"}]");
+        when(baselineTemplateService.matchForDowngrade(any())).thenReturn(Optional.of(template));
+
+        doThrow(new RuntimeException("Simulated trigger assignment failure"))
+                .when(orchestrator).startExecution(anyLong(), anyLong(), anyInt());
+
+        replanningService.replan(500L, 2, "ERR_EXECUTION_FAILED: step 2 failed");
+
+        // 验证配额仍然被持久消耗 (replanUsed = true)
+        assertTrue(testTask.getReplanUsed());
+
+        // 验证任务安全转为 PENDING_MANUAL，未发生脏回滚
+        assertEquals(TaskStatus.PENDING_MANUAL, testTask.getStatus());
+        assertTrue(testTask.getFailureReason().contains("局部重新规划后启动执行失败"));
+
+        // 验证时间线记录了基线降级、失败事件与待人工处置事件
+        verify(taskEventService).append(eq(500L), eq("BASELINE_DOWNGRADED"), eq("SYSTEM"), eq("RULE_HIGH_RISK"), contains("局部重规划后切换至基线模板"));
         verify(taskEventService).append(eq(500L), eq("REPLAN_FAILED"), eq("SYSTEM"), eq("ERR_REPLAN_EXECUTION_FAILED"), contains("启动执行失败"));
         verify(taskEventService).append(eq(500L), eq("TASK_PENDING_MANUAL"), eq("SYSTEM"), eq("ERR_REPLAN_EXECUTION_FAILED"), contains("启动执行失败"));
 

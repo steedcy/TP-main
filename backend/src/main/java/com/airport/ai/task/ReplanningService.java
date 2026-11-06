@@ -11,7 +11,10 @@ import com.airport.ai.risk.RiskAssessmentResult;
 import com.airport.ai.risk.RiskAssessmentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,11 +32,20 @@ import java.util.UUID;
  */
 @Service
 public class ReplanningService {
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private PlatformTransactionManager transactionManager;
+
     @org.springframework.beans.factory.annotation.Autowired
     private com.airport.ai.taskdef.TaskDefinitionMapper definitions;
 
     @org.springframework.beans.factory.annotation.Autowired(required = false)
     private TaskExceptionMapper taskExceptionMapper;
+
+    public void setTransactionManager(PlatformTransactionManager transactionManager) {
+        this.transactionManager = transactionManager;
+    }
+
+    public record PlanStartInfo(Long taskId, Long planVersionId, Integer failedStepSeq) {}
 
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ReplanningService.class);
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -77,12 +89,25 @@ public class ReplanningService {
      *                      该步骤及其后续步骤全部替换为新计划
      * @param reason        重规划原因（异常类型+原因码），写入tasks.replanning_reason
      */
-    @Transactional
     public void replan(Long taskId, Integer failedStepSeq, String reason) {
+        PlanStartInfo startInfo = executeInNewTransaction(() -> replanCore(taskId, failedStepSeq, reason));
+        if (startInfo == null) {
+            return;
+        }
+
+        try {
+            startExecutionInTransaction(startInfo.taskId(), startInfo.planVersionId(), startInfo.failedStepSeq());
+        } catch (Throwable ex) {
+            log.error("Failed to start execution after replanning for task {}: {}", taskId, ex.getMessage(), ex);
+            commitExecutionFailure(taskId, startInfo.failedStepSeq(), ex);
+        }
+    }
+
+    private PlanStartInfo replanCore(Long taskId, Integer failedStepSeq, String reason) {
         Task task = taskMapper.findById(taskId).orElseThrow();
         if (Boolean.TRUE.equals(task.getReplanUsed())) {
             toPendingManual(task, failedStepSeq, "ERR_REPLAN_LIMIT_EXCEEDED", "重新规划机会已使用，不允许第二次请求");
-            return;
+            return null;
         }
         // 备选路径2a：剩余额度为0直接判无法重规划（异常发生步骤本身即占用了一个步骤名额，
         // 但该步骤已失败不计入"已完成"，故剩余额度=5-已完成步骤数，允许等于1时仍可重规划1个替换步骤）
@@ -97,7 +122,7 @@ public class ReplanningService {
             taskEventService.append(taskId, "REPLAN_FAILED", "SYSTEM", "ERR_STEP_QUOTA_EXHAUSTED",
                     "已完成步骤数达到5步上限，无剩余步骤额度，无法重新规划");
             toPendingManual(task, failedStepSeq, "ERR_STEP_QUOTA_EXHAUSTED", "重新规划失败：已完成步骤数达到5步上限，无剩余额度");
-            return;
+            return null;
         }
 
         PlanVersion originalVersion = planVersionMapper.findById(task.getCurrentPlanVersionId()).orElseThrow();
@@ -112,7 +137,7 @@ public class ReplanningService {
             TaskStepAssignment completed = completedAssignments.get(seq);
             if (completed == null) {
                 toPendingManual(task, failedStepSeq, "ERR_PREVIOUS_STEPS_INCOMPLETE", "重规划前序步骤缺少实际完成记录，不允许假定为已完成");
-                return;
+                return null;
             }
             Map<String, Object> preserved = new java.util.LinkedHashMap<>(original);
             preserved.put("executionResult", completed.getExecutionResult());
@@ -129,7 +154,7 @@ public class ReplanningService {
                 String description=definition.get().getConstraintDescription();
                 definitionConstraint=description;
                 try { allowedTypes=MAPPER.readValue(definition.get().getAvailableCapabilityTypes(),List.class); }
-                catch (Exception ex) { toPendingManual(task, failedStepSeq, "ERR_TASK_DEFINITION_INVALID", "任务定义能力范围无法解析，禁止重新规划执行"); return; }
+                catch (Exception ex) { toPendingManual(task, failedStepSeq, "ERR_TASK_DEFINITION_INVALID", "任务定义能力范围无法解析，禁止重新规划执行"); return null; }
             }
         }
 
@@ -160,7 +185,7 @@ public class ReplanningService {
         // A failed/timeout attempt still consumes the single opportunity required by SRS_F019.
         if (taskMapper.claimReplan(taskId,reason)!=1) {
             taskEventService.append(taskId,"REPLAN_DUPLICATE_IGNORED","SYSTEM",null,"重新规划机会已由另一请求占用，未重复调用模型");
-            return;
+            return null;
         }
         task.setReplanUsed(true);
         task.setReplanningReason(reason);
@@ -178,7 +203,7 @@ public class ReplanningService {
             taskEventService.append(taskId, "REPLAN_FAILED", "SYSTEM", "ERR_REPLANNING_MODEL_FAILED",
                     "局部重新规划调用模型失败: " + (response == null ? "响应为空" : response.getErrorMessage()));
             toPendingManual(task, failedStepSeq, "ERR_REPLANNING_MODEL_FAILED", "局部重新规划失败：规划模型服务不可用或超时");
-            return;
+            return null;
         }
 
         List<Map<String, Object>> newTailSteps = response.getPlanSteps();
@@ -187,7 +212,7 @@ public class ReplanningService {
                     "新计划替换的可执行步骤数" + PlanStepRules.executableCount(newTailSteps) + "超过剩余额度" + remainingQuota + "或为空（已完成"
                             + completedSteps.size() + "步，条件节点不计数、分支动作计数）");
             toPendingManual(task, failedStepSeq, "ERR_STEP_LIMIT_EXCEEDED", "局部重新规划失败：新计划步骤数超过剩余额度");
-            return;
+            return null;
         }
 
         // 模型返回的替换步骤stepSeq通常从1起算，须重新编号以衔接在已完成步骤之后，避免序号冲突
@@ -256,7 +281,7 @@ public class ReplanningService {
             }
             taskEventService.append(taskId, "REPLAN_FAILED", "SYSTEM", primaryReason, summary.toString());
             toPendingManual(task, failedStepSeq, primaryReason, "局部重新规划失败：新计划版本三类校验未通过: " + primaryReason);
-            return;
+            return null;
         }
 
         newVersion.setFrozenAt(LocalDateTime.now());
@@ -276,7 +301,7 @@ public class ReplanningService {
             taskEventService.append(taskId, "SUPERVISION_JUDGED", "SYSTEM", "ERR_SUPERVISION_UNAVAILABLE",
                     "重新规划后监督服务不可用: " + e.getMessage());
             toPendingManual(task, failedStepSeq, "ERR_SUPERVISION_UNAVAILABLE", "局部重新规划后监督判定失败：" + e.getMessage());
-            return;
+            return null;
         }
 
         newVersion.setRiskLevel(riskResult.getRiskLevel());
@@ -289,14 +314,13 @@ public class ReplanningService {
                 riskResult.timelineDetail("重新规划后监督判定"));
 
         if ("HIGH".equals(riskResult.getRiskLevel())) {
-            downgradeReplanned(task, completedSteps, failedStepSeq, remainingQuota, riskResult);
-            return;
+            return downgradeReplanned(task, completedSteps, failedStepSeq, remainingQuota, riskResult);
         }
         if (!"LOW".equals(riskResult.getRiskLevel())) {
             taskEventService.append(taskId, "REPLAN_FAILED", "SYSTEM", "ERR_REPLAN_RISK_UNDETERMINED",
                     "重新规划后新计划版本风险无法确定，转人工处理");
             toPendingManual(task, failedStepSeq, "ERR_REPLAN_RISK_UNDETERMINED", "局部重新规划后监督风险无法确定");
-            return;
+            return null;
         }
 
         task.setCurrentPlanVersionId(newVersion.getId());
@@ -307,26 +331,18 @@ public class ReplanningService {
         taskEventService.append(taskId, "REPLAN_SUCCEEDED", "SYSTEM", null,
                 "局部重新规划成功，新计划版本" + newVersion.getVersionNo() + "已冻结，任务重新进入待分配");
 
-        // DEF-S3-111: 执行启动异常保护，防止外层事务回滚导致已消耗的单次重规划配额、新版本与快照丢失
-        try {
-            taskExecutionOrchestrator.startExecution(taskId, newVersion.getId(), failedStepSeq);
-        } catch (Exception ex) {
-            log.error("Failed to start execution after replanning for task {}: {}", taskId, ex.getMessage(), ex);
-            taskEventService.append(taskId, "REPLAN_FAILED", "SYSTEM", "ERR_REPLAN_EXECUTION_FAILED",
-                    "局部重新规划后启动执行失败: " + ex.getMessage());
-            toPendingManual(task, failedStepSeq, "ERR_REPLAN_EXECUTION_FAILED", "局部重新规划后启动执行失败: " + ex.getMessage());
-        }
+        return new PlanStartInfo(taskId, newVersion.getId(), failedStepSeq);
     }
 
     /** High-risk replanning follows 5.4.6 while retaining actually completed actions. */
-    private void downgradeReplanned(Task task, List<Map<String, Object>> completedSteps,
-                                    int failedStepSeq, int remainingQuota, RiskAssessmentResult risk) {
+    private PlanStartInfo downgradeReplanned(Task task, List<Map<String, Object>> completedSteps,
+                                             int failedStepSeq, int remainingQuota, RiskAssessmentResult risk) {
         Long taskId = task.getId();
         Optional<BaselineTemplate> matched = task.getTaskFamily() == null ? Optional.empty()
                 : baselineTemplateService.matchForDowngrade(task.getTaskFamily());
         if (matched.isEmpty()) {
             baselineUnavailable(task, "无匹配的已启用基线模板");
-            return;
+            return null;
         }
         BaselineTemplate template = matched.get();
         List<Map<String, Object>> templateSteps;
@@ -345,7 +361,7 @@ public class ReplanningService {
                                 + bound.defaultedLocations());
                 baselineUnavailable(task, "原目标要求地点但未解析出可用目的地且无显式场景参数，拒绝以模板默认地点执行: "
                         + bound.defaultedLocations());
-                return;
+                return null;
             }
             scene.putAll(bound.values());
             if (!bound.fromParsedGoal().isEmpty()) {
@@ -358,7 +374,7 @@ public class ReplanningService {
             }
         } catch (Exception ex) {
             baselineUnavailable(task, "基线模板步骤或输入无法绑定: " + ex.getMessage());
-            return;
+            return null;
         }
 
         // A completed action may only be skipped when the template has the same
@@ -366,7 +382,7 @@ public class ReplanningService {
         // automatic switch could silently repeat or omit a physical action.
         if (templateSteps.size() <= completedSteps.size()) {
             baselineUnavailable(task, "基线模板没有可替换的剩余步骤");
-            return;
+            return null;
         }
         for (int index = 0; index < completedSteps.size(); index++) {
             Map<String, Object> completed = completedSteps.get(index);
@@ -377,7 +393,7 @@ public class ReplanningService {
                     || completedCondition == null || String.valueOf(completedCondition).isBlank()
                     || !Objects.equals(completedCondition, baselineCondition)) {
                 baselineUnavailable(task, "基线模板前缀与已完成步骤不一致，禁止重复或跳过动作");
-                return;
+                return null;
             }
         }
         List<Map<String, Object>> tail = new ArrayList<>();
@@ -389,7 +405,7 @@ public class ReplanningService {
         }
         if (tail.size() > remainingQuota) {
             baselineUnavailable(task, "基线模板剩余步骤超过五步路径额度" + remainingQuota);
-            return;
+            return null;
         }
         List<Map<String, Object>> merged = new ArrayList<>(completedSteps);
         merged.addAll(tail);
@@ -420,7 +436,7 @@ public class ReplanningService {
             planVersionMapper.insert(baselineVersion);
             String primaryReason = validation.getErrors().isEmpty() ? "ERR_TEMPLATE_VALIDATION_FAILED" : validation.getErrors().get(0).getReasonCode();
             baselineUnavailable(task, "基线模板三类校验未通过: " + primaryReason);
-            return;
+            return null;
         }
         baselineVersion.setFrozenAt(LocalDateTime.now());
         planVersionMapper.insert(baselineVersion);
@@ -439,15 +455,54 @@ public class ReplanningService {
             downgradeDetail += "，" + matchBasis;
         }
         taskEventService.append(taskId, "BASELINE_DOWNGRADED", "SYSTEM", risk.getRiskReasonCode(), downgradeDetail);
-        // DEF-S3-111: 执行启动异常保护，防止外层事务回滚导致已消耗的单次重规划配额与快照丢失
-        try {
-            taskExecutionOrchestrator.startExecution(taskId, baselineVersion.getId(), failedStepSeq);
-        } catch (Exception ex) {
-            log.error("Failed to start execution after replanning baseline downgrade for task {}: {}", taskId, ex.getMessage(), ex);
-            taskEventService.append(taskId, "REPLAN_FAILED", "SYSTEM", "ERR_REPLAN_EXECUTION_FAILED",
-                    "局部重规划基线降级后启动执行失败: " + ex.getMessage());
-            toPendingManual(task, failedStepSeq, "ERR_REPLAN_EXECUTION_FAILED", "局部重规划基线降级后启动执行失败: " + ex.getMessage());
+        return new PlanStartInfo(taskId, baselineVersion.getId(), failedStepSeq);
+    }
+
+    private <T> T executeInNewTransaction(java.util.concurrent.Callable<T> action) {
+        if (transactionManager == null) {
+            try {
+                return action.call();
+            } catch (RuntimeException re) {
+                throw re;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
+        TransactionTemplate template = new TransactionTemplate(transactionManager);
+        template.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        return template.execute(status -> {
+            try {
+                return action.call();
+            } catch (RuntimeException re) {
+                throw re;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    private void startExecutionInTransaction(Long taskId, Long planVersionId, Integer resumeFromStepSeq) {
+        if (transactionManager == null) {
+            taskExecutionOrchestrator.startExecution(taskId, planVersionId, resumeFromStepSeq);
+            return;
+        }
+        TransactionTemplate template = new TransactionTemplate(transactionManager);
+        template.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        template.execute(status -> {
+            taskExecutionOrchestrator.startExecution(taskId, planVersionId, resumeFromStepSeq);
+            return null;
+        });
+    }
+
+    private void commitExecutionFailure(Long taskId, Integer failedStepSeq, Throwable ex) {
+        executeInNewTransaction(() -> {
+            Task task = taskMapper.findById(taskId).orElse(null);
+            if (task == null) return null;
+            taskEventService.append(taskId, "REPLAN_FAILED", "SYSTEM", "ERR_REPLAN_EXECUTION_FAILED",
+                    "局部重新规划后启动执行失败: " + ex.getMessage());
+            toPendingManual(task, failedStepSeq, "ERR_REPLAN_EXECUTION_FAILED", "局部重新规划后启动执行失败: " + ex.getMessage());
+            return null;
+        });
     }
 
     private void baselineUnavailable(Task task, String detail) {
