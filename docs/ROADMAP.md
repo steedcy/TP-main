@@ -2,8 +2,8 @@
 
 > **当前基准**：V2.4（2026-11-04 用户追加整轮复测授权；继承V2.3，见BL-005；下方既有产品验收/交接记录保留原执行版本）
 > **主干验收合入提交**：F001～F019已验收并安全合main；F019验收合入锚点`a6c3f9a8434a06c9e2a1a3f5e9798e60cce026bc`，远端已核对，最终证明随本提交同步。
-> **最新产品代码提交**：`b7df234eb1aa412959f15ccaabbaa10408cc5618` / `V1.170`（F019整项独立验收通过，标签固定）
-> **交接状态**：`REQUIREMENT_PASSED`（F019规则9P/0F/0NT、六步骤6P/0F/0NT；必要创建/重启P，114关闭/110～113保持；证据`437217e79f414e2e5ef6cff359ab742f9e3acc59`先推送，已合main `a6c3f9a8434a06c9e2a1a3f5e9798e60cce026bc`；下一F020顺序正式交接）
+> **最新产品代码提交**：`7ef206287e69de350e2bd3c53d480a6bc36bb019` / `V1.171`（F020当前整轮未通过；最新已验收仍F019 V1.170，标签固定）
+> **交接状态**：`READY_FOR_CLAUDE`（F020规则7P/2F/0NT、六步骤4P/2F/0NT；062原因残留及新115前端分页遗漏；完整证据`8fa7b7fbbc332a0500b044ef387c9fd9d79ac7aa`已先推送，main保持`6775491be9118e4aab33c30b4ae81362d4a096d5`未合本轮，无PR）
 > **文档定位**：本文件为跨会话、跨需求修复推进的**唯一全景进度与依据底账**。每轮需求修复与复测验收后必须同步更新本文件。
 
 ---
@@ -54,10 +54,10 @@
 | **commit `4ec6695`** | `RiskRuleController.java`<br/>`RiskRuleValidationTest.java` | **DEF-S3-041** | **SRS_F014/F022** | 风险规则 code/content 必填与长度校验 | **已移植 (V1.150)** |
 | **commit `4ec6695`** | `GlobalExceptionHandler.java`<br/>`GlobalExceptionHandlerStatusTest.java` | **DEF-S3-058/061** | **SRS_F021/F027** | 不支持请求方法返回 405 + Allow，未知路径 404 | 待移植 |
 | **commit `4ec6695`** | `TaskService.java` (`terminateTask`) | **DEF-S3-059** (`F021.R08`) | **SRS_F021** | 终止任务联动下发取消指令，审计详情记录取消结果与 cancelCommandId | 待移植 |
-| **commit `4ec6695`** | `TaskService.java` (`handleManualAction`)<br/>`ManualActionRequest.java` | **DEF-S3-062** (`F020.R08`) | **SRS_F020** | 人工操作记录原因，`MARK_FAILED` 强制要求原因并写入 `TASK_FAILED` 事件 | 待移植 |
-| **commit `64d1f8e`** | `TaskController.java`, `TaskMapper.xml`, `TaskService.java` | **DEF-S3-006** (`F020.R06`) | **SRS_F020** | `GET /tasks` 支持 `goalKeyword` 模糊查询，安全转义通配符 | 待移植 |
-| **commit `64d1f8e`** | `TaskDetailView.vue` | **DEF-S3-007** | **SRS_F020** | 任务详情 404 告警并安全回退列表页，停止轮询 | 待移植 |
-| **commit `64d1f8e`** | `TaskListView.vue`, `taskListView.js` | **DEF-S3-060** (`F020.R04`) | **SRS_F020** | 待人工接管任务橙色标签与左侧提示条醒目高亮 | 待移植 |
+| **commit `4ec6695`** | `TaskService.java` (`handleManualAction`)<br/>`ManualActionRequest.java` | **DEF-S3-062** (`F020.R08`) | **SRS_F020** | 人工操作记录原因，`MARK_FAILED` 强制要求原因并写入 `TASK_FAILED` 事件 | 已纳入V1.171；置失败P，062其余动作原因残留F |
+| **commit `64d1f8e`** | `TaskController.java`, `TaskMapper.xml`, `TaskService.java` | **DEF-S3-006** (`F020.R06`) | **SRS_F020** | `GET /tasks` 支持 `goalKeyword` 模糊查询，安全转义通配符 | 已纳入V1.171；GPT当前对应修复P，检索另有115 |
+| **commit `64d1f8e`** | `TaskDetailView.vue` | **DEF-S3-007** | **SRS_F020** | 任务详情 404 告警并安全回退列表页，停止轮询 | 已纳入V1.171；GPT当前对应修复P，检索另有115 |
+| **commit `64d1f8e`** | `TaskListView.vue`, `taskListView.js` | **DEF-S3-060** (`F020.R04`) | **SRS_F020** | 待人工接管任务橙色标签与左侧提示条醒目高亮 | 已纳入V1.171；GPT当前对应修复P，检索另有115 |
 | **commit `332e250`** | `RequiredInfoGuard.java`<br/>`TaskService.java` | **DEF-S3-003** (`F024.R03`)<br/>**DEF-S3-004** (`F025.R01`)<br/>**DEF-S3-005** (`F026.R04`) | **SRS_F024**<br/>**SRS_F025**<br/>**SRS_F026** | 系统端强校验超规行李、特殊旅客、航班变动的必需字段；完整时发 `INFO_CHECK_OVERRIDE` 放行，替代大模型幻觉追问与套取旅客隐私 | 待移植 |
 | **commit `01afe2d`** | `AuthService.java`<br/>`OperationLogService.java`<br/>`UserService.java`<br/>`AccountAuditDetailTest.java` | **DEF-S3-009** (`F028.R03`) | **SRS_F028** | 用户创建、重置密码、状态切换、解锁操作记录带 `before`/`after` 结构化摘要，不含密码明文或哈希；解锁详情为合法 JSON 并经同一脱敏 | 待移植 |
 | **commit `c9a7d5f`** | `EventReasonCodes.java`<br/>`TaskEventService.java`<br/>`EventReasonCodesTest.java` | **DEF-S3-057** (`F027.R02`) | **SRS_F027** | 每条任务事件都有原因码：调用方显式给的保留，缺失时按事件类型补 `NORMAL_*`/`ERR_*`/`WARN_*`；扫描测试保证新增事件类型必须登记。**取值是约定，SRS 未定义，需求方可改 `EventReasonCodes`** | 待移植 |
@@ -78,7 +78,7 @@
 | **SRS_F017** | 业务指令下发与状态流转 | **10P/0F/0NT（V1.162当前实测）** | TC-054～TC-056，6步骤全P | 104/068/B07关闭；066 F017时间线及069 TC054正式四渠道/普通分支闭环通过。35有效独立观察全P、37独立组件/邻接P、真实JAR/HTTP/Edge五页通过；所有旧失败/夹具诊断保留、无历史业务P替代。 | V1.162 | **REQUIREMENT_PASSED；证据6db8a6a已推送，已合main ccaed0f；下一F018另启动** |
 | **SRS_F018** | 任务异常识别与单次重规划 | **10P/0F/0NT（V1.166当前实测）** | TC-057～TC-059，6P/0F/0NT | 106全部残留/109候选恢复事实回归关闭，064/065关联范围/066/105/107/108保持。30任务31组189断言全P、45独立组件、构建/JAR/HTTP/21 Edge视图；历史业务P复用0，BL-007时点分层。 | V1.166 | **REQUIREMENT_PASSED；证据50ace81先推送，已合main 3dbc00b；下一F019** |
 | **SRS_F019** | 局部重规划与上下文继承 | **9P/0F/0NT（当前实测）** | TC-060～TC-062，6P/0F/0NT | 114历史间隙正常启动/重启首创建及基线共享编号通过关闭；110～113保持，28任务/29组/344断言全P、78定向/408报告/48 Edge视图；历史P复用0。 | V1.170 | **REQUIREMENT_PASSED；证据437217e已推送，已合main a6c3f9a；下一F020顺序正式交接** |
-| **SRS_F020** | 任务检索与全生命周期追踪 | P:3 F:4 NT:2 | TC-063～TC-065 | DEF-S3-006, 060, 062（移植暂存 `4ec6695` + `64d1f8e`：关键字检索、待人工高亮、失败原因必填、详情 404 回退；DEF-S3-066 已在 main，勿重修）。 | 待正式交接确定 | 下一项：Claude从F019最终main同步后顺序正式交接；prep不替代交付 |
+| **SRS_F020** | 任务检索与全生命周期追踪 | P:7 F:2 NT:0 | TC-063～TC-065（六步骤4P/2F/0NT） | 006/007/060关闭；062置失败子项P、重试/转基线原因残留；新115前端仅分页首批20/总127；066保持/NT026补齐，原证据保留。 | V1.171 | READY_FOR_CLAUDE；修062/115后F020再整轮，不推进F021 |
 | **SRS_F021** | 人工终止与安全制动 | P:7 F:1 NT:0 | TC-067.S1 | DEF-S3-059（移植暂存 `4ec6695`：终止操作记录带原因、前状态和每台设备的取消结果与 cancelCommandId）。 | V1.148 | 待启动 |
 | **SRS_F022** | 任务定义与约束管理 | P:3 F:1 NT:4 | TC-068, TC-069 | DEF-S3-030（移植暂存 `4ec6695`：约束描述必填校验）。 | V1.149 | 待启动 |
 | **SRS_F023** | 协同态势与多维大屏监控 | P:7 F:1 NT:2 | TC-070.S1, TC-071 | DEF-S3-047、048（移植暂存 `efe0790`：离线原因码与任务影响、标记层级）。 | V1.150 | 待启动 |
@@ -414,3 +414,9 @@ F018最终已安全合main并推送`3dbc00b991829cd21f0d55584f2a4dc55530a983`，
 完整证据`437217e79f414e2e5ef6cff359ab742f9e3acc59`已先推送，产品`b7df234eb1aa412959f15ccaabbaa10408cc5618`/V1.170、Claude交接`071199b749a8726e741682652a72497c3e18dfcd`与远端标签已核对。9规则9P/0F/0NT、六步骤6P/0F/0NT，必要创建/重启门禁P，114关闭/110～113保持，无遗留F/NT。28任务含3真实试运行、29观察/344断言全P，408报告406通过2原有跳过、78定向/构建/JAR/HTTP/SQL/合成设备/48 Edge完成；当前全实测、历史P复用0。自有资源清理，分配占用/注入0、4进程树/6端口释放。正式交接后按授权安全同步main并追加远端证明；下一仅F020顺序正式交接，不启动后续四项并行、不扩大为三核心或95项验收。
 
 F019已安全快进合main并推送`a6c3f9a8434a06c9e2a1a3f5e9798e60cce026bc`，远端核对一致，40用户文件哈希不变；合入证明/最终交接/README随本提交同步两分支。下一仅SRS_F020，保留历史证据及后续台账原P/F/NT，后续四项按用户要求逐项正式交接，产品标签固定。
+
+## 2026-11-06 GPT：F020 V1.171整轮未通过，统一交修062/115
+
+固定产品`7ef206287e69de350e2bd3c53d480a6bc36bb019`/V1.171，实际Claude交接`da2dc465c6bd645f4f1211d5bca483a8e7553e41`；消息另一完整文档SHA不存在，原声明/远端核对保留。完整证据`8fa7b7fbbc332a0500b044ef387c9fd9d79ac7aa`已先推送；正式9规则7P/2F/0NT、TC063～065六步4P/2F/0NT，全部当前实测/历史P复用0。062重试/转基线不填原因成功且审计null，置失败/显式原因对照P；新115今日127仅加载20本地两页不可访问余107。006/007/060/NT026闭环、764三轮缺信息绕过拦截，749实际重规划与752基线穷尽及完整当前Edge时间线、748≤15秒刷新P，066保持。058/061关联404/405不可变P；059仅单设备详情审计子范围，不抢验F021。暂存搜索/转义/高亮/404/失败原因实际已纳入标签，上表更新移植事实不把所有人工原因残留写成已修。
+
+426本轮报告424通过2跳过、生产构建/JAR/HTTP/SQL/合成设备、44持久任务；26 HTTP观察组/160断言及14 Edge组/64断言/27截图，层间共证不重复计次数。探针错误及更正逐项保留，无产品替代修复/基线放宽/原F删除。配置恢复停用、分配/占用0、4自有树（含中间模型）/6端口清理；Claude与共享服务未动。main仍`6775491be9118e4aab33c30b4ae81362d4a096d5`未合本轮、无PR，最新验收F019保持。Claude接ai/gpt-test完整证据和正式交接，仅修062残留与115及直接影响后新标签再F020整轮，不推进F021/并行/三核心或95项通过。
