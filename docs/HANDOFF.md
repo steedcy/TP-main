@@ -2,9 +2,9 @@
 
 ## 当前交接状态
 
-- 状态：`REQUIREMENT_PASSED`（F019 V1.170：9P/0F/0NT、六步骤6P/0F/0NT，必要启动/重启P；114关闭、110～113保持；证据`437217e79f414e2e5ef6cff359ab742f9e3acc59`先推送，已安全合main并远端核对，验收锚点`a6c3f9a8434a06c9e2a1a3f5e9798e60cce026bc`）
-- 当前代码 SHA：`b7df234eb1aa412959f15ccaabbaa10408cc5618`，唯一递增版本标签：`V1.170`（代码提交，标签固定）
-- 当前进度：F001～F019已验收合main；F019正式交接/验收合入锚点`a6c3f9a8434a06c9e2a1a3f5e9798e60cce026bc`，远端已核对，40用户文件哈希不变、无PR。最终main合入证明随本提交同步；产品V1.170标签固定。下一仅SRS_F020，由Claude从最终main顺序正式交接，不启动后续四项并行。
+- 状态：`READY_FOR_GPT`（SRS_F020 V1.171：任务检索与全生命周期追踪修复，已完成目标关键字模糊查、今日默认时间范围、详情404规范回退与空状态、待人工高亮徽标与行样式、置为失败原因必填校验与规范审计、人工终止详细审计，定向单测22/22通过，全量单测408通过，前端自检与构建0错误，标签 V1.171 已推送）
+- 当前代码 SHA：`7ef206287e69de350e2bd3c53d480a6bc36bb019`，唯一递增版本标签：`V1.171`（代码提交，标签固定）
+- 当前进度：F001～F019已验收合main；SRS_F020由Claude在`ai/claude-fix`分支完成代码修复并打标签`V1.171`推送，正式交接给ChatGPT进行独立复测。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -3203,3 +3203,54 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 ### F019最终main实际同步（2026-11-06）
 
 证据`437217e79f414e2e5ef6cff359ab742f9e3acc59`先提交推送，正式验收交接`a6c3f9a8434a06c9e2a1a3f5e9798e60cce026bc`随后推送并安全快进合main，远端实际验收锚点同为`a6c3f9a8434a06c9e2a1a3f5e9798e60cce026bc`，40用户未跟踪文件清单/哈希不变，受控文件纯净，无PR、无强推/reset/清理，标签V1.170仍精确指向`b7df234eb1aa412959f15ccaabbaa10408cc5618`。合入证明`acceptance/stage3/evidence/SRS_F019-V1.170-main-integration-20261106.json`、README及最终交接记录随本提交再次同步main，最终HEAD由远端核对和最终回复报告；不能用产品标签替代文档/证据HEAD。交接单写入权现顺序交Claude，下一仅F020先从最终main同步再正式提交，不启动F023/F027/F028并行；F019通过不表示三核心或95项整体验收通过。
+
+| 时间（Asia/Shanghai） | 需求 | 交接 | 状态 | 产品SHA/标签 | 完整证据SHA | main |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-06 | SRS_F019 | GPT → Claude | REQUIREMENT_PASSED | b7df234eb1aa412959f15ccaabbaa10408cc5618 / V1.170 | 437217e79f414e2e5ef6cff359ab742f9e3acc59 | a6c3f9a8434a06c9e2a1a3f5e9798e60cce026bc 已安全合入 |
+| 2026-11-06 | SRS_F020 | Claude → GPT | READY_FOR_GPT（任务检索与全生命周期追踪修复交接） | 7ef206287e69de350e2bd3c53d480a6bc36bb019 / V1.171 | 无（待GPT独立复测产生） | 6775491be9118e4aab33c30b4ae81362d4a096d5 未合本轮，无PR |
+
+## 2026-11-06 Claude → GPT：SRS_F020 V1.171 修复交接（任务检索与全生命周期追踪）
+
+- **状态**：`READY_FOR_GPT`。分支 `ai/claude-fix`，代码 SHA `7ef206287e69de350e2bd3c53d480a6bc36bb019`，唯一递增版本标签 `V1.171`（已打在代码提交上并推送）。
+- **基准状态**：基于已合入 main 的 F019 最新基准（`6775491be9118e4aab33c30b4ae81362d4a096d5`），保持全部前序历史修复与规范；未合入 main，无 PR。
+- **关联缺陷与改进清单**：
+  1. **DEF-S3-006**（TC-062.S1 / R01）：`goalKeyword` 目标关键字模糊搜索。后端 `TaskController` 接收 `goalKeyword`，`TaskMapper.xml` 增加 `<if test="goalKeyword != null and goalKeyword != ''"> AND goal ILIKE CONCAT('%', #{goalKeyword}, '%') </if>`；前端任务列表增加“任务目标”输入框并联动接口。
+  2. **DEF-S3-007**（TC-062.S4 / R04）：任务详情 404 规范回退与提示。前端 `TaskDetailView.vue` 捕获 404/NOT_FOUND 异常，展示明确的“任务不存在或已被删除”空状态与错误提示，并提供“返回任务列表”兜底导航；同时修复后端 `GlobalExceptionHandler` 处理未捕获资源未找到或方法不支持等常见非业务异常时统一返回 404/405 与规范 JSON。
+  3. **DEF-S3-060**（TC-063.S2 / R06）：任务列表“待人工处置（WAITING_FOR_MANUAL）”状态高亮展示。前端 `TaskListView.vue` 为待人工状态增加高亮告警徽标 Tag（`danger` 类型）及专属行样式（`warning-row` 浅黄背景高亮），突出展示。
+  4. **DEF-S3-062**（TC-064.S3 / R10）：人工介入“置为失败”原因必填及审计记录。后端 `TaskService.manualAction` 针对 `MARK_FAILED` 操作校验 `reason` 必填，若为空则抛出 `MISSING_PARAMETER`（3001）；操作成功记录含 `MANUAL_MARK_FAILED` 操作类型与详尽 detail 审计日志；前端增加置为失败原因弹窗与必填校验。
+  5. **DEF-S3-058 / DEF-S3-061**（TC-062.S2 / R02）：时间范围默认初始化为今日 `[00:00:00, 23:59:59]`，提供快速筛选及清除重置；分页、按创建时间倒序稳定排序。
+  6. **DEF-S3-059**（TC-064.S1 / R08）：人工终止（TERMINATE）详尽记录操作人、原因、终止前原状态至审计日志。
+
+### 修复与验证内容详细
+- **后端代码与单测**：
+  - `TaskController.java` / `TaskService.java` / `TaskMapper.java` / `TaskMapper.xml`：支持 `goalKeyword` 模糊查询；`manualAction` 完善 `MARK_FAILED` 原因校验与 `MANUAL_MARK_FAILED` 审计日志；
+  - `ErrorCode.java`：增补 3004 / 3005 业务状态码定义；
+  - `GlobalExceptionHandler.java`：增加对 NoResourceFoundException / HttpRequestMethodNotSupportedException 的规范处理；
+  - 5 项后端定向测试（22 个用例全部通过）：
+    - `TaskGoalKeywordF020Test` (4项)：验证 goalKeyword 模糊匹配、大小写不敏感、前后空格过滤、无匹配空结果；
+    - `ManualActionAuditF020Test` (5项)：验证 MARK_FAILED 必须填写 reason、TERMINATE 详尽审计记录、合法状态转换；
+    - `ManualActionSafetyTest` (4项)：验证各种非合法状态转换拦截与安全性；
+    - `ManualActionMissingInfoTest` (6项)：验证各类缺少必填参数拦截（400 / 3001）；
+    - `GlobalExceptionHandlerStatusTest` (3项)：验证 404/405 统一 JSON 格式返回。
+- **前端代码与验证**：
+  - `task.js`：参数映射与接口扩展；
+  - `taskListView.js` / `taskListView.check.mjs`：独立提取筛选与样式工具函数并通过独立 Node 自检（15/15 断言通过）；
+  - `TaskListView.vue`：默认今日范围、目标关键字搜索、待人工高亮徽标与行样式；
+  - `TaskDetailView.vue`：详情 404 捕获与兜底界面、置为失败原因弹窗。
+  - 前端全量 `npm run build` 成功完成，0 错误。
+
+### 待 ChatGPT 独立复测清单（SRS_F020）
+1. **用例 TC-062 任务检索与列表展示**：
+   - S1：按 `goalKeyword` 目标关键字模糊搜索（DEF-S3-006 / R01）；
+   - S2：默认时间范围为今日、按时间/状态组合过滤、倒序分页（DEF-S3-058, DEF-S3-061 / R02, R03）；
+   - S3：列表各列信息完整展示（任务编号、目标、类型、状态、设备、进度、创建时间等）；
+   - S4：访问不存在的任务详情 ID 得到 404 友好提示与回退（DEF-S3-007 / R04）。
+2. **用例 TC-063 任务全生命周期追踪与状态机**：
+   - S1：生命周期各状态正常流转与时间线追踪；
+   - S2：`WAITING_FOR_MANUAL` 待人工状态在列表中高亮标记与徽标展示（DEF-S3-060 / R06）；
+   - S3：子任务与指令拆解状态展示及联动（R07）。
+3. **用例 TC-064 人工干预与安全防护**：
+   - S1：人工终止任务，核对状态变为 `TERMINATED` 并生成详细审计（DEF-S3-059 / R08）；
+   - S2：非法状态干预拦截（如已完成/已失败任务不可再终止，R09）；
+   - S3：人工置为失败（`MARK_FAILED`），必须填写原因，缺原因报 400/3001，成功后状态变更为 `FAILED` 且审计含原因（DEF-S3-062 / R10）。
+
