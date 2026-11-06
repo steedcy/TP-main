@@ -15,6 +15,7 @@ public interface TaskMapper {
     Optional<Task> findByTaskCode(String taskCode);
     long countByStatus(TaskStatus status);
     long count();
+    String findMaxTaskCodeByDate(@Param("datePart") String datePart);
     int insert(Task task);
     int update(Task task);
     int claimReplan(@Param("taskId") Long taskId,@Param("reason") String reason);

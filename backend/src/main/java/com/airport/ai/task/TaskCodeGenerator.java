@@ -8,7 +8,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 任务编号生成器（格式TASK-{yyyyMMdd}-{4位序号}），供5.3.2试运行和5.4任务规划链路共用，
- * 避免两处各自"count()+1"在并发下产生重复编号。进程内自增序号，跨天自动归零。
+ * 避免两处各自"count()+1"在并发下产生重复编号。基于库中当天最大序号初始化，并在自增中校验唯一性，
+ * 免疫重启后序号碰撞与事务回滚留下的编号间隙（DEF-S3-114）。
  */
 @Component
 public class TaskCodeGenerator {
@@ -27,9 +28,23 @@ public class TaskCodeGenerator {
         String datePart = DATE_FMT.format(LocalDateTime.now());
         if (!datePart.equals(currentDatePart)) {
             currentDatePart = datePart;
-            sequence.set(taskMapper.count());
+            long maxSeq = 0L;
+            try {
+                String maxCode = taskMapper.findMaxTaskCodeByDate(datePart);
+                if (maxCode != null && maxCode.startsWith("TASK-" + datePart + "-")) {
+                    String seqPart = maxCode.substring(("TASK-" + datePart + "-").length());
+                    maxSeq = Long.parseLong(seqPart);
+                }
+            } catch (Exception ignored) {
+            }
+            sequence.set(Math.max(taskMapper.count(), maxSeq));
         }
-        long seq = sequence.incrementAndGet();
-        return "TASK-" + datePart + "-" + String.format("%04d", seq);
+        while (true) {
+            long seq = sequence.incrementAndGet();
+            String candidateCode = "TASK-" + datePart + "-" + String.format("%04d", seq);
+            if (taskMapper.findByTaskCode(candidateCode).isEmpty()) {
+                return candidateCode;
+            }
+        }
     }
 }

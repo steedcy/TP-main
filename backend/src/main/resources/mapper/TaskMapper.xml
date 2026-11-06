@@ -64,6 +64,10 @@
         SELECT COUNT(*) FROM tasks
     </select>
 
+    <select id="findMaxTaskCodeByDate" resultType="java.lang.String">
+        SELECT MAX(task_code) FROM tasks WHERE task_code LIKE CONCAT('TASK-', #{datePart}, '-%')
+    </select>
+
     <insert id="insert" parameterType="com.airport.ai.task.Task" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO tasks (task_code, task_goal, task_family, scene_params, goal_parsing_result, status,
                             current_plan_version_id, replan_used, replanning_reason, manual_terminate_reason,
