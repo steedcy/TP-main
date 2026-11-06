@@ -1,0 +1,39 @@
+overview-highlight F { highlighted: false, correctFilter: true }
+today-list-pagination P { todayRange: true, fields: true, allServerPagesAccessible: true }
+search-and-highlight DIAGNOSTIC TimeoutError: locator.click: Timeout 18000ms exceeded.
+Call log:
+[2m  - waiting for getByRole('button', { name: '查询', exact: true })[22m
+
+missing-detail-fallback DIAGNOSTIC TimeoutError: locator.waitFor: Timeout 18000ms exceeded.
+Call log:
+[2m  - waiting for getByText('任务不存在或已被删除', { exact: true }) to be visible[22m
+
+mark-failed-ui P {
+  fourOptions: true,
+  emptyDisabled: true,
+  whitespaceDisabled: true,
+  terminalVisible: true,
+  noManualActions: true
+}
+terminate-ui DIAGNOSTIC TimeoutError: locator.isDisabled: Timeout 18000ms exceeded.
+Call log:
+[2m  - waiting for getByRole('dialog').getByRole('button', { name: /确\s*定/ })[22m
+
+retry-ui P { newPlan: true, noManualConfirmation: true }
+switch-ui-no-reason F { baselineVisible: true, reasonCollected: false }
+live-refresh F {
+  wasExecuting: true,
+  within15Seconds: true,
+  progress100: false,
+  timelineAppendVisible: true,
+  noManualButtons: true
+}
+timeline-detail-completeness F {
+  originalGoal: true,
+  parsing: true,
+  baselineVersion: true,
+  validationSupervision: false,
+  deviceProgress: true,
+  timelineReadonly: true
+}
+{"cases":[{"name":"overview-highlight","result":"F"},{"name":"today-list-pagination","result":"P"},{"name":"search-and-highlight","result":"DIAGNOSTIC"},{"name":"missing-detail-fallback","result":"DIAGNOSTIC"},{"name":"mark-failed-ui","result":"P"},{"name":"terminate-ui","result":"DIAGNOSTIC"},{"name":"retry-ui","result":"P"},{"name":"switch-ui-no-reason","result":"F"},{"name":"live-refresh","result":"F"},{"name":"timeline-detail-completeness","result":"F"}],"errors":[]}

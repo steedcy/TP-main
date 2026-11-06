@@ -1,0 +1,2760 @@
+{
+  "tag": "V1.171",
+  "productSha": "7ef206287e69de350e2bd3c53d480a6bc36bb019",
+  "startedAt": "2026-11-06T06:33:23.410Z",
+  "timezone": "Asia/Shanghai",
+  "cases": [
+    {
+      "name": "overview-highlight",
+      "color": "rgb(240, 240, 240)",
+      "checks": {
+        "highlighted": false,
+        "correctFilter": true
+      },
+      "result": "F"
+    },
+    {
+      "name": "today-list-pagination",
+      "dateValues": [
+        "2026-11-06 00:00:00",
+        "2026-11-06 23:59:59"
+      ],
+      "headers": [
+        "任务编号",
+        "任务目标",
+        "任务族",
+        "状态",
+        "创建时间",
+        "操作"
+      ],
+      "rows": 10,
+      "pages": [
+        "1",
+        "2"
+      ],
+      "apiContent": 20,
+      "apiUrl": "http://127.0.0.1:15179/api/v1/tasks?createdFrom=2026-11-06T00:00:00&createdTo=2026-11-06T23:59:59",
+      "checks": {
+        "todayRange": true,
+        "fields": true,
+        "allServerPagesAccessible": true
+      },
+      "result": "P"
+    },
+    {
+      "name": "search-and-highlight",
+      "diagnostic": "TimeoutError: locator.click: Timeout 18000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: '查询', exact: true })\u001b[22m\n",
+      "result": "DIAGNOSTIC"
+    },
+    {
+      "name": "missing-detail-fallback",
+      "diagnostic": "TimeoutError: locator.waitFor: Timeout 18000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText('任务不存在或已被删除', { exact: true }) to be visible\u001b[22m\n",
+      "result": "DIAGNOSTIC"
+    },
+    {
+      "name": "mark-failed-ui",
+      "fourActions": "待人工处理\n转基线执行\n重试规划\n置为失败\n终止任务",
+      "emptyDisabled": true,
+      "whitespaceDisabled": true,
+      "checks": {
+        "fourOptions": true,
+        "emptyDisabled": true,
+        "whitespaceDisabled": true,
+        "terminalVisible": true,
+        "noManualActions": true
+      },
+      "result": "P"
+    },
+    {
+      "name": "terminate-ui",
+      "diagnostic": "TimeoutError: locator.isDisabled: Timeout 18000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('dialog').getByRole('button', { name: /确\\s*定/ })\u001b[22m\n",
+      "result": "DIAGNOSTIC"
+    },
+    {
+      "name": "retry-ui",
+      "checks": {
+        "newPlan": true,
+        "noManualConfirmation": true
+      },
+      "result": "P"
+    },
+    {
+      "name": "switch-ui-no-reason",
+      "dialogCount": 0,
+      "checks": {
+        "baselineVisible": true,
+        "reasonCollected": false
+      },
+      "result": "F"
+    },
+    {
+      "name": "live-refresh",
+      "elapsedMs": 9210,
+      "requests": [
+        {
+          "at": 1793946881525,
+          "url": "http://127.0.0.1:15179/api/v1/tasks/748"
+        },
+        {
+          "at": 1793946891513,
+          "url": "http://127.0.0.1:15179/api/v1/tasks/748"
+        }
+      ],
+      "checks": {
+        "wasExecuting": true,
+        "within15Seconds": true,
+        "progress100": false,
+        "timelineAppendVisible": true,
+        "noManualButtons": true
+      },
+      "result": "F"
+    },
+    {
+      "name": "timeline-detail-completeness",
+      "tabs": [
+        "版本1（基线模板）"
+      ],
+      "timeline": [
+        "2026-11-06T14:32:08.413269 - GOAL_SUBMITTED ：运行操作员oprator提交任务目标: F171_SWITCH_VALID synthetic navigation to F2_TEST_GATE",
+        "2026-11-06T14:32:08.430362 - GOAL_CLARIFIED ：目标理解完成，关键信息已完整，进入规划上下文构建",
+        "2026-11-06T14:32:08.436514 - CONTEXT_SNAPSHOT_GENERATED ：生成规划上下文快照CTX-20261106-0911",
+        "2026-11-06T14:32:08.441624 - PLAN_GENERATED （原因码: ERR_PLANNING_MODEL_FAILED）：候选计划生成调用失败: 规划模型服务调用超时或不可用: 503 Service Unavailable: \"{\"error\":\"synthetic isolated model unavailable\"}\"",
+        "2026-11-06T14:32:08.444815 - BASELINE_DOWNGRADED （原因码: ERR_NO_BASELINE_TEMPLATE）：无匹配的已启用基线模板: 候选计划生成失败或模型服务不可用",
+        "2026-11-06T14:32:08.446009 - TASK_PENDING_MANUAL （原因码: ERR_PLANNING_FAILED）：候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+        "2026-11-06T14:32:34.201964 - BASELINE_SWITCH_REQUESTED ：运行操作员oprator选择SWITCH_TO_BASELINE，原因: F020 valid baseline reason",
+        "2026-11-06T14:32:34.235925 - BASELINE_DOWNGRADED ：已自动切换至基线模板G171 F020 baseline 1793946750416153900(V1.0)，原因: 运行操作员选择基线模板，选择依据: [任务族精确匹配(EXT_0BD83987), 步骤数1步少优先, 最近试运行通过时间2026-11-06T14:32:31.071934优先]",
+        "2026-11-06T14:32:34.243802 - AGENT_ASSIGNMENT_REQUESTED ：步骤1候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)；AGT-8519A3B6(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求",
+        "2026-11-06T14:32:35.525359 - AGENT_ASSIGNED ：设备代理AGT-386E8C30接受步骤1承接请求",
+        "2026-11-06T14:32:35.529906 - STEP_DISPATCHED ：指令CMD-20261106143235-50A70010已下发至设备代理AGT-386E8C30，业务意图: 执行CAP_NAVIGATION能力（基线模板步骤）",
+        "2026-11-06T14:32:35.917874 - EXECUTION_FEEDBACK_RECEIVED （原因码: DEVICE_SUCCESS）：指令CMD-20261106143235-50A70010收到设备代理AGT-386E8C30执行反馈: SUCCESS",
+        "2026-11-06T14:32:35.922244 - STEP_COMPLETED ：步骤1完成条件已满足: routeGenerated=true",
+        "2026-11-06T14:32:35.926212 - TASK_COMPLETED ：全部步骤完成条件均已满足，任务完成"
+      ],
+      "editable": 0,
+      "checks": {
+        "originalGoal": true,
+        "parsing": true,
+        "baselineVersion": true,
+        "validationSupervision": false,
+        "deviceProgress": true,
+        "timelineReadonly": true
+      },
+      "result": "F"
+    }
+  ],
+  "views": [
+    {
+      "name": "overview",
+      "url": "http://127.0.0.1:15179/overview",
+      "at": "2026-11-06T06:33:30.198Z",
+      "text": "智慧机场AI协同平台\n运行总览\n任务管理\n异常处置\n过程追溯\n二维态势\n设备代理\n操作记录\noprator（GPT Synthetic Account，运行操作员）\n退出登录\n今日\n刷 新\n设备代理总数\n--\n在线代理数\n--\n进行中任务数\n--\n重新规划次数\n--\n未处置异常数\n--\n待人工任务数\n--\n任务状态分布\n待规划\n--\n监督判定中\n--\n待分配\n--\n降级执行中\n--\n执行中\n--\n已完成\n--\n失败\n--\n待人工处理\n--\n人工终止\n--\n最新异常列表\n暂无异常"
+    },
+    {
+      "name": "overview-to-list",
+      "url": "http://127.0.0.1:15179/tasks?status=PENDING_MANUAL",
+      "at": "2026-11-06T06:33:30.920Z",
+      "text": "智慧机场AI协同平台\n运行总览\n任务管理\n异常处置\n过程追溯\n二维态势\n设备代理\n操作记录\noprator（GPT Synthetic Account，运行操作员）\n退出登录\n提交任务\n待人工处理\n按任务族筛选\n查 询\n任务编号\t任务目标\t任务族\t状态\t创建时间\t操作\n\n\nNo data"
+    },
+    {
+      "name": "today-list",
+      "url": "http://127.0.0.1:15179/tasks",
+      "at": "2026-11-06T06:33:32.710Z",
+      "text": "智慧机场AI协同平台\n运行总览\n任务管理\n异常处置\n过程追溯\n二维态势\n设备代理\n操作记录\noprator（GPT Synthetic Account，运行操作员）\n退出登录\n提交任务\n按状态筛选\n按任务族筛选\n查 询\n任务编号\t任务目标\t任务族\t状态\t创建时间\t操作\nTASK-20261106-0741\tF171_UI_REFRESH synthetic navigation to F2_TEST_GATE\tEXT_0BD83987\t执行中\t2026-11-06T14:32:51.455271\t\n详情\n\nTASK-20261106-0739\tF171_UI_SWITCH synthetic navigation to F2_TEST_GATE\tEXT_0BD83987\t待人工处理\t2026-11-06T14:32:28.328582\t\n详情\n\nTASK-20261106-0738\tF171_UI_RETRY synthetic navigation to F2_TEST_GATE\tEXT_0BD83987\t待人工处理\t2026-11-06T14:32:25.320917\t\n详情\n\nTASK-20261106-0737\tF171_UI_TERMINATE synthetic navigation to F2_TEST_GATE\tEXT_0BD83987\t待人工处理\t2026-11-06T14:32:22.789605\t\n详情\n\nTASK-20261106-0736\tF171_UI_MARK_FAILED synthetic navigation to F2_TEST_GATE\tEXT_0BD83987\t待人工处理\t2026-11-06T14:32:20.288327\t\n详情\n\nTASK-20261106-0735\tF171_SWITCH_REJECT_CONSTRAINT synthetic navigation to F2_TEST_GATE\tEXT_0BD83987\t人工终止\t2026-11-06T14:32:17.745608\t\n详情\n\nTASK-20261106-0734\tF171_SWITCH_REJECT_CAPABILITY synthetic navigation to F2_TEST_GATE\tEXT_0BD83987\t人工终止\t2026-11-06T14:32:15.519445\t\n详情\n\nTASK-20261106-0733\tF171_SWITCH_REJECT_STRUCTURE synthetic navigation to F2_TEST_GATE\tEXT_0BD83987\t人工终止\t2026-11-06T14:32:13.290045\t\n详情\n\nTASK-20261106-0732\tF171_SWITCH_NO_REASON synthetic navigation to F2_TEST_GATE\tEXT_0BD83987\t已完成\t2026-11-06T14:32:10.163102\t\n详情\n\nTASK-20261106-0731\tF171_SWITCH_VALID synthetic navigation to F2_TEST_GATE\tEXT_0BD83987\t已完成\t2026-11-06T14:32:08.411778\t\n详情\n1\n2"
+    },
+    {
+      "name": "today-list-page2",
+      "url": "http://127.0.0.1:15179/tasks",
+      "at": "2026-11-06T06:33:32.988Z",
+      "text": "智慧机场AI协同平台\n运行总览\n任务管理\n异常处置\n过程追溯\n二维态势\n设备代理\n操作记录\noprator（GPT Synthetic Account，运行操作员）\n退出登录\n提交任务\n按状态筛选\n按任务族筛选\n查 询\n任务编号\t任务目标\t任务族\t状态\t创建时间\t操作\nTASK-20261106-0730\tF171_UI_SWITCH synthetic navigation to F2_TEST_GATE\tEXT_5BFC331D\t人工终止\t2026-11-06T14:30:31.774538\t\n详情\n\nTASK-20261106-0729\tF171_UI_RETRY synthetic navigation to F2_TEST_GATE\tEXT_5BFC331D\t人工终止\t2026-11-06T14:30:29.892833\t\n详情\n\nTASK-20261106-0728\tF171_UI_TERMINATE synthetic navigation to F2_TEST_GATE\tEXT_5BFC331D\t人工终止\t2026-11-06T14:30:28.031283\t\n详情\n\nTASK-20261106-0727\tF171_UI_MARK_FAILED synthetic navigation to F2_TEST_GATE\tEXT_5BFC331D\t人工终止\t2026-11-06T14:30:26.138524\t\n详情\n\nTASK-20261106-0726\tF171_SWITCH_VALID synthetic navigation to F2_TEST_GATE\tEXT_5BFC331D\t人工终止\t2026-11-06T14:30:22.996923\t\n详情\n\nTASK-20261106-0724\tF171_TERMINATE_EXECUTING synthetic navigation to F2_TEST_GATE\tEXT_5BFC331D\t人工终止\t2026-11-06T14:30:14.582733\t\n详情\n\nTASK-20261106-0723\tF171_NORMAL_TWO_STEP synthetic navigation to F2_TEST_GATE\tEXT_5BFC331D\t已完成\t2026-11-06T14:30:07.597456\t\n详情\n\nTASK-20261106-0722\tF171_RETRY_REJECT_MISSING_INFO synthetic navigation to F2_TEST_GATE\tEXT_5BFC331D\t人工终止\t2026-11-06T14:30:03.423629\t\n详情\n\nTASK-20261106-0721\tF171_RETRY_REJECT_FORCE synthetic navigation to F2_TEST_GATE\tEXT_5BFC331D\t人工终止\t2026-11-06T14:29:59.14467\t\n详情\n\nTASK-20261106-0720\tF171_RETRY_REJECT_HIGH synthetic navigation to F2_TEST_GATE\tEXT_5BFC331D\t人工终止\t2026-11-06T14:29:54.091294\t\n详情\n1\n2"
+    },
+    {
+      "name": "search-and-highlight-diagnostic",
+      "url": "http://127.0.0.1:15179/tasks",
+      "at": "2026-11-06T06:33:52.401Z",
+      "text": "智慧机场AI协同平台\n运行总览\n任务管理\n异常处置\n过程追溯\n二维态势\n设备代理\n操作记录\noprator（GPT Synthetic Account，运行操作员）\n退出登录\n提交任务\n按状态筛选\n按任务族筛选\n查 询\n任务编号\t任务目标\t任务族\t状态\t创建时间\t操作\nTASK-20261106-0741\tF171_UI_REFRESH synthetic navigation to F2_TEST_GATE\tEXT_0BD83987\t执行中\t2026-11-06T14:32:51.455271\t\n详情\n\nTASK-20261106-0739\tF171_UI_SWITCH synthetic navigation to F2_TEST_GATE\tEXT_0BD83987\t待人工处理\t2026-11-06T14:32:28.328582\t\n详情\n\nTASK-20261106-0738\tF171_UI_RETRY synthetic navigation to F2_TEST_GATE\tEXT_0BD83987\t待人工处理\t2026-11-06T14:32:25.320917\t\n详情\n\nTASK-20261106-0737\tF171_UI_TERMINATE synthetic navigation to F2_TEST_GATE\tEXT_0BD83987\t待人工处理\t2026-11-06T14:32:22.789605\t\n详情\n\nTASK-20261106-0736\tF171_UI_MARK_FAILED synthetic navigation to F2_TEST_GATE\tEXT_0BD83987\t待人工处理\t2026-11-06T14:32:20.288327\t\n详情\n\nTASK-20261106-0735\tF171_SWITCH_REJECT_CONSTRAINT synthetic navigation to F2_TEST_GATE\tEXT_0BD83987\t人工终止\t2026-11-06T14:32:17.745608\t\n详情\n\nTASK-20261106-0734\tF171_SWITCH_REJECT_CAPABILITY synthetic navigation to F2_TEST_GATE\tEXT_0BD83987\t人工终止\t2026-11-06T14:32:15.519445\t\n详情\n\nTASK-20261106-0733\tF171_SWITCH_REJECT_STRUCTURE synthetic navigation to F2_TEST_GATE\tEXT_0BD83987\t人工终止\t2026-11-06T14:32:13.290045\t\n详情\n\nTASK-20261106-0732\tF171_SWITCH_NO_REASON synthetic navigation to F2_TEST_GATE\tEXT_0BD83987\t已完成\t2026-11-06T14:32:10.163102\t\n详情\n\nTASK-20261106-0731\tF171_SWITCH_VALID synthetic navigation to F2_TEST_GATE\tEXT_0BD83987\t已完成\t2026-11-06T14:32:08.411778\t\n详情\n1\n2"
+    },
+    {
+      "name": "missing-detail-fallback-diagnostic",
+      "url": "http://127.0.0.1:15179/tasks",
+      "at": "2026-11-06T06:34:12.432Z",
+      "text": "智慧机场AI协同平台\n运行总览\n任务管理\n异常处置\n过程追溯\n二维态势\n设备代理\n操作记录\noprator（GPT Synthetic Account，运行操作员）\n退出登录\n提交任务\n按状态筛选\n按任务族筛选\n查 询\n任务编号\t任务目标\t任务族\t状态\t创建时间\t操作\nTASK-20261106-0741\tF171_UI_REFRESH synthetic navigation to F2_TEST_GATE\tEXT_0BD83987\t执行中\t2026-11-06T14:32:51.455271\t\n详情\n\nTASK-20261106-0739\tF171_UI_SWITCH synthetic navigation to F2_TEST_GATE\tEXT_0BD83987\t待人工处理\t2026-11-06T14:32:28.328582\t\n详情\n\nTASK-20261106-0738\tF171_UI_RETRY synthetic navigation to F2_TEST_GATE\tEXT_0BD83987\t待人工处理\t2026-11-06T14:32:25.320917\t\n详情\n\nTASK-20261106-0737\tF171_UI_TERMINATE synthetic navigation to F2_TEST_GATE\tEXT_0BD83987\t待人工处理\t2026-11-06T14:32:22.789605\t\n详情\n\nTASK-20261106-0736\tF171_UI_MARK_FAILED synthetic navigation to F2_TEST_GATE\tEXT_0BD83987\t待人工处理\t2026-11-06T14:32:20.288327\t\n详情\n\nTASK-20261106-0735\tF171_SWITCH_REJECT_CONSTRAINT synthetic navigation to F2_TEST_GATE\tEXT_0BD83987\t人工终止\t2026-11-06T14:32:17.745608\t\n详情\n\nTASK-20261106-0734\tF171_SWITCH_REJECT_CAPABILITY synthetic navigation to F2_TEST_GATE\tEXT_0BD83987\t人工终止\t2026-11-06T14:32:15.519445\t\n详情\n\nTASK-20261106-0733\tF171_SWITCH_REJECT_STRUCTURE synthetic navigation to F2_TEST_GATE\tEXT_0BD83987\t人工终止\t2026-11-06T14:32:13.290045\t\n详情\n\nTASK-20261106-0732\tF171_SWITCH_NO_REASON synthetic navigation to F2_TEST_GATE\tEXT_0BD83987\t已完成\t2026-11-06T14:32:10.163102\t\n详情\n\nTASK-20261106-0731\tF171_SWITCH_VALID synthetic navigation to F2_TEST_GATE\tEXT_0BD83987\t已完成\t2026-11-06T14:32:08.411778\t\n详情\n1\n2"
+    },
+    {
+      "name": "mark-failed-required",
+      "url": "http://127.0.0.1:15179/tasks/743",
+      "at": "2026-11-06T06:34:13.971Z",
+      "text": "智慧机场AI协同平台\n运行总览\n任务管理\n异常处置\n过程追溯\n二维态势\n设备代理\n操作记录\noprator（GPT Synthetic Account，运行操作员）\n退出登录\n任务编号\tTASK-20261106-0736\t状态\t待人工处理\n任务目标\tF171_UI_MARK_FAILED synthetic navigation to F2_TEST_GATE\n任务族\tEXT_0BD83987\t重规划次数\t0 / 1\n失败/降级原因\t候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板\n目标理解结果\n起点\tF2_SERVICE_POINT\n目的地\tF2_TEST_GATE\n约束条件\tsynthetic test\n完成条件\trouteGenerated=true\n规划依据（上下文快照）\nCTX-20261106-0916 - 生成时间: 2026-11-06T14:32:20.330035\n事件时间线（只读，事件仅可追加不可修改删除，对应5.7.1）\n2026-11-06T14:32:20.291538 - GOAL_SUBMITTED ：运行操作员oprator提交任务目标: F171_UI_MARK_FAILED synthetic navigation to F2_TEST_GATE\n2026-11-06T14:32:20.324961 - GOAL_CLARIFIED ：目标理解完成，关键信息已完整，进入规划上下文构建\n2026-11-06T14:32:20.330035 - CONTEXT_SNAPSHOT_GENERATED ：生成规划上下文快照CTX-20261106-0916\n2026-11-06T14:32:20.344935 - PLAN_GENERATED （原因码: ERR_PLANNING_MODEL_FAILED）：候选计划生成调用失败: 规划模型服务调用超时或不可用: 503 Service Unavailable: \"{\"error\":\"synthetic isolated model unavailable\"}\"\n2026-11-06T14:32:20.347515 - BASELINE_DOWNGRADED （原因码: ERR_NO_BASELINE_TEMPLATE）：无匹配的已启用基线模板: 候选计划生成失败或模型服务不可用\n2026-11-06T14:32:20.350345 - TASK_PENDING_MANUAL （原因码: ERR_PLANNING_FAILED）：候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板\n待人工处理\n转基线执行\n重试规划\n置为失败\n终止任务\n将任务置为失败\n\n置为失败后任务进入终态，无法再转基线或重试规划。请写明原因（1～200 字）：\n\nCancel确认置为失败"
+    },
+    {
+      "name": "mark-failed-result",
+      "url": "http://127.0.0.1:15179/tasks/743",
+      "at": "2026-11-06T06:34:15.397Z",
+      "text": "智慧机场AI协同平台\n运行总览\n任务管理\n异常处置\n过程追溯\n二维态势\n设备代理\n操作记录\noprator（GPT Synthetic Account，运行操作员）\n退出登录\n任务编号\tTASK-20261106-0736\t状态\t失败\n任务目标\tF171_UI_MARK_FAILED synthetic navigation to F2_TEST_GATE\n任务族\tEXT_0BD83987\t重规划次数\t0 / 1\n失败/降级原因\t运行操作员oprator在待人工处理阶段手动置为失败，原因: F020 browser mark failure reason\n目标理解结果\n起点\tF2_SERVICE_POINT\n目的地\tF2_TEST_GATE\n约束条件\tsynthetic test\n完成条件\trouteGenerated=true\n规划依据（上下文快照）\nCTX-20261106-0916 - 生成时间: 2026-11-06T14:32:20.330035\n事件时间线（只读，事件仅可追加不可修改删除，对应5.7.1）\n2026-11-06T14:32:20.291538 - GOAL_SUBMITTED ：运行操作员oprator提交任务目标: F171_UI_MARK_FAILED synthetic navigation to F2_TEST_GATE\n2026-11-06T14:32:20.324961 - GOAL_CLARIFIED ：目标理解完成，关键信息已完整，进入规划上下文构建\n2026-11-06T14:32:20.330035 - CONTEXT_SNAPSHOT_GENERATED ：生成规划上下文快照CTX-20261106-0916\n2026-11-06T14:32:20.344935 - PLAN_GENERATED （原因码: ERR_PLANNING_MODEL_FAILED）：候选计划生成调用失败: 规划模型服务调用超时或不可用: 503 Service Unavailable: \"{\"error\":\"synthetic isolated model unavailable\"}\"\n2026-11-06T14:32:20.347515 - BASELINE_DOWNGRADED （原因码: ERR_NO_BASELINE_TEMPLATE）：无匹配的已启用基线模板: 候选计划生成失败或模型服务不可用\n2026-11-06T14:32:20.350345 - TASK_PENDING_MANUAL （原因码: ERR_PLANNING_FAILED）：候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板\n2026-11-06T14:34:14.417171 - TASK_FAILED （原因码: MANUAL_MARK_FAILED）：运行操作员oprator在待人工处理阶段手动置为失败，原因: F020 browser mark failure reason\n操作已提交"
+    },
+    {
+      "name": "terminate-ui-diagnostic",
+      "url": "http://127.0.0.1:15179/tasks/744",
+      "at": "2026-11-06T06:34:34.728Z",
+      "text": "智慧机场AI协同平台\n运行总览\n任务管理\n异常处置\n过程追溯\n二维态势\n设备代理\n操作记录\noprator（GPT Synthetic Account，运行操作员）\n退出登录\n任务编号\tTASK-20261106-0737\t状态\t待人工处理\n任务目标\tF171_UI_TERMINATE synthetic navigation to F2_TEST_GATE\n任务族\tEXT_0BD83987\t重规划次数\t0 / 1\n失败/降级原因\t候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板\n目标理解结果\n起点\tF2_SERVICE_POINT\n目的地\tF2_TEST_GATE\n约束条件\tsynthetic test\n完成条件\trouteGenerated=true\n规划依据（上下文快照）\nCTX-20261106-0917 - 生成时间: 2026-11-06T14:32:22.818566\n事件时间线（只读，事件仅可追加不可修改删除，对应5.7.1）\n2026-11-06T14:32:22.791188 - GOAL_SUBMITTED ：运行操作员oprator提交任务目标: F171_UI_TERMINATE synthetic navigation to F2_TEST_GATE\n2026-11-06T14:32:22.811844 - GOAL_CLARIFIED ：目标理解完成，关键信息已完整，进入规划上下文构建\n2026-11-06T14:32:22.818566 - CONTEXT_SNAPSHOT_GENERATED ：生成规划上下文快照CTX-20261106-0917\n2026-11-06T14:32:22.825797 - PLAN_GENERATED （原因码: ERR_PLANNING_MODEL_FAILED）：候选计划生成调用失败: 规划模型服务调用超时或不可用: 503 Service Unavailable: \"{\"error\":\"synthetic isolated model unavailable\"}\"\n2026-11-06T14:32:22.829528 - BASELINE_DOWNGRADED （原因码: ERR_NO_BASELINE_TEMPLATE）：无匹配的已启用基线模板: 候选计划生成失败或模型服务不可用\n2026-11-06T14:32:22.831592 - TASK_PENDING_MANUAL （原因码: ERR_PLANNING_FAILED）：候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板\n待人工处理\n转基线执行\n重试规划\n置为失败\n终止任务\n人工终止任务\n责任边界提示\n人工终止仅停止后续业务步骤下发并释放设备占用，不等同于设备安全急停；已完成步骤结果保留，不回滚不补偿。请核实设备现场实际状态。\n终止原因（1~200字，必填）\n我已阅读并确认上述责任边界提示，确认终止此任务\nCancelOK"
+    },
+    {
+      "name": "retry-confirmation",
+      "url": "http://127.0.0.1:15179/tasks/745",
+      "at": "2026-11-06T06:34:36.286Z",
+      "text": "智慧机场AI协同平台\n运行总览\n任务管理\n异常处置\n过程追溯\n二维态势\n设备代理\n操作记录\noprator（GPT Synthetic Account，运行操作员）\n退出登录\n任务编号\tTASK-20261106-0738\t状态\t待人工处理\n任务目标\tF171_UI_RETRY synthetic navigation to F2_TEST_GATE\n任务族\tEXT_0BD83987\t重规划次数\t0 / 1\n失败/降级原因\t候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板\n目标理解结果\n起点\tF2_SERVICE_POINT\n目的地\tF2_TEST_GATE\n约束条件\tsynthetic test\n完成条件\trouteGenerated=true\n规划依据（上下文快照）\nCTX-20261106-0918 - 生成时间: 2026-11-06T14:32:25.360559\n事件时间线（只读，事件仅可追加不可修改删除，对应5.7.1）\n2026-11-06T14:32:25.320917 - GOAL_SUBMITTED ：运行操作员oprator提交任务目标: F171_UI_RETRY synthetic navigation to F2_TEST_GATE\n2026-11-06T14:32:25.351937 - GOAL_CLARIFIED ：目标理解完成，关键信息已完整，进入规划上下文构建\n2026-11-06T14:32:25.360559 - CONTEXT_SNAPSHOT_GENERATED ：生成规划上下文快照CTX-20261106-0918\n2026-11-06T14:32:25.369587 - PLAN_GENERATED （原因码: ERR_PLANNING_MODEL_FAILED）：候选计划生成调用失败: 规划模型服务调用超时或不可用: 503 Service Unavailable: \"{\"error\":\"synthetic isolated model unavailable\"}\"\n2026-11-06T14:32:25.383096 - BASELINE_DOWNGRADED （原因码: ERR_NO_BASELINE_TEMPLATE）：无匹配的已启用基线模板: 候选计划生成失败或模型服务不可用\n2026-11-06T14:32:25.391669 - TASK_PENDING_MANUAL （原因码: ERR_PLANNING_FAILED）：候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板\n待人工处理\n转基线执行\n重试规划\n置为失败\n终止任务\n重试规划\n修改目标并重试规划\n可在重试前修改任务目标，系统将基于新目标重新进行目标理解与候选计划生成；原计划版本将完整保留在历史列表中。\n任务目标（1~500字，必填）\n处置原因（选填，不超过200字）\n取 消确 定"
+    },
+    {
+      "name": "retry-resumed",
+      "url": "http://127.0.0.1:15179/tasks/745",
+      "at": "2026-11-06T06:34:37.649Z",
+      "text": "智慧机场AI协同平台\n运行总览\n任务管理\n异常处置\n过程追溯\n二维态势\n设备代理\n操作记录\noprator（GPT Synthetic Account，运行操作员）\n退出登录\n任务编号\tTASK-20261106-0738\t状态\t待分配\n任务目标\tF171_UI_RETRY synthetic navigation to F2_TEST_GATE\n任务族\tEXT_0BD83987\t重规划次数\t0 / 1\n失败/降级原因\t候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板\n目标理解结果\n起点\tF2_SERVICE_POINT\n目的地\tF2_TEST_GATE\n约束条件\tsynthetic test\n完成条件\trouteGenerated=true\n规划依据（上下文快照）\nCTX-20261106-0926 - 生成时间: 2026-11-06T14:34:36.742076\nCTX-20261106-0918 - 生成时间: 2026-11-06T14:32:25.360559\n计划版本与校验/判定结果\n版本1（自主规划）\n结构校验\t通过\t能力校验\t通过\n约束校验\t通过\t冻结时间\t2026-11-06T14:34:36.770162\n风险等级\tLOW\t推荐处置\t自动执行\n判定依据\t未命中确定性高风险规则，风险信号数量不足以触发降级\n置信度\t0.99\t规则集版本\tV1.132\n可执行步骤数\t1 / 5\t剩余步骤额度\t4\n规划说明\t规划模型依据上下文快照 CTX-20261106-0926生成 1 步候选计划，置信度 0.99\n\n候选步骤：\n\n步骤\t步骤目标\t所需能力\t输入参数\t参数来源\t候选设备\t前置条件\t完成条件\t失败处理\n1\t前往区域\tCAP_NAVIGATION\t{\"targetLocation\":\"F2_TEST_GATE\"}\t规划模型依据任务目标与场景参数生成\tAGT-386E8C30，AGT-8519A3B6\tdevice online\trouteGenerated=true\tmanual handling\n步骤设备分配与执行情况\n执行进度：0/1，当前步骤1 \n0%\n步骤\t分配设备\t指令编号\t步骤状态\t重试次数\t执行结果\t承接响应时间\t下发时间\t反馈时间\n1\tAGT-8519A3B6\tCMD-20261106143436-50A70017\t待分配\t0\t\t-\t\t\n事件时间线（只读，事件仅可追加不可修改删除，对应5.7.1）\n2026-11-06T14:32:25.320917 - GOAL_SUBMITTED ：运行操作员oprator提交任务目标: F171_UI_RETRY synthetic navigation to F2_TEST_GATE\n2026-11-06T14:32:25.351937 - GOAL_CLARIFIED ：目标理解完成，关键信息已完整，进入规划上下文构建\n2026-11-06T14:32:25.360559 - CONTEXT_SNAPSHOT_GENERATED ：生成规划上下文快照CTX-20261106-0918\n2026-11-06T14:32:25.369587 - PLAN_GENERATED （原因码: ERR_PLANNING_MODEL_FAILED）：候选计划生成调用失败: 规划模型服务调用超时或不可用: 503 Service Unavailable: \"{\"error\":\"synthetic isolated model unavailable\"}\"\n2026-11-06T14:32:25.383096 - BASELINE_DOWNGRADED （原因码: ERR_NO_BASELINE_TEMPLATE）：无匹配的已启用基线模板: 候选计划生成失败或模型服务不可用\n2026-11-06T14:32:25.391669 - TASK_PENDING_MANUAL （原因码: ERR_PLANNING_FAILED）：候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板\n2026-11-06T14:34:36.683096 - TASK_GOAL_UPDATED ：运行操作员oprator修改任务目标为: F171_UI_RETRY synthetic navigation to F2_TEST_GATE\n2026-11-06T14:34:36.707131 - REPLANNING_TRIGGERED ：运行操作员oprator选择RETRY_PLANNING，原因: F020 browser retry reason\n2026-11-06T14:34:36.721013 - GOAL_CLARIFIED ：目标理解完成，关键信息已完整，进入规划上下文构建\n2026-11-06T14:34:36.743198 - CONTEXT_SNAPSHOT_GENERATED ：生成规划上下文快照CTX-20261106-0926\n2026-11-06T14:34:36.766911 - PLAN_GENERATED ：候选计划生成完成，来源AUTONOMOUS，版本1\n2026-11-06T14:34:36.770162 - PLAN_VALIDATED ：候选计划三类校验全部通过，已冻结版本\n2026-11-06T14:34:36.779043 - SUPERVISION_JUDGED ：监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.132；推荐处置=AUTO_EXECUTE（自动执行）\n2026-11-06T14:34:36.788617 - AGENT_ASSIGNMENT_REQUESTED ：步骤1候选排序（能力匹配->距离->负载）: AGT-8519A3B6(匹配度1.0,距离0.0,负载0)，向候选AGT-8519A3B6发起承接请求\n终止任务\n终止任务\n重试规划已提交"
+    },
+    {
+      "name": "switch-resumed-without-reason",
+      "url": "http://127.0.0.1:15179/tasks/746",
+      "at": "2026-11-06T06:34:40.267Z",
+      "text": "智慧机场AI协同平台\n运行总览\n任务管理\n异常处置\n过程追溯\n二维态势\n设备代理\n操作记录\noprator（GPT Synthetic Account，运行操作员）\n退出登录\n任务编号\tTASK-20261106-0739\t状态\t降级执行中\n任务目标\tF171_UI_SWITCH synthetic navigation to F2_TEST_GATE\n任务族\tEXT_0BD83987\t重规划次数\t0 / 1\n失败/降级原因\t运行操作员选择基线模板\n目标理解结果\n起点\tF2_SERVICE_POINT\n目的地\tF2_TEST_GATE\n约束条件\tsynthetic test\n完成条件\trouteGenerated=true\n规划依据（上下文快照）\nCTX-20261106-0927 - 生成时间: 2026-11-06T14:34:39.571843\nCTX-20261106-0919 - 生成时间: 2026-11-06T14:32:28.355327\n计划版本与校验/判定结果\n版本1（基线模板）\n结构校验\t通过\t能力校验\t通过\n约束校验\t通过\t冻结时间\t2026-11-06T14:34:39.576853\n规则集版本\tV1.0\n计划来源\t固定来源基线模板\t所用基线模板\tG171 F020 baseline 1793946750416153900查看详情\n模板版本（冻结时）\tV1.0查看详情\t降级原因\t运行操作员选择基线模板\n匹配项\t任务要求\t模板/计划\t结果\n任务族 / 模板意图\tEXT_0BD83987\tEXT_0BD83987\t匹配\n所需能力\tCAP_NAVIGATION\tCAP_NAVIGATION\t匹配\n步骤数上限\t≤ 5 步\t1 步\t匹配\n可执行步骤数\t1 / 5\t剩余步骤额度\t4\n规划说明\t基线模板（CTX-20261106-0927）生成的 1 步计划\n\n候选步骤：\n\n步骤\t步骤目标\t所需能力\t输入参数\t参数来源\t候选设备\t前置条件\t完成条件\t失败处理\n1\t执行CAP_NAVIGATION能力（基线模板步骤）\tCAP_NAVIGATION\t{}\t基线模板参数映射/任务场景参数\tAGT-386E8C30，AGT-8519A3B6\t候选设备在线且空闲\trouteGenerated=true\t重试一次或转人工处理\n步骤设备分配与执行情况\n执行进度：0/1，当前步骤1 \n0%\n步骤\t分配设备\t指令编号\t步骤状态\t重试次数\t执行结果\t承接响应时间\t下发时间\t反馈时间\n1\tAGT-8519A3B6\tCMD-20261106143439-50A70019\t待分配\t0\t\t-\t\t\n事件时间线（只读，事件仅可追加不可修改删除，对应5.7.1）\n2026-11-06T14:32:28.329849 - GOAL_SUBMITTED ：运行操作员oprator提交任务目标: F171_UI_SWITCH synthetic navigation to F2_TEST_GATE\n2026-11-06T14:32:28.350684 - GOAL_CLARIFIED ：目标理解完成，关键信息已完整，进入规划上下文构建\n2026-11-06T14:32:28.356551 - CONTEXT_SNAPSHOT_GENERATED ：生成规划上下文快照CTX-20261106-0919\n2026-11-06T14:32:28.362294 - PLAN_GENERATED （原因码: ERR_PLANNING_MODEL_FAILED）：候选计划生成调用失败: 规划模型服务调用超时或不可用: 503 Service Unavailable: \"{\"error\":\"synthetic isolated model unavailable\"}\"\n2026-11-06T14:32:28.365831 - BASELINE_DOWNGRADED （原因码: ERR_NO_BASELINE_TEMPLATE）：无匹配的已启用基线模板: 候选计划生成失败或模型服务不可用\n2026-11-06T14:32:28.367492 - TASK_PENDING_MANUAL （原因码: ERR_PLANNING_FAILED）：候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板\n2026-11-06T14:34:39.555706 - BASELINE_SWITCH_REQUESTED ：运行操作员oprator选择SWITCH_TO_BASELINE\n2026-11-06T14:34:39.583628 - BASELINE_DOWNGRADED ：已自动切换至基线模板G171 F020 baseline 1793946750416153900(V1.0)，原因: 运行操作员选择基线模板，选择依据: [任务族精确匹配(EXT_0BD83987), 步骤数1步少优先, 最近试运行通过时间2026-11-06T14:32:31.071934优先]\n2026-11-06T14:34:39.595407 - AGENT_ASSIGNMENT_REQUESTED ：步骤1候选排序（能力匹配->距离->负载）: AGT-8519A3B6(匹配度1.0,距离0.0,负载0)，向候选AGT-8519A3B6发起承接请求\n终止任务\n终止任务\n操作已提交"
+    },
+    {
+      "name": "live-refresh-completed",
+      "url": "http://127.0.0.1:15179/tasks/748",
+      "at": "2026-11-06T06:34:51.778Z",
+      "text": "智慧机场AI协同平台\n运行总览\n任务管理\n异常处置\n过程追溯\n二维态势\n设备代理\n操作记录\noprator（GPT Synthetic Account，运行操作员）\n退出登录\n任务编号\tTASK-20261106-0741\t状态\t已完成\n任务目标\tF171_UI_REFRESH synthetic navigation to F2_TEST_GATE\n任务族\tEXT_0BD83987\t重规划次数\t0 / 1\n目标理解结果\n起点\tF2_SERVICE_POINT\n目的地\tF2_TEST_GATE\n约束条件\tsynthetic test\n完成条件\trouteGenerated=true\n规划依据（上下文快照）\nCTX-20261106-0925 - 生成时间: 2026-11-06T14:32:51.490676\n计划版本与校验/判定结果\n版本1（自主规划）\n结构校验\t通过\t能力校验\t通过\n约束校验\t通过\t冻结时间\t2026-11-06T14:32:51.505306\n风险等级\tLOW\t推荐处置\t自动执行\n判定依据\t未命中确定性高风险规则，风险信号数量不足以触发降级\n置信度\t0.99\t规则集版本\tV1.132\n可执行步骤数\t1 / 5\t剩余步骤额度\t4\n规划说明\t规划模型依据上下文快照 CTX-20261106-0925生成 1 步候选计划，置信度 0.99\n\n候选步骤：\n\n步骤\t步骤目标\t所需能力\t输入参数\t参数来源\t候选设备\t前置条件\t完成条件\t失败处理\n1\t前往区域\tCAP_NAVIGATION\t{\"targetLocation\":\"F2_TEST_GATE\"}\t规划模型依据任务目标与场景参数生成\tAGT-386E8C30，AGT-8519A3B6\tdevice online\trouteGenerated=true\tmanual handling\n步骤设备分配与执行情况\n执行进度：1/1 \n步骤\t分配设备\t指令编号\t步骤状态\t重试次数\t执行结果\t承接响应时间\t下发时间\t反馈时间\n1\tAGT-386E8C30\tCMD-20261106143251-50A70015\t已完成\t0\tSUCCESS\t1444ms\t2026-11-06T14:32:52.970518\t2026-11-06T14:34:46.604183\n事件时间线（只读，事件仅可追加不可修改删除，对应5.7.1）\n2026-11-06T14:32:51.456887 - GOAL_SUBMITTED ：运行操作员oprator提交任务目标: F171_UI_REFRESH synthetic navigation to F2_TEST_GATE\n2026-11-06T14:32:51.483438 - GOAL_CLARIFIED ：目标理解完成，关键信息已完整，进入规划上下文构建\n2026-11-06T14:32:51.491642 - CONTEXT_SNAPSHOT_GENERATED ：生成规划上下文快照CTX-20261106-0925\n2026-11-06T14:32:51.503108 - PLAN_GENERATED ：候选计划生成完成，来源AUTONOMOUS，版本1\n2026-11-06T14:32:51.505747 - PLAN_VALIDATED ：候选计划三类校验全部通过，已冻结版本\n2026-11-06T14:32:51.510209 - SUPERVISION_JUDGED ：监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.132；推荐处置=AUTO_EXECUTE（自动执行）\n2026-11-06T14:32:51.518951 - AGENT_ASSIGNMENT_REQUESTED ：步骤1候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)；AGT-8519A3B6(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求\n2026-11-06T14:32:52.967455 - AGENT_ASSIGNED ：设备代理AGT-386E8C30接受步骤1承接请求\n2026-11-06T14:32:52.971924 - STEP_DISPATCHED ：指令CMD-20261106143252-50A70016已下发至设备代理AGT-386E8C30，业务意图: 前往区域\n2026-11-06T14:34:46.604183 - EXECUTION_FEEDBACK_RECEIVED （原因码: DEVICE_SUCCESS）：指令CMD-20261106143252-50A70016收到设备代理AGT-386E8C30执行反馈: SUCCESS\n2026-11-06T14:34:46.607946 - STEP_COMPLETED ：步骤1完成条件已满足: routeGenerated=true\n2026-11-06T14:34:46.613298 - TASK_COMPLETED ：全部步骤完成条件均已满足，任务完成"
+    },
+    {
+      "name": "baseline-full-detail",
+      "url": "http://127.0.0.1:15179/tasks/738",
+      "at": "2026-11-06T06:34:54.943Z",
+      "text": "智慧机场AI协同平台\n运行总览\n任务管理\n异常处置\n过程追溯\n二维态势\n设备代理\n操作记录\noprator（GPT Synthetic Account，运行操作员）\n退出登录\n任务编号\tTASK-20261106-0731\t状态\t已完成\n任务目标\tF171_SWITCH_VALID synthetic navigation to F2_TEST_GATE\n任务族\tEXT_0BD83987\t重规划次数\t0 / 1\n失败/降级原因\t运行操作员选择基线模板\n目标理解结果\n起点\tF2_SERVICE_POINT\n目的地\tF2_TEST_GATE\n约束条件\tsynthetic test\n完成条件\trouteGenerated=true\n规划依据（上下文快照）\nCTX-20261106-0920 - 生成时间: 2026-11-06T14:32:34.219541\nCTX-20261106-0911 - 生成时间: 2026-11-06T14:32:08.435898\n计划版本与校验/判定结果\n版本1（基线模板）\n结构校验\t通过\t能力校验\t通过\n约束校验\t通过\t冻结时间\t2026-11-06T14:32:34.223671\n规则集版本\tV1.0\n计划来源\t固定来源基线模板\t所用基线模板\tG171 F020 baseline 1793946750416153900查看详情\n模板版本（冻结时）\tV1.0查看详情\t降级原因\t运行操作员选择基线模板\n匹配项\t任务要求\t模板/计划\t结果\n任务族 / 模板意图\tEXT_0BD83987\tEXT_0BD83987\t匹配\n所需能力\tCAP_NAVIGATION\tCAP_NAVIGATION\t匹配\n步骤数上限\t≤ 5 步\t1 步\t匹配\n可执行步骤数\t1 / 5\t剩余步骤额度\t4\n规划说明\t基线模板（CTX-20261106-0920）生成的 1 步计划\n\n候选步骤：\n\n步骤\t步骤目标\t所需能力\t输入参数\t参数来源\t候选设备\t前置条件\t完成条件\t失败处理\n1\t执行CAP_NAVIGATION能力（基线模板步骤）\tCAP_NAVIGATION\t{}\t基线模板参数映射/任务场景参数\tAGT-386E8C30，AGT-8519A3B6\t候选设备在线且空闲\trouteGenerated=true\t重试一次或转人工处理\n步骤设备分配与执行情况\n执行进度：1/1 \n步骤\t分配设备\t指令编号\t步骤状态\t重试次数\t执行结果\t承接响应时间\t下发时间\t反馈时间\n1\tAGT-386E8C30\tCMD-20261106143234-50A7000F\t已完成\t0\tSUCCESS\t1278ms\t2026-11-06T14:32:35.528836\t2026-11-06T14:32:35.917874\n事件时间线（只读，事件仅可追加不可修改删除，对应5.7.1）\n2026-11-06T14:32:08.413269 - GOAL_SUBMITTED ：运行操作员oprator提交任务目标: F171_SWITCH_VALID synthetic navigation to F2_TEST_GATE\n2026-11-06T14:32:08.430362 - GOAL_CLARIFIED ：目标理解完成，关键信息已完整，进入规划上下文构建\n2026-11-06T14:32:08.436514 - CONTEXT_SNAPSHOT_GENERATED ：生成规划上下文快照CTX-20261106-0911\n2026-11-06T14:32:08.441624 - PLAN_GENERATED （原因码: ERR_PLANNING_MODEL_FAILED）：候选计划生成调用失败: 规划模型服务调用超时或不可用: 503 Service Unavailable: \"{\"error\":\"synthetic isolated model unavailable\"}\"\n2026-11-06T14:32:08.444815 - BASELINE_DOWNGRADED （原因码: ERR_NO_BASELINE_TEMPLATE）：无匹配的已启用基线模板: 候选计划生成失败或模型服务不可用\n2026-11-06T14:32:08.446009 - TASK_PENDING_MANUAL （原因码: ERR_PLANNING_FAILED）：候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板\n2026-11-06T14:32:34.201964 - BASELINE_SWITCH_REQUESTED ：运行操作员oprator选择SWITCH_TO_BASELINE，原因: F020 valid baseline reason\n2026-11-06T14:32:34.235925 - BASELINE_DOWNGRADED ：已自动切换至基线模板G171 F020 baseline 1793946750416153900(V1.0)，原因: 运行操作员选择基线模板，选择依据: [任务族精确匹配(EXT_0BD83987), 步骤数1步少优先, 最近试运行通过时间2026-11-06T14:32:31.071934优先]\n2026-11-06T14:32:34.243802 - AGENT_ASSIGNMENT_REQUESTED ：步骤1候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)；AGT-8519A3B6(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求\n2026-11-06T14:32:35.525359 - AGENT_ASSIGNED ：设备代理AGT-386E8C30接受步骤1承接请求\n2026-11-06T14:32:35.529906 - STEP_DISPATCHED ：指令CMD-20261106143235-50A70010已下发至设备代理AGT-386E8C30，业务意图: 执行CAP_NAVIGATION能力（基线模板步骤）\n2026-11-06T14:32:35.917874 - EXECUTION_FEEDBACK_RECEIVED （原因码: DEVICE_SUCCESS）：指令CMD-20261106143235-50A70010收到设备代理AGT-386E8C30执行反馈: SUCCESS\n2026-11-06T14:32:35.922244 - STEP_COMPLETED ：步骤1完成条件已满足: routeGenerated=true\n2026-11-06T14:32:35.926212 - TASK_COMPLETED ：全部步骤完成条件均已满足，任务完成"
+    }
+  ],
+  "javascriptErrors": [],
+  "listResponses": [
+    {
+      "at": 1793946810970,
+      "url": "http://127.0.0.1:15179/api/v1/tasks?status=PENDING_MANUAL",
+      "http": 200,
+      "body": {
+        "code": 200,
+        "message": "success",
+        "data": {
+          "content": [
+            {
+              "id": 746,
+              "taskCode": "TASK-20261106-0739",
+              "taskGoal": "F171_UI_SWITCH synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_SWITCH synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:28.328582",
+              "updatedAt": "2026-11-06T14:32:28.366409",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 745,
+              "taskCode": "TASK-20261106-0738",
+              "taskGoal": "F171_UI_RETRY synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_RETRY synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:25.320917",
+              "updatedAt": "2026-11-06T14:32:25.384731",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 744,
+              "taskCode": "TASK-20261106-0737",
+              "taskGoal": "F171_UI_TERMINATE synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_TERMINATE synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:22.789605",
+              "updatedAt": "2026-11-06T14:32:22.830041",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 743,
+              "taskCode": "TASK-20261106-0736",
+              "taskGoal": "F171_UI_MARK_FAILED synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_MARK_FAILED synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:20.288327",
+              "updatedAt": "2026-11-06T14:32:20.350345",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 187,
+              "taskCode": "TASK-20261104-0187",
+              "taskGoal": "F149_MULTI_MATCH synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0FA30230",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "The navigation route has been generated.",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F149_MULTI_MATCH synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": 181,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-04T01:20:51.64523",
+              "updatedAt": "2026-11-04T01:20:51.721219",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 186,
+              "taskCode": "TASK-20261104-0186",
+              "taskGoal": "F149_NORMALIZED synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0FA30230",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F149_NORMALIZED synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": 180,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-04T01:20:51.047313",
+              "updatedAt": "2026-11-04T01:20:51.101572",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 185,
+              "taskCode": "TASK-20261104-0185",
+              "taskGoal": "F149_MATCH synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0FA30230",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "The navigation route has been generated.",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F149_MATCH synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": 179,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-04T01:20:50.406637",
+              "updatedAt": "2026-11-04T01:20:50.498046",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 184,
+              "taskCode": "TASK-20261104-0184",
+              "taskGoal": "F149_BADBOOL synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0FA30230",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F149_BADBOOL synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": 178,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-04T01:20:49.351677",
+              "updatedAt": "2026-11-04T01:20:49.66384",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 176,
+              "taskCode": "TASK-20261104-0176",
+              "taskGoal": "F148_MULTI_MATCH synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0FA30230",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "The navigation route has been generated.",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F148_MULTI_MATCH synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": 167,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-04T00:48:02.777286",
+              "updatedAt": "2026-11-04T00:48:02.941138",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 175,
+              "taskCode": "TASK-20261104-0175",
+              "taskGoal": "F148_NORMALIZED synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0FA30230",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F148_NORMALIZED synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": 166,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-04T00:48:01.688135",
+              "updatedAt": "2026-11-04T00:48:01.77515",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 174,
+              "taskCode": "TASK-20261104-0174",
+              "taskGoal": "F148_MATCH synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0FA30230",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "The navigation route has been generated.",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F148_MATCH synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": 165,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-04T00:48:00.793256",
+              "updatedAt": "2026-11-04T00:48:00.943673",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 173,
+              "taskCode": "TASK-20261104-0173",
+              "taskGoal": "F148_BADBOOL synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0FA30230",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F148_BADBOOL synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": 164,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-04T00:47:59.659783",
+              "updatedAt": "2026-11-04T00:48:00.059665",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 166,
+              "taskCode": "TASK-20261104-0166",
+              "taskGoal": "F147_MULTI_MATCH synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0FA30230",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "The navigation route has been generated.",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F147_MULTI_MATCH synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": 154,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-04T00:03:53.771264",
+              "updatedAt": "2026-11-04T00:03:53.871495",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 165,
+              "taskCode": "TASK-20261104-0165",
+              "taskGoal": "F147_NORMALIZED synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0FA30230",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F147_NORMALIZED synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": 153,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-04T00:03:52.90567",
+              "updatedAt": "2026-11-04T00:03:52.980045",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 164,
+              "taskCode": "TASK-20261104-0164",
+              "taskGoal": "F147_MATCH synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0FA30230",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "The navigation route has been generated.",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F147_MATCH synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": 152,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-04T00:03:52.047072",
+              "updatedAt": "2026-11-04T00:03:52.166028",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 163,
+              "taskCode": "TASK-20261104-0163",
+              "taskGoal": "F147_BADBOOL synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0FA30230",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F147_BADBOOL synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": 151,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-04T00:03:50.832911",
+              "updatedAt": "2026-11-04T00:03:51.223117",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 159,
+              "taskCode": "TASK-20261103-0159",
+              "taskGoal": "F146_MULTI_MATCH synthetic navigation to F2_TEST_GATE; required routeGenerated=true",
+              "taskFamily": "EXT_0FA30230",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F146_MULTI_MATCH synthetic navigation to F2_TEST_GATE; required routeGenerated=true",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": 144,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-03T23:20:07.219519",
+              "updatedAt": "2026-11-03T23:20:07.288693",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 158,
+              "taskCode": "TASK-20261103-0158",
+              "taskGoal": "F146_NORMALIZED synthetic navigation to F2_TEST_GATE; required routeGenerated=true",
+              "taskFamily": "EXT_0FA30230",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F146_NORMALIZED synthetic navigation to F2_TEST_GATE; required routeGenerated=true",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": 143,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-03T23:20:06.609332",
+              "updatedAt": "2026-11-03T23:20:06.663654",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 157,
+              "taskCode": "TASK-20261103-0157",
+              "taskGoal": "F146_MATCH synthetic navigation to F2_TEST_GATE; required routeGenerated=true",
+              "taskFamily": "EXT_0FA30230",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F146_MATCH synthetic navigation to F2_TEST_GATE; required routeGenerated=true",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": 142,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "监督判定高风险: RULE_RESOURCE_CRITICAL；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-03T23:20:05.975637",
+              "updatedAt": "2026-11-03T23:20:06.061662",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 156,
+              "taskCode": "TASK-20261103-0156",
+              "taskGoal": "F146_BADBOOL synthetic navigation to F2_TEST_GATE; required routeGenerated=true",
+              "taskFamily": "EXT_0FA30230",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F146_BADBOOL synthetic navigation to F2_TEST_GATE; required routeGenerated=true",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": 141,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_COMPLETION_CONDITION_CONFLICT；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-03T23:20:05.152135",
+              "updatedAt": "2026-11-03T23:20:05.425199",
+              "createdBy": "oprator"
+            }
+          ],
+          "totalElements": 114,
+          "page": 1,
+          "size": 20
+        },
+        "timestamp": "2026-11-06T14:33:30.918891300+08:00"
+      }
+    },
+    {
+      "at": 1793946812034,
+      "url": "http://127.0.0.1:15179/api/v1/tasks?createdFrom=2026-11-06T00:00:00&createdTo=2026-11-06T23:59:59",
+      "http": 200,
+      "body": {
+        "code": 200,
+        "message": "success",
+        "data": {
+          "content": [
+            {
+              "id": 748,
+              "taskCode": "TASK-20261106-0741",
+              "taskGoal": "F171_UI_REFRESH synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_REFRESH synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "EXECUTING",
+              "currentPlanVersionId": 898,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": null,
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:51.455271",
+              "updatedAt": "2026-11-06T14:32:52.969481",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 746,
+              "taskCode": "TASK-20261106-0739",
+              "taskGoal": "F171_UI_SWITCH synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_SWITCH synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:28.328582",
+              "updatedAt": "2026-11-06T14:32:28.366409",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 745,
+              "taskCode": "TASK-20261106-0738",
+              "taskGoal": "F171_UI_RETRY synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_RETRY synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:25.320917",
+              "updatedAt": "2026-11-06T14:32:25.384731",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 744,
+              "taskCode": "TASK-20261106-0737",
+              "taskGoal": "F171_UI_TERMINATE synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_TERMINATE synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:22.789605",
+              "updatedAt": "2026-11-06T14:32:22.830041",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 743,
+              "taskCode": "TASK-20261106-0736",
+              "taskGoal": "F171_UI_MARK_FAILED synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_MARK_FAILED synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:20.288327",
+              "updatedAt": "2026-11-06T14:32:20.350345",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 742,
+              "taskCode": "TASK-20261106-0735",
+              "taskGoal": "F171_SWITCH_REJECT_CONSTRAINT synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_SWITCH_REJECT_CONSTRAINT synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": 897,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "基线降级任务执行异常且恢复失败，按业务规则不再二次自动降级",
+              "missingInfoQuestions": null,
+              "downgradeReason": "运行操作员选择基线模板",
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:17.745608",
+              "updatedAt": "2026-11-06T14:32:50.431677",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 741,
+              "taskCode": "TASK-20261106-0734",
+              "taskGoal": "F171_SWITCH_REJECT_CAPABILITY synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_SWITCH_REJECT_CAPABILITY synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "运行操作员选择基线模板；所选基线模板校验失败: ERR_CAPABILITY_GAP",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:15.519445",
+              "updatedAt": "2026-11-06T14:32:48.150167",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 740,
+              "taskCode": "TASK-20261106-0733",
+              "taskGoal": "F171_SWITCH_REJECT_STRUCTURE synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_SWITCH_REJECT_STRUCTURE synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "运行操作员选择基线模板；所选基线模板校验失败: ERR_STEP_FIELD_MISSING",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:13.290045",
+              "updatedAt": "2026-11-06T14:32:45.577259",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 739,
+              "taskCode": "TASK-20261106-0732",
+              "taskGoal": "F171_SWITCH_NO_REASON synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_SWITCH_NO_REASON synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "COMPLETED",
+              "currentPlanVersionId": 894,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": null,
+              "missingInfoQuestions": null,
+              "downgradeReason": "运行操作员选择基线模板",
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:10.163102",
+              "updatedAt": "2026-11-06T14:32:40.734387",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 738,
+              "taskCode": "TASK-20261106-0731",
+              "taskGoal": "F171_SWITCH_VALID synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_SWITCH_VALID synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "COMPLETED",
+              "currentPlanVersionId": 893,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": null,
+              "missingInfoQuestions": null,
+              "downgradeReason": "运行操作员选择基线模板",
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:08.411778",
+              "updatedAt": "2026-11-06T14:32:35.925118",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 737,
+              "taskCode": "TASK-20261106-0730",
+              "taskGoal": "F171_UI_SWITCH synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_5BFC331D",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_SWITCH synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:30:31.774538",
+              "updatedAt": "2026-11-06T14:30:36.37339",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 736,
+              "taskCode": "TASK-20261106-0729",
+              "taskGoal": "F171_UI_RETRY synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_5BFC331D",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_RETRY synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:30:29.892833",
+              "updatedAt": "2026-11-06T14:30:36.14798",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 735,
+              "taskCode": "TASK-20261106-0728",
+              "taskGoal": "F171_UI_TERMINATE synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_5BFC331D",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_TERMINATE synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:30:28.031283",
+              "updatedAt": "2026-11-06T14:30:35.912879",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 734,
+              "taskCode": "TASK-20261106-0727",
+              "taskGoal": "F171_UI_MARK_FAILED synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_5BFC331D",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_MARK_FAILED synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:30:26.138524",
+              "updatedAt": "2026-11-06T14:30:35.723275",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 733,
+              "taskCode": "TASK-20261106-0726",
+              "taskGoal": "F171_SWITCH_VALID synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_5BFC331D",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_SWITCH_VALID synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:30:22.996923",
+              "updatedAt": "2026-11-06T14:30:35.517082",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 731,
+              "taskCode": "TASK-20261106-0724",
+              "taskGoal": "F171_TERMINATE_EXECUTING synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_5BFC331D",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_TERMINATE_EXECUTING synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": 890,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "F020 terminate executing reason",
+              "failureReason": null,
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:30:14.582733",
+              "updatedAt": "2026-11-06T14:30:17.133045",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 730,
+              "taskCode": "TASK-20261106-0723",
+              "taskGoal": "F171_NORMAL_TWO_STEP synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_5BFC331D",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_NORMAL_TWO_STEP synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "COMPLETED",
+              "currentPlanVersionId": 889,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": null,
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:30:07.597456",
+              "updatedAt": "2026-11-06T14:30:11.840081",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 729,
+              "taskCode": "TASK-20261106-0722",
+              "taskGoal": "F171_RETRY_REJECT_MISSING_INFO synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_5BFC331D",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_RETRY_REJECT_MISSING_INFO synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": [
+                "Synthetic unresolved destination"
+              ],
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:30:03.423629",
+              "updatedAt": "2026-11-06T14:30:06.848758",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 728,
+              "taskCode": "TASK-20261106-0721",
+              "taskGoal": "F171_RETRY_REJECT_FORCE synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_5BFC331D",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_RETRY_REJECT_FORCE synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:29:59.14467",
+              "updatedAt": "2026-11-06T14:30:02.544722",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 727,
+              "taskCode": "TASK-20261106-0720",
+              "taskGoal": "F171_RETRY_REJECT_HIGH synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_5BFC331D",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_RETRY_REJECT_HIGH synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": 888,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "监督判定高风险: RISK_SIGNAL_COMBINATION；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:29:54.091294",
+              "updatedAt": "2026-11-06T14:29:58.364714",
+              "createdBy": "oprator"
+            }
+          ],
+          "totalElements": 127,
+          "page": 1,
+          "size": 20
+        },
+        "timestamp": "2026-11-06T14:33:32.025322+08:00"
+      }
+    },
+    {
+      "at": 1793946813739,
+      "url": "http://127.0.0.1:15179/api/v1/tasks?createdFrom=2026-11-06T00:00:00&createdTo=2026-11-06T23:59:59",
+      "http": 200,
+      "body": {
+        "code": 200,
+        "message": "success",
+        "data": {
+          "content": [
+            {
+              "id": 748,
+              "taskCode": "TASK-20261106-0741",
+              "taskGoal": "F171_UI_REFRESH synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_REFRESH synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "EXECUTING",
+              "currentPlanVersionId": 898,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": null,
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:51.455271",
+              "updatedAt": "2026-11-06T14:32:52.969481",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 746,
+              "taskCode": "TASK-20261106-0739",
+              "taskGoal": "F171_UI_SWITCH synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_SWITCH synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:28.328582",
+              "updatedAt": "2026-11-06T14:32:28.366409",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 745,
+              "taskCode": "TASK-20261106-0738",
+              "taskGoal": "F171_UI_RETRY synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_RETRY synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:25.320917",
+              "updatedAt": "2026-11-06T14:32:25.384731",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 744,
+              "taskCode": "TASK-20261106-0737",
+              "taskGoal": "F171_UI_TERMINATE synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_TERMINATE synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:22.789605",
+              "updatedAt": "2026-11-06T14:32:22.830041",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 743,
+              "taskCode": "TASK-20261106-0736",
+              "taskGoal": "F171_UI_MARK_FAILED synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_MARK_FAILED synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:20.288327",
+              "updatedAt": "2026-11-06T14:32:20.350345",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 742,
+              "taskCode": "TASK-20261106-0735",
+              "taskGoal": "F171_SWITCH_REJECT_CONSTRAINT synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_SWITCH_REJECT_CONSTRAINT synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": 897,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "基线降级任务执行异常且恢复失败，按业务规则不再二次自动降级",
+              "missingInfoQuestions": null,
+              "downgradeReason": "运行操作员选择基线模板",
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:17.745608",
+              "updatedAt": "2026-11-06T14:32:50.431677",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 741,
+              "taskCode": "TASK-20261106-0734",
+              "taskGoal": "F171_SWITCH_REJECT_CAPABILITY synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_SWITCH_REJECT_CAPABILITY synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "运行操作员选择基线模板；所选基线模板校验失败: ERR_CAPABILITY_GAP",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:15.519445",
+              "updatedAt": "2026-11-06T14:32:48.150167",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 740,
+              "taskCode": "TASK-20261106-0733",
+              "taskGoal": "F171_SWITCH_REJECT_STRUCTURE synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_SWITCH_REJECT_STRUCTURE synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "运行操作员选择基线模板；所选基线模板校验失败: ERR_STEP_FIELD_MISSING",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:13.290045",
+              "updatedAt": "2026-11-06T14:32:45.577259",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 739,
+              "taskCode": "TASK-20261106-0732",
+              "taskGoal": "F171_SWITCH_NO_REASON synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_SWITCH_NO_REASON synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "COMPLETED",
+              "currentPlanVersionId": 894,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": null,
+              "missingInfoQuestions": null,
+              "downgradeReason": "运行操作员选择基线模板",
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:10.163102",
+              "updatedAt": "2026-11-06T14:32:40.734387",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 738,
+              "taskCode": "TASK-20261106-0731",
+              "taskGoal": "F171_SWITCH_VALID synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_SWITCH_VALID synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "COMPLETED",
+              "currentPlanVersionId": 893,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": null,
+              "missingInfoQuestions": null,
+              "downgradeReason": "运行操作员选择基线模板",
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:08.411778",
+              "updatedAt": "2026-11-06T14:32:35.925118",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 737,
+              "taskCode": "TASK-20261106-0730",
+              "taskGoal": "F171_UI_SWITCH synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_5BFC331D",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_SWITCH synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:30:31.774538",
+              "updatedAt": "2026-11-06T14:30:36.37339",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 736,
+              "taskCode": "TASK-20261106-0729",
+              "taskGoal": "F171_UI_RETRY synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_5BFC331D",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_RETRY synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:30:29.892833",
+              "updatedAt": "2026-11-06T14:30:36.14798",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 735,
+              "taskCode": "TASK-20261106-0728",
+              "taskGoal": "F171_UI_TERMINATE synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_5BFC331D",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_TERMINATE synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:30:28.031283",
+              "updatedAt": "2026-11-06T14:30:35.912879",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 734,
+              "taskCode": "TASK-20261106-0727",
+              "taskGoal": "F171_UI_MARK_FAILED synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_5BFC331D",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_MARK_FAILED synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:30:26.138524",
+              "updatedAt": "2026-11-06T14:30:35.723275",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 733,
+              "taskCode": "TASK-20261106-0726",
+              "taskGoal": "F171_SWITCH_VALID synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_5BFC331D",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_SWITCH_VALID synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:30:22.996923",
+              "updatedAt": "2026-11-06T14:30:35.517082",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 731,
+              "taskCode": "TASK-20261106-0724",
+              "taskGoal": "F171_TERMINATE_EXECUTING synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_5BFC331D",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_TERMINATE_EXECUTING synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": 890,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "F020 terminate executing reason",
+              "failureReason": null,
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:30:14.582733",
+              "updatedAt": "2026-11-06T14:30:17.133045",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 730,
+              "taskCode": "TASK-20261106-0723",
+              "taskGoal": "F171_NORMAL_TWO_STEP synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_5BFC331D",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_NORMAL_TWO_STEP synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "COMPLETED",
+              "currentPlanVersionId": 889,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": null,
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:30:07.597456",
+              "updatedAt": "2026-11-06T14:30:11.840081",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 729,
+              "taskCode": "TASK-20261106-0722",
+              "taskGoal": "F171_RETRY_REJECT_MISSING_INFO synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_5BFC331D",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_RETRY_REJECT_MISSING_INFO synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": [
+                "Synthetic unresolved destination"
+              ],
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:30:03.423629",
+              "updatedAt": "2026-11-06T14:30:06.848758",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 728,
+              "taskCode": "TASK-20261106-0721",
+              "taskGoal": "F171_RETRY_REJECT_FORCE synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_5BFC331D",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_RETRY_REJECT_FORCE synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:29:59.14467",
+              "updatedAt": "2026-11-06T14:30:02.544722",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 727,
+              "taskCode": "TASK-20261106-0720",
+              "taskGoal": "F171_RETRY_REJECT_HIGH synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_5BFC331D",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_RETRY_REJECT_HIGH synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": 888,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "监督判定高风险: RISK_SIGNAL_COMBINATION；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:29:54.091294",
+              "updatedAt": "2026-11-06T14:29:58.364714",
+              "createdBy": "oprator"
+            }
+          ],
+          "totalElements": 127,
+          "page": 1,
+          "size": 20
+        },
+        "timestamp": "2026-11-06T14:33:33.732931400+08:00"
+      }
+    },
+    {
+      "at": 1793946833755,
+      "url": "http://127.0.0.1:15179/api/v1/tasks?createdFrom=2026-11-06T00:00:00&createdTo=2026-11-06T23:59:59",
+      "http": 200,
+      "body": {
+        "code": 200,
+        "message": "success",
+        "data": {
+          "content": [
+            {
+              "id": 748,
+              "taskCode": "TASK-20261106-0741",
+              "taskGoal": "F171_UI_REFRESH synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_REFRESH synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "EXECUTING",
+              "currentPlanVersionId": 898,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": null,
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:51.455271",
+              "updatedAt": "2026-11-06T14:32:52.969481",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 746,
+              "taskCode": "TASK-20261106-0739",
+              "taskGoal": "F171_UI_SWITCH synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_SWITCH synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:28.328582",
+              "updatedAt": "2026-11-06T14:32:28.366409",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 745,
+              "taskCode": "TASK-20261106-0738",
+              "taskGoal": "F171_UI_RETRY synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_RETRY synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:25.320917",
+              "updatedAt": "2026-11-06T14:32:25.384731",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 744,
+              "taskCode": "TASK-20261106-0737",
+              "taskGoal": "F171_UI_TERMINATE synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_TERMINATE synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:22.789605",
+              "updatedAt": "2026-11-06T14:32:22.830041",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 743,
+              "taskCode": "TASK-20261106-0736",
+              "taskGoal": "F171_UI_MARK_FAILED synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_MARK_FAILED synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "PENDING_MANUAL",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:20.288327",
+              "updatedAt": "2026-11-06T14:32:20.350345",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 742,
+              "taskCode": "TASK-20261106-0735",
+              "taskGoal": "F171_SWITCH_REJECT_CONSTRAINT synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_SWITCH_REJECT_CONSTRAINT synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": 897,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "基线降级任务执行异常且恢复失败，按业务规则不再二次自动降级",
+              "missingInfoQuestions": null,
+              "downgradeReason": "运行操作员选择基线模板",
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:17.745608",
+              "updatedAt": "2026-11-06T14:32:50.431677",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 741,
+              "taskCode": "TASK-20261106-0734",
+              "taskGoal": "F171_SWITCH_REJECT_CAPABILITY synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_SWITCH_REJECT_CAPABILITY synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "运行操作员选择基线模板；所选基线模板校验失败: ERR_CAPABILITY_GAP",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:15.519445",
+              "updatedAt": "2026-11-06T14:32:48.150167",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 740,
+              "taskCode": "TASK-20261106-0733",
+              "taskGoal": "F171_SWITCH_REJECT_STRUCTURE synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_SWITCH_REJECT_STRUCTURE synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "运行操作员选择基线模板；所选基线模板校验失败: ERR_STEP_FIELD_MISSING",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:13.290045",
+              "updatedAt": "2026-11-06T14:32:45.577259",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 739,
+              "taskCode": "TASK-20261106-0732",
+              "taskGoal": "F171_SWITCH_NO_REASON synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_SWITCH_NO_REASON synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "COMPLETED",
+              "currentPlanVersionId": 894,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": null,
+              "missingInfoQuestions": null,
+              "downgradeReason": "运行操作员选择基线模板",
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:10.163102",
+              "updatedAt": "2026-11-06T14:32:40.734387",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 738,
+              "taskCode": "TASK-20261106-0731",
+              "taskGoal": "F171_SWITCH_VALID synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_0BD83987",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_SWITCH_VALID synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "COMPLETED",
+              "currentPlanVersionId": 893,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": null,
+              "missingInfoQuestions": null,
+              "downgradeReason": "运行操作员选择基线模板",
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:32:08.411778",
+              "updatedAt": "2026-11-06T14:32:35.925118",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 737,
+              "taskCode": "TASK-20261106-0730",
+              "taskGoal": "F171_UI_SWITCH synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_5BFC331D",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_SWITCH synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:30:31.774538",
+              "updatedAt": "2026-11-06T14:30:36.37339",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 736,
+              "taskCode": "TASK-20261106-0729",
+              "taskGoal": "F171_UI_RETRY synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_5BFC331D",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_RETRY synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:30:29.892833",
+              "updatedAt": "2026-11-06T14:30:36.14798",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 735,
+              "taskCode": "TASK-20261106-0728",
+              "taskGoal": "F171_UI_TERMINATE synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_5BFC331D",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_TERMINATE synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:30:28.031283",
+              "updatedAt": "2026-11-06T14:30:35.912879",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 734,
+              "taskCode": "TASK-20261106-0727",
+              "taskGoal": "F171_UI_MARK_FAILED synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_5BFC331D",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_UI_MARK_FAILED synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:30:26.138524",
+              "updatedAt": "2026-11-06T14:30:35.723275",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 733,
+              "taskCode": "TASK-20261106-0726",
+              "taskGoal": "F171_SWITCH_VALID synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_5BFC331D",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_SWITCH_VALID synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:30:22.996923",
+              "updatedAt": "2026-11-06T14:30:35.517082",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 731,
+              "taskCode": "TASK-20261106-0724",
+              "taskGoal": "F171_TERMINATE_EXECUTING synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_5BFC331D",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_TERMINATE_EXECUTING synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": 890,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "F020 terminate executing reason",
+              "failureReason": null,
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:30:14.582733",
+              "updatedAt": "2026-11-06T14:30:17.133045",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 730,
+              "taskCode": "TASK-20261106-0723",
+              "taskGoal": "F171_NORMAL_TWO_STEP synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_5BFC331D",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_NORMAL_TWO_STEP synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "COMPLETED",
+              "currentPlanVersionId": 889,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": null,
+              "failureReason": null,
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:30:07.597456",
+              "updatedAt": "2026-11-06T14:30:11.840081",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 729,
+              "taskCode": "TASK-20261106-0722",
+              "taskGoal": "F171_RETRY_REJECT_MISSING_INFO synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_5BFC331D",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_RETRY_REJECT_MISSING_INFO synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": [
+                "Synthetic unresolved destination"
+              ],
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:30:03.423629",
+              "updatedAt": "2026-11-06T14:30:06.848758",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 728,
+              "taskCode": "TASK-20261106-0721",
+              "taskGoal": "F171_RETRY_REJECT_FORCE synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_5BFC331D",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_RETRY_REJECT_FORCE synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": null,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "候选计划生成失败或模型服务不可用；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:29:59.14467",
+              "updatedAt": "2026-11-06T14:30:02.544722",
+              "createdBy": "oprator"
+            },
+            {
+              "id": 727,
+              "taskCode": "TASK-20261106-0720",
+              "taskGoal": "F171_RETRY_REJECT_HIGH synthetic navigation to F2_TEST_GATE",
+              "taskFamily": "EXT_5BFC331D",
+              "sceneParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "goalParsingResult": {
+                "completionCondition": "routeGenerated=true",
+                "origin": "F2_SERVICE_POINT",
+                "destination": "F2_TEST_GATE",
+                "originalGoal": "F171_RETRY_REJECT_HIGH synthetic navigation to F2_TEST_GATE",
+                "constraints": [
+                  "synthetic test"
+                ]
+              },
+              "status": "MANUAL_TERMINATED",
+              "currentPlanVersionId": 888,
+              "replanUsed": false,
+              "replanningReason": null,
+              "manualTerminateReason": "Synthetic F020 cleanup",
+              "failureReason": "监督判定高风险: RISK_SIGNAL_COMBINATION；且无匹配的已启用基线模板",
+              "missingInfoQuestions": null,
+              "downgradeReason": null,
+              "isDryRun": false,
+              "createdAt": "2026-11-06T14:29:54.091294",
+              "updatedAt": "2026-11-06T14:29:58.364714",
+              "createdBy": "oprator"
+            }
+          ],
+          "totalElements": 127,
+          "page": 1,
+          "size": 20
+        },
+        "timestamp": "2026-11-06T14:33:53.740317+08:00"
+      }
+    }
+  ],
+  "pollRequests": [
+    {
+      "at": 1793946833357,
+      "url": "http://127.0.0.1:15179/api/v1/tasks/999999999"
+    },
+    {
+      "at": 1793946853066,
+      "url": "http://127.0.0.1:15179/api/v1/tasks/743"
+    },
+    {
+      "at": 1793946854438,
+      "url": "http://127.0.0.1:15179/api/v1/tasks/743"
+    },
+    {
+      "at": 1793946855904,
+      "url": "http://127.0.0.1:15179/api/v1/tasks/744"
+    },
+    {
+      "at": 1793946865906,
+      "url": "http://127.0.0.1:15179/api/v1/tasks/744"
+    },
+    {
+      "at": 1793946875403,
+      "url": "http://127.0.0.1:15179/api/v1/tasks/745"
+    },
+    {
+      "at": 1793946876845,
+      "url": "http://127.0.0.1:15179/api/v1/tasks/745"
+    },
+    {
+      "at": 1793946878738,
+      "url": "http://127.0.0.1:15179/api/v1/tasks/746"
+    },
+    {
+      "at": 1793946879634,
+      "url": "http://127.0.0.1:15179/api/v1/tasks/746"
+    },
+    {
+      "at": 1793946881525,
+      "url": "http://127.0.0.1:15179/api/v1/tasks/748"
+    },
+    {
+      "at": 1793946891513,
+      "url": "http://127.0.0.1:15179/api/v1/tasks/748"
+    },
+    {
+      "at": 1793946893391,
+      "url": "http://127.0.0.1:15179/api/v1/tasks/738"
+    }
+  ],
+  "browser": "156.0.4314.58",
+  "endedAt": "2026-11-06T06:34:56.815Z"
+}
