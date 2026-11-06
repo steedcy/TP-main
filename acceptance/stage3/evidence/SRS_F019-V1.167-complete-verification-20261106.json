@@ -1,0 +1,68 @@
+{
+  "status": "READY_FOR_CLAUDE",
+  "tag": "V1.167",
+  "productSha": "75790d9064eb5dbc1f868365b2faccde28a33ea5",
+  "receivedHandoffSha": "bfb86a775d9dafd7ac5011156656631fee6656a5",
+  "branch": "ai/gpt-test",
+  "timezone": "Asia/Shanghai",
+  "ruleCounts": {
+    "P": 4,
+    "F": 5,
+    "NT": 0
+  },
+  "stepCounts": {
+    "P": 2,
+    "F": 4,
+    "NT": 0
+  },
+  "historicalBusinessPReuse": 0,
+  "issuesOpen": [
+    "DEF-S3-110",
+    "DEF-S3-111"
+  ],
+  "report": "acceptance/stage3/SRS_F019-V1.167-整轮独立复测与统一交修.md",
+  "checkpoints": [
+    "81a3a84",
+    "175a890"
+  ],
+  "mainActual": "620c16669b2bba725df54818dffb0d21ac27f627",
+  "mergedMain": false,
+  "pullRequest": null,
+  "currentEvidence": {
+    "tasks": 30,
+    "trials": 2,
+    "effectiveObservationGroups": 23,
+    "effectiveGroupsP": 21,
+    "effectiveGroupsF": 2,
+    "assertionsP": 356,
+    "assertionsF": 13,
+    "uiViews": 42,
+    "backendReported": 399,
+    "backendPassed": 397,
+    "backendSkipped": 2,
+    "directedPassed": 60,
+    "independentWithinDirected": 7
+  },
+  "commands": [
+    "git status --short; git log -5 --oneline; git worktree list; git fetch origin",
+    "git merge --ff-only origin/ai/claude-fix",
+    "git ls-remote origin refs/heads/main refs/heads/ai/claude-fix refs/tags/V1.167 refs/tags/V1.167^{}",
+    "mvn -o -f backend/pom.xml package",
+    "npm.cmd --prefix frontend run build",
+    "mvn -o -f backend/pom.xml test -Dtest=IndependentF019V167Test,TaskReplanningQuotaAndManualTakeoverF018Test,PlanStepLimitAndReplanningF012Test,BaselineDowngradeAndFailureBoundaryF015Test,CommandDispatchAndExecutionF017Test,RecoveryEventTruthF015Test,InstructionTimeoutAndRollbackF019Test",
+    "python acceptance/stage3/fixtures/start-f019-v167-jar.py",
+    "python acceptance/stage3/probe-f019-v167-round.py",
+    "python acceptance/stage3/probe-f019-v167-stable.py",
+    "python acceptance/stage3/probe-f019-v167-conditional.py",
+    "python acceptance/stage3/probe-f019-v167-conditional-replay.py",
+    "python acceptance/stage3/probe-f019-v167-contrast.py",
+    "node acceptance/stage3/retest-f019-v167-ui.cjs compare TASK-20261106-0601 TASK-20261106-0603",
+    "node acceptance/stage3/retest-f019-v167-ui.cjs final TASK-20261106-0620 TASK-20261106-0624 TASK-20261106-0627 TASK-20261106-0617",
+    "node acceptance/stage3/retest-f019-v167-ui.cjs contrast TASK-20261106-0629 TASK-20261106-0630",
+    "python acceptance/stage3/probe-f019-v167-audit.py",
+    "python acceptance/stage3/probe-f019-v167-finish.py",
+    "acceptance/stage3/fixtures/stop-f019-v167-processes.ps1"
+  ],
+  "cleanup": "3 owned process trees/6 ports released;30 tasks,5 definitions,2 templates retained; all owned resources inactive, allocation/occupation0;63 resolved and8 processing exceptions retained without backfill",
+  "verificationScope": "Real packaged JAR/HTTP/SQL/headless Edge/synthetic model and devices. No commercial model/physical hardware/three-core-end-to-end/95 overall acceptance claims."
+}

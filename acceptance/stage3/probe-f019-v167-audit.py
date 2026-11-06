@@ -1,0 +1,54 @@
+"""Reconcile raw observations without re-running sufficient same-version HTTP tests.
+Preserves initial diagnostic JSON and incorrect probe verdicts; adds explicit corrected
+assertions based on raw requests, SQL and transport facts. No product/state writes.
+"""
+from pathlib import Path
+from datetime import datetime
+import json,hashlib
+R=Path(__file__).resolve().parents[2];E=R/'acceptance/stage3/evidence'
+def load(n):return json.loads((E/n).read_text(encoding='utf8'))
+files=['SRS_F019-V1.167-http-20261106.json','SRS_F019-V1.167-http-20261106-stable.json','SRS_F019-V1.167-http-20261106-conditional.json','SRS_F019-V1.167-http-20261106-conditional-replay.json','SRS_F019-V1.167-http-20261106-contrast.json']
+raw=[(n,load(n)) for n in files];requests=[json.loads(l) for l in (R/'.local-test/f019-v167-model-requests.jsonl').read_text(encoding='utf8').splitlines()]
+def events(o,t):return [e for e in o['events'] if e['eventType']==t]
+def replans(r):return [x for x in requests if r['request']['taskGoal'].split()[0] in x['request']['taskGoal'] and x['phase']=='planning' and any('仅替换步骤' in c for c in x['request'].get('constraints',[]))]
+excluded={601,602,605,606,607,619,621};observations=[];diagnostics=[]
+for filename,d in raw:
+ for x in d['diagnostics']:diagnostics.append(dict(source=filename,**x))
+ for r in d['cases']:
+  tid=r['taskId']
+  if tid in excluded:continue
+  o=r.get('after') or r.get('replanned');checks={};n=0;mode='trial'
+  if not o:raise AssertionError(('Missing observation',tid))
+  if 'request' not in r:
+   checks={'trialActuallyCompleted':o['task']['status']=='COMPLETED'}
+  elif tid in [628,629]:
+   mode='conditional-replan-rollback';before=r['prefix'];o=r.get('after') or r['replanned'];calls=replans(r);n=2
+   checks={'validTailAccepted':len(o['plans'])==2,'newSnapshotPersisted':len(o['snapshots'])>len(before['snapshots']),'allFeedbackAccepted':all(f['response']['http']==200 for f in r['feedbacks']),'singleOpportunityConsumed':o['task']['replanUsed'],'successOrManualOutcome':o['task']['status']=='PENDING_MANUAL' or (len(o['plans'])==2 and o['task']['currentPlanVersionId']==o['plans'][-1]['id']),'replanningTimelineRetained':bool(events(o,'REPLANNING_TRIGGERED')),'atMostOneReplanModelCall':len(calls)<=1,'originalGoalUnchanged':o['task']['taskGoal']==r['request']['taskGoal'],'actualPrefixUnchanged':all(any(a['id']==old['id'] and a==old for a in o['allAssignments']) for old in before['allAssignments'] if old['step_status']=='COMPLETED')}
+  elif tid==616:
+   checks=r['checks'];mode='timeout-rollback-late-feedback'
+  else:
+   before=r['prefix'];old=before['plans'][0];kept=[a for a in before['allAssignments'] if a['step_status']=='COMPLETED'];n=len(kept);current={a['id']:a for a in o['allAssignments']};calls=replans(r)
+   originalFutureIds={a[k] for a in o['allAssignments'] if a['plan_version_id']==old['id'] and a['step_seq']>n+1 for k in ['command_id','execute_command_id'] if a[k]}
+   checks={'goalUnchanged':o['task']['taskGoal']==r['request']['taskGoal'],'oldPlanUnchanged':o['plans'][0]==old,'actualPrefixUnchanged':all(current[a['id']]==a for a in kept),'oneReplanRequest':len(calls)==1,'exactRemainingQuota':len(calls)==1 and calls[0]['request']['remainingStepQuota']==5-n,'modelReceivesActualCompletedResults':len(calls)==1 and len(calls[0]['request']['completedSteps'])==n and all(calls[0]['request']['completedSteps'][i]['outputParams']==kept[i]['output_params'] and calls[0]['request']['completedSteps'][i]['originalCommandId']==kept[i]['command_id'] for i in range(n)),'freshSavedSnapshot':len(o['snapshots'])>len(before['snapshots']) and len(set(x['snapshotCode'] for x in o['snapshots']))==len(o['snapshots']),'oneTrigger':len(events(o,'REPLANNING_TRIGGERED'))==1,'consumedOpportunity':o['task']['replanUsed'],'priorRecoveryFactInFullTimeline':bool(events(o,'EXCEPTION_RECOVERY_FAILED')) and events(o,'EXCEPTION_RECOVERY_FAILED')[0]['id']<events(o,'REPLANNING_TRIGGERED')[0]['id'],'noOldFutureCommand':not any(c['command_id'] in originalFutureIds for c in o['commandRows']),'allDeviceFeedbackAccepted':all(f['response']['http']==200 for f in r.get('feedbacks',[]))}
+   if tid in [620,622,623,630]:
+    mode='successful-partial-replan';new=o['plans'][-1];stored=new['planSteps'];newRows=[a for a in o['allAssignments'] if a['plan_version_id']==new['id']]
+    checks.update(taskCompleted=o['task']['status']=='COMPLETED',threeValidationPass=all(new[k]=='PASS' for k in ['structureCheckResult','capabilityCheckResult','constraintCheckResult']),supervisionLow=new['riskLevel']=='LOW' and bool(events(o,'SUPERVISION_JUDGED')),newVersionFrozen=len(o['plans'])==2 and bool(new['frozenAt']),exactFiveActionVersion=len(stored)==5,copiedPrefixHasActualResults=all(stored[i]['outputParams']==kept[i]['output_params'] and stored[i]['executionResult']=='SUCCESS' for i in range(n)),copiedAssignmentsNeverRedispatched=all(a['command_id'] is None and a['execute_command_id'] is None and a['step_status']=='COMPLETED' for a in newRows if a['step_seq']<=n),exactFivePhysicalCompletedActions=sum(c['command_type']=='EXECUTE_CAPABILITY' and c['command_status']=='SUCCEEDED' for c in o['commandRows'])==5,retryEventsDoNotAddAssignments=len([a for a in o['allAssignments'] if a['plan_version_id']==old['id'] and a['step_seq']==n+1])==1)
+    if tid==630:checks.update(conditionNotStored=not any(s.get('conditionNode') for s in stored),twoBranchActionsCounted=sum('branchCondition' in s for s in stored)==2,noDispatchForFoldedNode=not any(c['step_seq']==4 and c['created_at']>=new['createdAt'] for c in o['commandRows']))
+   elif tid==624:
+    mode='second-failure-after-replan';checks.update(manual=o['task']['status']=='PENDING_MANUAL',noThirdPlan=len(o['plans'])==2,stillOneModelRequest=len(calls)==1,secondFailureReason=bool(o['task']['failureReason']) and any('机会已用' in x['impact_conclusion'] for x in o['exceptions'] if x['impact_conclusion']),noFalseRecovery=not events(o,'EXCEPTION_RECOVERED'))
+   elif tid==627:
+    mode='replan-high-risk-baseline';base=o['plans'][-1];checks.update(initialLow=o['plans'][0]['riskLevel']=='LOW',replanHigh=o['plans'][1]['riskLevel']=='HIGH',autoBaseline=len(o['plans'])==3 and base['source']=='BASELINE_TEMPLATE' and bool(events(o,'BASELINE_DOWNGRADED')),baseValidated=all(base[k]=='PASS' for k in ['structureCheckResult','capabilityCheckResult','constraintCheckResult']),baseFrozen=bool(base['frozenAt']),mergedFiveActions=len(base['planSteps'])==5,completed=o['task']['status']=='COMPLETED',preservedPrefix=all(base['planSteps'][i]['outputParams']==kept[i]['output_params'] for i in range(n)),onlyFivePhysicalSuccesses=sum(c['command_type']=='EXECUTE_CAPABILITY' and c['command_status']=='SUCCEEDED' for c in o['commandRows'])==5)
+   else:
+    mode='replan-rejected-manual';checks.update(manual=o['task']['status']=='PENDING_MANUAL',failureException=any(e['exception_type']=='REPLAN_FAILED' and e['recovery_result']=='FAILED' for e in o['exceptions']),noNewVersionDispatch=not any(a['plan_version_id']!=old['id'] and a['command_id'] for a in o['allAssignments']),noSuccessEvent=not events(o,'REPLAN_SUCCEEDED'),originalCurrentPlan=o['task']['currentPlanVersionId']==old['id'])
+    if tid in [603,604,615]:checks.update(rejectedWithoutTruncation=len(o['plans'])==1,stepLimitReason=any(e['reasonCode']=='ERR_STEP_LIMIT_EXCEEDED' for e in events(o,'REPLAN_FAILED')))
+    if tid in [612,613,614]:
+     field={612:'structureCheckResult',613:'capabilityCheckResult',614:'constraintCheckResult'}[tid];checks.update(failedCandidateRetained=len(o['plans'])==2 and o['plans'][-1][field]=='FAIL',notFrozen=not o['plans'][-1].get('frozenAt'))
+    if tid==617:
+     t1=datetime.fromisoformat(events(o,'REPLANNING_TRIGGERED')[0]['occurredAt']);t2=datetime.fromisoformat(events(o,'REPLAN_FAILED')[0]['occurredAt']);elapsed=(t2-t1).total_seconds();checks['realSixtySecondTimeout']=59<=elapsed<=63;r['measuredReplanTimeoutSeconds']=elapsed
+    if tid==625:checks['highWithoutMatchingBaselineManual']=o['plans'][-1]['riskLevel']=='HIGH' and any(e['reasonCode']=='ERR_REPLAN_BASELINE_UNAVAILABLE' for e in events(o,'REPLAN_FAILED'))
+  observations.append({'taskId':tid,'name':r['name'],'source':filename,'mode':mode,'completedPrefix':n,'checks':checks,'result':'P' if all(checks.values()) else 'F','timeoutSeconds':r.get('measuredReplanTimeoutSeconds')})
+ui={}
+for phase in ['initial','compare','final','contrast']:
+ d=load(f'SRS_F019-V1.167-ui-{phase}-20261106.json');ui[phase]={'views':len(d['views']),'diagnostic':d.get('diagnostic'),'noJsErrors':not d['javascriptErrors'],'assertions':[{'name':v['name'],'checks':v['checks'],'linkChecks':v.get('linkChecks')} for v in d['views'] if 'checks' in v]}
+out={'tag':'V1.167','productSha':'75790d9064eb5dbc1f868365b2faccde28a33ea5','timezone':'Asia/Shanghai','observations':observations,'businessResultCounts':{s:sum(x['result']==s for x in observations) for s in ['P','F']},'assertionCounts':{'P':sum(bool(v) for x in observations for v in x['checks'].values()),'F':sum(not v for x in observations for v in x['checks'].values())},'ui':ui,'probeCorrections':{'retainedIncompleteOrRepeatedSourceTasks':sorted(excluded),'notes':['device_commands has no plan_version_id; join assignment command IDs or inspect new-version assignment dispatch, never infer product F from KeyError.','Initial planning also supplies remainingStepQuota=5. Replan calls identified by replace-tail constraint, not field existence.','New versions intentionally create inherited COMPLETED assignment rows without command IDs. Count physical successes from command/transport rows, not repeated copied rows.','602/621 initially misclassified as probe timing diagnostics; durable gate628 reproduced and replay629 confirmed product DEF111. Raw records retained;602/621 are repeated provenance, not extra independent counts.630 action-before-condition is the legal contrast.','Original raw F/checks retained. Corrected assertions are sidecar only, with exact IDs and sources; no repeat of sufficient negative observations.','Startup helper initially appended local backend-v166.log and runtime-v166.json due inherited filename; actual runtime.version=V1.167/PID15444/JAR fixed. Saved helper filenames corrected, V167 process/log excerpt explicitly retained. No tracked V166 raw evidence changed.'],'diagnostics':diagnostics},'scope':'All F019 applicable branches current measured; historical business P reuse zero. Service zero quota and used budget separated from real HTTP. UI failure DEF110 remains despite business positive assertions.'}
+p=E/'SRS_F019-V1.167-cross-evidence-audit-20261106.json';p.write_text(json.dumps(out,ensure_ascii=False,indent=2),encoding='utf8');print(json.dumps({'observations':len(observations),'results':out['businessResultCounts'],'assertions':out['assertionCounts'],'failures':[(x['taskId'],[k for k,v in x['checks'].items() if not v]) for x in observations if x['result']=='F'],'ui':ui},ensure_ascii=True))
