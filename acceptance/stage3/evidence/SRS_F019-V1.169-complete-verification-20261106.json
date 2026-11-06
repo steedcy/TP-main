@@ -1,0 +1,922 @@
+{
+  "status": "READY_FOR_CLAUDE",
+  "tag": "V1.169",
+  "productSha": "2fc0aa3a294d2ae8a0b5eefb33e9ddf878640bea",
+  "handoffSha": "d840c770ade466ada9e51d63c40f69399e9d929d",
+  "declaredHandoffSha": "d840c777610dfb841a0279cbeaa4b7f872e42217",
+  "executionBaseline": "V2.4",
+  "timezone": "Asia/Shanghai",
+  "rules": {
+    "P": 9,
+    "F": 0,
+    "NT": 0
+  },
+  "steps": {
+    "P": 6,
+    "F": 0,
+    "NT": 0
+  },
+  "necessaryDependencyGates": {
+    "P": 0,
+    "F": 1,
+    "NT": 0,
+    "issue": "DEF-S3-114",
+    "reason": "Normal JAR restart creates500 due task_code count-based collisions. Business9rules/6steps pass kept separate; existing controlled scope requires direct dependency/core smoke pass, so overall not passed."
+  },
+  "closed": [
+    "DEF-S3-111",
+    "DEF-S3-112",
+    "DEF-S3-113"
+  ],
+  "maintainedClosed": [
+    "DEF-S3-110 original scope"
+  ],
+  "open": [
+    "DEF-S3-114"
+  ],
+  "historicalBusinessPReuse": 0,
+  "observations": [
+    {
+      "name": "exact-leading-replay",
+      "taskId": 688,
+      "result": "P",
+      "checks": {
+        "exactReplayAll200": true,
+        "exactlyOneModelReplan": true,
+        "consumedQuotaAndTwoPlans": true,
+        "completedFiveActions": true
+      }
+    },
+    {
+      "name": "normal-three",
+      "taskId": 680,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "newPlanFrozen": true,
+        "allThreePass": true,
+        "lowSupervision": true,
+        "prefixMerged": true,
+        "replacementOnly": true,
+        "noExtraRetrySteps": true,
+        "completed": true,
+        "physicalActionsAtMostFive": true,
+        "oneReplanFinal": true
+      }
+    },
+    {
+      "name": "conditional-three-retest",
+      "taskId": 681,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "newPlanFrozen": true,
+        "allThreePass": true,
+        "lowSupervision": true,
+        "prefixMerged": true,
+        "replacementOnly": true,
+        "noExtraRetrySteps": true,
+        "conditionNotFrozen": true,
+        "branchConditionPreserved": true,
+        "completed": true,
+        "physicalActionsAtMostFive": true,
+        "oneReplanFinal": true
+      }
+    },
+    {
+      "name": "overquota-retest",
+      "taskId": 682,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "manual": true,
+        "replanFailedException": true,
+        "noNewPlanCommands": true,
+        "noSuccessEvent": true,
+        "preservedCurrentVersion": true,
+        "noTruncation": true
+      }
+    },
+    {
+      "name": "high-no-baseline",
+      "taskId": 683,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "manual": true,
+        "replanFailedException": true,
+        "noNewPlanCommands": true,
+        "noSuccessEvent": true,
+        "preservedCurrentVersion": true
+      }
+    },
+    {
+      "name": "startup-fault",
+      "taskId": 684,
+      "result": "P",
+      "checks": {
+        "controlledFailureDoesNot500": true,
+        "consumedQuotaPersists": true,
+        "snapshotAndVersionPersist": true,
+        "failureAndManualPersist": true,
+        "noRepeatModelCall": true,
+        "prefixPreserved": true
+      }
+    },
+    {
+      "name": "no-retry-timeout-truth",
+      "taskId": 685,
+      "result": "P",
+      "checks": {
+        "noRetryActuallyDispatched": true,
+        "timeoutAndManual": true,
+        "summaryDoesNotInventRetry": true,
+        "originalGoalRetained": true
+      }
+    },
+    {
+      "name": "baseline-trial",
+      "taskId": 686,
+      "result": "P",
+      "checks": {
+        "realFiveStepTrialCompleted": true
+      }
+    },
+    {
+      "name": "base-startup-fault",
+      "taskId": 687,
+      "result": "P",
+      "checks": {
+        "controlledFailureDoesNot500": true,
+        "consumedQuotaPersists": true,
+        "snapshotAndVersionPersist": true,
+        "failureAndManualPersist": true,
+        "noRepeatModelCall": true,
+        "prefixPreserved": true
+      }
+    },
+    {
+      "name": "restart-snapshot-creation",
+      "taskId": 692,
+      "result": "P",
+      "checks": {
+        "acceptedAfterCountAdvances": true,
+        "taskCompleted": true,
+        "snapshotStored": true,
+        "snapshotBeyondPreviousMax": true,
+        "snapshotUnique": true
+      }
+    },
+    {
+      "name": "restart-task-create-gate",
+      "taskId": null,
+      "result": "F",
+      "checks": {
+        "firstCreateSuccess": false,
+        "nextTaskCodeNotAlreadyUsed": false
+      }
+    },
+    {
+      "name": "branch-overquota-four",
+      "taskId": 664,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "manual": true,
+        "replanFailedException": true,
+        "noNewPlanCommands": true,
+        "noSuccessEvent": true,
+        "preservedCurrentVersion": true,
+        "noTruncation": true
+      }
+    },
+    {
+      "name": "one-remaining",
+      "taskId": 665,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "newPlanFrozen": true,
+        "allThreePass": true,
+        "lowSupervision": true,
+        "prefixMerged": true,
+        "replacementOnly": true,
+        "noExtraRetrySteps": true,
+        "completed": true,
+        "physicalActionsAtMostFive": true,
+        "oneReplanFinal": true
+      }
+    },
+    {
+      "name": "five-remaining",
+      "taskId": 666,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "newPlanFrozen": true,
+        "allThreePass": true,
+        "lowSupervision": true,
+        "prefixMerged": true,
+        "replacementOnly": true,
+        "noExtraRetrySteps": true,
+        "completed": true,
+        "physicalActionsAtMostFive": true,
+        "oneReplanFinal": true
+      }
+    },
+    {
+      "name": "second-failure",
+      "taskId": 667,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "secondFailureManual": true,
+        "onlyTwoPlans": true,
+        "stillOnlyOneReplanCall": true,
+        "noSecondTrigger": true,
+        "reasonAndImpactRecorded": true,
+        "noFalseRecovered": true
+      }
+    },
+    {
+      "name": "request-failure",
+      "taskId": 668,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "manual": true,
+        "replanFailedException": true,
+        "noNewPlanCommands": true,
+        "noSuccessEvent": true,
+        "preservedCurrentVersion": true
+      }
+    },
+    {
+      "name": "model-unavailable",
+      "taskId": 669,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "manual": true,
+        "replanFailedException": true,
+        "noNewPlanCommands": true,
+        "noSuccessEvent": true,
+        "preservedCurrentVersion": true
+      }
+    },
+    {
+      "name": "malformed-model",
+      "taskId": 670,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "manual": true,
+        "replanFailedException": true,
+        "noNewPlanCommands": true,
+        "noSuccessEvent": true,
+        "preservedCurrentVersion": true
+      }
+    },
+    {
+      "name": "model-error-code",
+      "taskId": 671,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "manual": true,
+        "replanFailedException": true,
+        "noNewPlanCommands": true,
+        "noSuccessEvent": true,
+        "preservedCurrentVersion": true
+      }
+    },
+    {
+      "name": "invalid-structure",
+      "taskId": 672,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "manual": true,
+        "replanFailedException": true,
+        "noNewPlanCommands": true,
+        "noSuccessEvent": true,
+        "preservedCurrentVersion": true,
+        "rejectedCandidateRetained": true,
+        "notFrozen": true
+      }
+    },
+    {
+      "name": "invalid-capability",
+      "taskId": 673,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "manual": true,
+        "replanFailedException": true,
+        "noNewPlanCommands": true,
+        "noSuccessEvent": true,
+        "preservedCurrentVersion": true,
+        "rejectedCandidateRetained": true,
+        "notFrozen": true
+      }
+    },
+    {
+      "name": "invalid-constraint",
+      "taskId": 674,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "manual": true,
+        "replanFailedException": true,
+        "noNewPlanCommands": true,
+        "noSuccessEvent": true,
+        "preservedCurrentVersion": true,
+        "rejectedCandidateRetained": true,
+        "notFrozen": true
+      }
+    },
+    {
+      "name": "empty-tail",
+      "taskId": 675,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "manual": true,
+        "replanFailedException": true,
+        "noNewPlanCommands": true,
+        "noSuccessEvent": true,
+        "preservedCurrentVersion": true,
+        "noTruncation": true
+      }
+    },
+    {
+      "name": "timeout-rollback-and-late-feedback",
+      "taskId": 676,
+      "result": "P",
+      "checks": {
+        "actualTimeoutAt30": true,
+        "timeoutRecorded": true,
+        "lateSuccessIgnored": true,
+        "prefixPreserved": true,
+        "noOldFutureCommands": true,
+        "oneReplanManual": true
+      }
+    },
+    {
+      "name": "model-timeout",
+      "taskId": 677,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "manual": true,
+        "replanFailedException": true,
+        "noNewPlanCommands": true,
+        "noSuccessEvent": true,
+        "preservedCurrentVersion": true,
+        "actual60SecondTimeout": true
+      }
+    },
+    {
+      "name": "baseline-trial",
+      "taskId": 678,
+      "result": "P",
+      "checks": {
+        "realFiveStepTrialCompleted": true
+      }
+    },
+    {
+      "name": "replan-high-risk",
+      "taskId": 679,
+      "result": "P",
+      "checks": {
+        "originalGoalUnchanged": true,
+        "completedResultsUnchanged": true,
+        "originalVersionUnchanged": true,
+        "oneModelReplan": true,
+        "exactQuotaAndContext": true,
+        "freshPersistedSnapshot": true,
+        "replanUsed": true,
+        "singleTrigger": true,
+        "recoveryBeforeReplan": true,
+        "noOldFutureDispatch": true,
+        "highReplan": true,
+        "autoDowngrade": true,
+        "retainedTwoCompleted": true,
+        "baselineThreePass": true,
+        "completed": true,
+        "noPrefixRedispatch": true
+      }
+    }
+  ],
+  "counts": {
+    "P": 26,
+    "F": 1
+  },
+  "assertions": {
+    "P": 333,
+    "F": 2
+  },
+  "persistedTasks": [
+    664,
+    665,
+    666,
+    667,
+    668,
+    669,
+    670,
+    671,
+    672,
+    673,
+    674,
+    675,
+    676,
+    677,
+    678,
+    679,
+    680,
+    681,
+    682,
+    683,
+    684,
+    685,
+    686,
+    687,
+    688,
+    692
+  ],
+  "trials": [
+    678,
+    686
+  ],
+  "ui": [
+    {
+      "file": "SRS_F019-V1.169-ui-core-20261106.json",
+      "views": 15,
+      "jsErrors": [],
+      "diagnostic": null,
+      "checks": [
+        {
+          "name": "TASK-20261106-0673-trace",
+          "checks": {
+            "traceHasGoal": true,
+            "compareShownWhenUsed": true,
+            "recoveryAndImpactInCompare": true,
+            "completedResultsInCompare": true,
+            "usesOneOfOne": true,
+            "oldAndNewLinks": false
+          },
+          "compareText": "局部重规划版本对比\n使用次数\t1 / 1\n触发原因\tSTEP_FAILED: ERR_SYNTHETIC_HARDWARE\n先行恢复与影响结论\t恢复动作: 局部重新规划，结果: FAILED，影响结论: 局部重新规划失败，转人工处理；恢复动作: 指令重试，结果: FAILED，影响结论: 候选设备切换恢复失败，当前计划不可继续执行；恢复动作: 指令重试，结果: FAILED，影响结论: 步骤3恢复失败且计划不可继续，触发重新规划；STEP_RETRY_DISPATCHED：步骤3自动重试1次，沿用执行指令编号CMD-20261106122002-F05B007B，尝试序号1，原因: 执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE；STEP_FAILED：步骤3重试后仍失败: 执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE；STEP_RETRY_DISPATCHED：步骤3自动重试1次，沿用执行指令编号CMD-20261106122004-F05B007D，尝试序号1，原因: 执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE；EXCEPTION_RECOVERY_FAILED：恢复动作: 指令重试，结果: 失败，异常类型: STEP_FAILED，影响结论: 候选设备切换恢复失败，判断计划是否可继续；REPLANNING_TRIGGERED：步骤3恢复失败且计划不可继续，重新规划机会未用，触发5.5.4局部重新规划；REPLAN_FAILED：局部重新规划调用模型失败: 规划模型服务调用超时或不可用: I/O error on POST request for \"http://127.0.0.1:18117/v1/planning/generate\": Read timed out；TASK_PENDING_MANUAL：局部重新规划失败：规划模型服务不可用或超时；AGENT_OFFLINE_DETECTED：设备代理AGT-8519A3B6心跳超时，判定离线，待5.5异常恢复流程判断是否影响任务\n版本链接\t\n版本1\n\n保留的已完成结果\t\n[\n  {\n    \"stepSeq\": 1,\n    \"capabilityType\": \"CAP_NAVIGATION\",\n    \"executionResult\": \"SUCCESS\",\n    \"outputParams\": {\n      \"routeGenerated\": true,\n      \"waypointCount\": 2,\n      \"fixturePrefix\": 1\n    },\n    \"originalCommandId\": \"CMD-20261106122000-F05B0076\"\n  },\n  {\n    \"stepSeq\": 2,\n    \"capabilityType\": \"CAP_NAVIGATION\",\n    \"executionResult\": \"SUCCESS\",\n    \"outputParams\": {\n      \"routeGenerated\": true,\n      \"waypointCount\": 2,\n      \"fixturePrefix\": 2\n    },\n    \"originalCommandId\": \"CMD-20261106122000-F05B0078\"\n  }\n]",
+          "links": [
+            {
+              "href": "#plan-version-818",
+              "hash": "#plan-version-818",
+              "expanded": "true"
+            }
+          ]
+        },
+        {
+          "name": "TASK-20261106-0670-trace",
+          "checks": {
+            "traceHasGoal": true,
+            "compareShownWhenUsed": true,
+            "recoveryAndImpactInCompare": true,
+            "completedResultsInCompare": true,
+            "usesOneOfOne": true,
+            "oldAndNewLinks": true
+          },
+          "compareText": "局部重规划版本对比\n使用次数\t1 / 1\n触发原因\tSTEP_FAILED: ERR_SYNTHETIC_HARDWARE\n先行恢复与影响结论\t恢复动作: 局部重新规划，结果: FAILED，影响结论: 局部重新规划失败，转人工处理；恢复动作: 指令重试，结果: FAILED，影响结论: 候选设备切换恢复失败，当前计划不可继续执行；恢复动作: 指令重试，结果: FAILED，影响结论: 步骤3恢复失败且计划不可继续，触发重新规划；STEP_RETRY_DISPATCHED：步骤3自动重试1次，沿用执行指令编号CMD-20261106121904-F05B0065，尝试序号1，原因: 执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE；STEP_FAILED：步骤3重试后仍失败: 执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE；STEP_RETRY_DISPATCHED：步骤3自动重试1次，沿用执行指令编号CMD-20261106121906-F05B0067，尝试序号1，原因: 执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE；EXCEPTION_RECOVERY_FAILED：恢复动作: 指令重试，结果: 失败，异常类型: STEP_FAILED，影响结论: 候选设备切换恢复失败，判断计划是否可继续；REPLANNING_TRIGGERED：步骤3恢复失败且计划不可继续，重新规划机会未用，触发5.5.4局部重新规划；REPLAN_FAILED：重新规划后新计划版本2三类校验未通过: 2项错误 [CONSTRAINT 步骤3: 步骤包含运动安全控制字段: [waypoint](ERR_MOTION_SAFETY_FIELD); CONSTRAINT 步骤3: 输入参数与当前能力定义不匹配(ERR_CAPABILITY_PARAMETER_INVALID)]；TASK_PENDING_MANUAL：局部重新规划失败：新计划版本三类校验未通过: ERR_MOTION_SAFETY_FIELD\n版本链接\t\n版本1\n版本2\n\n保留的已完成结果\t\n[\n  {\n    \"stepSeq\": 1,\n    \"capabilityType\": \"CAP_NAVIGATION\",\n    \"executionResult\": \"SUCCESS\",\n    \"outputParams\": {\n      \"routeGenerated\": true,\n      \"waypointCount\": 2,\n      \"fixturePrefix\": 1\n    },\n    \"originalCommandId\": \"CMD-20261106121901-F05B0060\"\n  },\n  {\n    \"stepSeq\": 2,\n    \"capabilityType\": \"CAP_NAVIGATION\",\n    \"executionResult\": \"SUCCESS\",\n    \"outputParams\": {\n      \"routeGenerated\": true,\n      \"waypointCount\": 2,\n      \"fixturePrefix\": 2\n    },\n    \"originalCommandId\": \"CMD-20261106121902-F05B0062\"\n  }\n]",
+          "links": [
+            {
+              "href": "#plan-version-814",
+              "hash": "#plan-version-814",
+              "expanded": "true"
+            },
+            {
+              "href": "#plan-version-815",
+              "hash": "#plan-version-815",
+              "expanded": "true"
+            }
+          ]
+        },
+        {
+          "name": "TASK-20261106-0675-trace",
+          "checks": {
+            "traceHasGoal": true,
+            "compareShownWhenUsed": true,
+            "recoveryAndImpactInCompare": true,
+            "completedResultsInCompare": true,
+            "usesOneOfOne": true,
+            "oldAndNewLinks": true
+          },
+          "compareText": "局部重规划版本对比\n使用次数\t1 / 1\n触发原因\tSTEP_FAILED: ERR_SYNTHETIC_HARDWARE\n先行恢复与影响结论\t恢复动作: 指令重试，结果: FAILED，影响结论: 候选设备切换恢复失败，当前计划不可继续执行；恢复动作: 指令重试，结果: FAILED，影响结论: 步骤3恢复失败且计划不可继续，触发重新规划；STEP_RETRY_DISPATCHED：步骤3自动重试1次，沿用执行指令编号CMD-20261106122119-F05B008E，尝试序号1，原因: 执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE；STEP_FAILED：步骤3重试后仍失败: 执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE；STEP_RETRY_DISPATCHED：步骤3自动重试1次，沿用执行指令编号CMD-20261106122121-F05B0090，尝试序号1，原因: 执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE；EXCEPTION_RECOVERY_FAILED：恢复动作: 指令重试，结果: 失败，异常类型: STEP_FAILED，影响结论: 候选设备切换恢复失败，判断计划是否可继续；REPLANNING_TRIGGERED：步骤3恢复失败且计划不可继续，重新规划机会未用，触发5.5.4局部重新规划\n版本链接\t\n版本1\n版本2\n版本3\n\n保留的已完成结果\t\n[\n  {\n    \"stepSeq\": 1,\n    \"capabilityType\": \"CAP_NAVIGATION\",\n    \"executionResult\": \"SUCCESS\",\n    \"outputParams\": {\n      \"routeGenerated\": true,\n      \"waypointCount\": 2,\n      \"fixturePrefix\": 1\n    },\n    \"originalCommandId\": \"CMD-20261106122116-F05B0089\"\n  },\n  {\n    \"stepSeq\": 2,\n    \"capabilityType\": \"CAP_NAVIGATION\",\n    \"executionResult\": \"SUCCESS\",\n    \"outputParams\": {\n      \"routeGenerated\": true,\n      \"waypointCount\": 2,\n      \"fixturePrefix\": 2\n    },\n    \"originalCommandId\": \"CMD-20261106122117-F05B008B\"\n  }\n]",
+          "links": [
+            {
+              "href": "#plan-version-820",
+              "hash": "#plan-version-820",
+              "expanded": "true"
+            },
+            {
+              "href": "#plan-version-821",
+              "hash": "#plan-version-821",
+              "expanded": "true"
+            },
+            {
+              "href": "#plan-version-822",
+              "hash": "#plan-version-822",
+              "expanded": "true"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "SRS_F019-V1.169-ui-final-20261106.json",
+      "views": 25,
+      "jsErrors": [],
+      "diagnostic": null,
+      "checks": [
+        {
+          "name": "TASK-20261106-0676-trace",
+          "checks": {
+            "traceHasGoal": true,
+            "compareShownWhenUsed": true,
+            "recoveryAndImpactInCompare": true,
+            "completedResultsInCompare": true,
+            "usesOneOfOne": true,
+            "oldAndNewLinks": true
+          },
+          "compareText": "局部重规划版本对比\n使用次数\t1 / 1\n触发原因\tSTEP_FAILED: ERR_SYNTHETIC_HARDWARE\n先行恢复与影响结论\t恢复动作: 指令重试，结果: FAILED，影响结论: 候选设备切换恢复失败，当前计划不可继续执行；恢复动作: 指令重试，结果: FAILED，影响结论: 步骤3恢复失败且计划不可继续，触发重新规划；STEP_RETRY_DISPATCHED：步骤3自动重试1次，沿用执行指令编号CMD-20261106122200-F05B009C，尝试序号1，原因: 执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE；STEP_FAILED：步骤3重试后仍失败: 执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE；STEP_RETRY_DISPATCHED：步骤3自动重试1次，沿用执行指令编号CMD-20261106122202-F05B009E，尝试序号1，原因: 执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE；EXCEPTION_RECOVERY_FAILED：恢复动作: 指令重试，结果: 失败，异常类型: STEP_FAILED，影响结论: 候选设备切换恢复失败，判断计划是否可继续；REPLANNING_TRIGGERED：步骤3恢复失败且计划不可继续，重新规划机会未用，触发5.5.4局部重新规划；REPLAN_SUCCEEDED：局部重新规划成功，新计划版本2已冻结，任务重新进入待分配\n版本链接\t\n版本1\n版本2\n\n保留的已完成结果\t\n[\n  {\n    \"stepSeq\": 1,\n    \"capabilityType\": \"CAP_NAVIGATION\",\n    \"executionResult\": \"SUCCESS\",\n    \"outputParams\": {\n      \"routeGenerated\": true,\n      \"waypointCount\": 2,\n      \"fixturePrefix\": 1\n    },\n    \"originalCommandId\": \"CMD-20261106122147-F05B0097\"\n  },\n  {\n    \"stepSeq\": 2,\n    \"capabilityType\": \"CAP_NAVIGATION\",\n    \"executionResult\": \"SUCCESS\",\n    \"outputParams\": {\n      \"routeGenerated\": true,\n      \"waypointCount\": 2,\n      \"fixturePrefix\": 2\n    },\n    \"originalCommandId\": \"CMD-20261106122158-F05B0099\"\n  }\n]",
+          "links": [
+            {
+              "href": "#plan-version-823",
+              "hash": "#plan-version-823",
+              "expanded": "true"
+            },
+            {
+              "href": "#plan-version-824",
+              "hash": "#plan-version-824",
+              "expanded": "true"
+            }
+          ]
+        },
+        {
+          "name": "TASK-20261106-0677-trace",
+          "checks": {
+            "traceHasGoal": true,
+            "compareShownWhenUsed": true,
+            "recoveryAndImpactInCompare": true,
+            "completedResultsInCompare": true,
+            "usesOneOfOne": true,
+            "oldAndNewLinks": true
+          },
+          "compareText": "局部重规划版本对比\n使用次数\t1 / 1\n触发原因\tSTEP_FAILED: ERR_SYNTHETIC_HARDWARE\n先行恢复与影响结论\t恢复动作: 指令重试，结果: FAILED，影响结论: 候选设备切换恢复失败，当前计划不可继续执行；恢复动作: 指令重试，结果: FAILED，影响结论: 步骤3恢复失败且计划不可继续，触发重新规划；STEP_RETRY_DISPATCHED：步骤3自动重试1次，沿用执行指令编号CMD-20261106122212-F05B00AA，尝试序号1，原因: 执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE；STEP_FAILED：步骤3重试后仍失败: 执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE；STEP_RETRY_DISPATCHED：步骤3自动重试1次，沿用执行指令编号CMD-20261106122215-F05B00AC，尝试序号1，原因: 执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE；EXCEPTION_RECOVERY_FAILED：恢复动作: 指令重试，结果: 失败，异常类型: STEP_FAILED，影响结论: 候选设备切换恢复失败，判断计划是否可继续；REPLANNING_TRIGGERED：步骤3恢复失败且计划不可继续，重新规划机会未用，触发5.5.4局部重新规划；REPLAN_SUCCEEDED：局部重新规划成功，新计划版本2已冻结，任务重新进入待分配\n版本链接\t\n版本1\n版本2\n\n保留的已完成结果\t\n[\n  {\n    \"stepSeq\": 1,\n    \"capabilityType\": \"CAP_NAVIGATION\",\n    \"executionResult\": \"SUCCESS\",\n    \"outputParams\": {\n      \"routeGenerated\": true,\n      \"waypointCount\": 2,\n      \"fixturePrefix\": 1\n    },\n    \"originalCommandId\": \"CMD-20261106122208-F05B00A5\"\n  },\n  {\n    \"stepSeq\": 2,\n    \"capabilityType\": \"CAP_NAVIGATION\",\n    \"executionResult\": \"SUCCESS\",\n    \"outputParams\": {\n      \"routeGenerated\": true,\n      \"waypointCount\": 2,\n      \"fixturePrefix\": 2\n    },\n    \"originalCommandId\": \"CMD-20261106122209-F05B00A7\"\n  }\n]",
+          "links": [
+            {
+              "href": "#plan-version-825",
+              "hash": "#plan-version-825",
+              "expanded": "true"
+            },
+            {
+              "href": "#plan-version-826",
+              "hash": "#plan-version-826",
+              "expanded": "true"
+            }
+          ]
+        },
+        {
+          "name": "TASK-20261106-0678-trace",
+          "checks": {
+            "traceHasGoal": true,
+            "compareShownWhenUsed": true,
+            "recoveryAndImpactInCompare": true,
+            "completedResultsInCompare": true,
+            "usesOneOfOne": true,
+            "oldAndNewLinks": false
+          },
+          "compareText": "局部重规划版本对比\n使用次数\t1 / 1\n触发原因\tSTEP_FAILED: ERR_SYNTHETIC_HARDWARE\n先行恢复与影响结论\t恢复动作: 局部重新规划，结果: FAILED，影响结论: 局部重新规划失败，转人工处理；恢复动作: 指令重试，结果: FAILED，影响结论: 候选设备切换恢复失败，当前计划不可继续执行；恢复动作: 指令重试，结果: FAILED，影响结论: 步骤3恢复失败且计划不可继续，触发重新规划；STEP_RETRY_DISPATCHED：步骤3自动重试1次，沿用执行指令编号CMD-20261106122227-F05B00B8，尝试序号1，原因: 执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE；STEP_FAILED：步骤3重试后仍失败: 执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE；STEP_RETRY_DISPATCHED：步骤3自动重试1次，沿用执行指令编号CMD-20261106122229-F05B00BA，尝试序号1，原因: 执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE；EXCEPTION_RECOVERY_FAILED：恢复动作: 指令重试，结果: 失败，异常类型: STEP_FAILED，影响结论: 候选设备切换恢复失败，判断计划是否可继续；REPLANNING_TRIGGERED：步骤3恢复失败且计划不可继续，重新规划机会未用，触发5.5.4局部重新规划；REPLAN_FAILED：新计划替换的可执行步骤数4超过剩余额度3或为空（已完成2步，条件节点不计数、分支动作计数）；TASK_PENDING_MANUAL：局部重新规划失败：新计划步骤数超过剩余额度\n版本链接\t\n版本1\n\n保留的已完成结果\t\n[\n  {\n    \"stepSeq\": 1,\n    \"capabilityType\": \"CAP_NAVIGATION\",\n    \"executionResult\": \"SUCCESS\",\n    \"outputParams\": {\n      \"routeGenerated\": true,\n      \"waypointCount\": 2,\n      \"fixturePrefix\": 1\n    },\n    \"originalCommandId\": \"CMD-20261106122223-F05B00B3\"\n  },\n  {\n    \"stepSeq\": 2,\n    \"capabilityType\": \"CAP_NAVIGATION\",\n    \"executionResult\": \"SUCCESS\",\n    \"outputParams\": {\n      \"routeGenerated\": true,\n      \"waypointCount\": 2,\n      \"fixturePrefix\": 2\n    },\n    \"originalCommandId\": \"CMD-20261106122224-F05B00B5\"\n  }\n]",
+          "links": [
+            {
+              "href": "#plan-version-827",
+              "hash": "#plan-version-827",
+              "expanded": "true"
+            }
+          ]
+        },
+        {
+          "name": "TASK-20261106-0680-trace",
+          "checks": {
+            "traceHasGoal": true,
+            "compareShownWhenUsed": true,
+            "recoveryAndImpactInCompare": true,
+            "completedResultsInCompare": true,
+            "usesOneOfOne": true,
+            "oldAndNewLinks": true
+          },
+          "compareText": "局部重规划版本对比\n使用次数\t1 / 1\n触发原因\tSTEP_FAILED: ERR_SYNTHETIC_HARDWARE\n先行恢复与影响结论\t恢复动作: 局部重新规划，结果: FAILED，影响结论: 局部重新规划失败，转人工处理；恢复动作: 指令重试，结果: FAILED，影响结论: 候选设备切换恢复失败，当前计划不可继续执行；恢复动作: 指令重试，结果: FAILED，影响结论: 步骤3恢复失败且计划不可继续，触发重新规划；STEP_RETRY_DISPATCHED：步骤3自动重试1次，沿用执行指令编号CMD-20261106122242-F05B00C8，尝试序号1，原因: 执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE；STEP_FAILED：步骤3重试后仍失败: 执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE；STEP_RETRY_DISPATCHED：步骤3自动重试1次，沿用执行指令编号CMD-20261106122243-F05B00CA，尝试序号1，原因: 执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE；EXCEPTION_RECOVERY_FAILED：恢复动作: 指令重试，结果: 失败，异常类型: STEP_FAILED，影响结论: 候选设备切换恢复失败，判断计划是否可继续；REPLANNING_TRIGGERED：步骤3恢复失败且计划不可继续，重新规划机会未用，触发5.5.4局部重新规划；REPLAN_SUCCEEDED：局部重新规划成功，新计划版本2已冻结，任务重新进入待分配；REPLAN_FAILED：局部重新规划后启动执行失败: ### Error updating database. Cause: org.postgresql.util.PSQLException: 错误: GPT_SYNTHETIC_OWN_SCHEMA_STARTUP_FAILURE 在位置：在RAISE的第2行的PL/pgSQL函数gpt_f169_startup_fault() ### The error may exist in class path resource [mapper/TaskStepAssignmentMapper.xml] ### The error may involve com.airport.ai.task.TaskStepAssignmentMapper.insert-Inline ### The error occurred while setting parameters ### SQL: INSERT INTO task_step_assignments (task_id, plan_version_id, step_seq, device_agent_id, command_id, execute_command_id, step_status, retry_count, execution_result, reason_code, output_params, dispatched_at, feedback_at, acceptance_requested_at, accepted_at, acceptance_duration_ms, rejected_agent_ids, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::json, ?, ?, ?, ?, ?, ?::json, ?, ?) ### Cause: org.postgresql.util.PSQLException: 错误: GPT_SYNTHETIC_OWN_SCHEMA_STARTUP_FAILURE 在位置：在RAISE的第2行的PL/pgSQL函数gpt_f169_startup_fault() ; uncategorized SQLException; SQL state [P0001]; error code [0]; 错误: GPT_SYNTHETIC_OWN_SCHEMA_STARTUP_FAILURE 在位置：在RAISE的第2行的PL/pgSQL函数gpt_f169_startup_fault()；TASK_PENDING_MANUAL：局部重新规划后启动执行失败: ### Error updating database. Cause: org.postgresql.util.PSQLException: 错误: GPT_SYNTHETIC_OWN_SCHEMA_STARTUP_FAILURE 在位置：在RAISE的第2行的PL/pgSQL函数gpt_f169_startup_fault() ### The error may exist in class path resource [mapper/TaskStepAssignmentMapper.xml] ### The error may involve com.airport.ai.task.TaskStepAssignmentMapper.insert-Inline ### The error occurred while setting parameters ### SQL: INSERT INTO task_step_assignments (task_id, plan_version_id, step_seq, device_agent_id, command_id, execute_command_id, step_status, retry_count, execution_result, reason_code, output_params, dispatched_at, feedback_at, acceptance_requested_at, accepted_at, acceptance_duration_ms, rejected_agent_ids, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::json, ?, ?, ?, ?, ?, ?::json, ?, ?) ### Cause: org.postgresql.util.PSQLException: 错误: GPT_SYNTHETIC_OWN_SCHEMA_STARTUP_FAILURE 在位置：在RAISE的第2行的PL/pgSQL函数gpt_f169_startup_fault() ; uncategorized SQLException; SQL state [P0001]; error code [0]; 错误: GPT_SYNTHETIC_OWN_SCHEMA_STARTUP_FAILURE 在位置：在RAISE的第2行的PL/pgSQL函数gpt_f169_startup_fault()\n版本链接\t\n版本1\n版本2\n\n保留的已完成结果\t\n[\n  {\n    \"stepSeq\": 1,\n    \"capabilityType\": \"CAP_NAVIGATION\",\n    \"executionResult\": \"SUCCESS\",\n    \"outputParams\": {\n      \"routeGenerated\": true,\n      \"waypointCount\": 2,\n      \"fixturePrefix\": 1\n    },\n    \"originalCommandId\": \"CMD-20261106122240-F05B00C3\"\n  },\n  {\n    \"stepSeq\": 2,\n    \"capabilityType\": \"CAP_NAVIGATION\",\n    \"executionResult\": \"SUCCESS\",\n    \"outputParams\": {\n      \"routeGenerated\": true,\n      \"waypointCount\": 2,\n      \"fixturePrefix\": 2\n    },\n    \"originalCommandId\": \"CMD-20261106122240-F05B00C5\"\n  }\n]",
+          "links": [
+            {
+              "href": "#plan-version-830",
+              "hash": "#plan-version-830",
+              "expanded": "true"
+            },
+            {
+              "href": "#plan-version-831",
+              "hash": "#plan-version-831",
+              "expanded": "true"
+            }
+          ]
+        },
+        {
+          "name": "TASK-20261106-0683-trace",
+          "checks": {
+            "traceHasGoal": true,
+            "compareShownWhenUsed": true,
+            "recoveryAndImpactInCompare": true,
+            "completedResultsInCompare": true,
+            "usesOneOfOne": true,
+            "oldAndNewLinks": true
+          },
+          "compareText": "局部重规划版本对比\n使用次数\t1 / 1\n触发原因\tSTEP_FAILED: ERR_SYNTHETIC_HARDWARE\n先行恢复与影响结论\t恢复动作: 局部重新规划，结果: FAILED，影响结论: 局部重新规划失败，转人工处理；恢复动作: 指令重试，结果: FAILED，影响结论: 候选设备切换恢复失败，当前计划不可继续执行；恢复动作: 指令重试，结果: FAILED，影响结论: 步骤3恢复失败且计划不可继续，触发重新规划；STEP_RETRY_DISPATCHED：步骤3自动重试1次，沿用执行指令编号CMD-20261106122341-F05B00DE，尝试序号1，原因: 执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE；STEP_FAILED：步骤3重试后仍失败: 执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE；STEP_RETRY_DISPATCHED：步骤3自动重试1次，沿用执行指令编号CMD-20261106122341-F05B00E0，尝试序号1，原因: 执行结果: FAILED，原因: ERR_SYNTHETIC_HARDWARE；EXCEPTION_RECOVERY_FAILED：恢复动作: 指令重试，结果: 失败，异常类型: STEP_FAILED，影响结论: 候选设备切换恢复失败，判断计划是否可继续；REPLANNING_TRIGGERED：步骤3恢复失败且计划不可继续，重新规划机会未用，触发5.5.4局部重新规划；REPLAN_FAILED：局部重新规划后启动执行失败: ### Error updating database. Cause: org.postgresql.util.PSQLException: 错误: GPT_SYNTHETIC_OWN_SCHEMA_STARTUP_FAILURE 在位置：在RAISE的第2行的PL/pgSQL函数gpt_f169_startup_fault() ### The error may exist in class path resource [mapper/TaskStepAssignmentMapper.xml] ### The error may involve com.airport.ai.task.TaskStepAssignmentMapper.insert-Inline ### The error occurred while setting parameters ### SQL: INSERT INTO task_step_assignments (task_id, plan_version_id, step_seq, device_agent_id, command_id, execute_command_id, step_status, retry_count, execution_result, reason_code, output_params, dispatched_at, feedback_at, acceptance_requested_at, accepted_at, acceptance_duration_ms, rejected_agent_ids, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::json, ?, ?, ?, ?, ?, ?::json, ?, ?) ### Cause: org.postgresql.util.PSQLException: 错误: GPT_SYNTHETIC_OWN_SCHEMA_STARTUP_FAILURE 在位置：在RAISE的第2行的PL/pgSQL函数gpt_f169_startup_fault() ; uncategorized SQLException; SQL state [P0001]; error code [0]; 错误: GPT_SYNTHETIC_OWN_SCHEMA_STARTUP_FAILURE 在位置：在RAISE的第2行的PL/pgSQL函数gpt_f169_startup_fault()；TASK_PENDING_MANUAL：局部重新规划后启动执行失败: ### Error updating database. Cause: org.postgresql.util.PSQLException: 错误: GPT_SYNTHETIC_OWN_SCHEMA_STARTUP_FAILURE 在位置：在RAISE的第2行的PL/pgSQL函数gpt_f169_startup_fault() ### The error may exist in class path resource [mapper/TaskStepAssignmentMapper.xml] ### The error may involve com.airport.ai.task.TaskStepAssignmentMapper.insert-Inline ### The error occurred while setting parameters ### SQL: INSERT INTO task_step_assignments (task_id, plan_version_id, step_seq, device_agent_id, command_id, execute_command_id, step_status, retry_count, execution_result, reason_code, output_params, dispatched_at, feedback_at, acceptance_requested_at, accepted_at, acceptance_duration_ms, rejected_agent_ids, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::json, ?, ?, ?, ?, ?, ?::json, ?, ?) ### Cause: org.postgresql.util.PSQLException: 错误: GPT_SYNTHETIC_OWN_SCHEMA_STARTUP_FAILURE 在位置：在RAISE的第2行的PL/pgSQL函数gpt_f169_startup_fault() ; uncategorized SQLException; SQL state [P0001]; error code [0]; 错误: GPT_SYNTHETIC_OWN_SCHEMA_STARTUP_FAILURE 在位置：在RAISE的第2行的PL/pgSQL函数gpt_f169_startup_fault()\n版本链接\t\n版本1\n版本2\n版本3\n\n保留的已完成结果\t\n[\n  {\n    \"stepSeq\": 1,\n    \"capabilityType\": \"CAP_NAVIGATION\",\n    \"executionResult\": \"SUCCESS\",\n    \"outputParams\": {\n      \"routeGenerated\": true,\n      \"waypointCount\": 2,\n      \"fixturePrefix\": 1\n    },\n    \"originalCommandId\": \"CMD-20261106122338-F05B00D9\"\n  },\n  {\n    \"stepSeq\": 2,\n    \"capabilityType\": \"CAP_NAVIGATION\",\n    \"executionResult\": \"SUCCESS\",\n    \"outputParams\": {\n      \"routeGenerated\": true,\n      \"waypointCount\": 2,\n      \"fixturePrefix\": 2\n    },\n    \"originalCommandId\": \"CMD-20261106122339-F05B00DB\"\n  }\n]",
+          "links": [
+            {
+              "href": "#plan-version-834",
+              "hash": "#plan-version-834",
+              "expanded": "true"
+            },
+            {
+              "href": "#plan-version-835",
+              "hash": "#plan-version-835",
+              "expanded": "true"
+            },
+            {
+              "href": "#plan-version-836",
+              "hash": "#plan-version-836",
+              "expanded": "true"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "SRS_F019-V1.169-ui-initial-20261106.json",
+      "views": 4,
+      "jsErrors": [],
+      "diagnostic": null,
+      "checks": [
+        {
+          "name": "TASK-20261106-0676-trace",
+          "checks": {
+            "initialZeroCountVisible": false,
+            "traceHasGoal": true
+          },
+          "compareText": "局部重规划版本对比\n使用次数\t0 / 1\n触发原因\t未触发局部重规划\n先行恢复与影响结论\t无先行异常与恢复记录\n版本链接\t\n版本1\n\n保留的已完成结果\t\n[]",
+          "links": [
+            {
+              "href": "#plan-version-823",
+              "hash": "#plan-version-823",
+              "expanded": "true"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "SRS_F019-V1.169-ui-truth-20261106.json",
+      "views": 4,
+      "jsErrors": [],
+      "diagnostic": null,
+      "checks": [
+        {
+          "name": "TASK-20261106-0681-trace",
+          "checks": {
+            "traceHasGoal": true,
+            "compareShownWhenUsed": true,
+            "recoveryAndImpactInCompare": false,
+            "completedResultsInCompare": true,
+            "usesOneOfOne": true,
+            "oldAndNewLinks": false
+          },
+          "compareText": "局部重规划版本对比\n使用次数\t1 / 1\n触发原因\tEXECUTION_TIMEOUT: 指令CMD-20261106122250-F05B00CE执行超时未收到\n先行恢复与影响结论\t恢复动作: 局部重新规划，结果: FAILED，影响结论: 局部重新规划失败，转人工处理；恢复动作: 无可用候选设备，恢复动作未执行，结果: FAILED，影响结论: 候选设备切换恢复失败，当前计划不可继续执行；STEP_TIMEOUT_DETECTED：第2步指令CMD-20261106122250-F05B00CE下发后超过30秒未收到执行反馈，判定执行超时；EXCEPTION_RECOVERY_FAILED：恢复动作: 无可用候选设备，恢复动作未执行，结果: 失败，异常类型: EXECUTION_TIMEOUT，影响结论: 候选设备切换恢复失败，判断计划是否可继续；REPLANNING_TRIGGERED：步骤2恢复失败且计划不可继续，重新规划机会未用，触发5.5.4局部重新规划；TASK_PENDING_MANUAL：局部重新规划失败：规划模型服务不可用或超时；REPLAN_FAILED：局部重新规划调用模型失败: 规划模型服务调用超时或不可用: 503 Service Unavailable: \"{\"error\":\"synthetic isolated model unavailable\"}\"\n版本链接\t\n版本1\n\n保留的已完成结果\t\n[\n  {\n    \"stepSeq\": 1,\n    \"capabilityType\": \"CAP_NAVIGATION\",\n    \"executionResult\": \"SUCCESS\",\n    \"outputParams\": {\n      \"routeGenerated\": true,\n      \"waypointCount\": 2,\n      \"fixturePrefix\": 1\n    },\n    \"originalCommandId\": \"CMD-20261106122248-F05B00CB\"\n  }\n]",
+          "links": [
+            {
+              "href": "#plan-version-832",
+              "hash": "#plan-version-832",
+              "expanded": "true"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "uiViews": 48,
+  "diagnostics": [
+    {
+      "name": "normal-three",
+      "at": "2026-11-06T12:17:28.094056+08:00",
+      "error": "invalid literal for int() with base 10: ''",
+      "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f019-v169.py\", line 102, in run\n    try:fn()\n        ~~^^\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f019-v169-round.py\", line 86, in <lambda>\n    h.run('normal-three',lambda:run_case('normal-three'))\n                                ~~~~~~~~^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f019-v169-round.py\", line 51, in run_case\n    h.reset();row=q.submit(name,[h.st(i+1,stepGoal='原计划动作'+str(i+1)) for i in range(min(5,n+2))]);h.cfgcase(row,replanSteps=tail if tail is not None else [h.st(i+1,stepGoal='新计划动作'+str(i+1)) for i in range(5-n)],**model)\n                  ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f019-v169.py\", line 130, in submit\n    res=p.raw(self.op,'/tasks',body);tid=int(sql(f'select id from {SC}.tasks where task_goal={lit(body[\"taskGoal\"])} order by id desc limit 1'))\n                                         ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: invalid literal for int() with base 10: ''\n"
+    },
+    {
+      "name": "conditional-three",
+      "at": "2026-11-06T12:17:29.363143+08:00",
+      "error": "invalid literal for int() with base 10: ''",
+      "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f019-v169.py\", line 102, in run\n    try:fn()\n        ~~^^\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f019-v169-round.py\", line 87, in <lambda>\n    h.run('conditional-three',lambda:run_case('conditional-three',tail=condition_tail(3)))\n                                     ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f019-v169-round.py\", line 51, in run_case\n    h.reset();row=q.submit(name,[h.st(i+1,stepGoal='原计划动作'+str(i+1)) for i in range(min(5,n+2))]);h.cfgcase(row,replanSteps=tail if tail is not None else [h.st(i+1,stepGoal='新计划动作'+str(i+1)) for i in range(5-n)],**model)\n                  ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f019-v169.py\", line 130, in submit\n    res=p.raw(self.op,'/tasks',body);tid=int(sql(f'select id from {SC}.tasks where task_goal={lit(body[\"taskGoal\"])} order by id desc limit 1'))\n                                         ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: invalid literal for int() with base 10: ''\n"
+    },
+    {
+      "name": "overquota-four",
+      "at": "2026-11-06T12:17:31.275811+08:00",
+      "error": "invalid literal for int() with base 10: ''",
+      "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f019-v169.py\", line 102, in run\n    try:fn()\n        ~~^^\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f019-v169-round.py\", line 88, in <lambda>\n    h.run('overquota-four',lambda:run_case('overquota-four',tail=[h.st(i+1) for i in range(4)],mode='over'))\n                                  ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f019-v169-round.py\", line 51, in run_case\n    h.reset();row=q.submit(name,[h.st(i+1,stepGoal='原计划动作'+str(i+1)) for i in range(min(5,n+2))]);h.cfgcase(row,replanSteps=tail if tail is not None else [h.st(i+1,stepGoal='新计划动作'+str(i+1)) for i in range(5-n)],**model)\n                  ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f019-v169.py\", line 130, in submit\n    res=p.raw(self.op,'/tasks',body);tid=int(sql(f'select id from {SC}.tasks where task_goal={lit(body[\"taskGoal\"])} order by id desc limit 1'))\n                                         ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: invalid literal for int() with base 10: ''\n"
+    }
+  ],
+  "corrections": [
+    "First3 missing task ids in probe are caused by tasks_task_code_key failure; own preserved history and precise restart responses confirm114. Missing regular/leading-condition/overquota observations supplemented680/681/682. No raw failures deleted.",
+    "Use actual taskCode from HTTP/SQL rather than equating task id and task code (restart gaps create differences). UI targets derived from saved rows.",
+    "Generic UI keywords/links flags are N/A where actual retry not performed or no new version exists. Explicit truth negative control685 uses event/SQL and no fabricated retry.",
+    "Current snapshot113 passed despite old count-derived code still being occupied: actual new snapshot unique and beyond pre-restart max; task114 classified separately."
+  ],
+  "backendTestCounts": {
+    "reported": 404,
+    "passed": 402,
+    "failed": 0,
+    "skipped": 2
+  },
+  "directedTestCounts": {
+    "total": 73,
+    "independentBoundary": 7,
+    "productNeighbor": 66,
+    "passed": 73
+  },
+  "main": "620c16669b2bba725df54818dffb0d21ac27f627",
+  "mergedMain": false,
+  "pr": null,
+  "productSourcesDiff": "",
+  "scope": "Real packaged JAR/HTTP/SQL/headless Edge; controlled HTTP model and devices. Zero quota service boundary. No commercial model/physical devices/three core end-to-end/95 overall acceptance claims.",
+  "commands": [
+    "mvn -o -f backend/pom.xml package",
+    "npm.cmd --prefix frontend run build",
+    "mvn -o -f backend/pom.xml test -Dtest=IndependentF019V169Test,TaskReplanningQuotaAndManualTakeoverF018Test,PlanStepLimitAndReplanningF012Test,BaselineDowngradeAndFailureBoundaryF015Test,CommandDispatchAndExecutionF017Test,RecoveryEventTruthF015Test,InstructionTimeoutAndRollbackF019Test,ReplanningHighRiskDowngradeTest,ContextSnapshotSafetyTest",
+    "python acceptance/stage3/fixtures/start-f019-v169-jar.py",
+    "python acceptance/stage3/probe-f019-v169-round.py",
+    "python acceptance/stage3/probe-f019-v169-extra.py",
+    "python acceptance/stage3/probe-f019-v169-replay-exact.py",
+    "node acceptance/stage3/retest-f019-v169-ui.cjs core (actual taskCodes derived from saved observations)",
+    "node acceptance/stage3/retest-f019-v169-ui.cjs final (actual taskCodes derived from saved observations)",
+    "python acceptance/stage3/probe-f019-v169-restart.py (after normal own JAR restart)",
+    "python acceptance/stage3/probe-f019-v169-finish.py",
+    "acceptance/stage3/fixtures/stop-f019-v169-processes.ps1"
+  ]
+}
