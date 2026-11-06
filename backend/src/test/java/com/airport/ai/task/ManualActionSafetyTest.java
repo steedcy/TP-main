@@ -44,7 +44,9 @@ class ManualActionSafetyTest {
         verify(planning, never()).advance(anyLong());
         verify(events).append(eq(7L), eq("TASK_MANUAL_ACTION_FAILED"), eq("SYSTEM"),
                 eq("ERR_MANUAL_ACTION_FAILED"), eq("baseline validation failed"));
-        verify(audit).record(4L, "operator", "OPERATOR", "TASK_MANUAL_ACTION",
-                "TASK-7 -> SWITCH_TO_BASELINE", "FAILED", null);
+        // 操作记录现在带详情（动作、原因、处置后的任务状态），失败结果仍记为FAILED（DEF-S3-062）
+        verify(audit).record(eq(4L), eq("operator"), eq("OPERATOR"), eq("TASK_MANUAL_ACTION"),
+                eq("TASK-7 -> SWITCH_TO_BASELINE"), eq("FAILED"), isNull(), argThat(detail ->
+                        "SWITCH_TO_BASELINE".equals(detail.get("action")) && "PENDING_MANUAL".equals(detail.get("resultStatus"))));
     }
 }

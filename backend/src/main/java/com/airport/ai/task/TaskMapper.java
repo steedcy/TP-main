@@ -28,6 +28,7 @@ public interface TaskMapper {
     List<Task> searchPaged(@Param("taskCode") String taskCode,
                             @Param("status") TaskStatus status,
                             @Param("taskFamily") String taskFamily,
+                            @Param("goalKeyword") String goalKeyword,
                             @Param("createdFrom") LocalDateTime createdFrom,
                             @Param("createdTo") LocalDateTime createdTo);
 }

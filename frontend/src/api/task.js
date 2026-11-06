@@ -9,8 +9,8 @@ export function listTasks(params) {
   return request.get('/tasks', { params })
 }
 
-export function getTask(taskId) {
-  return request.get(`/tasks/${taskId}`)
+export function getTask(taskId, config = {}) {
+  return request.get(`/tasks/${taskId}`, config)
 }
 
 export function manualAction(taskId, action, reason, taskGoal) {

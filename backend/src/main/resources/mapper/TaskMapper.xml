@@ -50,6 +50,7 @@
             <if test="taskCode != null">AND task_code = #{taskCode}</if>
             <if test="status != null">AND status = #{status}</if>
             <if test="taskFamily != null">AND task_family = #{taskFamily}</if>
+            <if test="goalKeyword != null and goalKeyword != ''">AND task_goal ILIKE '%' || #{goalKeyword} || '%' ESCAPE '\'</if>
             <if test="createdFrom != null">AND created_at &gt;= #{createdFrom}</if>
             <if test="createdTo != null">AND created_at &lt;= #{createdTo}</if>
         </where>

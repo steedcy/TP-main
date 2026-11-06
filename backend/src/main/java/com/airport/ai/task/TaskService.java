@@ -130,9 +130,24 @@ public class TaskService {
     /** 对应5.7.1界面元素：任务编号、时间范围、任务族/状态任意组合筛选（同时供5.4任务列表复用） */
     public PageResult<Task> list(String taskCode, TaskStatus status, String taskFamily,
                                   LocalDateTime createdFrom, LocalDateTime createdTo, int page, int size) {
+        return list(taskCode, status, taskFamily, null, createdFrom, createdTo, page, size);
+    }
+
+    /** 增加目标关键字筛选（SRS_F020.R06，DEF-S3-006）：对任务目标做不区分大小写的包含查询；转义 LIKE 通配符，最长100字。 */
+    public PageResult<Task> list(String taskCode, TaskStatus status, String taskFamily,
+                                  String goalKeyword,
+                                  LocalDateTime createdFrom, LocalDateTime createdTo, int page, int size) {
+        String cleanKeyword = escapeLike(goalKeyword);
         PageHelper.startPage(page, size);
         return PageResult.of(new PageInfo<>(taskMapper.searchPaged(
-                blankToNull(taskCode), status, blankToNull(taskFamily), createdFrom, createdTo)));
+                blankToNull(taskCode), status, blankToNull(taskFamily), cleanKeyword, createdFrom, createdTo)));
+    }
+
+    static String escapeLike(String input) {
+        if (input == null || input.isBlank()) return null;
+        String trimmed = input.trim();
+        if (trimmed.length() > 100) trimmed = trimmed.substring(0, 100);
+        return trimmed.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
     }
 
     private String blankToNull(String value) {
@@ -268,6 +283,10 @@ public class TaskService {
         if (cleanReason != null && cleanReason.length() > 200) {
             throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, "处置原因不得超过200字");
         }
+        // 置为失败不可逆，必须写明原因；转基线/重试规划的原因可选（DEF-S3-062、F020.R08）
+        if ("MARK_FAILED".equals(upperAction) && cleanReason == null) {
+            throw new BusinessException(ErrorCode.PARAM_MISSING, "置为失败须填写处置原因");
+        }
         if (cleanGoal != null && cleanGoal.length() > 500) {
             throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, "修改后的目标不得超过500字");
         }
@@ -316,8 +335,7 @@ public class TaskService {
             }
             case "MARK_FAILED" -> {
                 task.setStatus(TaskStatus.FAILED);
-                task.setFailureReason("运行操作员" + operator.getUsername() + "在待人工处理阶段手动置为失败"
-                        + (cleanReason == null ? "" : "，原因: " + cleanReason));
+                task.setFailureReason("运行操作员" + operator.getUsername() + "在待人工处理阶段手动置为失败，原因: " + cleanReason);
                 task.setUpdatedAt(LocalDateTime.now());
                 taskMapper.update(task);
                 taskEventService.append(taskId, "TASK_FAILED", "OPERATOR", "MANUAL_MARK_FAILED", task.getFailureReason());
@@ -329,8 +347,12 @@ public class TaskService {
         boolean failed = result.getStatus() == TaskStatus.PENDING_MANUAL;
         if (failed) taskEventService.append(taskId, "TASK_MANUAL_ACTION_FAILED", "SYSTEM",
                 "ERR_MANUAL_ACTION_FAILED", result.getFailureReason());
+        Map<String, Object> actionDetail = new HashMap<>();
+        actionDetail.put("action", action);
+        actionDetail.put("reason", cleanReason);
+        actionDetail.put("resultStatus", result.getStatus().name());
         operationLogService.record(operator.getId(), operator.getUsername(), operator.getRole(),
-                "TASK_MANUAL_ACTION", task.getTaskCode() + " -> " + action, failed ? "FAILED" : "SUCCESS", null);
+                "TASK_MANUAL_ACTION", task.getTaskCode() + " -> " + action, failed ? "FAILED" : "SUCCESS", null, actionDetail);
         return result;
     }
 
@@ -375,6 +397,7 @@ public class TaskService {
                     "任务当前状态为" + task.getStatus() + "，已处于终态，不可终止");
         }
 
+        TaskStatus previousStatus = task.getStatus();
         List<Map<String, String>> deviceResults = new ArrayList<>();
         Map<Long, TaskStepAssignment> activeAssignmentsByAgent = new HashMap<>();
         if (task.getCurrentPlanVersionId() != null) {
@@ -417,11 +440,11 @@ public class TaskService {
                         assignment == null ? agent.getCurrentStepSeq() : assignment.getStepSeq());
                 taskEventService.append(taskId, "TASK_CANCEL_REQUESTED", "OPERATOR", null,
                         "已向设备代理" + agentCode + "发送业务任务取消请求");
-                deviceResults.add(Map.of("agentId", agentCode, "result", "CANCEL_QUEUED"));
+                deviceResults.add(Map.of("agentId", agentCode, "result", "CANCEL_QUEUED", "cancelCommandId", cancelCommandId));
             } catch (RuntimeException ex) {
                 taskEventService.append(taskId, "TASK_CANCEL_DELIVERY_FAILED", "OPERATOR", "DEVICE_API_ERROR",
                         "向设备代理" + agentCode + "发送业务任务取消请求失败: " + ex.getMessage());
-                deviceResults.add(Map.of("agentId", agentCode, "result", "CANCEL_FAILED"));
+                deviceResults.add(Map.of("agentId", agentCode, "result", "CANCEL_FAILED", "cancelCommandId", cancelCommandId));
             }
             if (taskId.equals(agent.getCurrentTaskId())) {
                 // A queued cancellation does not prove the device stopped. Keep it unavailable
@@ -445,8 +468,14 @@ public class TaskService {
         taskEventService.append(taskId, "MANUAL_TERMINATED", "OPERATOR", null,
                 "运行操作员" + operator.getUsername() + "人工终止任务，原因: " + reason
                         + "，涉及设备: " + deviceResults.stream().map(m -> m.get("agentId")).toList());
+        // 操作日志也要有终止原因和每个设备的取消结果，与时间线对应（DEF-S3-059、F021.R08）。
+        // 取消请求只表示已排队，设备是否空闲以后续CONFIRMED_IDLE事件为准，这里记录的是“请求结果”。
+        Map<String, Object> terminateDetail = new HashMap<>();
+        terminateDetail.put("reason", reason);
+        terminateDetail.put("previousStatus", previousStatus.name());
+        terminateDetail.put("deviceCancelResults", deviceResults);
         operationLogService.record(operator.getId(), operator.getUsername(), operator.getRole(),
-                "TASK_TERMINATE", task.getTaskCode(), "SUCCESS", null);
+                "TASK_TERMINATE", task.getTaskCode(), "SUCCESS", null, terminateDetail);
         return task;
     }
 
