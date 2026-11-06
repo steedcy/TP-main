@@ -280,12 +280,12 @@ public class TaskService {
             throw new BusinessException(ErrorCode.FORCE_BYPASS_HARD_CHECK, "硬性校验失败的计划严禁进入监督判定或强行放行");
         }
 
-        if (cleanReason != null && cleanReason.length() > 200) {
-            throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, "处置原因不得超过200字");
+        // 所有人工处置动作（置为失败、转基线、重试规划）均须填写处置原因（DEF-S3-062、F020.R08）
+        if (cleanReason == null) {
+            throw new BusinessException(ErrorCode.PARAM_MISSING, "人工处置须填写处置原因");
         }
-        // 置为失败不可逆，必须写明原因；转基线/重试规划的原因可选（DEF-S3-062、F020.R08）
-        if ("MARK_FAILED".equals(upperAction) && cleanReason == null) {
-            throw new BusinessException(ErrorCode.PARAM_MISSING, "置为失败须填写处置原因");
+        if (cleanReason.length() > 200) {
+            throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, "处置原因不得超过200字");
         }
         if (cleanGoal != null && cleanGoal.length() > 500) {
             throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, "修改后的目标不得超过500字");
@@ -310,8 +310,7 @@ public class TaskService {
                 task.setUpdatedAt(LocalDateTime.now());
                 taskMapper.update(task);
                 taskEventService.append(taskId, "BASELINE_SWITCH_REQUESTED", "OPERATOR", null,
-                        "运行操作员" + operator.getUsername() + "选择SWITCH_TO_BASELINE"
-                                + (cleanReason == null ? "" : "，原因: " + cleanReason));
+                        "运行操作员" + operator.getUsername() + "选择SWITCH_TO_BASELINE，原因: " + cleanReason);
                 taskPlanningOrchestrator.switchToBaseline(taskId);
             }
             case "RETRY_PLANNING" -> {
@@ -325,8 +324,7 @@ public class TaskService {
                 task.setUpdatedAt(LocalDateTime.now());
                 taskMapper.update(task);
                 taskEventService.append(taskId, "REPLANNING_TRIGGERED", "OPERATOR", null,
-                        "运行操作员" + operator.getUsername() + "选择RETRY_PLANNING"
-                                + (cleanReason == null ? "" : "，原因: " + cleanReason));
+                        "运行操作员" + operator.getUsername() + "选择RETRY_PLANNING，原因: " + cleanReason);
                 if (cleanGoal != null) {
                     runGoalUnderstanding(task, fromJsonMap(task.getSceneParams()), null);
                 } else {

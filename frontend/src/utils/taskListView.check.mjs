@@ -38,6 +38,11 @@ assert.equal(p.createdTo, '2026-10-31T23:59:59')
 assert.equal(buildListParams({ range: [new Date()] }).createdFrom, undefined)
 assert.equal(buildListParams({ range: [null, null] }).createdFrom, undefined)
 
+// 分页参数正确传递（DEF-S3-115）
+p = buildListParams({ page: 2, size: 20 })
+assert.equal(p.page, 2)
+assert.equal(p.size, 20)
+
 // 状态强调：待人工与已完成明显不同
 assert.equal(statusTagColor('PENDING_MANUAL'), 'orange')
 assert.notEqual(statusTagColor('PENDING_MANUAL'), statusTagColor('COMPLETED'))

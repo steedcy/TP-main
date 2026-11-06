@@ -17,14 +17,16 @@ export function formatLocal(date) {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
 }
 
-// 请求参数：空白关键字不传，时间范围有效才传。
-export function buildListParams({ status, taskCode, taskFamily, goalKeyword, range }) {
+// 请求参数：空白关键字不传，时间范围有效才传，支持分页参数（DEF-S3-115）。
+export function buildListParams({ status, taskCode, taskFamily, goalKeyword, range, page, size }) {
   const params = {
     status: status || undefined,
     taskCode: taskCode?.trim() || undefined,
     taskFamily: taskFamily || undefined,
     goalKeyword: goalKeyword?.trim() || undefined
   }
+  if (page) params.page = page
+  if (size) params.size = size
   if (Array.isArray(range) && range.length === 2 && range[0] && range[1]) {
     // 范围可以是 Date，也可以是选择器给出的 ISO 字符串
     params.createdFrom = typeof range[0] === 'string' ? range[0] : formatLocal(range[0])

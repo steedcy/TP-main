@@ -48,7 +48,7 @@ class ManualActionMissingInfoTest {
     void baselineAndRetryAreRejectedWhileKeyInformationIsStillMissing() {
         for (String action : new String[]{"SWITCH_TO_BASELINE", "RETRY_PLANNING"}) {
             Task task = pendingManual("[\"请提供协助类型\",\"请提供起点\",\"请提供终点\"]");
-            BusinessException ex = assertThrows(BusinessException.class, () -> service.manualAction(7L, action, operator()));
+            BusinessException ex = assertThrows(BusinessException.class, () -> service.manualAction(7L, action, "提供原因测试", operator()));
             assertEquals(ErrorCode.PARAM_MISSING, ex.getErrorCode());
             assertTrue(ex.getMessage().contains("请提供起点"));
             assertEquals(TaskStatus.PENDING_MANUAL, task.getStatus(), "被拒绝时状态不变");
@@ -69,10 +69,10 @@ class ManualActionMissingInfoTest {
         for (String missing : new String[]{null, "", "[]"}) {
             reset(planning);
             pendingManual(missing);
-            service.manualAction(7L, "SWITCH_TO_BASELINE", operator());
+            service.manualAction(7L, "SWITCH_TO_BASELINE", "转基线正常原因", operator());
             verify(planning).switchToBaseline(7L);
             pendingManual(missing); // 上一步把任务置为PLANNING，重新置为待人工再验证另一动作
-            service.manualAction(7L, "RETRY_PLANNING", operator());
+            service.manualAction(7L, "RETRY_PLANNING", "重试规划正常原因", operator());
             verify(planning).advance(7L);
         }
     }

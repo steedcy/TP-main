@@ -33,6 +33,7 @@ public class PageResult<T> {
 
     public List<T> getContent() { return content; }
     public long getTotalElements() { return totalElements; }
+    public long getTotal() { return totalElements; }
     public int getPage() { return page; }
     public int getSize() { return size; }
 }

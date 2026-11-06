@@ -2,20 +2,21 @@
   <div>
     <a-space style="margin-bottom: 16px" wrap>
       <a-button type="primary" @click="submitVisible = true">提交任务</a-button>
-      <a-input v-model:value="filterTaskCode" placeholder="任务编号" style="width: 180px" @pressEnter="fetchList" />
+      <a-input v-model:value="filterTaskCode" placeholder="任务编号" style="width: 180px" @pressEnter="onFilterChange" />
       <a-input v-model:value="filterGoalKeyword" placeholder="目标关键字" style="width: 180px" allow-clear
-               :maxlength="100" data-testid="goal-keyword" @pressEnter="fetchList" />
-      <a-select v-model:value="filterStatus" style="width: 160px" placeholder="按状态筛选" allow-clear @change="fetchList">
+               :maxlength="100" data-testid="goal-keyword" @pressEnter="onFilterChange" />
+      <a-select v-model:value="filterStatus" style="width: 160px" placeholder="按状态筛选" allow-clear @change="onFilterChange">
         <a-select-option v-for="s in statusOptions" :key="s.key" :value="s.key">{{ s.label }}</a-select-option>
       </a-select>
-      <a-select v-model:value="filterTaskFamily" style="width: 180px" placeholder="按任务族筛选" allow-clear @change="fetchList">
+      <a-select v-model:value="filterTaskFamily" style="width: 180px" placeholder="按任务族筛选" allow-clear @change="onFilterChange">
         <a-select-option v-for="d in allTaskDefinitions" :key="d.definitionCode" :value="d.definitionCode">{{ d.taskName }}</a-select-option>
       </a-select>
-      <a-range-picker v-model:value="filterTimeRange" show-time format="YYYY-MM-DD HH:mm:ss" value-format="YYYY-MM-DDTHH:mm:ss" @change="fetchList" />
-      <a-button @click="fetchList">查询</a-button>
+      <a-range-picker v-model:value="filterTimeRange" show-time format="YYYY-MM-DD HH:mm:ss" value-format="YYYY-MM-DDTHH:mm:ss" @change="onFilterChange" />
+      <a-button @click="onFilterChange">查询</a-button>
     </a-space>
 
-    <a-table :dataSource="list" :columns="columns" rowKey="id" :rowClassName="rowClassName">
+    <a-table :dataSource="list" :columns="columns" rowKey="id" :rowClassName="rowClassName"
+             :pagination="pagination" @change="handleTableChange">
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'status'">
           <a-tag :color="statusTagColor(record.status)">{{ statusLabel(record.status) }}</a-tag>
@@ -177,14 +178,39 @@ function statusLabel(status) {
   return statusOptions.find((s) => s.key === status)?.label || status
 }
 
+const pagination = reactive({
+  current: 1,
+  pageSize: 20,
+  total: 0,
+  showSizeChanger: true,
+  pageSizeOptions: ['10', '20', '50', '100'],
+  showTotal: (total) => `共 ${total} 条`
+})
+
+function handleTableChange(pag) {
+  pagination.current = pag.current
+  pagination.pageSize = pag.pageSize || pagination.pageSize
+  fetchList()
+}
+
+function onFilterChange() {
+  pagination.current = 1
+  fetchList()
+}
+
 async function fetchList() {
   const params = buildListParams({
-    status: filterStatus.value, taskCode: filterTaskCode.value, taskFamily: filterTaskFamily.value,
+    status: filterStatus.value,
+    taskCode: filterTaskCode.value,
+    taskFamily: filterTaskFamily.value,
     goalKeyword: filterGoalKeyword.value,
-    range: filterTimeRange.value
+    range: filterTimeRange.value,
+    page: pagination.current,
+    size: pagination.pageSize
   })
   const resp = await listTasks(params)
   list.value = resp.data.content || resp.data
+  pagination.total = resp.data.totalElements ?? resp.data.total ?? (Array.isArray(resp.data) ? resp.data.length : 0)
 }
 
 async function handleSubmit() {
@@ -237,6 +263,7 @@ function closeSubmitModalAndRefresh() {
   Object.keys(sceneValues).forEach((k) => delete sceneValues[k])
   Object.assign(flight, { flightNumber: '', changeType: undefined, originalTime: null, newTime: null,
     originalGate: undefined, newGate: undefined, changeDescription: '' })
+  pagination.current = 1
   fetchList()
 }
 

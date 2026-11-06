@@ -197,7 +197,7 @@
 
     <a-card title="待人工处理" v-if="isOperator && task.status === 'PENDING_MANUAL'" style="margin-top: 16px">
       <a-space>
-        <a-button @click="handleManualAction('SWITCH_TO_BASELINE')">转基线执行</a-button>
+        <a-button @click="openSwitchBaselineModal">转基线执行</a-button>
         <a-button id="btn-retry-planning" type="primary" @click="openRetryModal">重试规划</a-button>
         <a-button @click="markFailedVisible = true" danger data-testid="mark-failed">置为失败</a-button>
         <a-button @click="terminateVisible = true" danger>终止任务</a-button>
@@ -210,8 +210,18 @@
       <a-button danger @click="terminateVisible = true">终止任务</a-button>
     </a-card>
 
-    <!-- 对应5.4.5异常路径4a与DEF-S3-091：待人工处理阶段允许操作员修改任务目标后重试规划 -->
-    <a-modal v-model:open="retryModalVisible" title="重试规划" @ok="handleConfirmRetry" okText="确定" cancelText="取消" :okButtonProps="{ id: 'btn-confirm-retry', loading: retryLoading, disabled: !retryGoal || !retryGoal.trim() }">
+    <!-- 转基线执行必须填写处置原因（DEF-S3-062） -->
+    <a-modal v-model:open="switchBaselineVisible" title="转基线执行" ok-text="确认转基线"
+             :okButtonProps="{ id: 'btn-confirm-switch-baseline', loading: switchBaselineLoading, disabled: !switchBaselineReason.trim() }"
+             @ok="handleConfirmSwitchBaseline">
+      <p>任务将切换为基线模板重新规划并执行。请写明处置原因（1～200 字，必填）：</p>
+      <a-textarea id="switch-baseline-reason" v-model:value="switchBaselineReason" :maxlength="200" :rows="3" show-count
+                  data-testid="switch-baseline-reason" placeholder="请输入转基线处置原因" />
+    </a-modal>
+
+    <!-- 对应5.4.5异常路径4a与DEF-S3-091：待人工处理阶段允许操作员修改任务目标后重试规划，必须填写处置原因（DEF-S3-062） -->
+    <a-modal v-model:open="retryModalVisible" title="重试规划" @ok="handleConfirmRetry" okText="确定" cancelText="取消"
+             :okButtonProps="{ id: 'btn-confirm-retry', loading: retryLoading, disabled: !retryGoal.trim() || !retryReason.trim() }">
       <a-alert type="info" show-icon style="margin-bottom: 12px"
                message="修改目标并重试规划"
                description="可在重试前修改任务目标，系统将基于新目标重新进行目标理解与候选计划生成；原计划版本将完整保留在历史列表中。" />
@@ -219,7 +229,7 @@
         <a-form-item label="任务目标（1~500字，必填）" required>
           <a-textarea id="retry-task-goal" v-model:value="retryGoal" :maxlength="500" :auto-size="{ minRows: 3, maxRows: 6 }" show-count placeholder="请输入修改后的任务目标" />
         </a-form-item>
-        <a-form-item label="处置原因（选填，不超过200字）">
+        <a-form-item label="处置原因（1~200字，必填）" required>
           <a-input id="retry-reason" v-model:value="retryReason" :maxlength="200" placeholder="请输入处置原因" />
         </a-form-item>
       </a-form>
@@ -244,9 +254,9 @@
 
     <!-- 置为失败不可逆，必须写明原因；原因会进入任务事件和操作记录（DEF-S3-062） -->
     <a-modal v-model:open="markFailedVisible" title="将任务置为失败" ok-text="确认置为失败" ok-type="danger"
-             :okButtonProps="{ disabled: !markFailedReason.trim() }" @ok="handleMarkFailed">
-      <p>置为失败后任务进入终态，无法再转基线或重试规划。请写明原因（1～200 字）：</p>
-      <a-textarea v-model:value="markFailedReason" :maxlength="200" :rows="3" show-count data-testid="mark-failed-reason" />
+             :okButtonProps="{ id: 'btn-confirm-mark-failed', disabled: !markFailedReason.trim() }" @ok="handleMarkFailed">
+      <p>置为失败后任务进入终态，无法再转基线或重试规划。请写明处置原因（1～200 字，必填）：</p>
+      <a-textarea v-model:value="markFailedReason" :maxlength="200" :rows="3" show-count data-testid="mark-failed-reason" placeholder="请输入置为失败原因" />
     </a-modal>
 
     <!-- 基线模板只读详情弹窗（DEF-S3-067） -->
@@ -541,6 +551,39 @@ function scrollToHighlightedStep() {
   })
 }
 
+const switchBaselineVisible = ref(false)
+const switchBaselineReason = ref('')
+const switchBaselineLoading = ref(false)
+
+function openSwitchBaselineModal() {
+  switchBaselineReason.value = ''
+  switchBaselineVisible.value = true
+}
+
+async function handleConfirmSwitchBaseline() {
+  const cleanReason = switchBaselineReason.value?.trim()
+  if (!cleanReason) {
+    message.warning('请填写转基线的处置原因')
+    return
+  }
+  switchBaselineLoading.value = true
+  try {
+    const response = await manualAction(taskId, 'SWITCH_TO_BASELINE', cleanReason)
+    switchBaselineVisible.value = false
+    switchBaselineReason.value = ''
+    await fetchAll()
+    if (response.data.status === 'PENDING_MANUAL') {
+      message.warning(response.data.failureReason || '转基线未通过校验，任务仍待人工处理')
+    } else {
+      message.success('已转基线执行')
+    }
+  } catch (err) {
+    // 错误在全局提示
+  } finally {
+    switchBaselineLoading.value = false
+  }
+}
+
 function openRetryModal() {
   retryGoal.value = task.value?.taskGoal || ''
   retryReason.value = ''
@@ -552,12 +595,17 @@ async function handleConfirmRetry() {
     message.warning('任务目标不能为空')
     return
   }
+  const cleanReason = retryReason.value?.trim()
+  if (!cleanReason) {
+    message.warning('请填写重试规划的处置原因')
+    return
+  }
   retryLoading.value = true
   try {
     const cleanGoal = retryGoal.value.trim()
-    const cleanReason = retryReason.value?.trim() || null
     const response = await manualAction(taskId, 'RETRY_PLANNING', cleanReason, cleanGoal)
     retryModalVisible.value = false
+    retryReason.value = ''
     await fetchAll()
     if (response.data.status === 'PENDING_MANUAL') {
       message.warning(response.data.failureReason || '重试规划未通过校验，任务仍待人工处理')
@@ -575,11 +623,12 @@ const markFailedVisible = ref(false)
 const markFailedReason = ref('')
 
 async function handleMarkFailed() {
-  if (!markFailedReason.value.trim()) {
+  const cleanReason = markFailedReason.value?.trim()
+  if (!cleanReason) {
     message.warning('请填写置为失败的原因')
     return
   }
-  await handleManualAction('MARK_FAILED', markFailedReason.value.trim())
+  await handleManualAction('MARK_FAILED', cleanReason)
   markFailedVisible.value = false
   markFailedReason.value = ''
 }
@@ -587,6 +636,14 @@ async function handleMarkFailed() {
 async function handleManualAction(action, reason) {
   if (action === 'RETRY_PLANNING') {
     openRetryModal()
+    return
+  }
+  if (action === 'SWITCH_TO_BASELINE' && !reason) {
+    openSwitchBaselineModal()
+    return
+  }
+  if (action === 'MARK_FAILED' && !reason) {
+    markFailedVisible.value = true
     return
   }
   const response = await manualAction(taskId, action, reason)

@@ -37,7 +37,7 @@ class ManualActionSafetyTest {
         operator.setUsername("operator");
         operator.setRole("OPERATOR");
 
-        Task result = service.manualAction(7L, "SWITCH_TO_BASELINE", operator);
+        Task result = service.manualAction(7L, "SWITCH_TO_BASELINE", "基线重规划测试原因", operator);
 
         assertEquals(TaskStatus.PENDING_MANUAL, result.getStatus());
         verify(planning).switchToBaseline(7L);
@@ -47,6 +47,6 @@ class ManualActionSafetyTest {
         // 操作记录现在带详情（动作、原因、处置后的任务状态），失败结果仍记为FAILED（DEF-S3-062）
         verify(audit).record(eq(4L), eq("operator"), eq("OPERATOR"), eq("TASK_MANUAL_ACTION"),
                 eq("TASK-7 -> SWITCH_TO_BASELINE"), eq("FAILED"), isNull(), argThat(detail ->
-                        "SWITCH_TO_BASELINE".equals(detail.get("action")) && "PENDING_MANUAL".equals(detail.get("resultStatus"))));
+                        "SWITCH_TO_BASELINE".equals(detail.get("action")) && "基线重规划测试原因".equals(detail.get("reason")) && "PENDING_MANUAL".equals(detail.get("resultStatus"))));
     }
 }

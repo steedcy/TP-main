@@ -60,15 +60,19 @@ class ManualActionAuditF020Test {
     }
 
     @Test
-    void markFailedRequiresAReasonAndChangesNothingWithout() {
-        Task t = task(TaskStatus.PENDING_MANUAL);
-        for (String reason : new String[]{null, "", "   "}) {
-            BusinessException ex = assertThrows(BusinessException.class, () -> service.manualAction(20L, "MARK_FAILED", reason, operator()));
-            assertEquals(ErrorCode.PARAM_MISSING, ex.getErrorCode());
+    void allManualActionsRequireAReasonAndChangeNothingWithout() {
+        for (String action : new String[]{"MARK_FAILED", "SWITCH_TO_BASELINE", "RETRY_PLANNING"}) {
+            Task t = task(TaskStatus.PENDING_MANUAL);
+            for (String reason : new String[]{null, "", "   "}) {
+                BusinessException ex = assertThrows(BusinessException.class, () -> service.manualAction(20L, action, reason, operator()));
+                assertEquals(ErrorCode.PARAM_MISSING, ex.getErrorCode());
+            }
+            assertEquals(TaskStatus.PENDING_MANUAL, t.getStatus());
+            verify(tasks, never()).update(any());
+            verifyNoInteractions(audit);
+            reset(tasks, audit);
+            when(tasks.findById(20L)).thenReturn(Optional.of(t));
         }
-        assertEquals(TaskStatus.PENDING_MANUAL, t.getStatus());
-        verify(tasks, never()).update(any());
-        verifyNoInteractions(audit);
     }
 
     @Test
@@ -85,19 +89,12 @@ class ManualActionAuditF020Test {
     }
 
     @Test
-    void tooLongReasonIsRejected() {
+    void baselineAndRetryWithAReasonRecordItInEventAndAudit() {
         task(TaskStatus.PENDING_MANUAL);
-        BusinessException ex = assertThrows(BusinessException.class,
-                () -> service.manualAction(20L, "MARK_FAILED", "x".repeat(201), operator()));
-        assertEquals(ErrorCode.PARAM_FORMAT_ERROR, ex.getErrorCode());
-    }
-
-    @Test
-    void baselineAndRetryWorkWithoutAReasonAndRecordOneWhenGiven() {
-        task(TaskStatus.PENDING_MANUAL);
-        service.manualAction(20L, "SWITCH_TO_BASELINE", null, operator());
+        service.manualAction(20L, "SWITCH_TO_BASELINE", "现场决定切换基线", operator());
         verify(planning).switchToBaseline(20L);
-        assertNull(lastAuditDetail().get("reason"));
+        verify(events).append(eq(20L), eq("BASELINE_SWITCH_REQUESTED"), eq("OPERATOR"), isNull(), contains("现场决定切换基线"));
+        assertEquals("现场决定切换基线", lastAuditDetail().get("reason"));
 
         reset(audit, events);
         task(TaskStatus.PENDING_MANUAL);
@@ -107,10 +104,21 @@ class ManualActionAuditF020Test {
     }
 
     @Test
-    void threeArgumentOverloadStillWorksForExistingCallers() {
+    void tooLongReasonIsRejected() {
+        for (String action : new String[]{"MARK_FAILED", "SWITCH_TO_BASELINE", "RETRY_PLANNING"}) {
+            task(TaskStatus.PENDING_MANUAL);
+            BusinessException ex = assertThrows(BusinessException.class,
+                    () -> service.manualAction(20L, action, "x".repeat(201), operator()));
+            assertEquals(ErrorCode.PARAM_FORMAT_ERROR, ex.getErrorCode());
+        }
+    }
+
+    @Test
+    void threeArgumentOverloadWithoutReasonFailsFast() {
         task(TaskStatus.PENDING_MANUAL);
-        service.manualAction(20L, "SWITCH_TO_BASELINE", operator());
-        verify(planning).switchToBaseline(20L);
+        BusinessException ex = assertThrows(BusinessException.class,
+                () -> service.manualAction(20L, "SWITCH_TO_BASELINE", operator()));
+        assertEquals(ErrorCode.PARAM_MISSING, ex.getErrorCode());
     }
 
     @Test
