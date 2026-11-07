@@ -54,7 +54,7 @@ def definition_boundaries():
  r['afterInvalid']=persist_snapshot()
  r['legal']=[]
  for n in [1,500]:
-  b=copy.deepcopy(base);b.update(taskName=(next(ch for ch in 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789' if ch not in {d['taskName'] for d in q.cfg('/task-definitions')}) if n==1 else 'G177'+'N'*60),goalTemplate='g'*n,constraintDescription='约'*n)
+  b=copy.deepcopy(base);b.update(taskName=(next(ch for ch in 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' if ch not in {d['taskName'] for d in q.cfg('/task-definitions')}) if n==1 else 'G177'+'N'*60),goalTemplate='g'*n,constraintDescription='约'*n)
   d=definition(b);r['legal'].append({'request':copy.deepcopy(b),'created':d,'persisted':drow(d['id'])})
   b['constraintDescription']='界'*(500 if n==1 else 1);u=q.cfg(f'/task-definitions/{d["id"]}','PUT',payload(b));r['legal'][-1].update(updateRequest=payload(b),updated=u,updatedRows=drow(d['id']))
  checks={'allInvalid400orDuplicate409':all(x['response']['http']==(409 if x['field']=='taskName' and x['value']==q.definitionBody['taskName'] else 400) for x in r['invalid']),'invalidNoMutation':before==r['afterInvalid'],'constraintInvalid3001':all(x['response']['body']['code']==3001 for x in r['invalid'] if x['field']=='constraintDescription'),'oneAnd500CharsPersistExactly':all(x['persisted'][0]['constraint_description']==x['request']['constraintDescription'] and x['updatedRows'][0]['constraint_description']==x['updateRequest']['constraintDescription'] for x in r['legal']),'name1And64Goal1And500':all(x['created']['taskName']==x['request']['taskName'] and x['created']['goalTemplate']==x['request']['goalTemplate'] for x in r['legal'])}
