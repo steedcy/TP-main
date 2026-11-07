@@ -1,0 +1,87 @@
+"""Register full V174 acceptance, preserving all prior F and diagnostic evidence."""
+import csv,io,json,hashlib,subprocess,xml.etree.ElementTree as ET
+from pathlib import Path
+R=Path(__file__).resolve().parents[2];D=R/'acceptance/stage3';E=D/'evidence';PRE='SRS_F021-V1.174-'
+def read(n):return json.loads((E/(PRE+n+'-20261107.json')).read_text(encoding='utf-8-sig'))
+def put(p,v):p.write_bytes(v.encode('utf8'))
+x=read('http');ui=read('ui');auth=read('auth-supplement');consistency=read('final-consistency');cleanup=read('cleanup-smoke');stopped=read('process-cleanup')
+assert consistency['allPass'] and stopped['allReleased'] and cleanup['activeAssignments']==cleanup['deviceOccupancy']=='0'
+groups=[]
+for c in x['cases']:
+ if c['name']=='structured-event-and-operation-audit' or c['name']=='cross-owner-executing-control':continue
+ if 'checks' not in c and c['name']!='authorization-order-controls':continue
+ checks=dict(auth['checks'] if c['name']=='authorization-order-controls' else c['checks']);ids=[c['taskId']]
+ if c['name']=='completed-prefix-executing-terminate':checks.update(next(k['checks'] for k in x['cases'] if k['name']=='structured-event-and-operation-audit'))
+ if c['name']=='cross-owner-pending-termination':ids.append(968);checks['otherControlCompleted']=next(k for k in x['cases'] if k['name']=='cross-owner-executing-control')['checks']['controlCompleted']
+ groups.append({'name':c['name'],'taskIds':ids,'checks':checks,'result':'P' if all(checks.values()) else 'F','source':PRE+'http-20261107.json','supplement':PRE+'auth-supplement-20261107.json' if c['name']=='authorization-order-controls' else None})
+assert len(groups)==23 and all(g['result']=='P' for g in groups)
+assert len(ui['cases'])==6 and all(all(c['checks'].values()) for c in ui['cases'])
+suites=[]
+for p in (R/'backend/target/surefire-reports').glob('TEST-*.xml'):
+ t=ET.parse(p).getroot();suites.append({'name':t.attrib['name'],**{k:int(t.attrib[k]) for k in ['tests','failures','errors','skipped']}})
+tests={k:sum(t[k] for t in suites) for k in ['tests','failures','errors','skipped']};assert tests==dict(tests=434,failures=0,errors=0,skipped=2)
+put(E/(PRE+'backend-tests-20261107.json'),json.dumps({'summary':tests,'suites':suites},indent=2))
+for source,target in [('f021-v174-backend-build.txt','backend-build'),('f021-v174-frontend-build.txt','frontend-build'),('f021-v174-round-console.txt','round-console')]:
+ raw=(R/'.local-test'/source).read_bytes();text=raw.decode('utf-16') if raw.startswith((b'\xff\xfe',b'\xfe\xff')) else raw.decode('utf8',errors='replace');put(E/(PRE+target+'-20261107.txt'),'\n'.join(s.rstrip() for s in text.splitlines())+'\n')
+log=(R/'.local-test/backend-v174.log').read_text(encoding='utf8',errors='replace');put(E/(PRE+'jar-runtime-20261107.txt'),'\n'.join(s for s in log.splitlines() if any(w in s for w in ['Starting AirportAiApplication','Started AirportAiApplication','Tomcat started on port']))+'\n')
+rules={
+ 'R01':'950省略/null/空串/空白/201字/未确认均400且业务快照不变；951合法200字、1字trim持久；981真实UI空白/未确认禁用、201输入限200、取消原状态保持。',
+ 'R02':'962待承接终止后迟到接受及963执行中终止后迟到反馈均不下发后续业务；981实际UI三步首步完成/后二步冻结；967只冻结自身，不影响他任务。',
+ 'R03':'963单设备与964双设备取消指令独立于承接/执行编号；设备编码/代理/取消编号与持久命令及传输逐项吻合，966离线取消DELIVERY_FAILED及失败摘要P。',
+ 'R04':'965真实默认60秒未响应转TIMED_OUT、记录设备/指令/原因并UI提示核查；BL006保留执行占用，OFFLINE IDLE/ONLINE BUSY不放行、相关ONLINE IDLE确认/幂等释放；964双设备及966离线恢复释放、967不清他任务占用。',
+ 'R05':'981真实弹窗明确业务终止非安全急停、完成结果不回滚不补偿和现场核实责任；禁用、二次确认及取消行为实际验证。',
+ 'R06':'963和981自然三步流程首步COMPLETED/outputParams保留、其余两步FROZEN，无回滚补偿；961正常两步和968另一任务完成对照P。',
+ 'R07':'963重试规划/转基线/置失败409，澄清/取消/重复终止拒绝，迟到反馈无恢复；952～957六合法状态200、958～960三终态409且快照不变；972～980真实UI九状态入口正确；超时/空闲恢复仍终态。',
+ 'R08':'DEF-S3-059闭环：963原反例及964多设备的MANUAL_TERMINATED/TASK_TERMINATED.detail整体json.loads成功，必需字段/每设备编码/取消编号齐全，HTTP原文=SQL持久原文=操作日志对象；detailSummary=JSON.summary。最终32任务47条结构化事件一致性全P，970引号/反斜杠/换行原因精确往返、971计划前取消JSON及当前UI/追溯/旧文本兼容P。'}
+steps={
+ 'TC-066.S1':rules['R01']+' '+rules['R05'],
+ 'TC-066.S2':rules['R02']+' '+rules['R03']+' '+rules['R06']+' '+rules['R07'],
+ 'TC-066.S3':rules['R08'],
+ 'TC-067.S1':'六合法状态952～957终止200；三终态958～960终止409且完整快照不变；972～980真实浏览器六入口有/三终态无。状态SQL夹具与自然执行分层。',
+ 'TC-067.S2':rules['R04']}
+counts={'groups':23,'P':23,'F':0,'assertions':sum(len(g['checks']) for g in groups),'failedAssertions':0}
+index={'tag':'V1.174','productSha':x['productSha'],'handoffSha':x['handoffSha'],'executionBaseline':'V2.4 + existing BL006','timezone':'Asia/Shanghai','startedAt':x['startedAt'],'endedAt':x['endedAt'],'verdict':'REQUIREMENT_PASSED','rules':{f'SRS_F021.{k}':{'status':'P','actual':v} for k,v in rules.items()},'steps':{k:{'status':'P','actual':v} for k,v in steps.items()},'ruleCounts':{'P':8,'F':0,'NT':0},'stepCounts':{'P':5,'F':0,'NT':0},'businessGroups':groups,'businessGroupCounts':counts,'uiGroups':6,'uiAssertions':sum(len(c['checks']) for c in ui['cases']),'uiStateEntries':9,'backendTests':tests,'currentTasks':32,'taskProvenance':{'naturalProtocolLifecycle':9,'explicitSQLStatusFixtures':23,'multiDeviceSecondOccupationExplicitSQL':True,'historicalDataCompatibilityReadOnlyTask':923},'historicalPassesReused':0,'historicalCompatibility':'Old V1.173 data under current V1.174 HTTP/UI behavior was actually re-read, not old P promoted','structuredEventsCrossChecked':47,'finalConsistency':PRE+'final-consistency-20261107.json','issueDisposition':{'DEF-S3-059':'closed V1.174; all prior F evidence preserved','newDefects':[],'remainingNT':[]},'diagnostics':{'authorization':'Exception-name copy typo retained; missing401 completed without re-running config403; source fixed, no product change','ui':'Previous expired session re-login and reopen animation checkbox helper error retained; current checked/disabled state freshly observed and verified'},'cleanup':PRE+'cleanup-smoke-20261107.json','processCleanup':PRE+'process-cleanup-20261107.json','mainBefore':'a8d6409964085e4a500bd399bb1a6b4f6bfb2918','mainIntegration':'After evidence and formal acceptance push only; actual anchor will be recorded separately','scopeLimits':['No commercial model or physical emergency-stop certification','Not acceptance of F022 or later, three core E2E scenarios or all95cases'],'report':'SRS_F021-V1.174-整轮独立验收与裁决.md'}
+put(E/(PRE+'complete-verification-20261107.json'),json.dumps(index,ensure_ascii=False,indent=2))
+evidence=';'.join('acceptance/stage3/evidence/'+PRE+n+'-20261107.json' for n in ['complete-verification','http','ui','final-consistency','auth-supplement'])
+for fn,key in [('rules.csv','ruleId'),('steps.csv','stepId'),('issues.csv','编号')]:
+ p=D/fn;old=p.read_bytes();reader=csv.DictReader(old.decode('utf-8-sig').splitlines());fields=reader.fieldnames;rows=list(reader)
+ for row in rows:
+  if fn=='rules.csv' and row[key].startswith('SRS_F021.'):
+   rid=row[key].split('.')[-1];row['status']='P';row['evidence']+=';'+evidence;row['issue']='';row['verifiedBy']='TC-066.S1' if rid in ['R01','R05'] else 'TC-066.S3' if rid=='R08' else 'TC-066.S2'
+   if rid=='R04':row['verifiedBy']+=';TC-067.S2'
+   if rid=='R07':row['verifiedBy']+=';TC-067.S1'
+  if fn=='steps.csv' and row[key] in steps:row['status']='P';row['observedAt']='2026-11-07';row['actual']+='；【V1.174 / 9870a4f / 本轮当前实测】'+steps[row[key]];row['evidence']+=';'+evidence;row['issue']=''
+  if fn=='issues.csv' and row[key]=='DEF-S3-059':row['状态']='V1.174 F021整轮已修复并独立复测关闭';row['事实']+='；【V1.174独立整轮】'+rules['R08'];row['证据']+=';'+evidence;row['阶段4动作']='V1.174当前关闭；保留全部V1.173及更早F/NT、原始反例和各轮证据。F021全8规则/5步骤当前通过，按授权安全合main后下一仅F022顺序正式交接。'
+ out=io.StringIO(newline='');w=csv.DictWriter(out,fieldnames=fields,lineterminator='\n');w.writeheader();w.writerows(rows);p.write_bytes((b'\xef\xbb\xbf' if old.startswith(b'\xef\xbb\xbf') else b'')+out.getvalue().encode('utf8'))
+p=D/'阶段3-复测进度.md';text=p.read_text(encoding='utf8');pos=text.index('\n')+1;put(p,text[:pos]+'\n- **2026-11-07 / F021 V1.174 / V2.4：REQUIREMENT_PASSED**。八规则8P/0F/0NT、五步骤5P/0F/0NT，全部当前实测/历史P复用0；059整体事件JSON/SQL/摘要与多设备闭环关闭。32任务（9实际/23显式SQL状态夹具），23业务组全P及6真实IAB组/九状态入口；47结构化事件最终一致性P，434报告432通过2原有跳过、生产构建/实际JAR。原F与探针/界面诊断保留，1定义/3设备停用、分配占用/注入0、3自有树/6端口释放。完整证据先推送，再正式验收与授权main同步；实际远端合入另证，下一仅F022顺序正式交接。报告`SRS_F021-V1.174-整轮独立验收与裁决.md`。\n'+text[pos:])
+report='''# SRS_F021 V1.174 整轮独立验收与裁决
+
+**REQUIREMENT_PASSED：八规则8P/0F/0NT，TC-066/TC-067五步骤5P/0F/0NT。DEF-S3-059当前关闭，无遗留F/NT。** 全部适用项本轮实测，历史P验收复用0；V1.173及更早失败、诊断、台账原文与证据均保留，未修改产品代替独立测试，未放宽业务基线。
+
+固定产品`9870a4fccbca3a397fb26d2cc58ba8874631e14e` / `V1.174`，Claude交接`4771446b9a9362c16cbb17a0b7b3be8a53e9cda8`，远端分支、标签、提交链与消息一致。独立工作区`C:/Users/savy/Desktop/TIP-main/tip-gpt-f013` / `ai/gpt-test`，日期2026-11-07、Asia/Shanghai，V2.4及既有BL006。开工main为`a8d6409964085e4a500bd399bb1a6b4f6bfb2918`；完整证据先推送，再正式交接与授权安全同步main，实际合入锚点和远端证明另记录，不提前声明已合入。
+
+| 规则 | 当前结果 | 依据 |
+|---|---|---|
+'''
+for k,v in rules.items():report+=f'| SRS_F021.{k} | P | {v} |\n'
+report+='\n| 正式步骤 | 当前结果 | 依据 |\n|---|---|---|\n'
+for k,v in steps.items():report+=f'| {k} | P | {v} |\n'
+report+=f'''
+059原反例在本轮任务963（TASK-20261107-0953）重新执行：三步先完成第一步、第二步执行时终止。两个终止事件HTTP `detail`均能整体`json.loads`得到对象，含reason/previousStatus/operator/deviceCancelResults及设备/代理/取消编号/状态；SQL `task_events.detail_summary`原文严格等于HTTP详情，操作日志对象与事件解析对象一致。964双设备（第二设备占用明确SQL播种）两独立取消与两个设备编码对应；970引号、反斜杠、换行原因合法精确往返；971计划前cancel受影响路径也产生完整JSON且无设备指令。最终32本轮任务47条结构化事件逐条SQL/HTTP/summary核验全P，UI981实际终止的时间线文本=解析对象summary。摘要为人类可读正文，包含原有设备结果摘录，界面未渲染整个事件JSON对象包装。原V1.173任务923保留旧文字原文，当前HTTP及真实UI兼容实测通过，不追溯伪写其事件为新JSON。
+
+数量分层：32本轮持久任务=9实际HTTP/合成设备生命周期+23显式SQL状态门禁夹具。23去重业务/兼容观察组全部P，共{counts['assertions']}条汇总断言；同一任务963的审计分析合并到同一观察组，967/968互为跨任务归属合法对照，UI981与HTTP同一终止共证不额外计业务执行次数。6真实IAB Chromium界面组全P、九状态入口、6截图；历史923只读兼容是当前程序的实测，不是历史P复用。每个结构化事件的详细子断言见原始HTTP文件和最终一致性文件，不通过重复跨层计数夸大测试次数。
+
+后端`mvn -o clean test package`434项报告：432通过、2原有跳过、0失败/错误；前端`npm run build`成功（3271模块、原有体积建议保留）。实际启动打包JAR、健康UP、认证/业务HTTP、SQL、控制模型和三HTTP设备适配器均已取证。正常两步961、另一任务968成功完成为核心冒烟；计划前取消、普通/历史事件兼容及过程追溯是真实受影响邻接。未扩大为商业模型、物理设备或安全急停认证；本轮不代表后续需求、三核心场景或95项整体验收通过。
+
+未改业务基线，继续按已有BL006：965默认60秒取消未确认转TIMED_OUT并记录设备/指令/原因与UI现场核查提示，执行设备保留占用；OFFLINE IDLE、ONLINE BUSY不放行，相关ONLINE IDLE确认后才释放，重复确认幂等，任务始终终态。TC067旧立即释放文字与受控BL006合并阅读，不因通过而取消物理运动安全门。多设备、离线恢复、跨任务归属及所有终态门禁本轮均实测。
+
+探针诊断仅1项：授权代码复制时把异常类型误写为`urllib.erroHTTPError`，原始异常保留。配置角色两次403已足够，不重复执行；缺失匿名401由专门探针补齐，任务前后与原始快照一致，最终权限组P。真实UI旧会话过期正常重新登录、取消/重开动画期间setChecked未切换的工具错误也原样登记；重新观察可见状态后点击确认框，禁用/启用/真实终止均满足预期。未把环境/探针错误交修、未删原始诊断。
+
+GPT资源：schema`tip_gpt_f006_v118_20261030`、Redis10、18129后端/18117模型/18132～18134适配器/15179前端。1新定义DISABLED、3设备INACTIVE，活跃分配0、设备占用0、注入触发器0，无规则/模板变更，32任务/计划/失败全保留。确认归属后3自有进程树停止、六端口监听0；Claude和共享PG/Redis未动。主工作区40个用户未跟踪文件已在本机保存合入前哈希，只有全部通过后按授权安全快进main并复核，远端实际结果见后续合入证据。
+
+总索引`evidence/{PRE}complete-verification-20261107.json`，版本/范围、原始HTTP、匿名补证、最终SQL一致性、UI JSON/截图/DOM、434项报告/构建、JAR及清理证据和SHA256清单共同构成验收依据。台账只更新F021八规则/五步骤与059；旧结果和原台账快照保留。证据SHA、正式交接SHA、main实际合入锚点由后续HANDOFF和远端实核记录，产品标签不移动。下一仅SRS_F022从最终main按顺序另行正式交接，本轮不直接启动后续需求。
+'''
+put(D/'SRS_F021-V1.174-整轮独立验收与裁决.md',report)
+files=sorted(E.glob(PRE+'*'))+list(D.glob('*f021-v174*.py'))+list((D/'fixtures').glob('*f021-v174*'))+[D/'SRS_F021-V1.174-整轮独立验收与裁决.md']
+manifest=[{'path':str(p.relative_to(R)).replace('\\','/'),'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()} for p in files if 'evidence-manifest' not in p.name];put(E/(PRE+'evidence-manifest-20261107.json'),json.dumps(manifest,ensure_ascii=False,indent=2))
+print(json.dumps({'verdict':'REQUIREMENT_PASSED','rules':'8P/0F/0NT','steps':'5P/0F/0NT','business':counts,'uiGroups':6,'uiAssertions':index['uiAssertions'],'manifestFiles':len(manifest),'tests':tests},ensure_ascii=False))

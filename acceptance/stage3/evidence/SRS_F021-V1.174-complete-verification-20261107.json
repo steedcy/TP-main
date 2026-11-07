@@ -1,0 +1,497 @@
+{
+  "tag": "V1.174",
+  "productSha": "9870a4fccbca3a397fb26d2cc58ba8874631e14e",
+  "handoffSha": "4771446b9a9362c16cbb17a0b7b3be8a53e9cda8",
+  "executionBaseline": "V2.4 + existing BL006",
+  "timezone": "Asia/Shanghai",
+  "startedAt": "2026-11-07T12:52:56.448279+08:00",
+  "endedAt": "2026-11-07T12:58:04.913250+08:00",
+  "verdict": "REQUIREMENT_PASSED",
+  "rules": {
+    "SRS_F021.R01": {
+      "status": "P",
+      "actual": "950省略/null/空串/空白/201字/未确认均400且业务快照不变；951合法200字、1字trim持久；981真实UI空白/未确认禁用、201输入限200、取消原状态保持。"
+    },
+    "SRS_F021.R02": {
+      "status": "P",
+      "actual": "962待承接终止后迟到接受及963执行中终止后迟到反馈均不下发后续业务；981实际UI三步首步完成/后二步冻结；967只冻结自身，不影响他任务。"
+    },
+    "SRS_F021.R03": {
+      "status": "P",
+      "actual": "963单设备与964双设备取消指令独立于承接/执行编号；设备编码/代理/取消编号与持久命令及传输逐项吻合，966离线取消DELIVERY_FAILED及失败摘要P。"
+    },
+    "SRS_F021.R04": {
+      "status": "P",
+      "actual": "965真实默认60秒未响应转TIMED_OUT、记录设备/指令/原因并UI提示核查；BL006保留执行占用，OFFLINE IDLE/ONLINE BUSY不放行、相关ONLINE IDLE确认/幂等释放；964双设备及966离线恢复释放、967不清他任务占用。"
+    },
+    "SRS_F021.R05": {
+      "status": "P",
+      "actual": "981真实弹窗明确业务终止非安全急停、完成结果不回滚不补偿和现场核实责任；禁用、二次确认及取消行为实际验证。"
+    },
+    "SRS_F021.R06": {
+      "status": "P",
+      "actual": "963和981自然三步流程首步COMPLETED/outputParams保留、其余两步FROZEN，无回滚补偿；961正常两步和968另一任务完成对照P。"
+    },
+    "SRS_F021.R07": {
+      "status": "P",
+      "actual": "963重试规划/转基线/置失败409，澄清/取消/重复终止拒绝，迟到反馈无恢复；952～957六合法状态200、958～960三终态409且快照不变；972～980真实UI九状态入口正确；超时/空闲恢复仍终态。"
+    },
+    "SRS_F021.R08": {
+      "status": "P",
+      "actual": "DEF-S3-059闭环：963原反例及964多设备的MANUAL_TERMINATED/TASK_TERMINATED.detail整体json.loads成功，必需字段/每设备编码/取消编号齐全，HTTP原文=SQL持久原文=操作日志对象；detailSummary=JSON.summary。最终32任务47条结构化事件一致性全P，970引号/反斜杠/换行原因精确往返、971计划前取消JSON及当前UI/追溯/旧文本兼容P。"
+    }
+  },
+  "steps": {
+    "TC-066.S1": {
+      "status": "P",
+      "actual": "950省略/null/空串/空白/201字/未确认均400且业务快照不变；951合法200字、1字trim持久；981真实UI空白/未确认禁用、201输入限200、取消原状态保持。 981真实弹窗明确业务终止非安全急停、完成结果不回滚不补偿和现场核实责任；禁用、二次确认及取消行为实际验证。"
+    },
+    "TC-066.S2": {
+      "status": "P",
+      "actual": "962待承接终止后迟到接受及963执行中终止后迟到反馈均不下发后续业务；981实际UI三步首步完成/后二步冻结；967只冻结自身，不影响他任务。 963单设备与964双设备取消指令独立于承接/执行编号；设备编码/代理/取消编号与持久命令及传输逐项吻合，966离线取消DELIVERY_FAILED及失败摘要P。 963和981自然三步流程首步COMPLETED/outputParams保留、其余两步FROZEN，无回滚补偿；961正常两步和968另一任务完成对照P。 963重试规划/转基线/置失败409，澄清/取消/重复终止拒绝，迟到反馈无恢复；952～957六合法状态200、958～960三终态409且快照不变；972～980真实UI九状态入口正确；超时/空闲恢复仍终态。"
+    },
+    "TC-066.S3": {
+      "status": "P",
+      "actual": "DEF-S3-059闭环：963原反例及964多设备的MANUAL_TERMINATED/TASK_TERMINATED.detail整体json.loads成功，必需字段/每设备编码/取消编号齐全，HTTP原文=SQL持久原文=操作日志对象；detailSummary=JSON.summary。最终32任务47条结构化事件一致性全P，970引号/反斜杠/换行原因精确往返、971计划前取消JSON及当前UI/追溯/旧文本兼容P。"
+    },
+    "TC-067.S1": {
+      "status": "P",
+      "actual": "六合法状态952～957终止200；三终态958～960终止409且完整快照不变；972～980真实浏览器六入口有/三终态无。状态SQL夹具与自然执行分层。"
+    },
+    "TC-067.S2": {
+      "status": "P",
+      "actual": "965真实默认60秒未响应转TIMED_OUT、记录设备/指令/原因并UI提示核查；BL006保留执行占用，OFFLINE IDLE/ONLINE BUSY不放行、相关ONLINE IDLE确认/幂等释放；964双设备及966离线恢复释放、967不清他任务占用。"
+    }
+  },
+  "ruleCounts": {
+    "P": 8,
+    "F": 0,
+    "NT": 0
+  },
+  "stepCounts": {
+    "P": 5,
+    "F": 0,
+    "NT": 0
+  },
+  "businessGroups": [
+    {
+      "name": "reason-and-confirmation-boundaries",
+      "taskIds": [
+        950
+      ],
+      "checks": {
+        "allMissingBlankOverlengthOrUnconfirmed400": true,
+        "noInvalidBusinessMutation": true,
+        "oneCharacterTrimmedAccepted": true,
+        "terminal": true,
+        "eventJsonPersistenceAndSummary": true
+      },
+      "result": "P",
+      "source": "SRS_F021-V1.174-http-20261107.json",
+      "supplement": null
+    },
+    {
+      "name": "exact-200-reason",
+      "taskIds": [
+        951
+      ],
+      "checks": {
+        "exact200Accepted": true,
+        "actualReasonPersisted": true,
+        "eventJsonPersistenceAndSummary": true
+      },
+      "result": "P",
+      "source": "SRS_F021-V1.174-http-20261107.json",
+      "supplement": null
+    },
+    {
+      "name": "legal-state-PLANNING",
+      "taskIds": [
+        952
+      ],
+      "checks": {
+        "legalState200": true,
+        "terminal": true,
+        "previousStatusAudited": true,
+        "eventJsonPersistenceAndSummary": true
+      },
+      "result": "P",
+      "source": "SRS_F021-V1.174-http-20261107.json",
+      "supplement": null
+    },
+    {
+      "name": "legal-state-SUPERVISING",
+      "taskIds": [
+        953
+      ],
+      "checks": {
+        "legalState200": true,
+        "terminal": true,
+        "previousStatusAudited": true,
+        "eventJsonPersistenceAndSummary": true
+      },
+      "result": "P",
+      "source": "SRS_F021-V1.174-http-20261107.json",
+      "supplement": null
+    },
+    {
+      "name": "legal-state-PENDING_ASSIGNMENT",
+      "taskIds": [
+        954
+      ],
+      "checks": {
+        "legalState200": true,
+        "terminal": true,
+        "previousStatusAudited": true,
+        "eventJsonPersistenceAndSummary": true
+      },
+      "result": "P",
+      "source": "SRS_F021-V1.174-http-20261107.json",
+      "supplement": null
+    },
+    {
+      "name": "legal-state-DOWNGRADING",
+      "taskIds": [
+        955
+      ],
+      "checks": {
+        "legalState200": true,
+        "terminal": true,
+        "previousStatusAudited": true,
+        "eventJsonPersistenceAndSummary": true
+      },
+      "result": "P",
+      "source": "SRS_F021-V1.174-http-20261107.json",
+      "supplement": null
+    },
+    {
+      "name": "legal-state-EXECUTING",
+      "taskIds": [
+        956
+      ],
+      "checks": {
+        "legalState200": true,
+        "terminal": true,
+        "previousStatusAudited": true,
+        "eventJsonPersistenceAndSummary": true
+      },
+      "result": "P",
+      "source": "SRS_F021-V1.174-http-20261107.json",
+      "supplement": null
+    },
+    {
+      "name": "legal-state-PENDING_MANUAL",
+      "taskIds": [
+        957
+      ],
+      "checks": {
+        "legalState200": true,
+        "terminal": true,
+        "previousStatusAudited": true,
+        "eventJsonPersistenceAndSummary": true
+      },
+      "result": "P",
+      "source": "SRS_F021-V1.174-http-20261107.json",
+      "supplement": null
+    },
+    {
+      "name": "terminal-state-COMPLETED",
+      "taskIds": [
+        958
+      ],
+      "checks": {
+        "terminalTerminate409": true,
+        "completeBusinessSnapshotUnchanged": true
+      },
+      "result": "P",
+      "source": "SRS_F021-V1.174-http-20261107.json",
+      "supplement": null
+    },
+    {
+      "name": "terminal-state-FAILED",
+      "taskIds": [
+        959
+      ],
+      "checks": {
+        "terminalTerminate409": true,
+        "completeBusinessSnapshotUnchanged": true
+      },
+      "result": "P",
+      "source": "SRS_F021-V1.174-http-20261107.json",
+      "supplement": null
+    },
+    {
+      "name": "terminal-state-MANUAL_TERMINATED",
+      "taskIds": [
+        960
+      ],
+      "checks": {
+        "terminalTerminate409": true,
+        "completeBusinessSnapshotUnchanged": true
+      },
+      "result": "P",
+      "source": "SRS_F021-V1.174-http-20261107.json",
+      "supplement": null
+    },
+    {
+      "name": "normal-completion-neighbor",
+      "taskIds": [
+        961
+      ],
+      "checks": {
+        "naturalCompletion": true,
+        "allStepsCompleted": true,
+        "noCancel": true
+      },
+      "result": "P",
+      "source": "SRS_F021-V1.174-http-20261107.json",
+      "supplement": null
+    },
+    {
+      "name": "pending-assignment-terminate",
+      "taskIds": [
+        962
+      ],
+      "checks": {
+        "terminated": true,
+        "allUnfinishedFrozen": true,
+        "noExecuteEvenLateAcceptance": true,
+        "noWrongBusyOccupancy": true,
+        "terminalRetained": true,
+        "eventJsonPersistenceAndSummary": true
+      },
+      "result": "P",
+      "source": "SRS_F021-V1.174-http-20261107.json",
+      "supplement": null
+    },
+    {
+      "name": "completed-prefix-executing-terminate",
+      "taskIds": [
+        963
+      ],
+      "checks": {
+        "terminate200": true,
+        "completedPrefixPreserved": true,
+        "unfinishedFrozen": true,
+        "noFutureBusiness": true,
+        "cancelDistinctFromExecuteAndAccept": true,
+        "confirmedIdle": true,
+        "terminalActions409": true,
+        "otherResumeRejected": true,
+        "noGateBusinessMutation": true,
+        "eventJsonPersistenceAndSummary": true,
+        "operationDetailValidJSON": true,
+        "eventDetailWholeJSON": true
+      },
+      "result": "P",
+      "source": "SRS_F021-V1.174-http-20261107.json",
+      "supplement": null
+    },
+    {
+      "name": "multi-device-cancel-summary",
+      "taskIds": [
+        964
+      ],
+      "checks": {
+        "twoOwnedDevices": true,
+        "twoIndependentCancelCommands": true,
+        "structuredOperationTwoDevices": true,
+        "realDeviceCodesMapped": true,
+        "cancelIdsCorrelate": true,
+        "bothConfirmedIdle": true,
+        "allOccupancyReleased": true,
+        "terminal": true,
+        "eventJsonPersistenceAndSummary": true
+      },
+      "result": "P",
+      "source": "SRS_F021-V1.174-http-20261107.json",
+      "supplement": null
+    },
+    {
+      "name": "unconfirmed-timeout-and-online-idle-recovery",
+      "taskIds": [
+        965
+      ],
+      "checks": {
+        "queuedRetainsBusy": true,
+        "actualDefaultTimeoutObserved": true,
+        "timeoutHasAgentCommandReason": true,
+        "timeoutPreservesSafetyOccupation": true,
+        "offlineIdleDoesNotRelease": true,
+        "onlineBusyDoesNotRelease": true,
+        "onlineIdleConfirms": true,
+        "noResurrection": true,
+        "idleConfirmationIdempotent": true,
+        "eventJsonPersistenceAndSummary": true
+      },
+      "result": "P",
+      "source": "SRS_F021-V1.174-http-20261107.json",
+      "supplement": null
+    },
+    {
+      "name": "offline-cancel-delivery-and-recovery",
+      "taskIds": [
+        966
+      ],
+      "checks": {
+        "offlineCancelPersisted": true,
+        "failureSummary": true,
+        "noPrematureRelease": true,
+        "recoveredOnlineIdle": true,
+        "terminalPreserved": true,
+        "eventJsonPersistenceAndSummary": true
+      },
+      "result": "P",
+      "source": "SRS_F021-V1.174-http-20261107.json",
+      "supplement": null
+    },
+    {
+      "name": "cross-owner-pending-termination",
+      "taskIds": [
+        967,
+        968
+      ],
+      "checks": {
+        "ownStepsFrozen": true,
+        "otherOwnerRetained": true,
+        "otherCommandsUnchanged": true,
+        "noCrossTaskCancel": true,
+        "otherTaskCompletes": true,
+        "eventJsonPersistenceAndSummary": true,
+        "otherControlCompleted": true
+      },
+      "result": "P",
+      "source": "SRS_F021-V1.174-http-20261107.json",
+      "supplement": null
+    },
+    {
+      "name": "authorization-order-controls",
+      "taskIds": [
+        969
+      ],
+      "checks": {
+        "priorConfigBoth403": true,
+        "anonymous401": true,
+        "noTaskMutation": true
+      },
+      "result": "P",
+      "source": "SRS_F021-V1.174-http-20261107.json",
+      "supplement": "SRS_F021-V1.174-auth-supplement-20261107.json"
+    },
+    {
+      "name": "escaped-json-reason",
+      "taskIds": [
+        970
+      ],
+      "checks": {
+        "accepted": true,
+        "exactReasonPreserved": true,
+        "eventEscapesRoundTrip": true,
+        "eventJsonPersistenceAndSummary": true
+      },
+      "result": "P",
+      "source": "SRS_F021-V1.174-http-20261107.json",
+      "supplement": null
+    },
+    {
+      "name": "planning-cancel-direct-neighbor",
+      "taskIds": [
+        971
+      ],
+      "checks": {
+        "cancel200": true,
+        "terminal": true,
+        "completeJsonPersisted": true,
+        "zeroDeviceResults": true,
+        "humanSummary": true,
+        "noCommands": true
+      },
+      "result": "P",
+      "source": "SRS_F021-V1.174-http-20261107.json",
+      "supplement": null
+    },
+    {
+      "name": "historical-event-backward-compatibility",
+      "taskIds": [
+        923
+      ],
+      "checks": {
+        "historicalTextUnchanged": true,
+        "oldHumanTextRetained": true,
+        "ordinaryEventRetainsText": true
+      },
+      "result": "P",
+      "source": "SRS_F021-V1.174-http-20261107.json",
+      "supplement": null
+    },
+    {
+      "name": "ui-real-executing-prefix",
+      "taskIds": [
+        981
+      ],
+      "checks": {
+        "browserTerminated": true,
+        "browserReasonPersisted": true,
+        "completedPrefixPreserved": true,
+        "futureFrozen": true,
+        "cancelConfirmed": true,
+        "eventJsonPersistenceAndSummary": true
+      },
+      "result": "P",
+      "source": "SRS_F021-V1.174-http-20261107.json",
+      "supplement": null
+    }
+  ],
+  "businessGroupCounts": {
+    "groups": 23,
+    "P": 23,
+    "F": 0,
+    "assertions": 113,
+    "failedAssertions": 0
+  },
+  "uiGroups": 6,
+  "uiAssertions": 26,
+  "uiStateEntries": 9,
+  "backendTests": {
+    "tests": 434,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 2
+  },
+  "currentTasks": 32,
+  "taskProvenance": {
+    "naturalProtocolLifecycle": 9,
+    "explicitSQLStatusFixtures": 23,
+    "multiDeviceSecondOccupationExplicitSQL": true,
+    "historicalDataCompatibilityReadOnlyTask": 923
+  },
+  "historicalPassesReused": 0,
+  "historicalCompatibility": "Old V1.173 data under current V1.174 HTTP/UI behavior was actually re-read, not old P promoted",
+  "structuredEventsCrossChecked": 47,
+  "finalConsistency": "SRS_F021-V1.174-final-consistency-20261107.json",
+  "issueDisposition": {
+    "DEF-S3-059": "closed V1.174; all prior F evidence preserved",
+    "newDefects": [],
+    "remainingNT": []
+  },
+  "diagnostics": {
+    "authorization": "Exception-name copy typo retained; missing401 completed without re-running config403; source fixed, no product change",
+    "ui": "Previous expired session re-login and reopen animation checkbox helper error retained; current checked/disabled state freshly observed and verified"
+  },
+  "cleanup": "SRS_F021-V1.174-cleanup-smoke-20261107.json",
+  "processCleanup": "SRS_F021-V1.174-process-cleanup-20261107.json",
+  "mainBefore": "a8d6409964085e4a500bd399bb1a6b4f6bfb2918",
+  "mainIntegration": "After evidence and formal acceptance push only; actual anchor will be recorded separately",
+  "scopeLimits": [
+    "No commercial model or physical emergency-stop certification",
+    "Not acceptance of F022 or later, three core E2E scenarios or all95cases"
+  ],
+  "report": "SRS_F021-V1.174-整轮独立验收与裁决.md",
+  "privacyScan": {
+    "localPasswordsKeysJwtMatches": 0,
+    "rawOfficeFiles": 0,
+    "dpapiFiles": 0,
+    "jarFiles": 0,
+    "unrelatedUserFiles": 0
+  }
+}
