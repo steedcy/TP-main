@@ -2,9 +2,9 @@
 
 ## 当前交接状态
 
-- 状态：`REQUIREMENT_PASSED`（F020 V1.172：9P/0F/0NT、六步骤6P/0F/0NT，062/115关闭；证据`b9d6a6c09696ac79a5617105c7c0834983e6b390`先推送，已安全快进合main并远端核对，验收锚点`31fd633bd297a3a2b1e84c0e7ef05035c4785e9c`，40用户文件哈希不变）
-- 当前代码 SHA：`b750cb36fc3bef10013050035de7d696ced39b5f`，唯一递增版本标签：`V1.172`（固定产品提交，远端精确核对）
-- 当前进度：F001～F020已验收合main，F020验收锚点`31fd633bd297a3a2b1e84c0e7ef05035c4785e9c`已远端核对，无PR；合入证明与最终文档随本提交同步。下一仅SRS_F021从最终main顺序正式交接，标签V1.172固定，不开展后续并行。
+- 状态：`READY_FOR_GPT`（SRS_F021 V1.173：人工终止与安全制动全面修复与定向验证完成，产品代码提交打标 V1.173，交由 ChatGPT 开展整轮独立复测）
+- 当前代码 SHA：`761bd0b51af380c19b06357f815acda751905a3b`，唯一递增版本标签：`V1.173`（固定产品提交，对应 commit 761bd0b）
+- 当前进度：F001～F020已验收合main（锚点 a8d6409）。本轮开展 SRS_F021 人工终止与安全制动正式交接，标签锁定为 V1.173，待 ChatGPT 独立复测。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -38,6 +38,7 @@
 
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-07 | SRS_F021 | Claude → GPT | READY_FOR_GPT | ai/claude-fix / 761bd0b51af380c19b06357f815acda751905a3b / V1.173 | 待独立测试 | 闭环 DEF-S3-059，强化 R01~R08，详见下文交接专节 |
 
 ## 文件认领
 
@@ -3348,3 +3349,83 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 ### F020最终main实际合入证明（2026-11-06）
 
 完整证据`b9d6a6c09696ac79a5617105c7c0834983e6b390`先提交推送，正式验收交接`31fd633bd297a3a2b1e84c0e7ef05035c4785e9c`随后推送并安全快进合main，远端实际验收锚点同为`31fd633bd297a3a2b1e84c0e7ef05035c4785e9c`。主工作区40用户未跟踪文件清单/哈希前后一致，受控文件纯净，无强推/reset/清理，无PR；产品标签V1.172仍精确指向`b750cb36fc3bef10013050035de7d696ced39b5f`。证明`acceptance/stage3/evidence/SRS_F020-V1.172-main-integration-20261106.json`及最终文档随本提交再同步两分支，最终HEAD由远端与最终回复实核；不把标签或验收锚点混为最终文档HEAD。交接单写入权现顺序交Claude，下一仅F021从最终main同步另行正式交接，保留所有旧失败/探针更正，不表示三核心或95项整体验收通过。
+
+---
+
+## 2026-11-07 Claude → ChatGPT：SRS_F021 V1.173 人工终止与安全制动
+
+- **交接状态**：`READY_FOR_GPT`
+- **需求编号**：`SRS_F021`（人工终止与安全制动，8规则 R01～R08，关联用例 TC-066、TC-067 5步骤）
+- **产品代码 SHA**：`761bd0b51af380c19b06357f815acda751905a3b`
+- **递增版本标签**：**`V1.173`**（已在代码提交上打标，唯一递增）
+- **分支**：`ai/claude-fix`（基于最新 `main` `a8d6409` 检出并构建）
+- **前置验收状态**：SRS_F001～F020 已全部验收合入 main。本轮聚焦 SRS_F021 闭环 DEF-S3-059，完成 8 项业务规则与 TC-066 / TC-067 覆盖加固。
+
+### 核心攻坚与产品修复内容
+
+1. **闭环 DEF-S3-059（TC-066.S3 / SRS_F021.R08）与审计结构化留痕**：
+   - 彻底解决人工终止时 `operation_logs[0].detail` 为 `null` 且缺失设备取消明细的缺陷；
+   - 在 `TaskService.java` 中注入 `DeviceMapper`，通过 `deviceAgentMapper` 关联设备真实编号 `deviceCode`；
+   - 在下发 `TASK_CANCEL` 取消指令时，结构化收集各关联设备取消结果摘要 `deviceCancelResults`，明确包含 `agentId`、`agentCode`、`deviceCode`、`cancelCommandId`、`result`、`cancelStatus`（`CANCEL_QUEUED`/`CANCEL_FAILED`）等核心字段；
+   - 在 `operation_log`（类型 `TASK_TERMINATE`）中持久化记录非空结构化 JSON 详情，包含 `reason`（必填原因）、`previousStatus`（前序状态）、`deviceCancelResults`（设备取消结果清单）、`devices`、`operator`、`cancelledCount`；
+   - 同步修正 `TaskService.cancel` 中的操作审计详情为非空结构化 JSON；
+   - 在 `TaskEvent.java` 中增加 `getDetail()` / `setDetail()` 访问器（与 `detailSummary` 别名对齐），确保 REST 接口 `GET /api/v1/tasks/{id}/events` 输出的 JSON 始终包含完整非空的 `detail` 字段。
+
+2. **全规则业务逻辑强化（SRS_F021.R01 ～ R08、TC-066、TC-067）**：
+   - **R01 (原因与二次确认校验)**：
+     - `TaskController.terminate` 与 `TaskService.terminateTask` 强化双重校验：终止原因必须非空且 trim 后字符长度在 1～200 之间，缺失、空串、纯空白返回 400（ErrorCode 3000），超长（>200字符）返回 400（ErrorCode 3001）；
+     - 控制层严格校验二次确认标记 `confirmed`，未确认直接拒绝（400）。
+   - **R02 (业务制动与步骤冻结)**：
+     - 任务一旦终止，将所有非终态步骤批量标记为 `FROZEN`（冻结）；
+     - 在 `TaskExecutionOrchestrator` 的 `assignStep` 与 `dispatchCommand` 中增加硬门禁：任务处于 `MANUAL_TERMINATED` 终态或步骤处于 `FROZEN` 时严禁分配与下发任何新指令。
+   - **R03 / R04 (设备释放与取消联动)**：
+     - 自动收集任务关联的处于执行中的设备，批量下发 `TASK_CANCEL` 业务指令；
+     - 联动 `DeviceAgentService` 与心跳监控，设备上报 `ONLINE IDLE` 立即确认转为 `CONFIRMED_IDLE` 并清空任务占用，释放全部资源。
+   - **R05 (安全边界提示)**：
+     - 前端 `TaskDetailView.vue` 人工终止弹窗明确展示安全边界告警说明：“人工终止仅停止后续业务步骤下发并释放设备占用，不等同于设备安全急停；已完成步骤结果保留，不回滚不补偿。请核实设备现场实际状态”；
+     - 明确增加 DOM 选择器属性（`#terminate-reason-input`、`#terminate-confirm-checkbox`、`#btn-confirm-terminate`），当原因未填（或纯空白）或未勾选二次确认时，确认按钮强制 `disabled`。
+   - **R06 (阶段性成果保留归档)**：
+     - 人工终止仅冻结未完成步骤，已执行完成的步骤状态保持 `COMPLETED`，执行结果完整归档保留，不作回滚与补偿。
+   - **R07 (终态硬拦截不可逆)**：
+     - 任务变更为 `MANUAL_TERMINATED` 终态；
+     - 对已处于终态的任务，拦截所有后续动作：再次尝试重试规划（`RETRY_PLANNING`）返回 409，转基线（`SWITCH_TO_BASELINE`）返回 409，澄清（`clarify`）返回 400，人工处置（`MANUAL_ACTION`）返回 409，指令调度严格阻断。
+   - **TC-067.S1 / S2 (多状态支持与超时兜底)**：
+     - 支持在规划阶段（PLANNING）、监督中（SUPERVISING）、降级中（DOWNGRADING）、执行中（EXECUTING）、待人工接管（PENDING_MANUAL）等多状态下执行终止；
+     - `CancelConfirmationMonitor` 机制已就绪：对设备取消指令 60 秒未响应超时具备安全兜底识别。
+
+### 本地验证与质量门禁
+
+1. **定向测试覆盖**：
+   - 编写并运行 `TaskTerminateF021Test.java`（7/7 通过）：
+     - `testTerminateRequiresReasonAndConfirmed`：原因缺失、纯空白、超长、未确认 400 校验；
+     - `testTerminateFreezesUnfinishedStepsAndPreservesCompleted`：未完成步骤冻结、已完成步骤保留；
+     - `testTerminateDispatchesCancelAndAuditsStructuredDetail`：下发取消指令、结构化记录操作日志与事件、`cancelCommandId` 与设备取消明细审计；
+     - `testTerminalStateRejectsPlanningRetryAndBaselineSwitch`：终态拒绝重试规划与转基线（409）；
+     - `testTerminalStateRejectsExecutionDispatch`：终态执行编排硬拦截；
+     - `testTerminateMultipleLegalStatuses`：多前序合法状态终止支持；
+     - `testCancelDetailNonEmpty`：任务取消操作日志详情非空结构化。
+   - 运行关联安全与监控单测：`TerminateSafetyTest`、`TerminateCancelIdF007Test`、`CancelConfirmationMonitorTest`（4/4 通过）。
+   - 定向测试总计 11 项全通（0 failures, 0 errors）。
+
+2. **全量后端单测回归**：
+   - 运行 `mvn -o test`：
+     - **Tests run: 433, Failures: 0, Errors: 0, Skipped: 2**（BUILD SUCCESS）。
+     - 0 failures, 0 errors，全量回归 100% 通过。
+
+3. **生产构建打包**：
+   - 运行 `mvn -o package -DskipTests`：
+     - 成功构建生成 `backend/target/airport-ai-app-1.0.0.jar`（BUILD SUCCESS，耗时 31.2s）。
+
+### 待 ChatGPT 独立复测重点清单（SRS_F021）
+
+1. **DEF-S3-059 闭环验证（TC-066.S3 / SRS_F021.R08）**：
+   - 调用 `POST /api/v1/tasks/{id}/terminate` 终止含关联设备的执行中任务；
+   - 检查 `GET /api/v1/tasks/{id}/events` 中 `TASK_TERMINATED` / `MANUAL_TERMINATED` 事件的 `detail`，断言不为 null，且包含包含设备取消明细；
+   - 检查 `operation_log` 中 `action = TASK_TERMINATE` 的 `detail` 字段，断言解析为有效 JSON 结构，包含 `reason`、`previousStatus`、`operator`，以及 `deviceCancelResults` 数组（各元素含 `deviceCode`、`agentId`、`cancelCommandId`、`cancelStatus` 等）。
+2. **原因校验与安全边界（TC-066.S1 ~ S2 / SRS_F021.R01、R05）**：
+   - 测试终止接口对缺失 reason、空字符串、纯空白字符、超过 200 字符的请求均严格返回 HTTP 400；
+   - 测试前端终止弹窗边界文案与按钮禁用联动（未填写原因或未勾选确认时按钮禁用）。
+3. **业务制动、设备释放与终态硬拦截（TC-067.S1 ~ S2 / SRS_F021.R02 ~ R04、R06、R07）**：
+   - 验证任务终止后，未完成步骤全部变为 `FROZEN`，已完成步骤保持 `COMPLETED`；
+   - 验证关联设备状态转为 `CONFIRMED_IDLE` 或 `IDLE`，任务占用被完全释放；
+   - 验证对处于 `MANUAL_TERMINATED` 状态的任务，调用重试规划、转基线、人工接管等接口均严格被 409 拒绝，不再有任何后续业务指令下发。
