@@ -2,9 +2,9 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_GPT`（F022 V1.176 闭环 DEF-S3-116：任务定义约束条件完整传入首次规划模型请求，且由 PlanValidationService 解析并执行硬拦截，定向单测20项全通，全量单测454通过，生产构建成功）
+- 状态：`READY_FOR_CLAUDE`（F022 V1.176实际JAR启动F：DEF-S3-117；八规则0P/0F/8NT、正式四步骤0P/0F/4NT，逐项前置阻断；116组件4P但实机NT未关闭；证据`e0da9e13db04fb21a0bdf1ff9586d0bb6df3ac29`已先推送）
 - 当前代码 SHA：`5bf8ad62f2a8269430d19f6db4d7d0ef45aedf32`，唯一递增版本标签：`V1.176`（基于 origin/main 413e1b3，已打标固定）
-- 当前进度：F001～F021已验收并合main；F022已完成 DEF-S3-116 修复与定向回归、全量单测通过（454通过，0失败，0错误，2原有跳过），生产构建生成 `airport-ai-app-1.0.0.jar`，待 ChatGPT 独立复测 R07/TC-068.S2 及整轮验证。main保持`413e1b3aee20116bb612ed1d4dac96e9937cde0e`，无合并/PR，不推进F023。
+- 当前进度：F001～F021已验收合main；F022 V1.176独立单测/构建及可执行组件检查完成，生产Spring构造器装配回归117阻断全部业务前置，逐项NT已登记。main保持`413e1b3aee20116bb612ed1d4dac96e9937cde0e`，未合本轮/无PR，不推进F023；Claude接证据修117并确保定义mapper注入后发布新标签再F022整轮。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -3652,3 +3652,29 @@ F021最终取证核对补充：核心证据提交`4dc3a8d3654c06b9233b20da641da4
 - **待 ChatGPT 独立复测重点**：
   - 复测 DEF-S3-116（TC-068.S2 / R07）：使用定义的约束文本（如包含“禁止前往F2_TEST_GATE”）发起任务规划，验证违规计划被硬拦截（`constraintCheckResult=FAIL`，原因码 `ERR_TASK_DEFINITION_CONSTRAINT`），不冻结且不下发指令；合法目标正常通过并执行；
   - F022 整体业务规则（R01~R08）与用例（TC-068、TC-069）整轮复测。
+
+## 2026-11-07 GPT → Claude：SRS_F022 V1.176实际发布物启动阻断，统一交修117
+
+- **READY_FOR_CLAUDE**。实际生产JAR启动门禁**F（新DEF-S3-117，阻断）**。八业务规则**0P/0F/8NT**、TC-068/069四正式步骤**0P/0F/4NT**，不是将未执行规则硬记F，也不是需求通过。所有仍能独立执行的检查已完成，12项各有前置链/尝试/解除条件；DEF-S3-116保持未关闭（手动注入mapper服务4P，真实HTTP/SQL/冻结/指令/界面复测NT）。历史业务P复用0，旧P/F/NT和原始失败均保留，没有产品修补绕过或业务标准放宽。
+- 产品 **`5bf8ad62f2a8269430d19f6db4d7d0ef45aedf32` / V1.176**、Claude交接 **`0ada3a8ef4d2692f61af53868e0a6639cd2806c2`**，用户消息、远端分支/标签/提交链完全一致。GPT独立`tip-gpt-f013` / `ai/gpt-test`开工干净、七端口空闲，无竞争实例，快进接入；主工作区没有测试运行或写入。
+- **完整证据已先提交推送 `e0da9e13db04fb21a0bdf1ff9586d0bb6df3ac29`**。报告`acceptance/stage3/SRS_F022-V1.176-整轮独立复测与启动阻断交修.md`；总索引`...evidence/SRS_F022-V1.176-complete-verification-20261107.json`；12项逐条阻断`...per-item-blockers...json`；原JAR日志、容器/服务JSON、454项报告/构建、台账更新前原文和SHA256清单均已推送。本专节所在随后Git提交是正式交接SHA，实际完整SHA由远端最终核对。
+
+### 117最小反例与修复目标
+
+1. 独立执行 **mvn -o test：454报告、452执行通过/2原有跳过、0失败/错误**；mvn -o package -DskipTests及npm run build均成功。随后运行实际本轮生产JAR（GPT schema/Redis10/18129、与此前健康配置相同）。PID9440在Spring初始化退出，未健康UP。
+2. 链路baselineDryRunService → taskService → taskPlanningOrchestrator → **planValidationService**；根因 **No default constructor found** / **NoSuchMethodException: PlanValidationService.&lt;init&gt;()**。新增两个public构造器均无构造器上的注入标识，参数上的@Autowired(required=false)不负责选择构造器。
+3. 从同一生产JAR提取的真实类/依赖，用**无数据库/Redis/模型**的AnnotationConfigApplicationContext注册两合成mapper Bean和PlanValidationService，仍同根失败；排除了运行资源配置作为此根因。未修改产品Bean或换旧JAR冒称成功。
+4. 最小证据`evidence/SRS_F022-V1.176-DEF-S3-117-minimal-20261107.json`、`...jar-startup-log...txt`、`...container-component...json`。实际启动复现`fixtures/start-f022-v176-jar.py`；无外部依赖复现`fixtures/run-f022-v176-container-probe.py`（新GPT_RUN_SUFFIX，保留原证据）。后者Java源`F022V176ContainerProbe.java`在acceptance中，不改产品目录。
+5. **同时修复构造器选择与真实TaskDefinitionMapper注入**。仅让旧单参数构造器被选中会令mapper=null、任务定义查询被跳过，不能算完整闭环。补真实Spring或生产JAR启动/健康回归，保留七参数入口原禁止/合法对照；修复、必要邻接、构建后发新唯一递增标签交READY_FOR_GPT，再完整F022复测。
+
+### 独立项、NT边界与资源
+
+- 手动两个mapper构造真实服务、调用**七参数**入口由mapper提供定义约束：原禁止GATE、仅允许GATE合法对照、仅允许ZONE_A合法对照、ZONE_B越界共**4服务观察P**。不同于修复方显式传八参数文本的测试，验证了查询分支，但不证明Spring实际注入或端到端116已关闭。首次模型请求/原997的冻结与指令、本轮动态UI/审计等均未能运行，不冒认P。
+- R01～R08及四步骤各自明确范围和共同链：117服务退出 → 认证/定义/规划/执行API不可用 → HTTP/浏览器/设备前置不足。先执行构建、实际JAR、独立容器/服务、数据库只读SELECT1及环境核对后才收口，符合V2.4真实发布物不可启动时逐项NT规则，没有以首F为由省略仍可执行的业务分支。下一修复版本须全量重测，不复用V1.175业务P。
+- GPT schema`tip_gpt_f006_v118_20261030` / Redis10；本轮无新业务任务/定义、配置/规则/模板/设备修改，任务max仍997，G176/F176记录0。既有自有代理INACTIVE、IDLE/无占用、触发器0，无需恢复配置。JAR自行退出，模型/适配器/前端/浏览器未启动，18129/18117/18132～18135/15179七端口无监听；共享PG/Redis与Claude资源未动。产品源码对V1.176 diff为空。
+- 主目录未写入/合并。哈希记录更正：默认Git引号编码使开工40条清单中仅10个路径真正算得哈希；这10个前后一致，NUL/UTF8方式另补40个当前文件的匿名哈希清单，不声称另30个有开工前后证明。原记录及更正均保留，真实用户文件名留本机。测试日志3个已结束隔离上下文临时默认口令在首次公开证据前脱敏，无真实凭据/原Office/JAR/无关用户文件提交。
+- **main保持 `413e1b3aee20116bb612ed1d4dac96e9937cde0e`，未合本轮，无PR；V1.176标签固定**。028/029/030保留V1.175关闭来源，V1.176复测NT不伪写新版P。下一仅Claude接`ai/gpt-test`证据修117并保留116修复，发新标签再F022整轮，不推进F023，不代表三核心或95项整体验收通过。正式交接推送/核对后单写入权顺序交Claude。
+
+| 时间（Asia/Shanghai） | 需求 | 交接 | 状态 | 产品SHA/标签 | 完整证据SHA | main |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-07 | SRS_F022 | GPT → Claude | READY_FOR_CLAUDE，启动F117，规则8NT/步骤4NT | 5bf8ad62f2a8269430d19f6db4d7d0ef45aedf32 / V1.176 | e0da9e13db04fb21a0bdf1ff9586d0bb6df3ac29 | 413e1b3aee20116bb612ed1d4dac96e9937cde0e，未合本轮/无PR |
