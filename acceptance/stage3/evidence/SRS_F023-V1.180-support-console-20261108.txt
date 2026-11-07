@@ -1,0 +1,65 @@
+Traceback (most recent call last):
+  File "C:\ProgramData\miniconda3\Lib\urllib\request.py", line 1333, in do_open
+    h.request(req.get_method(), req.selector, req.data, headers,
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+              encode_chunked=req.has_header('Transfer-encoding'))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\ProgramData\miniconda3\Lib\http\client.py", line 1386, in request
+    self._send_request(method, url, body, headers, encode_chunked)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\ProgramData\miniconda3\Lib\http\client.py", line 1432, in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\ProgramData\miniconda3\Lib\http\client.py", line 1381, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\ProgramData\miniconda3\Lib\http\client.py", line 1141, in _send_output
+    self.send(msg)
+    ~~~~~~~~~^^^^^
+  File "C:\ProgramData\miniconda3\Lib\http\client.py", line 1085, in send
+    self.connect()
+    ~~~~~~~~~~~~^^
+  File "C:\ProgramData\miniconda3\Lib\http\client.py", line 1051, in connect
+    self.sock = self._create_connection(
+                ~~~~~~~~~~~~~~~~~~~~~~~^
+        (self.host,self.port), self.timeout, self.source_address)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\ProgramData\miniconda3\Lib\socket.py", line 874, in create_connection
+    raise exceptions[0]
+  File "C:\ProgramData\miniconda3\Lib\socket.py", line 859, in create_connection
+    sock.connect(sa)
+    ~~~~~~~~~~~~^^^^
+ConnectionRefusedError: [WinError 10061] ����Ŀ�����������ܾ����޷����ӡ�
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\savy\Desktop\TIP-main\tip-gpt-f013\acceptance\stage3\probe-f023-v180-runtime.py", line 158, in <module>
+    elif command=='serve':serve()
+                          ~~~~~^^
+  File "C:\Users\savy\Desktop\TIP-main\tip-gpt-f013\acceptance\stage3\probe-f023-v180-runtime.py", line 96, in serve
+    f=Fixture();f.setup()
+  File "C:\Users\savy\Desktop\TIP-main\tip-gpt-f013\acceptance\stage3\probe-f023-v180-runtime.py", line 40, in __init__
+    self.cfg=b.l.API('���ù���Ա');self.op=b.l.API('���в���Ա');self.devices=[];self.task=None;self.definition=None;self.mode='live';self.net=[]
+             ~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\savy\Desktop\TIP-main\tip\scripts\local-test-environment.py", line 51, in __init__
+    response=request(BASE+'/auth/login','POST',{'username':username,'password':password})
+  File "C:\Users\savy\Desktop\TIP-main\tip\scripts\local-test-environment.py", line 40, in request
+    with urllib.request.urlopen(urllib.request.Request(url,body,headers,method=method),timeout=timeout) as res:
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\ProgramData\miniconda3\Lib\urllib\request.py", line 187, in urlopen
+    return opener.open(url, data, timeout)
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "C:\ProgramData\miniconda3\Lib\urllib\request.py", line 487, in open
+    response = self._open(req, data)
+  File "C:\ProgramData\miniconda3\Lib\urllib\request.py", line 504, in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+                              '_open', req)
+  File "C:\ProgramData\miniconda3\Lib\urllib\request.py", line 464, in _call_chain
+    result = func(*args)
+  File "C:\ProgramData\miniconda3\Lib\urllib\request.py", line 1362, in http_open
+    return self.do_open(http.client.HTTPConnection, req)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\ProgramData\miniconda3\Lib\urllib\request.py", line 1336, in do_open
+    raise URLError(err)
+urllib.error.URLError: <urlopen error [WinError 10061] ����Ŀ�����������ܾ����޷����ӡ�>
