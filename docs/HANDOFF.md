@@ -2,9 +2,9 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（兼容既有状态值；实际修复接收者按2026-11-08用户最新授权为 **Germini AI**）。SRS_F023 V1.180整轮完成：规则9P/1F/0NT、五步骤3P/2F/0NT，DEF-S3-048在线重叠选择残留统一交修；047/024当前关闭。
-- 当前产品SHA：`1c612d55c9e228b2bdbea1375101648060c9dfc7` / `V1.180`，原Claude交接文档`605de7e4fef9343c74d50d498f293280734320e4`；标签保持固定。完整证据已先提交推送并核对：`9f9c7e5444a6a70f9d974fa117eac9a3c8b3af15`，首F检查点169ecd27ce4bc5da8993909eddac61d8c50b0c22。
-- main仍`dbd7b5c31ede69aedd25023986a89af9c6bf43ce`，F001～F022既有验收保持；F023未通过、无合并/PR，不推进F024。当前交出GPT，发送正式客户端提示后文件写入权转Germini；下一修复仅处理048及直接影响，发下一全局唯一标签/READY_FOR_GPT后GPT重开本需求整轮。
+- 状态：`READY_FOR_GPT`。SRS_F023 第二轮修复（Germini / Claude 修复轮）完成：彻底闭环 `DEF-S3-048` 同状态/同坐标/近坐标标记选择缺陷。
+- 当前产品SHA：`67fb8960245d08c4d74be85e515bbe325ca21b0f` / `V1.181`（基于 `f4d151ad07bef27fc619886d3606d3c1771fc500`，已打标并推送）。
+- main仍保持 `dbd7b5c31ede69aedd25023986a89af9c6bf43ce`，F001～F022既有验收保持；F023未合入main、无合并/PR，不推进F024。文件写入权交出给 ChatGPT 开展独立整轮复测。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -52,6 +52,8 @@
 | 2026-11-07 | SRS_F022 | Claude → GPT | READY_FOR_GPT | ai/claude-fix / 7e86a0afb7169154a9ec7b2b12c7eda60e4851af / V1.179 | 待独立复测 | 彻底闭环 DEF-S3-116 混合逗号约束（禁止地点/允许能力及反序）子句独立作用域与极性划分，详见下文交接专节 |
 | 2026-11-07 | SRS_F022 | GPT → Claude | REQUIREMENT_PASSED | ai/gpt-test / 7e86a0afb7169154a9ec7b2b12c7eda60e4851af / V1.179 | 42f2ac64b78436e2c3e76a3af7c5deb669fc48da | 8规则/4步骤全当前P，116关闭；正式交接后安全合main并另记证明，下一F023 |
 | 2026-11-08 | SRS_F023 | Claude → GPT | READY_FOR_GPT | ai/claude-fix / 1c612d55c9e228b2bdbea1375101648060c9dfc7 / V1.180 | 待独立测试 | 闭环 DEF-S3-047（态势快照携带离线代理 offlineInfo、页面红色高亮及详情弹窗显示）与 DEF-S3-048（标记层级 选中>离线>忙碌>在线、悬停置顶防遮挡），详见下文交接专节 |
+| 2026-11-08 | SRS_F023 | GPT → Germini | READY_FOR_CLAUDE | ai/gpt-test / 1c612d55c9e228b2bdbea1375101648060c9dfc7 / V1.180 | 9f9c7e5444a6a70f9d974fa117eac9a3c8b3af15 | 9P/1F/0NT，DEF-S3-048在线重叠选择残留统一交修；047/024关闭 |
+| 2026-11-08 | SRS_F023 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / 67fb8960245d08c4d74be85e515bbe325ca21b0f / V1.181 | 待独立复测 | 彻底闭环 DEF-S3-048，提供同状态同坐标重叠候选选择弹窗与详情弹窗同位置快捷切换，详见下文交接专节 |
 
 ## 文件认领
 
@@ -3899,3 +3901,33 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
 | 时间 | 需求 | 交接 | 状态 | 产品 | 证据提交 |
 | --- | --- | --- | --- | --- | --- |
 | 2026-11-08 Asia/Shanghai | SRS_F023 | GPT → Germini | READY_FOR_CLAUDE（兼容） | 1c612d55c9e228b2bdbea1375101648060c9dfc7 / V1.180 | 9f9c7e5444a6a70f9d974fa117eac9a3c8b3af15 |
+
+
+## 2026-11-08 Germini → ChatGPT：SRS_F023 V1.181 协同态势与多维大屏监控第二轮交接
+
+- **交接状态**：`READY_FOR_GPT`
+- **需求编号**：`SRS_F023` 协同态势与多维大屏监控（第二轮修复）
+- **产品代码提交 SHA**：`67fb8960245d08c4d74be85e515bbe325ca21b0f`
+- **版本标签**：`V1.181`（全局唯一递增标签，已在代码提交打标并推送，不移动 V1.180）
+- **交接基础**：基于 GPT 完整交接提交 `f4d151ad07bef27fc619886d3606d3c1771fc500`
+- **修复背景与闭环实现**：
+  1. **DEF-S3-048 残留闭环（同状态、同坐标/近坐标标记可靠目标选择交互）**：
+     - **问题根因**：两台真实持久设备 `G145_F013_DISPLAY`（智慧航显，`G180 SMART_DISPLAY`）与 `G180_F023_0`（移动机器人，`G180 MOBILE_ROBOT`）均位于坐标 `(450, 260)`，且同为 `ENABLED/ONLINE/IDLE`。由于层级均为在线基础层（`z=2`），后渲染的机器人标记遮挡了先渲染的航显终端标记，真实浏览器鼠标点击终端中心时事件被上层机器人拦截，导致连续两次点击实际弹窗均为机器人；而离线或筛选时由于层级或 DOM 独立可正常点中。单纯依赖固定层级或 CSS hover 无法解决同状态重叠问题。
+     - **纯函数工具扩展（`frontend/src/utils/situationMarkers.js`）**：
+       - 新增 `parseMarkerPoint(device, mapWidth, mapHeight)`：统一规范解析设备百分比坐标（左上角原点，地图天然 1260x6895），过滤无效坐标与越界点。
+       - 新增 `findOverlappingDevices(targetDevice, allDevices, threshold = 2.5)`：准确识别指定阈值内的同坐标/极近距离重叠设备集合。
+       - 新增 `hasSameTierOverlap(targetDevice, allDevices, threshold = 2.5)`：精准判断是否存在同层级重叠。当两个设备层级不同时（如离线 z=4 vs 在线 z=2），严格保留层级优先级，直接点选最高层级（保障离线/忙碌分支不受阻）；当两个设备状态层级相同时（如均为在线 z=2），触发重叠候选选择交互。
+     - **前端交互重构（`frontend/src/views/situation/SituationView.vue`）**：
+       - **同状态重叠候选选择器（Candidate Disambiguation Modal）**：点击同状态重叠标记时，弹出专属选择弹窗，列出该坐标下的全部重叠设备（设备编码、设备名称、设备类型标签、在线/工作状态标签、启用能力摘要），并提供醒目的“查看详情”操作，用户/自动化探针可直接点选目标设备打开对应详情。
+       - **详情弹窗同位置设备快捷切换（Detail In-Modal Peer Switcher）**：在设备详情弹窗中，若当前设备在同一坐标存在重叠设备，在描述列表顶部直观展示“同坐标重叠设备”信息条与快捷切换按钮，操作员可一键切换查看同坐标下的其他设备（如航显终端与移动机器人之间无缝切换），无需关闭弹窗重新定位。
+       - **悬停与提示增强**：标记悬停 title 动态增加重叠数量提示（如“当前坐标存在 2 个重叠设备，点击选择目标”），保留 CSS `hover: z=7` 交互。
+       - **基线约束严格保持**：未挪动任何数据库或前端设备坐标；保持底图 1260x6895 天然比例与 `left: ${point.left}%`, `top: ${point.top}%` 几何锚点（`pixelCoordinatesProportional` 100% 保持）；保持 `selected(6) > offline(4) > busy(3) > online(2)` 层级结构；保持任务链接跳转。
+- **本地定向验证与质量门禁**：
+  1. 前端算法自检：`node frontend/src/utils/situationMarkers.check.mjs` 全通（验证坐标解析、重叠设备查找、同层级重叠判断、离线优先级不被破坏）。
+  2. 前端生产构建：`npm run build`（built in 49.43s，`SituationView-CZg-Clh_.js` 编译成功，0 错误 0 警告）。
+  3. 后端定向测试：`mvn -o test "-Dtest=SituationControllerTest,SituationOfflineInfoTest"` 2/2 通过（BUILD SUCCESS，态势快照 offlineInfo 契约保持）。
+- **给 ChatGPT 独立复测重点**：
+  1. 复测 DEF-S3-048：当 `G145_F013_DISPLAY` 与 `G180_F023_0` 均为 ONLINE/IDLE 且坐标同为 (450, 260) 时，通过重叠选择交互可靠选中 `G145_F013_DISPLAY` 终端详情，确认 `onlineOverlapSelectsRequestedDisplay` 通过。
+  2. 验证详情弹窗同坐标设备切换按钮（智慧航显与移动机器人直接切换）。
+  3. 验证离线层级（离线终端 z=4 高于在线机器人 z=2）与单设备直接点击行为不受任何负面影响。
+  4. 验证五类类型筛选、底图缩放/平移/滚轮、任务跳转等既有 9P 规则与 3P 步骤定向回归无衰退。
