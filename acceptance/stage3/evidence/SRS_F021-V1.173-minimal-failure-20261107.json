@@ -1,0 +1,83 @@
+{
+  "productSha": "761bd0b51af380c19b06357f815acda751905a3b",
+  "tag": "V1.173",
+  "handoffSha": "f00536c595d291a495a5f7e55561dbf08823ac8c",
+  "timezone": "Asia/Shanghai",
+  "requirement": "SRS_F021",
+  "rule": "SRS_F021.R08",
+  "step": "TC-066.S3",
+  "issue": "DEF-S3-059",
+  "classification": "Existing audit completeness defect residual in event serialization; operation-log null detail fixed",
+  "taskId": 923,
+  "environment": {
+    "schema": "tip_gpt_f006_v118_20261030",
+    "backendPort": 18129,
+    "redisDb": 10,
+    "protocol": "Synthetic HTTP device, not physical hardware"
+  },
+  "reproduce": [
+    "Run packaged V1.173",
+    "Submit valid three-step navigation and complete step1; accept step2",
+    "POST /api/v1/tasks/923/terminate with reason and confirmed=true",
+    "GET /api/v1/tasks/923/events; select TASK_TERMINATED and json.loads(event.detail)"
+  ],
+  "expected": "Nonempty complete JSON detail containing deviceCancelResults with deviceCode,agentId,cancelCommandId,cancelStatus, and operator/reason/previousStatus",
+  "actual": "detail aliases detailSummary: narrative Chinese text plus JSON array suffix. Whole value fails JSON parsing. operation_logs.detail is valid structured JSON.",
+  "jsonValid": false,
+  "parseError": "Expecting value: line 1 column 1 (char 0)",
+  "event": [
+    {
+      "id": 14171,
+      "taskId": 923,
+      "eventType": "TASK_TERMINATED",
+      "occurredAt": "2026-11-07T10:56:40.357064",
+      "trigger": "OPERATOR",
+      "reasonCode": "NORMAL_MANUAL_TERMINATED",
+      "detailSummary": "运行操作员oprator人工终止任务，原因: F173 independent safe termination，前序状态: EXECUTING，涉及设备: [AGT-386E8C30]，取消响应摘要: [{\"agentId\":\"AGT-386E8C30\",\"agentCode\":\"AGT-386E8C30\",\"deviceCode\":\"G160_F016_A\",\"cancelCommandId\":\"CMD-20261107105640-A0B9000A\",\"result\":\"CANCEL_QUEUED\",\"cancelStatus\":\"CANCEL_QUEUED\",\"status\":\"CANCEL_QUEUED\"}]",
+      "detail": "运行操作员oprator人工终止任务，原因: F173 independent safe termination，前序状态: EXECUTING，涉及设备: [AGT-386E8C30]，取消响应摘要: [{\"agentId\":\"AGT-386E8C30\",\"agentCode\":\"AGT-386E8C30\",\"deviceCode\":\"G160_F016_A\",\"cancelCommandId\":\"CMD-20261107105640-A0B9000A\",\"result\":\"CANCEL_QUEUED\",\"cancelStatus\":\"CANCEL_QUEUED\",\"status\":\"CANCEL_QUEUED\"}]"
+    }
+  ],
+  "operationLog": [
+    {
+      "id": 6230,
+      "user_id": 3,
+      "username": "oprator",
+      "role": "OPERATOR",
+      "operation_type": "TASK_TERMINATE",
+      "operation_target": "TASK-20261107-0913",
+      "operation_result": "SUCCESS",
+      "source_ip": "127.0.0.1",
+      "detail": {
+        "reason": "F173 independent safe termination",
+        "previousStatus": "EXECUTING",
+        "deviceCancelResults": [
+          {
+            "agentId": "AGT-386E8C30",
+            "agentCode": "AGT-386E8C30",
+            "deviceCode": "G160_F016_A",
+            "cancelCommandId": "CMD-20261107105640-A0B9000A",
+            "result": "CANCEL_QUEUED",
+            "cancelStatus": "CANCEL_QUEUED",
+            "status": "CANCEL_QUEUED"
+          }
+        ],
+        "devices": [
+          {
+            "agentId": "AGT-386E8C30",
+            "agentCode": "AGT-386E8C30",
+            "deviceCode": "G160_F016_A",
+            "cancelCommandId": "CMD-20261107105640-A0B9000A",
+            "result": "CANCEL_QUEUED",
+            "cancelStatus": "CANCEL_QUEUED",
+            "status": "CANCEL_QUEUED"
+          }
+        ],
+        "operator": "oprator",
+        "cancelledCount": 1
+      },
+      "created_at": "2026-11-07T10:56:40.357064"
+    }
+  ],
+  "source": "SRS_F021-V1.173-http-20261107.json",
+  "roundContinues": true
+}
