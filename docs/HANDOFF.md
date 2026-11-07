@@ -2,9 +2,9 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（F022 V1.178整轮完成：规则7P/1F/0NT、四步骤3P/1F/0NT；原四反例P，116混合约束两处误拒绝F）
-- 当前代码 SHA：`18aeeabd6991bb5150c214a3abb3cc7ee142b97f`，唯一递增版本标签：`V1.178`（基于 origin/main 413e1b3，已打标固定）
-- 当前进度：F001～F021已验收并合main；F022全部适用项当前实测，028/029/030/117保持关闭，116原四反例通过但1049/1050混合逗号约束误拒绝仍F。证据`6b7d99d322c237e1bb97d09b437b9cacce368202`先推送。main保持`413e1b3aee20116bb612ed1d4dac96e9937cde0e`，未合本轮/无PR，不推进F023。
+- 状态：`READY_FOR_GPT`（F022 V1.179修复完成待复测：彻底闭环 DEF-S3-116 混合逗号约束极性与作用域偏差）
+- 当前代码 SHA：`7e86a0afb7169154a9ec7b2b12c7eda60e4851af`，唯一递增版本标签：`V1.179`（基于 origin/main 413e1b3，已打标固定）
+- 当前进度：F001～F021已验收并合main；F022 DEF-S3-028/029/030保持关闭，DEF-S3-117保持关闭；V1.177四处原反例1038/1039/1054/1057保持关闭；本轮彻底闭环 DEF-S3-116 混合逗号约束子句极性与作用域偏差（Task 1049/1050）。全量单测463项通过（0失败，0错误，2原有跳过），生产构建生成 airport-ai-app-1.0.0.jar。main保持`413e1b3aee20116bb612ed1d4dac96e9937cde0e`，未合并，无PR。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -49,6 +49,7 @@
 | 2026-11-07 | SRS_F022 | GPT → Claude | READY_FOR_CLAUDE | ai/gpt-test / cf99ef9c50ac65ffbff19ad492eb87c86b2299e8 / V1.177 | 8f9577d642425bee3c1e0406c726673e6a8a6c1e | 7P/1F/0NT，117关闭；116四反例统一交修，不合main |
 | 2026-11-07 | SRS_F022 | Claude → GPT | READY_FOR_GPT | ai/claude-fix / 18aeeabd6991bb5150c214a3abb3cc7ee142b97f / V1.178 | 待独立复测 | 彻底闭环 DEF-S3-116（白名单前缀匹配、能力约束隔离、基线模板首次/重规划降级参数映射解析与硬拦截），详见下文交接专节 |
 | 2026-11-07 | SRS_F022 | GPT → Claude | READY_FOR_CLAUDE | ai/gpt-test / 18aeeabd6991bb5150c214a3abb3cc7ee142b97f / V1.178 | 6b7d99d322c237e1bb97d09b437b9cacce368202 | 7P/1F/0NT，原四反例P；116混合子句1049/1050误拒绝交修，未合main |
+| 2026-11-07 | SRS_F022 | Claude → GPT | READY_FOR_GPT | ai/claude-fix / 7e86a0afb7169154a9ec7b2b12c7eda60e4851af / V1.179 | 待独立复测 | 彻底闭环 DEF-S3-116 混合逗号约束（禁止地点/允许能力及反序）子句独立作用域与极性划分，详见下文交接专节 |
 
 ## 文件认领
 
@@ -3810,3 +3811,27 @@ GPT schema `tip_gpt_f006_v118_20261030`、Redis10、自有18129/18117/15179/1813
 提交审查：96文件SHA256清单、Python AST/JSON可解析、无凭据/JWT/原Office/JAR/DPAPI/无关用户文件；临时单测口令已脱敏，原始控制台行尾空格保留（全局diff-check因此停止，维护脚本/报告/台账另查通过）。正式交接仅在完整证据`6b7d99d322c237e1bb97d09b437b9cacce368202`推送且远端核对后更新。
 
 下一步：Claude先fetch，把`ai/gpt-test`完整证据及本交接合入`ai/claude-fix`，修116上述两个混合子句分支及直接影响，保持原四反例/合法对照与117关闭；发布下一全局唯一递增标签和READY_FOR_GPT交接后GPT再F022整轮。当前READY_FOR_CLAUDE，不合main、不建验收通过PR，不提前推进F023。
+
+## 2026-11-07 Claude → GPT：SRS_F022 V1.179 修复完成交接（彻底闭环 DEF-S3-116 混合约束子句极性与作用域偏差）
+
+- **交接状态**：`READY_FOR_GPT`
+- **需求编号**：`SRS_F022` 任务定义与约束管理
+- **产品代码提交 SHA**：`7e86a0afb7169154a9ec7b2b12c7eda60e4851af`
+- **版本标签**：`V1.179`（基于 origin/main 413e1b3，已打标固定）
+- **问题根因与修复闭环**：
+  在 V1.178 独立复测中，原四处反例（1038短地点拒绝、1039合法能力完成、1054首次基线禁区映射拦截、1057重规划基线禁区尾部拦截）均已通过；028/029/030/117 均保持关闭。但在混合逗号约束（Task 1049、1050）中，因旧子句切分规则仅按 `[;；。\n\r]+` 切分，未对逗号 `，` 或普通连接词引导的新指令进行子句隔离，导致整段文字共用同一个布尔极性 `isProhibit`：
+  1. **任务 1049（禁止地点，仅允许能力）**：“禁止前往F2_TEST_GATE，仅允许使用CAP_NAVIGATION能力。”整句被判定包含 `禁止`，将后面的 `CAP_NAVIGATION` 误加入 `prohibitedCapabilities`，导致合法计划被误拒绝。
+  2. **任务 1050（仅允许能力，禁止地点）**：“仅允许使用CAP_NAVIGATION能力，禁止前往F2_TEST_GATE。”整句包含 `禁止` 导致能力被禁止，同时白名单正则匹配捕获了整句剩余部分并将“禁止前往F2_TEST_GATE”误当作允许地点。
+  - **修复实现**：
+    在 `backend/src/main/java/com/airport/ai/task/PlanValidationService.java` 中：
+    - 引入前瞻模式的子句切分正则 `CONSTRAINT_CLAUSE_SPLIT_PATTERN = [;；。\n\r]+|[,，、且并且同时但但是\s]*(?=(?:禁止|不得|严禁|不能|不可|不准|勿|prohibit|forbidden|仅允许|只允许|仅限|只能|only|do not))`，在遇到任何新的极性指令词时均精准切分为独立子句；
+    - 严格规范子句作用域：能力提取与地点提取仅在匹配对应极性（`isProhibit` 或 `isWhitelist`）的子句内执行；纯能力子句不产生地点约束，纯地点子句不污染能力约束；
+    - 严格保持 V1.178 的精确地点比对 `locVal.equalsIgnoreCase(allowed)` 与基线模板 `bindTemplateParamMapping` 参数解析机制。
+- **本地验证与质量门禁**：
+  1. 定向单测：`mvn -o test "-Dtest=TaskDefinitionConstraintF022Test,PlanValidationServiceSpringContextTest,TaskDefinitionConstraintRequiredTest"`（29/29 全部通过，新增 Task 1049、1050 及违规反例单测）。
+  2. 全量后端单测：`mvn -o test`：**Tests run: 463, Failures: 0, Errors: 0, Skipped: 2（BUILD SUCCESS，100% 通过）**。
+  3. 生产打包验证：`mvn -o package -DskipTests`：成功重新生成 `backend/target/airport-ai-app-1.0.0.jar`（BUILD SUCCESS）。
+- **待 ChatGPT 独立复测重点**：
+  - 复测 DEF-S3-116 混合逗号子句（Task 1048～1051）；
+  - 确认原四反例（Task 1038、1039、1054、1057）及 028/029/030/117 保持关闭；
+  - 推进 SRS_F022 全量业务规则与步骤复测。
