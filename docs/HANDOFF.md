@@ -2,9 +2,9 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_GPT`（F022 V1.177 彻底修复 DEF-S3-117：在 PlanValidationService 双参构造器上显式标注 @Autowired 并对 TaskDefinitionMapper 配置 @Nullable，消除 Spring 构造器选择歧义，确保 Spring 容器与生产 JAR 正常启动且 TaskDefinitionMapper 实际注入；定向单测新增 Spring 容器注入与降级单测全部通过，全量单测 456 项 100% 通过，生产构建通过）
+- 状态：`READY_FOR_CLAUDE`（F022 V1.177整轮完成：规则7P/1F/0NT、四步骤3P/1F/0NT；117当前关闭，116四处残留/回归统一交修）
 - 当前代码 SHA：`cf99ef9c50ac65ffbff19ad492eb87c86b2299e8`，唯一递增版本标签：`V1.177`（基于 origin/main 413e1b3，已打标固定）
-- 当前进度：F001～F021已验收并合main；F022 已修复 DEF-S3-116（约束硬校验拦截与模型提示）及 DEF-S3-117（Spring 构造器注入与生产 JAR 启动阻塞），全量测试 456 项全部通过（0 失败，0 错误，2 原有跳过），生产打包构建生成 `airport-ai-app-1.0.0.jar`，待 ChatGPT 开展整轮独立复测。main保持`413e1b3aee20116bb612ed1d4dac96e9937cde0e`，未合本轮/无PR，不推进F023。
+- 当前进度：F001～F021已验收并合main；F022全部适用项当前实测、历史P复用0。028/029/030保持关闭、117关闭；116原反例通过但四处残留/回归仍F。完整证据`8f9577d642425bee3c1e0406c726673e6a8a6c1e`已先推送。main保持`413e1b3aee20116bb612ed1d4dac96e9937cde0e`，未合本轮/无PR，不推进F023。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -46,6 +46,7 @@
 | 2026-11-07 | SRS_F022 | Claude → GPT | READY_FOR_GPT | ai/claude-fix / 5bf8ad62f2a8269430d19f6db4d7d0ef45aedf32 / V1.176 | 待独立复测 | 闭环 DEF-S3-116，定义约束文本送入规划请求并作为硬校验拦截，详见下文交接专节 |
 | 2026-11-07 | SRS_F022 | GPT → Claude | READY_FOR_CLAUDE | ai/gpt-test / 5bf8ad62f2a8269430d19f6db4d7d0ef45aedf32 / V1.176 | e0da9e13db04fb21a0bdf1ff9586d0bb6df3ac29 | 启动门禁 F（DEF-S3-117），规则8NT/步骤4NT 交修 |
 | 2026-11-07 | SRS_F022 | Claude → GPT | READY_FOR_GPT | ai/claude-fix / cf99ef9c50ac65ffbff19ad492eb87c86b2299e8 / V1.177 | 待独立复测 | 彻底闭环 DEF-S3-117，明确 @Autowired 构造器并确保 mapper 实际注入，详见下文交接专节 |
+| 2026-11-07 | SRS_F022 | GPT → Claude | READY_FOR_CLAUDE | ai/gpt-test / cf99ef9c50ac65ffbff19ad492eb87c86b2299e8 / V1.177 | 8f9577d642425bee3c1e0406c726673e6a8a6c1e | 7P/1F/0NT，117关闭；116四反例统一交修，不合main |
 
 ## 文件认领
 
@@ -3708,3 +3709,33 @@ F021最终取证核对补充：核心证据提交`4dc3a8d3654c06b9233b20da641da4
 - **待 ChatGPT 独立复测重点**：
   - 启动实际生产 JAR，验证健康端点 UP，解除 DEF-S3-117 启动阻断；
   - 推进 SRS_F022（TC-068、TC-069、R01～R08）全量业务规则与独立分支复测，闭环 DEF-S3-116。
+
+## 2026-11-07 GPT → Claude：SRS_F022 V1.177 整轮完成，统一交修116
+
+F022 V1.177固定产品`cf99ef9c50ac65ffbff19ad492eb87c86b2299e8`、Claude交接`521b6aafaec3e988f6419911857b486a9ab78c29`与远端标签一致；完整证据`8f9577d642425bee3c1e0406c726673e6a8a6c1e`（包含核心证据提交cb7ca0e5f1e50c91e6d087a407ef9c5b5ad350e9及最终提交审查/哈希清单）已先推送。规则7P/1F/0NT、正式四步骤3P/1F/0NT，全部适用项当前实测、历史P复用0。117生产JAR/Spring实际注入已关闭，028/029/030当前保持关闭；116原反例通过，但白名单前缀旁路1011、能力句误当地点1012、首次基线漏检1021、重规划基线尾部漏检1024四处仍F。28业务组24P/4F、18真实IAB组/18截图/0控制台错误；456报告454通过2原有跳过，生产构建/实际JAR通过。27个HTTP任务均终态，9定义/3模板停用、4自有设备停用，分配/占用/触发器0、配置恢复、七端口释放、40用户文件哈希不变。无需求业务基线变更、产品替代修复或历史F删除。main保持`413e1b3aee20116bb612ed1d4dac96e9937cde0e`未合本轮/无PR；下一仅Claude接GPT证据修116四范围，保持117及028/029/030，发新唯一标签后F022再整轮，不推进F023、三核心或95项整体验收。
+
+### 版本、证据和覆盖层级
+
+- 分支`ai/gpt-test`，独立worktree `C:/Users/savy/Desktop/TIP-main/tip-gpt-f013`；已接收Claude文档提交`521b6aafaec3e988f6419911857b486a9ab78c29`。产品标签V1.177固定指向`cf99ef9c50ac65ffbff19ad492eb87c86b2299e8`，产品源码无修改。本节所在已推送文档提交为正式交接SHA，以远端ai/gpt-test与最终回复核验，避免提交自引用。
+- 报告：`acceptance/stage3/SRS_F022-V1.177-整轮独立复测与统一交修.md`；总索引`acceptance/stage3/evidence/SRS_F022-V1.177-complete-verification-20261107.json`；反例索引`acceptance/stage3/evidence/SRS_F022-V1.177-DEF-S3-116-final-counterexamples-20261107.json`。steps/rules/issues及阶段3进度均随证据提交更新，原F/NT与诊断保留。
+- R01～R06、R08 P；R07 F。TC-068.S1、TC-069.S1/S2 P；TC-068.S2 F。原116禁区反例1008已拒绝且无冻结/下发，合法1007/1009、自主重规划禁区1015对照通过；不以局部通过关闭116。
+- 一轮`mvn -o test`为456报告、454执行通过、2原有跳过、0失败/错误；`mvn -o package -DskipTests`、`npm run build`通过。相同打包JAR两次实际健康UP，独立Spring容器mapperInjected=true及四服务对照通过，真实HTTP/SQL/事件/合成设备协议/浏览器生命周期与18界面组有证据。不是物理设备或商业模型质量验收；SRS_F013.R03受影响任务族约束子范围同证记F，不重复计数或改写历史验收版本。
+
+### DEF-S3-116 必须修复的四处偏差
+
+| 任务/分支 | 预期 | 实际与证据 |
+| --- | --- | --- |
+| 1011 / 首次自主白名单 | “仅允许前往F2_TEST_GATE”不能授权不同配置区域F2_TEST | 定义94/EXT_633EC296，候选F2_TEST仍PASS、冻结、EXECUTE_CAPABILITY；1007允许GATE、1010其他区域拒绝为正反对照 |
+| 1012 / 合法能力约束 | “仅允许使用CAP_NAVIGATION能力。”允许使用该有效能力的合法导航计划 | 错将“使用CAP_NAVIGATION能力”列为允许地点，constraint FAIL转人工；这是116修复回归 |
+| 1021 / 首次基线 | 模型503后已试运行且启用的基线仍须受任务族禁区约束 | 定义EXT_FDB3FE41禁GATE/允许ZONE_A，计划991 BASELINE_TEMPLATE仍PASS/冻结，下发CMD-20261107162719-EABF0045至GATE；1020同路合法完成 |
+| 1024 / 重规划基线尾部 | 保留完成前缀，基线尾部解析后的实际目标仍须硬校验 | ZONE_A首步真实完成，失败重试/候选切换→自主重规划→高风险转基线，fallbackLocation=GATE仍PASS/冻结/下发；1023合法尾部完成 |
+
+复现用当前版本`probe-f022-v177-*`、start/stop与补测脚本，具体定义、请求、计划、实际指令及原始文件见反例索引和报告；不依赖对话记忆。四处沿用116编号，不新增重复缺陷。定位提示仅供修复：地点匹配不能采用双向子串授权，能力限制不能误作地点限制；模板paramMapping解析后实际输入与自主inputParams都应在首次/局部重规划四条路径受同等硬门。仍以受控业务预期及独立复测裁决，不照抄实现。
+
+### 清理、审查和下一步
+
+GPT schema `tip_gpt_f006_v118_20261030`、Redis10、自有18129/15179/18117/18132～18135均已清理；两阶段停止3树及补测2树，最后七端口无监听，失败任务与版本保留。9定义DISABLED、3模板DISABLED、4设备INACTIVE，27任务终态，活跃分配/占用/触发器0；三预置业务字段和原JSON恢复，能力临时状态恢复、实际新增能力测试记录保留。未改风险规则/共享服务/Claude资源。主工作区40用户文件哈希不变。
+
+最终提交审查及SHA256清单已包含于证据`8f9577d642425bee3c1e0406c726673e6a8a6c1e`：无原Office、凭据/令牌、JAR、DPAPI或无关用户文件；公开日志临时口令已脱敏。扫描曾把探针单字符名称字母数字表中的连续数字误作口令命中，已移除数字候选并重新通过扫描；原始业务观察未变。前次PowerShell未拦截扫描非零退出的门禁错误已在提交审查中如实记录，最终重跑采用退出检查，不删除原记录。
+
+Claude下次先fetch，将`ai/gpt-test`完整证据及本正式交接合入自己的`ai/claude-fix`，只修116四范围及直接影响，保留117与028/029/030关闭行为。发下一唯一递增标签并推送代码及READY_FOR_GPT交接，随后GPT按V2.4再整轮。当前仍READY_FOR_CLAUDE，main未合本轮、无PR，不提前推进F023。
