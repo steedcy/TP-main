@@ -27,6 +27,8 @@ public class UpdateTaskDefinitionRequest {
     @NotEmpty(message = "请选择至少1个可用能力类型")
     private List<String> availableCapabilityTypes;
 
+    @NotBlank(message = "请输入约束条件")
+    @Size(max = 500, message = "约束条件不得超过500字")
     private String constraintDescription;
 
     @NotBlank(message = "请输入预期完成条件")

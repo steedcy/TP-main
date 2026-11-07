@@ -53,7 +53,7 @@
             <a-checkbox v-for="c in CAPABILITY_TYPES" :key="c.value" :value="c.value">{{ c.label }}</a-checkbox>
           </a-checkbox-group>
         </a-form-item>
-        <a-form-item label="约束条件（描述该任务族的业务约束，参与5.4.4约束校验的能力范围维度）">
+        <a-form-item label="约束条件（描述该任务族的业务约束，参与5.4.4约束校验的能力范围维度）" name="constraintDescription">
           <a-textarea v-model:value="form.constraintDescription" :rows="2" />
         </a-form-item>
         <a-form-item label="预期完成条件（描述任务完成判定依据）" name="completionCondition">
@@ -109,6 +109,7 @@ const form = reactive(emptyForm())
 const formRules = {
   taskName: [{ required: true, message: '请输入任务名称' }, { max: 64, message: '最长64位' }],
   goalTemplate: [{ required: true, message: '请输入自然语言目标模板' }, { max: 500, message: '最长500位' }],
+  constraintDescription: [{ required: true, message: '请输入约束条件' }, { max: 500, message: '约束条件不得超过500字' }],
   completionCondition: [{ required: true, message: '请输入预期完成条件' }]
 }
 
