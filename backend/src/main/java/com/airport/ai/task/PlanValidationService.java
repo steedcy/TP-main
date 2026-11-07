@@ -25,14 +25,19 @@ public class PlanValidationService {
     private final com.airport.ai.taskdef.TaskDefinitionMapper taskDefinitionMapper;
 
     public PlanValidationService(DeviceCapabilityMapper deviceCapabilityMapper) {
-        this(deviceCapabilityMapper, null);
+        this(deviceCapabilityMapper, (com.airport.ai.taskdef.TaskDefinitionMapper) null);
     }
 
+    @org.springframework.beans.factory.annotation.Autowired
     public PlanValidationService(DeviceCapabilityMapper deviceCapabilityMapper,
-                                 @org.springframework.beans.factory.annotation.Autowired(required = false)
+                                 @org.springframework.lang.Nullable
                                  com.airport.ai.taskdef.TaskDefinitionMapper taskDefinitionMapper) {
         this.deviceCapabilityMapper = deviceCapabilityMapper;
         this.taskDefinitionMapper = taskDefinitionMapper;
+    }
+
+    public com.airport.ai.taskdef.TaskDefinitionMapper getTaskDefinitionMapper() {
+        return taskDefinitionMapper;
     }
 
     /**
