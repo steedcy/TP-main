@@ -402,7 +402,15 @@ public class TaskPlanningOrchestrator {
         request.setTaskGoal(SceneParamsPrivacyGuard.sanitizeGoal(task.getTaskGoal()));
         request.setTaskFamily(task.getTaskFamily());
         request.setSceneParams(SceneParamsPrivacyGuard.sanitize(parseMap(task.getSceneParams())));
-        request.setConstraints(List.of("不得下发运动安全控制指令", "步骤数不超过5"));
+
+        List<String> constraints = new ArrayList<>();
+        constraints.add("不得下发运动安全控制指令");
+        constraints.add("步骤数不超过5");
+        String definitionConstraint = resolveConstraintDescription(task);
+        if (definitionConstraint != null && !definitionConstraint.isBlank()) {
+            constraints.add(definitionConstraint);
+        }
+        request.setConstraints(constraints.stream().distinct().toList());
 
         request.setCapabilityContext(contextSnapshotService.capabilityContext(snapshot, requiredCapabilities));
         request.setRemainingStepQuota(MAX_STEPS);
@@ -517,6 +525,14 @@ public class TaskPlanningOrchestrator {
 
         if (conditions.isEmpty()) return null;
         return String.join("; ", conditions.stream().distinct().toList());
+    }
+
+    private String resolveConstraintDescription(Task task) {
+        if (task == null || task.getTaskFamily() == null) return null;
+        return taskDefinitionService.findByCode(task.getTaskFamily())
+                .map(com.airport.ai.taskdef.TaskDefinition::getConstraintDescription)
+                .filter(c -> !c.isBlank())
+                .orElse(null);
     }
 
     private static final java.util.regex.Pattern EXPLICIT_COND_PATTERN = java.util.regex.Pattern.compile(

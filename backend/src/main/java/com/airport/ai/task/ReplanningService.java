@@ -586,6 +586,14 @@ public class ReplanningService {
         }
     }
 
+    private String resolveDefinitionConstraint(Task task) {
+        if (task == null || definitions == null || task.getTaskFamily() == null) return null;
+        return definitions.findByDefinitionCode(task.getTaskFamily())
+                .map(com.airport.ai.taskdef.TaskDefinition::getConstraintDescription)
+                .filter(c -> !c.isBlank())
+                .orElse(null);
+    }
+
     private String resolveExpectedCompletionCondition(Task task) {
         if (task == null) return null;
         List<String> conditions = new ArrayList<>();

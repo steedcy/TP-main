@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -272,5 +273,108 @@ class TaskDefinitionConstraintF022Test {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
+    }
+
+    // ==================== 3. DEF-S3-116 / SRS_F022.R07: 任务定义约束参与硬校验 ====================
+
+    @Test
+    @DisplayName("PlanValidationService - 任务定义明确禁止地点时，违规候选计划硬拦截为 FAIL (DEF-S3-116)")
+    void testPlanValidationHardRejectsProhibitedLocation_DEF_S3_116() {
+        com.airport.ai.device.DeviceCapabilityMapper devCapMapper = mock(com.airport.ai.device.DeviceCapabilityMapper.class);
+        when(devCapMapper.existsByCapabilityTypeAndCapabilityStatus(eq("CAP_NAVIGATION"), eq("ENABLED"))).thenReturn(true);
+
+        com.airport.ai.task.PlanValidationService validatorService = new com.airport.ai.task.PlanValidationService(devCapMapper);
+
+        Map<String, Object> candidateStep = new java.util.HashMap<>();
+        candidateStep.put("stepSeq", 1);
+        candidateStep.put("stepGoal", "前往区域");
+        candidateStep.put("capabilityType", "CAP_NAVIGATION");
+        candidateStep.put("inputParams", Map.of("targetLocation", "F2_TEST_GATE"));
+        candidateStep.put("precondition", "device online");
+        candidateStep.put("completionCondition", "routeGenerated=true");
+        candidateStep.put("failureHandling", "manual handling");
+        candidateStep.put("stepTimeout", 600);
+
+        List<Map<String, Object>> agents = List.of(Map.of(
+                "onlineStatus", "ONLINE",
+                "capabilities", List.of("CAP_NAVIGATION")
+        ));
+
+        // 定义约束: 禁止前往F2_TEST_GATE；仅允许前往F2_ZONE_A。
+        String constraint = "禁止前往F2_TEST_GATE；仅允许前往F2_ZONE_A。";
+        com.airport.ai.task.PlanValidationResult result = validatorService.validate(
+                List.of(candidateStep), agents, List.of("CAP_NAVIGATION"), "EXT_TEST", 0, 100L, "routeGenerated=true", constraint
+        );
+
+        assertEquals("FAIL", result.getConstraintCheckResult(), "包含禁止地点应判定约束校验失败");
+        assertFalse(result.isAllPassed(), "整体验收不应通过");
+        assertTrue(result.getErrors().stream().anyMatch(e -> "ERR_TASK_DEFINITION_CONSTRAINT".equals(e.getReasonCode())),
+                "错误清单应包含 ERR_TASK_DEFINITION_CONSTRAINT: " + result.getErrors().stream().map(com.airport.ai.task.PlanValidationResult.ValidationError::getDescription).toList());
+    }
+
+    @Test
+    @DisplayName("PlanValidationService - 任务定义允许合法地点时，校验通过 (PASS)")
+    void testPlanValidationPassesAllowedLocation_DEF_S3_116() {
+        com.airport.ai.device.DeviceCapabilityMapper devCapMapper = mock(com.airport.ai.device.DeviceCapabilityMapper.class);
+        when(devCapMapper.existsByCapabilityTypeAndCapabilityStatus(eq("CAP_NAVIGATION"), eq("ENABLED"))).thenReturn(true);
+
+        com.airport.ai.task.PlanValidationService validatorService = new com.airport.ai.task.PlanValidationService(devCapMapper);
+
+        Map<String, Object> candidateStep = new java.util.HashMap<>();
+        candidateStep.put("stepSeq", 1);
+        candidateStep.put("stepGoal", "前往区域");
+        candidateStep.put("capabilityType", "CAP_NAVIGATION");
+        candidateStep.put("inputParams", Map.of("targetLocation", "F2_TEST_GATE"));
+        candidateStep.put("precondition", "device online");
+        candidateStep.put("completionCondition", "routeGenerated=true");
+        candidateStep.put("failureHandling", "manual handling");
+        candidateStep.put("stepTimeout", 600);
+
+        List<Map<String, Object>> agents = List.of(Map.of(
+                "onlineStatus", "ONLINE",
+                "capabilities", List.of("CAP_NAVIGATION")
+        ));
+
+        // 正例对照: 仅允许前往F2_TEST_GATE。
+        String constraint = "仅允许前往F2_TEST_GATE。";
+        com.airport.ai.task.PlanValidationResult result = validatorService.validate(
+                List.of(candidateStep), agents, List.of("CAP_NAVIGATION"), "EXT_TEST", 0, 100L, "routeGenerated=true", constraint
+        );
+
+        assertEquals("PASS", result.getConstraintCheckResult(), "目标符合约束限定范围应通过");
+        assertTrue(result.isAllPassed(), "整体验收应全部通过");
+    }
+
+    @Test
+    @DisplayName("PlanValidationService - 计划步骤符合白名单允许区域时通过校验")
+    void testPlanValidationCompliantWithWhitelist_DEF_S3_116() {
+        com.airport.ai.device.DeviceCapabilityMapper devCapMapper = mock(com.airport.ai.device.DeviceCapabilityMapper.class);
+        when(devCapMapper.existsByCapabilityTypeAndCapabilityStatus(eq("CAP_NAVIGATION"), eq("ENABLED"))).thenReturn(true);
+
+        com.airport.ai.task.PlanValidationService validatorService = new com.airport.ai.task.PlanValidationService(devCapMapper);
+
+        Map<String, Object> candidateStep = new java.util.HashMap<>();
+        candidateStep.put("stepSeq", 1);
+        candidateStep.put("stepGoal", "前往指定区域");
+        candidateStep.put("capabilityType", "CAP_NAVIGATION");
+        candidateStep.put("inputParams", Map.of("targetLocation", "F2_ZONE_A"));
+        candidateStep.put("precondition", "device online");
+        candidateStep.put("completionCondition", "routeGenerated=true");
+        candidateStep.put("failureHandling", "manual handling");
+        candidateStep.put("stepTimeout", 600);
+
+        List<Map<String, Object>> agents = List.of(Map.of(
+                "onlineStatus", "ONLINE",
+                "capabilities", List.of("CAP_NAVIGATION")
+        ));
+
+        // 白名单约束: 禁止前往F2_TEST_GATE；仅允许前往F2_ZONE_A。
+        String constraint = "禁止前往F2_TEST_GATE；仅允许前往F2_ZONE_A。";
+        com.airport.ai.task.PlanValidationResult result = validatorService.validate(
+                List.of(candidateStep), agents, List.of("CAP_NAVIGATION"), "EXT_TEST", 0, 100L, "routeGenerated=true", constraint
+        );
+
+        assertEquals("PASS", result.getConstraintCheckResult(), "目标为F2_ZONE_A应符合仅允许前往F2_ZONE_A约束");
+        assertTrue(result.isAllPassed(), "全部校验应通过");
     }
 }

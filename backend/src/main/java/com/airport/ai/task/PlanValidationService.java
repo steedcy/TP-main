@@ -22,9 +22,17 @@ public class PlanValidationService {
             java.util.regex.Pattern.CASE_INSENSITIVE);
 
     private final DeviceCapabilityMapper deviceCapabilityMapper;
+    private final com.airport.ai.taskdef.TaskDefinitionMapper taskDefinitionMapper;
 
     public PlanValidationService(DeviceCapabilityMapper deviceCapabilityMapper) {
+        this(deviceCapabilityMapper, null);
+    }
+
+    public PlanValidationService(DeviceCapabilityMapper deviceCapabilityMapper,
+                                 @org.springframework.beans.factory.annotation.Autowired(required = false)
+                                 com.airport.ai.taskdef.TaskDefinitionMapper taskDefinitionMapper) {
         this.deviceCapabilityMapper = deviceCapabilityMapper;
+        this.taskDefinitionMapper = taskDefinitionMapper;
     }
 
     /**
@@ -80,10 +88,28 @@ public class PlanValidationService {
                                           List<String> allowedCapabilityTypes, String taskFamily,
                                           int completedPrefixCount, Long currentTaskId,
                                           String expectedCompletionCondition) {
+        return validate(steps, snapshotAgents, allowedCapabilityTypes, taskFamily, completedPrefixCount, currentTaskId, expectedCompletionCondition, null);
+    }
+
+    @SuppressWarnings("unchecked")
+    public PlanValidationResult validate(List<Map<String, Object>> steps, List<Map<String, Object>> snapshotAgents,
+                                          List<String> allowedCapabilityTypes, String taskFamily,
+                                          int completedPrefixCount, Long currentTaskId,
+                                          String expectedCompletionCondition,
+                                          String constraintDescription) {
         PlanValidationResult result = new PlanValidationResult();
         if (steps == null || steps.isEmpty()) {
             result.failStructure("计划必须包含至少一个步骤", null, "ERR_STEP_FIELD_MISSING");
             return result;
+        }
+
+        if ((constraintDescription == null || constraintDescription.isBlank()) && taskDefinitionMapper != null && taskFamily != null) {
+            try {
+                constraintDescription = taskDefinitionMapper.findByDefinitionCode(taskFamily)
+                        .map(com.airport.ai.taskdef.TaskDefinition::getConstraintDescription)
+                        .orElse(null);
+            } catch (Exception ignored) {
+            }
         }
 
         // 1. 结构校验：步骤数≤5、字段完整、顺序与依赖合法、无循环、无无限轮次协商
@@ -284,7 +310,103 @@ public class PlanValidationService {
         // 约束校验比较任务目标期望完成条件与候选步骤完成条件，拒绝同一Boolean/等值字段真/假直接反向矛盾
         checkCompletionConditionConflict(steps, expectedCompletionCondition, result);
 
+        // 对应SRS_F022.R07 / DEF-S3-116：任务定义文本约束条件（如禁止前往某地点、限定区域等）参与硬校验
+        checkTaskDefinitionConstraint(steps, constraintDescription, result);
+
         return result;
+    }
+
+    private static final java.util.regex.Pattern WHITELIST_PATTERN = java.util.regex.Pattern.compile(
+            "(?:仅允许|只允许|仅限|只能|only allow|only permit)(?:前往|进入|到达|去往|移动至|引导至|派往|to)?\\s*(.+)",
+            java.util.regex.Pattern.CASE_INSENSITIVE);
+
+    private static final java.util.regex.Pattern PROHIBIT_PATTERN = java.util.regex.Pattern.compile(
+            "(?:禁止|不得|严禁|不能|不可|不准|勿|prohibit|forbidden|do not go to|do not visit)(?:前往|进入|到达|去往|移动至|引导至|派往|引导)?\\s*(.+)",
+            java.util.regex.Pattern.CASE_INSENSITIVE);
+
+    @SuppressWarnings("unchecked")
+    private void checkTaskDefinitionConstraint(List<Map<String, Object>> steps, String constraintDescription, PlanValidationResult result) {
+        if (constraintDescription == null || constraintDescription.isBlank() || steps == null || steps.isEmpty()) {
+            return;
+        }
+
+        Set<String> prohibitedTargets = new LinkedHashSet<>();
+        Set<String> allowedTargets = new LinkedHashSet<>();
+
+        String[] clauses = constraintDescription.split("[;；。\\n\\r]+");
+        for (String clause : clauses) {
+            String trimmed = clause.trim();
+            if (trimmed.isBlank()) continue;
+
+            // Check whitelist / allowed first
+            java.util.regex.Matcher wm = WHITELIST_PATTERN.matcher(trimmed);
+            if (wm.find()) {
+                String targetPart = wm.group(1).trim();
+                for (String t : targetPart.split("[,，、/|\\s]+")) {
+                    String clean = t.replaceAll("^[“\"'‘]+|[”\"'’]+$", "").trim();
+                    if (!clean.isBlank()) allowedTargets.add(clean);
+                }
+            }
+
+            // Check prohibition / forbidden
+            java.util.regex.Matcher pm = PROHIBIT_PATTERN.matcher(trimmed);
+            if (pm.find()) {
+                String targetPart = pm.group(1).trim();
+                for (String t : targetPart.split("[,，、/|\\s]+")) {
+                    String clean = t.replaceAll("^[“\"'‘]+|[”\"'’]+$", "").trim();
+                    if (!clean.isBlank()) prohibitedTargets.add(clean);
+                }
+            }
+        }
+
+        for (int i = 0; i < steps.size(); i++) {
+            Map<String, Object> step = steps.get(i);
+            Integer stepSeq = asInteger(step.get("stepSeq"));
+            if (stepSeq == null) stepSeq = i + 1;
+            if (PlanStepRules.isConditionNode(step)) continue;
+
+            Object inputParamsObj = step.get("inputParams");
+            Map<String, Object> inputParams = inputParamsObj instanceof Map<?, ?> m ? (Map<String, Object>) m : Map.of();
+            String stepGoal = asString(step.get("stepGoal"));
+
+            // Check against prohibited targets
+            for (String prohibited : prohibitedTargets) {
+                if (prohibited.isBlank() || prohibited.length() < 2) continue;
+                for (Map.Entry<String, Object> entry : inputParams.entrySet()) {
+                    String valStr = String.valueOf(entry.getValue());
+                    if (valStr.equalsIgnoreCase(prohibited) || valStr.contains(prohibited)) {
+                        result.failConstraint("步骤" + stepSeq + "参数 " + entry.getKey() + "=" + valStr + " 与任务定义约束冲突（禁止: " + prohibited + "）",
+                                stepSeq, "ERR_TASK_DEFINITION_CONSTRAINT");
+                    }
+                }
+                if (stepGoal != null && stepGoal.contains(prohibited)) {
+                    result.failConstraint("步骤" + stepSeq + "目标与任务定义约束冲突（禁止: " + prohibited + "）",
+                            stepSeq, "ERR_TASK_DEFINITION_CONSTRAINT");
+                }
+            }
+
+            // Check against allowed / whitelist targets (for destination/location fields)
+            if (!allowedTargets.isEmpty()) {
+                for (String locKey : List.of("targetLocation", "destination", "location", "targetZone", "zone")) {
+                    if (inputParams.containsKey(locKey) && inputParams.get(locKey) != null) {
+                        String locVal = String.valueOf(inputParams.get(locKey)).trim();
+                        if (!locVal.isBlank()) {
+                            boolean matched = false;
+                            for (String allowed : allowedTargets) {
+                                if (locVal.equalsIgnoreCase(allowed) || locVal.contains(allowed) || allowed.contains(locVal)) {
+                                    matched = true;
+                                    break;
+                                }
+                            }
+                            if (!matched) {
+                                result.failConstraint("步骤" + stepSeq + "目标地点 " + locVal + " 超出任务定义约束限定范围（仅允许: " + allowedTargets + "）",
+                                        stepSeq, "ERR_TASK_DEFINITION_CONSTRAINT");
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /** Every preset scenario must plan its required actions on the correct physical channels. */
