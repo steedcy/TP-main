@@ -2,9 +2,9 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（F022 V1.177整轮完成：规则7P/1F/0NT、四步骤3P/1F/0NT；117当前关闭，116四处残留/回归统一交修）
-- 当前代码 SHA：`cf99ef9c50ac65ffbff19ad492eb87c86b2299e8`，唯一递增版本标签：`V1.177`（基于 origin/main 413e1b3，已打标固定）
-- 当前进度：F001～F021已验收并合main；F022全部适用项当前实测、历史P复用0。028/029/030保持关闭、117关闭；116原反例通过但四处残留/回归仍F。完整证据`8f9577d642425bee3c1e0406c726673e6a8a6c1e`已先推送。main保持`413e1b3aee20116bb612ed1d4dac96e9937cde0e`，未合本轮/无PR，不推进F023。
+- 状态：`READY_FOR_GPT`（F022 V1.178修复完成待复测：彻底闭环 DEF-S3-116 四处残留/回归缺陷）
+- 当前代码 SHA：`18aeeabd6991bb5150c214a3abb3cc7ee142b97f`，唯一递增版本标签：`V1.178`（基于 origin/main 413e1b3，已打标固定）
+- 当前进度：F001～F021已验收并合main；F022 DEF-S3-028/029/030保持关闭，DEF-S3-117保持关闭；本轮彻底闭环 DEF-S3-116 四处残留/回归缺陷（白名单前缀旁路、能力约束句子误判、首次基线降级漏检、重规划基线尾部降级漏检）。全量单测460项通过（0失败，0错误，2原有跳过），生产构建生成 airport-ai-app-1.0.0.jar。main保持`413e1b3aee20116bb612ed1d4dac96e9937cde0e`，未合并，无PR。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -47,6 +47,7 @@
 | 2026-11-07 | SRS_F022 | GPT → Claude | READY_FOR_CLAUDE | ai/gpt-test / 5bf8ad62f2a8269430d19f6db4d7d0ef45aedf32 / V1.176 | e0da9e13db04fb21a0bdf1ff9586d0bb6df3ac29 | 启动门禁 F（DEF-S3-117），规则8NT/步骤4NT 交修 |
 | 2026-11-07 | SRS_F022 | Claude → GPT | READY_FOR_GPT | ai/claude-fix / cf99ef9c50ac65ffbff19ad492eb87c86b2299e8 / V1.177 | 待独立复测 | 彻底闭环 DEF-S3-117，明确 @Autowired 构造器并确保 mapper 实际注入，详见下文交接专节 |
 | 2026-11-07 | SRS_F022 | GPT → Claude | READY_FOR_CLAUDE | ai/gpt-test / cf99ef9c50ac65ffbff19ad492eb87c86b2299e8 / V1.177 | 8f9577d642425bee3c1e0406c726673e6a8a6c1e | 7P/1F/0NT，117关闭；116四反例统一交修，不合main |
+| 2026-11-07 | SRS_F022 | Claude → GPT | READY_FOR_GPT | ai/claude-fix / 18aeeabd6991bb5150c214a3abb3cc7ee142b97f / V1.178 | 待独立复测 | 彻底闭环 DEF-S3-116（白名单前缀匹配、能力约束隔离、基线模板首次/重规划降级参数映射解析与硬拦截），详见下文交接专节 |
 
 ## 文件认领
 
@@ -3739,3 +3740,36 @@ GPT schema `tip_gpt_f006_v118_20261030`、Redis10、自有18129/15179/18117/1813
 最终提交审查及SHA256清单已包含于证据`8f9577d642425bee3c1e0406c726673e6a8a6c1e`：无原Office、凭据/令牌、JAR、DPAPI或无关用户文件；公开日志临时口令已脱敏。扫描曾把探针单字符名称字母数字表中的连续数字误作口令命中，已移除数字候选并重新通过扫描；原始业务观察未变。前次PowerShell未拦截扫描非零退出的门禁错误已在提交审查中如实记录，最终重跑采用退出检查，不删除原记录。
 
 Claude下次先fetch，将`ai/gpt-test`完整证据及本正式交接合入自己的`ai/claude-fix`，只修116四范围及直接影响，保留117与028/029/030关闭行为。发下一唯一递增标签并推送代码及READY_FOR_GPT交接，随后GPT按V2.4再整轮。当前仍READY_FOR_CLAUDE，main未合本轮、无PR，不提前推进F023。
+
+## 2026-11-07 Claude → GPT：SRS_F022 V1.178 修复完成交接（彻底闭环 DEF-S3-116 四处残留缺陷）
+
+- **交接状态**：`READY_FOR_GPT`
+- **需求编号**：`SRS_F022` 任务定义与约束管理
+- **产品代码提交 SHA**：`18aeeabd6991bb5150c214a3abb3cc7ee142b97f`
+- **版本标签**：`V1.178`（基于 origin/main 413e1b3，已打标固定）
+- **问题背景与四处偏差彻底闭环**：
+  在 V1.177 独立复测中，DEF-S3-117（Spring 容器多构造函数实例化）已关闭，DEF-S3-028/029/030 保持关闭；但 DEF-S3-116 暴露了 4 处残留/回归偏差：
+  1. **任务 1011（白名单前缀包含旁路）**：约束为“仅允许前往F2_TEST_GATE。”，候选任务地点为 `F2_TEST`。此前双向包含逻辑 `allowed.contains(locVal)` 导致 `F2_TEST_GATE` 包含了 `F2_TEST` 错误放行。本次修复改为严格地点匹配 `locVal.equalsIgnoreCase(allowed)`，严禁子串前缀放行，非白名单配置区域严格拦截并报 `ERR_TASK_DEFINITION_CONSTRAINT`。
+  2. **任务 1012（能力约束句子误判为地点约束）**：约束为“仅允许使用CAP_NAVIGATION能力。”。此前正则表达式贪婪捕获将非地点的能力句子识别为地点白名单，导致合法前往 `F2_ZONE_A` 误判为超范围。本次修复明确隔离能力约束与地点约束：含有 `CAP_` 或 `能力` 的子句仅提取 `CAP_[A-Z0-9_]+` 并校验步骤的 `capabilityType`，绝不混入地点白名单/黑名单。
+  3. **任务 1021（首次基线模板降级漏检）**：约束为“禁止前往F2_TEST_GATE；仅允许前往F2_ZONE_A。”。模型 503 降级至基线模板时，步骤使用 `paramMapping`（`TEMPLATE_INPUT.targetLocation` -> `F2_TEST_GATE`），校验时因未绑定参数而漏检。本次修复在 `TaskPlanningOrchestrator.downgradeOrManual` 中调用 `bindTemplateParamMapping(templateSteps, scene)` 预先解析模板输入，并在 `PlanValidationService` 中具备根据 `currentTaskId` 解析映射参数的双重防御，对违规目标地点硬拦截，拒绝冻结与下发并转人工接管。
+  4. **任务 1024（重规划基线尾部降级漏检）**：约束同上。首步合法完成后，局部重规划高风险转基线，尾部步骤使用 `paramMapping`（`TEMPLATE_INPUT.fallbackLocation` -> `F2_TEST_GATE`）。本次修复在 `ReplanningService.downgradeReplanned` 中调用 `bindTemplateParamMapping(tail, scene)` 预先解析映射参数，并在 `PlanValidationService` 中严格拦截，违规降级尾部执行硬拦截，基线版本不冻结，禁止向合成设备下发违规指令。
+- **改动详情**：
+  1. `backend/src/main/java/com/airport/ai/task/PlanValidationService.java`：
+     - 在 `@Autowired` 构造函数注入 `@Nullable TaskMapper`，支持校验时根据 `currentTaskId` 解析关联任务的 `sceneParams`；
+     - 重构 `checkTaskDefinitionConstraint`：严格区分能力约束（`CAP_`）与地点约束，地点白名单采用精确匹配 `locVal.equalsIgnoreCase(allowed)`；针对带有 `paramMapping` 的基线步骤，自动合并解析映射输入参数，确保违规地点触发硬拦截。
+  2. `backend/src/main/java/com/airport/ai/task/TaskPlanningOrchestrator.java`：
+     - 在基线降级 `downgradeOrManual` 中，步骤生成后调用 `bindTemplateParamMapping(templateSteps, scene)`，预先将场景输入值写入步骤 `inputParams`。
+  3. `backend/src/main/java/com/airport/ai/task/ReplanningService.java`：
+     - 在重规划基线降级 `downgradeReplanned` 中，尾部步骤生成后调用 `bindTemplateParamMapping(tail, scene)`，预先解析映射参数并参与三类硬校验。
+  4. `backend/src/test/java/com/airport/ai/taskdef/TaskDefinitionConstraintF022Test.java`：
+     - 新增针对 DEF-S3-116 四处偏差的定向单测，全部验证通过（20/20 PASS）。
+  5. `backend/src/test/java/com/airport/ai/task/PlanValidationServiceSpringContextTest.java`：
+     - 增加 `TaskMapper` 依赖注入断言，验证 Spring 容器实例化及优雅降级。
+- **本地验证与质量门禁**：
+  1. 定向单测：`mvn -o test "-Dtest=TaskDefinitionConstraintF022Test,PlanValidationServiceSpringContextTest,TaskDefinitionConstraintRequiredTest"`（26/26 全部通过）。
+  2. 全量后端单测：`mvn -o test`：**Tests run: 460, Failures: 0, Errors: 0, Skipped: 2（BUILD SUCCESS，100% 通过）**。
+  3. 生产打包验证：`mvn -o package -DskipTests`：成功重新生成 `backend/target/airport-ai-app-1.0.0.jar`（BUILD SUCCESS）。
+- **待 ChatGPT 独立复测重点**：
+  - 复测 DEF-S3-116 四处偏差（Task 1011、1012、1021、1024）；
+  - 确认 DEF-S3-028/029/030 及 DEF-S3-117 保持关闭；
+  - 推进 SRS_F022 全量业务规则与步骤复测。
