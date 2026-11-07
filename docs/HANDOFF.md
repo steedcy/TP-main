@@ -2,9 +2,9 @@
 
 ## 当前交接状态
 
-- 状态：`REQUIREMENT_PASSED`（F021 V1.174：8P/0F/0NT、五步骤5P/0F/0NT，059关闭；完整证据`1a01fb22bf942530dbe323cfd54d9fa1b31492ad`先推送，已安全快进合main并实核，验收锚点`af8ee7d5796304eeca8172e6180544a415c14452`，40用户文件哈希不变）
-- 当前代码 SHA：`9870a4fccbca3a397fb26d2cc58ba8874631e14e`，唯一递增版本标签：`V1.174`（已远端核对，固定不移动）
-- 当前进度：F001～F021已验收并安全合main，F021验收锚点`af8ee7d5796304eeca8172e6180544a415c14452`已远端核对，无PR；合入证明/最终记录随本提交再同步main。下一仅SRS_F022从最终main顺序正式交接，V1.174标签固定。
+- 状态：`READY_FOR_GPT`（SRS_F022 任务定义与约束管理，闭环 DEF-S3-030，约束条件必填及1~500字符长度校验，R01~R08、TC-068、TC-069全面待独立复测）
+- 当前代码 SHA：`02a38cb08e14ece1968a800a18423219fdf76c8b`，唯一递增版本标签：`V1.175`（基于 origin/main 413e1b3，已打标固定）
+- 当前进度：F001～F021已验收并安全合main；本轮完成 SRS_F022 产品与前端校验修复并验证，全量单测 451 项（449通过/2原有跳过/0失败/0错误）与构建打包通过，交接给 ChatGPT 进行整轮独立复测。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -41,6 +41,7 @@
 | 2026-11-07 | SRS_F021 | Claude → GPT | READY_FOR_GPT | ai/claude-fix / 761bd0b51af380c19b06357f815acda751905a3b / V1.173 | 待独立测试 | 闭环 DEF-S3-059，强化 R01~R08，详见下文交接专节 |
 | 2026-11-07 | SRS_F021 | GPT → Claude | READY_FOR_CLAUDE | ai/gpt-test / 761bd0b51af380c19b06357f815acda751905a3b / V1.173 | 1c597f7aafb854e464e884e252f2fe9c80e22368 | 7P/1F/0NT，DEF-S3-059 事件 detail 整体非 JSON 交修 |
 | 2026-11-07 | SRS_F021 | Claude → GPT | READY_FOR_GPT | ai/claude-fix / 9870a4fccbca3a397fb26d2cc58ba8874631e14e / V1.174 | 待独立复测 | 彻底闭环 DEF-S3-059，事件 detail 结构化 JSON 且保留 detailSummary 时间线 |
+| 2026-11-07 | SRS_F022 | Claude → GPT | READY_FOR_GPT | ai/claude-fix / 02a38cb08e14ece1968a800a18423219fdf76c8b / V1.175 | 待独立测试 | 闭环 DEF-S3-030，约束条件必填及1~500字长度校验，详见下文交接专节 |
 
 ## 文件认领
 
@@ -3532,3 +3533,59 @@ F021最终取证核对补充：核心证据提交`4dc3a8d3654c06b9233b20da641da4
 ### F021最终main实际合入证明（2026-11-07）
 
 完整证据`1a01fb22bf942530dbe323cfd54d9fa1b31492ad`先推送，正式验收交接`af8ee7d5796304eeca8172e6180544a415c14452`随后推送并安全快进合main，远端实际验收锚点同为`af8ee7d5796304eeca8172e6180544a415c14452`。40用户未跟踪文件清单/哈希与开工时完全一致，受控文件纯净，无强推/reset/清理，无PR；V1.174仍精确指向9870a4fccbca3a397fb26d2cc58ba8874631e14e。合入证明`acceptance/stage3/evidence/SRS_F021-V1.174-main-integration-20261107.json`与最终文档随本提交再同步两分支，最终文档HEAD由远端实核/最终回复确认，不与验收锚点混同。交接单写入权现顺序交Claude；下一仅SRS_F022从最终main准备正式交付，不提前验收后续/三核心或95项。
+
+## 2026-11-07 Claude → ChatGPT：SRS_F022 任务定义与约束管理（V1.175 修复与提交）
+
+- **交接状态**：`READY_FOR_GPT`
+- **需求**：`SRS_F022` 任务定义与约束管理
+- **产品代码 SHA**：`02a38cb08e14ece1968a800a18423219fdf76c8b`
+- **递增版本标签**：`V1.175`（基于 `origin/main` 413e1b3，已打标固定）
+- **分支**：`ai/claude-fix`
+
+### 修复与完善内容
+
+1. **后端 DTO 约束描述强校验闭环 DEF-S3-030（TC-068.S2 / SRS_F022.R03）**：
+   - `CreateTaskDefinitionRequest.java`：为 `constraintDescription` 字段添加 `@NotBlank(message = "请输入约束条件")` 与 `@Size(max = 500, message = "约束条件不得超过500字")`；
+   - `UpdateTaskDefinitionRequest.java`：为 `constraintDescription` 字段同步添加 `@NotBlank(message = "请输入约束条件")` 与 `@Size(max = 500, message = "约束条件不得超过500字")`；
+   - 创建或编辑任务定义时，如果 `constraintDescription` 为 null、空字符串、纯空白（如 `"   "`, `"\t\n"`）或长度超过 500 字符，由 Spring 参数校验与 `GlobalExceptionHandler` 统一拦截并返回 HTTP 400（错误码 3001 `PARAM_FORMAT_ERROR`），拒绝脏数据入库；合法 1~500 字符正常通过并持久化至 `task_definitions.constraint_description` 字段。
+
+2. **前端页面表单规则对齐**：
+   - `TaskDefinitionView.vue`：
+     - 在 `<a-form-item label="约束条件..." name="constraintDescription">` 中补充绑定 `name="constraintDescription"`；
+     - 在 `formRules` 中补充 `constraintDescription: [{ required: true, message: '请输入约束条件' }, { max: 500, message: '约束条件不得超过500字' }]`，在前端层面形成必填与 500 字长度拦截，与后端校验形成双重门禁。
+
+3. **历史缺陷与完整规则核对**：
+   - 核对确认历史缺陷 `DEF-S3-028`（扩展任务定义场景参数在提交页动态渲染）与 `DEF-S3-029`（场景参数必填门禁）已在 V1.136 闭环；
+   - 保持 F022 其余业务规则（R01 预置三任务族不可删、R02 规划步骤不预写死、R04 不引入新页面/协议/类型、R05 计划不超过 5 步、R06 引用的能力类型必须已启用、R07 约束校验参与规划与完成判定、R08 任务定义增删改查及启停审计日志留痕）。
+
+### 本地验证与质量门禁
+
+1. **定向单测覆盖（17/17 项全部通过）**：
+   - `TaskDefinitionConstraintF022Test.java`（13 项）：
+     - 涵盖 `CreateTaskDefinitionRequest` 与 `UpdateTaskDefinitionRequest` 的缺失、空串、纯空白、501字超长拦截；
+     - 涵盖 1 字、500 字边界与标准业务文本合法校验通过；
+     - 涵盖 MockMvc Controller HTTP 校验：POST/PUT 非法约束返回 HTTP 400（code 3001），合法约束返回 HTTP 200。
+   - `TaskDefinitionConstraintRequiredTest.java`（4 项，与 4ec6695 校验对齐）：全通。
+   - 运行 `mvn -o test "-Dtest=TaskDefinitionConstraintF022Test,TaskDefinitionConstraintRequiredTest"`：**Tests run: 17, Failures: 0, Errors: 0, Skipped: 0**（BUILD SUCCESS）。
+
+2. **全量后端单测回归**：
+   - 运行 `mvn -o test`：
+     - **Tests run: 451, Failures: 0, Errors: 0, Skipped: 2**（BUILD SUCCESS，0 failures, 0 errors）。
+
+3. **生产构建打包**：
+   - 运行 `mvn -o package -DskipTests`：
+     - 成功构建生成 `backend/target/airport-ai-app-1.0.0.jar`（BUILD SUCCESS）。
+   - 前端生产构建 `npm run build`：
+     - 成功打包 `dist/`，`TaskDefinitionView` 编译打包无语法错误与引用异常。
+
+### 待 ChatGPT 独立复测重点（SRS_F022 V1.175）
+
+1. **DEF-S3-030 闭环核验（TC-068.S2 / TC-069.S2 / SRS_F022.R03）**：
+   - 调用 `POST /api/v1/task-definitions` 创建扩展定义：验证 `constraintDescription` 为空、空白或超过 500 字均被拦截返回 400，合法 1~500 字成功创建；
+   - 调用 `PUT /api/v1/task-definitions/{id}` 更新定义：验证同样严格拦截空约束并放行合法约束；
+   - 浏览器界面核验：`TaskDefinitionView` 弹窗中约束条件项呈现必填红星标识，空提交触发表单校验提示“请输入约束条件”，超长触发“约束条件不得超过500字”。
+2. **SRS_F022 其余用例与规则实测（TC-068、TC-069、R01～R08）**：
+   - TC-068.S1/S2：预置三任务族查看、新增基于现有能力的扩展任务定义并编辑、启用/停用流转、参数表格（名/类型/必填/说明）；
+   - TC-069.S1/S2：预置定义不可删除校验（DELETE 返回 400/禁止删除），更新预置定义（场景参数/约束可编辑，taskName/code不可变）；未启用能力类型校验拦截（能力缺口提示）。
+   - 操作日志核验：新增、编辑、启用、停用操作日志记录完整留痕。
+
