@@ -38,7 +38,8 @@ public class SituationController {
                     agent.getAgentStatus(), new Location(device.getPositionX(), device.getPositionY(), device.getAreaCode()),
                     agent.getOnlineStatus(), agent.getWorkStatus(), agent.getCurrentTaskId(), agent.getCurrentStepSeq(), agent.getLastReportedAt(),
                     capabilityMapper.findByDeviceIdAndCapabilityStatus(device.getId(), "ENABLED").stream()
-                            .map(com.airport.ai.device.DeviceCapability::getCapabilityType).distinct().toList());
+                            .map(com.airport.ai.device.DeviceCapability::getCapabilityType).distinct().toList(),
+                    agentService.offlineInfo(agent));
         }).toList();
         return ApiResponse.ok(new Snapshot(devices, OffsetDateTime.now().toString(), 5));
     }
@@ -48,5 +49,7 @@ public class SituationController {
     public record Marker(String agentId, String deviceCode, String deviceName, String deviceTypeCode,
                          String simulatedDeviceType, String agentStatus, Location location,
                          String onlineStatus, String workStatus, Long currentTaskId, Integer currentStepSeq,
-                         java.time.LocalDateTime lastReportedAt, List<String> capabilityTypes) {}
+                         java.time.LocalDateTime lastReportedAt, List<String> capabilityTypes,
+                         /** 仅离线代理有值：offlineAt、reasonCode、detail、affectsTask（DEF-S3-047）；在线为null */
+                         java.util.Map<String, Object> offline) {}
 }

@@ -55,7 +55,7 @@
             :key="device.deviceCode"
             class="device-marker"
             :class="markerClass(device)"
-            :style="markerStyle(device)"
+            :style="{ ...markerStyle(device), zIndex: markerZIndex(device, selectedDevice?.deviceCode) }"
             :title="markerTitle(device)"
             @pointerdown.stop
             @click.stop="selectedDevice = device"
@@ -85,7 +85,8 @@
             {{ markerPosition(record) ? `${coordinate(record.location?.x)}, ${coordinate(record.location?.y)}` : '无有效坐标' }}
           </template>
           <template v-else-if="column.key === 'lastReportedAt'">
-            {{ record.lastReportedAt || '—' }}
+            <span :class="reportedAtClass(record)">{{ record.lastReportedAt || '—' }}</span>
+            <a-tag v-if="offlineSummary(record)" color="red" style="margin-left: 6px">{{ offlineSummary(record).reason }}</a-tag>
           </template>
         </template>
       </a-table>
@@ -104,7 +105,13 @@
           <router-link v-if="canViewTasks && selectedDevice.currentTaskId" :to="`/tasks/${selectedDevice.currentTaskId}`">任务 {{ selectedDevice.currentTaskId }}</router-link>
           <span v-else>{{ selectedDevice.currentTaskId ?? '—' }}</span>
         </a-descriptions-item>
-        <a-descriptions-item label="最后上报">{{ selectedDevice.lastReportedAt || '—' }}</a-descriptions-item>
+        <a-descriptions-item label="最后上报"><span :class="reportedAtClass(selectedDevice)">{{ selectedDevice.lastReportedAt || '—' }}</span></a-descriptions-item>
+        <!-- 离线代理：原因码、离线时间和对任务的影响（DEF-S3-047） -->
+        <template v-if="offlineSummary(selectedDevice)">
+          <a-descriptions-item label="离线原因码"><a-tag color="red">{{ offlineSummary(selectedDevice).reason }}</a-tag></a-descriptions-item>
+          <a-descriptions-item label="离线时间">{{ offlineSummary(selectedDevice).offlineAt || '—' }}</a-descriptions-item>
+          <a-descriptions-item label="对任务的影响" :span="2">{{ offlineSummary(selectedDevice).impact }}</a-descriptions-item>
+        </template>
       </a-descriptions>
     </a-modal>
   </section>
@@ -113,6 +120,7 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import request from '../../api/request'
+import { markerZIndex, offlineSummary, reportedAtClass } from '../../utils/situationMarkers'
 import { DEVICE_TYPES, deviceTypeLabel, capabilityLabel } from '../../constants/capability'
 import { useAuthStore } from '../../store/auth'
 
@@ -311,6 +319,8 @@ onUnmounted(() => {
 .map-viewport.dragging { cursor: grabbing; }
 .map-canvas { position: absolute; left: 0; top: 0; transform-origin: 0 0; user-select: none; }
 .floorplan { display: block; width: 100%; height: 100%; object-fit: fill; pointer-events: none; }
+.device-marker:hover { z-index: 7 !important; }
+.reported-at-offline { color: #cf1322; font-weight: 600; }
 .device-marker { position: absolute; z-index: 2; transform: translate(-50%, -50%); padding: 0; border: 0; background: transparent; cursor: pointer; white-space: nowrap; }
 .marker-dot { width: 14px; height: 14px; border-width: 2px; }
 .marker-online .marker-dot { background: #16a34a; }
