@@ -395,12 +395,24 @@ public class TaskService {
         task.setUpdatedAt(LocalDateTime.now());
         taskMapper.update(task);
 
-        taskEventService.append(task.getId(), "MANUAL_TERMINATED", "OPERATOR", null,
-                "运行操作员" + operator.getUsername() + "在计划生成前取消任务: " + reason);
+        String timelineSummary = "运行操作员" + operator.getUsername() + "在计划生成前取消任务: " + reason;
         Map<String, Object> cancelDetail = new LinkedHashMap<>();
+        cancelDetail.put("summary", timelineSummary);
         cancelDetail.put("reason", reason);
         cancelDetail.put("previousStatus", TaskStatus.PLANNING.name());
         cancelDetail.put("operator", operator.getUsername());
+        cancelDetail.put("deviceCancelResults", java.util.Collections.emptyList());
+        cancelDetail.put("devices", java.util.Collections.emptyList());
+        cancelDetail.put("cancelledCount", 0);
+
+        String cancelEventJson;
+        try {
+            cancelEventJson = MAPPER.writeValueAsString(cancelDetail);
+        } catch (Exception e) {
+            cancelEventJson = "{\"summary\":\"" + reason + "\"}";
+        }
+
+        taskEventService.append(task.getId(), "MANUAL_TERMINATED", "OPERATOR", null, cancelEventJson);
         operationLogService.record(operator.getId(), operator.getUsername(), operator.getRole(),
                 "TASK_CANCEL", task.getTaskCode(), "SUCCESS", null, cancelDetail);
         return task;
@@ -530,27 +542,36 @@ public class TaskService {
             deviceSummaryStr = deviceResults.toString();
         }
 
-        // 记录结构化人工终止事件 MANUAL_TERMINATED 与 TASK_TERMINATED（DEF-S3-059，TC-066.S3 / SRS_F021.R08）
-        taskEventService.append(taskId, "MANUAL_TERMINATED", "OPERATOR", "NORMAL_MANUAL_TERMINATED",
-                "运行操作员" + operator.getUsername() + "人工终止任务，原因: " + cleanReason
-                        + "，前序状态: " + previousStatus.name()
-                        + "，涉及设备: " + deviceResults.stream().map(m -> m.get("agentId")).toList()
-                        + "，取消响应摘要: " + deviceSummaryStr);
+        // 人类可读时间线文本摘要（保留用于 UI 与时间线展示）
+        String timelineSummary = "运行操作员" + operator.getUsername() + "人工终止任务，原因: " + cleanReason
+                + "，前序状态: " + previousStatus.name()
+                + "，涉及设备: " + deviceResults.stream().map(m -> m.get("agentId")).toList()
+                + "，取消响应摘要: " + deviceSummaryStr;
 
-        taskEventService.append(taskId, "TASK_TERMINATED", "OPERATOR", "NORMAL_MANUAL_TERMINATED",
-                "运行操作员" + operator.getUsername() + "人工终止任务，原因: " + cleanReason
-                        + "，前序状态: " + previousStatus.name()
-                        + "，涉及设备: " + deviceResults.stream().map(m -> m.get("agentId")).toList()
-                        + "，取消响应摘要: " + deviceSummaryStr);
+        // 构造结构化详情 JSON（DEF-S3-059，TC-066.S3 / SRS_F021.R08）
+        // 包含 reason、previousStatus、operator、deviceCancelResults 以及 summary 人类可读时间线
+        Map<String, Object> eventDetailMap = new LinkedHashMap<>();
+        eventDetailMap.put("summary", timelineSummary);
+        eventDetailMap.put("reason", cleanReason);
+        eventDetailMap.put("previousStatus", previousStatus.name());
+        eventDetailMap.put("operator", operator.getUsername());
+        eventDetailMap.put("deviceCancelResults", deviceResults);
+        eventDetailMap.put("devices", deviceResults);
+        eventDetailMap.put("cancelledCount", deviceResults.size());
+
+        String eventDetailJson;
+        try {
+            eventDetailJson = MAPPER.writeValueAsString(eventDetailMap);
+        } catch (Exception e) {
+            eventDetailJson = "{\"summary\":\"" + cleanReason + "\"}";
+        }
+
+        // 记录结构化人工终止事件 MANUAL_TERMINATED 与 TASK_TERMINATED（事件 detail 可被 json.loads 整体解析且同时保留 detailSummary 人类可读摘要）
+        taskEventService.append(taskId, "MANUAL_TERMINATED", "OPERATOR", "NORMAL_MANUAL_TERMINATED", eventDetailJson);
+        taskEventService.append(taskId, "TASK_TERMINATED", "OPERATOR", "NORMAL_MANUAL_TERMINATED", eventDetailJson);
 
         // 操作日志必须包含终止原因、前序状态以及每个设备取消响应摘要（包括 cancelCommandId），严禁 detail 为 null！
-        Map<String, Object> terminateDetail = new LinkedHashMap<>();
-        terminateDetail.put("reason", cleanReason);
-        terminateDetail.put("previousStatus", previousStatus.name());
-        terminateDetail.put("deviceCancelResults", deviceResults);
-        terminateDetail.put("devices", deviceResults);
-        terminateDetail.put("operator", operator.getUsername());
-        terminateDetail.put("cancelledCount", deviceResults.size());
+        Map<String, Object> terminateDetail = new LinkedHashMap<>(eventDetailMap);
         operationLogService.record(operator.getId(), operator.getUsername(), operator.getRole(),
                 "TASK_TERMINATE", task.getTaskCode(), "SUCCESS", null, terminateDetail);
         return task;

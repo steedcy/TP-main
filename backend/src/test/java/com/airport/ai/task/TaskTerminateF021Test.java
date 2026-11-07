@@ -113,7 +113,7 @@ class TaskTerminateF021Test {
 
     @Test
     @DisplayName("R08 & DEF-S3-059: 终止审计与事件完整记录取消响应摘要、cancelCommandId、deviceCode，严禁 detail 为 null")
-    void testTerminateDetailContainsDeviceCancelResultsAndCancelCommandId_DEF_S3_059() {
+    void testTerminateDetailContainsDeviceCancelResultsAndCancelCommandId_DEF_S3_059() throws Exception {
         Long taskId = 64L;
         Task task = new Task();
         task.setId(taskId);
@@ -195,10 +195,20 @@ class TaskTerminateF021Test {
         assertEquals("CANCEL_QUEUED", devResult.get("result"));
         assertEquals("CANCEL_QUEUED", devResult.get("cancelStatus"));
 
-        // 5. 事件留痕核验 (task_events)
+        // 5. 事件留痕核验 (task_events) 必须为完整 JSON 结构且包含取消指令编号及原因
         verify(taskEventService).append(eq(taskId), eq("TASK_CANCEL_REQUESTED"), eq("OPERATOR"), isNull(), contains("AGT-0158A712"));
-        verify(taskEventService).append(eq(taskId), eq("MANUAL_TERMINATED"), eq("OPERATOR"), eq("NORMAL_MANUAL_TERMINATED"), contains("阶段3人工终止边界复测"));
-        verify(taskEventService).append(eq(taskId), eq("TASK_TERMINATED"), eq("OPERATOR"), eq("NORMAL_MANUAL_TERMINATED"), contains(capturedCancelCmdId));
+        ArgumentCaptor<String> eventDetailCaptor = ArgumentCaptor.forClass(String.class);
+        verify(taskEventService).append(eq(taskId), eq("TASK_TERMINATED"), eq("OPERATOR"), eq("NORMAL_MANUAL_TERMINATED"), eventDetailCaptor.capture());
+        String eventDetailJson = eventDetailCaptor.getValue();
+        assertNotNull(eventDetailJson);
+        assertTrue(eventDetailJson.startsWith("{") && eventDetailJson.endsWith("}"), "TASK_TERMINATED.detail 必须为有效 JSON 对象字符串");
+        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        com.fasterxml.jackson.databind.JsonNode eventJson = mapper.readTree(eventDetailJson);
+        assertEquals("阶段3人工终止边界复测", eventJson.get("reason").asText());
+        assertEquals("EXECUTING", eventJson.get("previousStatus").asText());
+        assertEquals("op_test", eventJson.get("operator").asText());
+        assertTrue(eventJson.has("deviceCancelResults"));
+        assertEquals(capturedCancelCmdId, eventJson.get("deviceCancelResults").get(0).get("cancelCommandId").asText());
     }
 
     @Test
@@ -394,5 +404,27 @@ class TaskTerminateF021Test {
         emptyEvent.setDetail("首次写入详情");
         assertEquals("首次写入详情", emptyEvent.getDetailSummary());
         assertEquals("首次写入详情", emptyEvent.getDetail());
+    }
+
+    @Test
+    @DisplayName("TaskEvent JSON detail: 结构化事件 detail 满足 json.loads 整体解析，detailSummary 保留时间线文字")
+    void testTaskEventJsonDetailAndSummary() throws Exception {
+        String jsonDetail = "{\"summary\":\"运行操作员人工终止任务，原因: 设备故障\",\"reason\":\"设备故障\",\"previousStatus\":\"EXECUTING\",\"operator\":\"admin\",\"deviceCancelResults\":[{\"deviceCode\":\"DEV_1\",\"cancelCommandId\":\"CMD-1\"}]}";
+        TaskEvent event = new TaskEvent();
+        event.setDetailSummary(jsonDetail);
+
+        // detailSummary 保持人类可读时间线摘要
+        assertEquals("运行操作员人工终止任务，原因: 设备故障", event.getDetailSummary());
+        // detail 保持完整 JSON 字符串，可被 ObjectMapper / json.loads 整体解析
+        assertEquals(jsonDetail, event.getDetail());
+        assertEquals(jsonDetail, event.getRawDetailSummary());
+
+        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        com.fasterxml.jackson.databind.JsonNode root = mapper.readTree(event.getDetail());
+        assertEquals("设备故障", root.get("reason").asText());
+        assertEquals("EXECUTING", root.get("previousStatus").asText());
+        assertEquals("admin", root.get("operator").asText());
+        assertTrue(root.has("deviceCancelResults"));
+        assertEquals("DEV_1", root.get("deviceCancelResults").get(0).get("deviceCode").asText());
     }
 }
