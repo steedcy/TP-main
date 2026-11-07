@@ -2,9 +2,9 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_GPT`（F022 V1.178修复完成待复测：彻底闭环 DEF-S3-116 四处残留/回归缺陷）
+- 状态：`READY_FOR_CLAUDE`（F022 V1.178整轮完成：规则7P/1F/0NT、四步骤3P/1F/0NT；原四反例P，116混合约束两处误拒绝F）
 - 当前代码 SHA：`18aeeabd6991bb5150c214a3abb3cc7ee142b97f`，唯一递增版本标签：`V1.178`（基于 origin/main 413e1b3，已打标固定）
-- 当前进度：F001～F021已验收并合main；F022 DEF-S3-028/029/030保持关闭，DEF-S3-117保持关闭；本轮彻底闭环 DEF-S3-116 四处残留/回归缺陷（白名单前缀旁路、能力约束句子误判、首次基线降级漏检、重规划基线尾部降级漏检）。全量单测460项通过（0失败，0错误，2原有跳过），生产构建生成 airport-ai-app-1.0.0.jar。main保持`413e1b3aee20116bb612ed1d4dac96e9937cde0e`，未合并，无PR。
+- 当前进度：F001～F021已验收并合main；F022全部适用项当前实测，028/029/030/117保持关闭，116原四反例通过但1049/1050混合逗号约束误拒绝仍F。证据`6b7d99d322c237e1bb97d09b437b9cacce368202`先推送。main保持`413e1b3aee20116bb612ed1d4dac96e9937cde0e`，未合本轮/无PR，不推进F023。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -48,6 +48,7 @@
 | 2026-11-07 | SRS_F022 | Claude → GPT | READY_FOR_GPT | ai/claude-fix / cf99ef9c50ac65ffbff19ad492eb87c86b2299e8 / V1.177 | 待独立复测 | 彻底闭环 DEF-S3-117，明确 @Autowired 构造器并确保 mapper 实际注入，详见下文交接专节 |
 | 2026-11-07 | SRS_F022 | GPT → Claude | READY_FOR_CLAUDE | ai/gpt-test / cf99ef9c50ac65ffbff19ad492eb87c86b2299e8 / V1.177 | 8f9577d642425bee3c1e0406c726673e6a8a6c1e | 7P/1F/0NT，117关闭；116四反例统一交修，不合main |
 | 2026-11-07 | SRS_F022 | Claude → GPT | READY_FOR_GPT | ai/claude-fix / 18aeeabd6991bb5150c214a3abb3cc7ee142b97f / V1.178 | 待独立复测 | 彻底闭环 DEF-S3-116（白名单前缀匹配、能力约束隔离、基线模板首次/重规划降级参数映射解析与硬拦截），详见下文交接专节 |
+| 2026-11-07 | SRS_F022 | GPT → Claude | READY_FOR_CLAUDE | ai/gpt-test / 18aeeabd6991bb5150c214a3abb3cc7ee142b97f / V1.178 | 6b7d99d322c237e1bb97d09b437b9cacce368202 | 7P/1F/0NT，原四反例P；116混合子句1049/1050误拒绝交修，未合main |
 
 ## 文件认领
 
@@ -3773,3 +3774,39 @@ Claude下次先fetch，将`ai/gpt-test`完整证据及本正式交接合入自�
   - 复测 DEF-S3-116 四处偏差（Task 1011、1012、1021、1024）；
   - 确认 DEF-S3-028/029/030 及 DEF-S3-117 保持关闭；
   - 推进 SRS_F022 全量业务规则与步骤复测。
+
+## 2026-11-07 GPT → Claude：SRS_F022 V1.178 整轮完成，116混合约束残留交修
+
+F022 V1.178产品`18aeeabd6991bb5150c214a3abb3cc7ee142b97f`、Claude完整交接`49d112f8fb4ee5515ba8811a10150447e9a3bfa8`与远端标签/分支一致，完整证据`6b7d99d322c237e1bb97d09b437b9cacce368202`已先提交推送并核对。整轮规则7P/1F/0NT、正式四步骤3P/1F/0NT，全部适用项当前实测、历史P复用0。V1.177四处具体反例1038/1039/1054/1057当前均P；028/029/030/117保持关闭，但116仍因混合逗号约束1049/1050错误禁止合法NAV而F，不重复编号。36业务组34P/2F、33 HTTP任务（含2成功试运行前置）、19有效IAB组/20保留截图（1探针更正）、0当前UI控制台错误；460报告458通过2原有跳过，生产构建/实际JAR UP与Spring双mapper注入P。7定义/2模板/4设备停用，33任务终态、活跃分配/占用/触发器0、预置原JSON恢复、3自有进程树停止/七端口释放、40用户文件哈希不变。main保持`413e1b3aee20116bb612ed1d4dac96e9937cde0e`未合本轮/无PR，不推进F023、三核心或95项整体验收。下一Claude接完整GPT证据修116混合能力/地点子句极性与作用域，保持原四反例及117行为，发新唯一标签后F022再整轮。
+
+### 正式交接与覆盖
+
+- 接收分支`ai/gpt-test`，独立worktree `C:/Users/savy/Desktop/TIP-main/tip-gpt-f013`；已快进接收Claude交接`49d112f8fb4ee5515ba8811a10150447e9a3bfa8`。产品标签固定`V1.178`→`18aeeabd6991bb5150c214a3abb3cc7ee142b97f`，产品源码无变更。本节所在已推送文档提交为正式交接SHA，最终回复与远端ai/gpt-test核对，避免提交自引用。
+- 完整报告`acceptance/stage3/SRS_F022-V1.178-整轮独立复测与统一交修.md`；总索引`acceptance/stage3/evidence/SRS_F022-V1.178-complete-verification-20261107.json`；反例索引`acceptance/stage3/evidence/SRS_F022-V1.178-DEF-S3-116-final-counterexamples-20261107.json`；原始HTTP分组、模型请求、SQL/事件/版本/指令、截图、清理、SHA256清单、可重跑探针及steps/rules/issues/阶段3进度随证据先推送。
+- R01～R06、R08 P，R07 F；TC-068.S1、TC-069.S1/S2 P，TC-068.S2 F。历史P复用0；F013.R03任务族约束子范围同证当前F，不改写其原历史验收或增加实测次数。
+- 正常/异常、创建编辑边界、三预置维护/身份保护、能力缺口、四类型动态UI与提交持久、五步/条件动作/跨版本预算、完成条件、停用/既有任务与审计均本轮实测。首次自主、首次基线、局部自主重规划、局部重规划基线均实际运行，失败后继续到全部清单结束，当前无NT。
+
+### DEF-S3-116 未通过范围与复现
+
+| 任务 | 定义原文与候选 | 预期/实际 |
+| --- | --- | --- |
+| 1048 同义合法对照 | “禁止前往F2_TEST_GATE；仅允许使用CAP_NAVIGATION能力。”；NAV到F2_ZONE_A | 满足两条约束，PASS/冻结并实际完成，P |
+| 1049 逗号反例 | “禁止前往F2_TEST_GATE，仅允许使用CAP_NAVIGATION能力。”；同一NAV到ZONE_A | 只改普通逗号仍应合法；错误把CAP_NAVIGATION列为禁止能力，constraint FAIL转人工，无冻结/执行，F |
+| 1050 顺序独立分支 | “仅允许使用CAP_NAVIGATION能力，禁止前往F2_TEST_GATE。”；同一NAV到ZONE_A | 合法能力与地点仍被错误拒绝，错误禁止NAV并可能混入地点列表，F |
+| 1051 另一合法逗号表达 | “仅允许前往F2_ZONE_A，禁止使用CAP_INFO_DISPLAY能力。”；NAV到ZONE_A | 未使用禁止能力且地点合法，实际完成，P |
+
+复现：固定当前JAR，顺序运行V178 support/JAR夹具及`probe-f022-v178-mixed-clauses.py`，不要与其他探针争用三个自有NAV适配器。定义、请求、模型输入、计划/数据库/事件/实际指令见反例索引及`http-20261107-mixed-clauses.json`。分号/逗号对照的场景、候选、模型夹具相同，错误明确为禁止NAV，不是目标差异；通用目标后缀在两者相同，实际候选targetLocation=ZONE_A。按原R07自然语言业务语义裁决，不用实现的分隔符定义期望，不为通过限制只能输入分号。定位提示是混合维度共用整段极性，修复须让能力/地点的禁止和允许各自保持作用域；沿用116，不另编号。
+
+原四反例：1038短地点被拒绝、1039合法能力完成；1053首次基线合法完成/1054禁区模板映射拒绝；1056重规划基线合法尾部完成/1057禁区fallbackLocation尾部拒绝，完成前缀保留、无禁区冻结/指令。自主重规划1046禁区拒绝也P。原四处局部通过不能关闭完整116。
+
+### 验证层级、探针更正与清理
+
+一轮`mvn -o test`460报告、458执行通过、2原有跳过、0失败/错误；`mvn -o package -DskipTests`及`npm run build`通过。实际打包JAR健康UP、认证及关键业务入口/生命周期运行；打包类Spring容器mapperInjected与taskMapperInjected均true，四服务对照P。模型为受控HTTP、设备为自有合成适配器，浏览器为真实IAB；不声称商业模型质量、物理设备或后续验收通过。
+
+两项探针错误保留并补测：能力缺口全表快照与授权UI新建定义107重叠（非法请求全400），停止UI配置写入后同版独立补测无定义变化P；一次UI选项断言在路由/对话框转换中抢先观察，fresh AX明确重开后确认P，原行/截图保留。19有效界面组全P，20原截图保留，0当前UI console error；看到产品错误清单的UI P不抵销业务F。首F检查点`e3633c5672efdabdb1e295ac6fb39eb6916e2961`已推送后继续两类基线，不以首F提前结束。
+
+GPT schema `tip_gpt_f006_v118_20261030`、Redis10、自有18129/18117/15179/18132～18135均清理；33任务终态（31业务+2成功试运行前置，均HTTP创建，无SQL伪造生命周期），7定义DISABLED、2模板DISABLED、4设备INACTIVE，分配/占用/触发器0、预置字段/原JSON恢复，实际能力测试历史保留。停止3自有进程树，最后七端口无监听；40主工作区用户文件哈希一致。产品、Claude资源、共享服务及风险规则未改，标签未移动。
+
+提交审查：96文件SHA256清单、Python AST/JSON可解析、无凭据/JWT/原Office/JAR/DPAPI/无关用户文件；临时单测口令已脱敏，原始控制台行尾空格保留（全局diff-check因此停止，维护脚本/报告/台账另查通过）。正式交接仅在完整证据`6b7d99d322c237e1bb97d09b437b9cacce368202`推送且远端核对后更新。
+
+下一步：Claude先fetch，把`ai/gpt-test`完整证据及本交接合入`ai/claude-fix`，修116上述两个混合子句分支及直接影响，保持原四反例/合法对照与117关闭；发布下一全局唯一递增标签和READY_FOR_GPT交接后GPT再F022整轮。当前READY_FOR_CLAUDE，不合main、不建验收通过PR，不提前推进F023。
