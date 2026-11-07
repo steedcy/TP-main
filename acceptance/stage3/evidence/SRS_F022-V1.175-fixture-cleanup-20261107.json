@@ -1,0 +1,699 @@
+{
+  "at": "2026-11-07T14:37:55.935024+08:00",
+  "presetsBeforeRestore": [
+    {
+      "id": 1,
+      "definition_code": "OVERSIZE_BAGGAGE_HANDLING",
+      "task_name": "超规行李处置",
+      "goal_template": "协助旅客处理超规行李，引导至行李处置点并完成尺寸重量测量",
+      "scene_params": [
+        {
+          "name": "baggageLocation",
+          "type": "String",
+          "required": true,
+          "defaultValue": null,
+          "range": "行李当前所在位置编码"
+        }
+      ],
+      "available_capability_types": [
+        "CAP_BAGGAGE_MEASURE",
+        "CAP_OVERSIZE_ALERT",
+        "CAP_NAVIGATION",
+        "CAP_NOTIFICATION",
+        "CAP_INFO_DISPLAY"
+      ],
+      "constraint_description": "超规行李处置全程不得引导旅客脱离监控区域；测量结果超标须触发超规事件上报",
+      "completion_condition": "行李已完成尺寸重量测量且超规事件（如有）已上报",
+      "is_preset": true,
+      "definition_status": "ENABLED",
+      "created_at": "2026-10-30T13:40:48.906796",
+      "updated_at": "2026-11-07T14:26:08.329802",
+      "updated_by": "set"
+    },
+    {
+      "id": 2,
+      "definition_code": "SPECIAL_PASSENGER_SERVICE",
+      "task_name": "特殊旅客服务",
+      "goal_template": "陪同或引导特殊旅客前往目标地点并完成必要通知",
+      "scene_params": [
+        {
+          "name": "assistanceType",
+          "type": "String",
+          "required": true,
+          "defaultValue": null,
+          "range": "协助类型，如轮椅/视障/听障陪同"
+        }
+      ],
+      "available_capability_types": [
+        "CAP_ESCORT",
+        "CAP_NAVIGATION",
+        "CAP_NOTIFICATION",
+        "CAP_INFO_DISPLAY"
+      ],
+      "constraint_description": "陪同对象为特殊旅客时优先安排陪同服务而非仅空间引导；全程与现场人员保持通知联动",
+      "completion_condition": "旅客已到达目标地点",
+      "is_preset": true,
+      "definition_status": "ENABLED",
+      "created_at": "2026-10-30T13:40:48.906796",
+      "updated_at": "2026-11-07T14:26:08.392894",
+      "updated_by": "set"
+    },
+    {
+      "id": 3,
+      "definition_code": "FLIGHT_CHANGE_RESPONSE",
+      "task_name": "航班变更应对",
+      "goal_template": "将航班变更信息同步至受影响旅客并提供后续引导",
+      "scene_params": [
+        {
+          "name": "flightNumber",
+          "type": "String",
+          "required": true,
+          "defaultValue": null,
+          "range": "航班号"
+        }
+      ],
+      "available_capability_types": [
+        "CAP_FLIGHT_UPDATE",
+        "CAP_INFO_DISPLAY",
+        "CAP_NOTIFICATION",
+        "CAP_NAVIGATION"
+      ],
+      "constraint_description": "航班变更信息发布须在旅客到达登机口前完成；涉及登机口变更时须同步空间引导",
+      "completion_condition": "航班变更信息已送达且旅客后续引导（如需）已完成",
+      "is_preset": true,
+      "definition_status": "ENABLED",
+      "created_at": "2026-10-30T13:40:48.906796",
+      "updated_at": "2026-11-07T14:27:43.994357",
+      "updated_by": "set"
+    }
+  ],
+  "presetsAfterRestore": [
+    {
+      "id": 1,
+      "definition_code": "OVERSIZE_BAGGAGE_HANDLING",
+      "task_name": "超规行李处置",
+      "goal_template": "协助旅客处理超规行李，引导至行李处置点并完成尺寸重量测量",
+      "scene_params": [
+        {
+          "name": "baggageLocation",
+          "type": "String",
+          "required": true,
+          "range": "行李当前所在位置编码"
+        }
+      ],
+      "available_capability_types": [
+        "CAP_BAGGAGE_MEASURE",
+        "CAP_OVERSIZE_ALERT",
+        "CAP_NAVIGATION",
+        "CAP_NOTIFICATION",
+        "CAP_INFO_DISPLAY"
+      ],
+      "constraint_description": "超规行李处置全程不得引导旅客脱离监控区域；测量结果超标须触发超规事件上报",
+      "completion_condition": "行李已完成尺寸重量测量且超规事件（如有）已上报",
+      "is_preset": true,
+      "definition_status": "ENABLED",
+      "created_at": "2026-10-30T13:40:48.906796",
+      "updated_at": "2026-11-07T14:26:08.329802",
+      "updated_by": "set"
+    },
+    {
+      "id": 2,
+      "definition_code": "SPECIAL_PASSENGER_SERVICE",
+      "task_name": "特殊旅客服务",
+      "goal_template": "陪同或引导特殊旅客前往目标地点并完成必要通知",
+      "scene_params": [
+        {
+          "name": "assistanceType",
+          "type": "String",
+          "required": true,
+          "range": "协助类型，如轮椅/视障/听障陪同"
+        }
+      ],
+      "available_capability_types": [
+        "CAP_ESCORT",
+        "CAP_NAVIGATION",
+        "CAP_NOTIFICATION",
+        "CAP_INFO_DISPLAY"
+      ],
+      "constraint_description": "陪同对象为特殊旅客时优先安排陪同服务而非仅空间引导；全程与现场人员保持通知联动",
+      "completion_condition": "旅客已到达目标地点",
+      "is_preset": true,
+      "definition_status": "ENABLED",
+      "created_at": "2026-10-30T13:40:48.906796",
+      "updated_at": "2026-11-07T14:26:08.392894",
+      "updated_by": "set"
+    },
+    {
+      "id": 3,
+      "definition_code": "FLIGHT_CHANGE_RESPONSE",
+      "task_name": "航班变更应对",
+      "goal_template": "将航班变更信息同步至受影响旅客并提供后续引导",
+      "scene_params": [
+        {
+          "name": "flightNumber",
+          "type": "String",
+          "required": true,
+          "range": "航班号"
+        }
+      ],
+      "available_capability_types": [
+        "CAP_FLIGHT_UPDATE",
+        "CAP_INFO_DISPLAY",
+        "CAP_NOTIFICATION",
+        "CAP_NAVIGATION"
+      ],
+      "constraint_description": "航班变更信息发布须在旅客到达登机口前完成；涉及登机口变更时须同步空间引导",
+      "completion_condition": "航班变更信息已送达且旅客后续引导（如需）已完成",
+      "is_preset": true,
+      "definition_status": "ENABLED",
+      "created_at": "2026-10-30T13:40:48.906796",
+      "updated_at": "2026-11-07T14:27:43.994357",
+      "updated_by": "set"
+    }
+  ],
+  "presetsInitial": [
+    {
+      "id": 1,
+      "definition_code": "OVERSIZE_BAGGAGE_HANDLING",
+      "task_name": "超规行李处置",
+      "goal_template": "协助旅客处理超规行李，引导至行李处置点并完成尺寸重量测量",
+      "scene_params": [
+        {
+          "name": "baggageLocation",
+          "type": "String",
+          "required": true,
+          "range": "行李当前所在位置编码"
+        }
+      ],
+      "available_capability_types": [
+        "CAP_BAGGAGE_MEASURE",
+        "CAP_OVERSIZE_ALERT",
+        "CAP_NAVIGATION",
+        "CAP_NOTIFICATION",
+        "CAP_INFO_DISPLAY"
+      ],
+      "constraint_description": "超规行李处置全程不得引导旅客脱离监控区域；测量结果超标须触发超规事件上报",
+      "completion_condition": "行李已完成尺寸重量测量且超规事件（如有）已上报",
+      "is_preset": true,
+      "definition_status": "ENABLED",
+      "created_at": "2026-10-30T13:40:48.906796",
+      "updated_at": "2026-11-02T07:38:42.890024",
+      "updated_by": null
+    },
+    {
+      "id": 2,
+      "definition_code": "SPECIAL_PASSENGER_SERVICE",
+      "task_name": "特殊旅客服务",
+      "goal_template": "陪同或引导特殊旅客前往目标地点并完成必要通知",
+      "scene_params": [
+        {
+          "name": "assistanceType",
+          "type": "String",
+          "required": true,
+          "range": "协助类型，如轮椅/视障/听障陪同"
+        }
+      ],
+      "available_capability_types": [
+        "CAP_ESCORT",
+        "CAP_NAVIGATION",
+        "CAP_NOTIFICATION",
+        "CAP_INFO_DISPLAY"
+      ],
+      "constraint_description": "陪同对象为特殊旅客时优先安排陪同服务而非仅空间引导；全程与现场人员保持通知联动",
+      "completion_condition": "旅客已到达目标地点",
+      "is_preset": true,
+      "definition_status": "ENABLED",
+      "created_at": "2026-10-30T13:40:48.906796",
+      "updated_at": "2026-10-30T13:40:48.906796",
+      "updated_by": null
+    },
+    {
+      "id": 3,
+      "definition_code": "FLIGHT_CHANGE_RESPONSE",
+      "task_name": "航班变更应对",
+      "goal_template": "将航班变更信息同步至受影响旅客并提供后续引导",
+      "scene_params": [
+        {
+          "name": "flightNumber",
+          "type": "String",
+          "required": true,
+          "range": "航班号"
+        }
+      ],
+      "available_capability_types": [
+        "CAP_FLIGHT_UPDATE",
+        "CAP_INFO_DISPLAY",
+        "CAP_NOTIFICATION",
+        "CAP_NAVIGATION"
+      ],
+      "constraint_description": "航班变更信息发布须在旅客到达登机口前完成；涉及登机口变更时须同步空间引导",
+      "completion_condition": "航班变更信息已送达且旅客后续引导（如需）已完成",
+      "is_preset": true,
+      "definition_status": "ENABLED",
+      "created_at": "2026-10-30T13:40:48.906796",
+      "updated_at": "2026-10-30T13:40:48.906796",
+      "updated_by": null
+    }
+  ],
+  "exactBusinessConfigRestored": true,
+  "definitions": [
+    {
+      "id": 86,
+      "definition_code": "EXT_F86E1B86",
+      "task_name": "G175 F022 acceptance 142138",
+      "goal_template": "Synthetic navigation",
+      "scene_params": [
+        {
+          "name": "targetLocation",
+          "type": "String",
+          "required": true,
+          "defaultValue": null,
+          "range": "synthetic location"
+        },
+        {
+          "name": "partyCount",
+          "type": "Number",
+          "required": true,
+          "defaultValue": null,
+          "range": "synthetic number"
+        },
+        {
+          "name": "assist",
+          "type": "Boolean",
+          "required": true,
+          "defaultValue": null,
+          "range": "synthetic boolean"
+        },
+        {
+          "name": "details",
+          "type": "Object",
+          "required": true,
+          "defaultValue": null,
+          "range": "synthetic object"
+        }
+      ],
+      "available_capability_types": [
+        "CAP_NAVIGATION"
+      ],
+      "constraint_description": "Synthetic isolated navigation",
+      "completion_condition": "routeGenerated=true",
+      "is_preset": false,
+      "definition_status": "DISABLED",
+      "created_at": "2026-11-07T14:21:39.063222",
+      "updated_at": "2026-11-07T14:24:59.588386",
+      "updated_by": "set"
+    },
+    {
+      "id": 87,
+      "definition_code": "EXT_85D2CBE3",
+      "task_name": "Z",
+      "goal_template": "g",
+      "scene_params": [
+        {
+          "name": "targetLocation",
+          "type": "String",
+          "required": true,
+          "defaultValue": null,
+          "range": "synthetic location"
+        },
+        {
+          "name": "partyCount",
+          "type": "Number",
+          "required": true,
+          "defaultValue": null,
+          "range": "synthetic number"
+        },
+        {
+          "name": "assist",
+          "type": "Boolean",
+          "required": true,
+          "defaultValue": null,
+          "range": "synthetic boolean"
+        },
+        {
+          "name": "details",
+          "type": "Object",
+          "required": true,
+          "defaultValue": null,
+          "range": "synthetic object"
+        }
+      ],
+      "available_capability_types": [
+        "CAP_NAVIGATION"
+      ],
+      "constraint_description": "界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界",
+      "completion_condition": "routeGenerated=true",
+      "is_preset": false,
+      "definition_status": "DISABLED",
+      "created_at": "2026-11-07T14:21:40.500238",
+      "updated_at": "2026-11-07T14:24:59.598829",
+      "updated_by": "set"
+    },
+    {
+      "id": 88,
+      "definition_code": "EXT_334EB575",
+      "task_name": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN",
+      "goal_template": "gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg",
+      "scene_params": [
+        {
+          "name": "targetLocation",
+          "type": "String",
+          "required": true,
+          "defaultValue": null,
+          "range": "synthetic location"
+        },
+        {
+          "name": "partyCount",
+          "type": "Number",
+          "required": true,
+          "defaultValue": null,
+          "range": "synthetic number"
+        },
+        {
+          "name": "assist",
+          "type": "Boolean",
+          "required": true,
+          "defaultValue": null,
+          "range": "synthetic boolean"
+        },
+        {
+          "name": "details",
+          "type": "Object",
+          "required": true,
+          "defaultValue": null,
+          "range": "synthetic object"
+        }
+      ],
+      "available_capability_types": [
+        "CAP_NAVIGATION"
+      ],
+      "constraint_description": "界",
+      "completion_condition": "routeGenerated=true",
+      "is_preset": false,
+      "definition_status": "DISABLED",
+      "created_at": "2026-11-07T14:21:41.194719",
+      "updated_at": "2026-11-07T14:24:59.608003",
+      "updated_by": "set"
+    },
+    {
+      "id": 90,
+      "definition_code": "EXT_72FA5001",
+      "task_name": "G175 browser definition",
+      "goal_template": "Synthetic passenger service F2_TEST_GATE",
+      "scene_params": [
+        {
+          "name": "targetLocation",
+          "type": "String",
+          "required": true,
+          "defaultValue": "",
+          "range": "Synthetic destination"
+        }
+      ],
+      "available_capability_types": [
+        "CAP_NAVIGATION"
+      ],
+      "constraint_description": "Updated synthetic navigation constraint",
+      "completion_condition": "routeGenerated=true",
+      "is_preset": false,
+      "definition_status": "DISABLED",
+      "created_at": "2026-11-07T14:24:10.493066",
+      "updated_at": "2026-11-07T14:32:11.297106",
+      "updated_by": "set"
+    },
+    {
+      "id": 91,
+      "definition_code": "EXT_7CF57B43",
+      "task_name": "G175 F022 acceptance 142607",
+      "goal_template": "Synthetic navigation",
+      "scene_params": [
+        {
+          "name": "targetLocation",
+          "type": "String",
+          "required": true,
+          "defaultValue": null,
+          "range": "synthetic location"
+        },
+        {
+          "name": "partyCount",
+          "type": "Integer",
+          "required": true,
+          "defaultValue": null,
+          "range": "synthetic integer"
+        },
+        {
+          "name": "assist",
+          "type": "Boolean",
+          "required": true,
+          "defaultValue": null,
+          "range": "synthetic boolean"
+        },
+        {
+          "name": "distance",
+          "type": "Double",
+          "required": true,
+          "defaultValue": null,
+          "range": "synthetic double"
+        }
+      ],
+      "available_capability_types": [
+        "CAP_NAVIGATION"
+      ],
+      "constraint_description": "Synthetic isolated navigation",
+      "completion_condition": "routeGenerated=true",
+      "is_preset": false,
+      "definition_status": "DISABLED",
+      "created_at": "2026-11-07T14:26:07.687279",
+      "updated_at": "2026-11-07T14:32:11.289437",
+      "updated_by": "set"
+    },
+    {
+      "id": 92,
+      "definition_code": "EXT_3EBF950C",
+      "task_name": "G175 F022 acceptance 143238",
+      "goal_template": "Synthetic navigation",
+      "scene_params": [
+        {
+          "name": "targetLocation",
+          "type": "String",
+          "required": true,
+          "defaultValue": "F2_TEST_GATE",
+          "range": null
+        }
+      ],
+      "available_capability_types": [
+        "CAP_NAVIGATION"
+      ],
+      "constraint_description": "Synthetic isolated navigation",
+      "completion_condition": "routeGenerated=true",
+      "is_preset": false,
+      "definition_status": "DISABLED",
+      "created_at": "2026-11-07T14:32:38.942701",
+      "updated_at": "2026-11-07T14:32:53.469536",
+      "updated_by": "set"
+    },
+    {
+      "id": 93,
+      "definition_code": "EXT_0408BD76",
+      "task_name": "G175 F022 acceptance 143535",
+      "goal_template": "Synthetic navigation",
+      "scene_params": [
+        {
+          "name": "targetLocation",
+          "type": "String",
+          "required": true,
+          "defaultValue": "F2_TEST_GATE",
+          "range": null
+        }
+      ],
+      "available_capability_types": [
+        "CAP_NAVIGATION"
+      ],
+      "constraint_description": "禁止前往F2_TEST_GATE；仅允许前往F2_ZONE_A。",
+      "completion_condition": "routeGenerated=true",
+      "is_preset": false,
+      "definition_status": "DISABLED",
+      "created_at": "2026-11-07T14:35:35.1587",
+      "updated_at": "2026-11-07T14:35:41.718857",
+      "updated_by": "set"
+    }
+  ],
+  "tasks": [
+    {
+      "id": 982,
+      "task_code": "TASK-20261107-0972",
+      "status": "MANUAL_TERMINATED",
+      "current_plan_version_id": 948
+    },
+    {
+      "id": 983,
+      "task_code": "TASK-20261107-0973",
+      "status": "MANUAL_TERMINATED",
+      "current_plan_version_id": 949
+    },
+    {
+      "id": 984,
+      "task_code": "TASK-20261107-0974",
+      "status": "COMPLETED",
+      "current_plan_version_id": 950
+    },
+    {
+      "id": 985,
+      "task_code": "TASK-20261107-0975",
+      "status": "COMPLETED",
+      "current_plan_version_id": 951
+    },
+    {
+      "id": 986,
+      "task_code": "TASK-20261107-0976",
+      "status": "MANUAL_TERMINATED",
+      "current_plan_version_id": null
+    },
+    {
+      "id": 987,
+      "task_code": "TASK-20261107-0977",
+      "status": "MANUAL_TERMINATED",
+      "current_plan_version_id": 952
+    },
+    {
+      "id": 988,
+      "task_code": "TASK-20261107-0978",
+      "status": "MANUAL_TERMINATED",
+      "current_plan_version_id": 953
+    },
+    {
+      "id": 989,
+      "task_code": "TASK-20261107-0979",
+      "status": "MANUAL_TERMINATED",
+      "current_plan_version_id": 954
+    },
+    {
+      "id": 990,
+      "task_code": "TASK-20261107-0980",
+      "status": "COMPLETED",
+      "current_plan_version_id": 955
+    },
+    {
+      "id": 991,
+      "task_code": "TASK-20261107-0981",
+      "status": "COMPLETED",
+      "current_plan_version_id": 958
+    },
+    {
+      "id": 992,
+      "task_code": "TASK-20261107-0982",
+      "status": "COMPLETED",
+      "current_plan_version_id": 959
+    },
+    {
+      "id": 993,
+      "task_code": "TASK-20261107-0983",
+      "status": "MANUAL_TERMINATED",
+      "current_plan_version_id": 960
+    },
+    {
+      "id": 994,
+      "task_code": "TASK-20261107-0984",
+      "status": "MANUAL_TERMINATED",
+      "current_plan_version_id": 962
+    },
+    {
+      "id": 995,
+      "task_code": "TASK-20261107-0985",
+      "status": "MANUAL_TERMINATED",
+      "current_plan_version_id": 964
+    },
+    {
+      "id": 996,
+      "task_code": "TASK-20261107-0986",
+      "status": "COMPLETED",
+      "current_plan_version_id": 965
+    },
+    {
+      "id": 997,
+      "task_code": "TASK-20261107-0987",
+      "status": "MANUAL_TERMINATED",
+      "current_plan_version_id": 966
+    }
+  ],
+  "ownedAgents": [
+    {
+      "id": 18,
+      "agent_code": "AGT-386E8C30",
+      "device_id": 19,
+      "agent_status": "DISABLED",
+      "online_status": "OFFLINE",
+      "work_status": "IDLE",
+      "current_task_id": null,
+      "current_step_seq": null,
+      "last_reported_at": "2026-11-07T14:35:41.685225",
+      "created_at": "2026-11-05T13:04:16.81064",
+      "updated_at": "2026-11-05T13:04:16.81064",
+      "business_status": {
+        "workloadScore": 0,
+        "capabilityMatch": 1
+      },
+      "device_code": "G160_F016_A",
+      "device_status": "INACTIVE"
+    },
+    {
+      "id": 19,
+      "agent_code": "AGT-8519A3B6",
+      "device_id": 20,
+      "agent_status": "DISABLED",
+      "online_status": "OFFLINE",
+      "work_status": "IDLE",
+      "current_task_id": null,
+      "current_step_seq": null,
+      "last_reported_at": "2026-11-07T14:35:41.692901",
+      "created_at": "2026-11-05T13:04:17.772513",
+      "updated_at": "2026-11-05T13:04:17.772513",
+      "business_status": {
+        "workloadScore": 0,
+        "capabilityMatch": 1
+      },
+      "device_code": "G160_F016_B",
+      "device_status": "INACTIVE"
+    },
+    {
+      "id": 20,
+      "agent_code": "AGT-D20379F3",
+      "device_id": 21,
+      "agent_status": "DISABLED",
+      "online_status": "OFFLINE",
+      "work_status": "IDLE",
+      "current_task_id": null,
+      "current_step_seq": null,
+      "last_reported_at": "2026-11-07T14:35:41.711586",
+      "created_at": "2026-11-05T13:05:21.137216",
+      "updated_at": "2026-11-05T13:05:21.137216",
+      "business_status": {
+        "workloadScore": 0,
+        "capabilityMatch": 1
+      },
+      "device_code": "G160_F016_C",
+      "device_status": "INACTIVE"
+    },
+    {
+      "id": 21,
+      "agent_code": "AGT-4BCA952E",
+      "device_id": 22,
+      "agent_status": "DISABLED",
+      "online_status": "OFFLINE",
+      "work_status": "IDLE",
+      "current_task_id": null,
+      "current_step_seq": null,
+      "last_reported_at": "2026-11-07T14:27:43.710099",
+      "created_at": "2026-11-07T14:27:43.598378",
+      "updated_at": "2026-11-07T14:27:43.598378",
+      "business_status": {
+        "workloadScore": 0,
+        "capabilityMatch": 1
+      },
+      "device_code": "G175_F022_FLIGHT",
+      "device_status": "INACTIVE"
+    }
+  ],
+  "currentActiveAssignments": "0",
+  "triggers": "0",
+  "sharedServices": "not stopped/reset; GPT-owned schema only; no rule/template changes"
+}

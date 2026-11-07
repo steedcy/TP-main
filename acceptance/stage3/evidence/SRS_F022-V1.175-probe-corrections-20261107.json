@@ -1,0 +1,75 @@
+{
+  "at": "2026-11-07T14:37:56.736178+08:00",
+  "rawEvidenceNeverOverwritten": true,
+  "originalDiagnostics": [
+    {
+      "name": "preset_protection",
+      "at": "2026-11-07T14:21:42.699717+08:00",
+      "error": "HTTP 400: 以下能力类型未存在已启用实例: [CAP_BAGGAGE_MEASURE, CAP_OVERSIZE_ALERT]",
+      "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f022-v175-base.py\", line 102, in run\n    try:fn()\n        ~~^^\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f022-v175-round.py\", line 70, in preset_protection\n    finally:entry['restored']=q.cfg(f'/task-definitions/{d[\"id\"]}','PUT',b);save()\n                              ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip\\scripts\\local-test-environment.py\", line 54, in __call__\n    result=request(BASE+path,method,data,self.token)\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip\\scripts\\local-test-environment.py\", line 46, in request\n    raise RuntimeError(f'HTTP {ex.code}: {message}') from None\nRuntimeError: HTTP 400: 以下能力类型未存在已启用实例: [CAP_BAGGAGE_MEASURE, CAP_OVERSIZE_ALERT]\n"
+    },
+    {
+      "name": "dynamic_gate",
+      "at": "2026-11-07T14:22:01.026118+08:00",
+      "error": "'gbk' codec can't decode byte 0xaa in position 1022: illegal multibyte sequence",
+      "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f022-v175-base.py\", line 102, in run\n    try:fn()\n        ~~^^\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f022-v175-round.py\", line 97, in dynamic_gate\n    r['taskCountBefore']=before;r['taskCountAfter']=m.sql(f'select count(*) from {SC}.tasks');r['modelCallsBefore']=calls;r['modelCallsAfter']=len(journal.read_text().splitlines()) if journal.exists() else 0\n                                                                                                                                                   ~~~~~~~~~~~~~~~~~^^\n  File \"C:\\ProgramData\\miniconda3\\Lib\\pathlib\\__init__.py\", line 788, in read_text\n    return f.read()\n           ~~~~~~^^\nUnicodeDecodeError: 'gbk' codec can't decode byte 0xaa in position 1022: illegal multibyte sequence\n"
+    },
+    {
+      "name": "disable_existing_and_audit",
+      "at": "2026-11-07T14:22:37.194590+08:00",
+      "error": "'result'",
+      "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f022-v175-base.py\", line 102, in run\n    try:fn()\n        ~~^^\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f022-v175-round.py\", line 119, in disable_existing_and_audit\n    record(row,{'disabledNotSelectable':not any(x['id']==did for x in row['enabledDefinitions']),'disabledNewSubmit400':row['disabledSubmit']['http']==400,'existingCompletes':end['task']['status']=='COMPLETED','existingVersionPreserved':before['task']['currentPlanVersionId']==end['task']['currentPlanVersionId'],'createUpdateEnableDisableAudited':{'TASK_DEFINITION_CREATE','TASK_DEFINITION_UPDATE','TASK_DEFINITION_ENABLE','TASK_DEFINITION_DISABLE'}<=set(x['operation_type'] for x in logs),'auditActorResultTime':all(x.get('username') and x.get('created_at') and x['result']=='SUCCESS' for x in logs)})\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  ^^^\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f022-v175-round.py\", line 119, in <genexpr>\n    record(row,{'disabledNotSelectable':not any(x['id']==did for x in row['enabledDefinitions']),'disabledNewSubmit400':row['disabledSubmit']['http']==400,'existingCompletes':end['task']['status']=='COMPLETED','existingVersionPreserved':before['task']['currentPlanVersionId']==end['task']['currentPlanVersionId'],'createUpdateEnableDisableAudited':{'TASK_DEFINITION_CREATE','TASK_DEFINITION_UPDATE','TASK_DEFINITION_ENABLE','TASK_DEFINITION_DISABLE'}<=set(x['operation_type'] for x in logs),'auditActorResultTime':all(x.get('username') and x.get('created_at') and x['result']=='SUCCESS' for x in logs)})\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ~^^^^^^^^^^\nKeyError: 'result'\n"
+    },
+    {
+      "name": "presets",
+      "at": "2026-11-07T14:26:34.842513+08:00",
+      "error": "HTTP 400: 以下能力类型未存在已启用实例: [CAP_FLIGHT_UPDATE]",
+      "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f022-v175-base.py\", line 102, in run\n    try:fn()\n        ~~^^\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013\\acceptance\\stage3\\probe-f022-v175-supplement.py\", line 31, in presets\n    finally:e['restored']=q.cfg(f'/task-definitions/{d[\"id\"]}','PUT',b);q.save()\n                          ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip\\scripts\\local-test-environment.py\", line 54, in __call__\n    result=request(BASE+path,method,data,self.token)\n  File \"C:\\Users\\savy\\Desktop\\TIP-main\\tip\\scripts\\local-test-environment.py\", line 46, in request\n    raise RuntimeError(f'HTTP {ex.code}: {message}') from None\nRuntimeError: HTTP 400: 以下能力类型未存在已启用实例: [CAP_FLIGHT_UPDATE]\n"
+    }
+  ],
+  "ui": {
+    "new-empty": {
+      "reason": "DOM textarea value differs from textContent; blank value attribute need not be null. Saved rendered DOM/screenshot supplies original actual value, no new UI execution.",
+      "checks": {
+        "constraintStartsBlank": true,
+        "requiredLabel": true
+      },
+      "result": "P"
+    },
+    "edit-roundtrip": {
+      "reason": "DOM textarea value differs from textContent; blank value attribute need not be null. Saved rendered DOM/screenshot supplies original actual value, no new UI execution.",
+      "checks": {
+        "textareaValueInSavedRenderedSnapshot": true
+      },
+      "result": "P"
+    },
+    "edit-persisted": {
+      "reason": "DOM textarea value differs from textContent; blank value attribute need not be null. Saved rendered DOM/screenshot supplies original actual value, no new UI execution.",
+      "checks": {
+        "textareaValueInSavedRenderedSnapshot": true
+      },
+      "result": "P"
+    }
+  },
+  "preset": {
+    "reason": "DTO normalization adds optional defaultValue:null; configuration values are semantically unchanged. Exact original JSON subsequently restored with explicit SQL fixture restoration. Capability-test return uses capabilityStatus=TESTED_PASSED, not result=SUCCESS.",
+    "checks": {
+      "threeValidEditsAndRestores": true,
+      "flightTestPassed": true,
+      "exactFinalConfigRestored": true
+    }
+  },
+  "budget": {
+    "reason": "Five-step replan passes validation but existing RULE_RESOURCE_CRITICAL intentionally routes to high risk/no baseline/manual. F022 requires plan/path<=5, not bypass of risk supervision. Original completion expectation was wrong; no standards relaxed.",
+    "taskId": 994,
+    "checks": {
+      "realReplanAndTwoVersions": true,
+      "everyVersionAtMostFive": true,
+      "mergedPlanFive": true,
+      "highRiskReasonRecorded": true,
+      "actualPathAtMostFive": true,
+      "completedPrefixPreserved": true
+    }
+  },
+  "unsupportedTypeScope": "SRS V1.0 5.6.1 does not enumerate allowed scene-schema type values. Original Number/Object fixtures were outside the UI-supported four types and cannot substitute for supported-type gate coverage. Accepted values/tasks982/983 retained as exploratory robustness observations, not retrospectively asserted P. Supported String/Integer/Boolean/Double negative and legal controls are separately current tested."
+}

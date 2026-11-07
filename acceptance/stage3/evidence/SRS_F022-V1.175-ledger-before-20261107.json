@@ -1,0 +1,174 @@
+{
+  "steps.csv": {
+    "originalSha256": "9f737cb6dfe533d15d96009f7f6276f5b43cea77e91eb216c26256476698fac9",
+    "rows": [
+      {
+        "stepId": "TC-068.S1",
+        "caseId": "TC-068",
+        "action": "查看三预置任务族，新增一个基于现有能力的任务定义并编辑。",
+        "expected": "名称唯一1～64位、目标模板1～500位；场景参数、能力、约束、完成条件必填；只定义场景与规则，不写死规划步骤，不新增页面/协议/能力类型。 场景参数行包含参数名、类型、必填和说明；录入项默认空。",
+        "status": "F",
+        "observedAt": "2026-10-26",
+        "actual": "扩展定义创建/编辑及名称等非法输入拒绝；空约束仍可创建，与约束必填不符；一次性空约束定义已删除",
+        "evidence": "acceptance/stage3/evidence/TC-068-dynamic-definition-api.json;acceptance/stage3/evidence/TC-068-empty-constraint.json;acceptance/stage3/evidence/TC-068-definition-edit.png",
+        "issue": "DEF-S3-030"
+      },
+      {
+        "stepId": "TC-068.S2",
+        "caseId": "TC-068",
+        "action": "在提交页选择新定义，生成计划；停用该定义。",
+        "expected": "场景参数动态显示，约束参与校验、完成条件参与完成判定，候选及实际路径≤5步；停用后不可新选，已有任务不受影响；新增修改停用留痕。",
+        "status": "F",
+        "observedAt": "2026-10-26",
+        "actual": "新定义可选但无动态参数；缺必填输入仍建任务33；停用后提交不可选且新提交400，旧任务可查，三类操作日志齐全；计划≤5步与完成判定未测",
+        "evidence": "acceptance/stage3/evidence/TC-031-068-dynamic-ui.json;acceptance/stage3/evidence/TC-031-068-submit-dynamic.png;acceptance/stage3/evidence/TC-031-068-dynamic-submit.json;acceptance/stage3/evidence/TC-068-dynamic-disable.json;acceptance/stage3/evidence/TC-068-disabled-ui.json;acceptance/stage3/evidence/TC-068-disabled-submit.png;acceptance/stage3/evidence/TC-068-disabled-history-filter.png",
+        "issue": "DEF-S3-028;DEF-S3-029"
+      },
+      {
+        "stepId": "TC-069.S1",
+        "caseId": "TC-069",
+        "action": "尝试删除三预置任务族；维护其场景参数与约束。",
+        "expected": "预置标识清楚、不可删除，但允许按需求编辑参数与约束。",
+        "status": "P",
+        "observedAt": "2026-10-26",
+        "actual": "三预置族均显示预置标识、删除按钮禁用且API删除拒绝；行李族场景参数及约束可编辑，复原后与原配置逐字段一致",
+        "evidence": "acceptance/stage3/evidence/TC-069-preset-definitions.json;acceptance/stage3/evidence/TC-069-preset-exact-restore.json;acceptance/stage3/evidence/TC-069-preset-ui.json;acceptance/stage3/evidence/TC-069-preset-list.png;acceptance/stage3/evidence/TC-069-preset-editor.png",
+        "issue": ""
+      },
+      {
+        "stepId": "TC-069.S2",
+        "caseId": "TC-069",
+        "action": "提交重复名、缺必填及不存在/未启用能力定义。",
+        "expected": "拒绝保存并提示重复、必填或能力缺口，不进入提交页可选集合。",
+        "status": "F",
+        "observedAt": "2026-10-26",
+        "actual": "重复名、空参数、空能力和未知能力均拒绝；空约束仍200创建定义，已删除；未启用能力实例分支仍待单测",
+        "evidence": "acceptance/stage3/evidence/TC-069-preset-definitions.json;acceptance/stage3/evidence/TC-069-preset-exact-restore.json;acceptance/stage3/evidence/TC-069-preset-ui.json;acceptance/stage3/evidence/TC-069-preset-list.png;acceptance/stage3/evidence/TC-069-preset-editor.png",
+        "issue": "DEF-S3-030"
+      }
+    ]
+  },
+  "rules.csv": {
+    "originalSha256": "3c4845f399336833fcf8a397dd4673765eaae841a79c0ec37afa26b5d0a23de4",
+    "rows": [
+      {
+        "ruleId": "SRS_F022.R01",
+        "requirement": "SRS_F022",
+        "text": "预置超规行李处置、特殊旅客服务和航班变更应对三类任务族，不可删除",
+        "candidateStep": "TC-069.S1",
+        "status": "P",
+        "verifiedBy": "TC-069.S1",
+        "evidence": "acceptance/stage3/evidence/TC-069-preset-definitions.json;acceptance/stage3/evidence/TC-069-preset-exact-restore.json;acceptance/stage3/evidence/TC-069-preset-ui.json;acceptance/stage3/evidence/TC-069-preset-list.png;acceptance/stage3/evidence/TC-069-preset-editor.png",
+        "issue": ""
+      },
+      {
+        "ruleId": "SRS_F022.R02",
+        "requirement": "SRS_F022",
+        "text": "任务族只规定场景数据、可用能力类型、约束和完成条件，不预先写死自主规划步骤",
+        "candidateStep": "TC-068.S1",
+        "status": "P",
+        "verifiedBy": "TC-068.S1",
+        "evidence": "acceptance/stage3/evidence/TC-068-dynamic-definition-api.json;acceptance/stage3/evidence/TC-068-empty-constraint.json;acceptance/stage3/evidence/TC-068-definition-edit.png",
+        "issue": ""
+      },
+      {
+        "ruleId": "SRS_F022.R03",
+        "requirement": "SRS_F022",
+        "text": "配置管理员可基于已有能力类型新增其他旅客服务任务定义，至少维护任务名称、自然语言目标、场景参数、约束和预期完成条件",
+        "candidateStep": "TC-068.S1",
+        "status": "F",
+        "verifiedBy": "TC-068.S1",
+        "evidence": "acceptance/stage3/evidence/TC-068-dynamic-definition-api.json;acceptance/stage3/evidence/TC-068-empty-constraint.json;acceptance/stage3/evidence/TC-068-definition-edit.png",
+        "issue": "DEF-S3-030"
+      },
+      {
+        "ruleId": "SRS_F022.R04",
+        "requirement": "SRS_F022",
+        "text": "扩展任务不得要求新增页面、设备协议或能力类型",
+        "candidateStep": "TC-068.S1",
+        "status": "NOT_RUN",
+        "verifiedBy": "",
+        "evidence": "",
+        "issue": ""
+      },
+      {
+        "ruleId": "SRS_F022.R05",
+        "requirement": "SRS_F022",
+        "text": "扩展任务的每个计划版本及最终实际执行路径均不得超出5个可执行步骤",
+        "candidateStep": "TC-068.S2",
+        "status": "NOT_RUN",
+        "verifiedBy": "",
+        "evidence": "",
+        "issue": ""
+      },
+      {
+        "ruleId": "SRS_F022.R06",
+        "requirement": "SRS_F022",
+        "text": "任务定义中引用的能力类型必须为已启用能力类型，否则保存失败并提示能力缺口",
+        "candidateStep": "TC-069.S2",
+        "status": "NOT_RUN",
+        "verifiedBy": "",
+        "evidence": "",
+        "issue": ""
+      },
+      {
+        "ruleId": "SRS_F022.R07",
+        "requirement": "SRS_F022",
+        "text": "任务定义的约束条件参与5.4.4约束校验，完成条件参与步骤与任务完成判定",
+        "candidateStep": "TC-068.S2",
+        "status": "NOT_RUN",
+        "verifiedBy": "",
+        "evidence": "",
+        "issue": ""
+      },
+      {
+        "ruleId": "SRS_F022.R08",
+        "requirement": "SRS_F022",
+        "text": "任务定义的新增、修改和停用均写入操作记录",
+        "candidateStep": "TC-068.S2",
+        "status": "P",
+        "verifiedBy": "TC-068.S2",
+        "evidence": "acceptance/stage3/evidence/TC-068-dynamic-disable.json;acceptance/stage3/evidence/TC-068-disabled-ui.json;acceptance/stage3/evidence/TC-068-disabled-submit.png;acceptance/stage3/evidence/TC-068-disabled-history-filter.png",
+        "issue": ""
+      }
+    ]
+  },
+  "issues.csv": {
+    "originalSha256": "cc9074d6bab14fabd82eaa678882a2e541a668f86a5ff12f0df760eb37e40cdc",
+    "rows": [
+      {
+        "编号": "DEF-S3-028",
+        "类型": "缺陷",
+        "级别": "高",
+        "关联用例步骤": "TC-031.S1;TC-068.S2;AC-001",
+        "关联需求规则": "SRS_F010.R01;SRS_F022.R03",
+        "状态": "F010已通过；F022待独立复测",
+        "事实": "扩展定义必填sampleLocation在配置页存在，提交页选中后无该输入项；V1.136扩展定义页面四种类型字段动态显示并按声明提交。",
+        "证据": "acceptance/stage3/evidence/TC-031-068-dynamic-ui.json;acceptance/stage3/evidence/TC-031-068-submit-dynamic.png;acceptance/stage3/evidence/TC-031-068-dynamic-submit.json;acceptance/stage3/evidence/SRS_F010-V1.136-dynamic-ui-20261102.json;acceptance/stage3/evidence/SRS_F010-V1.136-dynamic-ui-20261102.png",
+        "阶段4动作": "提交页按已启用任务定义动态渲染场景参数，校验类型和必填，完整重跑TC-031/068及AC-001"
+      },
+      {
+        "编号": "DEF-S3-029",
+        "类型": "缺陷",
+        "级别": "高",
+        "关联用例步骤": "TC-031.S1;TC-068.S2;AC-001",
+        "关联需求规则": "SRS_F010.R01;SRS_F022.R03",
+        "状态": "F010已通过；F022待独立复测",
+        "事实": "缺少必填sampleLocation的POST /tasks返回200并创建任务33，随后目标理解才追问；V1.136缺必填与错误类型均400，任务数/模型调用数不变。",
+        "证据": "acceptance/stage3/evidence/TC-031-068-dynamic-submit.json;acceptance/stage3/evidence/SRS_F010-V1.136-boundaries-20261102.json",
+        "阶段4动作": "任务提交前按定义校验场景参数必填和类型，非法请求不建任务不调模型；复测边界"
+      },
+      {
+        "编号": "DEF-S3-030",
+        "类型": "缺陷",
+        "级别": "中",
+        "关联用例步骤": "TC-068.S1;AC-001;TC-069.S2",
+        "关联需求规则": "SRS_F022.R03",
+        "状态": "待修复",
+        "事实": "POST /task-definitions的constraintDescription为空仍保存扩展定义，复测定义已删除",
+        "证据": "acceptance/stage3/evidence/TC-068-empty-constraint.json;acceptance/stage3/evidence/TC-069-preset-definitions.json",
+        "阶段4动作": "定义新增和编辑均校验约束必填，复测预置与扩展定义边界"
+      }
+    ]
+  }
+}
