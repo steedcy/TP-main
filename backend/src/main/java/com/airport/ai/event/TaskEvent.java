@@ -32,4 +32,14 @@ public class TaskEvent {
     public void setReasonCode(String reasonCode) { this.reasonCode = reasonCode; }
     public String getDetailSummary() { return detailSummary; }
     public void setDetailSummary(String detailSummary) { this.detailSummary = detailSummary; }
+
+    /**
+     * 兼容接口与审计统一查询：提供 detail 别名访问器，保证在 JSON 序列化与审计提取时始终有非空结构化详情。
+     */
+    public String getDetail() { return detailSummary; }
+    public void setDetail(String detail) {
+        if (this.detailSummary == null || this.detailSummary.isBlank()) {
+            this.detailSummary = detail;
+        }
+    }
 }

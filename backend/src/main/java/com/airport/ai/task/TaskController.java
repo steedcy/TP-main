@@ -77,9 +77,16 @@ public class TaskController {
     public ApiResponse<TaskView> terminate(@PathVariable Long taskId,
                                             @Valid @RequestBody com.airport.ai.task.dto.TerminateTaskRequest request) {
         if (!Boolean.TRUE.equals(request.getConfirmed())) {
-            throw new com.airport.ai.common.BusinessException(com.airport.ai.common.ErrorCode.TERMINATE_REASON_REQUIRED);
+            throw new com.airport.ai.common.BusinessException(com.airport.ai.common.ErrorCode.TERMINATE_REASON_REQUIRED, "请完成二次确认");
         }
-        return ApiResponse.ok(TaskView.from(taskService.terminate(taskId, request.getReason(), currentUser.get())));
+        String cleanReason = request.getReason() == null ? "" : request.getReason().trim();
+        if (cleanReason.isEmpty()) {
+            throw new com.airport.ai.common.BusinessException(com.airport.ai.common.ErrorCode.TERMINATE_REASON_REQUIRED, "请填写终止原因");
+        }
+        if (cleanReason.length() > 200) {
+            throw new com.airport.ai.common.BusinessException(com.airport.ai.common.ErrorCode.PARAM_FORMAT_ERROR, "终止原因最长200位");
+        }
+        return ApiResponse.ok(TaskView.from(taskService.terminate(taskId, cleanReason, currentUser.get())));
     }
 
     @GetMapping("/{taskId}/events")

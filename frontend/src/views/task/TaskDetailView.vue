@@ -236,16 +236,17 @@
     </a-modal>
 
     <!-- 对应5.5.6业务规则1/5：原因1~200字+二次确认缺一不可；责任边界固定文案，人工终止不等同于设备安全急停 -->
-    <a-modal v-model:open="terminateVisible" title="人工终止任务" @ok="handleTerminate" :okButtonProps="{ disabled: !confirmed || !terminateReason }">
+    <a-modal v-model:open="terminateVisible" title="人工终止任务" @ok="handleTerminate"
+             :okButtonProps="{ id: 'btn-confirm-terminate', disabled: !confirmed || !terminateReason || !terminateReason.trim() }">
       <a-alert type="warning" show-icon style="margin-bottom: 12px"
                message="责任边界提示"
                description="人工终止仅停止后续业务步骤下发并释放设备占用，不等同于设备安全急停；已完成步骤结果保留，不回滚不补偿。请核实设备现场实际状态。" />
       <a-form layout="vertical">
-        <a-form-item label="终止原因（1~200字，必填）">
-          <a-textarea v-model:value="terminateReason" :maxlength="200" show-count />
+        <a-form-item label="终止原因（1~200字，必填）" required>
+          <a-textarea id="terminate-reason-input" v-model:value="terminateReason" :maxlength="200" show-count placeholder="请输入终止原因（1~200字）" />
         </a-form-item>
         <a-form-item>
-          <a-checkbox v-model:checked="confirmed">
+          <a-checkbox id="terminate-confirm-checkbox" v-model:checked="confirmed">
             我已阅读并确认上述责任边界提示，确认终止此任务
           </a-checkbox>
         </a-form-item>
@@ -701,11 +702,12 @@ function formatVersion(v) {
 }
 
 async function handleTerminate() {
-  if (!confirmed.value || !terminateReason.value) {
+  const cleanReason = terminateReason.value ? terminateReason.value.trim() : ''
+  if (!confirmed.value || !cleanReason) {
     message.warning('请填写终止原因并勾选二次确认')
     return
   }
-  await terminateTask(taskId, terminateReason.value)
+  await terminateTask(taskId, cleanReason)
   message.success('任务已终止')
   terminateVisible.value = false
   fetchAll()

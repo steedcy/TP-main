@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -53,6 +54,7 @@ public class TaskService {
     private final TaskDefinitionService taskDefinitionService;
     private final DeviceAgentMessagingService deviceAgentMessagingService;
     private final ForceBypassAuditRecorder forceBypassAuditRecorder;
+    private final com.airport.ai.device.DeviceMapper deviceMapper;
 
     @Autowired
     public TaskService(TaskMapper taskMapper,
@@ -67,7 +69,8 @@ public class TaskService {
                         TaskStepAssignmentMapper assignmentMapper,
                         TaskDefinitionService taskDefinitionService,
                         DeviceAgentMessagingService deviceAgentMessagingService,
-                        ForceBypassAuditRecorder forceBypassAuditRecorder) {
+                        ForceBypassAuditRecorder forceBypassAuditRecorder,
+                        @Autowired(required = false) com.airport.ai.device.DeviceMapper deviceMapper) {
         this.taskMapper = taskMapper;
         this.planVersionMapper = planVersionMapper;
         this.contextSnapshotMapper = contextSnapshotMapper;
@@ -81,6 +84,27 @@ public class TaskService {
         this.taskDefinitionService = taskDefinitionService;
         this.deviceAgentMessagingService = deviceAgentMessagingService;
         this.forceBypassAuditRecorder = forceBypassAuditRecorder;
+        this.deviceMapper = deviceMapper;
+    }
+
+    public TaskService(TaskMapper taskMapper,
+                        PlanVersionMapper planVersionMapper,
+                        ContextSnapshotMapper contextSnapshotMapper,
+                        DeviceAgentMapper deviceAgentMapper,
+                        GoalUnderstandingService goalUnderstandingService,
+                        TaskCodeGenerator taskCodeGenerator,
+                        TaskEventService taskEventService,
+                        OperationLogService operationLogService,
+                        TaskPlanningOrchestrator taskPlanningOrchestrator,
+                        TaskStepAssignmentMapper assignmentMapper,
+                        TaskDefinitionService taskDefinitionService,
+                        DeviceAgentMessagingService deviceAgentMessagingService,
+                        ForceBypassAuditRecorder forceBypassAuditRecorder) {
+        this(taskMapper, planVersionMapper, contextSnapshotMapper, deviceAgentMapper,
+                goalUnderstandingService, taskCodeGenerator, taskEventService,
+                operationLogService, taskPlanningOrchestrator, assignmentMapper,
+                taskDefinitionService, deviceAgentMessagingService,
+                forceBypassAuditRecorder, null);
     }
 
     public TaskService(TaskMapper taskMapper,
@@ -373,8 +397,12 @@ public class TaskService {
 
         taskEventService.append(task.getId(), "MANUAL_TERMINATED", "OPERATOR", null,
                 "运行操作员" + operator.getUsername() + "在计划生成前取消任务: " + reason);
+        Map<String, Object> cancelDetail = new LinkedHashMap<>();
+        cancelDetail.put("reason", reason);
+        cancelDetail.put("previousStatus", TaskStatus.PLANNING.name());
+        cancelDetail.put("operator", operator.getUsername());
         operationLogService.record(operator.getId(), operator.getUsername(), operator.getRole(),
-                "TASK_CANCEL", task.getTaskCode(), "SUCCESS", null);
+                "TASK_CANCEL", task.getTaskCode(), "SUCCESS", null, cancelDetail);
         return task;
     }
 
@@ -387,6 +415,14 @@ public class TaskService {
      */
     @Transactional
     public Task terminate(Long taskId, String reason, User operator) {
+        String cleanReason = reason == null ? "" : reason.trim();
+        if (cleanReason.isEmpty()) {
+            throw new BusinessException(ErrorCode.TERMINATE_REASON_REQUIRED, "请填写终止原因");
+        }
+        if (cleanReason.length() > 200) {
+            throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, "终止原因最长200位");
+        }
+
         Task task = get(taskId);
         Set<TaskStatus> terminable = Set.of(TaskStatus.PLANNING, TaskStatus.SUPERVISING,
                 TaskStatus.PENDING_ASSIGNMENT, TaskStatus.DOWNGRADING, TaskStatus.EXECUTING, TaskStatus.PENDING_MANUAL);
@@ -396,7 +432,7 @@ public class TaskService {
         }
 
         TaskStatus previousStatus = task.getStatus();
-        List<Map<String, String>> deviceResults = new ArrayList<>();
+        List<Map<String, Object>> deviceResults = new ArrayList<>();
         Map<Long, TaskStepAssignment> activeAssignmentsByAgent = new HashMap<>();
         if (task.getCurrentPlanVersionId() != null) {
             for (TaskStepAssignment assignment : assignmentMapper.findByPlanVersionIdOrderByStepSeqAsc(task.getCurrentPlanVersionId())) {
@@ -431,19 +467,43 @@ public class TaskService {
             }
 
             String agentCode = agent.getAgentCode();
+            String deviceCode = agentCode;
+            if (deviceMapper != null && agent.getDeviceId() != null) {
+                try {
+                    com.airport.ai.device.Device dev = deviceMapper.findById(agent.getDeviceId()).orElse(null);
+                    if (dev != null && dev.getDeviceCode() != null && !dev.getDeviceCode().isBlank()) {
+                        deviceCode = dev.getDeviceCode();
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+
             TaskStepAssignment assignment = activeAssignmentsByAgent.get(agent.getId());
             String cancelCommandId = generateCancelCommandId();
+            Map<String, Object> devResult = new LinkedHashMap<>();
+            devResult.put("agentId", agentCode);
+            devResult.put("agentCode", agentCode);
+            devResult.put("deviceCode", deviceCode);
+            devResult.put("cancelCommandId", cancelCommandId);
+
             try {
                 deviceAgentMessagingService.cancelTask(agentCode, cancelCommandId, taskId,
                         assignment == null ? agent.getCurrentStepSeq() : assignment.getStepSeq());
                 taskEventService.append(taskId, "TASK_CANCEL_REQUESTED", "OPERATOR", null,
                         "已向设备代理" + agentCode + "发送业务任务取消请求");
-                deviceResults.add(Map.of("agentId", agentCode, "result", "CANCEL_QUEUED", "cancelCommandId", cancelCommandId));
+                devResult.put("result", "CANCEL_QUEUED");
+                devResult.put("cancelStatus", "CANCEL_QUEUED");
+                devResult.put("status", "CANCEL_QUEUED");
             } catch (RuntimeException ex) {
                 taskEventService.append(taskId, "TASK_CANCEL_DELIVERY_FAILED", "OPERATOR", "DEVICE_API_ERROR",
                         "向设备代理" + agentCode + "发送业务任务取消请求失败: " + ex.getMessage());
-                deviceResults.add(Map.of("agentId", agentCode, "result", "CANCEL_FAILED", "cancelCommandId", cancelCommandId));
+                devResult.put("result", "CANCEL_FAILED");
+                devResult.put("cancelStatus", "CANCEL_FAILED");
+                devResult.put("status", "CANCEL_FAILED");
+                devResult.put("error", ex.getMessage());
             }
+            deviceResults.add(devResult);
+
             if (taskId.equals(agent.getCurrentTaskId())) {
                 // A queued cancellation does not prove the device stopped. Keep it unavailable
                 // until an IDLE status report confirms release (or an operator resolves it).
@@ -459,19 +519,38 @@ public class TaskService {
         }
 
         task.setStatus(TaskStatus.MANUAL_TERMINATED);
-        task.setManualTerminateReason(reason);
+        task.setManualTerminateReason(cleanReason);
         task.setUpdatedAt(LocalDateTime.now());
         taskMapper.update(task);
 
-        taskEventService.append(taskId, "MANUAL_TERMINATED", "OPERATOR", null,
-                "运行操作员" + operator.getUsername() + "人工终止任务，原因: " + reason
-                        + "，涉及设备: " + deviceResults.stream().map(m -> m.get("agentId")).toList());
-        // 操作日志也要有终止原因和每个设备的取消结果，与时间线对应（DEF-S3-059、F021.R08）。
-        // 取消请求只表示已排队，设备是否空闲以后续CONFIRMED_IDLE事件为准，这里记录的是“请求结果”。
-        Map<String, Object> terminateDetail = new HashMap<>();
-        terminateDetail.put("reason", reason);
+        String deviceSummaryStr;
+        try {
+            deviceSummaryStr = MAPPER.writeValueAsString(deviceResults);
+        } catch (Exception e) {
+            deviceSummaryStr = deviceResults.toString();
+        }
+
+        // 记录结构化人工终止事件 MANUAL_TERMINATED 与 TASK_TERMINATED（DEF-S3-059，TC-066.S3 / SRS_F021.R08）
+        taskEventService.append(taskId, "MANUAL_TERMINATED", "OPERATOR", "NORMAL_MANUAL_TERMINATED",
+                "运行操作员" + operator.getUsername() + "人工终止任务，原因: " + cleanReason
+                        + "，前序状态: " + previousStatus.name()
+                        + "，涉及设备: " + deviceResults.stream().map(m -> m.get("agentId")).toList()
+                        + "，取消响应摘要: " + deviceSummaryStr);
+
+        taskEventService.append(taskId, "TASK_TERMINATED", "OPERATOR", "NORMAL_MANUAL_TERMINATED",
+                "运行操作员" + operator.getUsername() + "人工终止任务，原因: " + cleanReason
+                        + "，前序状态: " + previousStatus.name()
+                        + "，涉及设备: " + deviceResults.stream().map(m -> m.get("agentId")).toList()
+                        + "，取消响应摘要: " + deviceSummaryStr);
+
+        // 操作日志必须包含终止原因、前序状态以及每个设备取消响应摘要（包括 cancelCommandId），严禁 detail 为 null！
+        Map<String, Object> terminateDetail = new LinkedHashMap<>();
+        terminateDetail.put("reason", cleanReason);
         terminateDetail.put("previousStatus", previousStatus.name());
         terminateDetail.put("deviceCancelResults", deviceResults);
+        terminateDetail.put("devices", deviceResults);
+        terminateDetail.put("operator", operator.getUsername());
+        terminateDetail.put("cancelledCount", deviceResults.size());
         operationLogService.record(operator.getId(), operator.getUsername(), operator.getRole(),
                 "TASK_TERMINATE", task.getTaskCode(), "SUCCESS", null, terminateDetail);
         return task;

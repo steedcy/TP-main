@@ -179,6 +179,10 @@ public class TaskExecutionOrchestrator {
 
         List<String> rejected = parseRejectedIds(assignment.getRejectedAgentIds());
         Task currentTask = taskMapper.findById(taskId).orElseThrow();
+        // 终态硬拦截（SRS_F021.R07）：任务处于 MANUAL_TERMINATED 或步骤已被冻结时，严禁继续分派或下发指令
+        if (currentTask.getStatus() == TaskStatus.MANUAL_TERMINATED || "FROZEN".equals(assignment.getStepStatus())) {
+            return;
+        }
         List<CandidateScore> candidates = findRankedCandidates(capabilityType, step, rejected, currentTask.getTaskFamily());
         if (Boolean.TRUE.equals(currentTask.getIsDryRun())) {
             Long selected = selections.findByTaskId(taskId).stream().filter(s -> stepSeq.equals(s.getStepSeq()))
@@ -354,6 +358,15 @@ public class TaskExecutionOrchestrator {
      * 分配阶段可能对inputParams做二次拼装，故须在真正下发动作发生前再拦截一次。
      */
     private void dispatchCommand(TaskStepAssignment assignment) {
+        // 终态硬拦截（SRS_F021.R07）：任务处于 MANUAL_TERMINATED 或步骤已被冻结时，严禁下发新指令
+        Task task = taskMapper.findById(assignment.getTaskId()).orElse(null);
+        if (task != null && task.getStatus() == TaskStatus.MANUAL_TERMINATED) {
+            return;
+        }
+        if ("FROZEN".equals(assignment.getStepStatus())) {
+            return;
+        }
+
         Map<String, Object> step = findStep(assignment.getPlanVersionId(), assignment.getStepSeq());
         List<String> motionSafetyHits = MotionSafetyGuard.detect(step);
         if (!motionSafetyHits.isEmpty()) {
