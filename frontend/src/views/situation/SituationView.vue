@@ -58,7 +58,7 @@
             :style="{ ...markerStyle(device), zIndex: markerZIndex(device, selectedDevice?.deviceCode) }"
             :title="markerTitle(device)"
             @pointerdown.stop
-            @click.stop="selectedDevice = device"
+            @click.stop="handleMarkerClick(device)"
           >
             <span class="marker-dot"></span>
             <span class="marker-label">{{ device.deviceName || device.deviceCode }}</span>
@@ -95,6 +95,23 @@
     <a-modal v-model:open="detailOpen" :title="selectedDevice?.deviceName || '设备详情'" :footer="null">
       <a-descriptions v-if="selectedDevice" :column="1" bordered size="small">
         <a-descriptions-item label="设备编码">{{ selectedDevice.deviceCode }}</a-descriptions-item>
+        <!-- 同坐标重叠设备快捷切换（DEF-S3-048） -->
+        <a-descriptions-item v-if="overlappingPeers.length" label="同坐标重叠设备" :span="2">
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <span style="color: #666">当前位置存在 {{ overlappingPeers.length + 1 }} 个设备，支持直接切换：</span>
+            <a-space wrap>
+              <a-button
+                v-for="peer in overlappingPeers"
+                :key="peer.deviceCode"
+                size="small"
+                type="dashed"
+                @click="selectedDevice = peer"
+              >
+                切换至 {{ peer.deviceName || peer.deviceCode }}（{{ statusLabel(peer) }}）
+              </a-button>
+            </a-space>
+          </div>
+        </a-descriptions-item>
         <a-descriptions-item label="代理编码">{{ selectedDevice.agentId }}</a-descriptions-item>
         <a-descriptions-item label="设备类型">{{ deviceTypeLabel(selectedDevice.simulatedDeviceType || selectedDevice.deviceTypeCode) }}</a-descriptions-item>
         <a-descriptions-item label="在线/工作状态">{{ statusLabel(selectedDevice) }}</a-descriptions-item>
@@ -114,13 +131,48 @@
         </template>
       </a-descriptions>
     </a-modal>
+
+    <!-- 同状态同坐标重叠候选选择器（DEF-S3-048） -->
+    <a-modal
+      v-model:open="candidateModalVisible"
+      title="选择重叠设备"
+      :footer="null"
+      :width="540"
+    >
+      <div style="margin-bottom: 12px; color: #555;">
+        当前坐标（X {{ coordinate(candidateDevices[0]?.location?.x) }}, Y {{ coordinate(candidateDevices[0]?.location?.y) }}）存在 {{ candidateDevices.length }} 个重叠设备，请选择目标设备查看详情：
+      </div>
+      <a-list item-layout="horizontal" :data-source="candidateDevices" size="small" bordered>
+        <template #renderItem="{ item }">
+          <a-list-item>
+            <template #actions>
+              <a-button type="primary" size="small" @click="selectCandidate(item)">查看详情</a-button>
+            </template>
+            <a-list-item-meta>
+              <template #title>
+                <a-button type="link" style="padding: 0; font-weight: 600" @click="selectCandidate(item)">
+                  {{ item.deviceName || item.deviceCode }}
+                </a-button>
+                <a-tag :color="statusColor(item)" style="margin-left: 8px">{{ statusLabel(item) }}</a-tag>
+              </template>
+              <template #description>
+                <div>设备编码：{{ item.deviceCode }} · 设备类型：{{ deviceTypeLabel(item.simulatedDeviceType || item.deviceTypeCode) }}</div>
+                <div v-if="item.capabilityTypes && item.capabilityTypes.length">
+                  已启用能力：{{ item.capabilityTypes.map(capabilityLabel).join('、') }}
+                </div>
+              </template>
+            </a-list-item-meta>
+          </a-list-item>
+        </template>
+      </a-list>
+    </a-modal>
   </section>
 </template>
 
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import request from '../../api/request'
-import { markerZIndex, offlineSummary, reportedAtClass } from '../../utils/situationMarkers'
+import { markerZIndex, offlineSummary, reportedAtClass, findOverlappingDevices, hasSameTierOverlap } from '../../utils/situationMarkers'
 import { DEVICE_TYPES, deviceTypeLabel, capabilityLabel } from '../../constants/capability'
 import { useAuthStore } from '../../store/auth'
 
@@ -145,6 +197,28 @@ const dragging = ref(false)
 const mapLoaded = ref(false)
 const mapError = ref(false)
 const selectedDevice = ref(null)
+const candidateDevices = ref([])
+const candidateModalVisible = ref(false)
+
+const overlappingPeers = computed(() => {
+  if (!selectedDevice.value) return []
+  return findOverlappingDevices(selectedDevice.value, positionedDevices.value)
+    .filter(d => d.deviceCode !== selectedDevice.value.deviceCode)
+})
+
+function handleMarkerClick(device) {
+  if (hasSameTierOverlap(device, positionedDevices.value)) {
+    candidateDevices.value = findOverlappingDevices(device, positionedDevices.value)
+    candidateModalVisible.value = true
+  } else {
+    selectedDevice.value = device
+  }
+}
+
+function selectCandidate(device) {
+  selectedDevice.value = device
+  candidateModalVisible.value = false
+}
 const detailOpen = computed({
   get: () => Boolean(selectedDevice.value),
   set: (value) => { if (!value) selectedDevice.value = null }
@@ -209,7 +283,12 @@ function statusColor(device) {
 }
 
 function markerTitle(device) {
-  return `${device.deviceName || device.deviceCode} · ${statusLabel(device)} · X ${coordinate(device.location?.x)}, Y ${coordinate(device.location?.y)}`
+  const baseTitle = `${device.deviceName || device.deviceCode} · ${statusLabel(device)} · X ${coordinate(device.location?.x)}, Y ${coordinate(device.location?.y)}`
+  const overlaps = findOverlappingDevices(device, positionedDevices.value)
+  if (overlaps.length > 1) {
+    return `${baseTitle}（当前坐标存在 ${overlaps.length} 个重叠设备，点击选择目标）`
+  }
+  return baseTitle
 }
 
 async function loadSnapshot() {
