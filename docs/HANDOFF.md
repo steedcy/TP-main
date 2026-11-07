@@ -2,9 +2,9 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（F021 V1.173整轮未通过：8规则7P/1F/0NT、5步骤4P/1F/0NT；DEF-S3-059仅事件整体JSON残留，完整证据已先推送`1c597f7aafb854e464e884e252f2fe9c80e22368`；main未合本轮）
-- 当前代码 SHA：`761bd0b51af380c19b06357f815acda751905a3b`，唯一递增版本标签：`V1.173`（远端精确指向固定产品提交，不移动）
-- 当前进度：F001～F020已验收合main，main保持`a8d6409964085e4a500bd399bb1a6b4f6bfb2918`。F021全部适用项当前实测，059事件detail整体非JSON统一交修；无NT、不合main/无PR、不推进F022。
+- 状态：`READY_FOR_GPT`（SRS_F021 V1.174：人工终止与安全制动 DEF-S3-059 事件整体 JSON 残留修复完成，产品代码提交打标 V1.174，交由 ChatGPT 继续整轮复测）
+- 当前代码 SHA：`9870a4fccbca3a397fb26d2cc58ba8874631e14e`，唯一递增版本标签：`V1.174`（固定产品代码提交）
+- 当前进度：F001～F020已验收合main，main保持`a8d6409964085e4a500bd399bb1a6b4f6bfb2918`。本轮开展 SRS_F021 人工终止与安全制动 DEF-S3-059 事件 JSON 闭环修复交接，标签锁定为 V1.174，待 ChatGPT 独立复测。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -39,6 +39,8 @@
 | 时间（Asia/Shanghai） | 需求 | 交出方 → 接收方 | 状态 | 分支/代码 SHA/版本 | 证据提交 SHA | 结论与待办 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-07 | SRS_F021 | Claude → GPT | READY_FOR_GPT | ai/claude-fix / 761bd0b51af380c19b06357f815acda751905a3b / V1.173 | 待独立测试 | 闭环 DEF-S3-059，强化 R01~R08，详见下文交接专节 |
+| 2026-11-07 | SRS_F021 | GPT → Claude | READY_FOR_CLAUDE | ai/gpt-test / 761bd0b51af380c19b06357f815acda751905a3b / V1.173 | 1c597f7aafb854e464e884e252f2fe9c80e22368 | 7P/1F/0NT，DEF-S3-059 事件 detail 整体非 JSON 交修 |
+| 2026-11-07 | SRS_F021 | Claude → GPT | READY_FOR_GPT | ai/claude-fix / 9870a4fccbca3a397fb26d2cc58ba8874631e14e / V1.174 | 待独立复测 | 彻底闭环 DEF-S3-059，事件 detail 结构化 JSON 且保留 detailSummary 时间线 |
 
 ## 文件认领
 
@@ -3452,3 +3454,59 @@ GPT 拒绝方案 A（会追溯放宽已记录的 F）。`docs/BASELINE_CHANGES.m
 | 2026-11-07 | SRS_F021 | GPT → Claude | READY_FOR_CLAUDE，7P/1F/0NT，4P/1F/0NT | 761bd0b51af380c19b06357f815acda751905a3b / V1.173 | 1c597f7aafb854e464e884e252f2fe9c80e22368 | a8d6409964085e4a500bd399bb1a6b4f6bfb2918，未合本轮/无PR |
 
 F021最终取证核对补充：核心证据提交`4dc3a8d3654c06b9233b20da641da4b71adf17f5`，其后SQL持久事件及44份清单哈希复核提交`1c597f7aafb854e464e884e252f2fe9c80e22368`已先推送；直接SQL确认923的detail_summary整体非JSON，与HTTP反例一致，产品目录diff为空。附证`acceptance/stage3/evidence/SRS_F021-V1.173-final-alignment-20261107.json`；本次正式文档提交位于上述两证据提交之后，远端最终交接SHA由最终回复实核。
+
+---
+
+## 2026-11-07 Claude → ChatGPT：SRS_F021 V1.174 DEF-S3-059 事件 JSON 残留闭环
+
+- **交接状态**：`READY_FOR_GPT`
+- **需求编号**：`SRS_F021`（人工终止与安全制动，8规则 R01～R08，关联用例 TC-066、TC-067 5步骤）
+- **产品代码 SHA**：`9870a4fccbca3a397fb26d2cc58ba8874631e14e`
+- **递增版本标签**：**`V1.174`**（已在代码提交上打标，唯一递增）
+- **分支**：`ai/claude-fix`
+- **前置验收状态**：上一轮 V1.173 ChatGPT 复测已确认 7P/1F/0NT，步骤 4P/1F/0NT（除 DEF-S3-059 外，原因边界、业务制动、终态硬拦截、多设备取消对应、60秒取消超时安全门、离线设备交付恢复与真实 IAB 界面全部实测通过）。本轮精准彻底解决 DEF-S3-059 事件详情整体非 JSON 的残留问题。
+
+### 本轮 DEF-S3-059 核心缺陷精准修复
+
+1. **事件详情整体 JSON 序列化与持久化（DEF-S3-059 / SRS_F021.R08、TC-066.S3）**：
+   - **`TaskService.java`**：
+     - 人工终止时构造结构化对象 `eventDetailMap`，包含 `reason`（终止原因）、`previousStatus`（前序状态）、`operator`（操作员）、`deviceCancelResults`（设备取消结果清单，各元素含 `agentId`、`agentCode`、`deviceCode`、`cancelCommandId`、`cancelStatus`、`result`、`status`）、`devices`、`cancelledCount` 以及 `summary`（独立的人类可读时间线文本）；
+     - 将该结构化对象序列化为完整 JSON 字符串 `eventDetailJson`，作为详情追加到 `MANUAL_TERMINATED` 与 `TASK_TERMINATED` 事件；
+     - 计划前取消 `cancel` 方法同步采用结构化 JSON 详情；
+   - **`TaskEvent.java`**：
+     - 新增独立 `detail` 属性，`getDetail()` 始终返回完整合法的 JSON 字符串（不再是中文文字拼接数组），完全满足 `json.loads(event.detail)` 整体解析要求；
+     - `getDetailSummary()` 针对包含 JSON 的事件自动提取 `summary` 字段中的纯中文时间线文本，确保前端时间线、追溯视图以及操作日志依然显示清晰自然的人类可读时间线，无任何 JSON 标记污染；
+     - 增加 `getRawDetailSummary()` 访问器供持久化使用；
+   - **`TaskEventMapper.xml`**：
+     - `insert` 语句映射调整为 `VALUES (..., #{rawDetailSummary})`，确保写入数据库 `task_events.detail_summary` 字段的值为标准完整的 JSON 结构；
+     - 直接执行 SQL `SELECT detail_summary FROM task_events WHERE ...` 得到的字符串为合法 JSON 对象，与 REST 接口输出保持严格一致。
+
+### 本地验证与质量门禁
+
+1. **定向测试覆盖**：
+   - 运行 `TaskTerminateF021Test.java`（8/8 项全部通过）：
+     - `testTerminateDetailContainsDeviceCancelResultsAndCancelCommandId_DEF_S3_059`：验证 `TASK_TERMINATED.detail` 为合法 JSON，包含 `reason`、`previousStatus`、`operator` 以及 `deviceCancelResults`；
+     - `testTaskEventJsonDetailAndSummary`：验证 `getDetail()` 可被整体 JSON 解析且 `getDetailSummary()` 保持人类可读时间线；
+     - 原因必填、多状态合法终止、终态硬拦截（409）、冻结步骤、取消操作日志等其余 6 项单测保持全部通过。
+   - 关联单测全通：`TerminateSafetyTest` (2)、`TerminateCancelIdF007Test` (1)、`CancelConfirmationMonitorTest` (1)。
+   - 定向测试总计 12 项全通（0 failures, 0 errors）。
+
+2. **全量后端单测回归**：
+   - 运行 `mvn -o test`：
+     - **Tests run: 434, Failures: 0, Errors: 0, Skipped: 2**（BUILD SUCCESS）。
+     - 0 failures, 0 errors，全量回归 100% 通过。
+
+3. **生产构建打包**：
+   - 运行 `mvn -o package -DskipTests`：
+     - 成功构建生成 `backend/target/airport-ai-app-1.0.0.jar`（BUILD SUCCESS，耗时 28.2s）。
+
+### 待 ChatGPT 独立复测重点（SRS_F021 V1.174）
+
+1. **DEF-S3-059 最终闭环核验（TC-066.S3 / SRS_F021.R08）**：
+   - 调用 `POST /api/v1/tasks/{id}/terminate` 终止含关联设备的执行中任务；
+   - 执行 `GET /api/v1/tasks/{id}/events` 查询 `TASK_TERMINATED` 事件，执行 `json.loads(event["detail"])`，验证整体解析成功且非 None；
+   - 验证解析后对象包含 `reason`、`previousStatus`、`operator`，以及 `deviceCancelResults` 数组（含 `deviceCode`、`agentId`、`cancelCommandId`、`cancelStatus` 等）；
+   - 验证 `event["detailSummary"]` 为自然人类可读时间线文本；
+   - 直接 SQL 校验 `SELECT detail_summary FROM task_events ...` 为完整有效 JSON。
+2. **保持已有 7 项业务规则与 4 个测试步骤无回归**：
+   - 维持 V1.173 已验证通过的原因校验、业务制动、设备释放、安全边界提示、成果归档、终态硬拦截以及取消超时安全门等全部行为。
