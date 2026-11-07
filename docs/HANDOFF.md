@@ -2,9 +2,9 @@
 
 ## 当前交接状态
 
-- 状态：`REQUIREMENT_PASSED`（F022 V1.179：8P/0F/0NT、四步骤4P/0F/0NT，116关闭；证据`42f2ac64b78436e2c3e76a3af7c5deb669fc48da`先推送，已安全合main并实核，验收锚点`9d72dbfba1fd06f34fc9606c6268e58248781e6e`，40用户文件哈希不变）
-- 当前代码 SHA：`7e86a0afb7169154a9ec7b2b12c7eda60e4851af`，唯一递增版本标签：`V1.179`（基于 origin/main 413e1b3，已打标固定）
-- 当前进度：F001～F022已验收并安全合main，F022验收锚点`9d72dbfba1fd06f34fc9606c6268e58248781e6e`已远端核对，无PR；合入证明/最终记录随本提交再同步main。下一仅SRS_F023从最终main顺序正式交Claude，V1.179标签固定。
+- 状态：`READY_FOR_GPT`（SRS_F023 协同态势与多维大屏监控：闭环 DEF-S3-047 离线代理原因码/上报时间高亮/任务影响，闭环 DEF-S3-048 标记层级 选中>离线>忙碌>在线 与悬停置顶防遮挡）
+- 当前代码 SHA：`1c612d55c9e228b2bdbea1375101648060c9dfc7`，唯一递增版本标签：`V1.180`（基于 origin/main dbd7b5c，已打标固定）
+- 当前进度：F001～F022 已验收并安全合入 main。本轮正式开启 SRS_F023 首轮修复交接，交 ChatGPT 独立复测。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -51,6 +51,7 @@
 | 2026-11-07 | SRS_F022 | GPT → Claude | READY_FOR_CLAUDE | ai/gpt-test / 18aeeabd6991bb5150c214a3abb3cc7ee142b97f / V1.178 | 6b7d99d322c237e1bb97d09b437b9cacce368202 | 7P/1F/0NT，原四反例P；116混合子句1049/1050误拒绝交修，未合main |
 | 2026-11-07 | SRS_F022 | Claude → GPT | READY_FOR_GPT | ai/claude-fix / 7e86a0afb7169154a9ec7b2b12c7eda60e4851af / V1.179 | 待独立复测 | 彻底闭环 DEF-S3-116 混合逗号约束（禁止地点/允许能力及反序）子句独立作用域与极性划分，详见下文交接专节 |
 | 2026-11-07 | SRS_F022 | GPT → Claude | REQUIREMENT_PASSED | ai/gpt-test / 7e86a0afb7169154a9ec7b2b12c7eda60e4851af / V1.179 | 42f2ac64b78436e2c3e76a3af7c5deb669fc48da | 8规则/4步骤全当前P，116关闭；正式交接后安全合main并另记证明，下一F023 |
+| 2026-11-08 | SRS_F023 | Claude → GPT | READY_FOR_GPT | ai/claude-fix / 1c612d55c9e228b2bdbea1375101648060c9dfc7 / V1.180 | 待独立测试 | 闭环 DEF-S3-047（态势快照携带离线代理 offlineInfo、页面红色高亮及详情弹窗显示）与 DEF-S3-048（标记层级 选中>离线>忙碌>在线、悬停置顶防遮挡），详见下文交接专节 |
 
 ## 文件认领
 
@@ -3858,3 +3859,27 @@ main合入按用户既有授权执行：正式验收交接推送后，检查main
 F022实际main验收快进合入并推送`9d72dbfba1fd06f34fc9606c6268e58248781e6e`，远端已核对，40用户文件哈希不变，无PR。完整证据`42f2ac64b78436e2c3e76a3af7c5deb669fc48da`与正式验收交接均已先推送；合入证明`acceptance/stage3/evidence/SRS_F022-V1.179-main-integration-20261107.json`及最终进度文档随本提交再同步两分支。当前已验收产品V1.179，下一仅F023从最终main顺序正式交Claude，标签固定，后三核心/95项尚未整体验收通过。
 
 Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势与多维大屏监控的正式范围/暂存047、048与历史缺口，发布下一唯一递增产品版本后READY_FOR_GPT。本轮只完成F022，不预填F023独立验收结果，不改其历史P/F/NT。
+
+## 2026-11-08 Claude → ChatGPT：SRS_F023 V1.180 协同态势与多维大屏监控交接
+
+- **交接状态**：`READY_FOR_GPT`
+- **需求编号**：`SRS_F023` 协同态势与多维大屏监控
+- **产品代码提交 SHA**：`1c612d55c9e228b2bdbea1375101648060c9dfc7`
+- **版本标签**：`V1.180`（基于 origin/main dbd7b5c，已打标固定）
+- **修复背景与闭环实现**：
+  1. **DEF-S3-047（离线代理原因码、最后上报时间标红及任务影响详情）**：
+     - `SituationController.java`：`/api/v1/situation/snapshot` 接口中，每个 Marker 补充 `offline` 字段（复用 `DeviceAgentService.offlineInfo`，仅离线代理非空，携带 `reasonCode` 如 `ERR_HEARTBEAT_TIMEOUT`、`offlineAt`、`affectsTask` 等字段；在线代理保持 `null`）。
+     - 前端 `SituationView.vue`：
+       - 列表表格中离线代理的“最后上报时间”以红色加粗样式标出（`.reported-at-offline`），表格增加离线原因码标签。
+       - 点击标记/查看详情时，弹窗（Detail Modal）明确展示离线原因码、离线时间以及是否影响正在进行的任务。
+  2. **DEF-S3-048（标记层级与悬停置顶防遮挡）**：
+     - 新增纯函数工具 `frontend/src/utils/situationMarkers.js`：定义严格层级顺序 `SELECTED (z=6) > OFFLINE (z=5) > BUSY (z=4) > ONLINE (z=3)`，并支持鼠标悬停时置顶（`hover: z=7`）。解决此前单一 z-index 导致机器人标记覆盖附近离线终端而无法点击交互的缺陷。
+     - `SituationView.vue` 引入上述排序与样式逻辑。
+- **本地验证与质量门禁**：
+  1. 前端算法自检：`node frontend/src/utils/situationMarkers.check.mjs`（通过）。
+  2. 后端单元测试：`SituationOfflineInfoTest`（通过，验证快照对离线代理填充 offlineInfo，在线代理保持为 null）。
+  3. 全量后端测试：`mvn -o test`（Tests run: 410, Failures: 0, Errors: 0, Skipped: 2，BUILD SUCCESS，100% 通过）。
+- **给 ChatGPT 独立复测重点**：
+  - 复测 DEF-S3-047：离线代理在态势快照中的 offline 结构与字段值（reasonCode、affectsTask、offlineAt），前端最后上报时间红色样式与详情弹窗展示。
+  - 复测 DEF-S3-048：标记层级（离线高于在线/忙碌）及鼠标悬停置顶交互，确保离线终端不被遮挡。
+  - 覆盖 SRS_F023 全量业务规则（R01～R08）与对应用例（TC-070.S1、TC-071）。
