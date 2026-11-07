@@ -344,12 +344,16 @@ public class PlanValidationService {
     private static final java.util.regex.Pattern CAPABILITY_CODE_PATTERN = java.util.regex.Pattern.compile(
             "CAP_[A-Z0-9_]+", java.util.regex.Pattern.CASE_INSENSITIVE);
 
+    private static final java.util.regex.Pattern CONSTRAINT_CLAUSE_SPLIT_PATTERN = java.util.regex.Pattern.compile(
+            "[;；。\\n\\r]+|[,，、且并且同时但但是\\s]*(?=(?:禁止|不得|严禁|不能|不可|不准|勿|prohibit|forbidden|仅允许|只允许|仅限|只能|only|do not))",
+            java.util.regex.Pattern.CASE_INSENSITIVE);
+
     private static final java.util.regex.Pattern WHITELIST_CLAUSE_PATTERN = java.util.regex.Pattern.compile(
-            "(?:仅允许|只允许|仅限|只能|only allow|only permit)\\s*(?:前往|进入|到达|去往|移动至|引导至|派往|to|使用)?\\s*(.+)",
+            "(?:仅允许|只允许|仅限|只能|only allow|only permit|only)\\s*(?:前往|进入|到达|去往|移动至|引导至|派往|to|在|使用)?\\s*(.+)",
             java.util.regex.Pattern.CASE_INSENSITIVE);
 
     private static final java.util.regex.Pattern PROHIBIT_CLAUSE_PATTERN = java.util.regex.Pattern.compile(
-            "(?:禁止|不得|严禁|不能|不可|不准|勿|prohibit|forbidden|do not go to|do not visit)\\s*(?:前往|进入|到达|去往|移动至|引导至|派往|引导|使用)?\\s*(.+)",
+            "(?:禁止|不得|严禁|不能|不可|不准|勿|prohibit|forbidden|do not go to|do not visit|do not use)\\s*(?:前往|进入|到达|去往|移动至|引导至|派往|引导|使用)?\\s*(.+)",
             java.util.regex.Pattern.CASE_INSENSITIVE);
 
     @SuppressWarnings("unchecked")
@@ -384,16 +388,18 @@ public class PlanValidationService {
         Set<String> prohibitedCapabilities = new LinkedHashSet<>();
         Set<String> allowedCapabilities = new LinkedHashSet<>();
 
-        String[] clauses = constraintDescription.split("[;；。\\n\\r]+");
-        for (String clause : clauses) {
-            String trimmed = clause.trim();
+        String[] rawClauses = CONSTRAINT_CLAUSE_SPLIT_PATTERN.split(constraintDescription);
+        for (String clause : rawClauses) {
+            String trimmed = clause.replaceAll("^[ ,，、;；。\\s\\t]+|[ ,，、;；。\\s\\t]+$", "").trim();
             if (trimmed.isBlank()) continue;
 
             // 1. Extract capabilities if any
-            if (trimmed.contains("CAP_") || trimmed.contains("能力") || trimmed.toLowerCase().contains("capability")) {
-                boolean isProhibit = trimmed.matches(".*(?:禁止|不得|严禁|不能|不可|不准|勿|prohibit|forbidden).*");
-                boolean isWhitelist = trimmed.matches(".*(?:仅允许|只允许|仅限|只能|only).*");
+            boolean hasCap = CAPABILITY_CODE_PATTERN.matcher(trimmed).find()
+                    || trimmed.contains("能力") || trimmed.toLowerCase().contains("capability");
+            boolean isProhibit = trimmed.matches(".*(?:禁止|不得|严禁|不能|不可|不准|勿|prohibit|forbidden|do not).*");
+            boolean isWhitelist = trimmed.matches(".*(?:仅允许|只允许|仅限|只能|only).*");
 
+            if (hasCap) {
                 java.util.regex.Matcher capMatcher = CAPABILITY_CODE_PATTERN.matcher(trimmed);
                 while (capMatcher.find()) {
                     String capCode = capMatcher.group().toUpperCase();
@@ -410,24 +416,28 @@ public class PlanValidationService {
             }
 
             // 2. Extract locations
-            java.util.regex.Matcher wm = WHITELIST_CLAUSE_PATTERN.matcher(trimmed);
-            if (wm.find()) {
-                String targetPart = wm.group(1).trim();
-                for (String t : targetPart.split("[,，、/|\\s]+")) {
-                    String clean = t.replaceAll("^[“\"'‘]+|[”\"'’]+$", "").trim();
-                    if (!clean.isBlank() && !clean.contains("能力") && !clean.startsWith("CAP_") && !clean.equals("使用")) {
-                        allowedTargets.add(clean);
+            if (isWhitelist) {
+                java.util.regex.Matcher wm = WHITELIST_CLAUSE_PATTERN.matcher(trimmed);
+                if (wm.find()) {
+                    String targetPart = wm.group(1).trim();
+                    for (String t : targetPart.split("[,，、/|\\s]+")) {
+                        String clean = t.replaceAll("^[“\"'‘]+|[”\"'’]+$", "").trim();
+                        if (!clean.isBlank() && !clean.contains("能力") && !clean.startsWith("CAP_") && !clean.equals("使用")) {
+                            allowedTargets.add(clean);
+                        }
                     }
                 }
             }
 
-            java.util.regex.Matcher pm = PROHIBIT_CLAUSE_PATTERN.matcher(trimmed);
-            if (pm.find()) {
-                String targetPart = pm.group(1).trim();
-                for (String t : targetPart.split("[,，、/|\\s]+")) {
-                    String clean = t.replaceAll("^[“\"'‘]+|[”\"'’]+$", "").trim();
-                    if (!clean.isBlank() && !clean.contains("能力") && !clean.startsWith("CAP_") && !clean.equals("使用")) {
-                        prohibitedTargets.add(clean);
+            if (isProhibit) {
+                java.util.regex.Matcher pm = PROHIBIT_CLAUSE_PATTERN.matcher(trimmed);
+                if (pm.find()) {
+                    String targetPart = pm.group(1).trim();
+                    for (String t : targetPart.split("[,，、/|\\s]+")) {
+                        String clean = t.replaceAll("^[“\"'‘]+|[”\"'’]+$", "").trim();
+                        if (!clean.isBlank() && !clean.contains("能力") && !clean.startsWith("CAP_") && !clean.equals("使用")) {
+                            prohibitedTargets.add(clean);
+                        }
                     }
                 }
             }
