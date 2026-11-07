@@ -1,0 +1,33 @@
+{
+  "tag": "V1.176",
+  "productSha": "5bf8ad62f2a8269430d19f6db4d7d0ef45aedf32",
+  "gate": "F",
+  "issue": "DEF-S3-117",
+  "expected": "Production JAR boots normally; PlanValidationService and its task-definition mapper dependency are instantiated; health UP and authenticated task-definition/task APIs reachable.",
+  "actual": "PID9440 exits; Spring cannot instantiate PlanValidationService: No default constructor found; root NoSuchMethodException PlanValidationService.<init>().",
+  "productionStartupCommand": "python acceptance/stage3/fixtures/start-f022-v176-jar.py (private isolated env only)",
+  "isolatedReproducer": "python acceptance/stage3/fixtures/run-f022-v176-container-probe.py (fresh GPT_RUN_SUFFIX)",
+  "constructorFacts": [
+    {
+      "parameterAnnotations": "[[]]",
+      "parameterCount": 1,
+      "constructorAnnotations": "[]"
+    },
+    {
+      "parameterAnnotations": "[[], [@org.springframework.beans.factory.annotation.Autowired(required=false)]]",
+      "parameterCount": 2,
+      "constructorAnnotations": "[]"
+    }
+  ],
+  "independentContainer": {
+    "started": false,
+    "failureChain": [
+      "org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'planValidationService': Failed to instantiate [com.airport.ai.task.PlanValidationService]: No default constructor found",
+      "org.springframework.beans.BeanInstantiationException: Failed to instantiate [com.airport.ai.task.PlanValidationService]: No default constructor found",
+      "java.lang.NoSuchMethodException: com.airport.ai.task.PlanValidationService.<init>()"
+    ]
+  },
+  "classification": "V1.176 regression from added unselected public overloaded constructors; @Autowired(required=false) on mapper parameter does not select the constructor.",
+  "impact": "All HTTP/browser business paths blocked; DEF116 live retest NT, not closed by manual direct-constructor checks.",
+  "fixScope": "Make production Spring constructor choice unambiguous and ensure TaskDefinitionMapper actually injected. Add a real Spring/JAR startup regression; keep seven-argument validation original negative/positive coverage. Do not only select legacy one-argument constructor with mapper=null."
+}
