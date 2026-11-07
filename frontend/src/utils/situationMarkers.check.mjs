@@ -79,4 +79,29 @@ assert.equal(offlineSummary(undefined), null)
 
 assert.equal(reportedAtClass(dev({ onlineStatus: 'OFFLINE' })), 'reported-at-offline')
 assert.equal(reportedAtClass(dev({})), '')
+// 动态重叠候选集同步与成员移离验证（DEF-S3-118）
+const anchor = { location: { x: 450, y: 260 } }
+// 1. 初始状态：两设备在 (450, 260)，候选包含两者
+const initialCandidates = findOverlappingDevices(anchor, [d1, d2, d3])
+assert.equal(initialCandidates.length, 2)
+assert.deepEqual(initialCandidates.map(d => d.deviceCode), ['G145_DISPLAY', 'G180_ROBOT'])
+
+// 2. 状态更新：G145_DISPLAY 发生心跳超时离线，候选列表中应即时体现离线状态与原因
+const offlineCandidates = findOverlappingDevices(anchor, [d1Offline, d2, d3])
+assert.equal(offlineCandidates.length, 2)
+const foundOffline = offlineCandidates.find(d => d.deviceCode === 'G145_DISPLAY')
+assert.equal(isOffline(foundOffline), true)
+
+// 3. 成员移离：G145_DISPLAY 经协议上报移至 (100, 800)，候选列表应自动剔除已移离成员，仅保留留在原坐标的 G180_ROBOT
+const d1Moved = dev({ deviceCode: 'G145_DISPLAY', location: { x: 100, y: 800 } })
+const movedCandidates = findOverlappingDevices(anchor, [d1Moved, d2, d3])
+assert.equal(movedCandidates.length, 1)
+assert.equal(movedCandidates[0].deviceCode, 'G180_ROBOT')
+
+// 4. 新成员加入：新设备 G199 移动到 (450, 260)，候选列表应即时反映新增重叠
+const dNew = dev({ deviceCode: 'G199_NEW', location: { x: 450, y: 260 } })
+const addedCandidates = findOverlappingDevices(anchor, [d1, d2, d3, dNew])
+assert.equal(addedCandidates.length, 3)
+assert.ok(addedCandidates.some(d => d.deviceCode === 'G199_NEW'))
+
 console.log('situationMarkers checks passed')

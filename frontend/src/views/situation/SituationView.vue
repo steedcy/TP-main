@@ -132,7 +132,7 @@
       </a-descriptions>
     </a-modal>
 
-    <!-- 同状态同坐标重叠候选选择器（DEF-S3-048） -->
+    <!-- 同状态同坐标重叠候选选择器（DEF-S3-048，DEF-S3-118 动态快照同步） -->
     <a-modal
       v-model:open="candidateModalVisible"
       title="选择重叠设备"
@@ -140,7 +140,7 @@
       :width="540"
     >
       <div style="margin-bottom: 12px; color: #555;">
-        当前坐标（X {{ coordinate(candidateDevices[0]?.location?.x) }}, Y {{ coordinate(candidateDevices[0]?.location?.y) }}）存在 {{ candidateDevices.length }} 个重叠设备，请选择目标设备查看详情：
+        当前坐标（X {{ coordinate(candidateCoordinate.x) }}, Y {{ coordinate(candidateCoordinate.y) }}）存在 {{ candidateDevices.length }} 个重叠设备，请选择目标设备查看详情：
       </div>
       <a-list item-layout="horizontal" :data-source="candidateDevices" size="small" bordered>
         <template #renderItem="{ item }">
@@ -159,6 +159,9 @@
                 <div>设备编码：{{ item.deviceCode }} · 设备类型：{{ deviceTypeLabel(item.simulatedDeviceType || item.deviceTypeCode) }}</div>
                 <div v-if="item.capabilityTypes && item.capabilityTypes.length">
                   已启用能力：{{ item.capabilityTypes.map(capabilityLabel).join('、') }}
+                </div>
+                <div v-if="offlineSummary(item)" style="color: #cf1322">
+                  离线原因：{{ offlineSummary(item).reason }} · {{ offlineSummary(item).impact }}
                 </div>
               </template>
             </a-list-item-meta>
@@ -197,8 +200,21 @@ const dragging = ref(false)
 const mapLoaded = ref(false)
 const mapError = ref(false)
 const selectedDevice = ref(null)
-const candidateDevices = ref([])
+const candidateAnchorLocation = ref(null)
 const candidateModalVisible = ref(false)
+
+const candidateDevices = computed(() => {
+  if (!candidateAnchorLocation.value) return []
+  const virtualAnchor = { location: candidateAnchorLocation.value }
+  return findOverlappingDevices(virtualAnchor, positionedDevices.value)
+})
+
+const candidateCoordinate = computed(() => {
+  if (candidateAnchorLocation.value && candidateAnchorLocation.value.x != null) {
+    return candidateAnchorLocation.value
+  }
+  return candidateDevices.value[0]?.location || { x: null, y: null }
+})
 
 const overlappingPeers = computed(() => {
   if (!selectedDevice.value) return []
@@ -208,7 +224,10 @@ const overlappingPeers = computed(() => {
 
 function handleMarkerClick(device) {
   if (hasSameTierOverlap(device, positionedDevices.value)) {
-    candidateDevices.value = findOverlappingDevices(device, positionedDevices.value)
+    candidateAnchorLocation.value = {
+      x: Number(device.location?.x),
+      y: Number(device.location?.y)
+    }
     candidateModalVisible.value = true
   } else {
     selectedDevice.value = device
@@ -216,7 +235,7 @@ function handleMarkerClick(device) {
 }
 
 function selectCandidate(device) {
-  selectedDevice.value = device
+  selectedDevice.value = devices.value.find(d => d.deviceCode === device.deviceCode) || device
   candidateModalVisible.value = false
 }
 const detailOpen = computed({
