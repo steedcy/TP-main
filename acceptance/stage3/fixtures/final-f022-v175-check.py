@@ -50,5 +50,5 @@ for p in sorted((R/'backend/target/surefire-reports').glob('TEST-*.xml')):
  x=ET.parse(p).getroot();suites.append({k:x.get(k) for k in ['name','tests','failures','errors','skipped','time']})
 put('backend-tests',{'command':'mvn -o test','totals':{k:sum(int(x[k]) for x in suites) for k in ['tests','failures','errors','skipped']},'suites':suites})
 for source,target in [('f022-v175-backend-test.txt','backend-test-log'),('f022-v175-backend-build.txt','backend-build-log'),('f022-v175-frontend-build.txt','frontend-build-log')]:
- data=(R/'.local-test'/source).read_text(encoding='utf-8',errors='replace');(E/(PRE+target+'-20261107.txt')).write_text(data,encoding='utf8')
+ data=(R/'.local-test'/source).read_text(encoding='utf-8',errors='replace');data=re.sub(r'(Using generated security password:) [^\r\n]+',r'\1 [REDACTED_EPHEMERAL_TEST_PASSWORD]',data);(E/(PRE+target+'-20261107.txt')).write_text(data,encoding='utf8')
 print(json.dumps({'cleanup':cleanup['exactBusinessConfigRestored'],'active':cleanup['currentActiveAssignments'],'correctionChecks':corrections['preset']['checks'],'smoke':{k:v['success'] for k,v in smoke['authenticated'].items()}},ensure_ascii=False))
