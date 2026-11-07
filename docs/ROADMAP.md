@@ -3,7 +3,7 @@
 > **当前基准**：V2.4（2026-11-04 用户追加整轮复测授权；继承V2.3，见BL-005；下方既有产品验收/交接记录保留原执行版本）
 > **主干验收合入提交**：F001～F022已验收安全合main；F022验收锚点`9d72dbfba1fd06f34fc9606c6268e58248781e6e`已远端核对，40用户文件哈希不变，无PR；合入证明/最终文档随本提交同步。
 > **最新产品代码提交**：`67fb8960245d08c4d74be85e515bbe325ca21b0f` / `V1.181`（SRS_F023 第二轮修复完成并打标固定）
-> **交接状态**：`READY_FOR_GPT`（SRS_F023 协同态势与多维大屏监控：闭环 DEF-S3-048 同状态同坐标重叠候选选择器与同位置快捷切换，交 ChatGPT 独立复测）
+> **交接状态**：`READY_FOR_CLAUDE`（实际Germini）；F023 V1.181整轮规则7P/3F/0NT、步骤4P/1F/0NT，048关闭，新增118候选状态/位置/成员陈旧，完整证据06cb339e9cb9ab94b2462286f088bf298c2696e4已先推送；main不合，不推进F024。
 > **文档定位**：本文件为跨会话、跨需求修复推进的**唯一全景进度与依据底账**。每轮需求修复与复测验收后必须同步更新本文件。
 
 ---
@@ -65,7 +65,7 @@
 | **commit `01afe2d`** | `AuthService.java`<br/>`OperationLogService.java`<br/>`UserService.java`<br/>`AccountAuditDetailTest.java` | **DEF-S3-009** (`F028.R03`) | **SRS_F028** | 用户创建、重置密码、状态切换、解锁操作记录带 `before`/`after` 结构化摘要，不含密码明文或哈希；解锁详情为合法 JSON 并经同一脱敏 | 待移植 |
 | **commit `c9a7d5f`** | `EventReasonCodes.java`<br/>`TaskEventService.java`<br/>`EventReasonCodesTest.java` | **DEF-S3-057** (`F027.R02`) | **SRS_F027** | 每条任务事件都有原因码：调用方显式给的保留，缺失时按事件类型补 `NORMAL_*`/`ERR_*`/`WARN_*`；扫描测试保证新增事件类型必须登记。**取值是约定，SRS 未定义，需求方可改 `EventReasonCodes`** | 待移植 |
 | **commit `6f7f389`** | `TaskTraceView.vue` | **DEF-S3-008** (`F027.R01`) | **SRS_F027** | 追溯页每个计划版本展开后显示来源、冻结时间、校验错误清单和步骤明细表（含被替换的历史版本） | 待移植 |
-| **commit `efe0790`** | `SituationController.java`<br/>`SituationView.vue`<br/>`situationMarkers.js`<br/>`SituationOfflineInfoTest.java` | **DEF-S3-047**、**DEF-S3-048** | **SRS_F023** | 态势快照为离线代理带 `offline`（原因码、离线时间、是否影响任务）；页面离线上报时间红色高亮、详情显示原因码与任务影响；标记层级 选中>离线>忙碌>空闲，悬停置顶，离线终端不再被机器人遮住 | 待移植 |
+| **commit `efe0790`** | `SituationController.java`<br/>`SituationView.vue`<br/>`situationMarkers.js`<br/>`SituationOfflineInfoTest.java` | **DEF-S3-047**、**DEF-S3-048** | **SRS_F023** | 态势快照为离线代理带 `offline`（原因码、离线时间、是否影响任务）；页面离线上报时间红色高亮、详情显示原因码与任务影响；标记层级 选中>离线>忙碌>空闲，悬停置顶，离线终端不再被机器人遮住 | **已实际纳入V1.180，V1.181本轮047/048关闭；另有118回归，整项未通过** |
 | **commit `e2d50d2`** | `RiskRuleView.vue`<br/>`riskRuleForm.js` | **DEF-S3-042** | **SRS_F014** | 风险规则页新增弹窗 | **已被 main 取代，勿移植**（`69b841f` / V1.150 已实现等价功能） |
 | **commit `2099c75`** | `TaskDetailView.vue`<br/>`planSummary.js` | **DEF-S3-036** | **SRS_F012** | 计划详情步数/剩余额度/输入参数/参数来源 | **已被 main 取代，勿移植**（`6de0e9e` / F012 已验收；main 另有"规划说明"） |
 
@@ -84,7 +84,7 @@
 | **SRS_F020** | 任务检索与全生命周期追踪 | **9P/0F/0NT（全部当前实测）** | TC-063～TC-065，6P/0F/0NT | 062全量处置实际原因及115真实127七页/尾页/筛选归1关闭，原失败保留；28 HTTP组167断言/16 Edge组66断言/30截图全P。 | V1.172 | **REQUIREMENT_PASSED；证据b9d6a6c已推送，已合main 31fd633；下一F021** |
 | **SRS_F021** | 人工终止与安全制动 | **8P/0F/0NT（全部当前实测）** | TC-066/TC-067五步骤5P/0F/0NT | 059事件整体JSON/SQL持久/人类摘要闭环；23业务组113断言/6 IAB组26断言/47结构化事件全P，旧失败保留。 | V1.174 | **REQUIREMENT_PASSED；证据1a01fb2已推送，已合main af8ee7d，下一F022** |
 | **SRS_F022** | 任务定义与约束管理 | **8P/0F/0NT（全部当前实测）** | TC-068/069四步骤4P/0F/0NT | 116六原反例与八组混合正反/连接词闭环，028/029/030/117保持；40业务组/37 HTTP任务/19 IAB组全P，原F保留 | V1.179 | **REQUIREMENT_PASSED；证据42f2ac6先推送，已合main 9d72dbf并远端实核，下一F023** |
-| **SRS_F023** | 协同态势与多维大屏监控 | V1.180实测9P/1F/0NT；DEF-S3-048已闭环 | TC-070, TC-071 | DEF-S3-047已关，048闭环：同状态同坐标重叠候选选择器与详情快捷切换 | V1.181 | **Germini 第二轮修复完成待复测（READY_FOR_GPT）** |
+| **SRS_F023** | 协同态势与多维大屏监控 | V1.181当前7P/3F/0NT；步骤4P/1F/0NT | TC-070, TC-071 | 047/024保持关闭、048当前关闭；新118候选刷新回归待修 | V1.181 | **READY_FOR_CLAUDE（实际Germini）** |
 | **SRS_F024** | 形式化目标歧义消除（超规行李） | P:2 F:2 NT:5 | TC-072, TC-073 | DEF-S3-003, DEF-S3-032（移植暂存：`RequiredInfoGuard` 超规行李必需字段把关）。 | V1.151 | 待启动 |
 | **SRS_F025** | 特殊旅客场景参数完整性 | P:0 F:1 NT:8 | TC-074, TC-075 | DEF-S3-004（移植暂存：特殊旅客服务参数完整性，拒绝身份隐私套取）。 | V1.152 | 待启动 |
 | **SRS_F026** | 航班变动应急协同响应 | P:0 F:1 NT:9 | TC-076, TC-077 | DEF-S3-005（移植暂存：航班变动信息系统级校验，禁止追问设备路由内部字段）。 | V1.153 | 待启动 |
@@ -504,3 +504,7 @@ F022实际main验收快进合入并推送`9d72dbfba1fd06f34fc9606c6268e58248781e
 ## 2026-11-08 F023 V1.180 GPT整轮完成，自动交Germini修048
 
 规则9P/1F/0NT、五步骤3P/2F/0NT（TC070S1/S2 F），047及024（BL-008分层）当前关闭，048离线选择P/在线重叠选错对象仍F。完整证据9f9c7e5444a6a70f9d974fa117eac9a3c8b3af15已先推送并核对。实际产品1c612d55c9e228b2bdbea1375101648060c9dfc7/V1.180；本轮全适用项当前执行，历史P复用0。464报告462通过2原有跳过、生产构建/JAR/3真实任务/29 UI保存点，自有资源清理完成，main仍dbd7b5c未合本轮、无PR，不推进F024。后续修复由Germini接替Claude，兼容READY_FOR_CLAUDE/ai/claude-fix名；先接GPT证据精准修048再新唯一标签交GPT全轮。用户已授权按F023→F030→NF001→NF018自动串行、修复/复测各独立对话，Germini工作每10分钟检查；F027/F028复用既有预修复对话并先核查归并，不重复修复。详见HANDOFF最新节及AUTO_COLLABORATION.md。
+
+## 2026-11-08 F023 V1.181 GPT整轮结论
+
+完整证据`06cb339e9cb9ab94b2462286f088bf298c2696e4`已先推送，产品67fb8960245d08c4d74be85e515bbe325ca21b0f/V1.181不移动。全部适用业务当前执行、无历史P替代；规则7P/3F/0NT、步骤4P/1F/0NT。048关闭，047/024保持；118候选状态/坐标/成员未刷新统一交Germini，见HANDOFF最新一节及stage3整轮报告。生产前端构建/实际JAR/HTTP/协议/SQL/真实UI与资源恢复完成；同源码后台组件历史报告明确引用。无main合并/PR，F001～F022保持，下一仍F023修118，不启动F024或宣称95项通过。
