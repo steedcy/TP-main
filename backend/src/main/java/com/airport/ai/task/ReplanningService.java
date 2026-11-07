@@ -403,6 +403,7 @@ public class ReplanningService {
             copy.put("stepSeq", sequence++);
             tail.add(copy);
         }
+        bindTemplateParamMapping(tail, scene);
         if (tail.size() > remainingQuota) {
             baselineUnavailable(task, "基线模板剩余步骤超过五步路径额度" + remainingQuota);
             return null;
@@ -524,6 +525,32 @@ public class ReplanningService {
             PlanStepRules.defaultIfAbsent(normalized, "inputParams", Map.of());
             return normalized;
         }).toList();
+    }
+
+    private void bindTemplateParamMapping(List<Map<String, Object>> steps, Map<String, Object> scene) {
+        if (steps == null || scene == null) return;
+        for (Map<String, Object> step : steps) {
+            Object mappingObj = step.get("paramMapping");
+            if (mappingObj instanceof List<?> mappings) {
+                Object inputParamsObj = step.get("inputParams");
+                Map<String, Object> inputParams = inputParamsObj instanceof Map<?, ?> m
+                        ? new java.util.LinkedHashMap<>((Map<String, Object>) m)
+                        : new java.util.LinkedHashMap<>();
+                for (Object item : mappings) {
+                    if (item instanceof Map<?, ?> map) {
+                        String source = String.valueOf(map.get("source"));
+                        String target = String.valueOf(map.get("target"));
+                        if (source.startsWith("TEMPLATE_INPUT.")) {
+                            String key = source.substring("TEMPLATE_INPUT.".length());
+                            if (scene.containsKey(key)) {
+                                inputParams.put(target, scene.get(key));
+                            }
+                        }
+                    }
+                }
+                step.put("inputParams", inputParams);
+            }
+        }
     }
 
     private void toPendingManual(Task task, String reason) {

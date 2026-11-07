@@ -23,21 +23,35 @@ public class PlanValidationService {
 
     private final DeviceCapabilityMapper deviceCapabilityMapper;
     private final com.airport.ai.taskdef.TaskDefinitionMapper taskDefinitionMapper;
+    private final TaskMapper taskMapper;
 
     public PlanValidationService(DeviceCapabilityMapper deviceCapabilityMapper) {
-        this(deviceCapabilityMapper, (com.airport.ai.taskdef.TaskDefinitionMapper) null);
+        this(deviceCapabilityMapper, null, null);
+    }
+
+    public PlanValidationService(DeviceCapabilityMapper deviceCapabilityMapper,
+                                 @org.springframework.lang.Nullable
+                                 com.airport.ai.taskdef.TaskDefinitionMapper taskDefinitionMapper) {
+        this(deviceCapabilityMapper, taskDefinitionMapper, null);
     }
 
     @org.springframework.beans.factory.annotation.Autowired
     public PlanValidationService(DeviceCapabilityMapper deviceCapabilityMapper,
                                  @org.springframework.lang.Nullable
-                                 com.airport.ai.taskdef.TaskDefinitionMapper taskDefinitionMapper) {
+                                 com.airport.ai.taskdef.TaskDefinitionMapper taskDefinitionMapper,
+                                 @org.springframework.lang.Nullable
+                                 TaskMapper taskMapper) {
         this.deviceCapabilityMapper = deviceCapabilityMapper;
         this.taskDefinitionMapper = taskDefinitionMapper;
+        this.taskMapper = taskMapper;
     }
 
     public com.airport.ai.taskdef.TaskDefinitionMapper getTaskDefinitionMapper() {
         return taskDefinitionMapper;
+    }
+
+    public TaskMapper getTaskMapper() {
+        return taskMapper;
     }
 
     /**
@@ -108,11 +122,17 @@ public class PlanValidationService {
             return result;
         }
 
-        if ((constraintDescription == null || constraintDescription.isBlank()) && taskDefinitionMapper != null && taskFamily != null) {
+        if ((constraintDescription == null || constraintDescription.isBlank()) && taskDefinitionMapper != null) {
             try {
-                constraintDescription = taskDefinitionMapper.findByDefinitionCode(taskFamily)
-                        .map(com.airport.ai.taskdef.TaskDefinition::getConstraintDescription)
-                        .orElse(null);
+                String effectiveFamily = taskFamily;
+                if ((effectiveFamily == null || effectiveFamily.isBlank()) && currentTaskId != null && taskMapper != null) {
+                    effectiveFamily = taskMapper.findById(currentTaskId).map(Task::getTaskFamily).orElse(null);
+                }
+                if (effectiveFamily != null && !effectiveFamily.isBlank()) {
+                    constraintDescription = taskDefinitionMapper.findByDefinitionCode(effectiveFamily)
+                            .map(com.airport.ai.taskdef.TaskDefinition::getConstraintDescription)
+                            .orElse(null);
+                }
             } catch (Exception ignored) {
             }
         }
@@ -316,53 +336,104 @@ public class PlanValidationService {
         checkCompletionConditionConflict(steps, expectedCompletionCondition, result);
 
         // 对应SRS_F022.R07 / DEF-S3-116：任务定义文本约束条件（如禁止前往某地点、限定区域等）参与硬校验
-        checkTaskDefinitionConstraint(steps, constraintDescription, result);
+        checkTaskDefinitionConstraint(steps, constraintDescription, result, currentTaskId);
 
         return result;
     }
 
-    private static final java.util.regex.Pattern WHITELIST_PATTERN = java.util.regex.Pattern.compile(
-            "(?:仅允许|只允许|仅限|只能|only allow|only permit)(?:前往|进入|到达|去往|移动至|引导至|派往|to)?\\s*(.+)",
+    private static final java.util.regex.Pattern CAPABILITY_CODE_PATTERN = java.util.regex.Pattern.compile(
+            "CAP_[A-Z0-9_]+", java.util.regex.Pattern.CASE_INSENSITIVE);
+
+    private static final java.util.regex.Pattern WHITELIST_CLAUSE_PATTERN = java.util.regex.Pattern.compile(
+            "(?:仅允许|只允许|仅限|只能|only allow|only permit)\\s*(?:前往|进入|到达|去往|移动至|引导至|派往|to|使用)?\\s*(.+)",
             java.util.regex.Pattern.CASE_INSENSITIVE);
 
-    private static final java.util.regex.Pattern PROHIBIT_PATTERN = java.util.regex.Pattern.compile(
-            "(?:禁止|不得|严禁|不能|不可|不准|勿|prohibit|forbidden|do not go to|do not visit)(?:前往|进入|到达|去往|移动至|引导至|派往|引导)?\\s*(.+)",
+    private static final java.util.regex.Pattern PROHIBIT_CLAUSE_PATTERN = java.util.regex.Pattern.compile(
+            "(?:禁止|不得|严禁|不能|不可|不准|勿|prohibit|forbidden|do not go to|do not visit)\\s*(?:前往|进入|到达|去往|移动至|引导至|派往|引导|使用)?\\s*(.+)",
             java.util.regex.Pattern.CASE_INSENSITIVE);
 
     @SuppressWarnings("unchecked")
-    private void checkTaskDefinitionConstraint(List<Map<String, Object>> steps, String constraintDescription, PlanValidationResult result) {
+    private Map<String, Object> loadTaskSceneParams(Long taskId) {
+        if (taskId == null || taskMapper == null) return null;
+        try {
+            return taskMapper.findById(taskId)
+                    .map(Task::getSceneParams)
+                    .filter(s -> s != null && !s.isBlank())
+                    .map(json -> {
+                        try {
+                            return new com.fasterxml.jackson.databind.ObjectMapper().readValue(json, Map.class);
+                        } catch (Exception e) {
+                            return null;
+                        }
+                    })
+                    .orElse(null);
+        } catch (Exception ignored) {
+            return null;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void checkTaskDefinitionConstraint(List<Map<String, Object>> steps, String constraintDescription,
+                                               PlanValidationResult result, Long currentTaskId) {
         if (constraintDescription == null || constraintDescription.isBlank() || steps == null || steps.isEmpty()) {
             return;
         }
 
         Set<String> prohibitedTargets = new LinkedHashSet<>();
         Set<String> allowedTargets = new LinkedHashSet<>();
+        Set<String> prohibitedCapabilities = new LinkedHashSet<>();
+        Set<String> allowedCapabilities = new LinkedHashSet<>();
 
         String[] clauses = constraintDescription.split("[;；。\\n\\r]+");
         for (String clause : clauses) {
             String trimmed = clause.trim();
             if (trimmed.isBlank()) continue;
 
-            // Check whitelist / allowed first
-            java.util.regex.Matcher wm = WHITELIST_PATTERN.matcher(trimmed);
+            // 1. Extract capabilities if any
+            if (trimmed.contains("CAP_") || trimmed.contains("能力") || trimmed.toLowerCase().contains("capability")) {
+                boolean isProhibit = trimmed.matches(".*(?:禁止|不得|严禁|不能|不可|不准|勿|prohibit|forbidden).*");
+                boolean isWhitelist = trimmed.matches(".*(?:仅允许|只允许|仅限|只能|only).*");
+
+                java.util.regex.Matcher capMatcher = CAPABILITY_CODE_PATTERN.matcher(trimmed);
+                while (capMatcher.find()) {
+                    String capCode = capMatcher.group().toUpperCase();
+                    if (isProhibit) {
+                        prohibitedCapabilities.add(capCode);
+                    } else if (isWhitelist) {
+                        allowedCapabilities.add(capCode);
+                    }
+                }
+                // If the clause does NOT have location verbs, it is purely a capability clause
+                if (!trimmed.matches(".*(?:前往|进入|到达|去往|移动至|引导至|派往|地点|区域).*")) {
+                    continue;
+                }
+            }
+
+            // 2. Extract locations
+            java.util.regex.Matcher wm = WHITELIST_CLAUSE_PATTERN.matcher(trimmed);
             if (wm.find()) {
                 String targetPart = wm.group(1).trim();
                 for (String t : targetPart.split("[,，、/|\\s]+")) {
                     String clean = t.replaceAll("^[“\"'‘]+|[”\"'’]+$", "").trim();
-                    if (!clean.isBlank()) allowedTargets.add(clean);
+                    if (!clean.isBlank() && !clean.contains("能力") && !clean.startsWith("CAP_") && !clean.equals("使用")) {
+                        allowedTargets.add(clean);
+                    }
                 }
             }
 
-            // Check prohibition / forbidden
-            java.util.regex.Matcher pm = PROHIBIT_PATTERN.matcher(trimmed);
+            java.util.regex.Matcher pm = PROHIBIT_CLAUSE_PATTERN.matcher(trimmed);
             if (pm.find()) {
                 String targetPart = pm.group(1).trim();
                 for (String t : targetPart.split("[,，、/|\\s]+")) {
                     String clean = t.replaceAll("^[“\"'‘]+|[”\"'’]+$", "").trim();
-                    if (!clean.isBlank()) prohibitedTargets.add(clean);
+                    if (!clean.isBlank() && !clean.contains("能力") && !clean.startsWith("CAP_") && !clean.equals("使用")) {
+                        prohibitedTargets.add(clean);
+                    }
                 }
             }
         }
+
+        Map<String, Object> scene = loadTaskSceneParams(currentTaskId);
 
         for (int i = 0; i < steps.size(); i++) {
             Map<String, Object> step = steps.get(i);
@@ -370,18 +441,58 @@ public class PlanValidationService {
             if (stepSeq == null) stepSeq = i + 1;
             if (PlanStepRules.isConditionNode(step)) continue;
 
+            String capabilityType = asString(step.get("capabilityType"));
+
+            // 1. Check capability constraints
+            if (!prohibitedCapabilities.isEmpty() && capabilityType != null
+                    && prohibitedCapabilities.contains(capabilityType.toUpperCase())) {
+                result.failConstraint("步骤" + stepSeq + "所需能力 " + capabilityType + " 与任务定义约束冲突（禁止: "
+                        + prohibitedCapabilities + "）", stepSeq, "ERR_TASK_DEFINITION_CONSTRAINT");
+            }
+            if (!allowedCapabilities.isEmpty() && capabilityType != null
+                    && !allowedCapabilities.contains(capabilityType.toUpperCase())) {
+                result.failConstraint("步骤" + stepSeq + "所需能力 " + capabilityType + " 超出任务定义约束限定范围（仅允许: "
+                        + allowedCapabilities + "）", stepSeq, "ERR_TASK_DEFINITION_CONSTRAINT");
+            }
+
+            // 2. Resolve effective parameters (combining inputParams and paramMapping)
+            Map<String, Object> effectiveParams = new LinkedHashMap<>();
             Object inputParamsObj = step.get("inputParams");
-            Map<String, Object> inputParams = inputParamsObj instanceof Map<?, ?> m ? (Map<String, Object>) m : Map.of();
+            if (inputParamsObj instanceof Map<?, ?> m) {
+                for (Map.Entry<?, ?> entry : m.entrySet()) {
+                    if (entry.getKey() != null && entry.getValue() != null) {
+                        effectiveParams.put(String.valueOf(entry.getKey()), entry.getValue());
+                    }
+                }
+            }
+            if (step.get("paramMapping") instanceof List<?> mappings && scene != null) {
+                for (Object item : mappings) {
+                    if (item instanceof Map<?, ?> map) {
+                        String source = String.valueOf(map.get("source"));
+                        String target = String.valueOf(map.get("target"));
+                        if (source.startsWith("TEMPLATE_INPUT.")) {
+                            String key = source.substring("TEMPLATE_INPUT.".length());
+                            if (scene.containsKey(key) && !effectiveParams.containsKey(target)) {
+                                effectiveParams.put(target, scene.get(key));
+                            }
+                        }
+                    }
+                }
+            }
+            if (inputParamsObj instanceof Map<?, ?> m && m.isEmpty() && !effectiveParams.isEmpty()) {
+                step.put("inputParams", effectiveParams);
+            }
+
             String stepGoal = asString(step.get("stepGoal"));
 
-            // Check against prohibited targets
+            // 3. Check against prohibited targets
             for (String prohibited : prohibitedTargets) {
                 if (prohibited.isBlank() || prohibited.length() < 2) continue;
-                for (Map.Entry<String, Object> entry : inputParams.entrySet()) {
-                    String valStr = String.valueOf(entry.getValue());
+                for (Map.Entry<String, Object> entry : effectiveParams.entrySet()) {
+                    String valStr = String.valueOf(entry.getValue()).trim();
                     if (valStr.equalsIgnoreCase(prohibited) || valStr.contains(prohibited)) {
-                        result.failConstraint("步骤" + stepSeq + "参数 " + entry.getKey() + "=" + valStr + " 与任务定义约束冲突（禁止: " + prohibited + "）",
-                                stepSeq, "ERR_TASK_DEFINITION_CONSTRAINT");
+                        result.failConstraint("步骤" + stepSeq + "参数 " + entry.getKey() + "=" + valStr
+                                + " 与任务定义约束冲突（禁止: " + prohibited + "）", stepSeq, "ERR_TASK_DEFINITION_CONSTRAINT");
                     }
                 }
                 if (stepGoal != null && stepGoal.contains(prohibited)) {
@@ -390,24 +501,30 @@ public class PlanValidationService {
                 }
             }
 
-            // Check against allowed / whitelist targets (for destination/location fields)
+            // 4. Check against allowed / whitelist targets (for destination/location fields)
             if (!allowedTargets.isEmpty()) {
-                for (String locKey : List.of("targetLocation", "destination", "location", "targetZone", "zone")) {
-                    if (inputParams.containsKey(locKey) && inputParams.get(locKey) != null) {
-                        String locVal = String.valueOf(inputParams.get(locKey)).trim();
+                List<String> locKeys = List.of("targetLocation", "destination", "location", "fallbackLocation", "targetZone", "zone");
+                List<String> stepLocations = new ArrayList<>();
+                for (String locKey : locKeys) {
+                    if (effectiveParams.containsKey(locKey) && effectiveParams.get(locKey) != null) {
+                        String locVal = String.valueOf(effectiveParams.get(locKey)).trim();
                         if (!locVal.isBlank()) {
-                            boolean matched = false;
-                            for (String allowed : allowedTargets) {
-                                if (locVal.equalsIgnoreCase(allowed) || locVal.contains(allowed) || allowed.contains(locVal)) {
-                                    matched = true;
-                                    break;
-                                }
-                            }
-                            if (!matched) {
-                                result.failConstraint("步骤" + stepSeq + "目标地点 " + locVal + " 超出任务定义约束限定范围（仅允许: " + allowedTargets + "）",
-                                        stepSeq, "ERR_TASK_DEFINITION_CONSTRAINT");
-                            }
+                            stepLocations.add(locVal);
                         }
+                    }
+                }
+
+                for (String locVal : stepLocations) {
+                    boolean matched = false;
+                    for (String allowed : allowedTargets) {
+                        if (locVal.equalsIgnoreCase(allowed)) {
+                            matched = true;
+                            break;
+                        }
+                    }
+                    if (!matched) {
+                        result.failConstraint("步骤" + stepSeq + "目标地点 " + locVal + " 超出任务定义约束限定范围（仅允许: "
+                                + allowedTargets + "）", stepSeq, "ERR_TASK_DEFINITION_CONSTRAINT");
                     }
                 }
             }

@@ -28,18 +28,22 @@ class PlanValidationServiceSpringContextTest {
     @MockBean
     private TaskDefinitionMapper taskDefinitionMapper;
 
+    @MockBean
+    private TaskMapper taskMapper;
+
     @Autowired
     private PlanValidationService planValidationService;
 
     @Test
-    @DisplayName("Spring 容器能成功通过 @Autowired 构造器实例化 PlanValidationService 并注入 TaskDefinitionMapper")
+    @DisplayName("Spring 容器能成功通过 @Autowired 构造器实例化 PlanValidationService 并注入 TaskDefinitionMapper 与 TaskMapper")
     void testSpringContainerInstantiatesPlanValidationServiceWithAutowiredConstructor() {
         assertNotNull(planValidationService, "PlanValidationService 必须成功被 Spring 容器实例化");
         assertNotNull(planValidationService.getTaskDefinitionMapper(), "TaskDefinitionMapper 必须成功注入 PlanValidationService");
+        assertNotNull(planValidationService.getTaskMapper(), "TaskMapper 必须成功注入 PlanValidationService");
     }
 
     @Test
-    @DisplayName("无 TaskDefinitionMapper Bean 时，通过 @Nullable 优雅降级实例化")
+    @DisplayName("无 TaskDefinitionMapper/TaskMapper Bean 时，通过 @Nullable 优雅降级实例化")
     void testSpringContainerInstantiatesWithoutTaskDefinitionMapper() {
         try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext()) {
             context.registerBean(DeviceCapabilityMapper.class, () -> mock(DeviceCapabilityMapper.class));
@@ -49,6 +53,7 @@ class PlanValidationServiceSpringContextTest {
             PlanValidationService service = context.getBean(PlanValidationService.class);
             assertNotNull(service, "PlanValidationService 在无 TaskDefinitionMapper 时应成功实例化");
             assertNull(service.getTaskDefinitionMapper(), "无 TaskDefinitionMapper Bean 时 mapper 应为 null");
+            assertNull(service.getTaskMapper(), "无 TaskMapper Bean 时 taskMapper 应为 null");
         }
     }
 }

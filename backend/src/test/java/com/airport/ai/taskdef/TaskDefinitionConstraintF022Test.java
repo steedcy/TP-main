@@ -377,4 +377,160 @@ class TaskDefinitionConstraintF022Test {
         assertEquals("PASS", result.getConstraintCheckResult(), "目标为F2_ZONE_A应符合仅允许前往F2_ZONE_A约束");
         assertTrue(result.isAllPassed(), "全部校验应通过");
     }
+
+    @Test
+    @DisplayName("PlanValidationService - DEF-S3-116 Case 1: 白名单禁止前缀包含旁路 (F2_TEST vs 仅允许前往F2_TEST_GATE)")
+    void testPlanValidationRejectsShorterAreaPrefixBypass_DEF_S3_116() {
+        com.airport.ai.device.DeviceCapabilityMapper devCapMapper = mock(com.airport.ai.device.DeviceCapabilityMapper.class);
+        when(devCapMapper.existsByCapabilityTypeAndCapabilityStatus(eq("CAP_NAVIGATION"), eq("ENABLED"))).thenReturn(true);
+
+        com.airport.ai.task.PlanValidationService validatorService = new com.airport.ai.task.PlanValidationService(devCapMapper);
+
+        Map<String, Object> candidateStep = new java.util.HashMap<>();
+        candidateStep.put("stepSeq", 1);
+        candidateStep.put("stepGoal", "前往F2_TEST区域");
+        candidateStep.put("capabilityType", "CAP_NAVIGATION");
+        candidateStep.put("inputParams", Map.of("targetLocation", "F2_TEST"));
+        candidateStep.put("precondition", "device online");
+        candidateStep.put("completionCondition", "routeGenerated=true");
+        candidateStep.put("failureHandling", "manual handling");
+        candidateStep.put("stepTimeout", 600);
+
+        List<Map<String, Object>> agents = List.of(Map.of(
+                "onlineStatus", "ONLINE",
+                "capabilities", List.of("CAP_NAVIGATION")
+        ));
+
+        // 约束限定为 F2_TEST_GATE，步骤目标为 F2_TEST，严禁因子串包含放行
+        String constraint = "仅允许前往F2_TEST_GATE。";
+        com.airport.ai.task.PlanValidationResult result = validatorService.validate(
+                List.of(candidateStep), agents, List.of("CAP_NAVIGATION"), "EXT_TEST", 0, 1011L, "routeGenerated=true", constraint
+        );
+
+        assertEquals("FAIL", result.getConstraintCheckResult(), "F2_TEST 不属于 F2_TEST_GATE，必须拦截");
+        assertFalse(result.isAllPassed(), "整体校验必须失败");
+        assertTrue(result.getErrors().stream().anyMatch(e -> "ERR_TASK_DEFINITION_CONSTRAINT".equals(e.getReasonCode())),
+                "必须包含 ERR_TASK_DEFINITION_CONSTRAINT 错误码");
+    }
+
+    @Test
+    @DisplayName("PlanValidationService - DEF-S3-116 Case 2: 能力约束句子不误判为地点约束 (仅允许使用CAP_NAVIGATION能力)")
+    void testPlanValidationAllowsCapabilitySentenceWithoutMisidentifyingAsLocation_DEF_S3_116() {
+        com.airport.ai.device.DeviceCapabilityMapper devCapMapper = mock(com.airport.ai.device.DeviceCapabilityMapper.class);
+        when(devCapMapper.existsByCapabilityTypeAndCapabilityStatus(eq("CAP_NAVIGATION"), eq("ENABLED"))).thenReturn(true);
+
+        com.airport.ai.task.PlanValidationService validatorService = new com.airport.ai.task.PlanValidationService(devCapMapper);
+
+        Map<String, Object> candidateStep = new java.util.HashMap<>();
+        candidateStep.put("stepSeq", 1);
+        candidateStep.put("stepGoal", "前往区域");
+        candidateStep.put("capabilityType", "CAP_NAVIGATION");
+        candidateStep.put("inputParams", Map.of("targetLocation", "F2_ZONE_A"));
+        candidateStep.put("precondition", "device online");
+        candidateStep.put("completionCondition", "routeGenerated=true");
+        candidateStep.put("failureHandling", "manual handling");
+        candidateStep.put("stepTimeout", 600);
+
+        List<Map<String, Object>> agents = List.of(Map.of(
+                "onlineStatus", "ONLINE",
+                "capabilities", List.of("CAP_NAVIGATION")
+        ));
+
+        // 纯能力约束，不得误提取为地点白名单导致合法地点 F2_ZONE_A 被拒绝
+        String constraint = "仅允许使用CAP_NAVIGATION能力。";
+        com.airport.ai.task.PlanValidationResult result = validatorService.validate(
+                List.of(candidateStep), agents, List.of("CAP_NAVIGATION"), "EXT_TEST", 0, 1012L, "routeGenerated=true", constraint
+        );
+
+        assertEquals("PASS", result.getConstraintCheckResult(), "合法能力与地点应正常通过校验");
+        assertTrue(result.isAllPassed(), "整体验收必须全部通过");
+    }
+
+    @Test
+    @DisplayName("PlanValidationService - DEF-S3-116 Case 3: 基线模板首次降级参数映射解析与违规地点拦截")
+    void testBaselineTemplateDowngradeInterceptionOnProhibitedLocation_DEF_S3_116() {
+        com.airport.ai.device.DeviceCapabilityMapper devCapMapper = mock(com.airport.ai.device.DeviceCapabilityMapper.class);
+        when(devCapMapper.existsByCapabilityTypeAndCapabilityStatus(eq("CAP_NAVIGATION"), eq("ENABLED"))).thenReturn(true);
+
+        com.airport.ai.task.TaskMapper taskMapper = mock(com.airport.ai.task.TaskMapper.class);
+        com.airport.ai.task.Task mockTask = new com.airport.ai.task.Task();
+        mockTask.setId(1021L);
+        mockTask.setSceneParams("{\"targetLocation\":\"F2_TEST_GATE\"}");
+        mockTask.setTaskFamily("EXT_TEST");
+        when(taskMapper.findById(eq(1021L))).thenReturn(java.util.Optional.of(mockTask));
+
+        com.airport.ai.task.PlanValidationService validatorService = new com.airport.ai.task.PlanValidationService(
+                devCapMapper, null, taskMapper
+        );
+
+        Map<String, Object> templateStep = new java.util.HashMap<>();
+        templateStep.put("stepSeq", 1);
+        templateStep.put("stepGoal", "执行CAP_NAVIGATION能力（基线模板步骤）");
+        templateStep.put("capabilityType", "CAP_NAVIGATION");
+        templateStep.put("paramMapping", List.of(Map.of("target", "targetLocation", "source", "TEMPLATE_INPUT.targetLocation")));
+        templateStep.put("inputParams", new java.util.HashMap<>());
+        templateStep.put("precondition", "候选设备在线且空闲");
+        templateStep.put("completionCondition", "routeGenerated=true");
+        templateStep.put("failureHandling", "重试一次或转人工处理");
+        templateStep.put("stepTimeout", 600);
+
+        List<Map<String, Object>> agents = List.of(Map.of(
+                "onlineStatus", "ONLINE",
+                "capabilities", List.of("CAP_NAVIGATION")
+        ));
+
+        String constraint = "禁止前往F2_TEST_GATE；仅允许前往F2_ZONE_A。";
+        com.airport.ai.task.PlanValidationResult result = validatorService.validate(
+                List.of(templateStep), agents, null, "EXT_TEST", 0, 1021L, "routeGenerated=true", constraint
+        );
+
+        assertEquals("FAIL", result.getConstraintCheckResult(), "基线模板映射到禁止地点 F2_TEST_GATE 必须拦截");
+        assertFalse(result.isAllPassed(), "整体校验必须失败");
+        assertTrue(result.getErrors().stream().anyMatch(e -> "ERR_TASK_DEFINITION_CONSTRAINT".equals(e.getReasonCode())),
+                "必须包含 ERR_TASK_DEFINITION_CONSTRAINT 错误码");
+    }
+
+    @Test
+    @DisplayName("PlanValidationService - DEF-S3-116 Case 4: 重规划基线尾部参数映射解析与违规地点拦截")
+    void testReplanningBaselineDowngradeInterceptionOnProhibitedTailLocation_DEF_S3_116() {
+        com.airport.ai.device.DeviceCapabilityMapper devCapMapper = mock(com.airport.ai.device.DeviceCapabilityMapper.class);
+        when(devCapMapper.existsByCapabilityTypeAndCapabilityStatus(eq("CAP_NAVIGATION"), eq("ENABLED"))).thenReturn(true);
+
+        com.airport.ai.task.TaskMapper taskMapper = mock(com.airport.ai.task.TaskMapper.class);
+        com.airport.ai.task.Task mockTask = new com.airport.ai.task.Task();
+        mockTask.setId(1024L);
+        mockTask.setSceneParams("{\"targetLocation\":\"F2_ZONE_A\",\"fallbackLocation\":\"F2_TEST_GATE\"}");
+        mockTask.setTaskFamily("EXT_TEST");
+        when(taskMapper.findById(eq(1024L))).thenReturn(java.util.Optional.of(mockTask));
+
+        com.airport.ai.task.PlanValidationService validatorService = new com.airport.ai.task.PlanValidationService(
+                devCapMapper, null, taskMapper
+        );
+
+        Map<String, Object> tailStep = new java.util.HashMap<>();
+        tailStep.put("stepSeq", 2);
+        tailStep.put("stepGoal", "执行CAP_NAVIGATION能力（基线模板步骤）");
+        tailStep.put("capabilityType", "CAP_NAVIGATION");
+        tailStep.put("paramMapping", List.of(Map.of("target", "targetLocation", "source", "TEMPLATE_INPUT.fallbackLocation")));
+        tailStep.put("inputParams", new java.util.HashMap<>());
+        tailStep.put("precondition", "候选设备在线且空闲");
+        tailStep.put("completionCondition", "routeGenerated=true");
+        tailStep.put("failureHandling", "重试一次或转人工处理");
+        tailStep.put("stepTimeout", 600);
+
+        List<Map<String, Object>> agents = List.of(Map.of(
+                "onlineStatus", "ONLINE",
+                "capabilities", List.of("CAP_NAVIGATION")
+        ));
+
+        String constraint = "禁止前往F2_TEST_GATE；仅允许前往F2_ZONE_A。";
+        com.airport.ai.task.PlanValidationResult result = validatorService.validate(
+                List.of(tailStep), agents, null, "EXT_TEST", 1, 1024L, "routeGenerated=true", constraint
+        );
+
+        assertEquals("FAIL", result.getConstraintCheckResult(), "重规划尾部步骤映射到禁止地点 F2_TEST_GATE 必须拦截");
+        assertFalse(result.isAllPassed(), "整体校验必须失败");
+        assertTrue(result.getErrors().stream().anyMatch(e -> "ERR_TASK_DEFINITION_CONSTRAINT".equals(e.getReasonCode())),
+                "必须包含 ERR_TASK_DEFINITION_CONSTRAINT 错误码");
+    }
 }

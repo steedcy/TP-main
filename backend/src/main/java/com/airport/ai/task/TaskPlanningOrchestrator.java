@@ -281,8 +281,9 @@ public class TaskPlanningOrchestrator {
 
         BaselineTemplate template = matched.get();
         // Bind typed template defaults before real execution while retaining original scene context.
+        Map<String, Object> scene;
         try {
-            Map<String,Object> scene = task.getSceneParams()==null ? new java.util.LinkedHashMap<>()
+            scene = task.getSceneParams()==null ? new java.util.LinkedHashMap<>()
                     : new java.util.LinkedHashMap<>(MAPPER.readValue(task.getSceneParams(),Map.class));
             Map<String,Object> parsedGoal = task.getGoalParsingResult()==null ? Map.of()
                     : MAPPER.readValue(task.getGoalParsingResult(),Map.class);
@@ -312,6 +313,7 @@ public class TaskPlanningOrchestrator {
             toPendingManual(task,"基线模板输入无法绑定: " + ex.getMessage()); return;
         }
         List<Map<String, Object>> templateSteps = normalizeTemplateSteps(parseSteps(template.getSteps()));
+        bindTemplateParamMapping(templateSteps, scene);
 
         // 重新构建上下文快照供模板校验使用（模板步骤同样需要能力/在线候选校验）
         List<String> requiredCapabilities = templateSteps.stream()
@@ -451,6 +453,32 @@ public class TaskPlanningOrchestrator {
             PlanStepRules.defaultIfAbsent(normalized, "inputParams", Map.of());
             return normalized;
         }).toList();
+    }
+
+    private void bindTemplateParamMapping(List<Map<String, Object>> steps, Map<String, Object> scene) {
+        if (steps == null || scene == null) return;
+        for (Map<String, Object> step : steps) {
+            Object mappingObj = step.get("paramMapping");
+            if (mappingObj instanceof List<?> mappings) {
+                Object inputParamsObj = step.get("inputParams");
+                Map<String, Object> inputParams = inputParamsObj instanceof Map<?, ?> m
+                        ? new java.util.LinkedHashMap<>((Map<String, Object>) m)
+                        : new java.util.LinkedHashMap<>();
+                for (Object item : mappings) {
+                    if (item instanceof Map<?, ?> map) {
+                        String source = String.valueOf(map.get("source"));
+                        String target = String.valueOf(map.get("target"));
+                        if (source.startsWith("TEMPLATE_INPUT.")) {
+                            String key = source.substring("TEMPLATE_INPUT.".length());
+                            if (scene.containsKey(key)) {
+                                inputParams.put(target, scene.get(key));
+                            }
+                        }
+                    }
+                }
+                step.put("inputParams", inputParams);
+            }
+        }
     }
 
     /**
