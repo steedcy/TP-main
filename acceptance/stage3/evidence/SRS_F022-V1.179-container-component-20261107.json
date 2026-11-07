@@ -1,0 +1,73 @@
+{
+  "layer" : "isolated Spring registration + direct seven-argument service; mapper fixtures only, not live HTTP acceptance",
+  "constructors" : [ {
+    "parameterAnnotations" : "[[], [@org.springframework.lang.Nullable()], [@org.springframework.lang.Nullable()]]",
+    "parameterCount" : 3,
+    "constructorAnnotations" : "[@org.springframework.beans.factory.annotation.Autowired(required=true)]"
+  }, {
+    "parameterAnnotations" : "[[], [@org.springframework.lang.Nullable()]]",
+    "parameterCount" : 2,
+    "constructorAnnotations" : "[]"
+  }, {
+    "parameterAnnotations" : "[[]]",
+    "parameterCount" : 1,
+    "constructorAnnotations" : "[]"
+  } ],
+  "container" : {
+    "started" : true,
+    "mapperInjected" : true,
+    "taskMapperInjected" : true
+  },
+  "componentObservations" : [ {
+    "errors" : [ {
+      "errorType" : "CONSTRAINT",
+      "description" : "步骤1参数 targetLocation=F2_TEST_GATE 与任务定义约束冲突（禁止: F2_TEST_GATE）",
+      "stepSeq" : 1,
+      "reasonCode" : "ERR_TASK_DEFINITION_CONSTRAINT"
+    }, {
+      "errorType" : "CONSTRAINT",
+      "description" : "步骤1目标地点 F2_TEST_GATE 超出任务定义约束限定范围（仅允许: [F2_ZONE_A]）",
+      "stepSeq" : 1,
+      "reasonCode" : "ERR_TASK_DEFINITION_CONSTRAINT"
+    } ],
+    "constraint" : "禁止前往F2_TEST_GATE；仅允许前往F2_ZONE_A。",
+    "result" : "P",
+    "target" : "F2_TEST_GATE",
+    "expectedConstraintResult" : "FAIL",
+    "allPassed" : false,
+    "actualConstraintResult" : "FAIL",
+    "name" : "original-prohibition"
+  }, {
+    "errors" : [ ],
+    "constraint" : "仅允许前往F2_TEST_GATE。",
+    "result" : "P",
+    "target" : "F2_TEST_GATE",
+    "expectedConstraintResult" : "PASS",
+    "allPassed" : true,
+    "actualConstraintResult" : "PASS",
+    "name" : "original-allowed-control"
+  }, {
+    "errors" : [ ],
+    "constraint" : "禁止前往F2_TEST_GATE；仅允许前往F2_ZONE_A。",
+    "result" : "P",
+    "target" : "F2_ZONE_A",
+    "expectedConstraintResult" : "PASS",
+    "allPassed" : true,
+    "actualConstraintResult" : "PASS",
+    "name" : "allowed-zone-control"
+  }, {
+    "errors" : [ {
+      "errorType" : "CONSTRAINT",
+      "description" : "步骤1目标地点 F2_ZONE_B 超出任务定义约束限定范围（仅允许: [F2_ZONE_A]）",
+      "stepSeq" : 1,
+      "reasonCode" : "ERR_TASK_DEFINITION_CONSTRAINT"
+    } ],
+    "constraint" : "仅允许前往F2_ZONE_A。",
+    "result" : "P",
+    "target" : "F2_ZONE_B",
+    "expectedConstraintResult" : "FAIL",
+    "allPassed" : false,
+    "actualConstraintResult" : "FAIL",
+    "name" : "other-zone-rejected"
+  } ]
+}

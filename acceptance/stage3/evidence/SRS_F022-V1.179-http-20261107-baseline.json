@@ -1,0 +1,1858 @@
+{
+  "tag": "V1.179",
+  "productSha": "7e86a0afb7169154a9ec7b2b12c7eda60e4851af",
+  "handoffSha": "e349145b658f221029d9aaa971c39f78f5bbc24a",
+  "fixtureSequencing": "Device RLock serializes heartbeat, acceptance and feedback; V165 stable repair carried into this round",
+  "executionBaseline": "V2.4",
+  "startedAt": "2026-11-07T22:58:37.234820+08:00",
+  "timezone": "Asia/Shanghai",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "redisDb": 10,
+  "cases": [
+    {
+      "name": "baseline-publication-trial",
+      "taskId": 1089,
+      "templateId": 97,
+      "request": {
+        "templateName": "G179 mapped baseline 1794063524376788200",
+        "templateIntent": "EXT_07015330",
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "range": "synthetic destination"
+          }
+        ],
+        "steps": [
+          {
+            "capabilityType": "CAP_NAVIGATION",
+            "paramMapping": [
+              {
+                "target": "targetLocation",
+                "source": "TEMPLATE_INPUT.targetLocation"
+              }
+            ],
+            "stepTimeout": 600,
+            "completionCondition": "routeGenerated=true"
+          }
+        ]
+      },
+      "response": {
+        "taskId": 1089,
+        "taskCode": "TASK-20261107-1079",
+        "result": "RUNNING",
+        "stepResults": [
+          {
+            "stepSeq": 1,
+            "result": "PENDING_ASSIGNMENT",
+            "duration": 0,
+            "failureReason": null
+          }
+        ],
+        "events": [
+          {
+            "eventType": "DRY_RUN_STARTED",
+            "trigger": "OPERATOR",
+            "detailSummary": "配置管理员set对模板G179 mapped baseline 1794063524376788200(V1.0)发起试运行",
+            "occurredAt": "2026-11-07T22:58:44.502014"
+          },
+          {
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "trigger": "SYSTEM",
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求",
+            "occurredAt": "2026-11-07T22:58:44.520736"
+          }
+        ],
+        "failureReason": null
+      },
+      "accepts": [
+        {
+          "request": {
+            "commandId": "CMD-20261107225844-24BB0049",
+            "commandType": "TASK_ACCEPT",
+            "attemptNo": 0,
+            "taskId": "TASK-20261107-1079",
+            "stepSeq": 1,
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE",
+              "routePreference": "BARRIER_FREE",
+              "targetX": 0.0,
+              "targetY": 0.0
+            },
+            "issuedAt": 1794063524.534876,
+            "deadline": 1794063584.534876
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-07T22:58:44.669002600+08:00"
+            }
+          }
+        }
+      ],
+      "feedbacks": [
+        {
+          "agent": "AGT-386E8C30",
+          "request": {
+            "commandId": "CMD-20261107225844-24BB004A",
+            "attemptNo": 0,
+            "executionResult": "SUCCESS",
+            "outputParams": {
+              "routeGenerated": true
+            }
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-07T22:58:45.885772+08:00"
+            }
+          }
+        }
+      ],
+      "after": {
+        "task": {
+          "id": 1089,
+          "taskCode": "TASK-20261107-1079",
+          "taskGoal": "基线模板试运行: G179 mapped baseline 1794063524376788200",
+          "taskFamily": "EXT_07015330",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": null,
+          "status": "COMPLETED",
+          "currentPlanVersionId": 1069,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": null,
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": true,
+          "createdAt": "2026-11-07T22:58:44.486758",
+          "updatedAt": "2026-11-07T22:58:45.869461",
+          "createdBy": "set"
+        },
+        "plans": [
+          {
+            "id": 1069,
+            "versionNo": 1,
+            "source": "BASELINE_TEMPLATE",
+            "baselineTemplateId": 97,
+            "snapshotId": "V1.0",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "paramMapping": [
+                  {
+                    "target": "targetLocation",
+                    "source": "TEMPLATE_INPUT.targetLocation"
+                  }
+                ],
+                "stepTimeout": 600,
+                "completionCondition": "routeGenerated=true"
+              }
+            ],
+            "structureCheckResult": null,
+            "capabilityCheckResult": null,
+            "constraintCheckResult": null,
+            "validationErrors": null,
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": null,
+            "ruleSetVersion": null,
+            "frozenAt": "2026-11-07T22:58:44.495295",
+            "createdAt": "2026-11-07T22:58:44.495295"
+          }
+        ],
+        "events": [
+          {
+            "id": 16252,
+            "taskId": 1089,
+            "eventType": "DRY_RUN_STARTED",
+            "occurredAt": "2026-11-07T22:58:44.502014",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "配置管理员set对模板G179 mapped baseline 1794063524376788200(V1.0)发起试运行",
+            "detail": "配置管理员set对模板G179 mapped baseline 1794063524376788200(V1.0)发起试运行",
+            "rawDetailSummary": "配置管理员set对模板G179 mapped baseline 1794063524376788200(V1.0)发起试运行"
+          },
+          {
+            "id": 16253,
+            "taskId": 1089,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-07T22:58:44.520736",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求",
+            "detail": "步骤1候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求",
+            "rawDetailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求"
+          },
+          {
+            "id": 16254,
+            "taskId": 1089,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-07T22:58:44.632413",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-386E8C30接受步骤1承接请求",
+            "detail": "设备代理AGT-386E8C30接受步骤1承接请求",
+            "rawDetailSummary": "设备代理AGT-386E8C30接受步骤1承接请求"
+          },
+          {
+            "id": 16255,
+            "taskId": 1089,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-07T22:58:44.640262",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261107225844-24BB004A已下发至设备代理AGT-386E8C30，业务意图: null",
+            "detail": "指令CMD-20261107225844-24BB004A已下发至设备代理AGT-386E8C30，业务意图: null",
+            "rawDetailSummary": "指令CMD-20261107225844-24BB004A已下发至设备代理AGT-386E8C30，业务意图: null"
+          },
+          {
+            "id": 16256,
+            "taskId": 1089,
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "occurredAt": "2026-11-07T22:58:45.859153",
+            "trigger": "SYSTEM",
+            "reasonCode": "DEVICE_SUCCESS",
+            "detailSummary": "指令CMD-20261107225844-24BB004A收到设备代理AGT-386E8C30执行反馈: SUCCESS",
+            "detail": "指令CMD-20261107225844-24BB004A收到设备代理AGT-386E8C30执行反馈: SUCCESS",
+            "rawDetailSummary": "指令CMD-20261107225844-24BB004A收到设备代理AGT-386E8C30执行反馈: SUCCESS"
+          },
+          {
+            "id": 16257,
+            "taskId": 1089,
+            "eventType": "STEP_COMPLETED",
+            "occurredAt": "2026-11-07T22:58:45.864216",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1完成条件已满足: routeGenerated=true",
+            "detail": "步骤1完成条件已满足: routeGenerated=true",
+            "rawDetailSummary": "步骤1完成条件已满足: routeGenerated=true"
+          },
+          {
+            "id": 16258,
+            "taskId": 1089,
+            "eventType": "TASK_COMPLETED",
+            "occurredAt": "2026-11-07T22:58:45.871826",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "全部步骤完成条件均已满足，任务完成",
+            "detail": "全部步骤完成条件均已满足，任务完成",
+            "rawDetailSummary": "全部步骤完成条件均已满足，任务完成"
+          },
+          {
+            "id": 16259,
+            "taskId": 1089,
+            "eventType": "DRY_RUN_SUCCEEDED",
+            "occurredAt": "2026-11-07T22:58:45.878017",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "所有步骤均收到实际设备成功反馈",
+            "detail": "所有步骤均收到实际设备成功反馈",
+            "rawDetailSummary": "所有步骤均收到实际设备成功反馈"
+          }
+        ],
+        "assignments": [
+          {
+            "id": 1585,
+            "stepSeq": 1,
+            "deviceAgentCode": "AGT-386E8C30",
+            "commandId": "CMD-20261107225844-24BB0049",
+            "stepStatus": "COMPLETED",
+            "retryCount": 0,
+            "executionResult": "SUCCESS",
+            "reasonCode": "DEVICE_SUCCESS",
+            "outputParams": {
+              "routeGenerated": true
+            },
+            "dispatchedAt": "2026-11-07T22:58:44.63807",
+            "feedbackAt": "2026-11-07T22:58:45.859153",
+            "rejectedAgentIds": [],
+            "acceptanceRequestedAt": "2026-11-07T22:58:44.523364",
+            "acceptedAt": "2026-11-07T22:58:44.626411",
+            "acceptanceDurationMs": 103,
+            "acceptanceResponseTime": "103ms"
+          }
+        ],
+        "commands": [
+          "3704|TASK_ACCEPT|ACCEPTED",
+          "3705|EXECUTE_CAPABILITY|SUCCEEDED"
+        ],
+        "bypassAuditRows": [],
+        "agentRows": [
+          {
+            "id": 18,
+            "agent_code": "AGT-386E8C30",
+            "device_id": 19,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-07T22:58:46.243551",
+            "created_at": "2026-11-05T13:04:16.81064",
+            "updated_at": "2026-11-05T13:04:16.81064",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 19,
+            "agent_code": "AGT-8519A3B6",
+            "device_id": 20,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-07T22:58:44.525781",
+            "created_at": "2026-11-05T13:04:17.772513",
+            "updated_at": "2026-11-05T13:04:17.772513",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 20,
+            "agent_code": "AGT-D20379F3",
+            "device_id": 21,
+            "agent_status": "ENABLED",
+            "online_status": "OFFLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-07T22:58:45.928546",
+            "created_at": "2026-11-05T13:05:21.137216",
+            "updated_at": "2026-11-05T13:05:21.137216",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          }
+        ],
+        "exceptions": [],
+        "commandRows": [
+          {
+            "id": 3704,
+            "command_id": "CMD-20261107225844-24BB0049",
+            "agent_code": "AGT-386E8C30",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 1089,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261107225844-24BB0049\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261107-1079\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-07T22:58:44.534876+08:00\",\"deadline\":\"2026-11-07T22:59:44.534876+08:00\"}",
+            "command_status": "ACCEPTED",
+            "response_payload": "{\"commandId\":\"CMD-20261107225844-24BB0049\",\"accepted\":true,\"rejectReason\":null}",
+            "created_at": "2026-11-07T22:58:44.534876",
+            "updated_at": "2026-11-07T22:58:44.622859"
+          },
+          {
+            "id": 3705,
+            "command_id": "CMD-20261107225844-24BB004A",
+            "agent_code": "AGT-386E8C30",
+            "command_type": "EXECUTE_CAPABILITY",
+            "attempt_no": 0,
+            "task_id": 1089,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261107225844-24BB004A\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261107-1079\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-07T22:58:44.6556977+08:00\",\"deadline\":\"2026-11-07T22:59:44.6556977+08:00\"}",
+            "command_status": "SUCCEEDED",
+            "response_payload": "{\"commandId\":\"CMD-20261107225844-24BB004A\",\"attemptNo\":0,\"executionResult\":\"SUCCESS\",\"reasonCode\":\"DEVICE_SUCCESS\",\"outputParams\":{\"routeGenerated\":true}}",
+            "created_at": "2026-11-07T22:58:44.655698",
+            "updated_at": "2026-11-07T22:58:45.855341"
+          }
+        ],
+        "transport": {
+          "G160_F016_A": [
+            {
+              "at": "2026-11-07T22:58:44.549434+08:00",
+              "message": {
+                "commandId": "CMD-20261107225844-24BB0049",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261107-1079",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "issuedAt": 1794063524.534876,
+                "deadline": 1794063584.534876
+              }
+            },
+            {
+              "at": "2026-11-07T22:58:44.711179+08:00",
+              "message": {
+                "commandId": "CMD-20261107225844-24BB004A",
+                "commandType": "EXECUTE_CAPABILITY",
+                "attemptNo": 0,
+                "taskId": "TASK-20261107-1079",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "issuedAt": 1794063524.6556976,
+                "deadline": 1794063584.6556976
+              }
+            }
+          ],
+          "G160_F016_B": [],
+          "G160_F016_C": []
+        }
+      },
+      "trialResult": {
+        "taskId": 1089,
+        "taskCode": "TASK-20261107-1079",
+        "result": "SUCCESS",
+        "stepResults": [
+          {
+            "stepSeq": 1,
+            "result": "COMPLETED",
+            "duration": 1,
+            "failureReason": "DEVICE_SUCCESS"
+          }
+        ],
+        "events": [
+          {
+            "eventType": "DRY_RUN_STARTED",
+            "trigger": "OPERATOR",
+            "detailSummary": "配置管理员set对模板G179 mapped baseline 1794063524376788200(V1.0)发起试运行",
+            "occurredAt": "2026-11-07T22:58:44.502014"
+          },
+          {
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "trigger": "SYSTEM",
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求",
+            "occurredAt": "2026-11-07T22:58:44.520736"
+          },
+          {
+            "eventType": "AGENT_ASSIGNED",
+            "trigger": "SYSTEM",
+            "detailSummary": "设备代理AGT-386E8C30接受步骤1承接请求",
+            "occurredAt": "2026-11-07T22:58:44.632413"
+          },
+          {
+            "eventType": "STEP_DISPATCHED",
+            "trigger": "SYSTEM",
+            "detailSummary": "指令CMD-20261107225844-24BB004A已下发至设备代理AGT-386E8C30，业务意图: null",
+            "occurredAt": "2026-11-07T22:58:44.640262"
+          },
+          {
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "trigger": "SYSTEM",
+            "detailSummary": "指令CMD-20261107225844-24BB004A收到设备代理AGT-386E8C30执行反馈: SUCCESS",
+            "occurredAt": "2026-11-07T22:58:45.859153"
+          },
+          {
+            "eventType": "STEP_COMPLETED",
+            "trigger": "SYSTEM",
+            "detailSummary": "步骤1完成条件已满足: routeGenerated=true",
+            "occurredAt": "2026-11-07T22:58:45.864216"
+          },
+          {
+            "eventType": "TASK_COMPLETED",
+            "trigger": "SYSTEM",
+            "detailSummary": "全部步骤完成条件均已满足，任务完成",
+            "occurredAt": "2026-11-07T22:58:45.871826"
+          },
+          {
+            "eventType": "DRY_RUN_SUCCEEDED",
+            "trigger": "SYSTEM",
+            "detailSummary": "所有步骤均收到实际设备成功反馈",
+            "occurredAt": "2026-11-07T22:58:45.878017"
+          }
+        ],
+        "failureReason": null
+      },
+      "checks": {
+        "completed": true,
+        "actualTrialSuccess": true
+      },
+      "result": "P"
+    },
+    {
+      "name": "baseline-location-allowed",
+      "taskId": 1090,
+      "request": {
+        "taskGoal": "F179_BASELINE_LOCATION_ALLOWED Synthetic passenger service F2_TEST_GATE",
+        "taskFamily": "EXT_07015330",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "response": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 1090,
+            "taskCode": "TASK-20261107-1080",
+            "taskGoal": "F179_BASELINE_LOCATION_ALLOWED Synthetic passenger service F2_TEST_GATE",
+            "taskFamily": "EXT_07015330",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=true",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F179_BASELINE_LOCATION_ALLOWED Synthetic passenger service F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "PLANNING",
+            "currentPlanVersionId": null,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": null,
+            "failureReason": null,
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-07T22:58:49.093339",
+            "updatedAt": "2026-11-07T22:58:49.093339",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-07T22:58:49.245045500+08:00"
+        }
+      },
+      "definition": {
+        "id": 118,
+        "definitionCode": "EXT_07015330",
+        "taskName": "G179 F022 acceptance 225841",
+        "goalTemplate": "Synthetic navigation",
+        "sceneParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "F2_TEST_GATE",
+            "range": null
+          }
+        ],
+        "availableCapabilityTypes": [
+          "CAP_NAVIGATION"
+        ],
+        "constraintDescription": "仅允许前往F2_TEST_GATE。",
+        "completionCondition": "routeGenerated=true",
+        "isPreset": false,
+        "definitionStatus": "ENABLED",
+        "updatedAt": "2026-11-07T22:58:47.951673",
+        "updatedBy": "set"
+      },
+      "beforeDevice": {
+        "task": {
+          "id": 1090,
+          "taskCode": "TASK-20261107-1080",
+          "taskGoal": "F179_BASELINE_LOCATION_ALLOWED Synthetic passenger service F2_TEST_GATE",
+          "taskFamily": "EXT_07015330",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F179_BASELINE_LOCATION_ALLOWED Synthetic passenger service F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "DOWNGRADING",
+          "currentPlanVersionId": 1070,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": null,
+          "missingInfoQuestions": null,
+          "downgradeReason": "候选计划生成失败或模型服务不可用",
+          "isDryRun": false,
+          "createdAt": "2026-11-07T22:58:49.093339",
+          "updatedAt": "2026-11-07T22:58:49.214944",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 1070,
+            "versionNo": 1,
+            "source": "BASELINE_TEMPLATE",
+            "baselineTemplateId": 97,
+            "snapshotId": "CTX-20261107-1111",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "paramMapping": [
+                  {
+                    "target": "targetLocation",
+                    "source": "TEMPLATE_INPUT.targetLocation"
+                  }
+                ],
+                "stepTimeout": 600,
+                "completionCondition": "routeGenerated=true",
+                "stepGoal": "执行CAP_NAVIGATION能力（基线模板步骤）",
+                "precondition": "候选设备在线且空闲",
+                "failureHandling": "重试一次或转人工处理",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                }
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": null,
+            "ruleSetVersion": "V1.0",
+            "frozenAt": "2026-11-07T22:58:49.212825",
+            "createdAt": "2026-11-07T22:58:49.212825"
+          }
+        ],
+        "events": [
+          {
+            "id": 16260,
+            "taskId": 1090,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-07T22:58:49.095908",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F179_BASELINE_LOCATION_ALLOWED Synthetic passenger service F2_TEST_GATE",
+            "detail": "运行操作员oprator提交任务目标: F179_BASELINE_LOCATION_ALLOWED Synthetic passenger service F2_TEST_GATE",
+            "rawDetailSummary": "运行操作员oprator提交任务目标: F179_BASELINE_LOCATION_ALLOWED Synthetic passenger service F2_TEST_GATE"
+          },
+          {
+            "id": 16261,
+            "taskId": 1090,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-07T22:58:49.138432",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建",
+            "detail": "目标理解完成，关键信息已完整，进入规划上下文构建",
+            "rawDetailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 16262,
+            "taskId": 1090,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-07T22:58:49.152753",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261107-1110",
+            "detail": "生成规划上下文快照CTX-20261107-1110",
+            "rawDetailSummary": "生成规划上下文快照CTX-20261107-1110"
+          },
+          {
+            "id": 16263,
+            "taskId": 1090,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-07T22:58:49.182369",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_MODEL_FAILED",
+            "detailSummary": "候选计划生成调用失败: 规划模型服务调用超时或不可用: 503 Service Unavailable: \"{\"error\":\"synthetic isolated model unavailable\"}\"",
+            "detail": "候选计划生成调用失败: 规划模型服务调用超时或不可用: 503 Service Unavailable: \"{\"error\":\"synthetic isolated model unavailable\"}\"",
+            "rawDetailSummary": "候选计划生成调用失败: 规划模型服务调用超时或不可用: 503 Service Unavailable: \"{\"error\":\"synthetic isolated model unavailable\"}\""
+          },
+          {
+            "id": 16264,
+            "taskId": 1090,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-07T22:58:49.224802",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "已自动切换至基线模板G179 mapped baseline 1794063524376788200(V1.0)，原因: 候选计划生成失败或模型服务不可用，选择依据: [任务族精确匹配(EXT_07015330), 步骤数1步少优先, 最近试运行通过时间2026-11-07T22:58:45.878017优先]",
+            "detail": "已自动切换至基线模板G179 mapped baseline 1794063524376788200(V1.0)，原因: 候选计划生成失败或模型服务不可用，选择依据: [任务族精确匹配(EXT_07015330), 步骤数1步少优先, 最近试运行通过时间2026-11-07T22:58:45.878017优先]",
+            "rawDetailSummary": "已自动切换至基线模板G179 mapped baseline 1794063524376788200(V1.0)，原因: 候选计划生成失败或模型服务不可用，选择依据: [任务族精确匹配(EXT_07015330), 步骤数1步少优先, 最近试运行通过时间2026-11-07T22:58:45.878017优先]"
+          },
+          {
+            "id": 16265,
+            "taskId": 1090,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-07T22:58:49.234831",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)；AGT-8519A3B6(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求",
+            "detail": "步骤1候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)；AGT-8519A3B6(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求",
+            "rawDetailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)；AGT-8519A3B6(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求"
+          }
+        ],
+        "assignments": [
+          {
+            "id": 1586,
+            "stepSeq": 1,
+            "deviceAgentCode": "AGT-386E8C30",
+            "commandId": "CMD-20261107225849-24BB004B",
+            "stepStatus": "PENDING_ASSIGNMENT",
+            "retryCount": 0,
+            "executionResult": null,
+            "reasonCode": null,
+            "outputParams": null,
+            "dispatchedAt": null,
+            "feedbackAt": null,
+            "rejectedAgentIds": [],
+            "acceptanceRequestedAt": "2026-11-07T22:58:49.234831",
+            "acceptedAt": null,
+            "acceptanceDurationMs": null,
+            "acceptanceResponseTime": null
+          }
+        ],
+        "commands": [
+          "3706|TASK_ACCEPT|SENT"
+        ],
+        "bypassAuditRows": [],
+        "agentRows": [
+          {
+            "id": 18,
+            "agent_code": "AGT-386E8C30",
+            "device_id": 19,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-07T22:58:50.276136",
+            "created_at": "2026-11-05T13:04:16.81064",
+            "updated_at": "2026-11-05T13:04:16.81064",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 19,
+            "agent_code": "AGT-8519A3B6",
+            "device_id": 20,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-07T22:58:48.597816",
+            "created_at": "2026-11-05T13:04:17.772513",
+            "updated_at": "2026-11-05T13:04:17.772513",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 20,
+            "agent_code": "AGT-D20379F3",
+            "device_id": 21,
+            "agent_status": "ENABLED",
+            "online_status": "OFFLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-07T22:58:49.944104",
+            "created_at": "2026-11-05T13:05:21.137216",
+            "updated_at": "2026-11-05T13:05:21.137216",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          }
+        ],
+        "exceptions": [],
+        "commandRows": [
+          {
+            "id": 3706,
+            "command_id": "CMD-20261107225849-24BB004B",
+            "agent_code": "AGT-386E8C30",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 1090,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261107225849-24BB004B\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261107-1080\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-07T22:58:49.24249+08:00\",\"deadline\":\"2026-11-07T22:59:49.24249+08:00\"}",
+            "command_status": "SENT",
+            "response_payload": null,
+            "created_at": "2026-11-07T22:58:49.24249",
+            "updated_at": "2026-11-07T22:58:49.253634"
+          }
+        ],
+        "transport": {
+          "G160_F016_A": [
+            {
+              "at": "2026-11-07T22:58:49.251765+08:00",
+              "message": {
+                "commandId": "CMD-20261107225849-24BB004B",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261107-1080",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "issuedAt": 1794063529.24249,
+                "deadline": 1794063589.24249
+              }
+            }
+          ],
+          "G160_F016_B": [],
+          "G160_F016_C": []
+        }
+      },
+      "accepts": [
+        {
+          "request": {
+            "commandId": "CMD-20261107225849-24BB004B",
+            "commandType": "TASK_ACCEPT",
+            "attemptNo": 0,
+            "taskId": "TASK-20261107-1080",
+            "stepSeq": 1,
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE",
+              "routePreference": "BARRIER_FREE",
+              "targetX": 0.0,
+              "targetY": 0.0
+            },
+            "issuedAt": 1794063529.24249,
+            "deadline": 1794063589.24249
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-07T22:58:51.305818900+08:00"
+            }
+          }
+        }
+      ],
+      "feedbacks": [
+        {
+          "agent": "AGT-386E8C30",
+          "request": {
+            "commandId": "CMD-20261107225851-24BB004C",
+            "attemptNo": 0,
+            "executionResult": "SUCCESS",
+            "outputParams": {
+              "routeGenerated": true
+            }
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-07T22:58:51.800988900+08:00"
+            }
+          }
+        }
+      ],
+      "after": {
+        "task": {
+          "id": 1090,
+          "taskCode": "TASK-20261107-1080",
+          "taskGoal": "F179_BASELINE_LOCATION_ALLOWED Synthetic passenger service F2_TEST_GATE",
+          "taskFamily": "EXT_07015330",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F179_BASELINE_LOCATION_ALLOWED Synthetic passenger service F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "COMPLETED",
+          "currentPlanVersionId": 1070,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": null,
+          "missingInfoQuestions": null,
+          "downgradeReason": "候选计划生成失败或模型服务不可用",
+          "isDryRun": false,
+          "createdAt": "2026-11-07T22:58:49.093339",
+          "updatedAt": "2026-11-07T22:58:51.794993",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 1070,
+            "versionNo": 1,
+            "source": "BASELINE_TEMPLATE",
+            "baselineTemplateId": 97,
+            "snapshotId": "CTX-20261107-1111",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "paramMapping": [
+                  {
+                    "target": "targetLocation",
+                    "source": "TEMPLATE_INPUT.targetLocation"
+                  }
+                ],
+                "stepTimeout": 600,
+                "completionCondition": "routeGenerated=true",
+                "stepGoal": "执行CAP_NAVIGATION能力（基线模板步骤）",
+                "precondition": "候选设备在线且空闲",
+                "failureHandling": "重试一次或转人工处理",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                }
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": null,
+            "ruleSetVersion": "V1.0",
+            "frozenAt": "2026-11-07T22:58:49.212825",
+            "createdAt": "2026-11-07T22:58:49.212825"
+          }
+        ],
+        "events": [
+          {
+            "id": 16260,
+            "taskId": 1090,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-07T22:58:49.095908",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F179_BASELINE_LOCATION_ALLOWED Synthetic passenger service F2_TEST_GATE",
+            "detail": "运行操作员oprator提交任务目标: F179_BASELINE_LOCATION_ALLOWED Synthetic passenger service F2_TEST_GATE",
+            "rawDetailSummary": "运行操作员oprator提交任务目标: F179_BASELINE_LOCATION_ALLOWED Synthetic passenger service F2_TEST_GATE"
+          },
+          {
+            "id": 16261,
+            "taskId": 1090,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-07T22:58:49.138432",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建",
+            "detail": "目标理解完成，关键信息已完整，进入规划上下文构建",
+            "rawDetailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 16262,
+            "taskId": 1090,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-07T22:58:49.152753",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261107-1110",
+            "detail": "生成规划上下文快照CTX-20261107-1110",
+            "rawDetailSummary": "生成规划上下文快照CTX-20261107-1110"
+          },
+          {
+            "id": 16263,
+            "taskId": 1090,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-07T22:58:49.182369",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_MODEL_FAILED",
+            "detailSummary": "候选计划生成调用失败: 规划模型服务调用超时或不可用: 503 Service Unavailable: \"{\"error\":\"synthetic isolated model unavailable\"}\"",
+            "detail": "候选计划生成调用失败: 规划模型服务调用超时或不可用: 503 Service Unavailable: \"{\"error\":\"synthetic isolated model unavailable\"}\"",
+            "rawDetailSummary": "候选计划生成调用失败: 规划模型服务调用超时或不可用: 503 Service Unavailable: \"{\"error\":\"synthetic isolated model unavailable\"}\""
+          },
+          {
+            "id": 16264,
+            "taskId": 1090,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-07T22:58:49.224802",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "已自动切换至基线模板G179 mapped baseline 1794063524376788200(V1.0)，原因: 候选计划生成失败或模型服务不可用，选择依据: [任务族精确匹配(EXT_07015330), 步骤数1步少优先, 最近试运行通过时间2026-11-07T22:58:45.878017优先]",
+            "detail": "已自动切换至基线模板G179 mapped baseline 1794063524376788200(V1.0)，原因: 候选计划生成失败或模型服务不可用，选择依据: [任务族精确匹配(EXT_07015330), 步骤数1步少优先, 最近试运行通过时间2026-11-07T22:58:45.878017优先]",
+            "rawDetailSummary": "已自动切换至基线模板G179 mapped baseline 1794063524376788200(V1.0)，原因: 候选计划生成失败或模型服务不可用，选择依据: [任务族精确匹配(EXT_07015330), 步骤数1步少优先, 最近试运行通过时间2026-11-07T22:58:45.878017优先]"
+          },
+          {
+            "id": 16265,
+            "taskId": 1090,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-07T22:58:49.234831",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)；AGT-8519A3B6(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求",
+            "detail": "步骤1候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)；AGT-8519A3B6(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求",
+            "rawDetailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)；AGT-8519A3B6(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求"
+          },
+          {
+            "id": 16266,
+            "taskId": 1090,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-07T22:58:51.288057",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-386E8C30接受步骤1承接请求",
+            "detail": "设备代理AGT-386E8C30接受步骤1承接请求",
+            "rawDetailSummary": "设备代理AGT-386E8C30接受步骤1承接请求"
+          },
+          {
+            "id": 16267,
+            "taskId": 1090,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-07T22:58:51.294862",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261107225851-24BB004C已下发至设备代理AGT-386E8C30，业务意图: 执行CAP_NAVIGATION能力（基线模板步骤）",
+            "detail": "指令CMD-20261107225851-24BB004C已下发至设备代理AGT-386E8C30，业务意图: 执行CAP_NAVIGATION能力（基线模板步骤）",
+            "rawDetailSummary": "指令CMD-20261107225851-24BB004C已下发至设备代理AGT-386E8C30，业务意图: 执行CAP_NAVIGATION能力（基线模板步骤）"
+          },
+          {
+            "id": 16268,
+            "taskId": 1090,
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "occurredAt": "2026-11-07T22:58:51.787316",
+            "trigger": "SYSTEM",
+            "reasonCode": "DEVICE_SUCCESS",
+            "detailSummary": "指令CMD-20261107225851-24BB004C收到设备代理AGT-386E8C30执行反馈: SUCCESS",
+            "detail": "指令CMD-20261107225851-24BB004C收到设备代理AGT-386E8C30执行反馈: SUCCESS",
+            "rawDetailSummary": "指令CMD-20261107225851-24BB004C收到设备代理AGT-386E8C30执行反馈: SUCCESS"
+          },
+          {
+            "id": 16269,
+            "taskId": 1090,
+            "eventType": "STEP_COMPLETED",
+            "occurredAt": "2026-11-07T22:58:51.792448",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1完成条件已满足: routeGenerated=true",
+            "detail": "步骤1完成条件已满足: routeGenerated=true",
+            "rawDetailSummary": "步骤1完成条件已满足: routeGenerated=true"
+          },
+          {
+            "id": 16270,
+            "taskId": 1090,
+            "eventType": "TASK_COMPLETED",
+            "occurredAt": "2026-11-07T22:58:51.797597",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "全部步骤完成条件均已满足，任务完成",
+            "detail": "全部步骤完成条件均已满足，任务完成",
+            "rawDetailSummary": "全部步骤完成条件均已满足，任务完成"
+          }
+        ],
+        "assignments": [
+          {
+            "id": 1586,
+            "stepSeq": 1,
+            "deviceAgentCode": "AGT-386E8C30",
+            "commandId": "CMD-20261107225849-24BB004B",
+            "stepStatus": "COMPLETED",
+            "retryCount": 0,
+            "executionResult": "SUCCESS",
+            "reasonCode": "DEVICE_SUCCESS",
+            "outputParams": {
+              "routeGenerated": true
+            },
+            "dispatchedAt": "2026-11-07T22:58:51.293134",
+            "feedbackAt": "2026-11-07T22:58:51.787316",
+            "rejectedAgentIds": [],
+            "acceptanceRequestedAt": "2026-11-07T22:58:49.234831",
+            "acceptedAt": "2026-11-07T22:58:51.284767",
+            "acceptanceDurationMs": 2049,
+            "acceptanceResponseTime": "2049ms"
+          }
+        ],
+        "commands": [
+          "3706|TASK_ACCEPT|ACCEPTED",
+          "3707|EXECUTE_CAPABILITY|SUCCEEDED"
+        ],
+        "bypassAuditRows": [],
+        "agentRows": [
+          {
+            "id": 18,
+            "agent_code": "AGT-386E8C30",
+            "device_id": 19,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-07T22:58:50.276136",
+            "created_at": "2026-11-05T13:04:16.81064",
+            "updated_at": "2026-11-05T13:04:16.81064",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 19,
+            "agent_code": "AGT-8519A3B6",
+            "device_id": 20,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-07T22:58:52.553458",
+            "created_at": "2026-11-05T13:04:17.772513",
+            "updated_at": "2026-11-05T13:04:17.772513",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 20,
+            "agent_code": "AGT-D20379F3",
+            "device_id": 21,
+            "agent_status": "ENABLED",
+            "online_status": "OFFLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-07T22:58:49.944104",
+            "created_at": "2026-11-05T13:05:21.137216",
+            "updated_at": "2026-11-05T13:05:21.137216",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          }
+        ],
+        "exceptions": [],
+        "commandRows": [
+          {
+            "id": 3706,
+            "command_id": "CMD-20261107225849-24BB004B",
+            "agent_code": "AGT-386E8C30",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 1090,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261107225849-24BB004B\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261107-1080\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-07T22:58:49.24249+08:00\",\"deadline\":\"2026-11-07T22:59:49.24249+08:00\"}",
+            "command_status": "ACCEPTED",
+            "response_payload": "{\"commandId\":\"CMD-20261107225849-24BB004B\",\"accepted\":true,\"rejectReason\":null}",
+            "created_at": "2026-11-07T22:58:49.24249",
+            "updated_at": "2026-11-07T22:58:51.282235"
+          },
+          {
+            "id": 3707,
+            "command_id": "CMD-20261107225851-24BB004C",
+            "agent_code": "AGT-386E8C30",
+            "command_type": "EXECUTE_CAPABILITY",
+            "attempt_no": 0,
+            "task_id": 1090,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261107225851-24BB004C\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261107-1080\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-07T22:58:51.3014181+08:00\",\"deadline\":\"2026-11-07T22:59:51.3014181+08:00\"}",
+            "command_status": "SUCCEEDED",
+            "response_payload": "{\"commandId\":\"CMD-20261107225851-24BB004C\",\"attemptNo\":0,\"executionResult\":\"SUCCESS\",\"reasonCode\":\"DEVICE_SUCCESS\",\"outputParams\":{\"routeGenerated\":true}}",
+            "created_at": "2026-11-07T22:58:51.301418",
+            "updated_at": "2026-11-07T22:58:51.784632"
+          }
+        ],
+        "transport": {
+          "G160_F016_A": [
+            {
+              "at": "2026-11-07T22:58:49.251765+08:00",
+              "message": {
+                "commandId": "CMD-20261107225849-24BB004B",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261107-1080",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "issuedAt": 1794063529.24249,
+                "deadline": 1794063589.24249
+              }
+            },
+            {
+              "at": "2026-11-07T22:58:51.309556+08:00",
+              "message": {
+                "commandId": "CMD-20261107225851-24BB004C",
+                "commandType": "EXECUTE_CAPABILITY",
+                "attemptNo": 0,
+                "taskId": "TASK-20261107-1080",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "issuedAt": 1794063531.301418,
+                "deadline": 1794063591.301418
+              }
+            }
+          ],
+          "G160_F016_B": [],
+          "G160_F016_C": []
+        }
+      },
+      "checks": {
+        "baselineSource": true,
+        "completed": true,
+        "validationPass": true
+      },
+      "result": "P"
+    },
+    {
+      "name": "baseline-location-prohibited",
+      "taskId": 1091,
+      "request": {
+        "taskGoal": "F179_BASELINE_LOCATION_PROHIBITED Synthetic passenger service F2_TEST_GATE",
+        "taskFamily": "EXT_07015330",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "response": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 1091,
+            "taskCode": "TASK-20261107-1081",
+            "taskGoal": "F179_BASELINE_LOCATION_PROHIBITED Synthetic passenger service F2_TEST_GATE",
+            "taskFamily": "EXT_07015330",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=true",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F179_BASELINE_LOCATION_PROHIBITED Synthetic passenger service F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "PLANNING",
+            "currentPlanVersionId": null,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": null,
+            "failureReason": null,
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-07T22:58:54.0878441",
+            "updatedAt": "2026-11-07T22:58:54.0878441",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-07T22:58:54.172964100+08:00"
+        }
+      },
+      "definition": {
+        "id": 118,
+        "definitionCode": "EXT_07015330",
+        "taskName": "G179 F022 acceptance 225841",
+        "goalTemplate": "Synthetic navigation",
+        "sceneParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "F2_TEST_GATE",
+            "range": null
+          }
+        ],
+        "availableCapabilityTypes": [
+          "CAP_NAVIGATION"
+        ],
+        "constraintDescription": "禁止前往F2_TEST_GATE；仅允许前往F2_ZONE_A。",
+        "completionCondition": "routeGenerated=true",
+        "isPreset": false,
+        "definitionStatus": "ENABLED",
+        "updatedAt": "2026-11-07T22:58:53.326026",
+        "updatedBy": "set"
+      },
+      "beforeDevice": {
+        "task": {
+          "id": 1091,
+          "taskCode": "TASK-20261107-1081",
+          "taskGoal": "F179_BASELINE_LOCATION_PROHIBITED Synthetic passenger service F2_TEST_GATE",
+          "taskFamily": "EXT_07015330",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F179_BASELINE_LOCATION_PROHIBITED Synthetic passenger service F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": null,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划生成失败或模型服务不可用；所选基线模板校验失败: ERR_TASK_DEFINITION_CONSTRAINT",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-07T22:58:54.087844",
+          "updatedAt": "2026-11-07T22:58:54.170403",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 1071,
+            "versionNo": 1,
+            "source": "BASELINE_TEMPLATE",
+            "baselineTemplateId": 97,
+            "snapshotId": "CTX-20261107-1113",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "paramMapping": [
+                  {
+                    "target": "targetLocation",
+                    "source": "TEMPLATE_INPUT.targetLocation"
+                  }
+                ],
+                "stepTimeout": 600,
+                "completionCondition": "routeGenerated=true",
+                "stepGoal": "执行CAP_NAVIGATION能力（基线模板步骤）",
+                "precondition": "候选设备在线且空闲",
+                "failureHandling": "重试一次或转人工处理",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                }
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "FAIL",
+            "validationErrors": [
+              {
+                "errorType": "CONSTRAINT",
+                "description": "步骤1参数 targetLocation=F2_TEST_GATE 与任务定义约束冲突（禁止: F2_TEST_GATE）",
+                "stepSeq": 1,
+                "reasonCode": "ERR_TASK_DEFINITION_CONSTRAINT"
+              },
+              {
+                "errorType": "CONSTRAINT",
+                "description": "步骤1目标地点 F2_TEST_GATE 超出任务定义约束限定范围（仅允许: [F2_ZONE_A]）",
+                "stepSeq": 1,
+                "reasonCode": "ERR_TASK_DEFINITION_CONSTRAINT"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": null,
+            "ruleSetVersion": "V1.0",
+            "frozenAt": null,
+            "createdAt": "2026-11-07T22:58:54.165783"
+          }
+        ],
+        "events": [
+          {
+            "id": 16272,
+            "taskId": 1091,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-07T22:58:54.090368",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F179_BASELINE_LOCATION_PROHIBITED Synthetic passenger service F2_TEST_GATE",
+            "detail": "运行操作员oprator提交任务目标: F179_BASELINE_LOCATION_PROHIBITED Synthetic passenger service F2_TEST_GATE",
+            "rawDetailSummary": "运行操作员oprator提交任务目标: F179_BASELINE_LOCATION_PROHIBITED Synthetic passenger service F2_TEST_GATE"
+          },
+          {
+            "id": 16273,
+            "taskId": 1091,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-07T22:58:54.116261",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建",
+            "detail": "目标理解完成，关键信息已完整，进入规划上下文构建",
+            "rawDetailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 16274,
+            "taskId": 1091,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-07T22:58:54.126109",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261107-1112",
+            "detail": "生成规划上下文快照CTX-20261107-1112",
+            "rawDetailSummary": "生成规划上下文快照CTX-20261107-1112"
+          },
+          {
+            "id": 16275,
+            "taskId": 1091,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-07T22:58:54.137457",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_MODEL_FAILED",
+            "detailSummary": "候选计划生成调用失败: 规划模型服务调用超时或不可用: 503 Service Unavailable: \"{\"error\":\"synthetic isolated model unavailable\"}\"",
+            "detail": "候选计划生成调用失败: 规划模型服务调用超时或不可用: 503 Service Unavailable: \"{\"error\":\"synthetic isolated model unavailable\"}\"",
+            "rawDetailSummary": "候选计划生成调用失败: 规划模型服务调用超时或不可用: 503 Service Unavailable: \"{\"error\":\"synthetic isolated model unavailable\"}\""
+          },
+          {
+            "id": 16276,
+            "taskId": 1091,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-07T22:58:54.167944",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_TASK_DEFINITION_CONSTRAINT",
+            "detailSummary": "所选基线模板G179 mapped baseline 1794063524376788200三类校验未通过: 2项错误 [CONSTRAINT 步骤1: 步骤1参数 targetLocation=F2_TEST_GATE 与任务定义约束冲突（禁止: F2_TEST_GATE）(ERR_TASK_DEFINITION_CONSTRAINT); CONSTRAINT 步骤1: 步骤1目标地点 F2_TEST_GATE 超出任务定义约束限定范围（仅允许: [F2_ZONE_A]）(ERR_TASK_DEFINITION_CONSTRAINT)]",
+            "detail": "所选基线模板G179 mapped baseline 1794063524376788200三类校验未通过: 2项错误 [CONSTRAINT 步骤1: 步骤1参数 targetLocation=F2_TEST_GATE 与任务定义约束冲突（禁止: F2_TEST_GATE）(ERR_TASK_DEFINITION_CONSTRAINT); CONSTRAINT 步骤1: 步骤1目标地点 F2_TEST_GATE 超出任务定义约束限定范围（仅允许: [F2_ZONE_A]）(ERR_TASK_DEFINITION_CONSTRAINT)]",
+            "rawDetailSummary": "所选基线模板G179 mapped baseline 1794063524376788200三类校验未通过: 2项错误 [CONSTRAINT 步骤1: 步骤1参数 targetLocation=F2_TEST_GATE 与任务定义约束冲突（禁止: F2_TEST_GATE）(ERR_TASK_DEFINITION_CONSTRAINT); CONSTRAINT 步骤1: 步骤1目标地点 F2_TEST_GATE 超出任务定义约束限定范围（仅允许: [F2_ZONE_A]）(ERR_TASK_DEFINITION_CONSTRAINT)]"
+          },
+          {
+            "id": 16277,
+            "taskId": 1091,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-07T22:58:54.170403",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划生成失败或模型服务不可用；所选基线模板校验失败: ERR_TASK_DEFINITION_CONSTRAINT",
+            "detail": "候选计划生成失败或模型服务不可用；所选基线模板校验失败: ERR_TASK_DEFINITION_CONSTRAINT",
+            "rawDetailSummary": "候选计划生成失败或模型服务不可用；所选基线模板校验失败: ERR_TASK_DEFINITION_CONSTRAINT"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": [],
+        "agentRows": [
+          {
+            "id": 18,
+            "agent_code": "AGT-386E8C30",
+            "device_id": 19,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-07T22:58:54.292516",
+            "created_at": "2026-11-05T13:04:16.81064",
+            "updated_at": "2026-11-05T13:04:16.81064",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 19,
+            "agent_code": "AGT-8519A3B6",
+            "device_id": 20,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-07T22:58:53.80071",
+            "created_at": "2026-11-05T13:04:17.772513",
+            "updated_at": "2026-11-05T13:04:17.772513",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 20,
+            "agent_code": "AGT-D20379F3",
+            "device_id": 21,
+            "agent_status": "ENABLED",
+            "online_status": "OFFLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-07T22:58:54.074402",
+            "created_at": "2026-11-05T13:05:21.137216",
+            "updated_at": "2026-11-05T13:05:21.137216",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          }
+        ],
+        "exceptions": [],
+        "commandRows": [],
+        "transport": {
+          "G160_F016_A": [],
+          "G160_F016_B": [],
+          "G160_F016_C": []
+        }
+      },
+      "after": {
+        "task": {
+          "id": 1091,
+          "taskCode": "TASK-20261107-1081",
+          "taskGoal": "F179_BASELINE_LOCATION_PROHIBITED Synthetic passenger service F2_TEST_GATE",
+          "taskFamily": "EXT_07015330",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F179_BASELINE_LOCATION_PROHIBITED Synthetic passenger service F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": null,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划生成失败或模型服务不可用；所选基线模板校验失败: ERR_TASK_DEFINITION_CONSTRAINT",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-07T22:58:54.087844",
+          "updatedAt": "2026-11-07T22:58:54.170403",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 1071,
+            "versionNo": 1,
+            "source": "BASELINE_TEMPLATE",
+            "baselineTemplateId": 97,
+            "snapshotId": "CTX-20261107-1113",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "paramMapping": [
+                  {
+                    "target": "targetLocation",
+                    "source": "TEMPLATE_INPUT.targetLocation"
+                  }
+                ],
+                "stepTimeout": 600,
+                "completionCondition": "routeGenerated=true",
+                "stepGoal": "执行CAP_NAVIGATION能力（基线模板步骤）",
+                "precondition": "候选设备在线且空闲",
+                "failureHandling": "重试一次或转人工处理",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                }
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "FAIL",
+            "validationErrors": [
+              {
+                "errorType": "CONSTRAINT",
+                "description": "步骤1参数 targetLocation=F2_TEST_GATE 与任务定义约束冲突（禁止: F2_TEST_GATE）",
+                "stepSeq": 1,
+                "reasonCode": "ERR_TASK_DEFINITION_CONSTRAINT"
+              },
+              {
+                "errorType": "CONSTRAINT",
+                "description": "步骤1目标地点 F2_TEST_GATE 超出任务定义约束限定范围（仅允许: [F2_ZONE_A]）",
+                "stepSeq": 1,
+                "reasonCode": "ERR_TASK_DEFINITION_CONSTRAINT"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": null,
+            "ruleSetVersion": "V1.0",
+            "frozenAt": null,
+            "createdAt": "2026-11-07T22:58:54.165783"
+          }
+        ],
+        "events": [
+          {
+            "id": 16272,
+            "taskId": 1091,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-07T22:58:54.090368",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F179_BASELINE_LOCATION_PROHIBITED Synthetic passenger service F2_TEST_GATE",
+            "detail": "运行操作员oprator提交任务目标: F179_BASELINE_LOCATION_PROHIBITED Synthetic passenger service F2_TEST_GATE",
+            "rawDetailSummary": "运行操作员oprator提交任务目标: F179_BASELINE_LOCATION_PROHIBITED Synthetic passenger service F2_TEST_GATE"
+          },
+          {
+            "id": 16273,
+            "taskId": 1091,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-07T22:58:54.116261",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建",
+            "detail": "目标理解完成，关键信息已完整，进入规划上下文构建",
+            "rawDetailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 16274,
+            "taskId": 1091,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-07T22:58:54.126109",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261107-1112",
+            "detail": "生成规划上下文快照CTX-20261107-1112",
+            "rawDetailSummary": "生成规划上下文快照CTX-20261107-1112"
+          },
+          {
+            "id": 16275,
+            "taskId": 1091,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-07T22:58:54.137457",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_MODEL_FAILED",
+            "detailSummary": "候选计划生成调用失败: 规划模型服务调用超时或不可用: 503 Service Unavailable: \"{\"error\":\"synthetic isolated model unavailable\"}\"",
+            "detail": "候选计划生成调用失败: 规划模型服务调用超时或不可用: 503 Service Unavailable: \"{\"error\":\"synthetic isolated model unavailable\"}\"",
+            "rawDetailSummary": "候选计划生成调用失败: 规划模型服务调用超时或不可用: 503 Service Unavailable: \"{\"error\":\"synthetic isolated model unavailable\"}\""
+          },
+          {
+            "id": 16276,
+            "taskId": 1091,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-07T22:58:54.167944",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_TASK_DEFINITION_CONSTRAINT",
+            "detailSummary": "所选基线模板G179 mapped baseline 1794063524376788200三类校验未通过: 2项错误 [CONSTRAINT 步骤1: 步骤1参数 targetLocation=F2_TEST_GATE 与任务定义约束冲突（禁止: F2_TEST_GATE）(ERR_TASK_DEFINITION_CONSTRAINT); CONSTRAINT 步骤1: 步骤1目标地点 F2_TEST_GATE 超出任务定义约束限定范围（仅允许: [F2_ZONE_A]）(ERR_TASK_DEFINITION_CONSTRAINT)]",
+            "detail": "所选基线模板G179 mapped baseline 1794063524376788200三类校验未通过: 2项错误 [CONSTRAINT 步骤1: 步骤1参数 targetLocation=F2_TEST_GATE 与任务定义约束冲突（禁止: F2_TEST_GATE）(ERR_TASK_DEFINITION_CONSTRAINT); CONSTRAINT 步骤1: 步骤1目标地点 F2_TEST_GATE 超出任务定义约束限定范围（仅允许: [F2_ZONE_A]）(ERR_TASK_DEFINITION_CONSTRAINT)]",
+            "rawDetailSummary": "所选基线模板G179 mapped baseline 1794063524376788200三类校验未通过: 2项错误 [CONSTRAINT 步骤1: 步骤1参数 targetLocation=F2_TEST_GATE 与任务定义约束冲突（禁止: F2_TEST_GATE）(ERR_TASK_DEFINITION_CONSTRAINT); CONSTRAINT 步骤1: 步骤1目标地点 F2_TEST_GATE 超出任务定义约束限定范围（仅允许: [F2_ZONE_A]）(ERR_TASK_DEFINITION_CONSTRAINT)]"
+          },
+          {
+            "id": 16277,
+            "taskId": 1091,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-07T22:58:54.170403",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划生成失败或模型服务不可用；所选基线模板校验失败: ERR_TASK_DEFINITION_CONSTRAINT",
+            "detail": "候选计划生成失败或模型服务不可用；所选基线模板校验失败: ERR_TASK_DEFINITION_CONSTRAINT",
+            "rawDetailSummary": "候选计划生成失败或模型服务不可用；所选基线模板校验失败: ERR_TASK_DEFINITION_CONSTRAINT"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": [],
+        "agentRows": [
+          {
+            "id": 18,
+            "agent_code": "AGT-386E8C30",
+            "device_id": 19,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-07T22:58:54.292516",
+            "created_at": "2026-11-05T13:04:16.81064",
+            "updated_at": "2026-11-05T13:04:16.81064",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 19,
+            "agent_code": "AGT-8519A3B6",
+            "device_id": 20,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-07T22:58:53.80071",
+            "created_at": "2026-11-05T13:04:17.772513",
+            "updated_at": "2026-11-05T13:04:17.772513",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 20,
+            "agent_code": "AGT-D20379F3",
+            "device_id": 21,
+            "agent_status": "ENABLED",
+            "online_status": "OFFLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-07T22:58:54.074402",
+            "created_at": "2026-11-05T13:05:21.137216",
+            "updated_at": "2026-11-05T13:05:21.137216",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          }
+        ],
+        "exceptions": [],
+        "commandRows": [],
+        "transport": {
+          "G160_F016_A": [],
+          "G160_F016_B": [],
+          "G160_F016_C": []
+        }
+      },
+      "checks": {
+        "baselineHardConstraintFail": true,
+        "definitionReason": true,
+        "noFrozen": true,
+        "noExecute": true
+      },
+      "result": "P",
+      "terminateResponse": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 1091,
+            "taskCode": "TASK-20261107-1081",
+            "taskGoal": "F179_BASELINE_LOCATION_PROHIBITED Synthetic passenger service F2_TEST_GATE",
+            "taskFamily": "EXT_07015330",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=true",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F179_BASELINE_LOCATION_PROHIBITED Synthetic passenger service F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "MANUAL_TERMINATED",
+            "currentPlanVersionId": null,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": "Synthetic F022 cleanup",
+            "failureReason": "候选计划生成失败或模型服务不可用；所选基线模板校验失败: ERR_TASK_DEFINITION_CONSTRAINT",
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-07T22:58:54.087844",
+            "updatedAt": "2026-11-07T22:58:56.8204472",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-07T22:58:56.825567700+08:00"
+        }
+      }
+    }
+  ],
+  "health": {
+    "status": "UP"
+  },
+  "diagnostics": [],
+  "taskIds": [
+    1089,
+    1090,
+    1091
+  ],
+  "templateIds": [
+    97
+  ],
+  "definitionIds": [
+    118
+  ],
+  "cleanup": {
+    "at": "2026-11-07T22:58:58.563895+08:00",
+    "errors": [],
+    "ownedAgentRows": [
+      {
+        "id": 18,
+        "agent_code": "AGT-386E8C30",
+        "device_id": 19,
+        "agent_status": "DISABLED",
+        "online_status": "OFFLINE",
+        "work_status": "IDLE",
+        "current_task_id": null,
+        "current_step_seq": null,
+        "last_reported_at": "2026-11-07T22:58:57.641662",
+        "created_at": "2026-11-05T13:04:16.81064",
+        "updated_at": "2026-11-05T13:04:16.81064",
+        "business_status": {
+          "workloadScore": 0,
+          "capabilityMatch": 1
+        }
+      },
+      {
+        "id": 19,
+        "agent_code": "AGT-8519A3B6",
+        "device_id": 20,
+        "agent_status": "DISABLED",
+        "online_status": "OFFLINE",
+        "work_status": "IDLE",
+        "current_task_id": null,
+        "current_step_seq": null,
+        "last_reported_at": "2026-11-07T22:58:57.68424",
+        "created_at": "2026-11-05T13:04:17.772513",
+        "updated_at": "2026-11-05T13:04:17.772513",
+        "business_status": {
+          "workloadScore": 0,
+          "capabilityMatch": 1
+        }
+      },
+      {
+        "id": 20,
+        "agent_code": "AGT-D20379F3",
+        "device_id": 21,
+        "agent_status": "DISABLED",
+        "online_status": "OFFLINE",
+        "work_status": "IDLE",
+        "current_task_id": null,
+        "current_step_seq": null,
+        "last_reported_at": "2026-11-07T22:58:57.993987",
+        "created_at": "2026-11-05T13:05:21.137216",
+        "updated_at": "2026-11-05T13:05:21.137216",
+        "business_status": {
+          "workloadScore": 0,
+          "capabilityMatch": 1
+        }
+      }
+    ],
+    "activeAssignments": "0"
+  },
+  "endedAt": "2026-11-07T22:58:59.541956+08:00"
+}
