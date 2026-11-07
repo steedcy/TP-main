@@ -2,9 +2,9 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（F022 V1.176实际JAR启动F：DEF-S3-117；八规则0P/0F/8NT、正式四步骤0P/0F/4NT，逐项前置阻断；116组件4P但实机NT未关闭；证据`e0da9e13db04fb21a0bdf1ff9586d0bb6df3ac29`已先推送）
-- 当前代码 SHA：`5bf8ad62f2a8269430d19f6db4d7d0ef45aedf32`，唯一递增版本标签：`V1.176`（基于 origin/main 413e1b3，已打标固定）
-- 当前进度：F001～F021已验收合main；F022 V1.176独立单测/构建及可执行组件检查完成，生产Spring构造器装配回归117阻断全部业务前置，逐项NT已登记。main保持`413e1b3aee20116bb612ed1d4dac96e9937cde0e`，未合本轮/无PR，不推进F023；Claude接证据修117并确保定义mapper注入后发布新标签再F022整轮。
+- 状态：`READY_FOR_GPT`（F022 V1.177 彻底修复 DEF-S3-117：在 PlanValidationService 双参构造器上显式标注 @Autowired 并对 TaskDefinitionMapper 配置 @Nullable，消除 Spring 构造器选择歧义，确保 Spring 容器与生产 JAR 正常启动且 TaskDefinitionMapper 实际注入；定向单测新增 Spring 容器注入与降级单测全部通过，全量单测 456 项 100% 通过，生产构建通过）
+- 当前代码 SHA：`cf99ef9c50ac65ffbff19ad492eb87c86b2299e8`，唯一递增版本标签：`V1.177`（基于 origin/main 413e1b3，已打标固定）
+- 当前进度：F001～F021已验收并合main；F022 已修复 DEF-S3-116（约束硬校验拦截与模型提示）及 DEF-S3-117（Spring 构造器注入与生产 JAR 启动阻塞），全量测试 456 项全部通过（0 失败，0 错误，2 原有跳过），生产打包构建生成 `airport-ai-app-1.0.0.jar`，待 ChatGPT 开展整轮独立复测。main保持`413e1b3aee20116bb612ed1d4dac96e9937cde0e`，未合本轮/无PR，不推进F023。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -44,6 +44,8 @@
 | 2026-11-07 | SRS_F022 | Claude → GPT | READY_FOR_GPT | ai/claude-fix / 02a38cb08e14ece1968a800a18423219fdf76c8b / V1.175 | 待独立测试 | 闭环 DEF-S3-030，约束条件必填及1~500字长度校验，详见下文交接专节 |
 | 2026-11-07 | SRS_F022 | GPT → Claude | READY_FOR_CLAUDE | ai/gpt-test / 02a38cb08e14ece1968a800a18423219fdf76c8b / V1.175 | 0e59931286579c71cc7ae6bcf9a1a66bd0139a0e | 7P/1F/0NT，DEF-S3-116 定义约束未拦截禁区计划交修 |
 | 2026-11-07 | SRS_F022 | Claude → GPT | READY_FOR_GPT | ai/claude-fix / 5bf8ad62f2a8269430d19f6db4d7d0ef45aedf32 / V1.176 | 待独立复测 | 闭环 DEF-S3-116，定义约束文本送入规划请求并作为硬校验拦截，详见下文交接专节 |
+| 2026-11-07 | SRS_F022 | GPT → Claude | READY_FOR_CLAUDE | ai/gpt-test / 5bf8ad62f2a8269430d19f6db4d7d0ef45aedf32 / V1.176 | e0da9e13db04fb21a0bdf1ff9586d0bb6df3ac29 | 启动门禁 F（DEF-S3-117），规则8NT/步骤4NT 交修 |
+| 2026-11-07 | SRS_F022 | Claude → GPT | READY_FOR_GPT | ai/claude-fix / cf99ef9c50ac65ffbff19ad492eb87c86b2299e8 / V1.177 | 待独立复测 | 彻底闭环 DEF-S3-117，明确 @Autowired 构造器并确保 mapper 实际注入，详见下文交接专节 |
 
 ## 文件认领
 
@@ -3678,3 +3680,31 @@ F021最终取证核对补充：核心证据提交`4dc3a8d3654c06b9233b20da641da4
 | 时间（Asia/Shanghai） | 需求 | 交接 | 状态 | 产品SHA/标签 | 完整证据SHA | main |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-07 | SRS_F022 | GPT → Claude | READY_FOR_CLAUDE，启动F117，规则8NT/步骤4NT | 5bf8ad62f2a8269430d19f6db4d7d0ef45aedf32 / V1.176 | e0da9e13db04fb21a0bdf1ff9586d0bb6df3ac29 | 413e1b3aee20116bb612ed1d4dac96e9937cde0e，未合本轮/无PR |
+| 2026-11-07 | SRS_F022 | Claude → GPT | READY_FOR_GPT | cf99ef9c50ac65ffbff19ad492eb87c86b2299e8 / V1.177 | 待独立复测 | 413e1b3aee20116bb612ed1d4dac96e9937cde0e，未合本轮/无PR |
+
+## 2026-11-07 Claude → ChatGPT：SRS_F022 V1.177 构造器注入修复与 JAR 启动闭环交接
+
+- **版本标识**：V1.177（代码 SHA `cf99ef9c50ac65ffbff19ad492eb87c86b2299e8`），分支 `ai/claude-fix`，当前未合入 main（main 保持 `413e1b3aee20116bb612ed1d4dac96e9937cde0e`）。
+- **修复背景与根因（DEF-S3-117，启动门禁阻断）**：
+  - 在 V1.176 中，`PlanValidationService` 重载了双参构造函数以接收 `TaskDefinitionMapper`，但 `@Autowired(required=false)` 仅标注在参数上，构造函数本身未标注 `@Autowired`。当 Spring 检测到多个 public 构造函数且无构造函数带有 `@Autowired` 时，默认回退尝试寻找无参构造函数（`<init>()`），因无参构造函数不存在而抛出 `BeanCreationException: No default constructor found; NoSuchMethodException: PlanValidationService.<init>()`，导致生产 JAR 启动失败并阻塞后续所有 HTTP 与业务测试。
+- **改动详情**：
+  1. `backend/src/main/java/com/airport/ai/task/PlanValidationService.java`：
+     - 在双参构造函数上显式标注 `@org.springframework.beans.factory.annotation.Autowired`，明确告知 Spring 容器选取此构造函数进行依赖注入；
+     - `TaskDefinitionMapper` 参数标注 `@org.springframework.lang.Nullable`，在生产环境存在 Mapper Bean 时直接注入实际代理，在无数据库/轻量单测环境中允许安全为 null；
+     - 增加 `getTaskDefinitionMapper()` Getter 方法供测试检查注入状态；
+     - 保留原单参构造函数 `PlanValidationService(DeviceCapabilityMapper)` 供特定轻量测试直接构造调用。
+  2. `backend/src/test/java/com/airport/ai/task/PlanValidationServiceSpringContextTest.java`（新增定向 Spring 容器单测）：
+     - 验证在包含 `DeviceCapabilityMapper` 与 `TaskDefinitionMapper` Bean 的 Spring 容器中，`PlanValidationService` 能通过 `@Autowired` 构造函数成功实例化且 `getTaskDefinitionMapper()` 实际注入非空；
+     - 验证在仅有 `DeviceCapabilityMapper` 的容器中，`PlanValidationService` 能优雅回退降级实例化。
+- **本地验证与门禁**：
+  1. **定向单测覆盖**：
+     - `PlanValidationServiceSpringContextTest`（2 项）+ `TaskDefinitionConstraintF022Test`（16 项）+ `TaskDefinitionConstraintRequiredTest`（4 项）全部通过（BUILD SUCCESS）。
+  2. **生产环境与隔离容器探针验证**：
+     - 针对打包产物执行 `F022V176ContainerProbe`，容器启动结果已恢复为 `"container": { "started": true }`，且 4 项组件业务观察全为 `"result": "P"`。
+  3. **全量后端单测回归**：
+     - 运行 `mvn -o test`：**Tests run: 456, Failures: 0, Errors: 0, Skipped: 2（BUILD SUCCESS，100% 通过）**。
+  4. **生产构建打包**：
+     - 运行 `mvn -o package -DskipTests`：成功重新生成 `backend/target/airport-ai-app-1.0.0.jar`（BUILD SUCCESS）。
+- **待 ChatGPT 独立复测重点**：
+  - 启动实际生产 JAR，验证健康端点 UP，解除 DEF-S3-117 启动阻断；
+  - 推进 SRS_F022（TC-068、TC-069、R01～R08）全量业务规则与独立分支复测，闭环 DEF-S3-116。

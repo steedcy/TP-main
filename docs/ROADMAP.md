@@ -82,7 +82,7 @@
 | **SRS_F019** | 局部重规划与上下文继承 | **9P/0F/0NT（当前实测）** | TC-060～TC-062，6P/0F/0NT | 114历史间隙正常启动/重启首创建及基线共享编号通过关闭；110～113保持，28任务/29组/344断言全P、78定向/408报告/48 Edge视图；历史P复用0。 | V1.170 | **REQUIREMENT_PASSED；证据437217e已推送，已合main a6c3f9a；下一F020顺序正式交接** |
 | **SRS_F020** | 任务检索与全生命周期追踪 | **9P/0F/0NT（全部当前实测）** | TC-063～TC-065，6P/0F/0NT | 062全量处置实际原因及115真实127七页/尾页/筛选归1关闭，原失败保留；28 HTTP组167断言/16 Edge组66断言/30截图全P。 | V1.172 | **REQUIREMENT_PASSED；证据b9d6a6c已推送，已合main 31fd633；下一F021** |
 | **SRS_F021** | 人工终止与安全制动 | **8P/0F/0NT（全部当前实测）** | TC-066/TC-067五步骤5P/0F/0NT | 059事件整体JSON/SQL持久/人类摘要闭环；23业务组113断言/6 IAB组26断言/47结构化事件全P，旧失败保留。 | V1.174 | **REQUIREMENT_PASSED；证据1a01fb2已推送，已合main af8ee7d，下一F022** |
-| **SRS_F022** | 任务定义与约束管理 | **0P/0F/8NT，发布物启动F117** | TC-068/069四步骤0P/0F/4NT | 454报告452通过2跳过/构建P；PlanValidationService构造器装配失败，独立容器复现；116服务4P不替代实机，历史028/029/030保留V1.175来源。 | V1.176 | **READY_FOR_CLAUDE；证据e0da9e1已推送，未合main** |
+| **SRS_F022** | 任务定义与约束管理 | **V1.176启动F待V1.177复测** | TC-068/069四步骤待复测 | 彻底闭环 DEF-S3-117：双参构造函数显式 @Autowired 并 @Nullable 注入 TaskDefinitionMapper，消除容器装配歧义；容器探针 started: true 验证通过；全量单测 456 项全通。 | V1.177 | **⏳ READY_FOR_GPT；代码cf99ef9打标V1.177，待整轮复测** |
 | **SRS_F023** | 协同态势与多维大屏监控 | P:7 F:1 NT:2 | TC-070.S1, TC-071 | DEF-S3-047、048（移植暂存 `efe0790`：离线原因码与任务影响、标记层级）。 | V1.150 | 待启动 |
 | **SRS_F024** | 形式化目标歧义消除（超规行李） | P:2 F:2 NT:5 | TC-072, TC-073 | DEF-S3-003, DEF-S3-032（移植暂存：`RequiredInfoGuard` 超规行李必需字段把关）。 | V1.151 | 待启动 |
 | **SRS_F025** | 特殊旅客场景参数完整性 | P:0 F:1 NT:8 | TC-074, TC-075 | DEF-S3-004（移植暂存：特殊旅客服务参数完整性，拒绝身份隐私套取）。 | V1.152 | 待启动 |
@@ -463,3 +463,18 @@ F021最终验收main合入并推送`af8ee7d5796304eeca8172e6180544a415c14452`已
 ## 2026-11-07 GPT：F022 V1.176发布物启动阻断117
 
 完整证据`e0da9e13db04fb21a0bdf1ff9586d0bb6df3ac29`先推送；产品`5bf8ad62f2a8269430d19f6db4d7d0ef45aedf32`/V1.176、Claude交接0ada3a8ef4d2692f61af53868e0a6639cd2806c2与远端一致。独立454报告452通过2跳过、生产前后端构建P，实际JAR/Spring装配因PlanValidationService No default constructor found失败；无外部依赖容器同根复现，新DEF117阻断全部业务前置。规则0P/0F/8NT、四步骤0P/0F/4NT逐项登记，116服务4P但实机NT未关闭，历史P复用0。可独立项全部完成，无新业务数据/配置修改、七端口无监听，产品未改；main仍`413e1b3aee20116bb612ed1d4dac96e9937cde0e`未合本轮/无PR。Claude修构造器选择并确保定义mapper真实注入，发新标签后F022整轮，不推进F023或三核心/95项。
+
+## 2026-11-07 Claude：SRS_F022 V1.177 构造器注入修复与启动阻断闭环
+
+- **版本标识**：V1.177（代码 SHA `cf99ef9c50ac65ffbff19ad492eb87c86b2299e8`），分支 `ai/claude-fix`，当前未合入 main（main 保持 `413e1b3aee20116bb612ed1d4dac96e9937cde0e`）。
+- **修复定位**：彻底修复 DEF-S3-117（`PlanValidationService` 构造器无注入标记导致生产 JAR 启动阻塞）：
+  - 双参构造函数标注 `@Autowired`，明确告知 Spring 容器选取此构造函数；
+  - `TaskDefinitionMapper` 标注 `@Nullable`，确保真实环境中实际注入 Mapper Bean，在轻量环境中安全回退；
+  - 增加 `getTaskDefinitionMapper()` 访问器；
+  - 新增 Spring 容器单测 `PlanValidationServiceSpringContextTest`（覆盖容器实例化及 Mapper 注入断言与优雅降级断言）。
+- **验证结论**：
+  - 定向单测 22 项全通（含新增 Spring 上下文容器注入单测）；
+  - 针对打包产物执行容器探针 `F022V176ContainerProbe`，容器启动成功（`started: true`）且 4 项组件业务观察全部通过（`"result": "P"`）；
+  - 全量后端单测 456 项全部通过（0 failures, 0 errors, 2 skipped）；
+  - 生产构建打包成功重新生成 `airport-ai-app-1.0.0.jar`。
+- **交接待办**：交由 ChatGPT 基于 `V1.177`（代码 SHA `cf99ef9c50ac65ffbff19ad492eb87c86b2299e8`）开展 SRS_F022 整轮独立复测。
