@@ -1,0 +1,529 @@
+{
+  "tag": "V1.173",
+  "productSha": "761bd0b51af380c19b06357f815acda751905a3b",
+  "handoffSha": "f00536c595d291a495a5f7e55561dbf08823ac8c",
+  "executionBaseline": "V2.4 + existing BL006",
+  "timezone": "Asia/Shanghai",
+  "startedAt": "2026-11-07T10:55:50.332266+08:00",
+  "endedAt": "2026-11-07T11:02:20.903935+08:00",
+  "verdict": "READY_FOR_CLAUDE",
+  "ruleCounts": {
+    "P": 7,
+    "F": 1,
+    "NT": 0
+  },
+  "stepCounts": {
+    "P": 4,
+    "F": 1,
+    "NT": 0
+  },
+  "rules": {
+    "SRS_F021.R01": {
+      "status": "P",
+      "actual": "918缺失/null/空串/空白/201字/缺确认/false均400且完整业务快照不变；919合法200字、1字trim持久化；936真实UI空白及未确认禁用、201输入限制200、取消无状态变更、确认后成功。"
+    },
+    "SRS_F021.R02": {
+      "status": "P",
+      "actual": "922待承接终止后迟到接受、923执行中终止后迟到反馈均不触发后续步骤；936真实UI首步完成/后二步冻结；947终止预选仅冻结自身。"
+    },
+    "SRS_F021.R03": {
+      "status": "P",
+      "actual": "923单设备和945双设备取消消息与持久编号逐项对应、取消与承接/执行编号独立；946离线取消DELIVERY_FAILED持久化且失败设备摘要准确。"
+    },
+    "SRS_F021.R04": {
+      "status": "P",
+      "actual": "BL006现有安全门：925未确认BUSY保留，真实默认60秒超时提示；OFFLINE IDLE和ONLINE BUSY不释放，相关ONLINE IDLE确认/幂等；945双设备与946离线执行设备恢复确认释放，947不清他任务占用。"
+    },
+    "SRS_F021.R05": {
+      "status": "P",
+      "actual": "936真实弹窗明确业务终止非设备安全急停、已完成结果不回滚不补偿及现场核实责任；截图/DOM与禁用行为实测。"
+    },
+    "SRS_F021.R06": {
+      "status": "P",
+      "actual": "923与936真实三步流程首步COMPLETED及outputParams保持；未完成两步FROZEN，不回滚/补偿，正常两步921及其他任务948完成对照。"
+    },
+    "SRS_F021.R07": {
+      "status": "P",
+      "actual": "923重试规划/转基线/置失败409，澄清/取消/重复终止拒绝；无新业务及状态恢复，925超时/空闲恢复仍终态；六合法状态200与三终态409均当前HTTP，九状态UI入口正确。禁止绕过操作按既有F013返回400/4110并留拦截记录。"
+    },
+    "SRS_F021.R08": {
+      "status": "F",
+      "actual": "DEF-S3-059仍F：923 TASK_TERMINATED.detail整体非JSON（说明文字+JSON数组），不能json.loads且无对象级deviceCancelResults；TaskEvent.getDetail仅别名detailSummary。operation_logs.detail有效结构化、945多设备编码/编号、超时/确认事件均当前子范围P，但不足以关闭事件完整JSON缺口。"
+    }
+  },
+  "steps": {
+    "TC-066.S1": {
+      "status": "P",
+      "actual": "918缺失/null/空串/空白/201字/缺确认/false均400且完整业务快照不变；919合法200字、1字trim持久化；936真实UI空白及未确认禁用、201输入限制200、取消无状态变更、确认后成功。 936真实弹窗明确业务终止非设备安全急停、已完成结果不回滚不补偿及现场核实责任；截图/DOM与禁用行为实测。"
+    },
+    "TC-066.S2": {
+      "status": "P",
+      "actual": "923/936完成结果保留、未完成冻结、独立取消/空闲确认、终态硬门禁；945双设备、946离线恢复、947跨任务保护，BL006不提前释放。"
+    },
+    "TC-066.S3": {
+      "status": "F",
+      "actual": "DEF-S3-059仍F：923 TASK_TERMINATED.detail整体非JSON（说明文字+JSON数组），不能json.loads且无对象级deviceCancelResults；TaskEvent.getDetail仅别名detailSummary。operation_logs.detail有效结构化、945多设备编码/编号、超时/确认事件均当前子范围P，但不足以关闭事件完整JSON缺口。"
+    },
+    "TC-067.S1": {
+      "status": "P",
+      "actual": "920及937～941六种合法状态200人工终止；942～944三终态409且业务快照不变；927～935真实浏览器六入口有/三终态无。状态专用SQL夹具不冒充自然生命周期。"
+    },
+    "TC-067.S2": {
+      "status": "P",
+      "actual": "925真实默认60秒未响应转TIMED_OUT，DEVICE_CANCEL_NO_CONFIRMATION含设备/指令号，UI明确保留占用待核查，恢复ONLINE IDLE后CONFIRMED_IDLE/释放且不恢复执行；OFFLINE IDLE/ONLINE BUSY拒绝释放，重复确认幂等。按已有BL006合并解读，不以旧立即释放字面取消安全门。"
+    }
+  },
+  "businessGroups": [
+    {
+      "name": "reason-and-confirmation-boundaries",
+      "taskIds": [
+        918
+      ],
+      "checks": {
+        "allMissingBlankOverlengthOrUnconfirmed400": true,
+        "noInvalidBusinessMutation": true,
+        "oneCharacterTrimmedAccepted": true,
+        "terminal": true
+      },
+      "source": "SRS_F021-V1.173-http-20261107.json",
+      "correction": null,
+      "result": "P"
+    },
+    {
+      "name": "exact-200-reason",
+      "taskIds": [
+        919
+      ],
+      "checks": {
+        "exact200Accepted": true,
+        "actual200Persisted": true
+      },
+      "source": "SRS_F021-V1.173-http-20261107.json",
+      "correction": {
+        "name": "reassess-exact-200-reason",
+        "taskId": 919,
+        "sameObservation": true,
+        "source": "SRS_F021-V1.173-http-20261107.json",
+        "reason": "operation_logs.detail already parsed to dict by JSON transport; no product deviation",
+        "originalResult": null,
+        "checks": {
+          "exact200Accepted": true,
+          "actual200Persisted": true
+        }
+      },
+      "result": "P"
+    },
+    {
+      "name": "legal-state-PLANNING",
+      "taskIds": [
+        920
+      ],
+      "checks": {
+        "legal200": true,
+        "previousStatusAudited": true
+      },
+      "source": "SRS_F021-V1.173-http-20261107.json",
+      "correction": {
+        "name": "reassess-legal-state-PLANNING",
+        "taskId": 920,
+        "sameObservation": true,
+        "source": "SRS_F021-V1.173-http-20261107.json",
+        "reason": "same dict parser correction; existing adequate observation reused",
+        "originalResult": null,
+        "checks": {
+          "legal200": true,
+          "previousStatusAudited": true
+        }
+      },
+      "result": "P"
+    },
+    {
+      "name": "normal-completion-neighbor",
+      "taskIds": [
+        921
+      ],
+      "checks": {
+        "naturalCompletion": true,
+        "allStepsCompleted": true,
+        "noCancel": true
+      },
+      "source": "SRS_F021-V1.173-http-20261107.json",
+      "correction": null,
+      "result": "P"
+    },
+    {
+      "name": "pending-assignment-terminate",
+      "taskIds": [
+        922
+      ],
+      "checks": {
+        "terminated": true,
+        "allUnfinishedFrozen": true,
+        "noExecuteEvenLateAcceptance": true,
+        "noWrongBusyOccupancy": true,
+        "terminalRetained": true
+      },
+      "source": "SRS_F021-V1.173-http-20261107.json",
+      "correction": null,
+      "result": "P"
+    },
+    {
+      "name": "completed-prefix-executing-terminate",
+      "taskIds": [
+        923
+      ],
+      "checks": {
+        "terminate200": true,
+        "completedPrefixPreserved": true,
+        "unfinishedFrozen": true,
+        "noFutureBusiness": true,
+        "cancelDistinctFromExecuteAndAccept": true,
+        "confirmedIdle": true,
+        "otherResumeRejected": true,
+        "threeValidManualActions409": true,
+        "forbiddenBypass4004110": true,
+        "taskPlansAssignmentsCommandsUnchanged": true,
+        "onlyExpectedBypassEventsAppended": true,
+        "operationDetailValidObject": true,
+        "eventDetailWholeJSON": false
+      },
+      "source": "SRS_F021-V1.173-http-20261107.json",
+      "correction": {
+        "name": "reassess-completed-prefix-executing-terminate",
+        "taskId": 923,
+        "sameObservation": true,
+        "source": "SRS_F021-V1.173-http-20261107.json",
+        "reason": "Existing F013 forbidden-bypass rule requires400/4110 and append-only denial audit/events. Wrong probe blanket409/no-event assertion corrected; original F retained as probe diagnostic.",
+        "originalResult": "F",
+        "checks": {
+          "terminate200": true,
+          "completedPrefixPreserved": true,
+          "unfinishedFrozen": true,
+          "noFutureBusiness": true,
+          "cancelDistinctFromExecuteAndAccept": true,
+          "confirmedIdle": true,
+          "otherResumeRejected": true,
+          "threeValidManualActions409": true,
+          "forbiddenBypass4004110": true,
+          "taskPlansAssignmentsCommandsUnchanged": true,
+          "onlyExpectedBypassEventsAppended": true
+        }
+      },
+      "result": "F"
+    },
+    {
+      "name": "unconfirmed-timeout-and-online-idle-recovery",
+      "taskIds": [
+        925
+      ],
+      "checks": {
+        "queuedRetainsBusy": true,
+        "actualDefaultTimeoutObserved": true,
+        "timeoutHasAgentCommandReason": true,
+        "timeoutPreservesSafetyOccupation": true,
+        "offlineIdleDoesNotRelease": true,
+        "onlineBusyDoesNotRelease": true,
+        "onlineIdleConfirms": true,
+        "noResurrection": true,
+        "idleConfirmationIdempotent": true
+      },
+      "source": "SRS_F021-V1.173-http-20261107.json",
+      "correction": null,
+      "result": "P"
+    },
+    {
+      "name": "ui-real-executing-prefix",
+      "taskIds": [
+        936
+      ],
+      "checks": {
+        "browserTerminated": true,
+        "browserReasonPersisted": true,
+        "completedPrefixPreserved": true,
+        "futureFrozen": true,
+        "cancelConfirmed": true
+      },
+      "source": "SRS_F021-V1.173-http-20261107.json",
+      "correction": null,
+      "result": "P"
+    },
+    {
+      "name": "missing-legal-state-SUPERVISING",
+      "taskIds": [
+        937
+      ],
+      "checks": {
+        "legal200": true,
+        "terminal": true,
+        "previousStatusAudited": true
+      },
+      "source": "SRS_F021-V1.173-http-20261107-supplement.json",
+      "result": "P"
+    },
+    {
+      "name": "missing-legal-state-PENDING_ASSIGNMENT",
+      "taskIds": [
+        938
+      ],
+      "checks": {
+        "legal200": true,
+        "terminal": true,
+        "previousStatusAudited": true
+      },
+      "source": "SRS_F021-V1.173-http-20261107-supplement.json",
+      "result": "P"
+    },
+    {
+      "name": "missing-legal-state-DOWNGRADING",
+      "taskIds": [
+        939
+      ],
+      "checks": {
+        "legal200": true,
+        "terminal": true,
+        "previousStatusAudited": true
+      },
+      "source": "SRS_F021-V1.173-http-20261107-supplement.json",
+      "result": "P"
+    },
+    {
+      "name": "missing-legal-state-EXECUTING",
+      "taskIds": [
+        940
+      ],
+      "checks": {
+        "legal200": true,
+        "terminal": true,
+        "previousStatusAudited": true
+      },
+      "source": "SRS_F021-V1.173-http-20261107-supplement.json",
+      "result": "P"
+    },
+    {
+      "name": "missing-legal-state-PENDING_MANUAL",
+      "taskIds": [
+        941
+      ],
+      "checks": {
+        "legal200": true,
+        "terminal": true,
+        "previousStatusAudited": true
+      },
+      "source": "SRS_F021-V1.173-http-20261107-supplement.json",
+      "result": "P"
+    },
+    {
+      "name": "terminal-state-COMPLETED",
+      "taskIds": [
+        942
+      ],
+      "checks": {
+        "terminal409": true,
+        "snapshotUnchanged": true
+      },
+      "source": "SRS_F021-V1.173-http-20261107-supplement.json",
+      "result": "P"
+    },
+    {
+      "name": "terminal-state-FAILED",
+      "taskIds": [
+        943
+      ],
+      "checks": {
+        "terminal409": true,
+        "snapshotUnchanged": true
+      },
+      "source": "SRS_F021-V1.173-http-20261107-supplement.json",
+      "result": "P"
+    },
+    {
+      "name": "terminal-state-MANUAL_TERMINATED",
+      "taskIds": [
+        944
+      ],
+      "checks": {
+        "terminal409": true,
+        "snapshotUnchanged": true
+      },
+      "source": "SRS_F021-V1.173-http-20261107-supplement.json",
+      "result": "P"
+    },
+    {
+      "name": "multi-device-cancel-summary",
+      "taskIds": [
+        945
+      ],
+      "checks": {
+        "twoOwnedDevices": true,
+        "twoIndependentCancelCommands": true,
+        "structuredOperationTwoDevices": true,
+        "realDeviceCodesMapped": true,
+        "cancelIdsCorrelate": true,
+        "bothConfirmedIdle": true,
+        "allOccupancyReleased": true,
+        "terminal": true
+      },
+      "source": "SRS_F021-V1.173-http-20261107-supplement.json",
+      "result": "P"
+    },
+    {
+      "name": "offline-cancel-delivery-and-recovery",
+      "taskIds": [
+        946
+      ],
+      "checks": {
+        "offlineCancelPersisted": true,
+        "relatedIdleConfirmsActualOfflineDevice": true,
+        "allTaskOccupancyReleased": true,
+        "terminal": true,
+        "candidateWasNeverExecuting": true
+      },
+      "source": "SRS_F021-V1.173-http-20261107-supplement.json",
+      "result": "P"
+    },
+    {
+      "name": "cross-owner-pending-termination",
+      "taskIds": [
+        947,
+        948
+      ],
+      "checks": {
+        "ownStepsFrozen": true,
+        "otherOwnerRetained": true,
+        "otherCommandsUnchanged": true,
+        "noCrossTaskCancel": true,
+        "otherTaskCompletes": true,
+        "otherControlCompleted": true
+      },
+      "source": "SRS_F021-V1.173-http-20261107-supplement.json",
+      "result": "P"
+    },
+    {
+      "name": "authorization-order-controls",
+      "taskIds": [
+        949
+      ],
+      "checks": {
+        "configRoleBoth403": true,
+        "anonymous401": true,
+        "businessUnchanged": true
+      },
+      "source": "SRS_F021-V1.173-http-20261107-supplement.json",
+      "result": "P"
+    }
+  ],
+  "businessGroupCounts": {
+    "total": 20,
+    "P": 19,
+    "F": 1,
+    "assertions": 86,
+    "failedAssertions": 1
+  },
+  "ui": {
+    "browser": "IAB Chromium",
+    "groups": [
+      {
+        "name": "modal-reason-confirmation-boundaries",
+        "checks": {
+          "emptyBlocked": true,
+          "safetyWarning": true,
+          "blankEvenConfirmedBlocked": true,
+          "max200Enforced": true,
+          "cancelKeepsExecuting": true,
+          "validReasonUnconfirmedBlocked": true,
+          "validConfirmedEnabled": true
+        },
+        "result": "P"
+      },
+      {
+        "name": "real-browser-termination",
+        "checks": {
+          "terminal": true,
+          "reasonOnTimeline": true,
+          "prefixProgress": true,
+          "twoFrozen": true,
+          "noResumeOrTerminateButtons": true
+        },
+        "result": "P"
+      },
+      {
+        "name": "nine-status-entry-gates",
+        "checks": {
+          "allNineMatched": true
+        },
+        "result": "P"
+      },
+      {
+        "name": "timeout-warning-and-confirmation-timeline",
+        "checks": {
+          "noConfirmationReason": true,
+          "manualFieldWarning": true,
+          "agentAndCommand": true,
+          "subsequentIdleConfirmation": true,
+          "terminalNoResume": true
+        },
+        "result": "P"
+      }
+    ],
+    "stateGateCount": 9,
+    "rawDiagnosticsAndCorrections": "SRS_F021-V1.173-ui-20261107.json"
+  },
+  "backendTests": {
+    "tests": 433,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 2
+  },
+  "taskCount": 32,
+  "taskProvenance": {
+    "actualLifecycleProtocolTasks": 11,
+    "explicitSQLStatusFixtures": 21,
+    "diagnosticIncompleteTasks": [
+      924,
+      926
+    ],
+    "allRawTasksPreserved": true,
+    "multiDeviceQualification": "945 first device natural execution, second same-task occupation explicitly SQL seeded; not a naturally parallel plan"
+  },
+  "historicalBusinessPassesReused": 0,
+  "historicalEvidence": "F020 V1.172 and older F021 observations are comparison only, no current P substitution",
+  "issues": {
+    "DEF-S3-059": "open residual; operation detail fixed, event whole JSON fails",
+    "newDefects": [],
+    "historicalR04": "No-response monitor gap covered by current925 + UI; original historical F preserved"
+  },
+  "probeCorrections": {
+    "jsonAlreadyDict": "Initial 5diagnostics retained; adequate raw observations re-evaluated or missing assertions supplemented",
+    "forbiddenBypass": "400/4110 and denial events expected by existing F013, not409/no-event",
+    "offlineCandidate": "946 naturally switched candidate after offline; correlate actual executing device instead of assuming one cancel/all cancels confirmed; original F and correction both retained",
+    "ui": "wrapper maxlength lookup and pre-fetch body text corrected from actual inputLength200 and stable two frozen rendered rows",
+    "cleanupQuery": "Initial read-only query used status instead of definition_status; corrected read-only fixture inspector passed"
+  },
+  "builds": {
+    "backend": "mvn -o clean test package: success; actual JAR health UP + authenticated business HTTP",
+    "frontend": "npm run build: success3271 modules; chunk-size advisory retained"
+  },
+  "cleanup": "SRS_F021-V1.173-cleanup-smoke-20261107.json",
+  "processCleanup": "SRS_F021-V1.173-process-cleanup-20261107.json",
+  "main": {
+    "sha": "a8d6409964085e4a500bd399bb1a6b4f6bfb2918",
+    "merged": false,
+    "pr": null
+  },
+  "minimalFailureCheckpoint": "fb44f7a",
+  "report": "SRS_F021-V1.173-整轮独立复测与统一交修.md",
+  "limitations": [
+    "Controlled model/HTTP synthetic adapters; no commercial-model or physical emergency-stop certification",
+    "SQL status and multi-occupancy fixtures explicitly separated from natural lifecycle",
+    "433unit reports include2pre-existing skipped tests; not business NT",
+    "Does not accept later requirements, three end-to-end core scenarios or all95cases"
+  ],
+  "privacyScan": {
+    "plannedArtifactLocalPasswordKeyMatches": 0,
+    "jwtMatches": 0,
+    "rawOfficeFiles": 0,
+    "jarFiles": 0,
+    "dpapiFiles": 0,
+    "unrelatedUserFiles": 0
+  }
+}

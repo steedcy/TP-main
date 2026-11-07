@@ -1,0 +1,151 @@
+{
+  "tag": "V1.173",
+  "productSha": "761bd0b51af380c19b06357f815acda751905a3b",
+  "browser": "IAB Chromium",
+  "startedAt": "2026-11-07T02:57:52.175Z",
+  "cases": [
+    {
+      "name": "modal-reason-confirmation-boundaries",
+      "taskId": 936,
+      "checks": {
+        "emptyBlocked": true,
+        "safetyWarning": true,
+        "blankEvenConfirmedBlocked": true,
+        "max200Enforced": false,
+        "cancelKeepsExecuting": true,
+        "validReasonUnconfirmedBlocked": true,
+        "validConfirmedEnabled": true
+      },
+      "inputLength": 200
+    },
+    {
+      "name": "real-browser-termination",
+      "taskId": 936,
+      "checks": {
+        "terminal": true,
+        "reasonOnTimeline": true,
+        "prefixProgress": true,
+        "twoFrozen": false,
+        "noResumeOrTerminateButtons": true
+      }
+    },
+    {
+      "name": "nine-status-entry-gates",
+      "states": [
+        {
+          "state": "PLANNING",
+          "taskId": 927,
+          "fixture": "SQL status gate only",
+          "expectedButton": true,
+          "actualCount": 1,
+          "pass": true
+        },
+        {
+          "state": "SUPERVISING",
+          "taskId": 928,
+          "fixture": "SQL status gate only",
+          "expectedButton": true,
+          "actualCount": 1,
+          "pass": true
+        },
+        {
+          "state": "PENDING_ASSIGNMENT",
+          "taskId": 929,
+          "fixture": "SQL status gate only",
+          "expectedButton": true,
+          "actualCount": 1,
+          "pass": true
+        },
+        {
+          "state": "DOWNGRADING",
+          "taskId": 930,
+          "fixture": "SQL status gate only",
+          "expectedButton": true,
+          "actualCount": 1,
+          "pass": true
+        },
+        {
+          "state": "EXECUTING",
+          "taskId": 931,
+          "fixture": "SQL status gate only",
+          "expectedButton": true,
+          "actualCount": 1,
+          "pass": true
+        },
+        {
+          "state": "PENDING_MANUAL",
+          "taskId": 932,
+          "fixture": "SQL status gate only",
+          "expectedButton": true,
+          "actualCount": 1,
+          "pass": true
+        },
+        {
+          "state": "COMPLETED",
+          "taskId": 933,
+          "fixture": "SQL status gate only",
+          "expectedButton": false,
+          "actualCount": 0,
+          "pass": true
+        },
+        {
+          "state": "FAILED",
+          "taskId": 934,
+          "fixture": "SQL status gate only",
+          "expectedButton": false,
+          "actualCount": 0,
+          "pass": true
+        },
+        {
+          "state": "MANUAL_TERMINATED",
+          "taskId": 935,
+          "fixture": "SQL status gate only",
+          "expectedButton": false,
+          "actualCount": 0,
+          "pass": true
+        }
+      ],
+      "checks": {
+        "allNineMatched": true
+      }
+    },
+    {
+      "name": "timeout-warning-and-confirmation-timeline",
+      "taskId": 925,
+      "checks": {
+        "noConfirmationReason": true,
+        "manualFieldWarning": true,
+        "agentAndCommand": true,
+        "subsequentIdleConfirmation": true,
+        "terminalNoResume": true
+      }
+    }
+  ],
+  "diagnostics": [],
+  "logs": [
+    {
+      "level": "error",
+      "message": "AxiosError: Request failed with status code 500\n    at settle (http://127.0.0.1:15179/node_modules/.vite/deps/axios.js?v=a39c5b79:1799:12)\n    at XMLHttpRequest.onloadend (http://127.0.0.1:15179/node_modules/.vite/deps/axios.js?v=a39c5b79:2329:7)",
+      "timestamp": "2026-11-07T02:55:29.998Z",
+      "url": "http://127.0.0.1:15179/node_modules/.vite/deps/axios.js?v=a39c5b79"
+    }
+  ],
+  "endedAt": "2026-11-07T03:00:03.139Z",
+  "corrections": [
+    {
+      "case": "modal-reason-confirmation-boundaries",
+      "assertion": "max200Enforced",
+      "original": false,
+      "corrected": true,
+      "reason": "Ant textarea locator resolved component wrapper; attribute lookup absent. Actual 201-character fill was truncated to 200, UI counter200/200 and captured inputLength200 are direct evidence."
+    },
+    {
+      "case": "real-browser-termination",
+      "assertion": "twoFrozen",
+      "original": false,
+      "corrected": true,
+      "reason": "Initial body text read preceded asynchronous fetchAll result after modal closed; current rendered two frozen rows and progress1/3 independently verified."
+    }
+  ],
+  "finalSnapshot": "- complementary:\n  - generic: 智慧机场AI协同平台\n  - menu:\n    - menuitem \"运行总览\":\n      - generic: 运行总览\n    - menuitem \"任务管理\":\n      - generic: 任务管理\n    - menuitem \"异常处置\":\n      - generic: 异常处置\n    - menuitem \"过程追溯\":\n      - generic: 过程追溯\n    - menuitem \"二维态势\":\n      - generic: 二维态势\n    - menuitem \"设备代理\":\n      - generic: 设备代理\n    - menuitem \"操作记录\":\n      - generic: 操作记录\n- generic: oprator（GPT Synthetic Account，运行操作员）\n- button \"退出登录\":\n  - generic: 退出登录\n- main:\n  - table:\n    - rowgroup:\n      - row \"任务编号 TASK-20261107-0917 状态 人工终止\":\n        - rowheader \"任务编号\"\n        - cell \"TASK-20261107-0917\":\n          - generic: TASK-20261107-0917\n        - rowheader \"状态\"\n        - cell \"人工终止\":\n          - generic: 人工终止\n      - row \"任务目标 F173_UI_REAL_EXECUTING_PREFIX synthetic navigation to F2_TEST_GATE\":\n        - rowheader \"任务目标\"\n        - cell \"F173_UI_REAL_EXECUTING_PREFIX synthetic navigation to F2_TEST_GATE\":\n          - generic: F173_UI_REAL_EXECUTING_PREFIX synthetic navigation to F2_TEST_GATE\n      - row \"任务族 EXT_589EB692 重规划次数 0 / 1\":\n        - rowheader \"任务族\"\n        - cell \"EXT_589EB692\":\n          - generic: EXT_589EB692\n        - rowheader \"重规划次数\"\n        - cell \"0 / 1\":\n          - generic: 0 / 1\n  - generic: 目标理解结果\n  - table:\n    - rowgroup:\n      - row \"起点 F2_SERVICE_POINT\":\n        - rowheader \"起点\"\n        - cell \"F2_SERVICE_POINT\":\n          - generic: F2_SERVICE_POINT\n      - row \"目的地 F2_TEST_GATE\":\n        - rowheader \"目的地\"\n        - cell \"F2_TEST_GATE\":\n          - generic: F2_TEST_GATE\n      - row \"约束条件 synthetic test\":\n        - rowheader \"约束条件\"\n        - cell \"synthetic test\":\n          - generic: synthetic test\n      - row \"完成条件 routeGenerated=true\":\n        - rowheader \"完成条件\"\n        - cell \"routeGenerated=true\":\n          - generic: routeGenerated=true\n  - generic: 规划依据（上下文快照）\n  - 'button \"right CTX-20261107-0967 - 生成时间: 2026-11-07T10:58:14.420452\"':\n    - img \"right\":\n    - generic: \"CTX-20261107-0967 - 生成时间: 2026-11-07T10:58:14.420452\"\n  - generic: 计划版本与校验/判定结果\n  - tablist:\n    - tab \"版本1（自主规划）\" [selected]\n  - tabpanel \"版本1（自主规划）\":\n    - table:\n      - rowgroup:\n        - row \"结构校验 通过 能力校验 通过\":\n          - rowheader \"结构校验\"\n          - cell \"通过\":\n            - generic: 通过\n          - rowheader \"能力校验\"\n          - cell \"通过\":\n            - generic: 通过\n        - row \"约束校验 通过 冻结时间 2026-11-07T10:58:14.435719\":\n          - rowheader \"约束校验\"\n          - cell \"通过\":\n            - generic: 通过\n          - rowheader \"冻结时间\"\n          - cell \"2026-11-07T10:58:14.435719\":\n            - generic: 2026-11-07T10:58:14.435719\n        - row \"风险等级 LOW 推荐处置 自动执行\":\n          - rowheader \"风险等级\"\n          - cell \"LOW\":\n            - generic: LOW\n          - rowheader \"推荐处置\"\n          - cell \"自动执行\":\n            - generic: 自动执行\n        - row \"判定依据 未命中确定性高风险规则，风险信号数量不足以触发降级\":\n          - rowheader \"判定依据\"\n          - cell \"未命中确定性高风险规则，风险信号数量不足以触发降级\":\n            - generic: 未命中确定性高风险规则，风险信号数量不足以触发降级\n        - row \"置信度 0.99 规则集版本 V1.141\":\n          - rowheader \"置信度\"\n          - cell \"0.99\":\n            - generic: \"0.99\"\n          - rowheader \"规则集版本\"\n          - cell \"V1.141\":\n            - generic: V1.141\n    - table:\n      - rowgroup:\n        - row \"可执行步骤数 3 / 5 剩余步骤额度 2\":\n          - rowheader \"可执行步骤数\"\n          - cell \"3 / 5\":\n            - generic: 3 / 5\n          - rowheader \"剩余步骤额度\"\n          - cell \"2\":\n            - generic: \"2\"\n        - row \"规划说明 规划模型依据上下文快照 CTX-20261107-0967生成 3 步候选计划，置信度 0.99\":\n          - rowheader \"规划说明\"\n          - cell \"规划模型依据上下文快照 CTX-20261107-0967生成 3 步候选计划，置信度 0.99\":\n            - generic: 规划模型依据上下文快照 CTX-20261107-0967生成 3 步候选计划，置信度 0.99\n    - paragraph: 候选步骤：\n    - table:\n      - rowgroup:\n        - row \"步骤 步骤目标 所需能力 输入参数 参数来源 候选设备 前置条件 完成条件 失败处理\":\n          - columnheader \"步骤\"\n          - columnheader \"步骤目标\"\n          - columnheader \"所需能力\"\n          - columnheader \"输入参数\"\n          - columnheader \"参数来源\"\n          - columnheader \"候选设备\"\n          - columnheader \"前置条件\"\n          - columnheader \"完成条件\"\n          - columnheader \"失败处理\"\n      - rowgroup:\n        - 'row \"1 前往区域 CAP_NAVIGATION {\\\"targetLocation\\\":\\\"F2_TEST_GATE\\\"} 规划模型依据任务目标与场景参数生成 AGT-386E8C30，AGT-8519A3B6 device online routeGenerated=true manual handling\"':\n          - cell \"1\"\n          - cell \"前往区域\"\n          - cell \"CAP_NAVIGATION\"\n          - 'cell \"{\\\"targetLocation\\\":\\\"F2_TEST_GATE\\\"}\"':\n            - code: \"{\\\"targetLocation\\\":\\\"F2_TEST_GATE\\\"}\"\n          - cell \"规划模型依据任务目标与场景参数生成\"\n          - cell \"AGT-386E8C30，AGT-8519A3B6\"\n          - cell \"device online\"\n          - cell \"routeGenerated=true\"\n          - cell \"manual handling\"\n        - 'row \"2 前往区域 CAP_NAVIGATION {\\\"targetLocation\\\":\\\"F2_TEST_GATE\\\"} 规划模型依据任务目标与场景参数生成 AGT-386E8C30，AGT-8519A3B6 device online routeGenerated=true manual handling\"':\n          - cell \"2\"\n          - cell \"前往区域\"\n          - cell \"CAP_NAVIGATION\"\n          - 'cell \"{\\\"targetLocation\\\":\\\"F2_TEST_GATE\\\"}\"':\n            - code: \"{\\\"targetLocation\\\":\\\"F2_TEST_GATE\\\"}\"\n          - cell \"规划模型依据任务目标与场景参数生成\"\n          - cell \"AGT-386E8C30，AGT-8519A3B6\"\n          - cell \"device online\"\n          - cell \"routeGenerated=true\"\n          - cell \"manual handling\"\n        - 'row \"3 前往区域 CAP_NAVIGATION {\\\"targetLocation\\\":\\\"F2_TEST_GATE\\\"} 规划模型依据任务目标与场景参数生成 AGT-386E8C30，AGT-8519A3B6 device online routeGenerated=true manual handling\"':\n          - cell \"3\"\n          - cell \"前往区域\"\n          - cell \"CAP_NAVIGATION\"\n          - 'cell \"{\\\"targetLocation\\\":\\\"F2_TEST_GATE\\\"}\"':\n            - code: \"{\\\"targetLocation\\\":\\\"F2_TEST_GATE\\\"}\"\n          - cell \"规划模型依据任务目标与场景参数生成\"\n          - cell \"AGT-386E8C30，AGT-8519A3B6\"\n          - cell \"device online\"\n          - cell \"routeGenerated=true\"\n          - cell \"manual handling\"\n  - generic: 步骤设备分配与执行情况\n  - text: 执行进度：1/3\n  - progressbar:\n    - generic \"33%\"\n  - table:\n    - rowgroup:\n      - row \"步骤 分配设备 指令编号 步骤状态 重试次数 执行结果 承接响应时间 下发时间 反馈时间\":\n        - columnheader \"步骤\"\n        - columnheader \"分配设备\"\n        - columnheader \"指令编号\"\n        - columnheader \"步骤状态\"\n        - columnheader \"重试次数\"\n        - columnheader \"执行结果\"\n        - columnheader \"承接响应时间\"\n        - columnheader \"下发时间\"\n        - columnheader \"反馈时间\"\n    - rowgroup:\n      - row \"1 AGT-386E8C30 CMD-20261107105814-A0B90017 已完成 0 SUCCESS 242ms 2026-11-07T10:58:14.699361 2026-11-07T10:58:15.101919\":\n        - cell \"1\"\n        - cell \"AGT-386E8C30\"\n        - cell \"CMD-20261107105814-A0B90017\"\n        - cell \"已完成\":\n          - generic: 已完成\n        - cell \"0\"\n        - cell \"SUCCESS\"\n        - cell \"242ms\"\n        - cell \"2026-11-07T10:58:14.699361\"\n        - cell \"2026-11-07T10:58:15.101919\"\n      - row \"2 AGT-386E8C30 CMD-20261107105815-A0B90019 已冻结 0 1237ms 2026-11-07T10:58:16.361928\":\n        - cell \"2\"\n        - cell \"AGT-386E8C30\"\n        - cell \"CMD-20261107105815-A0B90019\"\n        - cell \"已冻结\":\n          - generic: 已冻结\n        - cell \"0\"\n        - cell\n        - cell \"1237ms\"\n        - cell \"2026-11-07T10:58:16.361928\"\n        - cell\n      - row \"3 已冻结 0 -\":\n        - cell \"3\"\n        - cell\n        - cell\n        - cell \"已冻结\":\n          - generic: 已冻结\n        - cell \"0\"\n        - cell\n        - cell \"-\"\n        - cell\n        - cell\n  - generic: 事件时间线（只读，事件仅可追加不可修改删除，对应5.7.1）\n  - list:\n    - generic: \"2026-11-07T10:58:14.393298 - GOAL_SUBMITTED ：运行操作员oprator提交任务目标: F173_UI_REAL_EXECUTING_PREFIX synthetic navigation to F2_TEST_GATE\"\n    - generic: 2026-11-07T10:58:14.412794 - GOAL_CLARIFIED ：目标理解完成，关键信息已完整，进入规划上下文构建\n    - generic: 2026-11-07T10:58:14.420452 - CONTEXT_SNAPSHOT_GENERATED ：生成规划上下文快照CTX-20261107-0967\n    - generic: 2026-11-07T10:58:14.433205 - PLAN_GENERATED ：候选计划生成完成，来源AUTONOMOUS，版本1\n    - generic: 2026-11-07T10:58:14.435719 - PLAN_VALIDATED ：候选计划三类校验全部通过，已冻结版本\n    - generic: \"2026-11-07T10:58:14.440809 - SUPERVISION_JUDGED ：监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.141；推荐处置=AUTO_EXECUTE（自动执行）\"\n    - generic: \"2026-11-07T10:58:14.450935 - AGENT_ASSIGNMENT_REQUESTED ：步骤1候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)；AGT-8519A3B6(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求\"\n    - generic: 2026-11-07T10:58:14.694765 - AGENT_ASSIGNED ：设备代理AGT-386E8C30接受步骤1承接请求\n    - generic: \"2026-11-07T10:58:14.701744 - STEP_DISPATCHED ：指令CMD-20261107105814-A0B90018已下发至设备代理AGT-386E8C30，业务意图: 前往区域\"\n    - generic: \"2026-11-07T10:58:15.101919 - EXECUTION_FEEDBACK_RECEIVED （原因码: DEVICE_SUCCESS）：指令CMD-20261107105814-A0B90018收到设备代理AGT-386E8C30执行反馈: SUCCESS\"\n    - generic: \"2026-11-07T10:58:15.111697 - STEP_COMPLETED ：步骤1完成条件已满足: routeGenerated=true\"\n    - generic: \"2026-11-07T10:58:15.119022 - AGENT_ASSIGNMENT_REQUESTED ：步骤2候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)；AGT-8519A3B6(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求\"\n    - generic: 2026-11-07T10:58:16.35968 - AGENT_ASSIGNED ：设备代理AGT-386E8C30接受步骤2承接请求\n    - generic: \"2026-11-07T10:58:16.361928 - STEP_DISPATCHED ：指令CMD-20261107105816-A0B9001A已下发至设备代理AGT-386E8C30，业务意图: 前往区域\"\n    - generic: \"2026-11-07T10:59:11.437889 - TASK_TERMINATED （原因码: NORMAL_MANUAL_TERMINATED）：运行操作员oprator人工终止任务，原因: F173 browser actual termination，前序状态: EXECUTING，涉及设备: [AGT-386E8C30]，取消响应摘要: [{\\\"agentId\\\":\\\"AGT-386E8C30\\\",\\\"agentCode\\\":\\\"AGT-386E8C30\\\",\\\"deviceCode\\\":\\\"G160_F016_A\\\",\\\"cancelCommandId\\\":\\\"CMD-20261107105911-A0B9001B\\\",\\\"result\\\":\\\"CANCEL_QUEUED\\\",\\\"cancelStatus\\\":\\\"CANCEL_QUEUED\\\",\\\"status\\\":\\\"CANCEL_QUEUED\\\"}]\"\n    - generic: 2026-11-07T10:59:11.437889 - TASK_CANCEL_REQUESTED ：已向设备代理AGT-386E8C30发送业务任务取消请求\n    - generic: \"2026-11-07T10:59:11.437889 - MANUAL_TERMINATED （原因码: NORMAL_MANUAL_TERMINATED）：运行操作员oprator人工终止任务，原因: F173 browser actual termination，前序状态: EXECUTING，涉及设备: [AGT-386E8C30]，取消响应摘要: [{\\\"agentId\\\":\\\"AGT-386E8C30\\\",\\\"agentCode\\\":\\\"AGT-386E8C30\\\",\\\"deviceCode\\\":\\\"G160_F016_A\\\",\\\"cancelCommandId\\\":\\\"CMD-20261107105911-A0B9001B\\\",\\\"result\\\":\\\"CANCEL_QUEUED\\\",\\\"cancelStatus\\\":\\\"CANCEL_QUEUED\\\",\\\"status\\\":\\\"CANCEL_QUEUED\\\"}]\""
+}

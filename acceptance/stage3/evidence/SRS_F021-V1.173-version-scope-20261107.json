@@ -1,0 +1,56 @@
+{
+  "executionBaseline": "V2.4",
+  "productSha": "761bd0b51af380c19b06357f815acda751905a3b",
+  "handoffSha": "f00536c595d291a495a5f7e55561dbf08823ac8c",
+  "mainBefore": "a8d6409964085e4a500bd399bb1a6b4f6bfb2918",
+  "testWorktree": "C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013",
+  "branch": "ai/gpt-test",
+  "statusAtReceipt": "clean before fast-forward f00536c",
+  "remote": "f00536c595d291a495a5f7e55561dbf08823ac8c\trefs/heads/ai/claude-fix\na8d6409964085e4a500bd399bb1a6b4f6bfb2918\trefs/heads/main\n761bd0b51af380c19b06357f815acda751905a3b\trefs/tags/V1.173",
+  "productChanges": ".../main/java/com/airport/ai/event/TaskEvent.java  |  10 +\n .../java/com/airport/ai/task/TaskController.java   |  11 +-\n .../airport/ai/task/TaskExecutionOrchestrator.java |  13 +\n .../main/java/com/airport/ai/task/TaskService.java | 105 +++++-\n .../com/airport/ai/task/TaskTerminateF021Test.java | 398 +++++++++++++++++++++\n frontend/src/views/task/TaskDetailView.vue         |  14 +-\n 6 files changed, 530 insertions(+), 21 deletions(-)",
+  "scope": {
+    "rules": [
+      "SRS_F021.R01",
+      "SRS_F021.R02",
+      "SRS_F021.R03",
+      "SRS_F021.R04",
+      "SRS_F021.R05",
+      "SRS_F021.R06",
+      "SRS_F021.R07",
+      "SRS_F021.R08"
+    ],
+    "steps": [
+      "TC-066.S1",
+      "TC-066.S2",
+      "TC-066.S3",
+      "TC-067.S1",
+      "TC-067.S2"
+    ],
+    "knownDefects": [
+      "DEF-S3-059",
+      "DEF-R04-001 historical monitor no-response gap"
+    ],
+    "currentRoundAllApplicable": true,
+    "historicalBusinessPassesReused": 0
+  },
+  "safetyBaseline": "Existing BL-006 applies to F021: hold executing device occupation until correlated ONLINE IDLE; timeout does not authorize unsafe release. TC067 old immediate-release text is read with controlled BL006 supplement.",
+  "resources": {
+    "schema": "tip_gpt_f006_v118_20261030",
+    "redisDb": 10,
+    "ports": [
+      18129,
+      18117,
+      18132,
+      18133,
+      18134,
+      15179
+    ],
+    "owner": "GPT only; existing resources verified inactive before start",
+    "cleanup": "disable newly created definitions; terminate own remaining tasks then correlated IDLE; disable own devices, preserve tasks, stop verified process trees; no shared server stop"
+  },
+  "roadmapStagingReview": {
+    "sourceCommit": "4ec6695",
+    "actualDelivered": "TaskService structured operation detail and device cancellation ids are present in actual V1.173 diff; event JSON independently tested; no declaration-only acceptance"
+  },
+  "jarSha256": "8b194d06020096b38fa191883e58b8a46fb4b1c6725325c9c82285681bdba521"
+}

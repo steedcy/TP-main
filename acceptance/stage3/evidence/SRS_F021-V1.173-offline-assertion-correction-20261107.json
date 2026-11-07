@@ -1,0 +1,20 @@
+{
+  "source": "SRS_F021-V1.173-http-20261107-supplement.json",
+  "taskId": 946,
+  "originalChecks": {
+    "offlineCancelPersisted": false,
+    "failureSummary": true,
+    "noPrematureRelease": true,
+    "recoveredOnlineIdle": false,
+    "terminalPreserved": true
+  },
+  "correctedChecks": {
+    "offlineCancelPersisted": true,
+    "relatedIdleConfirmsActualOfflineDevice": true,
+    "allTaskOccupancyReleased": true,
+    "terminal": true,
+    "candidateWasNeverExecuting": true
+  },
+  "reason": "Offline status naturally triggered candidate switch to second device before termination. Original probe incorrectly required exactly one cancel and CONFIRMED_IDLE for the never-accepted alternate candidate. Correlate actual executing offline agent; its DELIVERY_FAILED->CONFIRMED_IDLE and no remaining task occupation already observed. No business re-execution.",
+  "originalFailureRetained": true
+}
