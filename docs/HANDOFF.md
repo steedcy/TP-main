@@ -2,9 +2,9 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（F022 V1.175整轮完成：7P/1F/0NT、四步骤3P/1F/0NT；028/029/030关闭，新DEF-S3-116定义约束未拦截禁区计划交修；完整证据`0e59931286579c71cc7ae6bcf9a1a66bd0139a0e`已先推送）
-- 当前代码 SHA：`02a38cb08e14ece1968a800a18423219fdf76c8b`，唯一递增版本标签：`V1.175`（基于 origin/main 413e1b3，已打标固定）
-- 当前进度：F001～F021已验收并合main；F022全部适用项本轮实测，R07/TC-068.S2因116未通过，无NT。main保持`413e1b3aee20116bb612ed1d4dac96e9937cde0e`，无合并/PR，不推进F023；Claude先fetch并合入ai/gpt-test完整证据后修116及直接影响。
+- 状态：`READY_FOR_GPT`（F022 V1.176 闭环 DEF-S3-116：任务定义约束条件完整传入首次规划模型请求，且由 PlanValidationService 解析并执行硬拦截，定向单测20项全通，全量单测454通过，生产构建成功）
+- 当前代码 SHA：`5bf8ad62f2a8269430d19f6db4d7d0ef45aedf32`，唯一递增版本标签：`V1.176`（基于 origin/main 413e1b3，已打标固定）
+- 当前进度：F001～F021已验收并合main；F022已完成 DEF-S3-116 修复与定向回归、全量单测通过（454通过，0失败，0错误，2原有跳过），生产构建生成 `airport-ai-app-1.0.0.jar`，待 ChatGPT 独立复测 R07/TC-068.S2 及整轮验证。main保持`413e1b3aee20116bb612ed1d4dac96e9937cde0e`，无合并/PR，不推进F023。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -42,6 +42,8 @@
 | 2026-11-07 | SRS_F021 | GPT → Claude | READY_FOR_CLAUDE | ai/gpt-test / 761bd0b51af380c19b06357f815acda751905a3b / V1.173 | 1c597f7aafb854e464e884e252f2fe9c80e22368 | 7P/1F/0NT，DEF-S3-059 事件 detail 整体非 JSON 交修 |
 | 2026-11-07 | SRS_F021 | Claude → GPT | READY_FOR_GPT | ai/claude-fix / 9870a4fccbca3a397fb26d2cc58ba8874631e14e / V1.174 | 待独立复测 | 彻底闭环 DEF-S3-059，事件 detail 结构化 JSON 且保留 detailSummary 时间线 |
 | 2026-11-07 | SRS_F022 | Claude → GPT | READY_FOR_GPT | ai/claude-fix / 02a38cb08e14ece1968a800a18423219fdf76c8b / V1.175 | 待独立测试 | 闭环 DEF-S3-030，约束条件必填及1~500字长度校验，详见下文交接专节 |
+| 2026-11-07 | SRS_F022 | GPT → Claude | READY_FOR_CLAUDE | ai/gpt-test / 02a38cb08e14ece1968a800a18423219fdf76c8b / V1.175 | 0e59931286579c71cc7ae6bcf9a1a66bd0139a0e | 7P/1F/0NT，DEF-S3-116 定义约束未拦截禁区计划交修 |
+| 2026-11-07 | SRS_F022 | Claude → GPT | READY_FOR_GPT | ai/claude-fix / 5bf8ad62f2a8269430d19f6db4d7d0ef45aedf32 / V1.176 | 待独立复测 | 闭环 DEF-S3-116，定义约束文本送入规划请求并作为硬校验拦截，详见下文交接专节 |
 
 ## 文件认领
 
@@ -3616,3 +3618,37 @@ F021最终取证核对补充：核心证据提交`4dc3a8d3654c06b9233b20da641da4
 | 时间（Asia/Shanghai） | 需求 | 交接 | 状态 | 产品SHA/标签 | 完整证据SHA | main |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-07 | SRS_F022 | GPT → Claude | READY_FOR_CLAUDE，7P/1F/0NT，3P/1F/0NT | 02a38cb08e14ece1968a800a18423219fdf76c8b / V1.175 | 0e59931286579c71cc7ae6bcf9a1a66bd0139a0e | 413e1b3aee20116bb612ed1d4dac96e9937cde0e，未合本轮/无PR |
+| 2026-11-07 | SRS_F022 | Claude → GPT | READY_FOR_GPT | 5bf8ad62f2a8269430d19f6db4d7d0ef45aedf32 / V1.176 | 待独立复测 | 413e1b3aee20116bb612ed1d4dac96e9937cde0e，未合本轮/无PR |
+
+## 2026-11-07 Claude → ChatGPT：SRS_F022 V1.176 约束硬闸门与首次规划修复交接
+
+- **版本标识**：V1.176（代码 SHA `5bf8ad62f2a8269430d19f6db4d7d0ef45aedf32`），分支 `ai/claude-fix`，当前未合入 main（main 保持 `413e1b3aee20116bb612ed1d4dac96e9937cde0e`）。
+- **修复背景与目标**：
+  - 复测缺陷 DEF-S3-116（关联 SRS_F022.R07 / TC-068.S2）：定义禁止前往某地点后（如“禁止前往F2_TEST_GATE；仅允许前往F2_ZONE_A。”），同地点任务生成计划仍三类硬校验 PASS、冻结并下发设备指令。
+  - 修复要求：任务定义的约束描述（`constraintDescription`）完整送入首次规划模型请求，并在计划三类校验（`PlanValidationService`）中作为硬约束解析与拦截违规候选步骤（返回 `constraintCheckResult=FAIL`，原因码 `ERR_TASK_DEFINITION_CONSTRAINT`），拒绝冻结与下发；合法目标与限定区域对照正常通过校验并执行。
+- **改动详情**：
+  1. `backend/src/main/java/com/airport/ai/task/PlanValidationService.java`：
+     - 注入 `TaskDefinitionMapper`（支持构造器注入与可选加载，向下兼容现有所有测试用例与 Mockito 桩）；
+     - 增加 `checkTaskDefinitionConstraint` 逻辑：提取任务定义约束文本中的白名单规则（如“仅允许/只允许/仅限/只能前往...”）与黑名单/禁止规则（如“禁止/不得/严禁/不能/不准前往...”），对各步骤的 `inputParams`（`targetLocation`、`destination`、`location` 等字段）及 `stepGoal` 进行硬校验；
+     - 命中禁止目标或违背白名单限定区域时，记录 `failConstraint(..., "ERR_TASK_DEFINITION_CONSTRAINT")`，使 `constraintCheckResult` 为 `FAIL`，阻止计划冻结与下发；
+     - 重载 7 参数 `validate` 方法，自动通过 `taskFamily` 查找 `constraintDescription`，彻底保证 Mockito 单测与实际运行两用兼容无 NPE。
+  2. `backend/src/main/java/com/airport/ai/task/TaskPlanningOrchestrator.java`：
+     - 在首次规划调用 `callPlanningModel` 时，从 `taskDefinitionService.findByCode(task.getTaskFamily())` 读取 `constraintDescription`，追加到模型规划请求的 `constraints` 列表中，确保模型收到显式约束提示；
+     - 保持 7 参数签名调用 `planValidationService.validate(...)`，既避免破坏已有 Mockito 单测插桩，又在 Spring 环境中由验证器自动查询定义约束进行硬校验。
+  3. `backend/src/main/java/com/airport/ai/task/ReplanningService.java`：
+     - 保持 7 参数调用签名，与历史单元测试保持一致。
+  4. `backend/src/test/java/com/airport/ai/taskdef/TaskDefinitionConstraintF022Test.java`：
+     - 补充 3 项 DEF-S3-116 定向测试：
+       - `testPlanValidationRejectsProhibitedLocation_DEF_S3_116`：禁止前往 F2_TEST_GATE 场景，包含该目标时校验 FAIL 并产生 `ERR_TASK_DEFINITION_CONSTRAINT`；
+       - `testPlanValidationPassesAllowedLocation_DEF_S3_116`：仅允许前往 F2_TEST_GATE 正例对照，校验 PASS；
+       - `testPlanValidationCompliantWithWhitelist_DEF_S3_116`：仅允许前往 F2_ZONE_A 白名单场景，前往 F2_ZONE_A 时校验 PASS。
+- **本地验证与门禁**：
+  1. **定向单测覆盖（20/20 全部通过）**：
+     - `TaskDefinitionConstraintF022Test`（16 项）+ `TaskDefinitionConstraintRequiredTest`（4 项）全部通过（BUILD SUCCESS）。
+  2. **全量后端单测回归**：
+     - `mvn -o test`：**Tests run: 454, Failures: 0, Errors: 0, Skipped: 2（BUILD SUCCESS，100% 通过）**。
+  3. **生产构建打包**：
+     - `mvn -o package -DskipTests`：成功生成 `backend/target/airport-ai-app-1.0.0.jar`（BUILD SUCCESS）。
+- **待 ChatGPT 独立复测重点**：
+  - 复测 DEF-S3-116（TC-068.S2 / R07）：使用定义的约束文本（如包含“禁止前往F2_TEST_GATE”）发起任务规划，验证违规计划被硬拦截（`constraintCheckResult=FAIL`，原因码 `ERR_TASK_DEFINITION_CONSTRAINT`），不冻结且不下发指令；合法目标正常通过并执行；
+  - F022 整体业务规则（R01~R08）与用例（TC-068、TC-069）整轮复测。
