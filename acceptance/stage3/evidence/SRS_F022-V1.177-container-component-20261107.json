@@ -1,0 +1,68 @@
+{
+  "layer" : "isolated Spring registration + direct seven-argument service; mapper fixtures only, not live HTTP acceptance",
+  "constructors" : [ {
+    "parameterAnnotations" : "[[]]",
+    "constructorAnnotations" : "[]",
+    "parameterCount" : 1
+  }, {
+    "parameterAnnotations" : "[[], [@org.springframework.lang.Nullable()]]",
+    "constructorAnnotations" : "[@org.springframework.beans.factory.annotation.Autowired(required=true)]",
+    "parameterCount" : 2
+  } ],
+  "container" : {
+    "mapperInjected" : true,
+    "started" : true
+  },
+  "componentObservations" : [ {
+    "result" : "P",
+    "constraint" : "禁止前往F2_TEST_GATE；仅允许前往F2_ZONE_A。",
+    "errors" : [ {
+      "errorType" : "CONSTRAINT",
+      "description" : "步骤1参数 targetLocation=F2_TEST_GATE 与任务定义约束冲突（禁止: F2_TEST_GATE）",
+      "stepSeq" : 1,
+      "reasonCode" : "ERR_TASK_DEFINITION_CONSTRAINT"
+    }, {
+      "errorType" : "CONSTRAINT",
+      "description" : "步骤1目标地点 F2_TEST_GATE 超出任务定义约束限定范围（仅允许: [F2_ZONE_A]）",
+      "stepSeq" : 1,
+      "reasonCode" : "ERR_TASK_DEFINITION_CONSTRAINT"
+    } ],
+    "name" : "original-prohibition",
+    "actualConstraintResult" : "FAIL",
+    "allPassed" : false,
+    "expectedConstraintResult" : "FAIL",
+    "target" : "F2_TEST_GATE"
+  }, {
+    "result" : "P",
+    "constraint" : "仅允许前往F2_TEST_GATE。",
+    "errors" : [ ],
+    "name" : "original-allowed-control",
+    "actualConstraintResult" : "PASS",
+    "allPassed" : true,
+    "expectedConstraintResult" : "PASS",
+    "target" : "F2_TEST_GATE"
+  }, {
+    "result" : "P",
+    "constraint" : "禁止前往F2_TEST_GATE；仅允许前往F2_ZONE_A。",
+    "errors" : [ ],
+    "name" : "allowed-zone-control",
+    "actualConstraintResult" : "PASS",
+    "allPassed" : true,
+    "expectedConstraintResult" : "PASS",
+    "target" : "F2_ZONE_A"
+  }, {
+    "result" : "P",
+    "constraint" : "仅允许前往F2_ZONE_A。",
+    "errors" : [ {
+      "errorType" : "CONSTRAINT",
+      "description" : "步骤1目标地点 F2_ZONE_B 超出任务定义约束限定范围（仅允许: [F2_ZONE_A]）",
+      "stepSeq" : 1,
+      "reasonCode" : "ERR_TASK_DEFINITION_CONSTRAINT"
+    } ],
+    "name" : "other-zone-rejected",
+    "actualConstraintResult" : "FAIL",
+    "allPassed" : false,
+    "expectedConstraintResult" : "FAIL",
+    "target" : "F2_ZONE_B"
+  } ]
+}

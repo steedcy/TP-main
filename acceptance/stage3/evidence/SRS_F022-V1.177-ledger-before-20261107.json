@@ -1,0 +1,196 @@
+{
+  "steps.csv": {
+    "sha256": "030ec8014909e827a55f8fecf43b6e6986d93dbfca355bfec7c993d8ee0d9c25",
+    "rows": [
+      {
+        "stepId": "TC-068.S1",
+        "caseId": "TC-068",
+        "action": "查看三预置任务族，新增一个基于现有能力的任务定义并编辑。",
+        "expected": "名称唯一1～64位、目标模板1～500位；场景参数、能力、约束、完成条件必填；只定义场景与规则，不写死规划步骤，不新增页面/协议/能力类型。 场景参数行包含参数名、类型、必填和说明；录入项默认空。",
+        "status": "NT",
+        "observedAt": "2026-11-07",
+        "actual": "V1.176本轮NT：实际生产JAR因DEF-S3-117无法装配PlanValidationService，No default constructor found并退出；登录/HTTP/浏览器/设备前置均不足。隔离无数据库Spring同根复现；单测454报告/构建及4服务对照不替代完整步骤。解除需下一版本真实JAR健康后整轮重测；原V1.175结果在ledger-before保留。",
+        "evidence": "acceptance/stage3/evidence/TC-068-dynamic-definition-api.json;acceptance/stage3/evidence/TC-068-empty-constraint.json;acceptance/stage3/evidence/TC-068-definition-edit.png;acceptance/stage3/SRS_F022-V1.175-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F022-V1.175-complete-verification-20261107.json;acceptance/stage3/SRS_F022-V1.176-整轮独立复测与启动阻断交修.md;acceptance/stage3/evidence/SRS_F022-V1.176-per-item-blockers-20261107.json;acceptance/stage3/evidence/SRS_F022-V1.176-DEF-S3-117-minimal-20261107.json",
+        "issue": "DEF-S3-117"
+      },
+      {
+        "stepId": "TC-068.S2",
+        "caseId": "TC-068",
+        "action": "在提交页选择新定义，生成计划；停用该定义。",
+        "expected": "场景参数动态显示，约束参与校验、完成条件参与完成判定，候选及实际路径≤5步；停用后不可新选，已有任务不受影响；新增修改停用留痕。",
+        "status": "NT",
+        "observedAt": "2026-11-07",
+        "actual": "V1.176本轮NT：实际生产JAR因DEF-S3-117无法装配PlanValidationService，No default constructor found并退出；登录/HTTP/浏览器/设备前置均不足。隔离无数据库Spring同根复现；单测454报告/构建及4服务对照不替代完整步骤。解除需下一版本真实JAR健康后整轮重测；原V1.175结果在ledger-before保留。",
+        "evidence": "acceptance/stage3/evidence/TC-031-068-dynamic-ui.json;acceptance/stage3/evidence/TC-031-068-submit-dynamic.png;acceptance/stage3/evidence/TC-031-068-dynamic-submit.json;acceptance/stage3/evidence/TC-068-dynamic-disable.json;acceptance/stage3/evidence/TC-068-disabled-ui.json;acceptance/stage3/evidence/TC-068-disabled-submit.png;acceptance/stage3/evidence/TC-068-disabled-history-filter.png;acceptance/stage3/SRS_F022-V1.175-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F022-V1.175-complete-verification-20261107.json;acceptance/stage3/SRS_F022-V1.176-整轮独立复测与启动阻断交修.md;acceptance/stage3/evidence/SRS_F022-V1.176-per-item-blockers-20261107.json;acceptance/stage3/evidence/SRS_F022-V1.176-DEF-S3-117-minimal-20261107.json",
+        "issue": "DEF-S3-117;DEF-S3-116（实机复测阻断）"
+      },
+      {
+        "stepId": "TC-069.S1",
+        "caseId": "TC-069",
+        "action": "尝试删除三预置任务族；维护其场景参数与约束。",
+        "expected": "预置标识清楚、不可删除，但允许按需求编辑参数与约束。",
+        "status": "NT",
+        "observedAt": "2026-11-07",
+        "actual": "V1.176本轮NT：实际生产JAR因DEF-S3-117无法装配PlanValidationService，No default constructor found并退出；登录/HTTP/浏览器/设备前置均不足。隔离无数据库Spring同根复现；单测454报告/构建及4服务对照不替代完整步骤。解除需下一版本真实JAR健康后整轮重测；原V1.175结果在ledger-before保留。",
+        "evidence": "acceptance/stage3/evidence/TC-069-preset-definitions.json;acceptance/stage3/evidence/TC-069-preset-exact-restore.json;acceptance/stage3/evidence/TC-069-preset-ui.json;acceptance/stage3/evidence/TC-069-preset-list.png;acceptance/stage3/evidence/TC-069-preset-editor.png;acceptance/stage3/SRS_F022-V1.175-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F022-V1.175-complete-verification-20261107.json;acceptance/stage3/SRS_F022-V1.176-整轮独立复测与启动阻断交修.md;acceptance/stage3/evidence/SRS_F022-V1.176-per-item-blockers-20261107.json;acceptance/stage3/evidence/SRS_F022-V1.176-DEF-S3-117-minimal-20261107.json",
+        "issue": "DEF-S3-117"
+      },
+      {
+        "stepId": "TC-069.S2",
+        "caseId": "TC-069",
+        "action": "提交重复名、缺必填及不存在/未启用能力定义。",
+        "expected": "拒绝保存并提示重复、必填或能力缺口，不进入提交页可选集合。",
+        "status": "NT",
+        "observedAt": "2026-11-07",
+        "actual": "V1.176本轮NT：实际生产JAR因DEF-S3-117无法装配PlanValidationService，No default constructor found并退出；登录/HTTP/浏览器/设备前置均不足。隔离无数据库Spring同根复现；单测454报告/构建及4服务对照不替代完整步骤。解除需下一版本真实JAR健康后整轮重测；原V1.175结果在ledger-before保留。",
+        "evidence": "acceptance/stage3/evidence/TC-069-preset-definitions.json;acceptance/stage3/evidence/TC-069-preset-exact-restore.json;acceptance/stage3/evidence/TC-069-preset-ui.json;acceptance/stage3/evidence/TC-069-preset-list.png;acceptance/stage3/evidence/TC-069-preset-editor.png;acceptance/stage3/SRS_F022-V1.175-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F022-V1.175-complete-verification-20261107.json;acceptance/stage3/SRS_F022-V1.176-整轮独立复测与启动阻断交修.md;acceptance/stage3/evidence/SRS_F022-V1.176-per-item-blockers-20261107.json;acceptance/stage3/evidence/SRS_F022-V1.176-DEF-S3-117-minimal-20261107.json",
+        "issue": "DEF-S3-117"
+      }
+    ]
+  },
+  "rules.csv": {
+    "sha256": "d2be2fec0d2ddc8786335e0040691f2b2f60db001ba97b587c27e8fe5f5d46e3",
+    "rows": [
+      {
+        "ruleId": "SRS_F022.R01",
+        "requirement": "SRS_F022",
+        "text": "预置超规行李处置、特殊旅客服务和航班变更应对三类任务族，不可删除",
+        "candidateStep": "TC-069.S1",
+        "status": "NT",
+        "verifiedBy": "V1.176：DEF-S3-117运行前置阻断；逐项范围/尝试/解除条件见per-item-blockers JSON；不冒用单测或V1.175 P",
+        "evidence": "acceptance/stage3/evidence/TC-069-preset-definitions.json;acceptance/stage3/evidence/TC-069-preset-exact-restore.json;acceptance/stage3/evidence/TC-069-preset-ui.json;acceptance/stage3/evidence/TC-069-preset-list.png;acceptance/stage3/evidence/TC-069-preset-editor.png;acceptance/stage3/SRS_F022-V1.175-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F022-V1.175-complete-verification-20261107.json;acceptance/stage3/SRS_F022-V1.176-整轮独立复测与启动阻断交修.md;acceptance/stage3/evidence/SRS_F022-V1.176-per-item-blockers-20261107.json;acceptance/stage3/evidence/SRS_F022-V1.176-DEF-S3-117-minimal-20261107.json",
+        "issue": "DEF-S3-117"
+      },
+      {
+        "ruleId": "SRS_F022.R02",
+        "requirement": "SRS_F022",
+        "text": "任务族只规定场景数据、可用能力类型、约束和完成条件，不预先写死自主规划步骤",
+        "candidateStep": "TC-068.S1",
+        "status": "NT",
+        "verifiedBy": "V1.176：DEF-S3-117运行前置阻断；逐项范围/尝试/解除条件见per-item-blockers JSON；不冒用单测或V1.175 P",
+        "evidence": "acceptance/stage3/evidence/TC-068-dynamic-definition-api.json;acceptance/stage3/evidence/TC-068-empty-constraint.json;acceptance/stage3/evidence/TC-068-definition-edit.png;acceptance/stage3/SRS_F022-V1.175-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F022-V1.175-complete-verification-20261107.json;acceptance/stage3/SRS_F022-V1.176-整轮独立复测与启动阻断交修.md;acceptance/stage3/evidence/SRS_F022-V1.176-per-item-blockers-20261107.json;acceptance/stage3/evidence/SRS_F022-V1.176-DEF-S3-117-minimal-20261107.json",
+        "issue": "DEF-S3-117"
+      },
+      {
+        "ruleId": "SRS_F022.R03",
+        "requirement": "SRS_F022",
+        "text": "配置管理员可基于已有能力类型新增其他旅客服务任务定义，至少维护任务名称、自然语言目标、场景参数、约束和预期完成条件",
+        "candidateStep": "TC-068.S1",
+        "status": "NT",
+        "verifiedBy": "V1.176：DEF-S3-117运行前置阻断；逐项范围/尝试/解除条件见per-item-blockers JSON；不冒用单测或V1.175 P",
+        "evidence": "acceptance/stage3/evidence/TC-068-dynamic-definition-api.json;acceptance/stage3/evidence/TC-068-empty-constraint.json;acceptance/stage3/evidence/TC-068-definition-edit.png;acceptance/stage3/SRS_F022-V1.175-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F022-V1.175-complete-verification-20261107.json;acceptance/stage3/SRS_F022-V1.176-整轮独立复测与启动阻断交修.md;acceptance/stage3/evidence/SRS_F022-V1.176-per-item-blockers-20261107.json;acceptance/stage3/evidence/SRS_F022-V1.176-DEF-S3-117-minimal-20261107.json",
+        "issue": "DEF-S3-117"
+      },
+      {
+        "ruleId": "SRS_F022.R04",
+        "requirement": "SRS_F022",
+        "text": "扩展任务不得要求新增页面、设备协议或能力类型",
+        "candidateStep": "TC-068.S1",
+        "status": "NT",
+        "verifiedBy": "V1.176：DEF-S3-117运行前置阻断；逐项范围/尝试/解除条件见per-item-blockers JSON；不冒用单测或V1.175 P",
+        "evidence": "acceptance/stage3/SRS_F022-V1.175-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F022-V1.175-complete-verification-20261107.json;acceptance/stage3/SRS_F022-V1.176-整轮独立复测与启动阻断交修.md;acceptance/stage3/evidence/SRS_F022-V1.176-per-item-blockers-20261107.json;acceptance/stage3/evidence/SRS_F022-V1.176-DEF-S3-117-minimal-20261107.json",
+        "issue": "DEF-S3-117"
+      },
+      {
+        "ruleId": "SRS_F022.R05",
+        "requirement": "SRS_F022",
+        "text": "扩展任务的每个计划版本及最终实际执行路径均不得超出5个可执行步骤",
+        "candidateStep": "TC-068.S2",
+        "status": "NT",
+        "verifiedBy": "V1.176：DEF-S3-117运行前置阻断；逐项范围/尝试/解除条件见per-item-blockers JSON；不冒用单测或V1.175 P",
+        "evidence": "acceptance/stage3/SRS_F022-V1.175-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F022-V1.175-complete-verification-20261107.json;acceptance/stage3/SRS_F022-V1.176-整轮独立复测与启动阻断交修.md;acceptance/stage3/evidence/SRS_F022-V1.176-per-item-blockers-20261107.json;acceptance/stage3/evidence/SRS_F022-V1.176-DEF-S3-117-minimal-20261107.json",
+        "issue": "DEF-S3-117"
+      },
+      {
+        "ruleId": "SRS_F022.R06",
+        "requirement": "SRS_F022",
+        "text": "任务定义中引用的能力类型必须为已启用能力类型，否则保存失败并提示能力缺口",
+        "candidateStep": "TC-069.S2",
+        "status": "NT",
+        "verifiedBy": "V1.176：DEF-S3-117运行前置阻断；逐项范围/尝试/解除条件见per-item-blockers JSON；不冒用单测或V1.175 P",
+        "evidence": "acceptance/stage3/SRS_F022-V1.175-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F022-V1.175-complete-verification-20261107.json;acceptance/stage3/SRS_F022-V1.176-整轮独立复测与启动阻断交修.md;acceptance/stage3/evidence/SRS_F022-V1.176-per-item-blockers-20261107.json;acceptance/stage3/evidence/SRS_F022-V1.176-DEF-S3-117-minimal-20261107.json",
+        "issue": "DEF-S3-117"
+      },
+      {
+        "ruleId": "SRS_F022.R07",
+        "requirement": "SRS_F022",
+        "text": "任务定义的约束条件参与5.4.4约束校验，完成条件参与步骤与任务完成判定",
+        "candidateStep": "TC-068.S2",
+        "status": "NT",
+        "verifiedBy": "V1.176：DEF-S3-117运行前置阻断；逐项范围/尝试/解除条件见per-item-blockers JSON；不冒用单测或V1.175 P",
+        "evidence": "acceptance/stage3/SRS_F022-V1.175-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F022-V1.175-complete-verification-20261107.json;acceptance/stage3/SRS_F022-V1.176-整轮独立复测与启动阻断交修.md;acceptance/stage3/evidence/SRS_F022-V1.176-per-item-blockers-20261107.json;acceptance/stage3/evidence/SRS_F022-V1.176-DEF-S3-117-minimal-20261107.json",
+        "issue": "DEF-S3-117;DEF-S3-116"
+      },
+      {
+        "ruleId": "SRS_F022.R08",
+        "requirement": "SRS_F022",
+        "text": "任务定义的新增、修改和停用均写入操作记录",
+        "candidateStep": "TC-068.S2",
+        "status": "NT",
+        "verifiedBy": "V1.176：DEF-S3-117运行前置阻断；逐项范围/尝试/解除条件见per-item-blockers JSON；不冒用单测或V1.175 P",
+        "evidence": "acceptance/stage3/evidence/TC-068-dynamic-disable.json;acceptance/stage3/evidence/TC-068-disabled-ui.json;acceptance/stage3/evidence/TC-068-disabled-submit.png;acceptance/stage3/evidence/TC-068-disabled-history-filter.png;acceptance/stage3/SRS_F022-V1.175-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F022-V1.175-complete-verification-20261107.json;acceptance/stage3/SRS_F022-V1.176-整轮独立复测与启动阻断交修.md;acceptance/stage3/evidence/SRS_F022-V1.176-per-item-blockers-20261107.json;acceptance/stage3/evidence/SRS_F022-V1.176-DEF-S3-117-minimal-20261107.json",
+        "issue": "DEF-S3-117"
+      }
+    ]
+  },
+  "issues.csv": {
+    "sha256": "55162168a8a216dc68a2f123d8a5685450a950661baa3ff89793337e73ba5f07",
+    "rows": [
+      {
+        "编号": "DEF-S3-028",
+        "类型": "缺陷",
+        "级别": "高",
+        "关联用例步骤": "TC-031.S1;TC-068.S2;AC-001",
+        "关联需求规则": "SRS_F010.R01;SRS_F022.R03",
+        "状态": "关闭（V1.175 F022当前独立复测；历史失败保留）",
+        "事实": "扩展定义必填sampleLocation在配置页存在，提交页选中后无该输入项；V1.136扩展定义页面四种类型字段动态显示并按声明提交。；2026-11-07 V1.175：四支持类型动态渲染与必填/类型非法输入在建任务/调模型前拒绝，993真实UI值完整持久。；V1.176本轮真实业务复测因DEF-S3-117启动阻断记NT，保留V1.175关闭来源，不冒称新版当前通过。",
+        "证据": "acceptance/stage3/evidence/TC-031-068-dynamic-ui.json;acceptance/stage3/evidence/TC-031-068-submit-dynamic.png;acceptance/stage3/evidence/TC-031-068-dynamic-submit.json;acceptance/stage3/evidence/SRS_F010-V1.136-dynamic-ui-20261102.json;acceptance/stage3/evidence/SRS_F010-V1.136-dynamic-ui-20261102.png;acceptance/stage3/SRS_F022-V1.175-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F022-V1.175-complete-verification-20261107.json;acceptance/stage3/SRS_F022-V1.176-整轮独立复测与启动阻断交修.md;acceptance/stage3/evidence/SRS_F022-V1.176-per-item-blockers-20261107.json;acceptance/stage3/evidence/SRS_F022-V1.176-DEF-S3-117-minimal-20261107.json",
+        "阶段4动作": "提交页按已启用任务定义动态渲染场景参数，校验类型和必填，完整重跑TC-031/068及AC-001"
+      },
+      {
+        "编号": "DEF-S3-029",
+        "类型": "缺陷",
+        "级别": "高",
+        "关联用例步骤": "TC-031.S1;TC-068.S2;AC-001",
+        "关联需求规则": "SRS_F010.R01;SRS_F022.R03",
+        "状态": "关闭（V1.175 F022当前独立复测；历史失败保留）",
+        "事实": "缺少必填sampleLocation的POST /tasks返回200并创建任务33，随后目标理解才追问；V1.136缺必填与错误类型均400，任务数/模型调用数不变。；2026-11-07 V1.175：四支持类型动态渲染与必填/类型非法输入在建任务/调模型前拒绝，993真实UI值完整持久。；V1.176本轮真实业务复测因DEF-S3-117启动阻断记NT，保留V1.175关闭来源，不冒称新版当前通过。",
+        "证据": "acceptance/stage3/evidence/TC-031-068-dynamic-submit.json;acceptance/stage3/evidence/SRS_F010-V1.136-boundaries-20261102.json;acceptance/stage3/SRS_F022-V1.175-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F022-V1.175-complete-verification-20261107.json;acceptance/stage3/SRS_F022-V1.176-整轮独立复测与启动阻断交修.md;acceptance/stage3/evidence/SRS_F022-V1.176-per-item-blockers-20261107.json;acceptance/stage3/evidence/SRS_F022-V1.176-DEF-S3-117-minimal-20261107.json",
+        "阶段4动作": "任务提交前按定义校验场景参数必填和类型，非法请求不建任务不调模型；复测边界"
+      },
+      {
+        "编号": "DEF-S3-030",
+        "类型": "缺陷",
+        "级别": "中",
+        "关联用例步骤": "TC-068.S1;AC-001;TC-069.S2",
+        "关联需求规则": "SRS_F022.R03",
+        "状态": "关闭（V1.175 F022当前独立复测；历史失败保留）",
+        "事实": "POST /task-definitions的constraintDescription为空仍保存扩展定义，复测定义已删除；2026-11-07 V1.175：新增/编辑约束省略、null、空串、空白、501均4003001；1/500及真实UI新增/编辑合法对照通过。；V1.176本轮真实业务复测因DEF-S3-117启动阻断记NT，保留V1.175关闭来源，不冒称新版当前通过。",
+        "证据": "acceptance/stage3/evidence/TC-068-empty-constraint.json;acceptance/stage3/evidence/TC-069-preset-definitions.json;acceptance/stage3/SRS_F022-V1.175-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F022-V1.175-complete-verification-20261107.json;acceptance/stage3/SRS_F022-V1.176-整轮独立复测与启动阻断交修.md;acceptance/stage3/evidence/SRS_F022-V1.176-per-item-blockers-20261107.json;acceptance/stage3/evidence/SRS_F022-V1.176-DEF-S3-117-minimal-20261107.json",
+        "阶段4动作": "定义新增和编辑均校验约束必填，复测预置与扩展定义边界"
+      },
+      {
+        "编号": "DEF-S3-116",
+        "类型": "缺陷",
+        "级别": "高",
+        "关联用例步骤": "TC-068.S2",
+        "关联需求规则": "SRS_F022.R07;SRS_F013.R03（直接依赖）",
+        "状态": "待实机复测（V1.176组件4P，117阻断HTTP/SQL/设备/界面NT，未关闭）",
+        "事实": "定义93/EXT_0408BD76约束为禁止前往F2_TEST_GATE、仅允许F2_ZONE_A；997/计划966仍constraint PASS、冻结且下发CMD-20261107143540-A68C003C导航到F2_TEST_GATE。初始规划请求仅通用两约束未含定义描述；996允许同地点合法对照完成。旧代码未覆盖缺口，非DTO新改引入。；V1.176手动注入两个mapper的七参数服务：原禁止、原允许、允许区域及非白名单区域4组P；真实Spring/JAR无默认构造器无法启动，故原997端到端反例未能重测，未关闭。",
+        "证据": "acceptance/stage3/evidence/SRS_F022-V1.175-DEF-S3-116-minimal-20261107.json;acceptance/stage3/SRS_F022-V1.175-整轮独立复测与统一交修.md;acceptance/stage3/evidence/SRS_F022-V1.175-complete-verification-20261107.json;acceptance/stage3/SRS_F022-V1.176-整轮独立复测与启动阻断交修.md;acceptance/stage3/evidence/SRS_F022-V1.176-per-item-blockers-20261107.json;acceptance/stage3/evidence/SRS_F022-V1.176-DEF-S3-117-minimal-20261107.json",
+        "阶段4动作": "让任务定义约束进入首次规划/三类硬校验，并对明确禁止目标反例拦截；不能只传提示词或仅校验能力清单。覆盖合法对照、基线/重规划直接影响，下一唯一标签后F022整轮复测。"
+      },
+      {
+        "编号": "DEF-S3-117",
+        "类型": "缺陷",
+        "级别": "阻断",
+        "关联用例步骤": "TC-068.S1;TC-068.S2;TC-069.S1;TC-069.S2（运行前置）",
+        "关联需求规则": "SRS_F022.R01～R08（运行前置）；116复测依赖",
+        "状态": "待修复（V1.176生产JAR启动F）",
+        "事实": "V1.176实际打包JAR PID9440启动退出，PlanValidationService两个public构造器均未标构造器注入，参数上的Autowired不选择构造器；Spring No default constructor found / NoSuchMethodException PlanValidationService.<init>()。无DB的真实Spring上下文注册同根失败；手动两个mapper构造+七参数服务4组P仅局部逻辑，不代替运行集成。",
+        "证据": "acceptance/stage3/SRS_F022-V1.176-整轮独立复测与启动阻断交修.md;acceptance/stage3/evidence/SRS_F022-V1.176-per-item-blockers-20261107.json;acceptance/stage3/evidence/SRS_F022-V1.176-DEF-S3-117-minimal-20261107.json",
+        "阶段4动作": "明确Spring构造器选择并保证TaskDefinitionMapper实际注入；仅启用旧单参数构造器会令mapper=null、约束读取旁路。补真实Spring/JAR健康回归，下一唯一标签再F022整轮；不要让GPT改产品绕过独立测试。"
+      }
+    ]
+  }
+}

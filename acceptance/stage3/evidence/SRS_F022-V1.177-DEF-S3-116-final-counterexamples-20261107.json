@@ -1,0 +1,1841 @@
+{
+  "tag": "V1.177",
+  "productSha": "cf99ef9c50ac65ffbff19ad492eb87c86b2299e8",
+  "issue": "DEF-S3-116 remains F; original exact prohibited case now P, no duplicate issue assigned",
+  "cases": [
+    {
+      "source": "SRS_F022-V1.177-http-20261107.json",
+      "name": "116-whitelist-shorter-valid-area",
+      "taskId": 1011,
+      "request": {
+        "taskGoal": "F177_116_WHITELIST_SHORTER_VALID_AREA Synthetic passenger service F2_TEST_GATE",
+        "taskFamily": "EXT_633EC296",
+        "sceneParams": {
+          "targetLocation": "F2_TEST",
+          "partyCount": 2,
+          "assist": true,
+          "distance": 2.5
+        }
+      },
+      "definition": {
+        "id": 94,
+        "definitionCode": "EXT_633EC296",
+        "taskName": "G177 F022 acceptance 161326",
+        "goalTemplate": "Synthetic navigation",
+        "sceneParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": null,
+            "range": "synthetic location"
+          },
+          {
+            "name": "partyCount",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": null,
+            "range": "synthetic integer"
+          },
+          {
+            "name": "assist",
+            "type": "Boolean",
+            "required": true,
+            "defaultValue": null,
+            "range": "synthetic boolean"
+          },
+          {
+            "name": "distance",
+            "type": "Double",
+            "required": true,
+            "defaultValue": null,
+            "range": "synthetic double"
+          }
+        ],
+        "availableCapabilityTypes": [
+          "CAP_NAVIGATION"
+        ],
+        "constraintDescription": "仅允许前往F2_TEST_GATE。",
+        "completionCondition": "routeGenerated=true",
+        "isPreset": false,
+        "definitionStatus": "ENABLED",
+        "updatedAt": "2026-11-07T16:15:03.154322",
+        "updatedBy": "set"
+      },
+      "checks": {
+        "definitionPersisted": true,
+        "hardConstraintFail": false,
+        "noFreeze": false,
+        "noExecution": false,
+        "exactDescriptionInInitialRequest": true
+      },
+      "taskBeforeCleanup": {
+        "id": 1011,
+        "taskCode": "TASK-20261107-1001",
+        "taskGoal": "F177_116_WHITELIST_SHORTER_VALID_AREA Synthetic passenger service F2_TEST_GATE",
+        "taskFamily": "EXT_633EC296",
+        "sceneParams": {
+          "targetLocation": "F2_TEST",
+          "partyCount": 2,
+          "assist": true,
+          "distance": 2.5
+        },
+        "goalParsingResult": {
+          "completionCondition": "routeGenerated=true",
+          "origin": "F2_SERVICE_POINT",
+          "destination": "F2_TEST_GATE",
+          "originalGoal": "F177_116_WHITELIST_SHORTER_VALID_AREA Synthetic passenger service F2_TEST_GATE",
+          "constraints": [
+            "synthetic test"
+          ]
+        },
+        "status": "EXECUTING",
+        "currentPlanVersionId": 979,
+        "replanUsed": false,
+        "replanningReason": null,
+        "manualTerminateReason": null,
+        "failureReason": null,
+        "missingInfoQuestions": null,
+        "downgradeReason": null,
+        "isDryRun": false,
+        "createdAt": "2026-11-07T16:15:03.838973",
+        "updatedAt": "2026-11-07T16:15:05.54934",
+        "createdBy": "oprator"
+      },
+      "plans": [
+        {
+          "id": 979,
+          "versionNo": 1,
+          "source": "AUTONOMOUS",
+          "baselineTemplateId": null,
+          "snapshotId": "CTX-20261107-1015",
+          "planSteps": [
+            {
+              "stepSeq": 1,
+              "stepGoal": "Synthetic passenger guidance",
+              "capabilityType": "CAP_NAVIGATION",
+              "inputParams": {
+                "targetLocation": "F2_TEST"
+              },
+              "precondition": "device online",
+              "completionCondition": "routeGenerated=true",
+              "failureHandling": "manual handling",
+              "stepTimeout": 600
+            }
+          ],
+          "structureCheckResult": "PASS",
+          "capabilityCheckResult": "PASS",
+          "constraintCheckResult": "PASS",
+          "validationErrors": [],
+          "riskLevel": "LOW",
+          "riskReasonCode": null,
+          "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+          "confidence": 0.99,
+          "ruleSetVersion": "V1.141",
+          "frozenAt": "2026-11-07T16:15:03.882472",
+          "createdAt": "2026-11-07T16:15:03.877294"
+        }
+      ],
+      "commandRows": [
+        {
+          "id": 3422,
+          "command_id": "CMD-20261107161503-EABF0025",
+          "agent_code": "AGT-386E8C30",
+          "command_type": "TASK_ACCEPT",
+          "attempt_no": 0,
+          "task_id": 1011,
+          "step_seq": 1,
+          "capability_type": "CAP_NAVIGATION",
+          "command_payload": "{\"commandId\":\"CMD-20261107161503-EABF0025\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261107-1001\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-07T16:15:03.9034416+08:00\",\"deadline\":\"2026-11-07T16:16:03.9034416+08:00\"}",
+          "command_status": "ACCEPTED",
+          "response_payload": "{\"commandId\":\"CMD-20261107161503-EABF0025\",\"accepted\":true,\"rejectReason\":null}",
+          "created_at": "2026-11-07T16:15:03.903442",
+          "updated_at": "2026-11-07T16:15:05.535457"
+        },
+        {
+          "id": 3423,
+          "command_id": "CMD-20261107161505-EABF0026",
+          "agent_code": "AGT-386E8C30",
+          "command_type": "EXECUTE_CAPABILITY",
+          "attempt_no": 0,
+          "task_id": 1011,
+          "step_seq": 1,
+          "capability_type": "CAP_NAVIGATION",
+          "command_payload": "{\"commandId\":\"CMD-20261107161505-EABF0026\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261107-1001\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-07T16:15:05.5639175+08:00\",\"deadline\":\"2026-11-07T16:16:05.5639175+08:00\"}",
+          "command_status": "SENT",
+          "response_payload": null,
+          "created_at": "2026-11-07T16:15:05.563918",
+          "updated_at": "2026-11-07T16:15:05.575839"
+        }
+      ],
+      "actualUnexpectedExecute": {
+        "commandId": "CMD-20261107161505-EABF0026",
+        "commandType": "EXECUTE_CAPABILITY",
+        "attemptNo": 0,
+        "taskId": "TASK-20261107-1001",
+        "stepSeq": 1,
+        "capabilityType": "CAP_NAVIGATION",
+        "inputParams": {
+          "targetLocation": "F2_TEST",
+          "routePreference": "BARRIER_FREE",
+          "targetX": 0.0,
+          "targetY": 0.0
+        },
+        "issuedAt": 1794039305.5639174,
+        "deadline": 1794039365.5639174
+      },
+      "modelCalls": [
+        {
+          "at": "2026-11-07T08:15:03.859513+00:00",
+          "phase": "goal",
+          "request": {
+            "requestId": "e07cd35f-0f56-4632-8f52-355f689361df",
+            "taskGoal": "F177_116_WHITELIST_SHORTER_VALID_AREA Synthetic passenger service F2_TEST_GATE",
+            "taskFamily": "EXT_633EC296",
+            "sceneParams": {
+              "targetLocation": "F2_TEST",
+              "partyCount": 2,
+              "assist": true,
+              "distance": 2.5
+            },
+            "clarificationAnswers": null
+          },
+          "response": {
+            "resultCode": "0",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ],
+            "completionCondition": "routeGenerated=true",
+            "infoComplete": true,
+            "missingInfoQuestions": [],
+            "unrelatedToAnyFamily": false,
+            "inferredTaskFamily": "EXT_633EC296"
+          }
+        },
+        {
+          "at": "2026-11-07T08:15:03.874948+00:00",
+          "phase": "planning",
+          "request": {
+            "requestId": "a238734a-30f5-4ba9-8513-823feb9235a7",
+            "taskGoal": "F177_116_WHITELIST_SHORTER_VALID_AREA Synthetic passenger service F2_TEST_GATE",
+            "taskFamily": "EXT_633EC296",
+            "sceneParams": {
+              "targetLocation": "F2_TEST",
+              "partyCount": 2,
+              "assist": true,
+              "distance": 2.5
+            },
+            "constraints": [
+              "不得下发运动安全控制指令",
+              "步骤数不超过5",
+              "仅允许前往F2_TEST_GATE。"
+            ],
+            "capabilityContext": [
+              {
+                "capabilityType": "CAP_NAVIGATION",
+                "candidateCount": 2,
+                "candidates": [
+                  {
+                    "agentId": "AGT-386E8C30",
+                    "deviceCode": "G160_F016_A",
+                    "deviceTypeCode": "SIMULATOR",
+                    "simulatedDeviceType": "MOBILE_ROBOT",
+                    "businessStatus": {
+                      "workloadScore": 0,
+                      "capabilityMatch": 1
+                    },
+                    "capabilities": [
+                      "CAP_NAVIGATION"
+                    ],
+                    "capabilitySchemas": [
+                      {
+                        "capabilityType": "CAP_NAVIGATION",
+                        "inputParams": [
+                          {
+                            "name": "targetLocation",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "F2_TEST_GATE",
+                            "range": null
+                          },
+                          {
+                            "name": "routePreference",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "BARRIER_FREE",
+                            "range": "SHORTEST/BARRIER_FREE"
+                          },
+                          {
+                            "name": "targetX",
+                            "type": "Double",
+                            "required": false,
+                            "defaultValue": "0",
+                            "range": null
+                          },
+                          {
+                            "name": "targetY",
+                            "type": "Double",
+                            "required": false,
+                            "defaultValue": "0",
+                            "range": null
+                          }
+                        ],
+                        "outputParams": [
+                          {
+                            "name": "routeGenerated",
+                            "type": "Boolean",
+                            "required": true,
+                            "defaultValue": null,
+                            "range": null
+                          },
+                          {
+                            "name": "estimatedDistance",
+                            "type": "Double",
+                            "required": true,
+                            "defaultValue": null,
+                            "range": null
+                          },
+                          {
+                            "name": "estimatedDuration",
+                            "type": "Integer",
+                            "required": true,
+                            "defaultValue": null,
+                            "range": null
+                          },
+                          {
+                            "name": "waypointCount",
+                            "type": "Integer",
+                            "required": true,
+                            "defaultValue": null,
+                            "range": null
+                          }
+                        ]
+                      }
+                    ],
+                    "onlineStatus": "ONLINE",
+                    "location": {
+                      "x": 0.0,
+                      "y": 0.0,
+                      "zone": "F2_TEST"
+                    },
+                    "workload": "IDLE",
+                    "currentTaskId": null,
+                    "currentStepSeq": null,
+                    "availableUntil": "2026-11-07T16:15:03.864935900"
+                  },
+                  {
+                    "agentId": "AGT-8519A3B6",
+                    "deviceCode": "G160_F016_B",
+                    "deviceTypeCode": "SIMULATOR",
+                    "simulatedDeviceType": "MOBILE_ROBOT",
+                    "businessStatus": {
+                      "workloadScore": 0,
+                      "capabilityMatch": 1
+                    },
+                    "capabilities": [
+                      "CAP_NAVIGATION"
+                    ],
+                    "capabilitySchemas": [
+                      {
+                        "capabilityType": "CAP_NAVIGATION",
+                        "inputParams": [
+                          {
+                            "name": "targetLocation",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "F2_TEST_GATE",
+                            "range": null
+                          },
+                          {
+                            "name": "routePreference",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "BARRIER_FREE",
+                            "range": "SHORTEST/BARRIER_FREE"
+                          },
+                          {
+                            "name": "targetX",
+                            "type": "Double",
+                            "required": false,
+                            "defaultValue": "0",
+                            "range": null
+                          },
+                          {
+                            "name": "targetY",
+                            "type": "Double",
+                            "required": false,
+                            "defaultValue": "0",
+                            "range": null
+                          }
+                        ],
+                        "outputParams": [
+                          {
+                            "name": "routeGenerated",
+                            "type": "Boolean",
+                            "required": true,
+                            "defaultValue": null,
+                            "range": null
+                          },
+                          {
+                            "name": "estimatedDistance",
+                            "type": "Double",
+                            "required": true,
+                            "defaultValue": null,
+                            "range": null
+                          },
+                          {
+                            "name": "estimatedDuration",
+                            "type": "Integer",
+                            "required": true,
+                            "defaultValue": null,
+                            "range": null
+                          },
+                          {
+                            "name": "waypointCount",
+                            "type": "Integer",
+                            "required": true,
+                            "defaultValue": null,
+                            "range": null
+                          }
+                        ]
+                      }
+                    ],
+                    "onlineStatus": "ONLINE",
+                    "location": {
+                      "x": 0.0,
+                      "y": 0.0,
+                      "zone": "F2_TEST"
+                    },
+                    "workload": "IDLE",
+                    "currentTaskId": null,
+                    "currentStepSeq": null,
+                    "availableUntil": "2026-11-07T16:15:03.864935900"
+                  }
+                ]
+              }
+            ],
+            "remainingStepQuota": 5,
+            "completedSteps": []
+          },
+          "response": {
+            "resultCode": "0",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic passenger guidance",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 600
+              }
+            ],
+            "planRationale": "Controlled F022 V163 fixture",
+            "confidence": 0.99,
+            "candidateDiverse": false
+          }
+        }
+      ],
+      "prefixBeforeReplan": null
+    },
+    {
+      "source": "SRS_F022-V1.177-http-20261107.json",
+      "name": "116-capability-sentence-legal",
+      "taskId": 1012,
+      "request": {
+        "taskGoal": "F177_116_CAPABILITY_SENTENCE_LEGAL Synthetic passenger service F2_TEST_GATE",
+        "taskFamily": "EXT_633EC296",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE",
+          "partyCount": 2,
+          "assist": true,
+          "distance": 2.5
+        }
+      },
+      "definition": {
+        "id": 94,
+        "definitionCode": "EXT_633EC296",
+        "taskName": "G177 F022 acceptance 161326",
+        "goalTemplate": "Synthetic navigation",
+        "sceneParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": null,
+            "range": "synthetic location"
+          },
+          {
+            "name": "partyCount",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": null,
+            "range": "synthetic integer"
+          },
+          {
+            "name": "assist",
+            "type": "Boolean",
+            "required": true,
+            "defaultValue": null,
+            "range": "synthetic boolean"
+          },
+          {
+            "name": "distance",
+            "type": "Double",
+            "required": true,
+            "defaultValue": null,
+            "range": "synthetic double"
+          }
+        ],
+        "availableCapabilityTypes": [
+          "CAP_NAVIGATION"
+        ],
+        "constraintDescription": "仅允许使用CAP_NAVIGATION能力。",
+        "completionCondition": "routeGenerated=true",
+        "isPreset": false,
+        "definitionStatus": "ENABLED",
+        "updatedAt": "2026-11-07T16:15:07.143385",
+        "updatedBy": "set"
+      },
+      "checks": {
+        "definitionPersisted": true,
+        "legalPlanPasses": false,
+        "legalTaskCompletes": false,
+        "exactDescriptionInInitialRequest": true
+      },
+      "taskBeforeCleanup": {
+        "id": 1012,
+        "taskCode": "TASK-20261107-1002",
+        "taskGoal": "F177_116_CAPABILITY_SENTENCE_LEGAL Synthetic passenger service F2_TEST_GATE",
+        "taskFamily": "EXT_633EC296",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE",
+          "partyCount": 2,
+          "assist": true,
+          "distance": 2.5
+        },
+        "goalParsingResult": {
+          "completionCondition": "routeGenerated=true",
+          "origin": "F2_SERVICE_POINT",
+          "destination": "F2_TEST_GATE",
+          "originalGoal": "F177_116_CAPABILITY_SENTENCE_LEGAL Synthetic passenger service F2_TEST_GATE",
+          "constraints": [
+            "synthetic test"
+          ]
+        },
+        "status": "PENDING_MANUAL",
+        "currentPlanVersionId": 980,
+        "replanUsed": false,
+        "replanningReason": null,
+        "manualTerminateReason": null,
+        "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_TASK_DEFINITION_CONSTRAINT；且无匹配的已启用基线模板",
+        "missingInfoQuestions": null,
+        "downgradeReason": null,
+        "isDryRun": false,
+        "createdAt": "2026-11-07T16:15:07.90641",
+        "updatedAt": "2026-11-07T16:15:07.962981",
+        "createdBy": "oprator"
+      },
+      "plans": [
+        {
+          "id": 980,
+          "versionNo": 1,
+          "source": "AUTONOMOUS",
+          "baselineTemplateId": null,
+          "snapshotId": "CTX-20261107-1016",
+          "planSteps": [
+            {
+              "stepSeq": 1,
+              "stepGoal": "Synthetic passenger guidance",
+              "capabilityType": "CAP_NAVIGATION",
+              "inputParams": {
+                "targetLocation": "F2_TEST_GATE"
+              },
+              "precondition": "device online",
+              "completionCondition": "routeGenerated=true",
+              "failureHandling": "manual handling",
+              "stepTimeout": 600
+            }
+          ],
+          "structureCheckResult": "PASS",
+          "capabilityCheckResult": "PASS",
+          "constraintCheckResult": "FAIL",
+          "validationErrors": [
+            {
+              "errorType": "CONSTRAINT",
+              "description": "步骤1目标地点 F2_TEST_GATE 超出任务定义约束限定范围（仅允许: [使用CAP_NAVIGATION能力]）",
+              "stepSeq": 1,
+              "reasonCode": "ERR_TASK_DEFINITION_CONSTRAINT"
+            }
+          ],
+          "riskLevel": null,
+          "riskReasonCode": null,
+          "judgmentBasis": null,
+          "confidence": 0.99,
+          "ruleSetVersion": null,
+          "frozenAt": null,
+          "createdAt": "2026-11-07T16:15:07.949064"
+        }
+      ],
+      "commandRows": [],
+      "actualUnexpectedExecute": null,
+      "modelCalls": [
+        {
+          "at": "2026-11-07T08:15:07.928181+00:00",
+          "phase": "goal",
+          "request": {
+            "requestId": "a5115fc9-501c-432f-b226-1dd1a97753ef",
+            "taskGoal": "F177_116_CAPABILITY_SENTENCE_LEGAL Synthetic passenger service F2_TEST_GATE",
+            "taskFamily": "EXT_633EC296",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE",
+              "partyCount": 2,
+              "assist": true,
+              "distance": 2.5
+            },
+            "clarificationAnswers": null
+          },
+          "response": {
+            "resultCode": "0",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "constraints": [
+              "synthetic test"
+            ],
+            "completionCondition": "routeGenerated=true",
+            "infoComplete": true,
+            "missingInfoQuestions": [],
+            "unrelatedToAnyFamily": false,
+            "inferredTaskFamily": "EXT_633EC296"
+          }
+        },
+        {
+          "at": "2026-11-07T08:15:07.945281+00:00",
+          "phase": "planning",
+          "request": {
+            "requestId": "2d0dfde7-b3e5-41bb-b4c0-572c7ebdfcbe",
+            "taskGoal": "F177_116_CAPABILITY_SENTENCE_LEGAL Synthetic passenger service F2_TEST_GATE",
+            "taskFamily": "EXT_633EC296",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE",
+              "partyCount": 2,
+              "assist": true,
+              "distance": 2.5
+            },
+            "constraints": [
+              "不得下发运动安全控制指令",
+              "步骤数不超过5",
+              "仅允许使用CAP_NAVIGATION能力。"
+            ],
+            "capabilityContext": [
+              {
+                "capabilityType": "CAP_NAVIGATION",
+                "candidateCount": 2,
+                "candidates": [
+                  {
+                    "agentId": "AGT-386E8C30",
+                    "deviceCode": "G160_F016_A",
+                    "deviceTypeCode": "SIMULATOR",
+                    "simulatedDeviceType": "MOBILE_ROBOT",
+                    "businessStatus": {
+                      "workloadScore": 0,
+                      "capabilityMatch": 1
+                    },
+                    "capabilities": [
+                      "CAP_NAVIGATION"
+                    ],
+                    "capabilitySchemas": [
+                      {
+                        "capabilityType": "CAP_NAVIGATION",
+                        "inputParams": [
+                          {
+                            "name": "targetLocation",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "F2_TEST_GATE",
+                            "range": null
+                          },
+                          {
+                            "name": "routePreference",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "BARRIER_FREE",
+                            "range": "SHORTEST/BARRIER_FREE"
+                          },
+                          {
+                            "name": "targetX",
+                            "type": "Double",
+                            "required": false,
+                            "defaultValue": "0",
+                            "range": null
+                          },
+                          {
+                            "name": "targetY",
+                            "type": "Double",
+                            "required": false,
+                            "defaultValue": "0",
+                            "range": null
+                          }
+                        ],
+                        "outputParams": [
+                          {
+                            "name": "routeGenerated",
+                            "type": "Boolean",
+                            "required": true,
+                            "defaultValue": null,
+                            "range": null
+                          },
+                          {
+                            "name": "estimatedDistance",
+                            "type": "Double",
+                            "required": true,
+                            "defaultValue": null,
+                            "range": null
+                          },
+                          {
+                            "name": "estimatedDuration",
+                            "type": "Integer",
+                            "required": true,
+                            "defaultValue": null,
+                            "range": null
+                          },
+                          {
+                            "name": "waypointCount",
+                            "type": "Integer",
+                            "required": true,
+                            "defaultValue": null,
+                            "range": null
+                          }
+                        ]
+                      }
+                    ],
+                    "onlineStatus": "ONLINE",
+                    "location": {
+                      "x": 0.0,
+                      "y": 0.0,
+                      "zone": "F2_TEST"
+                    },
+                    "workload": "IDLE",
+                    "currentTaskId": null,
+                    "currentStepSeq": null,
+                    "availableUntil": "2026-11-07T16:15:07.935139600"
+                  },
+                  {
+                    "agentId": "AGT-8519A3B6",
+                    "deviceCode": "G160_F016_B",
+                    "deviceTypeCode": "SIMULATOR",
+                    "simulatedDeviceType": "MOBILE_ROBOT",
+                    "businessStatus": {
+                      "workloadScore": 0,
+                      "capabilityMatch": 1
+                    },
+                    "capabilities": [
+                      "CAP_NAVIGATION"
+                    ],
+                    "capabilitySchemas": [
+                      {
+                        "capabilityType": "CAP_NAVIGATION",
+                        "inputParams": [
+                          {
+                            "name": "targetLocation",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "F2_TEST_GATE",
+                            "range": null
+                          },
+                          {
+                            "name": "routePreference",
+                            "type": "String",
+                            "required": true,
+                            "defaultValue": "BARRIER_FREE",
+                            "range": "SHORTEST/BARRIER_FREE"
+                          },
+                          {
+                            "name": "targetX",
+                            "type": "Double",
+                            "required": false,
+                            "defaultValue": "0",
+                            "range": null
+                          },
+                          {
+                            "name": "targetY",
+                            "type": "Double",
+                            "required": false,
+                            "defaultValue": "0",
+                            "range": null
+                          }
+                        ],
+                        "outputParams": [
+                          {
+                            "name": "routeGenerated",
+                            "type": "Boolean",
+                            "required": true,
+                            "defaultValue": null,
+                            "range": null
+                          },
+                          {
+                            "name": "estimatedDistance",
+                            "type": "Double",
+                            "required": true,
+                            "defaultValue": null,
+                            "range": null
+                          },
+                          {
+                            "name": "estimatedDuration",
+                            "type": "Integer",
+                            "required": true,
+                            "defaultValue": null,
+                            "range": null
+                          },
+                          {
+                            "name": "waypointCount",
+                            "type": "Integer",
+                            "required": true,
+                            "defaultValue": null,
+                            "range": null
+                          }
+                        ]
+                      }
+                    ],
+                    "onlineStatus": "ONLINE",
+                    "location": {
+                      "x": 0.0,
+                      "y": 0.0,
+                      "zone": "F2_TEST"
+                    },
+                    "workload": "IDLE",
+                    "currentTaskId": null,
+                    "currentStepSeq": null,
+                    "availableUntil": "2026-11-07T16:15:07.935139600"
+                  }
+                ]
+              }
+            ],
+            "remainingStepQuota": 5,
+            "completedSteps": []
+          },
+          "response": {
+            "resultCode": "0",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "Synthetic passenger guidance",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 600
+              }
+            ],
+            "planRationale": "Controlled F022 V163 fixture",
+            "confidence": 0.99,
+            "candidateDiverse": false
+          }
+        }
+      ],
+      "prefixBeforeReplan": null
+    },
+    {
+      "source": "SRS_F022-V1.177-http-20261107-baseline-stable.json",
+      "name": "baseline-location-prohibited",
+      "taskId": 1021,
+      "request": {
+        "taskGoal": "F177_BASELINE_LOCATION_PROHIBITED Synthetic passenger service F2_TEST_GATE",
+        "taskFamily": "EXT_FDB3FE41",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "definition": {
+        "id": 102,
+        "definitionCode": "EXT_FDB3FE41",
+        "taskName": "G177 F022 acceptance 162709",
+        "goalTemplate": "Synthetic navigation",
+        "sceneParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "F2_TEST_GATE",
+            "range": null
+          }
+        ],
+        "availableCapabilityTypes": [
+          "CAP_NAVIGATION"
+        ],
+        "constraintDescription": "禁止前往F2_TEST_GATE；仅允许前往F2_ZONE_A。",
+        "completionCondition": "routeGenerated=true",
+        "isPreset": false,
+        "definitionStatus": "ENABLED",
+        "updatedAt": "2026-11-07T16:27:16.94173",
+        "updatedBy": "set"
+      },
+      "checks": {
+        "baselineHardConstraintFail": false,
+        "definitionReason": false,
+        "noFrozen": false,
+        "noExecute": false
+      },
+      "taskBeforeCleanup": {
+        "id": 1021,
+        "taskCode": "TASK-20261107-1011",
+        "taskGoal": "F177_BASELINE_LOCATION_PROHIBITED Synthetic passenger service F2_TEST_GATE",
+        "taskFamily": "EXT_FDB3FE41",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        },
+        "goalParsingResult": {
+          "completionCondition": "routeGenerated=true",
+          "origin": "F2_SERVICE_POINT",
+          "destination": "F2_TEST_GATE",
+          "originalGoal": "F177_BASELINE_LOCATION_PROHIBITED Synthetic passenger service F2_TEST_GATE",
+          "constraints": [
+            "synthetic test"
+          ]
+        },
+        "status": "EXECUTING",
+        "currentPlanVersionId": 991,
+        "replanUsed": false,
+        "replanningReason": null,
+        "manualTerminateReason": null,
+        "failureReason": null,
+        "missingInfoQuestions": null,
+        "downgradeReason": "候选计划生成失败或模型服务不可用",
+        "isDryRun": false,
+        "createdAt": "2026-11-07T16:27:17.683559",
+        "updatedAt": "2026-11-07T16:27:19.062569",
+        "createdBy": "oprator"
+      },
+      "plans": [
+        {
+          "id": 991,
+          "versionNo": 1,
+          "source": "BASELINE_TEMPLATE",
+          "baselineTemplateId": 93,
+          "snapshotId": "CTX-20261107-1029",
+          "planSteps": [
+            {
+              "stepSeq": 1,
+              "capabilityType": "CAP_NAVIGATION",
+              "paramMapping": [
+                {
+                  "target": "targetLocation",
+                  "source": "TEMPLATE_INPUT.targetLocation"
+                }
+              ],
+              "stepTimeout": 600,
+              "completionCondition": "routeGenerated=true",
+              "stepGoal": "执行CAP_NAVIGATION能力（基线模板步骤）",
+              "precondition": "候选设备在线且空闲",
+              "failureHandling": "重试一次或转人工处理",
+              "inputParams": {}
+            }
+          ],
+          "structureCheckResult": "PASS",
+          "capabilityCheckResult": "PASS",
+          "constraintCheckResult": "PASS",
+          "validationErrors": [],
+          "riskLevel": null,
+          "riskReasonCode": null,
+          "judgmentBasis": null,
+          "confidence": null,
+          "ruleSetVersion": "V1.0",
+          "frozenAt": "2026-11-07T16:27:17.74177",
+          "createdAt": "2026-11-07T16:27:17.739185"
+        }
+      ],
+      "commandRows": [
+        {
+          "id": 3472,
+          "command_id": "CMD-20261107162717-EABF0044",
+          "agent_code": "AGT-386E8C30",
+          "command_type": "TASK_ACCEPT",
+          "attempt_no": 0,
+          "task_id": 1021,
+          "step_seq": 1,
+          "capability_type": "CAP_NAVIGATION",
+          "command_payload": "{\"commandId\":\"CMD-20261107162717-EABF0044\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261107-1011\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-07T16:27:17.7620144+08:00\",\"deadline\":\"2026-11-07T16:28:17.7620144+08:00\"}",
+          "command_status": "ACCEPTED",
+          "response_payload": "{\"commandId\":\"CMD-20261107162717-EABF0044\",\"accepted\":true,\"rejectReason\":null}",
+          "created_at": "2026-11-07T16:27:17.762014",
+          "updated_at": "2026-11-07T16:27:19.058896"
+        },
+        {
+          "id": 3473,
+          "command_id": "CMD-20261107162719-EABF0045",
+          "agent_code": "AGT-386E8C30",
+          "command_type": "EXECUTE_CAPABILITY",
+          "attempt_no": 0,
+          "task_id": 1021,
+          "step_seq": 1,
+          "capability_type": "CAP_NAVIGATION",
+          "command_payload": "{\"commandId\":\"CMD-20261107162719-EABF0045\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261107-1011\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-07T16:27:19.0726473+08:00\",\"deadline\":\"2026-11-07T16:28:19.0726473+08:00\"}",
+          "command_status": "SENT",
+          "response_payload": null,
+          "created_at": "2026-11-07T16:27:19.072647",
+          "updated_at": "2026-11-07T16:27:19.080919"
+        }
+      ],
+      "actualUnexpectedExecute": {
+        "commandId": "CMD-20261107162719-EABF0045",
+        "commandType": "EXECUTE_CAPABILITY",
+        "attemptNo": 0,
+        "taskId": "TASK-20261107-1011",
+        "stepSeq": 1,
+        "capabilityType": "CAP_NAVIGATION",
+        "inputParams": {
+          "targetLocation": "F2_TEST_GATE",
+          "routePreference": "BARRIER_FREE",
+          "targetX": 0.0,
+          "targetY": 0.0
+        },
+        "issuedAt": 1794040039.0726473,
+        "deadline": 1794040099.0726473
+      },
+      "modelCalls": [],
+      "prefixBeforeReplan": null
+    },
+    {
+      "source": "SRS_F022-V1.177-http-20261107-replan-baseline.json",
+      "name": "replan-baseline-prohibited-tail",
+      "taskId": 1024,
+      "request": {
+        "taskGoal": "F177_REPLAN_BASELINE_PROHIBITED_TAIL Synthetic passenger guidance F2_ZONE_A",
+        "taskFamily": "EXT_2C296894",
+        "sceneParams": {
+          "targetLocation": "F2_ZONE_A",
+          "fallbackLocation": "F2_TEST_GATE"
+        }
+      },
+      "definition": {
+        "id": 103,
+        "definitionCode": "EXT_2C296894",
+        "taskName": "G177 F022 acceptance 163719",
+        "goalTemplate": "Synthetic navigation",
+        "sceneParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": null,
+            "range": null
+          },
+          {
+            "name": "fallbackLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": null,
+            "range": null
+          }
+        ],
+        "availableCapabilityTypes": [
+          "CAP_NAVIGATION"
+        ],
+        "constraintDescription": "禁止前往F2_TEST_GATE；仅允许前往F2_ZONE_A。",
+        "completionCondition": "routeGenerated=true",
+        "isPreset": false,
+        "definitionStatus": "ENABLED",
+        "updatedAt": "2026-11-07T16:37:23.170667",
+        "updatedBy": "set"
+      },
+      "checks": {
+        "realReplan": true,
+        "baselineTailVersion": true,
+        "prefixStillCompleted": true,
+        "prohibitedTailRejected": false,
+        "prohibitedBaselineUnfrozen": false,
+        "noProhibitedTailCommand": false
+      },
+      "taskBeforeCleanup": {
+        "id": 1024,
+        "taskCode": "TASK-20261107-1014",
+        "taskGoal": "F177_REPLAN_BASELINE_PROHIBITED_TAIL Synthetic passenger guidance F2_ZONE_A",
+        "taskFamily": "EXT_2C296894",
+        "sceneParams": {
+          "targetLocation": "F2_ZONE_A",
+          "fallbackLocation": "F2_TEST_GATE"
+        },
+        "goalParsingResult": {
+          "completionCondition": "routeGenerated=true",
+          "origin": "F2_SERVICE_POINT",
+          "destination": "F2_TEST_GATE",
+          "originalGoal": "F177_REPLAN_BASELINE_PROHIBITED_TAIL Synthetic passenger guidance F2_ZONE_A",
+          "constraints": [
+            "synthetic test"
+          ]
+        },
+        "status": "EXECUTING",
+        "currentPlanVersionId": 998,
+        "replanUsed": true,
+        "replanningReason": "STEP_FAILED: ERR_SYNTHETIC_HARDWARE",
+        "manualTerminateReason": null,
+        "failureReason": null,
+        "missingInfoQuestions": null,
+        "downgradeReason": "局部重新规划后监督判定高风险: RULE_RESOURCE_CRITICAL",
+        "isDryRun": false,
+        "createdAt": "2026-11-07T16:37:32.90386",
+        "updatedAt": "2026-11-07T16:37:37.926525",
+        "createdBy": "oprator"
+      },
+      "plans": [
+        {
+          "id": 996,
+          "versionNo": 1,
+          "source": "AUTONOMOUS",
+          "baselineTemplateId": null,
+          "snapshotId": "CTX-20261107-1033",
+          "planSteps": [
+            {
+              "stepSeq": 1,
+              "stepGoal": "前往区域",
+              "capabilityType": "CAP_NAVIGATION",
+              "inputParams": {
+                "targetLocation": "F2_ZONE_A"
+              },
+              "precondition": "device online",
+              "completionCondition": "routeGenerated=true",
+              "failureHandling": "manual handling",
+              "stepTimeout": 600
+            },
+            {
+              "stepSeq": 2,
+              "stepGoal": "前往区域",
+              "capabilityType": "CAP_NAVIGATION",
+              "inputParams": {
+                "targetLocation": "F2_ZONE_A"
+              },
+              "precondition": "device online",
+              "completionCondition": "routeGenerated=true",
+              "failureHandling": "manual handling",
+              "stepTimeout": 600
+            }
+          ],
+          "structureCheckResult": "PASS",
+          "capabilityCheckResult": "PASS",
+          "constraintCheckResult": "PASS",
+          "validationErrors": [],
+          "riskLevel": "LOW",
+          "riskReasonCode": null,
+          "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+          "confidence": 0.99,
+          "ruleSetVersion": "V1.141",
+          "frozenAt": "2026-11-07T16:37:32.959512",
+          "createdAt": "2026-11-07T16:37:32.954357"
+        },
+        {
+          "id": 997,
+          "versionNo": 2,
+          "source": "AUTONOMOUS",
+          "baselineTemplateId": null,
+          "snapshotId": "CTX-20261107-1034",
+          "planSteps": [
+            {
+              "stepSeq": 1,
+              "stepGoal": "前往区域",
+              "capabilityType": "CAP_NAVIGATION",
+              "inputParams": {
+                "targetLocation": "F2_ZONE_A"
+              },
+              "precondition": "device online",
+              "completionCondition": "routeGenerated=true",
+              "failureHandling": "manual handling",
+              "stepTimeout": 600,
+              "executionResult": "SUCCESS",
+              "outputParams": {
+                "routeGenerated": true
+              },
+              "originalCommandId": "CMD-20261107163732-2494000C"
+            },
+            {
+              "stepSeq": 2,
+              "stepGoal": "前往区域",
+              "capabilityType": "CAP_NAVIGATION",
+              "inputParams": {
+                "targetLocation": "F2_ZONE_A"
+              },
+              "precondition": "device online",
+              "completionCondition": "routeGenerated=true",
+              "failureHandling": "manual handling",
+              "stepTimeout": 600
+            }
+          ],
+          "structureCheckResult": "PASS",
+          "capabilityCheckResult": "PASS",
+          "constraintCheckResult": "PASS",
+          "validationErrors": [],
+          "riskLevel": "HIGH",
+          "riskReasonCode": "RULE_RESOURCE_CRITICAL",
+          "judgmentBasis": "可用备用候选设备数量(0)低于配置阈值(1)，命中确定性高风险规则",
+          "confidence": 0.79,
+          "ruleSetVersion": "V1.141",
+          "frozenAt": "2026-11-07T16:37:36.708027",
+          "createdAt": "2026-11-07T16:37:36.703339"
+        },
+        {
+          "id": 998,
+          "versionNo": 3,
+          "source": "BASELINE_TEMPLATE",
+          "baselineTemplateId": 94,
+          "snapshotId": "CTX-20261107-1035",
+          "planSteps": [
+            {
+              "stepSeq": 1,
+              "stepGoal": "前往区域",
+              "capabilityType": "CAP_NAVIGATION",
+              "inputParams": {
+                "targetLocation": "F2_ZONE_A"
+              },
+              "precondition": "device online",
+              "completionCondition": "routeGenerated=true",
+              "failureHandling": "manual handling",
+              "stepTimeout": 600,
+              "executionResult": "SUCCESS",
+              "outputParams": {
+                "routeGenerated": true
+              },
+              "originalCommandId": "CMD-20261107163732-2494000C"
+            },
+            {
+              "stepSeq": 2,
+              "capabilityType": "CAP_NAVIGATION",
+              "paramMapping": [
+                {
+                  "target": "targetLocation",
+                  "source": "TEMPLATE_INPUT.fallbackLocation"
+                }
+              ],
+              "stepTimeout": 600,
+              "completionCondition": "routeGenerated=true",
+              "stepGoal": "执行CAP_NAVIGATION能力（基线模板步骤）",
+              "precondition": "候选设备在线且空闲",
+              "failureHandling": "重试一次或转人工处理",
+              "inputParams": {}
+            }
+          ],
+          "structureCheckResult": "PASS",
+          "capabilityCheckResult": "PASS",
+          "constraintCheckResult": "PASS",
+          "validationErrors": [],
+          "riskLevel": null,
+          "riskReasonCode": null,
+          "judgmentBasis": null,
+          "confidence": null,
+          "ruleSetVersion": "V1.0",
+          "frozenAt": "2026-11-07T16:37:36.736871",
+          "createdAt": "2026-11-07T16:37:36.734199"
+        }
+      ],
+      "commandRows": [
+        {
+          "id": 3492,
+          "command_id": "CMD-20261107163732-2494000C",
+          "agent_code": "AGT-386E8C30",
+          "command_type": "TASK_ACCEPT",
+          "attempt_no": 0,
+          "task_id": 1024,
+          "step_seq": 1,
+          "capability_type": "CAP_NAVIGATION",
+          "command_payload": "{\"commandId\":\"CMD-20261107163732-2494000C\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261107-1014\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_ZONE_A\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-07T16:37:32.9906947+08:00\",\"deadline\":\"2026-11-07T16:38:32.9906947+08:00\"}",
+          "command_status": "ACCEPTED",
+          "response_payload": "{\"commandId\":\"CMD-20261107163732-2494000C\",\"accepted\":true,\"rejectReason\":null}",
+          "created_at": "2026-11-07T16:37:32.990695",
+          "updated_at": "2026-11-07T16:37:33.311617"
+        },
+        {
+          "id": 3493,
+          "command_id": "CMD-20261107163733-2494000D",
+          "agent_code": "AGT-386E8C30",
+          "command_type": "EXECUTE_CAPABILITY",
+          "attempt_no": 0,
+          "task_id": 1024,
+          "step_seq": 1,
+          "capability_type": "CAP_NAVIGATION",
+          "command_payload": "{\"commandId\":\"CMD-20261107163733-2494000D\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261107-1014\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_ZONE_A\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-07T16:37:33.3274947+08:00\",\"deadline\":\"2026-11-07T16:38:33.3274947+08:00\"}",
+          "command_status": "SUCCEEDED",
+          "response_payload": "{\"commandId\":\"CMD-20261107163733-2494000D\",\"attemptNo\":0,\"executionResult\":\"SUCCESS\",\"reasonCode\":\"DEVICE_SUCCESS\",\"outputParams\":{\"routeGenerated\":true}}",
+          "created_at": "2026-11-07T16:37:33.3296",
+          "updated_at": "2026-11-07T16:37:33.873418"
+        },
+        {
+          "id": 3494,
+          "command_id": "CMD-20261107163733-2494000E",
+          "agent_code": "AGT-386E8C30",
+          "command_type": "TASK_ACCEPT",
+          "attempt_no": 0,
+          "task_id": 1024,
+          "step_seq": 2,
+          "capability_type": "CAP_NAVIGATION",
+          "command_payload": "{\"commandId\":\"CMD-20261107163733-2494000E\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261107-1014\",\"stepSeq\":2,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_ZONE_A\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-07T16:37:33.8980595+08:00\",\"deadline\":\"2026-11-07T16:38:33.8980595+08:00\"}",
+          "command_status": "ACCEPTED",
+          "response_payload": "{\"commandId\":\"CMD-20261107163733-2494000E\",\"accepted\":true,\"rejectReason\":null}",
+          "created_at": "2026-11-07T16:37:33.89806",
+          "updated_at": "2026-11-07T16:37:35.102978"
+        },
+        {
+          "id": 3495,
+          "command_id": "CMD-20261107163735-2494000F",
+          "agent_code": "AGT-386E8C30",
+          "command_type": "EXECUTE_CAPABILITY",
+          "attempt_no": 0,
+          "task_id": 1024,
+          "step_seq": 2,
+          "capability_type": "CAP_NAVIGATION",
+          "command_payload": "{\"commandId\":\"CMD-20261107163735-2494000F\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261107-1014\",\"stepSeq\":2,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_ZONE_A\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-07T16:37:35.118437+08:00\",\"deadline\":\"2026-11-07T16:38:35.118437+08:00\"}",
+          "command_status": "FAILED",
+          "response_payload": "{\"commandId\":\"CMD-20261107163735-2494000F\",\"attemptNo\":0,\"executionResult\":\"FAILED\",\"reasonCode\":\"ERR_SYNTHETIC_HARDWARE\",\"outputParams\":{\"routeGenerated\":true}}",
+          "created_at": "2026-11-07T16:37:35.119184",
+          "updated_at": "2026-11-07T16:37:35.55001"
+        },
+        {
+          "id": 3496,
+          "command_id": "CMD-20261107163735-2494000F",
+          "agent_code": "AGT-386E8C30",
+          "command_type": "EXECUTE_CAPABILITY",
+          "attempt_no": 1,
+          "task_id": 1024,
+          "step_seq": 2,
+          "capability_type": "CAP_NAVIGATION",
+          "command_payload": "{\"commandId\":\"CMD-20261107163735-2494000F\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":1,\"taskId\":\"TASK-20261107-1014\",\"stepSeq\":2,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_ZONE_A\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-07T16:37:35.5628375+08:00\",\"deadline\":\"2026-11-07T16:38:35.5628375+08:00\"}",
+          "command_status": "FAILED",
+          "response_payload": "{\"commandId\":\"CMD-20261107163735-2494000F\",\"attemptNo\":1,\"executionResult\":\"FAILED\",\"reasonCode\":\"ERR_SYNTHETIC_HARDWARE\",\"outputParams\":{\"routeGenerated\":true}}",
+          "created_at": "2026-11-07T16:37:35.562838",
+          "updated_at": "2026-11-07T16:37:35.789835"
+        },
+        {
+          "id": 3497,
+          "command_id": "CMD-20261107163735-24940010",
+          "agent_code": "AGT-8519A3B6",
+          "command_type": "TASK_ACCEPT",
+          "attempt_no": 0,
+          "task_id": 1024,
+          "step_seq": 2,
+          "capability_type": "CAP_NAVIGATION",
+          "command_payload": "{\"commandId\":\"CMD-20261107163735-24940010\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261107-1014\",\"stepSeq\":2,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_ZONE_A\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-07T16:37:35.8172569+08:00\",\"deadline\":\"2026-11-07T16:38:35.8172569+08:00\"}",
+          "command_status": "ACCEPTED",
+          "response_payload": "{\"commandId\":\"CMD-20261107163735-24940010\",\"accepted\":true,\"rejectReason\":null}",
+          "created_at": "2026-11-07T16:37:35.817257",
+          "updated_at": "2026-11-07T16:37:35.905827"
+        },
+        {
+          "id": 3498,
+          "command_id": "CMD-20261107163735-24940011",
+          "agent_code": "AGT-8519A3B6",
+          "command_type": "EXECUTE_CAPABILITY",
+          "attempt_no": 0,
+          "task_id": 1024,
+          "step_seq": 2,
+          "capability_type": "CAP_NAVIGATION",
+          "command_payload": "{\"commandId\":\"CMD-20261107163735-24940011\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261107-1014\",\"stepSeq\":2,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_ZONE_A\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-07T16:37:35.9186255+08:00\",\"deadline\":\"2026-11-07T16:38:35.9186255+08:00\"}",
+          "command_status": "FAILED",
+          "response_payload": "{\"commandId\":\"CMD-20261107163735-24940011\",\"attemptNo\":0,\"executionResult\":\"FAILED\",\"reasonCode\":\"ERR_SYNTHETIC_HARDWARE\",\"outputParams\":{\"routeGenerated\":true}}",
+          "created_at": "2026-11-07T16:37:35.918626",
+          "updated_at": "2026-11-07T16:37:36.385103"
+        },
+        {
+          "id": 3499,
+          "command_id": "CMD-20261107163735-24940011",
+          "agent_code": "AGT-8519A3B6",
+          "command_type": "EXECUTE_CAPABILITY",
+          "attempt_no": 1,
+          "task_id": 1024,
+          "step_seq": 2,
+          "capability_type": "CAP_NAVIGATION",
+          "command_payload": "{\"commandId\":\"CMD-20261107163735-24940011\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":1,\"taskId\":\"TASK-20261107-1014\",\"stepSeq\":2,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_ZONE_A\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-07T16:37:36.3985769+08:00\",\"deadline\":\"2026-11-07T16:38:36.3985769+08:00\"}",
+          "command_status": "FAILED",
+          "response_payload": "{\"commandId\":\"CMD-20261107163735-24940011\",\"attemptNo\":1,\"executionResult\":\"FAILED\",\"reasonCode\":\"ERR_SYNTHETIC_HARDWARE\",\"outputParams\":{\"routeGenerated\":true}}",
+          "created_at": "2026-11-07T16:37:36.398577",
+          "updated_at": "2026-11-07T16:37:36.653132"
+        },
+        {
+          "id": 3500,
+          "command_id": "CMD-20261107163736-24940012",
+          "agent_code": "AGT-386E8C30",
+          "command_type": "TASK_ACCEPT",
+          "attempt_no": 0,
+          "task_id": 1024,
+          "step_seq": 2,
+          "capability_type": "CAP_NAVIGATION",
+          "command_payload": "{\"commandId\":\"CMD-20261107163736-24940012\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261107-1014\",\"stepSeq\":2,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-07T16:37:36.7593095+08:00\",\"deadline\":\"2026-11-07T16:38:36.7593095+08:00\"}",
+          "command_status": "ACCEPTED",
+          "response_payload": "{\"commandId\":\"CMD-20261107163736-24940012\",\"accepted\":true,\"rejectReason\":null}",
+          "created_at": "2026-11-07T16:37:36.75931",
+          "updated_at": "2026-11-07T16:37:37.919807"
+        },
+        {
+          "id": 3501,
+          "command_id": "CMD-20261107163737-24940013",
+          "agent_code": "AGT-386E8C30",
+          "command_type": "EXECUTE_CAPABILITY",
+          "attempt_no": 0,
+          "task_id": 1024,
+          "step_seq": 2,
+          "capability_type": "CAP_NAVIGATION",
+          "command_payload": "{\"commandId\":\"CMD-20261107163737-24940013\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261107-1014\",\"stepSeq\":2,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-07T16:37:37.9380534+08:00\",\"deadline\":\"2026-11-07T16:38:37.9380534+08:00\"}",
+          "command_status": "SENT",
+          "response_payload": null,
+          "created_at": "2026-11-07T16:37:37.938053",
+          "updated_at": "2026-11-07T16:37:37.948832"
+        }
+      ],
+      "actualUnexpectedExecute": {
+        "commandId": "CMD-20261107163737-24940013",
+        "commandType": "EXECUTE_CAPABILITY",
+        "attemptNo": 0,
+        "taskId": "TASK-20261107-1014",
+        "stepSeq": 2,
+        "capabilityType": "CAP_NAVIGATION",
+        "inputParams": {
+          "targetLocation": "F2_TEST_GATE",
+          "routePreference": "BARRIER_FREE",
+          "targetX": 0.0,
+          "targetY": 0.0
+        },
+        "issuedAt": 1794040657.9380534,
+        "deadline": 1794040717.9380534
+      },
+      "modelCalls": [],
+      "prefixBeforeReplan": {
+        "task": {
+          "id": 1024,
+          "taskCode": "TASK-20261107-1014",
+          "taskGoal": "F177_REPLAN_BASELINE_PROHIBITED_TAIL Synthetic passenger guidance F2_ZONE_A",
+          "taskFamily": "EXT_2C296894",
+          "sceneParams": {
+            "targetLocation": "F2_ZONE_A",
+            "fallbackLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F177_REPLAN_BASELINE_PROHIBITED_TAIL Synthetic passenger guidance F2_ZONE_A",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "EXECUTING",
+          "currentPlanVersionId": 996,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": null,
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-07T16:37:32.90386",
+          "updatedAt": "2026-11-07T16:37:33.317686",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 996,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261107-1033",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "前往区域",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_ZONE_A"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 600
+              },
+              {
+                "stepSeq": 2,
+                "stepGoal": "前往区域",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_ZONE_A"
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "manual handling",
+                "stepTimeout": 600
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "LOW",
+            "riskReasonCode": null,
+            "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.141",
+            "frozenAt": "2026-11-07T16:37:32.959512",
+            "createdAt": "2026-11-07T16:37:32.954357"
+          }
+        ],
+        "events": [
+          {
+            "id": 15225,
+            "taskId": 1024,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-07T16:37:32.908952",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F177_REPLAN_BASELINE_PROHIBITED_TAIL Synthetic passenger guidance F2_ZONE_A",
+            "detail": "运行操作员oprator提交任务目标: F177_REPLAN_BASELINE_PROHIBITED_TAIL Synthetic passenger guidance F2_ZONE_A",
+            "rawDetailSummary": "运行操作员oprator提交任务目标: F177_REPLAN_BASELINE_PROHIBITED_TAIL Synthetic passenger guidance F2_ZONE_A"
+          },
+          {
+            "id": 15226,
+            "taskId": 1024,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-07T16:37:32.930423",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建",
+            "detail": "目标理解完成，关键信息已完整，进入规划上下文构建",
+            "rawDetailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 15227,
+            "taskId": 1024,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-07T16:37:32.940245",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261107-1033",
+            "detail": "生成规划上下文快照CTX-20261107-1033",
+            "rawDetailSummary": "生成规划上下文快照CTX-20261107-1033"
+          },
+          {
+            "id": 15228,
+            "taskId": 1024,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-07T16:37:32.956892",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1",
+            "detail": "候选计划生成完成，来源AUTONOMOUS，版本1",
+            "rawDetailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 15229,
+            "taskId": 1024,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-07T16:37:32.959512",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本",
+            "detail": "候选计划三类校验全部通过，已冻结版本",
+            "rawDetailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 15230,
+            "taskId": 1024,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-07T16:37:32.967783",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.141；推荐处置=AUTO_EXECUTE（自动执行）",
+            "detail": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.141；推荐处置=AUTO_EXECUTE（自动执行）",
+            "rawDetailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.141；推荐处置=AUTO_EXECUTE（自动执行）"
+          },
+          {
+            "id": 15231,
+            "taskId": 1024,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-07T16:37:32.981627",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)；AGT-8519A3B6(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求",
+            "detail": "步骤1候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)；AGT-8519A3B6(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求",
+            "rawDetailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)；AGT-8519A3B6(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求"
+          },
+          {
+            "id": 15232,
+            "taskId": 1024,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-07T16:37:33.315539",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-386E8C30接受步骤1承接请求",
+            "detail": "设备代理AGT-386E8C30接受步骤1承接请求",
+            "rawDetailSummary": "设备代理AGT-386E8C30接受步骤1承接请求"
+          },
+          {
+            "id": 15233,
+            "taskId": 1024,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-07T16:37:33.32278",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261107163733-2494000D已下发至设备代理AGT-386E8C30，业务意图: 前往区域",
+            "detail": "指令CMD-20261107163733-2494000D已下发至设备代理AGT-386E8C30，业务意图: 前往区域",
+            "rawDetailSummary": "指令CMD-20261107163733-2494000D已下发至设备代理AGT-386E8C30，业务意图: 前往区域"
+          },
+          {
+            "id": 15234,
+            "taskId": 1024,
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "occurredAt": "2026-11-07T16:37:33.874787",
+            "trigger": "SYSTEM",
+            "reasonCode": "DEVICE_SUCCESS",
+            "detailSummary": "指令CMD-20261107163733-2494000D收到设备代理AGT-386E8C30执行反馈: SUCCESS",
+            "detail": "指令CMD-20261107163733-2494000D收到设备代理AGT-386E8C30执行反馈: SUCCESS",
+            "rawDetailSummary": "指令CMD-20261107163733-2494000D收到设备代理AGT-386E8C30执行反馈: SUCCESS"
+          },
+          {
+            "id": 15235,
+            "taskId": 1024,
+            "eventType": "STEP_COMPLETED",
+            "occurredAt": "2026-11-07T16:37:33.881385",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1完成条件已满足: routeGenerated=true",
+            "detail": "步骤1完成条件已满足: routeGenerated=true",
+            "rawDetailSummary": "步骤1完成条件已满足: routeGenerated=true"
+          },
+          {
+            "id": 15236,
+            "taskId": 1024,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-07T16:37:33.888694",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤2候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)；AGT-8519A3B6(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求",
+            "detail": "步骤2候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)；AGT-8519A3B6(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求",
+            "rawDetailSummary": "步骤2候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)；AGT-8519A3B6(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求"
+          }
+        ],
+        "assignments": [
+          {
+            "id": 1503,
+            "stepSeq": 1,
+            "deviceAgentCode": "AGT-386E8C30",
+            "commandId": "CMD-20261107163732-2494000C",
+            "stepStatus": "COMPLETED",
+            "retryCount": 0,
+            "executionResult": "SUCCESS",
+            "reasonCode": "DEVICE_SUCCESS",
+            "outputParams": {
+              "routeGenerated": true
+            },
+            "dispatchedAt": "2026-11-07T16:37:33.3202",
+            "feedbackAt": "2026-11-07T16:37:33.874787",
+            "rejectedAgentIds": [],
+            "acceptanceRequestedAt": "2026-11-07T16:37:32.981627",
+            "acceptedAt": "2026-11-07T16:37:33.313443",
+            "acceptanceDurationMs": 331,
+            "acceptanceResponseTime": "331ms"
+          },
+          {
+            "id": 1504,
+            "stepSeq": 2,
+            "deviceAgentCode": "AGT-386E8C30",
+            "commandId": "CMD-20261107163733-2494000E",
+            "stepStatus": "PENDING_ASSIGNMENT",
+            "retryCount": 0,
+            "executionResult": null,
+            "reasonCode": null,
+            "outputParams": null,
+            "dispatchedAt": null,
+            "feedbackAt": null,
+            "rejectedAgentIds": [],
+            "acceptanceRequestedAt": "2026-11-07T16:37:33.891313",
+            "acceptedAt": null,
+            "acceptanceDurationMs": null,
+            "acceptanceResponseTime": null
+          }
+        ],
+        "commands": [
+          "3492|TASK_ACCEPT|ACCEPTED",
+          "3493|EXECUTE_CAPABILITY|SUCCEEDED",
+          "3494|TASK_ACCEPT|SENT"
+        ],
+        "bypassAuditRows": [],
+        "agentRows": [
+          {
+            "id": 18,
+            "agent_code": "AGT-386E8C30",
+            "device_id": 19,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-07T16:37:33.082732",
+            "created_at": "2026-11-05T13:04:16.81064",
+            "updated_at": "2026-11-05T13:04:16.81064",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 19,
+            "agent_code": "AGT-8519A3B6",
+            "device_id": 20,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-07T16:37:34.182238",
+            "created_at": "2026-11-05T13:04:17.772513",
+            "updated_at": "2026-11-05T13:04:17.772513",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 20,
+            "agent_code": "AGT-D20379F3",
+            "device_id": 21,
+            "agent_status": "ENABLED",
+            "online_status": "OFFLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-07T16:37:32.889146",
+            "created_at": "2026-11-05T13:05:21.137216",
+            "updated_at": "2026-11-05T13:05:21.137216",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          }
+        ],
+        "exceptions": [],
+        "commandRows": [
+          {
+            "id": 3492,
+            "command_id": "CMD-20261107163732-2494000C",
+            "agent_code": "AGT-386E8C30",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 1024,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261107163732-2494000C\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261107-1014\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_ZONE_A\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-07T16:37:32.9906947+08:00\",\"deadline\":\"2026-11-07T16:38:32.9906947+08:00\"}",
+            "command_status": "ACCEPTED",
+            "response_payload": "{\"commandId\":\"CMD-20261107163732-2494000C\",\"accepted\":true,\"rejectReason\":null}",
+            "created_at": "2026-11-07T16:37:32.990695",
+            "updated_at": "2026-11-07T16:37:33.311617"
+          },
+          {
+            "id": 3493,
+            "command_id": "CMD-20261107163733-2494000D",
+            "agent_code": "AGT-386E8C30",
+            "command_type": "EXECUTE_CAPABILITY",
+            "attempt_no": 0,
+            "task_id": 1024,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261107163733-2494000D\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261107-1014\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_ZONE_A\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-07T16:37:33.3274947+08:00\",\"deadline\":\"2026-11-07T16:38:33.3274947+08:00\"}",
+            "command_status": "SUCCEEDED",
+            "response_payload": "{\"commandId\":\"CMD-20261107163733-2494000D\",\"attemptNo\":0,\"executionResult\":\"SUCCESS\",\"reasonCode\":\"DEVICE_SUCCESS\",\"outputParams\":{\"routeGenerated\":true}}",
+            "created_at": "2026-11-07T16:37:33.3296",
+            "updated_at": "2026-11-07T16:37:33.873418"
+          },
+          {
+            "id": 3494,
+            "command_id": "CMD-20261107163733-2494000E",
+            "agent_code": "AGT-386E8C30",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 1024,
+            "step_seq": 2,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261107163733-2494000E\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261107-1014\",\"stepSeq\":2,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_ZONE_A\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-07T16:37:33.8980595+08:00\",\"deadline\":\"2026-11-07T16:38:33.8980595+08:00\"}",
+            "command_status": "SENT",
+            "response_payload": null,
+            "created_at": "2026-11-07T16:37:33.89806",
+            "updated_at": "2026-11-07T16:37:33.910345"
+          }
+        ],
+        "transport": {
+          "G160_F016_A": [
+            {
+              "at": "2026-11-07T16:37:33.000838+08:00",
+              "message": {
+                "commandId": "CMD-20261107163732-2494000C",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261107-1014",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_ZONE_A",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "issuedAt": 1794040652.9906948,
+                "deadline": 1794040712.9906948
+              }
+            },
+            {
+              "at": "2026-11-07T16:37:33.340227+08:00",
+              "message": {
+                "commandId": "CMD-20261107163733-2494000D",
+                "commandType": "EXECUTE_CAPABILITY",
+                "attemptNo": 0,
+                "taskId": "TASK-20261107-1014",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_ZONE_A",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "issuedAt": 1794040653.3274946,
+                "deadline": 1794040713.3274946
+              }
+            },
+            {
+              "at": "2026-11-07T16:37:33.909239+08:00",
+              "message": {
+                "commandId": "CMD-20261107163733-2494000E",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261107-1014",
+                "stepSeq": 2,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_ZONE_A",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "issuedAt": 1794040653.8980596,
+                "deadline": 1794040713.8980596
+              }
+            }
+          ],
+          "G160_F016_B": [],
+          "G160_F016_C": []
+        }
+      }
+    }
+  ],
+  "controls": {
+    "originalAllowed": 1007,
+    "originalProhibitedRejected": 1008,
+    "allowedZone": 1009,
+    "otherZoneRejected": 1010,
+    "baselineAllowedCompleted": 1020,
+    "replanAutonomousProhibitedRejected": 1015,
+    "replanBaselineAllowedCompleted": 1023
+  },
+  "sameVersionExecutionCounts": "UI/SQL/protocol corroboration of same task does not add business executions",
+  "cleanup": "All27 tasks terminal, failures/plans/events retained"
+}

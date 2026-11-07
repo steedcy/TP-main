@@ -1,0 +1,640 @@
+{
+  "tag": "V1.177",
+  "productSha": "cf99ef9c50ac65ffbff19ad492eb87c86b2299e8",
+  "handoffSha": "521b6aafaec3e988f6419911857b486a9ab78c29",
+  "fixtureSequencing": "Device RLock serializes heartbeat, acceptance and feedback; V165 stable repair carried into this round",
+  "executionBaseline": "V2.4",
+  "startedAt": "2026-11-07T16:23:32.559639+08:00",
+  "timezone": "Asia/Shanghai",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "redisDb": 10,
+  "cases": [
+    {
+      "name": "baseline-publication-trial",
+      "taskId": 1017,
+      "templateId": 92,
+      "request": {
+        "templateName": "G177 mapped baseline 1794039816299998900",
+        "templateIntent": "EXT_426B417A",
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "range": "synthetic destination"
+          }
+        ],
+        "steps": [
+          {
+            "capabilityType": "CAP_NAVIGATION",
+            "paramMapping": [
+              {
+                "target": "targetLocation",
+                "source": "TEMPLATE_INPUT.targetLocation"
+              }
+            ],
+            "stepTimeout": 600,
+            "completionCondition": "routeGenerated=true"
+          }
+        ]
+      },
+      "response": {
+        "taskId": 1017,
+        "taskCode": "TASK-20261107-1007",
+        "result": "RUNNING",
+        "stepResults": [
+          {
+            "stepSeq": 1,
+            "result": "PENDING_ASSIGNMENT",
+            "duration": 0,
+            "failureReason": null
+          }
+        ],
+        "events": [
+          {
+            "eventType": "DRY_RUN_STARTED",
+            "trigger": "OPERATOR",
+            "detailSummary": "配置管理员set对模板G177 mapped baseline 1794039816299998900(V1.0)发起试运行",
+            "occurredAt": "2026-11-07T16:23:36.446739"
+          },
+          {
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "trigger": "SYSTEM",
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求",
+            "occurredAt": "2026-11-07T16:23:36.482043"
+          }
+        ],
+        "failureReason": null
+      },
+      "accepts": [
+        {
+          "request": {
+            "commandId": "CMD-20261107162336-EABF003C",
+            "commandType": "TASK_ACCEPT",
+            "attemptNo": 0,
+            "taskId": "TASK-20261107-1007",
+            "stepSeq": 1,
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_TEST_GATE",
+              "routePreference": "BARRIER_FREE",
+              "targetX": 0.0,
+              "targetY": 0.0
+            },
+            "issuedAt": 1794039816.4909403,
+            "deadline": 1794039876.4909403
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-07T16:23:36.623590300+08:00"
+            }
+          }
+        }
+      ],
+      "feedbacks": [
+        {
+          "agent": "AGT-386E8C30",
+          "request": {
+            "commandId": "CMD-20261107162336-EABF003D",
+            "attemptNo": 0,
+            "executionResult": "SUCCESS",
+            "outputParams": {
+              "routeGenerated": true
+            }
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-07T16:23:37.091718300+08:00"
+            }
+          }
+        }
+      ],
+      "after": {
+        "task": {
+          "id": 1017,
+          "taskCode": "TASK-20261107-1007",
+          "taskGoal": "基线模板试运行: G177 mapped baseline 1794039816299998900",
+          "taskFamily": "EXT_426B417A",
+          "sceneParams": {
+            "targetLocation": "F2_TEST_GATE"
+          },
+          "goalParsingResult": null,
+          "status": "COMPLETED",
+          "currentPlanVersionId": 987,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": null,
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": true,
+          "createdAt": "2026-11-07T16:23:36.380467",
+          "updatedAt": "2026-11-07T16:23:37.079915",
+          "createdBy": "set"
+        },
+        "plans": [
+          {
+            "id": 987,
+            "versionNo": 1,
+            "source": "BASELINE_TEMPLATE",
+            "baselineTemplateId": 92,
+            "snapshotId": "V1.0",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "paramMapping": [
+                  {
+                    "target": "targetLocation",
+                    "source": "TEMPLATE_INPUT.targetLocation"
+                  }
+                ],
+                "stepTimeout": 600,
+                "completionCondition": "routeGenerated=true"
+              }
+            ],
+            "structureCheckResult": null,
+            "capabilityCheckResult": null,
+            "constraintCheckResult": null,
+            "validationErrors": null,
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": null,
+            "ruleSetVersion": null,
+            "frozenAt": "2026-11-07T16:23:36.43203",
+            "createdAt": "2026-11-07T16:23:36.43203"
+          }
+        ],
+        "events": [
+          {
+            "id": 15122,
+            "taskId": 1017,
+            "eventType": "DRY_RUN_STARTED",
+            "occurredAt": "2026-11-07T16:23:36.446739",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "配置管理员set对模板G177 mapped baseline 1794039816299998900(V1.0)发起试运行",
+            "detail": "配置管理员set对模板G177 mapped baseline 1794039816299998900(V1.0)发起试运行",
+            "rawDetailSummary": "配置管理员set对模板G177 mapped baseline 1794039816299998900(V1.0)发起试运行"
+          },
+          {
+            "id": 15123,
+            "taskId": 1017,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-07T16:23:36.482043",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求",
+            "detail": "步骤1候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求",
+            "rawDetailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求"
+          },
+          {
+            "id": 15124,
+            "taskId": 1017,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-07T16:23:36.609798",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-386E8C30接受步骤1承接请求",
+            "detail": "设备代理AGT-386E8C30接受步骤1承接请求",
+            "rawDetailSummary": "设备代理AGT-386E8C30接受步骤1承接请求"
+          },
+          {
+            "id": 15125,
+            "taskId": 1017,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-07T16:23:36.614372",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261107162336-EABF003D已下发至设备代理AGT-386E8C30，业务意图: null",
+            "detail": "指令CMD-20261107162336-EABF003D已下发至设备代理AGT-386E8C30，业务意图: null",
+            "rawDetailSummary": "指令CMD-20261107162336-EABF003D已下发至设备代理AGT-386E8C30，业务意图: null"
+          },
+          {
+            "id": 15126,
+            "taskId": 1017,
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "occurredAt": "2026-11-07T16:23:37.072887",
+            "trigger": "SYSTEM",
+            "reasonCode": "DEVICE_SUCCESS",
+            "detailSummary": "指令CMD-20261107162336-EABF003D收到设备代理AGT-386E8C30执行反馈: SUCCESS",
+            "detail": "指令CMD-20261107162336-EABF003D收到设备代理AGT-386E8C30执行反馈: SUCCESS",
+            "rawDetailSummary": "指令CMD-20261107162336-EABF003D收到设备代理AGT-386E8C30执行反馈: SUCCESS"
+          },
+          {
+            "id": 15127,
+            "taskId": 1017,
+            "eventType": "STEP_COMPLETED",
+            "occurredAt": "2026-11-07T16:23:37.077471",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1完成条件已满足: routeGenerated=true",
+            "detail": "步骤1完成条件已满足: routeGenerated=true",
+            "rawDetailSummary": "步骤1完成条件已满足: routeGenerated=true"
+          },
+          {
+            "id": 15128,
+            "taskId": 1017,
+            "eventType": "TASK_COMPLETED",
+            "occurredAt": "2026-11-07T16:23:37.082234",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "全部步骤完成条件均已满足，任务完成",
+            "detail": "全部步骤完成条件均已满足，任务完成",
+            "rawDetailSummary": "全部步骤完成条件均已满足，任务完成"
+          },
+          {
+            "id": 15129,
+            "taskId": 1017,
+            "eventType": "DRY_RUN_SUCCEEDED",
+            "occurredAt": "2026-11-07T16:23:37.086974",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "所有步骤均收到实际设备成功反馈",
+            "detail": "所有步骤均收到实际设备成功反馈",
+            "rawDetailSummary": "所有步骤均收到实际设备成功反馈"
+          }
+        ],
+        "assignments": [
+          {
+            "id": 1492,
+            "stepSeq": 1,
+            "deviceAgentCode": "AGT-386E8C30",
+            "commandId": "CMD-20261107162336-EABF003C",
+            "stepStatus": "COMPLETED",
+            "retryCount": 0,
+            "executionResult": "SUCCESS",
+            "reasonCode": "DEVICE_SUCCESS",
+            "outputParams": {
+              "routeGenerated": true
+            },
+            "dispatchedAt": "2026-11-07T16:23:36.61209",
+            "feedbackAt": "2026-11-07T16:23:37.072887",
+            "rejectedAgentIds": [],
+            "acceptanceRequestedAt": "2026-11-07T16:23:36.484389",
+            "acceptedAt": "2026-11-07T16:23:36.607132",
+            "acceptanceDurationMs": 122,
+            "acceptanceResponseTime": "122ms"
+          }
+        ],
+        "commands": [
+          "3455|TASK_ACCEPT|ACCEPTED",
+          "3456|EXECUTE_CAPABILITY|SUCCEEDED"
+        ],
+        "bypassAuditRows": [],
+        "agentRows": [
+          {
+            "id": 18,
+            "agent_code": "AGT-386E8C30",
+            "device_id": 19,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-07T16:23:37.697848",
+            "created_at": "2026-11-05T13:04:16.81064",
+            "updated_at": "2026-11-05T13:04:16.81064",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 19,
+            "agent_code": "AGT-8519A3B6",
+            "device_id": 20,
+            "agent_status": "ENABLED",
+            "online_status": "ONLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-07T16:23:35.982519",
+            "created_at": "2026-11-05T13:04:17.772513",
+            "updated_at": "2026-11-05T13:04:17.772513",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          },
+          {
+            "id": 20,
+            "agent_code": "AGT-D20379F3",
+            "device_id": 21,
+            "agent_status": "ENABLED",
+            "online_status": "OFFLINE",
+            "work_status": "IDLE",
+            "current_task_id": null,
+            "current_step_seq": null,
+            "last_reported_at": "2026-11-07T16:23:36.293597",
+            "created_at": "2026-11-05T13:05:21.137216",
+            "updated_at": "2026-11-05T13:05:21.137216",
+            "business_status": {
+              "workloadScore": 0,
+              "capabilityMatch": 1
+            }
+          }
+        ],
+        "exceptions": [],
+        "commandRows": [
+          {
+            "id": 3455,
+            "command_id": "CMD-20261107162336-EABF003C",
+            "agent_code": "AGT-386E8C30",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 1017,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261107162336-EABF003C\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261107-1007\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-07T16:23:36.4909403+08:00\",\"deadline\":\"2026-11-07T16:24:36.4909403+08:00\"}",
+            "command_status": "ACCEPTED",
+            "response_payload": "{\"commandId\":\"CMD-20261107162336-EABF003C\",\"accepted\":true,\"rejectReason\":null}",
+            "created_at": "2026-11-07T16:23:36.493259",
+            "updated_at": "2026-11-07T16:23:36.58948"
+          },
+          {
+            "id": 3456,
+            "command_id": "CMD-20261107162336-EABF003D",
+            "agent_code": "AGT-386E8C30",
+            "command_type": "EXECUTE_CAPABILITY",
+            "attempt_no": 0,
+            "task_id": 1017,
+            "step_seq": 1,
+            "capability_type": "CAP_NAVIGATION",
+            "command_payload": "{\"commandId\":\"CMD-20261107162336-EABF003D\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261107-1007\",\"stepSeq\":1,\"capabilityType\":\"CAP_NAVIGATION\",\"inputParams\":{\"targetLocation\":\"F2_TEST_GATE\",\"routePreference\":\"BARRIER_FREE\",\"targetX\":0.0,\"targetY\":0.0},\"issuedAt\":\"2026-11-07T16:23:36.6189902+08:00\",\"deadline\":\"2026-11-07T16:24:36.6189902+08:00\"}",
+            "command_status": "SUCCEEDED",
+            "response_payload": "{\"commandId\":\"CMD-20261107162336-EABF003D\",\"attemptNo\":0,\"executionResult\":\"SUCCESS\",\"reasonCode\":\"DEVICE_SUCCESS\",\"outputParams\":{\"routeGenerated\":true}}",
+            "created_at": "2026-11-07T16:23:36.61899",
+            "updated_at": "2026-11-07T16:23:37.070404"
+          }
+        ],
+        "transport": {
+          "G160_F016_A": [
+            {
+              "at": "2026-11-07T16:23:36.511322+08:00",
+              "message": {
+                "commandId": "CMD-20261107162336-EABF003C",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261107-1007",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "issuedAt": 1794039816.4909403,
+                "deadline": 1794039876.4909403
+              }
+            },
+            {
+              "at": "2026-11-07T16:23:36.627243+08:00",
+              "message": {
+                "commandId": "CMD-20261107162336-EABF003D",
+                "commandType": "EXECUTE_CAPABILITY",
+                "attemptNo": 0,
+                "taskId": "TASK-20261107-1007",
+                "stepSeq": 1,
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "issuedAt": 1794039816.6189902,
+                "deadline": 1794039876.6189902
+              }
+            }
+          ],
+          "G160_F016_B": [],
+          "G160_F016_C": []
+        }
+      },
+      "trialResult": {
+        "taskId": 1017,
+        "taskCode": "TASK-20261107-1007",
+        "result": "SUCCESS",
+        "stepResults": [
+          {
+            "stepSeq": 1,
+            "result": "COMPLETED",
+            "duration": 0,
+            "failureReason": "DEVICE_SUCCESS"
+          }
+        ],
+        "events": [
+          {
+            "eventType": "DRY_RUN_STARTED",
+            "trigger": "OPERATOR",
+            "detailSummary": "配置管理员set对模板G177 mapped baseline 1794039816299998900(V1.0)发起试运行",
+            "occurredAt": "2026-11-07T16:23:36.446739"
+          },
+          {
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "trigger": "SYSTEM",
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-386E8C30(匹配度1.0,距离0.0,负载0)，向候选AGT-386E8C30发起承接请求",
+            "occurredAt": "2026-11-07T16:23:36.482043"
+          },
+          {
+            "eventType": "AGENT_ASSIGNED",
+            "trigger": "SYSTEM",
+            "detailSummary": "设备代理AGT-386E8C30接受步骤1承接请求",
+            "occurredAt": "2026-11-07T16:23:36.609798"
+          },
+          {
+            "eventType": "STEP_DISPATCHED",
+            "trigger": "SYSTEM",
+            "detailSummary": "指令CMD-20261107162336-EABF003D已下发至设备代理AGT-386E8C30，业务意图: null",
+            "occurredAt": "2026-11-07T16:23:36.614372"
+          },
+          {
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "trigger": "SYSTEM",
+            "detailSummary": "指令CMD-20261107162336-EABF003D收到设备代理AGT-386E8C30执行反馈: SUCCESS",
+            "occurredAt": "2026-11-07T16:23:37.072887"
+          },
+          {
+            "eventType": "STEP_COMPLETED",
+            "trigger": "SYSTEM",
+            "detailSummary": "步骤1完成条件已满足: routeGenerated=true",
+            "occurredAt": "2026-11-07T16:23:37.077471"
+          },
+          {
+            "eventType": "TASK_COMPLETED",
+            "trigger": "SYSTEM",
+            "detailSummary": "全部步骤完成条件均已满足，任务完成",
+            "occurredAt": "2026-11-07T16:23:37.082234"
+          },
+          {
+            "eventType": "DRY_RUN_SUCCEEDED",
+            "trigger": "SYSTEM",
+            "detailSummary": "所有步骤均收到实际设备成功反馈",
+            "occurredAt": "2026-11-07T16:23:37.086974"
+          }
+        ],
+        "failureReason": null
+      },
+      "checks": {
+        "completed": true,
+        "actualTrialSuccess": true
+      },
+      "result": "P"
+    },
+    {
+      "name": "baseline-location-allowed",
+      "taskId": 1018,
+      "request": {
+        "taskGoal": "F177_BASELINE_LOCATION_ALLOWED Synthetic passenger service F2_TEST_GATE",
+        "taskFamily": "EXT_426B417A",
+        "sceneParams": {
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "response": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 1018,
+            "taskCode": "TASK-20261107-1008",
+            "taskGoal": "F177_BASELINE_LOCATION_ALLOWED Synthetic passenger service F2_TEST_GATE",
+            "taskFamily": "EXT_426B417A",
+            "sceneParams": {
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=true",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F177_BASELINE_LOCATION_ALLOWED Synthetic passenger service F2_TEST_GATE",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "PLANNING",
+            "currentPlanVersionId": null,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": null,
+            "failureReason": null,
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-07T16:23:39.3179493",
+            "updatedAt": "2026-11-07T16:23:39.3179493",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-07T16:23:39.433233700+08:00"
+        }
+      },
+      "definition": {
+        "id": 99,
+        "definitionCode": "EXT_426B417A",
+        "taskName": "G177 F022 acceptance 162335",
+        "goalTemplate": "Synthetic navigation",
+        "sceneParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "F2_TEST_GATE",
+            "range": null
+          }
+        ],
+        "availableCapabilityTypes": [
+          "CAP_NAVIGATION"
+        ],
+        "constraintDescription": "仅允许前往F2_TEST_GATE。",
+        "completionCondition": "routeGenerated=true",
+        "isPreset": false,
+        "definitionStatus": "ENABLED",
+        "updatedAt": "2026-11-07T16:23:38.510758",
+        "updatedBy": "set"
+      }
+    }
+  ],
+  "health": {
+    "status": "UP"
+  },
+  "diagnostics": [],
+  "taskIds": [
+    1017,
+    1018
+  ],
+  "templateIds": [
+    92
+  ],
+  "definitionIds": [
+    99
+  ],
+  "cleanup": {
+    "at": "2026-11-07T16:24:01.344180+08:00",
+    "errors": [],
+    "ownedAgentRows": [
+      {
+        "id": 19,
+        "agent_code": "AGT-8519A3B6",
+        "device_id": 20,
+        "agent_status": "DISABLED",
+        "online_status": "OFFLINE",
+        "work_status": "IDLE",
+        "current_task_id": null,
+        "current_step_seq": null,
+        "last_reported_at": "2026-11-07T16:24:00.275171",
+        "created_at": "2026-11-05T13:04:17.772513",
+        "updated_at": "2026-11-05T13:04:17.772513",
+        "business_status": {
+          "workloadScore": 0,
+          "capabilityMatch": 1
+        }
+      },
+      {
+        "id": 20,
+        "agent_code": "AGT-D20379F3",
+        "device_id": 21,
+        "agent_status": "DISABLED",
+        "online_status": "OFFLINE",
+        "work_status": "IDLE",
+        "current_task_id": null,
+        "current_step_seq": null,
+        "last_reported_at": "2026-11-07T16:24:00.284514",
+        "created_at": "2026-11-05T13:05:21.137216",
+        "updated_at": "2026-11-05T13:05:21.137216",
+        "business_status": {
+          "workloadScore": 0,
+          "capabilityMatch": 1
+        }
+      },
+      {
+        "id": 18,
+        "agent_code": "AGT-386E8C30",
+        "device_id": 19,
+        "agent_status": "DISABLED",
+        "online_status": "OFFLINE",
+        "work_status": "IDLE",
+        "current_task_id": null,
+        "current_step_seq": null,
+        "last_reported_at": "2026-11-07T16:24:00.267341",
+        "created_at": "2026-11-05T13:04:16.81064",
+        "updated_at": "2026-11-05T13:04:16.81064",
+        "business_status": {
+          "workloadScore": 0,
+          "capabilityMatch": 1
+        }
+      }
+    ],
+    "activeAssignments": "0"
+  },
+  "endedAt": "2026-11-07T16:24:01.987477+08:00"
+}

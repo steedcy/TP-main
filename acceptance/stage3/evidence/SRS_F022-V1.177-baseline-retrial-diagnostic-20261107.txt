@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "C:\Users\savy\Desktop\TIP-main\tip-gpt-f013\acceptance\stage3\probe-f022-v177-baseline-completion.py", line 30, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "C:\Users\savy\Desktop\TIP-main\tip-gpt-f013\acceptance\stage3\probe-f022-v177-baseline-completion.py", line 15, in main
+    ret=q.cfg(f'/baseline-templates/{tid}/dry-run','POST',{'inputParams':{'targetLocation':'F2_TEST_GATE'},'simulatedDevices':[{'stepSeq':1,'agentId':q.devices[0].agent}]});trial={'name':'baseline-reactivation-required-trial','taskId':ret['taskId'],'response':ret,'templateId':tid};q.tasks.append(trial['taskId']);q.ev['cases'].append(trial);q.save();o=h.finish(trial);trial['trialResult']=q.cfg(f'/baseline-templates/{tid}/dry-runs/{trial["taskId"]}');r.record(trial,{'completed':o['task']['status']=='COMPLETED','trialPassed':trial['trialResult']['result']=='SUCCESS'});q.cfg(f'/baseline-templates/{tid}/enable','POST')
+  File "C:\Users\savy\Desktop\TIP-main\tip\scripts\local-test-environment.py", line 54, in __call__
+    result=request(BASE+path,method,data,self.token)
+  File "C:\Users\savy\Desktop\TIP-main\tip\scripts\local-test-environment.py", line 46, in request
+    raise RuntimeError(f'HTTP {ex.code}: {message}') from None
+RuntimeError: HTTP 400: 仅草稿状态的模板可试运行，请先编辑模板生成新版本
