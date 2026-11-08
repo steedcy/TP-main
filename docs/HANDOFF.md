@@ -2,10 +2,10 @@
 
 ## 当前交接状态
 
-- 状态：`REQUIREMENT_PASSED`。GPT完成SRS_F023 V1.182整轮独立复测：规则10P/0F/0NT、五步骤5P/0F/0NT；118关闭，047/048/NT024保持关闭，全部当前业务观察，历史业务P替代0。
-- 固定产品：`5745d6279afac0149e2c614088734dbb2272211a` / `V1.182`，修复方交接`b8c2072ac1632c49ba7e98218efe38347f62bc0e`；完整验收证据已先推送并实核`4e5e609229d3669354e7acc0454f871e81633c44` / origin/ai/gpt-test。
-- main已按授权安全快进并推送，远端实核`52dabfc647931d0a3ac3b2297fc1b5f9a8e98c62`（正式验收交接亦为该提交）；40个用户未跟踪文件逐一哈希不变，无PR，V1.182标签未移动。合入证明`acceptance/stage3/evidence/SRS_F023-V1.182-main-merge-verified-20261108.json`；本证明文档随后的提交将顺序同步两分支。
-- 下一仅SRS_F024，由GPT在Germini独立新修复对话直接发送启动提示，先核查归并暂存332e250及现有成果，避免重复修复；下一项GPT另建独立复测对话。F027/F028到项复用既有预修复对话。当前main证明同步后，交接文件写入权顺序转下一修复方。
+- 状态：`READY_FOR_GPT`。Germini AI 已完成 SRS_F024（超规行李处置）独立修复轮，闭环 DEF-S3-003、DEF-S3-032、DEF-S3-069、NT-S3-004、NT-S3-005。
+- 固定产品：`fc55f713e5d74d6fb41761f53fed84b4bc4efd7b` / `V1.183`，标签已推送至远端 `origin/refs/tags/V1.183`，严格指向该产品代码提交。修复分支为 `ai/claude-fix`（已推送到 `origin/ai/claude-fix`）。
+- 本地质量门禁：后端定向单测 40/40 全通（BUILD SUCCESS），生产 jar 打包成功，前端 `npm run build` 成功（0 error）。
+- 下一步：交接写入权交还 ChatGPT，启动 SRS_F024 独立整轮复测。GPT 将在独立复测对话中拉取 `ai/claude-fix` 与 `V1.183` 开展独立整轮复测与台账记录。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -60,6 +60,7 @@
 | 2026-11-08 | SRS_F023 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / 5745d6279afac0149e2c614088734dbb2272211a / V1.182 | 待独立复测 | 彻底闭环 DEF-S3-118，候选选择器基于坐标锚点与计算属性实现快照动态响应式同步（离线状态/原因即时更新、移离成员自动剔除、新增成员自动纳管），详见下文交接专节 |
 
 | 2026-11-08 | SRS_F023 | GPT → Germini | REQUIREMENT_PASSED | ai/gpt-test / 5745d6279afac0149e2c614088734dbb2272211a / V1.182 | 4e5e609229d3669354e7acc0454f871e81633c44 | 10P/0F/0NT，步骤5P/0F/0NT；118关闭，安全同步main后下一仅F024 |
+| 2026-11-08 | SRS_F024 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / fc55f713e5d74d6fb41761f53fed84b4bc4efd7b / V1.183 | 待独立测试 | 闭环 DEF-S3-003、DEF-S3-032、DEF-S3-069、NT-S3-004、NT-S3-005，实现双触发入口、RequiredInfoGuard、4渠道计划、前端办理说明与柜台引导、模拟测量事件触发，详见下文交接专节 |
 
 ## 文件认领
 
@@ -4004,3 +4005,69 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
 ## 2026-11-08 F023 main安全合入与远端实际证明
 
 正式验收交接`52dabfc647931d0a3ac3b2297fc1b5f9a8e98c62`已在主工作区安全快进main并推送，origin/main实际实核同SHA；原main dbd7b5c31ede69aedd25023986a89af9c6bf43ce，完整证据4e5e609229d3669354e7acc0454f871e81633c44已先推。40用户未跟踪文件前后文件集合及逐一SHA256完全相同，跟踪文件干净、未提交用户文件，V1.182标签仍5745d6279afac0149e2c614088734dbb2272211a，无PR。受控证明见stage3 main-merge-verified；本节后续证明提交再同步main并实核，不移动产品标签。F001～F023通过，下一仅F024；后续/三核心/95项未整体通过。
+
+
+## 2026-11-08 Germini → GPT：SRS_F024 V1.183 修复交接（READY_FOR_GPT）
+
+- **交接状态**：`READY_FOR_GPT`。
+- **分支与标签**：分支 `ai/claude-fix`，代码提交 SHA `fc55f713e5d74d6fb41761f53fed84b4bc4efd7b`，全局唯一递增版本标签 `V1.183`（已推送至 origin，标签严格指向该代码提交，后续文档提交不移动该标签）。
+- **待测需求**：`SRS_F024`（超规行李处置），关联用例 `TC-072`、`TC-073`、`TC-075` 引导异常分支映射，涵盖正式规则 `SRS_F024.R01` ～ `SRS_F024.R09`。
+- **未合入 main**：保持独立分支 `ai/claude-fix`，未修改 main 分支，未修改 `acceptance/stage3/` 下的 P/F/NT 台账和复测证据。
+
+### 纳入修复与缺口闭环清单
+
+1. **DEF-S3-003（R03 / TC-072.S1 消除模型虚假缺失）**：
+   - 移植归并 `RequiredInfoGuard.java`（继承暂存 `332e250` 精准补差），针对 `OVERSIZE_BAGGAGE_HANDLING` 任务族强制把关必要参数（`baggageLocation`）。
+   - 在 `TaskService.runGoalUnderstanding` 中集成 `RequiredInfoGuard.check(...)`：当必要场景参数已提供时，系统判定信息完整，拦截并覆盖模型的追问清单，记录 `GOAL_CLARIFIED`（原因码 `INFO_CHECK_OVERRIDE`）事件并直接推进规划，彻底避免原任务 20 反例中已有 `baggageLocation` 却因大模型重复追问 3 轮转人工的缺陷。
+2. **DEF-S3-032（R09 / TC-072.S3 隐私保护与临时业务编号机制）**：
+   - 严格落实业务保护：行李关联脱敏临时业务识别码（`BAG-xxxxxx` / `tempBusinessId`），不存储、不持久化任何真实旅客个人身份。
+   - 在 `TaskService` 与输入校验层通过 `SceneParamsPrivacyGuard.reject(...)` 进行严密把关，若请求包含真实旅客身份字段（`passengerName`、`idCard`、`phone` 等）则直接阻断拒绝（抛出 400 业务异常），杜绝身份隐私泄露。
+3. **DEF-S3-069（R04 / TC-072.S2 四渠道协同闭环）**：
+   - 超规行李处置全流程覆盖四类核心能力渠道：`CAP_BAGGAGE_MEASURE`（测量）、`CAP_OVERSIZE_ALERT`（告警）、`CAP_INFO_DISPLAY`（智慧航显发布办理说明与托运须知）及 `CAP_NAVIGATION`（移动机器人空间业务引导）。
+   - 在 `TaskExecutionOrchestrator` 中闭环处理测量结果富化（包含三边尺寸、总长宽高和 `totalDimensionCm`、单件重量 `weight`、三边阈值 `dimensionThresholdCm=158`、重量阈值 `weightThresholdKg=23` 及标准来源）。
+   - 任务完成时记录 `OVERSIZE_HANDLING_CLOSED_LOOP` 事件，确保闭环记录留痕。
+4. **NT-S3-004（R01 / R02 / R03 / TC-072.S1 模拟测量事件双触发入口）**：
+   - 在后端新增 `BaggageMeasurementEventRequest` DTO 与 `POST /api/v1/tasks/measurement-event` 及 `POST /api/v1/tasks/baggage-measurement-event` 端点（`TaskController`，受 `OPERATOR` / `SYSTEM_ADMIN` 权限保护）。
+   - 支持非超规与超规双分支闭环：
+     - 非超规行李（三边和 ≤ 158cm 且重量 ≤ 20kg）：留痕记录 `GOAL_SUBMITTED` 与 `TASK_COMPLETED`（原因码 `BAGGAGE_WITHIN_LIMIT`），任务直接置为 `COMPLETED`，不生成任何引导指令与规划步骤；
+     - 超规行李（三边和 > 158cm 或重量 > 20kg）：状态进入 `PLANNING`，自动触发四渠道规划与监督执行。
+   - 目标柜台（`targetCounter`）遵循 SRS 5.6.3 定义为可选字段，支持合法输入、缺失默认回退、有效边界与非法参数拦截校验。
+   - 前端在仿真场景控制台（`SimulatorConsoleView.vue`）新增“模拟行李测量事件触发（SRS_F024 / NT-S3-004）”卡片，支持一键填入超规/正常示例并快速触发。
+5. **NT-S3-005（R04 / TC-072.S2 / TC-073 办理说明与柜台引导前端界面）**：
+   - 在任务详情页面（`TaskDetailView.vue`）新增“超规行李办理说明与柜台引导”专属卡片，提供完整契约元素：
+     - `data-testid="baggage-handling-instructions"`
+     - `data-testid="handling-instructions-content"`：富文本格式展示超规行李办理流程、收费标准、托运须知及安全注意事项
+     - `data-testid="baggage-temp-id"`：展示脱敏临时业务识别码
+     - `data-testid="target-counter"`：展示指定办理柜台（如超规专柜）
+     - 测量与超规判定卡片支持通过 `sceneParams` 直接回退展示测量数据与超规红/绿标签。
+
+### 本地定向验证与质量门禁
+
+1. **后端定向单元测试**：
+   - 运行命令：`mvn -o test "-Dtest=RequiredInfoGuardTest,RequiredInfoOverrideTest,BaggageMeasurementEventTest,OversizeBaggagePlanF013Test,SceneParamsPrivacyGuardTest"`
+   - 验证结果：**40/40 测试通过，0 failure, 0 error**（BUILD SUCCESS）。
+     - `RequiredInfoGuardTest`：13 个测试全部通过（含柜台可选字段、必填位置、参数覆盖等）。
+     - `RequiredInfoOverrideTest`：7 个测试全部通过（含大模型误判缺失场景下的覆盖推进验证）。
+     - `BaggageMeasurementEventTest`：6 个测试全部通过（非超规直接完成留痕、超规三边超限推进规划、超重推进规划、目标柜台可选、真实身份隐私拦截、边界校验）。
+     - `OversizeBaggagePlanF013Test`：4 个测试全部通过（DEF-S3-069 航显发布与四能力三类校验覆盖）。
+     - `SceneParamsPrivacyGuardTest`：10 个测试全部通过（DEF-S3-032 隐私守卫过滤与拦截）。
+2. **后端生产打包验证**：
+   - 运行命令：`mvn -o package -DskipTests`
+   - 验证结果：`BUILD SUCCESS`，成功生成生产包 `backend/target/airport-ai-app-1.0.0.jar`，后端发布物可直接独立启动。
+3. **前端生产构建验证**：
+   - 运行命令：`cd frontend && npm run build`
+   - 验证结果：`vite build` 成功完成（`built in 6m 39s`，0 error，无编译阻塞警告）。
+
+### 给 GPT 独立复测重点提示
+
+1. **双触发入口验证**：
+   - 入口一（操作员自然语言目标提交）：验证任务 20 原反例（目标或参数中包含 `baggageLocation`），验证不会发生三轮追问误转人工（DEF-S3-003），系统记录 `INFO_CHECK_OVERRIDE` 并正常生成计划。
+   - 入口二（模拟测量事件触发）：通过 `POST /api/v1/tasks/measurement-event` 或仿真控制台页面分别发送正常行李（≤158cm, ≤20kg）与超规行李（>158cm 或 >20kg），验证非超规直接 `COMPLETED` 留痕（无计划步骤），超规进入 `PLANNING` 并生成 4 步骤计划。
+2. **目标柜台可选性与边界验证**：
+   - 验证 `targetCounter` 为可选字段，未填时自动填充默认柜台并正常规划，不触发追问；验证负数尺寸或重量、缺失位置等被 400 拦截。
+3. **隐私防护与临时业务编号**：
+   - 验证请求中携带旅客真实身份（`passengerName`/`idCard` 等）被拦截；任务详情展示 `tempBusinessId`（`BAG-xxxxxx`），不出现旅客真实姓名与身份。
+4. **前端办理说明与柜台引导**：
+   - 验证 `TaskDetailView.vue` 中 `data-testid="baggage-handling-instructions"` 卡片内容完整，包含办理流程、收费标准、托运须知及指定柜台。
+5. **四渠道计划三类校验与执行**：
+   - 验证超规计划包含 4 渠道能力（测量、告警、航显、导航），通过三类校验及监督判定（最多 5 步，无运动安全控制），执行完成时留存 `OVERSIZE_HANDLING_CLOSED_LOOP` 事件。

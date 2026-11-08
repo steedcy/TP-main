@@ -2,8 +2,8 @@
 
 > **当前基准**：V2.4（2026-11-04 用户追加整轮复测授权；继承V2.3，见BL-005；下方既有产品验收/交接记录保留原执行版本）
 > **主干验收合入提交**：F001～F023已验收安全合main；F023验收锚点`52dabfc647931d0a3ac3b2297fc1b5f9a8e98c62`已远端核对，40用户文件哈希不变，无PR；最终证明随本提交同步。
-> **最新产品代码提交**：`5745d6279afac0149e2c614088734dbb2272211a` / `V1.182`（F023独立整轮验收通过）
-> **交接状态**：`REQUIREMENT_PASSED`（F023 10P/0F/0NT、步骤5P/0F/0NT，118关闭；已安全合main 52dabfc647931d0a3ac3b2297fc1b5f9a8e98c62，下一仅F024）
+> **最新产品代码提交**：`fc55f713e5d74d6fb41761f53fed84b4bc4efd7b` / `V1.183`（SRS_F024 Germini独立修复完成）
+> **交接状态**：`READY_FOR_GPT`（F024待GPT整轮独立复测；交接写入权交还ChatGPT）
 > **文档定位**：本文件为跨会话、跨需求修复推进的**唯一全景进度与依据底账**。每轮需求修复与复测验收后必须同步更新本文件。
 
 ---
@@ -86,7 +86,7 @@ F001～F023（含分支共25条目）已完成独立验收并安全合main；F02
 | **SRS_F021** | 人工终止与安全制动 | **8P/0F/0NT（全部当前实测）** | TC-066/TC-067五步骤5P/0F/0NT | 059事件整体JSON/SQL持久/人类摘要闭环；23业务组113断言/6 IAB组26断言/47结构化事件全P，旧失败保留。 | V1.174 | **REQUIREMENT_PASSED；证据1a01fb2已推送，已合main af8ee7d，下一F022** |
 | **SRS_F022** | 任务定义与约束管理 | **8P/0F/0NT（全部当前实测）** | TC-068/069四步骤4P/0F/0NT | 116六原反例与八组混合正反/连接词闭环，028/029/030/117保持；40业务组/37 HTTP任务/19 IAB组全P，原F保留 | V1.179 | **REQUIREMENT_PASSED；证据42f2ac6先推送，已合main 9d72dbf并远端实核，下一F023** |
 
-| **SRS_F024** | 形式化目标歧义消除（超规行李） | P:2 F:2 NT:5 | TC-072, TC-073 | DEF-S3-003, DEF-S3-032（移植暂存：`RequiredInfoGuard` 超规行李必需字段把关）。 | V1.151 | 待启动 |
+| **SRS_F024** | 形式化目标歧义消除（超规行李处置） | 待独立整轮复测 | TC-072, TC-073 | 闭环 DEF-S3-003, DEF-S3-032, DEF-S3-069, NT-S3-004, NT-S3-005；双触发入口、RequiredInfoGuard、4渠道计划、办理说明与柜台引导、模拟测量事件触发 | V1.183 | **READY_FOR_GPT**（代码 fc55f713e5d74d6fb41761f53fed84b4bc4efd7b / V1.183 已推送，待GPT独立整轮复测） |
 | **SRS_F025** | 特殊旅客场景参数完整性 | P:0 F:1 NT:8 | TC-074, TC-075 | DEF-S3-004（移植暂存：特殊旅客服务参数完整性，拒绝身份隐私套取）。 | V1.152 | 待启动 |
 | **SRS_F026** | 航班变动应急协同响应 | P:0 F:1 NT:9 | TC-076, TC-077 | DEF-S3-005（移植暂存：航班变动信息系统级校验，禁止追问设备路由内部字段）。 | V1.153 | 待启动 |
 | **SRS_F027** | 任务全流程追溯与因果复盘 | P:4 F:2 NT:2 | TC-078, TC-079 | DEF-S3-008、057（移植暂存 `6f7f389` 追溯页步骤明细、`c9a7d5f` 事件原因码）。 | V1.154 | 待启动 |
@@ -520,3 +520,20 @@ F022实际main验收快进合入并推送`9d72dbfba1fd06f34fc9606c6268e58248781e
 规则10P/0F/0NT、五步骤5P/0F/0NT，业务历史P替代0，118关闭，047/048/024保持；产品5745d6279afac0149e2c614088734dbb2272211a/V1.182，修复方交接b8c2072，完整证据`4e5e609229d3669354e7acc0454f871e81633c44`已先推。51真实UI保存点/60核对断言、两真实任务/协议/HTTP/SQL、当前前端构建/实际JAR/控制器契约和清理均完成。后台完整树未变，历史组件报告明确分层引用。先正式交接再按授权安全同步main并实核实际提交与用户文件；下一仅F024，新修复/复测各独立对话，预先归并现有/暂存内容，F027/F028到项复用既有预修复对话。后续/三核心/95项尚未整体通过。
 
 F023正式验收交接`52dabfc647931d0a3ac3b2297fc1b5f9a8e98c62`已安全快进main并推送，远端实核一致；40用户文件集合/逐一哈希不变，产品标签未移动，无PR。合入证据stage3/evidence/SRS_F023-V1.182-main-merge-verified-20261108.json。本证明提交随后顺序同步main，下一仅F024（新修复/新复测对话，先归并已存内容）。
+
+
+## 2026-11-08 Germini：SRS_F024 V1.183 闭环双触发入口、RequiredInfoGuard、4渠道计划、办理说明与柜台引导、模拟测量事件触发，交 GPT 独立整轮复测
+
+- **代码与标签**：`fc55f713e5d74d6fb41761f53fed84b4bc4efd7b` / 标签 `V1.183` 已推送至远端 `origin/ai/claude-fix` 与 `origin/refs/tags/V1.183`，标签严格指向该代码提交。
+- **问题与缺口闭环**：
+  1. **DEF-S3-003（R03 / TC-072.S1）**：归并集成 `RequiredInfoGuard.java`，当任务族所需必要参数（如 `baggageLocation`）已在场景参数中提供时，系统判定信息完整，拦截并覆盖大模型的重复追问（记录 `INFO_CHECK_OVERRIDE` 事件），防止因模型虚假缺失而误转人工。
+  2. **DEF-S3-032（R09 / TC-072.S3）**：实现旅客身份隐私保护与临时业务编号机制。采用脱敏临时业务识别码（`BAG-xxxxxx`）关联行李业务；`TaskService` 与输入校验层严密拦截真实姓名、身份证号、手机号等敏感信息。
+  3. **DEF-S3-069（R04 / TC-072.S2）**：超规行李处置四渠道协同闭环。支持 `CAP_BAGGAGE_MEASURE`、`CAP_OVERSIZE_ALERT`、`CAP_INFO_DISPLAY`（智慧航显发布办理说明与托运须知）及 `CAP_NAVIGATION`（移动机器人空间业务引导），并通过三类校验、监督判定与闭环事件记录（`OVERSIZE_HANDLING_CLOSED_LOOP`）。
+  4. **NT-S3-004（R01 / R02 / R03 / TC-072.S1）**：提供双触发入口支持。新增 `POST /api/v1/tasks/measurement-event` 及 `/baggage-measurement-event` 接口，支持外部测量设备或模拟器自动上传测量事件。非超规测量留痕后直接进入 `COMPLETED`（无引导指令，原因码 `BAGGAGE_WITHIN_LIMIT`）；超规测量自动触发超规处置规划。支持目标柜台可选字段及合法/非法边界校验。并在仿真控制台页面（`SimulatorConsoleView.vue`）提供一键填入与事件触发卡片。
+  5. **NT-S3-005（R04 / TC-072.S2 / TC-073）**：在任务详情页面（`TaskDetailView.vue`）新增超规行李办理说明与柜台引导卡片（`data-testid="baggage-handling-instructions"`、`data-testid="handling-instructions-content"`、`data-testid="baggage-temp-id"`、`data-testid="target-counter"`），完整展示办理流程、收费标准、托运须知及指定柜台位置。
+- **本地定向验证与质量门禁**：
+  1. 后端定向单元测试全通：`mvn -o test "-Dtest=RequiredInfoGuardTest,RequiredInfoOverrideTest,BaggageMeasurementEventTest,OversizeBaggagePlanF013Test,SceneParamsPrivacyGuardTest"`，40/40 全部通过（0 failure, 0 error）。
+  2. 后端生产包构建成功：`mvn -o package -DskipTests` 生成 `airport-ai-app-1.0.0.jar`，BUILD SUCCESS。
+  3. 前端生产构建成功：`npm run build` 成功完成（`built in 6m 39s`，0 error）。
+- **交接与状态**：
+  交接状态置为 `READY_FOR_GPT`，交接写入权交还 ChatGPT 启动 SRS_F024 独立整轮复测。
