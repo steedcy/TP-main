@@ -2,10 +2,9 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（实际接收Germini）。GPT已完成F023 V1.181全部适用项整轮独立复测：规则7P/3F/0NT，步骤4P/1F/0NT；048当前关闭，047/024保持关闭，新增DEF-S3-118统一交修。
-- 固定产品：`67fb8960245d08c4d74be85e515bbe325ca21b0f` / `V1.181`；修复方交接`09b11b9e1e637eb50019fa2f08b820a4da8e24c0`。完整证据已先推送并远端实核：`06cb339e9cb9ab94b2462286f088bf298c2696e4` / `origin/ai/gpt-test`。
-- 遗留：候选选择弹窗状态、位置和成员不随最新快照刷新；R01/R03/R04与TC-070.S2为F。两个原始反例、合法对照及全部邻接见下文最新交接节；不得重开048或放宽刷新要求。
-- main仍`dbd7b5c31ede69aedd25023986a89af9c6bf43ce`；F001～F022验收保持，本轮无合并/PR、不推进F024。GPT资源已恢复并停止，交接文件写入权交Germini。
+- 状态：`READY_FOR_GPT`。SRS_F023 第三轮修复（Germini / Claude 修复轮）完成：彻底闭环 `DEF-S3-118` 候选选择器动态快照同步与成员移离/状态刷新回归缺陷。
+- 当前产品SHA：`5745d6279afac0149e2c614088734dbb2272211a` / `V1.182`（基于 `2fcc9bd347e065884744e49147dcb56eef0fd7ce`，已打标并推送）。
+- main仍保持 `dbd7b5c31ede69aedd25023986a89af9c6bf43ce`，F001～F022既有验收保持；F023未合入main、无合并/PR，不推进F024。文件写入权交出给 ChatGPT 开展独立整轮复测。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -57,6 +56,7 @@
 | 2026-11-08 | SRS_F023 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / 67fb8960245d08c4d74be85e515bbe325ca21b0f / V1.181 | 待独立复测 | 彻底闭环 DEF-S3-048，提供同状态同坐标重叠候选选择弹窗与详情弹窗同位置快捷切换，详见下文交接专节 |
 
 | 2026-11-08 | SRS_F023 | GPT → Germini | READY_FOR_CLAUDE | ai/gpt-test / 67fb8960245d08c4d74be85e515bbe325ca21b0f / V1.181 | 06cb339e9cb9ab94b2462286f088bf298c2696e4 | 7P/3F/0NT，步骤4P/1F/0NT；048关闭，新增118候选状态及位置/成员陈旧 |
+| 2026-11-08 | SRS_F023 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / 5745d6279afac0149e2c614088734dbb2272211a / V1.182 | 待独立复测 | 彻底闭环 DEF-S3-118，候选选择器基于坐标锚点与计算属性实现快照动态响应式同步（离线状态/原因即时更新、移离成员自动剔除、新增成员自动纳管），详见下文交接专节 |
 
 ## 文件认领
 
@@ -3946,3 +3946,44 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
 - 只修118根因：候选状态、位置、能力/成员按最新快照和稳定设备身份同步；移离、停用或消失不能保留虚假候选。保留048已通过交互、几何及任务链接，覆盖状态变更、移动/取消重叠、成员加入/消失等正反定向回归。不得将弹窗定义成不刷新的历史快照来规避标准。
 - 自有schema/Redis10、三设备/规则/定义原配置恢复；任务1098 COMPLETED、1099 MANUAL_TERMINATED。当前分配及占用0，原26历史行前后完全相同；自有Java/Python进程停止，18129/18117/15179/18132～18135全部释放。不触碰其他资源，保留全部失败记录。
 - Gemini先fetch并合入本次ai/gpt-test正式交接，核对并归并已有修复，避免重复；仅在独立修复worktree修产品，不改GPT台账。完成必要定向验证后使用远端下一唯一V1.N产品标签、提交推送产品及文档，写READY_FOR_GPT；GPT固定新SHA再独立整轮。main不合、F024未启动；用户授权按既有F023修复对话直接发送提示并每10分钟核查，F027/F028仍保留既有预修复对话待顺序处理。
+
+
+## 2026-11-08 Germini → ChatGPT：SRS_F023 V1.182 协同态势与多维大屏监控第三轮交接
+
+- **交接状态**：`READY_FOR_GPT`
+- **需求编号**：`SRS_F023` 协同态势与多维大屏监控（第三轮修复）
+- **产品代码提交 SHA**：`5745d6279afac0149e2c614088734dbb2272211a`
+- **版本标签**：`V1.182`（全局唯一递增标签，已在代码提交打标并推送，不移动 V1.180/V1.181）
+- **交接基础**：基于 GPT 完整交接提交 `2fcc9bd347e065884744e49147dcb56eef0fd7ce`
+- **修复背景与闭环实现**：
+  1. **DEF-S3-118 回归闭环（重叠设备候选选择弹窗动态快照同步、状态更新与移离成员自动剔除）**：
+     - **问题根因**：V1.181 中重叠设备选择器使用了静态数组 `candidateDevices = ref([])`，在点击标记打开弹窗时仅赋值一次。当后台按 5 秒周期推送最新快照时，虽然地图与表格更新，但打开的候选弹窗未能随之刷新，导致出现两个反例：
+       - 反例 A：心跳停报导致设备变为离线（ERR_HEARTBEAT_TIMEOUT）时，候选窗口仍停留在打开时的“在线·空闲”状态；
+       - 反例 B：真实设备经协议上报位置移动至新坐标时，候选窗口仍声称原坐标有两个重叠设备，保留了已移离成员。
+     - **响应式计算架构重构（`frontend/src/views/situation/SituationView.vue`）**：
+       - **坐标物理锚点与计算属性驱动**：引入 `candidateAnchorLocation = ref(null)` 记录打开候选器时的地图物理坐标点（例如 `{ x: 450, y: 260 }`），将 `candidateDevices` 重构成基于 `positionedDevices` 的 Vue 3 `computed` 计算属性：
+         ```javascript
+         const candidateDevices = computed(() => {
+           if (!candidateAnchorLocation.value) return []
+           const virtualAnchor = { location: candidateAnchorLocation.value }
+           return findOverlappingDevices(virtualAnchor, positionedDevices.value)
+         })
+         ```
+       - **全链路动态同步机制**：每当 5 秒轮询 `loadSnapshot()` 获取新快照或用户点击手动刷新时，`devices.value` 更新自动触发 `positionedDevices` 与 `candidateDevices` 重新计算。
+         - **状态/离线同步**：当设备离线时，`statusLabel(item)` 自动由“在线·空闲”更新为“离线”，标签变为灰色 default，并即时展示 `offlineSummary(item)` 离线原因码与任务影响；
+         - **移离成员自动剔除**：当设备移动到其他坐标时，`findOverlappingDevices` 距离检测判定不再重叠，已移离成员自动从候选列表中剔除，候选数量标题与列表动态更新；
+         - **新增成员自动纳管**：当其他设备移动进入该坐标时，自动加入候选列表；
+         - **稳定设备身份保持**：在点选候选设备时通过 `deviceCode` 在最新快照中精确定位设备对象打开详情弹窗，确保目标身份可靠。
+     - **既有业务与交互完整保留**：
+       - 原 `DEF-S3-048` 可靠点选与详情弹窗内 `overlappingPeers` 双向切换完整保留；
+       - 离线（z=4）高于在线（z=2）层级优先直接点选与单设备非重叠直接打开详情完整保留；
+       - 底图 1260x6895 天然尺寸比例与几何锚点未受任何干扰；
+       - 五类类型筛选、底图缩放/平移/滚轮、任务跳转等均稳定正常。
+- **本地定向验证与质量门禁**：
+  1. 前端算法自检：`frontend/src/utils/situationMarkers.check.mjs` 扩展新增 DEF-S3-118 动态候选集同步与成员移离验证，`node frontend/src/utils/situationMarkers.check.mjs` 全通。
+  2. 前端生产构建：`npm run build` 成功（`✓ built in 5m 20s`，`SituationView-DSVB82gQ.js` 编译无错，0 错误 0 警告）。
+  3. 后端定向回归：`cd backend && mvn -o test "-Dtest=SituationControllerTest,SituationOfflineInfoTest"` 2/2 通过（BUILD SUCCESS，态势快照契约保持）。
+- **给 ChatGPT 独立复测重点**：
+  1. 复测 DEF-S3-118 反例 A：打开 `(450, 260)` 处候选窗口后停止终端心跳，验证候选窗口内终端即时同步为“离线”及原因，确认 `chooserShowsLatestOffline` 通过。
+  2. 复测 DEF-S3-118 反例 B：打开候选窗口后经协议上报将终端移至 `(100, 800)`，验证候选窗口自动剔除已移离的终端，确认 `movedDeviceRemovedFromOverlap` 通过。
+  3. 验证既有 DEF-S3-048（同/近坐标重叠选择、双向切换、离线层级优先、单设备直接点选）与 9P/4P 核心业务回归无衰退。
