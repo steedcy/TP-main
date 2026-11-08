@@ -179,9 +179,34 @@
       <a-descriptions bordered :column="2">
         <a-descriptions-item label="长×宽×高">{{ baggageResult.length }}×{{ baggageResult.width }}×{{ baggageResult.height }} cm</a-descriptions-item>
         <a-descriptions-item label="重量">{{ baggageResult.weight }} kg</a-descriptions-item>
-        <a-descriptions-item label="超规判定">{{ baggageResult.isOversize ? '超规' : '非超规' }}</a-descriptions-item>
+        <a-descriptions-item label="超规判定">
+          <a-tag :color="baggageResult.isOversize ? 'red' : 'green'">
+            {{ baggageResult.isOversize ? '超规' : '非超规' }}
+          </a-tag>
+        </a-descriptions-item>
         <a-descriptions-item label="阈值">三边和 ＞ {{ baggageResult.dimensionThresholdCm }} cm 或重量 ＞ {{ baggageResult.weightThresholdKg }} kg</a-descriptions-item>
         <a-descriptions-item label="阈值来源" :span="2">{{ baggageResult.thresholdSource || '未记录' }}</a-descriptions-item>
+      </a-descriptions>
+    </a-card>
+
+    <a-card v-if="task.taskFamily === 'OVERSIZE_BAGGAGE_HANDLING'"
+            title="超规行李办理说明与柜台引导"
+            style="margin-top: 16px"
+            data-testid="baggage-handling-instructions">
+      <a-descriptions bordered :column="2">
+        <a-descriptions-item label="临时业务号">
+          <span data-testid="baggage-temp-id">{{ baggageTempId }}</span>
+          <span style="margin-left: 8px; color: #8c8c8c; font-size: 12px">（脱敏临时业务识别码，不存储真实旅客身份）</span>
+        </a-descriptions-item>
+        <a-descriptions-item label="指定办理柜台">
+          <span data-testid="target-counter">{{ targetCounterDisplay }}</span>
+        </a-descriptions-item>
+        <a-descriptions-item label="状态提示" :span="2">
+          <a-alert :type="isOversizeBaggage ? 'warning' : 'success'" :message="baggageNoticeText" show-icon />
+        </a-descriptions-item>
+        <a-descriptions-item label="办理说明与托运须知" :span="2">
+          <pre data-testid="handling-instructions-content" style="white-space: pre-wrap; font-family: inherit; margin: 0; background: #fafafa; padding: 12px; border-radius: 4px;">{{ baggageHandlingInstructions }}</pre>
+        </a-descriptions-item>
       </a-descriptions>
     </a-card>
 
@@ -360,8 +385,60 @@ const stepAssignments = ref([])
 const currentSteps = computed(() => planVersions.value.find(p => p.id === task.value?.currentPlanVersionId)?.planSteps || [])
 const progress = computed(() => taskProgress(currentSteps.value, stepAssignments.value))
 const progressLabel = computed(() => progressText(progress.value))
-const baggageResult = computed(() => stepAssignments.value
-  .find(a => currentSteps.value.find(s => s.stepSeq === a.stepSeq)?.capabilityType === 'CAP_BAGGAGE_MEASURE')?.outputParams || null)
+const baggageResult = computed(() => {
+  const fromStep = stepAssignments.value
+    .find(a => currentSteps.value.find(s => s.stepSeq === a.stepSeq)?.capabilityType === 'CAP_BAGGAGE_MEASURE')?.outputParams
+  if (fromStep && (fromStep.length != null || fromStep.isOversize != null)) {
+    return fromStep
+  }
+  const sp = task.value?.sceneParams
+  if (sp && (sp.length != null || sp.isOversize != null || sp.measurement != null)) {
+    return {
+      length: sp.length != null ? sp.length : (sp.measurement?.length),
+      width: sp.width != null ? sp.width : (sp.measurement?.width),
+      height: sp.height != null ? sp.height : (sp.measurement?.height),
+      weight: sp.weight != null ? sp.weight : (sp.measurement?.weight),
+      isOversize: sp.isOversize != null ? sp.isOversize : (sp.measurement?.isOversize),
+      dimensionThresholdCm: sp.dimensionThresholdCm || 158,
+      weightThresholdKg: sp.weightThresholdKg || 20,
+      thresholdSource: sp.thresholdSource || '航司超规行李标准'
+    }
+  }
+  return fromStep || null
+})
+
+const isOversizeBaggage = computed(() => {
+  if (task.value?.taskFamily !== 'OVERSIZE_BAGGAGE_HANDLING') return false
+  return baggageResult.value?.isOversize === true || task.value?.sceneParams?.isOversize === true
+})
+
+const baggageTempId = computed(() => {
+  return task.value?.sceneParams?.tempBusinessId || task.value?.sceneParams?.baggageId || ('BAG-' + (task.value?.id || ''))
+})
+
+const targetCounterDisplay = computed(() => {
+  return task.value?.sceneParams?.targetCounter || '超规行李专柜 B-01 (值机岛端头)'
+})
+
+const baggageNoticeText = computed(() => {
+  if (!isOversizeBaggage.value) {
+    return '行李规格尺寸及重量在正常限额范围内，无需转运至超规专柜。'
+  }
+  return '该行李已超出标准托运限额（长宽高合计超限或单件超重）。已触发超规预警并生成专柜办理指引。'
+})
+
+const baggageHandlingInstructions = computed(() => {
+  return `【超规行李办理流程】
+1. 前往指定超规行李专柜（${targetCounterDisplay.value}）进行人工复核与二次称重。
+2. 出示临时业务识别码（${baggageTempId.value}），核对托运凭证。
+3. 按照航空公司超限行李费率标准现场补缴逾重/超规附加费。
+4. 完成人工加固或打包（如适用）并领取超规行李提取凭证。
+
+【注意事项与托运须知】
+- 严禁在托运行李中夹带锂电池、移动电源、易燃易爆等违禁品。
+- 异形或易碎超规行李需签署免责托运声明。
+- 现场智能服务终端与导引机器人持续提供路线指引与状态播报。`
+})
 const flightChannelResults = computed(() => [
   { name: '航延屏', capabilities: ['CAP_FLIGHT_UPDATE'] },
   { name: '智慧航显', capabilities: ['CAP_INFO_DISPLAY'] },

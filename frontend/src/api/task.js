@@ -50,3 +50,9 @@ export function getStepAssignments(taskId) {
 export function listTaskExceptions(params) {
   return request.get('/task-exceptions', { params })
 }
+
+// 对应5.6.3 / SRS_F024 / NT-S3-004: 模拟行李测量事件触发
+export function submitMeasurementEvent(data) {
+  return request.post('/tasks/measurement-event', data)
+}
+

@@ -30,6 +30,49 @@
       </a-row>
     </a-card>
 
+    <a-card title="模拟行李测量事件触发（SRS_F024 / NT-S3-004）" style="margin-bottom: 16px" data-testid="measurement-event-card">
+      <p style="color: #666; margin-bottom: 12px">
+        对应 SRS 5.6.3 / SRS_F024：模拟行李测量设备自动上传测量事件。非超规测量留痕后直接完成；超规测量自动触发超规处置规划。
+      </p>
+      <a-form layout="inline" style="margin-bottom: 12px; row-gap: 8px;">
+        <a-form-item label="行李位置">
+          <a-input v-model:value="measurementForm.baggageLocation" style="width: 140px" placeholder="如 T2值机岛A03" />
+        </a-form-item>
+        <a-form-item label="长 (cm)">
+          <a-input-number v-model:value="measurementForm.length" :min="1" :max="500" style="width: 90px" />
+        </a-form-item>
+        <a-form-item label="宽 (cm)">
+          <a-input-number v-model:value="measurementForm.width" :min="1" :max="500" style="width: 90px" />
+        </a-form-item>
+        <a-form-item label="高 (cm)">
+          <a-input-number v-model:value="measurementForm.height" :min="1" :max="500" style="width: 90px" />
+        </a-form-item>
+        <a-form-item label="重量 (kg)">
+          <a-input-number v-model:value="measurementForm.weight" :min="0.1" :step="0.5" :max="200" style="width: 90px" />
+        </a-form-item>
+        <a-form-item label="目标柜台（可选）">
+          <a-input v-model:value="measurementForm.targetCounter" style="width: 150px" placeholder="选填，默认专柜" />
+        </a-form-item>
+        <a-form-item>
+          <a-space>
+            <a-button type="primary" :loading="measurementSubmitting" @click="handleSendMeasurementEvent" data-testid="btn-submit-measurement">触发测量事件</a-button>
+            <a-button size="small" @click="fillOversizePreset">填入超规示例</a-button>
+            <a-button size="small" @click="fillNormalPreset">填入正常示例</a-button>
+          </a-space>
+        </a-form-item>
+      </a-form>
+      <div v-if="lastMeasurementResult" style="font-size: 13px; color: #595959;">
+        最新触发结果:
+        <a-tag :color="lastMeasurementResult.isOversize ? 'red' : 'green'">
+          {{ lastMeasurementResult.isOversize ? '超规行李' : '正常行李' }}
+        </a-tag>
+        任务状态: <strong>{{ lastMeasurementResult.status }}</strong>
+        <router-link v-if="lastMeasurementResult.taskId" :to="`/tasks/${lastMeasurementResult.taskId}`" style="margin-left: 12px">
+          查看任务详情 (ID: {{ lastMeasurementResult.taskId }})
+        </router-link>
+      </div>
+    </a-card>
+
     <a-table :columns="columns" :data-source="simulators" :loading="loading" row-key="deviceCode" :pagination="false">
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'type'">
@@ -80,7 +123,64 @@ import {
   listSimulators, setSimulatorOnline, setSimulatorScenario,
   listSimulatorEvents, listSimulatorCommands
 } from '../../api/simulator'
-import { submitTask } from '../../api/task'
+import { submitTask, submitMeasurementEvent } from '../../api/task'
+
+const measurementForm = ref({
+  baggageLocation: 'T2值机岛A03',
+  length: 100,
+  width: 60,
+  height: 40,
+  weight: 28,
+  targetCounter: '超规行李专柜B01'
+})
+const measurementSubmitting = ref(false)
+const lastMeasurementResult = ref(null)
+
+function fillOversizePreset() {
+  measurementForm.value = {
+    baggageLocation: 'T2值机岛A03',
+    length: 100,
+    width: 60,
+    height: 40,
+    weight: 28,
+    targetCounter: '超规行李专柜B01'
+  }
+}
+
+function fillNormalPreset() {
+  measurementForm.value = {
+    baggageLocation: 'T2值机岛A02',
+    length: 50,
+    width: 40,
+    height: 20,
+    weight: 12,
+    targetCounter: ''
+  }
+}
+
+async function handleSendMeasurementEvent() {
+  if (!measurementForm.value.baggageLocation?.trim()) {
+    message.warning('请填写行李位置')
+    return
+  }
+  measurementSubmitting.value = true
+  try {
+    const res = await submitMeasurementEvent(measurementForm.value)
+    const task = res.data
+    lastMeasurementResult.value = {
+      taskId: task.id,
+      taskCode: task.taskCode,
+      status: task.status,
+      isOversize: task.sceneParams?.isOversize
+    }
+    message.success(`已触发行李测量事件，生成任务：${task.taskCode || task.id}`)
+  } catch (err) {
+    message.error(err?.response?.data?.message || '触发行李测量事件失败')
+  } finally {
+    measurementSubmitting.value = false
+  }
+}
+
 
 
 const simulators = ref([])

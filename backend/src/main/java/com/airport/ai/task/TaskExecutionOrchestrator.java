@@ -458,6 +458,23 @@ public class TaskExecutionOrchestrator {
                     "步骤" + assignment.getStepSeq() + "完成条件已满足: " + step.get("completionCondition"));
             taskExceptionService.onStepRecovered(assignment.getTaskId(), assignment.getStepSeq());
             Task currentTask = taskMapper.findById(assignment.getTaskId()).orElseThrow();
+            if ("OVERSIZE_BAGGAGE_HANDLING".equals(currentTask.getTaskFamily())
+                    && "CAP_BAGGAGE_MEASURE".equals(step.get("capabilityType"))) {
+                Map<String, Object> scene = fromJsonMap(currentTask.getSceneParams());
+                outputParams.putIfAbsent("dimensionThresholdCm", scene.getOrDefault("dimensionThresholdCm", 158.0));
+                outputParams.putIfAbsent("weightThresholdKg", scene.getOrDefault("weightThresholdKg", 23.0));
+                outputParams.putIfAbsent("thresholdSource", scene.getOrDefault("thresholdSource", "民航旅客行李运输标准（2026版）"));
+                if (outputParams.get("totalDimensionCm") == null && outputParams.get("length") != null && outputParams.get("width") != null && outputParams.get("height") != null) {
+                    try {
+                        double l = ((Number) outputParams.get("length")).doubleValue();
+                        double w = ((Number) outputParams.get("width")).doubleValue();
+                        double h = ((Number) outputParams.get("height")).doubleValue();
+                        outputParams.put("totalDimensionCm", l + w + h);
+                    } catch (Exception ignored) {}
+                }
+                assignment.setOutputParams(toJson(outputParams));
+                assignmentMapper.update(assignment);
+            }
             if (!Boolean.TRUE.equals(currentTask.getIsDryRun())
                     && "OVERSIZE_BAGGAGE_HANDLING".equals(currentTask.getTaskFamily())
                     && "CAP_BAGGAGE_MEASURE".equals(step.get("capabilityType"))
@@ -519,8 +536,26 @@ public class TaskExecutionOrchestrator {
 
     private void completeNormalBaggageBranch(Task task, Long planVersionId, Integer measuredStepSeq,
                                              Map<String, Object> outputParams) {
+        Map<String, Object> scene = fromJsonMap(task.getSceneParams());
+        outputParams.putIfAbsent("dimensionThresholdCm", scene.getOrDefault("dimensionThresholdCm", 158.0));
+        outputParams.putIfAbsent("weightThresholdKg", scene.getOrDefault("weightThresholdKg", 23.0));
+        outputParams.putIfAbsent("thresholdSource", scene.getOrDefault("thresholdSource", "民航旅客行李运输标准（2026版）"));
+        if (outputParams.get("totalDimensionCm") == null && outputParams.get("length") != null && outputParams.get("width") != null && outputParams.get("height") != null) {
+            try {
+                double l = ((Number) outputParams.get("length")).doubleValue();
+                double w = ((Number) outputParams.get("width")).doubleValue();
+                double h = ((Number) outputParams.get("height")).doubleValue();
+                outputParams.put("totalDimensionCm", l + w + h);
+            } catch (Exception ignored) {}
+        }
         for (TaskStepAssignment later : assignmentMapper.findByPlanVersionIdOrderByStepSeqAsc(planVersionId)) {
-            if (later.getStepSeq() <= measuredStepSeq) continue;
+            if (later.getStepSeq() <= measuredStepSeq) {
+                if (later.getStepSeq().equals(measuredStepSeq)) {
+                    later.setOutputParams(toJson(outputParams));
+                    assignmentMapper.update(later);
+                }
+                continue;
+            }
             later.setStepStatus("SKIPPED");
             later.setReasonCode("BAGGAGE_WITHIN_LIMIT");
             later.setUpdatedAt(LocalDateTime.now());
@@ -597,6 +632,20 @@ public class TaskExecutionOrchestrator {
             taskExceptionService.archiveAllUnresolvedOnTaskComplete(taskId);
             taskEventService.append(taskId, "TASK_COMPLETED", "SYSTEM", null,
                     "航班变更可用渠道执行完成；已覆盖: " + covered + "；未覆盖: " + uncovered);
+            return;
+        }
+
+        if ("OVERSIZE_BAGGAGE_HANDLING".equals(task.getTaskFamily()) && !Boolean.TRUE.equals(task.getIsDryRun())) {
+            task.setStatus(TaskStatus.COMPLETED);
+            task.setUpdatedAt(LocalDateTime.now());
+            taskMapper.update(task);
+            taskExceptionService.archiveAllUnresolvedOnTaskComplete(taskId);
+
+            Map<String, Object> scene = fromJsonMap(task.getSceneParams());
+            String baggageId = String.valueOf(scene.getOrDefault("baggageId", "临时业务编号"));
+            String targetLoc = String.valueOf(scene.getOrDefault("targetCounter", scene.getOrDefault("targetLocation", "F2_TEST_GATE")));
+            String detail = "超规行李处置闭环完成（临时业务编号: " + baggageId + "）：已完成行李测量、超规告警上报、航显办理说明发布，以及移动机器人至" + targetLoc + "的空间引导；全部步骤均已执行完成。";
+            taskEventService.append(taskId, "TASK_COMPLETED", "SYSTEM", "OVERSIZE_HANDLING_CLOSED_LOOP", detail);
             return;
         }
 
@@ -792,6 +841,16 @@ public class TaskExecutionOrchestrator {
             return MAPPER.writeValueAsString(value);
         } catch (Exception e) {
             throw new RuntimeException("序列化失败", e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> fromJsonMap(String json) {
+        if (json == null || json.isBlank()) return new HashMap<>();
+        try {
+            return MAPPER.readValue(json, Map.class);
+        } catch (Exception e) {
+            return new HashMap<>();
         }
     }
 }

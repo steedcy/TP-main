@@ -204,11 +204,17 @@ public class TaskService {
         taskDefinitionService.findByCode(request.getTaskFamily())
                 .ifPresent(def -> SceneParamsValidator.validate(def, request.getSceneParams()));
 
+        Map<String, Object> sanitizedScene = SceneParamsPrivacyGuard.sanitize(request.getSceneParams());
+        if ("OVERSIZE_BAGGAGE_HANDLING".equals(request.getTaskFamily()) && sanitizedScene != null) {
+            sanitizedScene.putIfAbsent("baggageId", "BAG-" + System.currentTimeMillis() % 1000000);
+            sanitizedScene.putIfAbsent("targetCounter", sanitizedScene.getOrDefault("targetLocation", "F2_TEST_GATE"));
+        }
+
         Task task = new Task();
         task.setTaskCode(taskCodeGenerator.next());
         task.setTaskGoal(request.getTaskGoal());
         task.setTaskFamily(request.getTaskFamily());
-        task.setSceneParams(toJson(SceneParamsPrivacyGuard.sanitize(request.getSceneParams())));
+        task.setSceneParams(toJson(sanitizedScene));
         task.setStatus(TaskStatus.PLANNING);
         task.setCreatedBy(operator.getUsername());
         taskMapper.insert(task);
@@ -635,7 +641,25 @@ public class TaskService {
             task.setTaskFamily(response.getInferredTaskFamily());
         }
 
-        if (response.isInfoComplete()) {
+        // 必要信息由系统按任务族核对，不直接采信模型的追问清单（DEF-S3-003/004/005）：
+        // 已提供的必要信息不再追问，缺失时只问缺的那几项，不问身份、设备、路线等系统自己决定的内容。
+        RequiredInfoGuard.Verdict verdict = RequiredInfoGuard.check(
+                RequiredInfoGuard.requirementsFor(task.getTaskFamily(),
+                        taskDefinitionService.findByCode(task.getTaskFamily()).orElse(null)),
+                sceneParams, parsingResult);
+        boolean infoComplete = response.isInfoComplete();
+        List<String> questions = response.getMissingInfoQuestions();
+        if (verdict != null) {
+            if (verdict.complete() != infoComplete) {
+                taskEventService.append(task.getId(), "GOAL_CLARIFIED", "SYSTEM", "INFO_CHECK_OVERRIDE",
+                        "系统按任务族核对必要信息：" + (verdict.complete() ? "均已提供，忽略模型的追问" : "仍缺 " + verdict.missing())
+                                + "（模型判断" + (infoComplete ? "完整" : "不完整") + "）");
+            }
+            infoComplete = verdict.complete();
+            questions = verdict.questions();
+        }
+
+        if (infoComplete) {
             task.setMissingInfoQuestions(null);
             taskMapper.update(task);
             taskEventService.append(task.getId(), "GOAL_CLARIFIED", "SYSTEM", null,
@@ -643,7 +667,7 @@ public class TaskService {
             taskPlanningOrchestrator.advance(task.getId());
         } else {
             // 业务规则4：信息补充完成前不得进入计划生成，任务停留在PLANNING
-            task.setMissingInfoQuestions(toJson(response.getMissingInfoQuestions()));
+            task.setMissingInfoQuestions(toJson(questions));
             if (clarificationAnswers != null && clarificationAnswers.size() >= 3) {
                 task.setStatus(TaskStatus.PENDING_MANUAL);
                 task.setFailureReason("三轮信息补充后仍缺少关键信息，需人工处理");
@@ -651,12 +675,129 @@ public class TaskService {
             taskMapper.update(task);
             taskEventService.append(task.getId(), "GOAL_CLARIFIED", "SYSTEM", "INFO_INCOMPLETE",
                     "目标理解发现信息缺失，已补充" + (clarificationAnswers == null ? 0 : clarificationAnswers.size())
-                            + "轮，待补充问题: " + response.getMissingInfoQuestions());
+                            + "轮，待补充问题: " + questions);
             if (task.getStatus() == TaskStatus.PENDING_MANUAL) {
                 taskEventService.append(task.getId(), "TASK_PENDING_MANUAL", "SYSTEM", "INFO_INCOMPLETE",
                         task.getFailureReason());
             }
         }
+    }
+
+    /**
+     * SRS_F024.R01 / NT-S3-004: 接收模拟行李测量事件，自动触发超规或非超规闭环任务。
+     */
+    @Transactional(noRollbackFor = BusinessException.class)
+    public Task submitMeasurementEvent(com.airport.ai.task.dto.BaggageMeasurementEventRequest request, User user) {
+        if (user == null) {
+            user = new User();
+            user.setId(0L);
+            user.setUsername("SYSTEM");
+            user.setRole("OPERATOR");
+        }
+
+        // 1. 旅客隐私保护检查（SRS_F024.R09 / DEF-S3-032）
+        Map<String, Object> privacyCheckMap = new HashMap<>(request.getExtraParams() != null ? request.getExtraParams() : Map.of());
+        privacyCheckMap.put("baggageLocation", request.getBaggageLocation());
+        if (request.getBaggageId() != null) privacyCheckMap.put("baggageId", request.getBaggageId());
+        if (request.getTargetCounter() != null) privacyCheckMap.put("targetCounter", request.getTargetCounter());
+        SceneParamsPrivacyGuard.reject(privacyCheckMap);
+
+        // 2. 测量数据计算与阈值核定（SRS_F024.R02）
+        double length = request.getLength();
+        double width = request.getWidth();
+        double height = request.getHeight();
+        double weight = request.getWeight();
+        double totalDimension = length + width + height;
+        double dimThreshold = request.getDimensionThresholdCm() != null ? request.getDimensionThresholdCm() : 158.0;
+        double weightThreshold = request.getWeightThresholdKg() != null ? request.getWeightThresholdKg() : 23.0;
+        String thresholdSource = request.getThresholdSource() != null && !request.getThresholdSource().isBlank()
+                ? request.getThresholdSource().trim() : "民航旅客行李运输标准（2026版）";
+
+        boolean isOversize = totalDimension > dimThreshold || weight > weightThreshold;
+
+        // 3. 临时业务编号（SRS_F024.R09）
+        String baggageId = request.getBaggageId();
+        if (baggageId == null || baggageId.isBlank()) {
+            baggageId = "BAG-" + System.currentTimeMillis() % 1000000;
+        }
+
+        // 4. 构造场景参数（含柜台可选字段，SRS §5.6.3）
+        String targetCounter = request.getTargetCounter() != null && !request.getTargetCounter().isBlank()
+                ? request.getTargetCounter().trim() : "F2_TEST_GATE";
+        String instructions = request.getHandlingInstructions() != null && !request.getHandlingInstructions().isBlank()
+                ? request.getHandlingInstructions().trim()
+                : "超规行李办理流程：1. 前往指定柜台办理称重核验；2. 打印并粘贴超规挂牌；3. 办理专属托运；4. 凭凭证通过安检。";
+
+        Map<String, Object> sceneParams = new LinkedHashMap<>();
+        sceneParams.put("baggageId", baggageId);
+        sceneParams.put("tempBusinessId", baggageId);
+        sceneParams.put("baggageLocation", request.getBaggageLocation());
+        sceneParams.put("targetCounter", targetCounter);
+        sceneParams.put("targetLocation", targetCounter);
+        sceneParams.put("length", length);
+        sceneParams.put("width", width);
+        sceneParams.put("height", height);
+        sceneParams.put("weight", weight);
+        sceneParams.put("totalDimensionCm", totalDimension);
+        sceneParams.put("dimensionThresholdCm", dimThreshold);
+        sceneParams.put("weightThresholdKg", weightThreshold);
+        sceneParams.put("thresholdSource", thresholdSource);
+        sceneParams.put("isOversize", isOversize);
+        sceneParams.put("measureMode", "EVENT_TRIGGERED");
+        sceneParams.put("routePreference", "BARRIER_FREE");
+        sceneParams.put("alertLevel", "WARNING");
+        sceneParams.put("contentType", "TEXT");
+        sceneParams.put("contentData", "超规行李（临时编号" + baggageId + "）请前往" + targetCounter + "办理托运");
+        sceneParams.put("handlingInstructions", instructions);
+        sceneParams.put("triggerSource", "MEASUREMENT_EVENT");
+        if (request.getDeviceCode() != null) sceneParams.put("deviceCode", request.getDeviceCode());
+        if (request.getExtraParams() != null) {
+            sceneParams.putAll(request.getExtraParams());
+        }
+
+        // 5. 创建任务实例
+        String taskGoal = "处理位于 " + request.getBaggageLocation() + " 的行李测量事件（临时业务编号: " + baggageId
+                + "，尺寸: " + length + "×" + width + "×" + height + " cm，重量: " + weight + " kg，判定: "
+                + (isOversize ? "超规" : "非超规") + "）";
+
+        Task task = new Task();
+        task.setTaskCode(taskCodeGenerator.next());
+        task.setTaskFamily("OVERSIZE_BAGGAGE_HANDLING");
+        task.setTaskGoal(taskGoal);
+        task.setCreatedBy(user.getUsername());
+        task.setSceneParams(toJson(sceneParams));
+
+        if (!isOversize) {
+            // SRS_F024.R03: 非超规时记录测量结果并结束任务，任务置为已完成，不生成引导步骤
+            task.setStatus(TaskStatus.COMPLETED);
+            task.setUpdatedAt(LocalDateTime.now());
+            taskMapper.insert(task);
+
+            taskEventService.append(task.getId(), "GOAL_SUBMITTED", "SYSTEM", "MEASUREMENT_EVENT",
+                    "接收模拟行李测量事件，临时业务编号: " + baggageId + "，位置: " + request.getBaggageLocation()
+                            + "，尺寸: " + length + "×" + width + "×" + height + "cm，重量: " + weight + "kg，判定: 非超规");
+            taskEventService.append(task.getId(), "TASK_COMPLETED", "SYSTEM", "BAGGAGE_WITHIN_LIMIT",
+                    "行李未超规，结束处置；三边和" + totalDimension + "cm（阈值" + dimThreshold + "cm），重量" + weight
+                            + "kg（阈值" + weightThreshold + "kg）；来源：" + thresholdSource);
+
+            operationLogService.record(user.getId(), user.getUsername(), user.getRole(),
+                    "MEASUREMENT_EVENT_NORMAL", task.getTaskCode(), "SUCCESS", null);
+            return task;
+        }
+
+        // 超规分支（SRS_F024.R04）：进入规划流程
+        task.setStatus(TaskStatus.PLANNING);
+        taskMapper.insert(task);
+
+        taskEventService.append(task.getId(), "GOAL_SUBMITTED", "SYSTEM", "MEASUREMENT_EVENT",
+                "接收模拟超规行李测量事件，临时业务编号: " + baggageId + "，位置: " + request.getBaggageLocation()
+                        + "，尺寸: " + length + "×" + width + "×" + height + "cm，重量: " + weight + "kg，超规判定: 超规");
+
+        operationLogService.record(user.getId(), user.getUsername(), user.getRole(),
+                "MEASUREMENT_EVENT_OVERSIZE", task.getTaskCode(), "SUCCESS", null);
+
+        runGoalUnderstanding(task, sceneParams, null);
+        return taskMapper.findById(task.getId()).orElse(task);
     }
 
     private String toJson(Object value) {

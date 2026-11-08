@@ -42,6 +42,22 @@ public class TaskController {
         return ApiResponse.ok(TaskView.from(taskService.submit(request, currentUser.get())));
     }
 
+    /**
+     * SRS_F024.R01 / NT-S3-004: 模拟行李测量事件自动触发入口。
+     * 支持超规触发与非超规直接完成闭环两类分支。
+     */
+    @PostMapping("/measurement-event")
+    @PreAuthorize("hasAnyRole('OPERATOR', 'SYSTEM_ADMIN')")
+    public ApiResponse<TaskView> measurementEvent(@Valid @RequestBody com.airport.ai.task.dto.BaggageMeasurementEventRequest request) {
+        return ApiResponse.ok(TaskView.from(taskService.submitMeasurementEvent(request, currentUser.get())));
+    }
+
+    @PostMapping("/baggage-measurement-event")
+    @PreAuthorize("hasAnyRole('OPERATOR', 'SYSTEM_ADMIN')")
+    public ApiResponse<TaskView> baggageMeasurementEvent(@Valid @RequestBody com.airport.ai.task.dto.BaggageMeasurementEventRequest request) {
+        return ApiResponse.ok(TaskView.from(taskService.submitMeasurementEvent(request, currentUser.get())));
+    }
+
     @GetMapping
     public ApiResponse<PageResult<TaskView>> list(@RequestParam(required = false) String taskCode,
                                                     @RequestParam(required = false) TaskStatus status,
