@@ -2,8 +2,8 @@
 
 > **当前基准**：V2.4（2026-11-04 用户追加整轮复测授权；继承V2.3，见BL-005；下方既有产品验收/交接记录保留原执行版本）
 > **主干验收合入提交**：F001～F023已验收安全合main；F023验收锚点`52dabfc647931d0a3ac3b2297fc1b5f9a8e98c62`已远端核对，40用户文件哈希不变，无PR；最终证明随本提交同步。
-> **最新产品代码提交**：8a130d72805c744ae66548911f874dbf5dab9273 / V1.187（SRS_F026）
-> **当前状态**：REQUIREMENT_PASSED。SRS_F026 航班变动应急协同响应整轮独立复测全P通过（规则10P/0F/0NT，步骤7P/0F/0NT，DEF-S3-005与NT-S3-006彻底实测关闭）。准备合入 main 并启动下一项 SRS_F027。\n> **文档定位**：本文件为跨会话修复与复测的**唯一全局断点**，每次修复与复测必须同步更新本文件。
+> **最新产品代码提交**：223436c61bf437ed6b287b41edc5b5e293a596c8 / V1.188（SRS_F027）
+> **当前状态**：REQUIREMENT_PASSED。SRS_F027 任务全流程追溯与因果复盘整轮独立复测全P通过（规则8P/0F/0NT，步骤3P/0F/0NT，DEF-S3-008、DEF-S3-057、NT-S3-007彻底实测关闭）。准备合入 main 并启动下一项 SRS_F028。\n> **文档定位**：本文件为跨会话修复与复测的**唯一全局断点**，每次修复与复测必须同步更新本文件。
 
 ---
 
@@ -63,8 +63,8 @@ F001～F023（含分支共25条目）已完成独立验收并安全合main；F02
 | **commit `64d1f8e`** | `TaskListView.vue`, `taskListView.js` | **DEF-S3-060** (`F020.R04`) | **SRS_F020** | 待人工接管任务橙色标签与左侧提示条醒目高亮 | 已纳入V1.171；V1.172对应修复与115分页当前全P |
 | **commit `332e250`** | `RequiredInfoGuard.java`<br/>`TaskService.java` | **DEF-S3-003** (`F024.R03`)<br/>**DEF-S3-004** (`F025.R01`)<br/>**DEF-S3-005** (`F026.R04`) | **SRS_F024**<br/>**SRS_F025**<br/>**SRS_F026** | 系统端强校验超规行李、特殊旅客、航班变动的必需字段；完整时发 `INFO_CHECK_OVERRIDE` 放行，替代大模型幻觉追问与套取旅客隐私 | 待移植 |
 | **commit `01afe2d`** | `AuthService.java`<br/>`OperationLogService.java`<br/>`UserService.java`<br/>`AccountAuditDetailTest.java` | **DEF-S3-009** (`F028.R03`) | **SRS_F028** | 用户创建、重置密码、状态切换、解锁操作记录带 `before`/`after` 结构化摘要，不含密码明文或哈希；解锁详情为合法 JSON 并经同一脱敏 | 待移植 |
-| **commit `c9a7d5f`** | `EventReasonCodes.java`<br/>`TaskEventService.java`<br/>`EventReasonCodesTest.java` | **DEF-S3-057** (`F027.R02`) | **SRS_F027** | 每条任务事件都有原因码：调用方显式给的保留，缺失时按事件类型补 `NORMAL_*`/`ERR_*`/`WARN_*`；扫描测试保证新增事件类型必须登记。**取值是约定，SRS 未定义，需求方可改 `EventReasonCodes`** | 待移植 |
-| **commit `6f7f389`** | `TaskTraceView.vue` | **DEF-S3-008** (`F027.R01`) | **SRS_F027** | 追溯页每个计划版本展开后显示来源、冻结时间、校验错误清单和步骤明细表（含被替换的历史版本） | 待移植 |
+| **commit `c9a7d5f`** | `EventReasonCodes.java`<br/>`TaskEventService.java`<br/>`EventReasonCodesTest.java` | **DEF-S3-057** (`F027.R02`) | **SRS_F027** | 每条任务事件都有原因码：调用方显式给的保留，缺失时按事件类型补 `NORMAL_*`/`ERR_*`/`WARN_*`；扫描测试保证新增事件类型必须登记。**取值是约定，SRS 未定义，需求方可改 `EventReasonCodes`** | 已纳入V1.188，DEF-S3-057已实测彻底关闭；SRS_F027整项全P通过已合入main |
+| **commit `6f7f389`** | `TaskTraceView.vue` | **DEF-S3-008** (`F027.R01`) | **SRS_F027** | 追溯页每个计划版本展开后显示来源、冻结时间、校验错误清单和步骤明细表（含被替换的历史版本） | 已纳入V1.188，DEF-S3-008已实测彻底关闭；SRS_F027整项全P通过已合入main |
 | **commit `efe0790`** | `SituationController.java`<br/>`SituationView.vue`<br/>`situationMarkers.js`<br/>`SituationOfflineInfoTest.java` | **DEF-S3-047**、**DEF-S3-048** | **SRS_F023** | 态势快照为离线代理带 `offline`（原因码、离线时间、是否影响任务）；页面离线上报时间红色高亮、详情显示原因码与任务影响；标记层级 选中>离线>忙碌>空闲，悬停置顶，离线终端不再被机器人遮住 | **已实际纳入V1.180，V1.181本轮047/048关闭；另有118回归，整项未通过** |
 | **commit `e2d50d2`** | `RiskRuleView.vue`<br/>`riskRuleForm.js` | **DEF-S3-042** | **SRS_F014** | 风险规则页新增弹窗 | **已被 main 取代，勿移植**（`69b841f` / V1.150 已实现等价功能） |
 | **commit `2099c75`** | `TaskDetailView.vue`<br/>`planSummary.js` | **DEF-S3-036** | **SRS_F012** | 计划详情步数/剩余额度/输入参数/参数来源 | **已被 main 取代，勿移植**（`6de0e9e` / F012 已验收；main 另有"规划说明"） |
@@ -87,7 +87,7 @@ F001～F023（含分支共25条目）已完成独立验收并安全合main；F02
 
 | **SRS_F024** | 形式化目标（超规行李处置） | **9P/0F/0NT（全部实测通过）** | TC-072～TC-076 全部通过（5P/0F/0NT） | DEF-S3-032、119～125 及 NT-S3-004/005 全部闭环，整项通过已合入 main |\n| **SRS_F025** | 特殊旅客场景参数完整性 | **9P/0F/0NT（全部实测通过）** | TC-077～TC-079 全部通过（5P/0F/0NT） | DEF-S3-004 彻底关闭；RequiredInfoGuard 业务强校验、SceneParamsPrivacyGuard 隐私脱敏、三通道联动与降级全链路闭环，整项通过已合入 main | V1.186 | **REQUIREMENT_PASSED；全量通过已合main，下一项SRS_F026** |
 | **SRS_F026** | 航班变动应急协同响应 | **10P/0F/0NT（全部实测通过）** | TC-080～TC-083 全部通过（7P/0F/0NT） | DEF-S3-005、NT-S3-006 彻底关闭；FlightChangeRequiredInfoGuard 条件必填强校验生效，双触发入口与四类事件覆盖，三渠道发布结果与耗时持久化 | V1.187 | **REQUIREMENT_PASSED（全部通过，准备合入main，下一项SRS_F027）** |
-| **SRS_F027** | 任务全流程追溯与因果复盘 | P:4 F:2 NT:2 | TC-078, TC-079 | DEF-S3-008、057（移植暂存 `6f7f389` 追溯页步骤明细、`c9a7d5f` 事件原因码）。 | V1.154 | 待启动 |
+| **SRS_F027** | 任务全流程追溯与因果复盘 | **8P/0F/0NT（全部实测通过）** | TC-084 全部通过（3P/0F/0NT） | DEF-S3-008、DEF-S3-057、NT-S3-007 彻底实测关闭；多计划版本步骤明细展示、事件规范原因码全覆盖、不可变性与只读追溯保护 | V1.188 | **REQUIREMENT_PASSED（全部通过，准备合入main，下一项SRS_F028）** |
 | **SRS_F028** | 安全审计与管理日志留痕 | P:7 F:1 NT:0 | TC-080, TC-081 | DEF-S3-009（移植暂存 `01afe2d`：用户管理关键操作 before/after 审计留痕，杜绝密码泄密）。 | V1.155 | 待启动 |
 
 ### 2. 非功能需求全景（18 项待推进）

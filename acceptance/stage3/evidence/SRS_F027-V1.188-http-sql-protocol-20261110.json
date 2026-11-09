@@ -1,0 +1,1223 @@
+{
+  "productSha": "223436c61bf437ed6b287b41edc5b5e293a596c8",
+  "tag": "V1.188",
+  "handoffSha": "6578a9e",
+  "baseline": "V2.4",
+  "startedAt": "2026-11-10T01:42:31.786728+08:00",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "redisDb": 10,
+  "cases": [
+    {
+      "name": "resources-ready",
+      "at": "2026-11-10T01:42:37.911305+08:00",
+      "capabilities": {
+        "CAP_FLIGHT_UPDATE": {
+          "id": 34,
+          "capabilityCode": "CAP_FLIGHT_UPDATE",
+          "capabilityName": "航班信息发布",
+          "capabilityType": "CAP_FLIGHT_UPDATE",
+          "inputParams": [
+            {
+              "name": "flightNumber",
+              "type": "String",
+              "required": true,
+              "defaultValue": "TEST1022",
+              "range": null
+            },
+            {
+              "name": "updateType",
+              "type": "String",
+              "required": true,
+              "defaultValue": "GATE_CHANGE",
+              "range": "DELAY/EARLY/GATE_CHANGE/CANCEL"
+            },
+            {
+              "name": "updateContent",
+              "type": "String",
+              "required": true,
+              "defaultValue": "测试航班登机口变更至F2_TEST_GATE",
+              "range": null
+            },
+            {
+              "name": "displayDuration",
+              "type": "Integer",
+              "required": true,
+              "defaultValue": "60",
+              "range": "10~600"
+            }
+          ],
+          "outputParams": [
+            {
+              "name": "publishStatus",
+              "type": "String",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            },
+            {
+              "name": "publishTime",
+              "type": "String",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            }
+          ],
+          "applicableConditions": null,
+          "capabilityStatus": "ENABLED",
+          "testResult": "实际设备代理调用通过，指令 TEST-c0af439e2a3541f8a9f2fa8fc7",
+          "lastTestAt": "2026-11-10T01:42:35.063889",
+          "testRequest": null,
+          "testResponse": null,
+          "testDurationMs": null,
+          "capabilityDescription": "标准能力模板：航班信息发布"
+        },
+        "CAP_INFO_DISPLAY": {
+          "id": 14,
+          "capabilityCode": "G6_134143",
+          "capabilityName": "GPT updated name",
+          "capabilityType": "CAP_INFO_DISPLAY",
+          "inputParams": [
+            {
+              "name": "contentType",
+              "type": "String",
+              "required": true,
+              "defaultValue": "TEXT",
+              "range": "TEXT/IMAGE/VIDEO/HTML"
+            },
+            {
+              "name": "contentData",
+              "type": "String",
+              "required": true,
+              "defaultValue": "测试信息：请前往F2服务点",
+              "range": null
+            },
+            {
+              "name": "displayDuration",
+              "type": "Integer",
+              "required": true,
+              "defaultValue": "60",
+              "range": "5~300"
+            }
+          ],
+          "outputParams": [
+            {
+              "name": "displayStatus",
+              "type": "String",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            },
+            {
+              "name": "actualDuration",
+              "type": "Integer",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            },
+            {
+              "name": "errorMessage",
+              "type": "String",
+              "required": false,
+              "defaultValue": null,
+              "range": null
+            }
+          ],
+          "applicableConditions": null,
+          "capabilityStatus": "UNTESTED",
+          "testResult": null,
+          "lastTestAt": null,
+          "testRequest": null,
+          "testResponse": null,
+          "testDurationMs": null,
+          "capabilityDescription": "GPT isolated V118"
+        },
+        "CAP_NAVIGATION": {
+          "id": 97,
+          "capabilityCode": "CAP_NAVIGATION",
+          "capabilityName": "空间引导",
+          "capabilityType": "CAP_NAVIGATION",
+          "inputParams": [
+            {
+              "name": "targetLocation",
+              "type": "String",
+              "required": true,
+              "defaultValue": "F2_TEST_GATE",
+              "range": null
+            },
+            {
+              "name": "routePreference",
+              "type": "String",
+              "required": true,
+              "defaultValue": "BARRIER_FREE",
+              "range": "SHORTEST/BARRIER_FREE"
+            },
+            {
+              "name": "targetX",
+              "type": "Double",
+              "required": false,
+              "defaultValue": "0",
+              "range": null
+            },
+            {
+              "name": "targetY",
+              "type": "Double",
+              "required": false,
+              "defaultValue": "0",
+              "range": null
+            }
+          ],
+          "outputParams": [
+            {
+              "name": "routeGenerated",
+              "type": "Boolean",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            },
+            {
+              "name": "estimatedDistance",
+              "type": "Double",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            },
+            {
+              "name": "estimatedDuration",
+              "type": "Integer",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            },
+            {
+              "name": "waypointCount",
+              "type": "Integer",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            }
+          ],
+          "applicableConditions": null,
+          "capabilityStatus": "ENABLED",
+          "testResult": "实际设备代理调用通过，指令 TEST-fc857e95d9e546c583ab28ea1d",
+          "lastTestAt": "2026-11-10T01:42:37.828309",
+          "testRequest": null,
+          "testResponse": null,
+          "testDurationMs": null,
+          "capabilityDescription": "标准能力模板：空间引导"
+        },
+        "CAP_NOTIFICATION": {
+          "id": 100,
+          "capabilityCode": "CAP_NOTIFICATION",
+          "capabilityName": "现场通知",
+          "capabilityType": "CAP_NOTIFICATION",
+          "inputParams": [
+            {
+              "name": "notificationType",
+              "type": "String",
+              "required": true,
+              "defaultValue": "BOTH",
+              "range": "VOICE/TEXT/BOTH"
+            },
+            {
+              "name": "notificationContent",
+              "type": "String",
+              "required": true,
+              "defaultValue": "测试旅客需要轮椅陪同，请现场服务人员协助",
+              "range": null
+            },
+            {
+              "name": "repeatCount",
+              "type": "Integer",
+              "required": true,
+              "defaultValue": "1",
+              "range": "1~5"
+            }
+          ],
+          "outputParams": [
+            {
+              "name": "notificationStatus",
+              "type": "String",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            },
+            {
+              "name": "actualRepeatCount",
+              "type": "Integer",
+              "required": true,
+              "defaultValue": null,
+              "range": null
+            }
+          ],
+          "applicableConditions": null,
+          "capabilityStatus": "ENABLED",
+          "testResult": "实际设备代理调用通过，指令 TEST-8796a636d90349d4bae718317f",
+          "lastTestAt": "2026-11-10T01:42:37.783324",
+          "testRequest": null,
+          "testResponse": null,
+          "testDurationMs": null,
+          "capabilityDescription": "标准能力模板：现场通知"
+        }
+      },
+      "health": {
+        "status": "UP"
+      },
+      "checks": {
+        "sixDevicesActive": true
+      },
+      "result": "P"
+    },
+    {
+      "name": "tc084-trace-multiversion",
+      "at": "2026-11-10T01:42:38.240622+08:00",
+      "taskId": 1346,
+      "request": {
+        "taskGoal": "F188_TC084_TRACE_MULTIVERSION 请为虚构测试旅客P-F027在F2_TEST_GATE提供协助指引至F2_ZONE_A，包含局部重规划与版本追溯验证",
+        "taskFamily": "FLIGHT_CHANGE_RESPONSE",
+        "sceneParams": {
+          "eventSource": "MANUAL_FORM",
+          "flightNumber": "CA1234",
+          "changeType": "GATE_CHANGE",
+          "originalTime": "2026-11-10T10:00:00",
+          "newGate": "F2_TEST_GATE",
+          "changeDescription": "虚构航班CA1234登机口变更至F2_TEST_GATE",
+          "updateType": "GATE_CHANGE",
+          "updateContent": "虚构航班CA1234登机口变更至F2_TEST_GATE",
+          "displayDuration": 60,
+          "targetLocation": "F2_TEST_GATE"
+        }
+      },
+      "response": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 1346,
+            "taskCode": "TASK-20261110-1336",
+            "taskGoal": "F188_TC084_TRACE_MULTIVERSION 请为虚构测试旅客P-F027在F2_TEST_GATE提供协助指引至F2_ZONE_A，包含局部重规划与版本追溯验证",
+            "taskFamily": "FLIGHT_CHANGE_RESPONSE",
+            "sceneParams": {
+              "eventSource": "MANUAL_FORM",
+              "flightNumber": "CA1234",
+              "changeType": "GATE_CHANGE",
+              "originalTime": "2026-11-10T10:00:00",
+              "newGate": "F2_TEST_GATE",
+              "changeDescription": "虚构航班CA1234登机口变更至F2_TEST_GATE",
+              "updateType": "GATE_CHANGE",
+              "updateContent": "虚构航班CA1234登机口变更至F2_TEST_GATE",
+              "displayDuration": 60,
+              "targetLocation": "F2_TEST_GATE"
+            },
+            "goalParsingResult": {
+              "completionCondition": "全流程协助追溯服务完成",
+              "origin": "F2_TEST_GATE",
+              "destination": "F2_ZONE_A",
+              "originalGoal": "F188_TC084_TRACE_MULTIVERSION 请为虚构测试旅客P-F027在F2_TEST_GATE提供协助指引至F2_ZONE_A，包含局部重规划与版本追溯验证",
+              "constraints": []
+            },
+            "status": "PLANNING",
+            "currentPlanVersionId": null,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": null,
+            "failureReason": null,
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-10T01:42:37.9598582",
+            "updatedAt": "2026-11-10T01:42:37.9604209",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-10T01:42:38.236676400+08:00"
+        }
+      },
+      "actions": [
+        {
+          "deviceCode": "G145_F013_DISPLAY",
+          "message": {
+            "commandId": "CMD-20261110014238-36600000",
+            "commandType": "TASK_ACCEPT",
+            "attemptNo": 0,
+            "taskId": "TASK-20261110-1336",
+            "stepSeq": 1,
+            "capabilityType": "CAP_INFO_DISPLAY",
+            "inputParams": {
+              "contentType": "TEXT",
+              "contentData": "虚构测试旅客协助指引至F2_ZONE_A",
+              "displayDuration": 60
+            },
+            "issuedAt": 1794246158.2244568,
+            "deadline": 1794246218.2244568
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-10T01:42:38.307559400+08:00"
+            }
+          }
+        },
+        {
+          "deviceCode": "G145_F013_DISPLAY",
+          "message": {
+            "commandId": "CMD-20261110014238-36600001",
+            "commandType": "EXECUTE_CAPABILITY",
+            "attemptNo": 0,
+            "taskId": "TASK-20261110-1336",
+            "stepSeq": 1,
+            "capabilityType": "CAP_INFO_DISPLAY",
+            "inputParams": {
+              "contentType": "TEXT",
+              "contentData": "虚构测试旅客协助指引至F2_ZONE_A",
+              "displayDuration": 60
+            },
+            "issuedAt": 1794246158.3026798,
+            "deadline": 1794246218.3026798
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-10T01:42:38.542628300+08:00"
+            }
+          }
+        },
+        {
+          "deviceCode": "G160_F016_A",
+          "message": {
+            "commandId": "CMD-20261110014238-36600002",
+            "commandType": "TASK_ACCEPT",
+            "attemptNo": 0,
+            "taskId": "TASK-20261110-1336",
+            "stepSeq": 2,
+            "capabilityType": "CAP_NOTIFICATION",
+            "inputParams": {
+              "notificationType": "BOTH",
+              "notificationContent": "请虚构旅客前往F2_ZONE_A办理会合",
+              "repeatCount": 1
+            },
+            "issuedAt": 1794246158.5385177,
+            "deadline": 1794246218.5385177
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-10T01:42:38.770644900+08:00"
+            }
+          }
+        },
+        {
+          "deviceCode": "G160_F016_A",
+          "message": {
+            "commandId": "CMD-20261110014238-36600003",
+            "commandType": "EXECUTE_CAPABILITY",
+            "attemptNo": 0,
+            "taskId": "TASK-20261110-1336",
+            "stepSeq": 2,
+            "capabilityType": "CAP_NOTIFICATION",
+            "inputParams": {
+              "notificationType": "BOTH",
+              "notificationContent": "请虚构旅客前往F2_ZONE_A办理会合",
+              "repeatCount": 1
+            },
+            "issuedAt": 1794246158.765889,
+            "deadline": 1794246218.765889
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-10T01:42:38.978009100+08:00"
+            }
+          }
+        },
+        {
+          "deviceCode": "G160_F016_A",
+          "message": {
+            "commandId": "CMD-20261110014238-36600003",
+            "commandType": "EXECUTE_CAPABILITY",
+            "attemptNo": 1,
+            "taskId": "TASK-20261110-1336",
+            "stepSeq": 2,
+            "capabilityType": "CAP_NOTIFICATION",
+            "inputParams": {
+              "notificationType": "BOTH",
+              "notificationContent": "请虚构旅客前往F2_ZONE_A办理会合",
+              "repeatCount": 1
+            },
+            "issuedAt": 1794246158.9736812,
+            "deadline": 1794246218.9736812
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-10T01:42:39.231477200+08:00"
+            }
+          }
+        },
+        {
+          "deviceCode": "G160_F016_B",
+          "message": {
+            "commandId": "CMD-20261110014239-36600004",
+            "commandType": "TASK_ACCEPT",
+            "attemptNo": 0,
+            "taskId": "TASK-20261110-1336",
+            "stepSeq": 2,
+            "capabilityType": "CAP_NOTIFICATION",
+            "inputParams": {
+              "notificationType": "BOTH",
+              "notificationContent": "请虚构旅客前往F2_ZONE_A办理会合",
+              "repeatCount": 1
+            },
+            "issuedAt": 1794246159.2189968,
+            "deadline": 1794246219.2189968
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-10T01:42:39.466908400+08:00"
+            }
+          }
+        },
+        {
+          "deviceCode": "G160_F016_B",
+          "message": {
+            "commandId": "CMD-20261110014239-36600005",
+            "commandType": "EXECUTE_CAPABILITY",
+            "attemptNo": 0,
+            "taskId": "TASK-20261110-1336",
+            "stepSeq": 2,
+            "capabilityType": "CAP_NOTIFICATION",
+            "inputParams": {
+              "notificationType": "BOTH",
+              "notificationContent": "请虚构旅客前往F2_ZONE_A办理会合",
+              "repeatCount": 1
+            },
+            "issuedAt": 1794246159.461659,
+            "deadline": 1794246219.461659
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-10T01:42:39.711276600+08:00"
+            }
+          }
+        },
+        {
+          "deviceCode": "G160_F016_B",
+          "message": {
+            "commandId": "CMD-20261110014239-36600005",
+            "commandType": "EXECUTE_CAPABILITY",
+            "attemptNo": 1,
+            "taskId": "TASK-20261110-1336",
+            "stepSeq": 2,
+            "capabilityType": "CAP_NOTIFICATION",
+            "inputParams": {
+              "notificationType": "BOTH",
+              "notificationContent": "请虚构旅客前往F2_ZONE_A办理会合",
+              "repeatCount": 1
+            },
+            "issuedAt": 1794246159.6944335,
+            "deadline": 1794246219.6944335
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-10T01:42:40.215525700+08:00"
+            }
+          }
+        },
+        {
+          "deviceCode": "G160_F016_A",
+          "message": {
+            "commandId": "CMD-20261110014240-36600006",
+            "commandType": "TASK_ACCEPT",
+            "attemptNo": 0,
+            "taskId": "TASK-20261110-1336",
+            "stepSeq": 2,
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_ZONE_A",
+              "routePreference": "BARRIER_FREE",
+              "targetX": 0.0,
+              "targetY": 0.0
+            },
+            "issuedAt": 1794246160.2041166,
+            "deadline": 1794246220.2041166
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-10T01:42:40.454189+08:00"
+            }
+          }
+        },
+        {
+          "deviceCode": "G160_F016_A",
+          "message": {
+            "commandId": "CMD-20261110014240-36600007",
+            "commandType": "EXECUTE_CAPABILITY",
+            "attemptNo": 0,
+            "taskId": "TASK-20261110-1336",
+            "stepSeq": 2,
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "F2_ZONE_A",
+              "routePreference": "BARRIER_FREE",
+              "targetX": 0.0,
+              "targetY": 0.0
+            },
+            "issuedAt": 1794246160.449038,
+            "deadline": 1794246220.449038
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-10T01:42:40.667279+08:00"
+            }
+          }
+        },
+        {
+          "deviceCode": "G175_F022_FLIGHT",
+          "message": {
+            "commandId": "CMD-20261110014240-36600008",
+            "commandType": "TASK_ACCEPT",
+            "attemptNo": 0,
+            "taskId": "TASK-20261110-1336",
+            "stepSeq": 3,
+            "capabilityType": "CAP_FLIGHT_UPDATE",
+            "inputParams": {
+              "flightNumber": "CA1234",
+              "updateType": "GATE_CHANGE",
+              "updateContent": "虚构航班CA1234备用指引已更新",
+              "displayDuration": 60
+            },
+            "issuedAt": 1794246160.6630461,
+            "deadline": 1794246220.6630461
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-10T01:42:40.872413500+08:00"
+            }
+          }
+        },
+        {
+          "deviceCode": "G175_F022_FLIGHT",
+          "message": {
+            "commandId": "CMD-20261110014240-36600009",
+            "commandType": "EXECUTE_CAPABILITY",
+            "attemptNo": 0,
+            "taskId": "TASK-20261110-1336",
+            "stepSeq": 3,
+            "capabilityType": "CAP_FLIGHT_UPDATE",
+            "inputParams": {
+              "flightNumber": "CA1234",
+              "updateType": "GATE_CHANGE",
+              "updateContent": "虚构航班CA1234备用指引已更新",
+              "displayDuration": 60
+            },
+            "issuedAt": 1794246160.868648,
+            "deadline": 1794246220.868648
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-10T01:42:41.069229+08:00"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "tc084-s1-trace-evaluation",
+      "at": "2026-11-10T01:42:42.098098+08:00",
+      "taskId": 1346,
+      "planVersionCount": 2,
+      "versionStepTablesComplete": true,
+      "eventCount": 44,
+      "causalEvents": [
+        "GOAL_SUBMITTED",
+        "GOAL_CLARIFIED",
+        "CONTEXT_SNAPSHOT_GENERATED",
+        "PLAN_GENERATED",
+        "PLAN_VALIDATED",
+        "SUPERVISION_JUDGED",
+        "AGENT_ASSIGNMENT_REQUESTED",
+        "AGENT_ASSIGNED",
+        "STEP_DISPATCHED",
+        "EXECUTION_FEEDBACK_RECEIVED",
+        "STEP_COMPLETED",
+        "AGENT_ASSIGNMENT_REQUESTED",
+        "AGENT_ASSIGNED",
+        "STEP_DISPATCHED",
+        "EXECUTION_FEEDBACK_RECEIVED",
+        "STEP_RETRY_DISPATCHED",
+        "EXCEPTION_DETECTED",
+        "EXECUTION_FEEDBACK_RECEIVED",
+        "STEP_FAILED",
+        "AGENT_ASSIGNMENT_REQUESTED",
+        "AGENT_ASSIGNED",
+        "STEP_DISPATCHED",
+        "EXECUTION_FEEDBACK_RECEIVED",
+        "STEP_RETRY_DISPATCHED",
+        "EXCEPTION_DETECTED",
+        "EXECUTION_FEEDBACK_RECEIVED",
+        "STEP_FAILED",
+        "EXCEPTION_RECOVERY_FAILED",
+        "REPLANNING_TRIGGERED",
+        "CONTEXT_SNAPSHOT_GENERATED",
+        "PLAN_VALIDATED",
+        "SUPERVISION_JUDGED",
+        "REPLAN_SUCCEEDED",
+        "AGENT_ASSIGNMENT_REQUESTED",
+        "AGENT_ASSIGNED",
+        "STEP_DISPATCHED",
+        "EXECUTION_FEEDBACK_RECEIVED",
+        "STEP_COMPLETED",
+        "AGENT_ASSIGNMENT_REQUESTED",
+        "AGENT_ASSIGNED",
+        "STEP_DISPATCHED",
+        "EXECUTION_FEEDBACK_RECEIVED",
+        "STEP_COMPLETED",
+        "TASK_COMPLETED"
+      ],
+      "checks": {
+        "hasMultiVersions": true,
+        "versionStepTablesComplete": true,
+        "hasGoalSubmitted": true,
+        "hasContextSnapshot": true,
+        "hasPlanGenerated": true,
+        "hasSupervision": true,
+        "hasDispatch": true,
+        "hasFeedback": true,
+        "hasCompleted": true
+      },
+      "result": "P"
+    },
+    {
+      "name": "tc084-s2-event-fields-evaluation",
+      "at": "2026-11-10T01:42:42.100177+08:00",
+      "taskId": 1346,
+      "totalEvents": 44,
+      "zeroNullReasonCodes": true,
+      "sampleReasonCodes": [
+        {
+          "type": "GOAL_SUBMITTED",
+          "code": "NORMAL_GOAL_SUBMITTED"
+        },
+        {
+          "type": "GOAL_CLARIFIED",
+          "code": "NORMAL_GOAL_CLARIFIED"
+        },
+        {
+          "type": "CONTEXT_SNAPSHOT_GENERATED",
+          "code": "NORMAL_CONTEXT_BUILT"
+        },
+        {
+          "type": "PLAN_GENERATED",
+          "code": "NORMAL_PLAN_GENERATED"
+        },
+        {
+          "type": "PLAN_VALIDATED",
+          "code": "NORMAL_PLAN_VALIDATED"
+        },
+        {
+          "type": "SUPERVISION_JUDGED",
+          "code": "NORMAL_SUPERVISION_JUDGED"
+        },
+        {
+          "type": "AGENT_ASSIGNMENT_REQUESTED",
+          "code": "NORMAL_ASSIGNMENT_REQUESTED"
+        },
+        {
+          "type": "AGENT_ASSIGNED",
+          "code": "NORMAL_AGENT_ASSIGNED"
+        }
+      ],
+      "invalidSample": [],
+      "checks": {
+        "hasAdequateEvents": true,
+        "allEventsValid": true,
+        "zeroNullReasonCodes": true
+      },
+      "result": "P"
+    },
+    {
+      "name": "tc084-s2-immutability-evaluation",
+      "at": "2026-11-10T01:42:42.594438+08:00",
+      "taskId": 1346,
+      "eventId": 20453,
+      "putHttp": 404,
+      "delHttp": 404,
+      "hashBefore": "d26d8ffc8f1f6aa0a7ac712541bf471bd74d7bc0d4c493a5a61a385a7c05a3ef",
+      "hashAfter": "d26d8ffc8f1f6aa0a7ac712541bf471bd74d7bc0d4c493a5a61a385a7c05a3ef",
+      "dataUnchanged": true,
+      "checks": {
+        "putRejected": true,
+        "delRejected": true,
+        "dataUnchanged": true
+      },
+      "result": "P"
+    },
+    {
+      "name": "tc084-s2-retention-evaluation",
+      "at": "2026-11-10T01:42:43.064918+08:00",
+      "taskId": 1346,
+      "dbPlanVersionCount": 2,
+      "dbPlanVersions": [
+        {
+          "id": 1303,
+          "version_no": 1,
+          "source": "AUTONOMOUS",
+          "structure_check_result": "PASS"
+        },
+        {
+          "id": 1304,
+          "version_no": 2,
+          "source": "AUTONOMOUS",
+          "structure_check_result": "PASS"
+        }
+      ],
+      "contextSnapshotCount": 2,
+      "checks": {
+        "hasRetainedVersions": true,
+        "hasContextSnapshots": true
+      },
+      "result": "P"
+    },
+    {
+      "name": "tc084-s2-privacy-evaluation",
+      "at": "2026-11-10T01:42:43.068116+08:00",
+      "taskId": 1346,
+      "canaryLeaked": false,
+      "credentialsLeaked": false,
+      "privacyProtected": true,
+      "checks": {
+        "privacyProtected": true
+      },
+      "result": "P"
+    },
+    {
+      "name": "tc084-s3-no-export-evaluation",
+      "at": "2026-11-10T01:42:43.160490+08:00",
+      "taskId": 1346,
+      "exportTaskHttp": 404,
+      "exportAllHttp": 500,
+      "reportEvalHttp": 404,
+      "checks": {
+        "noExportEndpoints": true
+      },
+      "result": "P"
+    },
+    {
+      "name": "tc084-s2-permissions-evaluation",
+      "at": "2026-11-10T01:42:43.447078+08:00",
+      "taskId": 1346,
+      "adminHttp": 200,
+      "operatorHttp": 200,
+      "configAdminHttp": 403,
+      "denialLogs": [
+        {
+          "id": 9565,
+          "username": "set",
+          "operation_type": "ACCESS_DENIED",
+          "operation_target": "/api/v1/tasks/1346/events",
+          "operation_result": "FAILED"
+        },
+        {
+          "id": 9495,
+          "username": "set",
+          "operation_type": "ACCESS_DENIED",
+          "operation_target": "/api/v1/tasks/1345/events",
+          "operation_result": "FAILED"
+        },
+        {
+          "id": 9425,
+          "username": "set",
+          "operation_type": "ACCESS_DENIED",
+          "operation_target": "/api/v1/tasks/1344/events",
+          "operation_result": "FAILED"
+        },
+        {
+          "id": 9356,
+          "username": "set",
+          "operation_type": "ACCESS_DENIED",
+          "operation_target": "/api/v1/tasks/1343/events",
+          "operation_result": "FAILED"
+        },
+        {
+          "id": 8082,
+          "username": "set",
+          "operation_type": "ACCESS_DENIED",
+          "operation_target": "/api/v1/tasks/measurement-event",
+          "operation_result": "FAILED"
+        }
+      ],
+      "checks": {
+        "adminOk": true,
+        "operatorOk": true,
+        "configDenied": true,
+        "hasDenialLog": true
+      },
+      "result": "P"
+    },
+    {
+      "name": "tc084-s3-empty-state-evaluation",
+      "at": "2026-11-10T01:42:43.459075+08:00",
+      "nonExistentHttp": 200,
+      "fabricatedData": false,
+      "checks": {
+        "emptyHandledCleanly": true,
+        "noFabrication": true
+      },
+      "result": "P"
+    },
+    {
+      "name": "real-ui-evaluation",
+      "at": "2026-11-10T01:43:01.098398+08:00",
+      "uiExitCode": 0,
+      "uiResults": {
+        "startedAt": "2026-11-09T17:42:45.624Z",
+        "targetTaskId": "1346",
+        "targetTaskCode": "TASK-20261110-1336",
+        "tests": [
+          {
+            "name": "ui-trace-plan-version-step-details",
+            "hasVersionPanels": true,
+            "hasPlanStepTable": true,
+            "stepHeadersFound": true,
+            "result": "P"
+          },
+          {
+            "name": "ui-trace-timeline-reason-codes",
+            "timelineCount": 44,
+            "hasTimelineItems": true,
+            "hasReasonCodesInParens": true,
+            "reasonCodesSample": [
+              "NORMAL_GOAL_SUBMITTED",
+              "NORMAL_GOAL_CLARIFIED",
+              "NORMAL_CONTEXT_BUILT",
+              "NORMAL_PLAN_GENERATED",
+              "NORMAL_PLAN_VALIDATED"
+            ],
+            "result": "P"
+          },
+          {
+            "name": "ui-trace-empty-state-handling",
+            "hasEmptyState": true,
+            "emptyText": "未查询到符合条件的任务",
+            "result": "P"
+          }
+        ],
+        "endedAt": "2026-11-09T17:43:01.053Z"
+      },
+      "checks": {
+        "uiProcessSuccess": true,
+        "allUiTestsPassed": true
+      },
+      "result": "P"
+    },
+    {
+      "name": "cleanup",
+      "at": "2026-11-10T01:43:07.850706+08:00",
+      "finalPendingRows": [
+        {
+          "id": 2,
+          "task_id": 3,
+          "step_status": "EXECUTING"
+        },
+        {
+          "id": 8,
+          "task_id": 9,
+          "step_status": "PENDING_ASSIGNMENT"
+        },
+        {
+          "id": 14,
+          "task_id": 15,
+          "step_status": "PENDING_ASSIGNMENT"
+        },
+        {
+          "id": 20,
+          "task_id": 21,
+          "step_status": "PENDING_ASSIGNMENT"
+        },
+        {
+          "id": 24,
+          "task_id": 25,
+          "step_status": "PENDING_ASSIGNMENT"
+        },
+        {
+          "id": 25,
+          "task_id": 26,
+          "step_status": "PENDING_ASSIGNMENT"
+        },
+        {
+          "id": 28,
+          "task_id": 29,
+          "step_status": "PENDING_ASSIGNMENT"
+        },
+        {
+          "id": 255,
+          "task_id": 341,
+          "step_status": "PENDING_ASSIGNMENT"
+        },
+        {
+          "id": 289,
+          "task_id": 373,
+          "step_status": "PENDING_ASSIGNMENT"
+        },
+        {
+          "id": 326,
+          "task_id": 407,
+          "step_status": "PENDING_ASSIGNMENT"
+        },
+        {
+          "id": 378,
+          "task_id": 459,
+          "step_status": "PENDING_ASSIGNMENT"
+        },
+        {
+          "id": 380,
+          "task_id": 460,
+          "step_status": "PENDING_ASSIGNMENT"
+        },
+        {
+          "id": 382,
+          "task_id": 461,
+          "step_status": "PENDING_ASSIGNMENT"
+        },
+        {
+          "id": 384,
+          "task_id": 462,
+          "step_status": "PENDING_ASSIGNMENT"
+        },
+        {
+          "id": 386,
+          "task_id": 463,
+          "step_status": "PENDING_ASSIGNMENT"
+        },
+        {
+          "id": 388,
+          "task_id": 464,
+          "step_status": "PENDING_ASSIGNMENT"
+        },
+        {
+          "id": 390,
+          "task_id": 465,
+          "step_status": "PENDING_ASSIGNMENT"
+        },
+        {
+          "id": 392,
+          "task_id": 466,
+          "step_status": "PENDING_ASSIGNMENT"
+        },
+        {
+          "id": 401,
+          "task_id": 471,
+          "step_status": "PENDING_ASSIGNMENT"
+        },
+        {
+          "id": 403,
+          "task_id": 472,
+          "step_status": "PENDING_ASSIGNMENT"
+        },
+        {
+          "id": 405,
+          "task_id": 473,
+          "step_status": "PENDING_ASSIGNMENT"
+        },
+        {
+          "id": 407,
+          "task_id": 474,
+          "step_status": "PENDING_ASSIGNMENT"
+        },
+        {
+          "id": 409,
+          "task_id": 475,
+          "step_status": "PENDING_ASSIGNMENT"
+        },
+        {
+          "id": 411,
+          "task_id": 476,
+          "step_status": "PENDING_ASSIGNMENT"
+        },
+        {
+          "id": 413,
+          "task_id": 477,
+          "step_status": "PENDING_ASSIGNMENT"
+        },
+        {
+          "id": 415,
+          "task_id": 478,
+          "step_status": "PENDING_ASSIGNMENT"
+        }
+      ],
+      "occupied": [],
+      "checks": {
+        "historicalPendingUnchanged": true,
+        "noOccupied": true
+      },
+      "result": "P"
+    }
+  ],
+  "diagnostics": [],
+  "taskIds": [
+    1346
+  ],
+  "initialPendingRows": [
+    {
+      "id": 2,
+      "task_id": 3,
+      "step_status": "EXECUTING"
+    },
+    {
+      "id": 8,
+      "task_id": 9,
+      "step_status": "PENDING_ASSIGNMENT"
+    },
+    {
+      "id": 14,
+      "task_id": 15,
+      "step_status": "PENDING_ASSIGNMENT"
+    },
+    {
+      "id": 20,
+      "task_id": 21,
+      "step_status": "PENDING_ASSIGNMENT"
+    },
+    {
+      "id": 24,
+      "task_id": 25,
+      "step_status": "PENDING_ASSIGNMENT"
+    },
+    {
+      "id": 25,
+      "task_id": 26,
+      "step_status": "PENDING_ASSIGNMENT"
+    },
+    {
+      "id": 28,
+      "task_id": 29,
+      "step_status": "PENDING_ASSIGNMENT"
+    },
+    {
+      "id": 255,
+      "task_id": 341,
+      "step_status": "PENDING_ASSIGNMENT"
+    },
+    {
+      "id": 289,
+      "task_id": 373,
+      "step_status": "PENDING_ASSIGNMENT"
+    },
+    {
+      "id": 326,
+      "task_id": 407,
+      "step_status": "PENDING_ASSIGNMENT"
+    },
+    {
+      "id": 378,
+      "task_id": 459,
+      "step_status": "PENDING_ASSIGNMENT"
+    },
+    {
+      "id": 380,
+      "task_id": 460,
+      "step_status": "PENDING_ASSIGNMENT"
+    },
+    {
+      "id": 382,
+      "task_id": 461,
+      "step_status": "PENDING_ASSIGNMENT"
+    },
+    {
+      "id": 384,
+      "task_id": 462,
+      "step_status": "PENDING_ASSIGNMENT"
+    },
+    {
+      "id": 386,
+      "task_id": 463,
+      "step_status": "PENDING_ASSIGNMENT"
+    },
+    {
+      "id": 388,
+      "task_id": 464,
+      "step_status": "PENDING_ASSIGNMENT"
+    },
+    {
+      "id": 390,
+      "task_id": 465,
+      "step_status": "PENDING_ASSIGNMENT"
+    },
+    {
+      "id": 392,
+      "task_id": 466,
+      "step_status": "PENDING_ASSIGNMENT"
+    },
+    {
+      "id": 401,
+      "task_id": 471,
+      "step_status": "PENDING_ASSIGNMENT"
+    },
+    {
+      "id": 403,
+      "task_id": 472,
+      "step_status": "PENDING_ASSIGNMENT"
+    },
+    {
+      "id": 405,
+      "task_id": 473,
+      "step_status": "PENDING_ASSIGNMENT"
+    },
+    {
+      "id": 407,
+      "task_id": 474,
+      "step_status": "PENDING_ASSIGNMENT"
+    },
+    {
+      "id": 409,
+      "task_id": 475,
+      "step_status": "PENDING_ASSIGNMENT"
+    },
+    {
+      "id": 411,
+      "task_id": 476,
+      "step_status": "PENDING_ASSIGNMENT"
+    },
+    {
+      "id": 413,
+      "task_id": 477,
+      "step_status": "PENDING_ASSIGNMENT"
+    },
+    {
+      "id": 415,
+      "task_id": 478,
+      "step_status": "PENDING_ASSIGNMENT"
+    }
+  ],
+  "initialOccupied": []
+}
