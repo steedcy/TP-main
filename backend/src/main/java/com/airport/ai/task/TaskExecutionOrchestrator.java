@@ -723,8 +723,35 @@ public class TaskExecutionOrchestrator {
             task.setUpdatedAt(LocalDateTime.now());
             taskMapper.update(task);
             taskExceptionService.archiveAllUnresolvedOnTaskComplete(taskId);
-            taskEventService.append(taskId, "TASK_COMPLETED", "SYSTEM", null,
-                    "航班变更可用渠道执行完成；已覆盖: " + covered + "；未覆盖: " + uncovered);
+
+            // 统计各渠道发布结果与响应时长（SRS_F026.R09 / TC-081.S3 / TC-082.S1）
+            List<Map<String, Object>> channelMetrics = new ArrayList<>();
+            for (TaskStepAssignment a : all) {
+                String cap = capabilities.get(a.getStepSeq());
+                long durationMs = 0L;
+                if (a.getDispatchedAt() != null && a.getFeedbackAt() != null) {
+                    durationMs = java.time.Duration.between(a.getDispatchedAt(), a.getFeedbackAt()).toMillis();
+                } else if (a.getAcceptanceDurationMs() != null) {
+                    durationMs = a.getAcceptanceDurationMs();
+                }
+                Map<String, Object> metric = new LinkedHashMap<>();
+                metric.put("stepSeq", a.getStepSeq());
+                metric.put("capabilityType", cap);
+                metric.put("deviceAgentId", a.getDeviceAgentId());
+                metric.put("stepStatus", a.getStepStatus());
+                metric.put("executionResult", a.getExecutionResult());
+                metric.put("durationMs", durationMs);
+                channelMetrics.add(metric);
+            }
+
+            Map<String, Object> completedDetail = new LinkedHashMap<>();
+            completedDetail.put("summary", "航班变更可用渠道执行完成；已覆盖: " + covered + "；未覆盖: " + uncovered);
+            completedDetail.put("coveredChannels", covered);
+            completedDetail.put("uncoveredChannels", uncovered);
+            completedDetail.put("channelMetrics", channelMetrics);
+
+            taskEventService.append(taskId, "TASK_COMPLETED", "SYSTEM", "FLIGHT_CHANGE_RESPONSE_COMPLETED",
+                    toJson(completedDetail));
             return;
         }
 

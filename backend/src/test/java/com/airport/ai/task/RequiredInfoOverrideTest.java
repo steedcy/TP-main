@@ -96,7 +96,7 @@ class RequiredInfoOverrideTest {
     @Test
     void flightChangeWithItsFactsProceedsAndNeverAsksForRobotIdOrRoute() {
         Task t = task("FLIGHT_CHANGE_RESPONSE",
-                "{\"flightNumber\":\"CA1234\",\"changeType\":\"GATE_CHANGE\",\"changeDescription\":\"登机口变更\"}", "[\"请提供机器人ID\"]");
+                "{\"flightNumber\":\"CA1234\",\"changeType\":\"GATE_CHANGE\",\"originalTime\":\"2026-11-09T12:00:00\",\"newGate\":\"B7\",\"changeDescription\":\"登机口变更\"}", "[\"请提供机器人ID\"]");
         modelSays(false, null, null, "请提供机器人ID", "请提供路线编码");
         service.clarify(20L, answers(Map.of("请提供机器人ID", "R1")), operator);
         verify(planning).advance(20L);

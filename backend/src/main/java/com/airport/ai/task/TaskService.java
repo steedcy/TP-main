@@ -662,17 +662,27 @@ public class TaskService {
 
         // 必要信息由系统按任务族核对，不直接采信模型的追问清单（DEF-S3-003/004/005）：
         // 已提供的必要信息不再追问，缺失时只问缺的那几项，不问身份、设备、路线等系统自己决定的内容。
-        RequiredInfoGuard.Verdict verdict = RequiredInfoGuard.check(
-                RequiredInfoGuard.requirementsFor(task.getTaskFamily(),
-                        taskDefinitionService.findByCode(task.getTaskFamily()).orElse(null)),
-                sceneParams, parsingResult);
+        RequiredInfoGuard.Verdict verdict = null;
+        if ("FLIGHT_CHANGE_RESPONSE".equals(task.getTaskFamily())) {
+            FlightChangeRequiredInfoGuard.Verdict fv = FlightChangeRequiredInfoGuard.check(sceneParams);
+            verdict = new RequiredInfoGuard.Verdict(fv.complete(), fv.questions(), fv.missing());
+        } else {
+            verdict = RequiredInfoGuard.check(
+                    RequiredInfoGuard.requirementsFor(task.getTaskFamily(),
+                            taskDefinitionService.findByCode(task.getTaskFamily()).orElse(null)),
+                    sceneParams, parsingResult);
+        }
         boolean infoComplete = response.isInfoComplete();
         List<String> questions = response.getMissingInfoQuestions();
         if (verdict != null) {
             if (verdict.complete() != infoComplete) {
+                boolean isFlight = "FLIGHT_CHANGE_RESPONSE".equals(task.getTaskFamily());
+                String prefix = isFlight ? "系统按航班变更必需字段核对：" : "系统按任务族核对必要信息：";
+                String detail = verdict.complete()
+                        ? (isFlight ? "关键信息已齐全，忽略模型追问" : "均已提供，忽略模型的追问")
+                        : ("仍缺 " + verdict.missing());
                 taskEventService.append(task.getId(), "GOAL_CLARIFIED", "SYSTEM", "INFO_CHECK_OVERRIDE",
-                        "系统按任务族核对必要信息：" + (verdict.complete() ? "均已提供，忽略模型的追问" : "仍缺 " + verdict.missing())
-                                + "（模型判断" + (infoComplete ? "完整" : "不完整") + "）");
+                        prefix + detail + "（模型判断" + (infoComplete ? "完整" : "不完整") + "）");
             }
             infoComplete = verdict.complete();
             questions = verdict.questions();
@@ -839,6 +849,59 @@ public class TaskService {
 
         runGoalUnderstanding(task, sceneParams, null);
         return taskMapper.findById(task.getId()).orElse(task);
+    }
+
+    /**
+     * SRS_F026.R01 / TC-080.S1: 仿真体航班变动事件触发入口。
+     */
+    @Transactional(noRollbackFor = BusinessException.class)
+    public Task submitFlightChangeEvent(com.airport.ai.task.dto.FlightChangeEventRequest request, User user) {
+        if (user == null) {
+            user = new User();
+            user.setId(0L);
+            user.setUsername("SIMULATOR");
+            user.setRole("OPERATOR");
+        }
+        Map<String, Object> sceneParams = new HashMap<>(request.getExtraParams() != null ? request.getExtraParams() : Map.of());
+        sceneParams.put("eventSource", request.getEventSource() != null ? request.getEventSource() : "SIMULATED_EVENT");
+        sceneParams.put("flightNumber", request.getFlightNumber().trim());
+        sceneParams.put("changeType", request.getChangeType().trim());
+        sceneParams.put("originalTime", request.getOriginalTime().trim());
+        sceneParams.put("changeDescription", request.getChangeDescription().trim());
+        sceneParams.put("updateType", request.getChangeType().trim());
+        sceneParams.put("updateContent", request.getChangeDescription().trim());
+        sceneParams.put("displayDuration", request.getDisplayDuration() != null ? request.getDisplayDuration() : 60);
+        if (request.getNewTime() != null && !request.getNewTime().isBlank()) {
+            sceneParams.put("newTime", request.getNewTime().trim());
+        }
+        if (request.getOriginalGate() != null && !request.getOriginalGate().isBlank()) {
+            sceneParams.put("originalGate", request.getOriginalGate().trim());
+        }
+        if (request.getNewGate() != null && !request.getNewGate().isBlank()) {
+            sceneParams.put("newGate", request.getNewGate().trim());
+            sceneParams.put("targetLocation", request.getNewGate().trim());
+        }
+
+        String changeLabel = switch (request.getChangeType().trim()) {
+            case "DELAY" -> "延误";
+            case "EARLY" -> "提前";
+            case "GATE_CHANGE" -> "登机口变更";
+            case "CANCEL" -> "取消";
+            default -> request.getChangeType();
+        };
+
+        String goal = "请处理虚构航班" + request.getFlightNumber().trim() + "的" + changeLabel + "事件："
+                + request.getChangeDescription().trim() + "。原计划时间" + request.getOriginalTime().trim()
+                + (request.getNewTime() != null && !request.getNewTime().isBlank() ? "，变更后时间" + request.getNewTime().trim() : "")
+                + (request.getOriginalGate() != null && !request.getOriginalGate().isBlank() ? "，原登机口" + request.getOriginalGate().trim() : "")
+                + (request.getNewGate() != null && !request.getNewGate().isBlank() ? "，新登机口" + request.getNewGate().trim() : "")
+                + "。请由航延屏发布、智慧航显提示，并由机器人现场通知或引导。";
+
+        SubmitTaskRequest submitReq = new SubmitTaskRequest();
+        submitReq.setTaskFamily("FLIGHT_CHANGE_RESPONSE");
+        submitReq.setTaskGoal(goal.length() > 500 ? goal.substring(0, 500) : goal);
+        submitReq.setSceneParams(sceneParams);
+        return submit(submitReq, user);
     }
 
     private String toJson(Object value) {

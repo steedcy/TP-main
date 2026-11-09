@@ -58,6 +58,15 @@ public class TaskController {
         return ApiResponse.ok(TaskView.from(taskService.submitMeasurementEvent(request, currentUser.get())));
     }
 
+    /**
+     * SRS_F026.R01 / TC-080.S1: 仿真体航班变动事件双触发入口之一。
+     */
+    @PostMapping("/flight-change-event")
+    @PreAuthorize("hasAnyRole('OPERATOR', 'SYSTEM_ADMIN', 'CONFIG_ADMIN')")
+    public ApiResponse<TaskView> flightChangeEvent(@Valid @RequestBody com.airport.ai.task.dto.FlightChangeEventRequest request) {
+        return ApiResponse.ok(TaskView.from(taskService.submitFlightChangeEvent(request, currentUser.get())));
+    }
+
     @GetMapping
     public ApiResponse<PageResult<TaskView>> list(@RequestParam(required = false) String taskCode,
                                                     @RequestParam(required = false) TaskStatus status,
