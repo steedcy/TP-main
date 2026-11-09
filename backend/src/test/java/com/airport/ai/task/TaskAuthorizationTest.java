@@ -3,6 +3,7 @@ package com.airport.ai.task;
 import com.airport.ai.auth.CurrentUser;
 import com.airport.ai.auth.User;
 import com.airport.ai.event.TaskEventService;
+import com.airport.ai.task.dto.BaggageMeasurementEventRequest;
 import com.airport.ai.task.dto.SubmitTaskRequest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -51,6 +52,33 @@ class TaskAuthorizationTest {
         when(tasks.submit(any(), any())).thenReturn(new Task());
         assertNotNull(controller.submit(new SubmitTaskRequest()));
         verify(tasks).submit(any(), any());
+    }
+
+    @Test void operatorConfigAdminAndSystemAdminCanSubmitMeasurementEvent() {
+        when(tasks.submitMeasurementEvent(any(), any())).thenReturn(new Task());
+
+        authenticate("OPERATOR");
+        assertNotNull(controller.measurementEvent(new BaggageMeasurementEventRequest()));
+
+        authenticate("CONFIG_ADMIN");
+        assertNotNull(controller.measurementEvent(new BaggageMeasurementEventRequest()));
+
+        authenticate("SYSTEM_ADMIN");
+        assertNotNull(controller.measurementEvent(new BaggageMeasurementEventRequest()));
+
+        verify(tasks, times(3)).submitMeasurementEvent(any(), any());
+    }
+
+    @Test void otherRolesCannotSubmitMeasurementEvent() {
+        authenticate("VIEWER");
+        assertThrows(AccessDeniedException.class, () ->
+                controller.measurementEvent(new BaggageMeasurementEventRequest()));
+
+        authenticate("GUEST");
+        assertThrows(AccessDeniedException.class, () ->
+                controller.measurementEvent(new BaggageMeasurementEventRequest()));
+
+        verifyNoInteractions(tasks);
     }
 
     private void authenticate(String role) {

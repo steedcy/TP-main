@@ -11,6 +11,8 @@ import com.airport.ai.risk.RiskAssessmentService;
 import com.airport.ai.taskdef.TaskDefinition;
 import com.airport.ai.taskdef.TaskDefinitionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,6 +46,32 @@ public class TaskPlanningOrchestrator {
     private final TaskEventService taskEventService;
     private final TaskExecutionOrchestrator taskExecutionOrchestrator;
     private final TaskDefinitionService taskDefinitionService;
+    private final TaskExceptionMapper taskExceptionMapper;
+
+    @Autowired
+    public TaskPlanningOrchestrator(TaskMapper taskMapper,
+                                     PlanVersionMapper planVersionMapper,
+                                     ContextSnapshotService contextSnapshotService,
+                                     PlanValidationService planValidationService,
+                                     PlanningModelService planningModelService,
+                                     RiskAssessmentService riskAssessmentService,
+                                     BaselineTemplateService baselineTemplateService,
+                                     TaskEventService taskEventService,
+                                     TaskExecutionOrchestrator taskExecutionOrchestrator,
+                                     TaskDefinitionService taskDefinitionService,
+                                     @Lazy TaskExceptionMapper taskExceptionMapper) {
+        this.taskMapper = taskMapper;
+        this.planVersionMapper = planVersionMapper;
+        this.contextSnapshotService = contextSnapshotService;
+        this.planValidationService = planValidationService;
+        this.planningModelService = planningModelService;
+        this.riskAssessmentService = riskAssessmentService;
+        this.baselineTemplateService = baselineTemplateService;
+        this.taskEventService = taskEventService;
+        this.taskExecutionOrchestrator = taskExecutionOrchestrator;
+        this.taskDefinitionService = taskDefinitionService;
+        this.taskExceptionMapper = taskExceptionMapper;
+    }
 
     public TaskPlanningOrchestrator(TaskMapper taskMapper,
                                      PlanVersionMapper planVersionMapper,
@@ -55,16 +83,9 @@ public class TaskPlanningOrchestrator {
                                      TaskEventService taskEventService,
                                      TaskExecutionOrchestrator taskExecutionOrchestrator,
                                      TaskDefinitionService taskDefinitionService) {
-        this.taskMapper = taskMapper;
-        this.planVersionMapper = planVersionMapper;
-        this.contextSnapshotService = contextSnapshotService;
-        this.planValidationService = planValidationService;
-        this.planningModelService = planningModelService;
-        this.riskAssessmentService = riskAssessmentService;
-        this.baselineTemplateService = baselineTemplateService;
-        this.taskEventService = taskEventService;
-        this.taskExecutionOrchestrator = taskExecutionOrchestrator;
-        this.taskDefinitionService = taskDefinitionService;
+        this(taskMapper, planVersionMapper, contextSnapshotService, planValidationService,
+             planningModelService, riskAssessmentService, baselineTemplateService,
+             taskEventService, taskExecutionOrchestrator, taskDefinitionService, null);
     }
 
     /**
@@ -191,6 +212,24 @@ public class TaskPlanningOrchestrator {
                 summary.append("]");
             }
             taskEventService.append(taskId, "PLAN_VALIDATED", "SYSTEM", primaryReason, summary.toString());
+            // DEF-S3-123: 记录可追溯的能力缺口异常（如CAP_BAGGAGE_MEASURE无在线设备）
+            if (taskExceptionMapper != null) {
+                for (var err : validation.getErrors()) {
+                    if ("CAPABILITY".equalsIgnoreCase(err.getErrorType()) || "ERR_NO_ONLINE_CANDIDATE".equals(err.getReasonCode())) {
+                        TaskException ex = new TaskException();
+                        ex.setTaskId(taskId);
+                        ex.setStepSeq(err.getStepSeq() != null ? err.getStepSeq() : 1);
+                        ex.setExceptionType("CAPABILITY_GAP");
+                        ex.setReasonCode(err.getReasonCode() != null ? err.getReasonCode() : "ERR_NO_CANDIDATE_AVAILABLE");
+                        ex.setExceptionStatus("PROCESSING");
+                        ex.setOccurredAt(LocalDateTime.now());
+                        ex.setRecoveryAction("无可用候选设备，恢复动作未执行");
+                        ex.setRecoveryResult("FAILED");
+                        ex.setImpactConclusion("规划三类校验发现能力缺口: " + err.getDescription());
+                        taskExceptionMapper.insert(ex);
+                    }
+                }
+            }
             downgradeOrManual(task, "候选计划三类校验未通过，转基线模板降级: " + primaryReason);
             return;
         }
@@ -383,6 +422,18 @@ public class TaskPlanningOrchestrator {
         task.setFailureReason(reason);
         task.setUpdatedAt(LocalDateTime.now());
         taskMapper.update(task);
+        if (taskExceptionMapper != null) {
+            for (TaskException ex : taskExceptionMapper.findByTaskIdOrderByOccurredAtDesc(task.getId())) {
+                if ("PROCESSING".equals(ex.getExceptionStatus())) {
+                    ex.setExceptionStatus("RESOLVED");
+                    ex.setRecoveryResult("FAILED");
+                    ex.setResolvedAt(LocalDateTime.now());
+                    ex.setResolvedBy("SYSTEM");
+                    ex.setImpactConclusion("规划能力缺口无法恢复且无可用基线降级，任务转入人工处理: " + reason);
+                    taskExceptionMapper.update(ex);
+                }
+            }
+        }
         // 状态转移须在时间线可见（DEF-S3-066、F020.R01）
         taskEventService.append(task.getId(), "TASK_PENDING_MANUAL", "SYSTEM", "ERR_PLANNING_FAILED", reason);
     }

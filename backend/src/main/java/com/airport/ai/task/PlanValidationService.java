@@ -246,6 +246,10 @@ public class PlanValidationService {
                 && List.of("CAP_FLIGHT_UPDATE", "CAP_INFO_DISPLAY", "CAP_NOTIFICATION").stream()
                 .anyMatch(type -> countOnlineCandidates(snapshotAgents, type, taskFamily) > 0);
 
+        // SRS §5.6.3 / DEF-S3-124: 超规行李处置在无移动资源（CAP_NAVIGATION）时，允许保留测量与信息提示渠道执行
+        boolean partialBaggageAvailable = "OVERSIZE_BAGGAGE_HANDLING".equals(taskFamily)
+                && countOnlineCandidates(snapshotAgents, "CAP_BAGGAGE_MEASURE", taskFamily) > 0;
+
         // 2. 能力校验：所需能力存在且已启用、存在可承接该步骤的候选代理、代理在线
         for (int i = 0; i < steps.size(); i++) {
             Map<String, Object> step = steps.get(i);
@@ -266,7 +270,9 @@ public class PlanValidationService {
             }
             long onlineCandidates = countOnlineCandidates(snapshotAgents, capabilityType, taskFamily);
             if (onlineCandidates == 0) {
-                if (!partialFlightAvailable || !CoreScenarioChannelPolicy.isFlightChannel(taskFamily, capabilityType)) {
+                boolean canSkipCandidate = (partialFlightAvailable && CoreScenarioChannelPolicy.isFlightChannel(taskFamily, capabilityType))
+                        || (partialBaggageAvailable && "CAP_NAVIGATION".equals(capabilityType));
+                if (!canSkipCandidate) {
                     String required = CoreScenarioChannelPolicy.requiredType(taskFamily, capabilityType);
                     result.failCapability("能力类型" + capabilityType + "无在线候选代理"
                             + (required == null ? "" : "（要求渠道" + required + "）"), stepSeq, "ERR_NO_ONLINE_CANDIDATE");
@@ -312,8 +318,9 @@ public class PlanValidationService {
             // 仍有空闲候选但备用数量偏少的情况则放行给5.4.5监督智能体风险判定（RULE_RESOURCE_CRITICAL软风险评估）。
             String capabilityType = asString(step.get("capabilityType"));
             if (capabilityType != null && !capabilityType.isBlank()) {
-                boolean flightExempt = partialFlightAvailable && CoreScenarioChannelPolicy.isFlightChannel(taskFamily, capabilityType);
-                if (!flightExempt) {
+                boolean channelExempt = (partialFlightAvailable && CoreScenarioChannelPolicy.isFlightChannel(taskFamily, capabilityType))
+                        || (partialBaggageAvailable && "CAP_NAVIGATION".equals(capabilityType));
+                if (!channelExempt) {
                     long onlineCandidates = countOnlineCandidates(snapshotAgents, capabilityType, taskFamily);
                     long idleCandidates = countIdleCandidates(snapshotAgents, capabilityType, taskFamily, currentTaskId);
                     if (onlineCandidates > 0 && idleCandidates == 0) {

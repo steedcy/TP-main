@@ -27,7 +27,7 @@ class GoalClarificationRoundsTest {
         task.setId(8L);
         task.setStatus(TaskStatus.PLANNING);
         task.setTaskGoal("虚构协助目标");
-        task.setTaskFamily("SPECIAL_PASSENGER_SERVICE");
+        task.setTaskFamily("GENERAL_TASK");
         task.setSceneParams("{}");
         task.setMissingInfoQuestions("[\"请提供地点\"]");
         TaskMapper tasks = mock(TaskMapper.class);
@@ -37,7 +37,7 @@ class GoalClarificationRoundsTest {
         incomplete.setResultCode("0");
         incomplete.setInfoComplete(false);
         incomplete.setMissingInfoQuestions(List.of("请提供地点"));
-        incomplete.setInferredTaskFamily("SPECIAL_PASSENGER_SERVICE");
+        incomplete.setInferredTaskFamily("GENERAL_TASK");
         when(model.understand(any())).thenReturn(incomplete);
         TaskPlanningOrchestrator planning = mock(TaskPlanningOrchestrator.class);
         TaskService service = new TaskService(tasks, mock(PlanVersionMapper.class),
@@ -72,7 +72,7 @@ class GoalClarificationRoundsTest {
         task.setId(9L);
         task.setStatus(TaskStatus.PLANNING);
         task.setTaskGoal("Synthetic navigation to F2_TEST_GATE; passengerName=FICTIONAL_PASSENGER_NAME_CANARY_F011_137");
-        task.setTaskFamily("SPECIAL_PASSENGER_SERVICE");
+        task.setTaskFamily("GENERAL_TASK");
         task.setSceneParams("{}");
         task.setMissingInfoQuestions("[\"请提供地点\"]");
         TaskMapper tasks = mock(TaskMapper.class);

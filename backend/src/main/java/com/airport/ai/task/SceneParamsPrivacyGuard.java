@@ -66,6 +66,20 @@ public final class SceneParamsPrivacyGuard {
         }
     }
 
+    public static boolean containsIdentityText(String text) {
+        if (text == null || text.isBlank()) return false;
+        Matcher m = IDENTITY_KV_PATTERN.matcher(text);
+        while (m.find()) {
+            String key = m.group("key");
+            if (isIdentityKey(key)) return true;
+        }
+        if (CHINESE_NAME_PATTERN.matcher(text).find()) return true;
+        if (ID_CARD_PATTERN.matcher(text).find()) return true;
+        if (PHONE_PATTERN.matcher(text).find()) return true;
+        if (EMAIL_PATTERN.matcher(text).find()) return true;
+        return false;
+    }
+
     private static void scanJsonNode(String path, JsonNode node, List<String> hits) {
         if (node == null || node.isNull()) return;
         if (node.isObject()) {
@@ -91,6 +105,9 @@ public final class SceneParamsPrivacyGuard {
                     scanJsonNode(path, parsed, hits);
                 } catch (Exception ignored) {}
             }
+            if (containsIdentityText(text)) {
+                hits.add(path.isEmpty() ? "[identity text in value]" : path);
+            }
         }
     }
 
@@ -109,6 +126,17 @@ public final class SceneParamsPrivacyGuard {
             int i = 0;
             for (Object item : iterable) {
                 scanObject(path + "[" + i++ + "]", item, hits);
+            }
+        } else if (obj instanceof String text) {
+            String trimmed = text.trim();
+            if ((trimmed.startsWith("{") && trimmed.endsWith("}")) || (trimmed.startsWith("[") && trimmed.endsWith("]"))) {
+                try {
+                    JsonNode parsed = MAPPER.readTree(trimmed);
+                    scanJsonNode(path, parsed, hits);
+                } catch (Exception ignored) {}
+            }
+            if (containsIdentityText(text)) {
+                hits.add(path.isEmpty() ? "[identity text in value]" : path);
             }
         }
     }
@@ -150,9 +178,10 @@ public final class SceneParamsPrivacyGuard {
                     Object cleaned = sanitizeValue(parsed);
                     return MAPPER.writeValueAsString(cleaned);
                 } catch (Exception ignored) {
-                    return text;
+                    return sanitizeGoal(text);
                 }
             }
+            return sanitizeGoal(text);
         }
         return value;
     }

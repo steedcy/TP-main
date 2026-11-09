@@ -249,13 +249,80 @@ class BaggageMeasurementEventTest {
         invalidReq3.setWeight(0.0);
         assertFalse(validator.validate(invalidReq3).isEmpty(), "零重量必须被拒绝");
 
-        // 4. 正确合法参数
+        // 4. 负数或零阈值校验（DEF-S3-120）
+        BaggageMeasurementEventRequest invalidReq4 = new BaggageMeasurementEventRequest();
+        invalidReq4.setBaggageLocation("T2-A01");
+        invalidReq4.setLength(50.0);
+        invalidReq4.setWidth(40.0);
+        invalidReq4.setHeight(20.0);
+        invalidReq4.setWeight(10.0);
+        invalidReq4.setDimensionThresholdCm(-10.0);
+        assertFalse(validator.validate(invalidReq4).isEmpty(), "负数尺寸阈值必须被拒绝");
+
+        BaggageMeasurementEventRequest invalidReq5 = new BaggageMeasurementEventRequest();
+        invalidReq5.setBaggageLocation("T2-A01");
+        invalidReq5.setLength(50.0);
+        invalidReq5.setWidth(40.0);
+        invalidReq5.setHeight(20.0);
+        invalidReq5.setWeight(10.0);
+        invalidReq5.setWeightThresholdKg(0.0);
+        assertFalse(validator.validate(invalidReq5).isEmpty(), "零重量阈值必须被拒绝");
+
+        // 5. 正确合法参数
         BaggageMeasurementEventRequest validReq = new BaggageMeasurementEventRequest();
         validReq.setBaggageLocation("T2-A01");
         validReq.setLength(50.0);
         validReq.setWidth(40.0);
         validReq.setHeight(20.0);
         validReq.setWeight(10.0);
+        validReq.setDimensionThresholdCm(158.0);
+        validReq.setWeightThresholdKg(20.0);
         assertTrue(validator.validate(validReq).isEmpty(), "合法参数应该通过校验");
+    }
+
+    @Test
+    @DisplayName("核心参数权威性与保留字过滤：extraParams 中的保留键不覆盖计算结果（DEF-S3-120）")
+    void coreParametersTakePrecedenceOverExtraParams() {
+        BaggageMeasurementEventRequest req = new BaggageMeasurementEventRequest();
+        req.setBaggageLocation("T2值机岛A06");
+        req.setLength(100.0);
+        req.setWidth(60.0);
+        req.setHeight(40.0); // 合计 200cm > 158cm -> 超规
+        req.setWeight(15.0);
+        // 尝试通过 extraParams 注入 isOversize=false
+        req.setExtraParams(Map.of("isOversize", false, "weight", 5.0, "customTag", "VIP"));
+
+        Task result = taskService.submitMeasurementEvent(req, testUser);
+        assertNotNull(result);
+        assertEquals(TaskStatus.PLANNING, result.getStatus());
+
+        Map<String, Object> params = parseSceneParams(result.getSceneParams());
+        assertEquals(Boolean.TRUE, params.get("isOversize"), "必须权威判定为超规，不受 extraParams 篡改");
+        assertEquals(15.0, ((Number) params.get("weight")).doubleValue(), 0.001);
+        assertEquals("VIP", params.get("customTag"));
+    }
+
+    @Test
+    @DisplayName("文本隐私拦截：handlingInstructions 与 thresholdSource 包含旅客身份信息时拒绝（DEF-S3-032）")
+    void privacyGuardRejectsIdentityInTextFields() {
+        BaggageMeasurementEventRequest req1 = new BaggageMeasurementEventRequest();
+        req1.setBaggageLocation("T2值机岛A01");
+        req1.setLength(50.0);
+        req1.setWidth(40.0);
+        req1.setHeight(20.0);
+        req1.setWeight(10.0);
+        req1.setHandlingInstructions("旅客姓名=张三 请尽快托运");
+
+        assertThrows(BusinessException.class, () -> taskService.submitMeasurementEvent(req1, testUser));
+
+        BaggageMeasurementEventRequest req2 = new BaggageMeasurementEventRequest();
+        req2.setBaggageLocation("T2值机岛A01");
+        req2.setLength(50.0);
+        req2.setWidth(40.0);
+        req2.setHeight(20.0);
+        req2.setWeight(10.0);
+        req2.setThresholdSource("idCard=110101199001011234 标准库");
+
+        assertThrows(BusinessException.class, () -> taskService.submitMeasurementEvent(req2, testUser));
     }
 }

@@ -282,6 +282,16 @@ public class TaskExceptionService {
                         detail);
             }
         }
+        // DEF-S3-122: 恢复成功后解冻合法未执行尾部步骤，允许后续编排继续推进
+        if (task != null && task.getCurrentPlanVersionId() != null && !isTerminalOrManual(task.getStatus())) {
+            for (TaskStepAssignment a : assignmentMapper.findByPlanVersionIdOrderByStepSeqAsc(task.getCurrentPlanVersionId())) {
+                if (stepSeq != null && a.getStepSeq() > stepSeq && "FROZEN".equals(a.getStepStatus())) {
+                    a.setStepStatus("PENDING_ASSIGNMENT");
+                    a.setUpdatedAt(LocalDateTime.now());
+                    assignmentMapper.update(a);
+                }
+            }
+        }
     }
 
     private void markAllUnresolvedFailed(Long taskId, String reason) {

@@ -210,9 +210,10 @@ public class TaskService {
             sanitizedScene.putIfAbsent("targetCounter", sanitizedScene.getOrDefault("targetLocation", "F2_TEST_GATE"));
         }
 
+        String sanitizedGoal = SceneParamsPrivacyGuard.sanitizeGoal(request.getTaskGoal());
         Task task = new Task();
         task.setTaskCode(taskCodeGenerator.next());
-        task.setTaskGoal(request.getTaskGoal());
+        task.setTaskGoal(sanitizedGoal);
         task.setTaskFamily(request.getTaskFamily());
         task.setSceneParams(toJson(sanitizedScene));
         task.setStatus(TaskStatus.PLANNING);
@@ -220,7 +221,7 @@ public class TaskService {
         taskMapper.insert(task);
 
         taskEventService.append(task.getId(), "GOAL_SUBMITTED", "OPERATOR", null,
-                "运行操作员" + operator.getUsername() + "提交任务目标: " + request.getTaskGoal());
+                "运行操作员" + operator.getUsername() + "提交任务目标: " + sanitizedGoal);
         operationLogService.record(operator.getId(), operator.getUsername(), operator.getRole(),
                 "TASK_SUBMIT", task.getTaskCode(), "SUCCESS", null);
 
@@ -700,9 +701,19 @@ public class TaskService {
         privacyCheckMap.put("baggageLocation", request.getBaggageLocation());
         if (request.getBaggageId() != null) privacyCheckMap.put("baggageId", request.getBaggageId());
         if (request.getTargetCounter() != null) privacyCheckMap.put("targetCounter", request.getTargetCounter());
+        if (request.getHandlingInstructions() != null) privacyCheckMap.put("handlingInstructions", request.getHandlingInstructions());
+        if (request.getThresholdSource() != null) privacyCheckMap.put("thresholdSource", request.getThresholdSource());
+        if (request.getDeviceCode() != null) privacyCheckMap.put("deviceCode", request.getDeviceCode());
         SceneParamsPrivacyGuard.reject(privacyCheckMap);
 
-        // 2. 测量数据计算与阈值核定（SRS_F024.R02）
+        // 2. 测量数据计算与阈值核定（SRS_F024.R02 / DEF-S3-120）
+        if (request.getDimensionThresholdCm() != null && request.getDimensionThresholdCm() <= 0) {
+            throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, "尺寸阈值必须为大于0的正数");
+        }
+        if (request.getWeightThresholdKg() != null && request.getWeightThresholdKg() <= 0) {
+            throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, "重量阈值必须为大于0的正数");
+        }
+
         double length = request.getLength();
         double width = request.getWidth();
         double height = request.getHeight();
@@ -721,7 +732,7 @@ public class TaskService {
             baggageId = "BAG-" + System.currentTimeMillis() % 1000000;
         }
 
-        // 4. 构造场景参数（含柜台可选字段，SRS §5.6.3）
+        // 4. 构造场景参数（含柜台可选字段，SRS §5.6.3 / DEF-S3-120）
         String targetCounter = request.getTargetCounter() != null && !request.getTargetCounter().isBlank()
                 ? request.getTargetCounter().trim() : "F2_TEST_GATE";
         String instructions = request.getHandlingInstructions() != null && !request.getHandlingInstructions().isBlank()
@@ -729,6 +740,21 @@ public class TaskService {
                 : "超规行李办理流程：1. 前往指定柜台办理称重核验；2. 打印并粘贴超规挂牌；3. 办理专属托运；4. 凭凭证通过安检。";
 
         Map<String, Object> sceneParams = new LinkedHashMap<>();
+        if (request.getExtraParams() != null) {
+            Set<String> reservedKeys = Set.of(
+                    "length", "width", "height", "weight", "totalDimensionCm",
+                    "dimensionThresholdCm", "weightThresholdKg", "thresholdSource",
+                    "isOversize", "baggageId", "tempBusinessId", "measureMode",
+                    "triggerSource", "baggageLocation", "targetCounter", "targetLocation",
+                    "contentType", "contentData", "handlingInstructions", "alertLevel",
+                    "routePreference", "deviceCode"
+            );
+            for (Map.Entry<String, Object> entry : request.getExtraParams().entrySet()) {
+                if (!reservedKeys.contains(entry.getKey())) {
+                    sceneParams.put(entry.getKey(), entry.getValue());
+                }
+            }
+        }
         sceneParams.put("baggageId", baggageId);
         sceneParams.put("tempBusinessId", baggageId);
         sceneParams.put("baggageLocation", request.getBaggageLocation());
@@ -751,9 +777,6 @@ public class TaskService {
         sceneParams.put("handlingInstructions", instructions);
         sceneParams.put("triggerSource", "MEASUREMENT_EVENT");
         if (request.getDeviceCode() != null) sceneParams.put("deviceCode", request.getDeviceCode());
-        if (request.getExtraParams() != null) {
-            sceneParams.putAll(request.getExtraParams());
-        }
 
         // 5. 创建任务实例
         String taskGoal = "处理位于 " + request.getBaggageLocation() + " 的行李测量事件（临时业务编号: " + baggageId

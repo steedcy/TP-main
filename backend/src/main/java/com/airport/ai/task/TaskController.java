@@ -47,13 +47,13 @@ public class TaskController {
      * 支持超规触发与非超规直接完成闭环两类分支。
      */
     @PostMapping("/measurement-event")
-    @PreAuthorize("hasAnyRole('OPERATOR', 'SYSTEM_ADMIN')")
+    @PreAuthorize("hasAnyRole('OPERATOR', 'SYSTEM_ADMIN', 'CONFIG_ADMIN')")
     public ApiResponse<TaskView> measurementEvent(@Valid @RequestBody com.airport.ai.task.dto.BaggageMeasurementEventRequest request) {
         return ApiResponse.ok(TaskView.from(taskService.submitMeasurementEvent(request, currentUser.get())));
     }
 
     @PostMapping("/baggage-measurement-event")
-    @PreAuthorize("hasAnyRole('OPERATOR', 'SYSTEM_ADMIN')")
+    @PreAuthorize("hasAnyRole('OPERATOR', 'SYSTEM_ADMIN', 'CONFIG_ADMIN')")
     public ApiResponse<TaskView> baggageMeasurementEvent(@Valid @RequestBody com.airport.ai.task.dto.BaggageMeasurementEventRequest request) {
         return ApiResponse.ok(TaskView.from(taskService.submitMeasurementEvent(request, currentUser.get())));
     }

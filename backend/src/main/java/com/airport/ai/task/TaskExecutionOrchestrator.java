@@ -198,6 +198,12 @@ public class TaskExecutionOrchestrator {
                 skipUnavailableFlightChannel(currentTask, assignment, capabilityType);
                 return;
             }
+            if (!Boolean.TRUE.equals(currentTask.getIsDryRun()) && rejected.isEmpty()
+                    && "OVERSIZE_BAGGAGE_HANDLING".equals(currentTask.getTaskFamily())
+                    && "CAP_NAVIGATION".equals(capabilityType)) {
+                skipUnavailableNavigationChannel(currentTask, assignment, capabilityType);
+                return;
+            }
             // 异常路径2a/4b：无候选(CAPABILITY_GAP)或全部候选已拒绝(ASSIGNMENT_FAILED)，进入5.5.3异常识别与恢复
             boolean hasRejected = !rejected.isEmpty();
             String errReasonCode = hasRejected ? "ERR_ALL_CANDIDATES_REJECTED" : "ERR_NO_CANDIDATE_AVAILABLE";
@@ -450,6 +456,20 @@ public class TaskExecutionOrchestrator {
         boolean completionSatisfied = "SUCCESS".equals(executionResult)
                 && CompletionConditionEvaluator.satisfied(step, outputParams);
 
+        // DEF-S3-125: 行李测量步骤必须包含长宽高尺寸、重量、超规结果三项必要数据，缺项不得完成
+        if (completionSatisfied && "CAP_BAGGAGE_MEASURE".equals(step.get("capabilityType"))) {
+            boolean hasDimensions = outputParams != null
+                    && outputParams.get("length") instanceof Number
+                    && outputParams.get("width") instanceof Number
+                    && outputParams.get("height") instanceof Number;
+            boolean hasWeight = outputParams != null && outputParams.get("weight") instanceof Number;
+            boolean hasOversize = outputParams != null && outputParams.get("isOversize") != null;
+            if (!hasDimensions || !hasWeight || !hasOversize) {
+                completionSatisfied = false;
+                reasonCode = "ERR_MEASUREMENT_DATA_INCOMPLETE";
+            }
+        }
+
         if (completionSatisfied) {
             assignment.setStepStatus("COMPLETED");
             assignmentMapper.update(assignment);
@@ -488,7 +508,10 @@ public class TaskExecutionOrchestrator {
 
         // 异常路径4a：设备返回SUCCESS但完成条件未满足，按步骤失败处理，不视为完成
         String failureDetail = "SUCCESS".equals(executionResult) && !completionSatisfied
-                ? "设备返回执行成功，但完成条件未满足" : "执行结果: " + executionResult + "，原因: " + reasonCode;
+                ? ("ERR_MEASUREMENT_DATA_INCOMPLETE".equals(reasonCode)
+                        ? "测量反馈缺少尺寸、重量或超规结果必要数据"
+                        : "设备返回执行成功，但完成条件未满足")
+                : "执行结果: " + executionResult + "，原因: " + reasonCode;
 
         if (Boolean.TRUE.equals(taskMapper.findById(assignment.getTaskId()).orElseThrow().getIsDryRun())) {
             assignment.setStepStatus("FAILED"); assignmentMapper.update(assignment);
@@ -549,18 +572,26 @@ public class TaskExecutionOrchestrator {
             } catch (Exception ignored) {}
         }
         for (TaskStepAssignment later : assignmentMapper.findByPlanVersionIdOrderByStepSeqAsc(planVersionId)) {
-            if (later.getStepSeq() <= measuredStepSeq) {
-                if (later.getStepSeq().equals(measuredStepSeq)) {
-                    later.setOutputParams(toJson(outputParams));
-                    assignmentMapper.update(later);
-                }
-                continue;
+            if (later.getStepSeq().equals(measuredStepSeq)) {
+                later.setOutputParams(toJson(outputParams));
+                assignmentMapper.update(later);
             }
-            later.setStepStatus("SKIPPED");
-            later.setReasonCode("BAGGAGE_WITHIN_LIMIT");
-            later.setUpdatedAt(LocalDateTime.now());
-            assignmentMapper.update(later);
         }
+        // DEF-S3-119: 非超规分支删除后续未执行引导步骤，严格遵守R03“不生成引导步骤”
+        assignmentMapper.deleteByPlanVersionIdAndStepSeqGreaterThan(planVersionId, measuredStepSeq);
+        planVersionMapper.findById(planVersionId).ifPresent(pv -> {
+            try {
+                List<Map<String, Object>> steps = parseSteps(pv.getPlanSteps());
+                List<Map<String, Object>> remainingSteps = steps.stream()
+                        .filter(s -> {
+                            Integer seq = asInteger(s.get("stepSeq"));
+                            return seq != null && seq <= measuredStepSeq;
+                        })
+                        .toList();
+                pv.setPlanSteps(toJson(remainingSteps));
+                planVersionMapper.update(pv);
+            } catch (Exception ignored) {}
+        });
         task.setStatus(TaskStatus.COMPLETED);
         task.setUpdatedAt(LocalDateTime.now());
         taskMapper.update(task);
@@ -580,7 +611,13 @@ public class TaskExecutionOrchestrator {
                 .min(Comparator.comparing(TaskStepAssignment::getStepSeq));
 
         if (next.isPresent()) {
-            assignStep(taskId, planVersionId, next.get().getStepSeq());
+            TaskStepAssignment nextAssignment = next.get();
+            if ("FROZEN".equals(nextAssignment.getStepStatus())) {
+                nextAssignment.setStepStatus("PENDING_ASSIGNMENT");
+                nextAssignment.setUpdatedAt(LocalDateTime.now());
+                assignmentMapper.update(nextAssignment);
+            }
+            assignStep(taskId, planVersionId, nextAssignment.getStepSeq());
             return;
         }
 
@@ -598,6 +635,30 @@ public class TaskExecutionOrchestrator {
         assignmentMapper.update(assignment);
         taskEventService.append(task.getId(), "FLIGHT_CHANNEL_UNCOVERED", "SYSTEM", "FLIGHT_CHANNEL_UNAVAILABLE",
                 "步骤" + assignment.getStepSeq() + "所需" + channel + "渠道无在线空闲候选，未下发设备命令");
+
+        List<TaskStepAssignment> all = assignmentMapper.findByPlanVersionIdOrderByStepSeqAsc(assignment.getPlanVersionId());
+        Optional<TaskStepAssignment> next = all.stream()
+                .filter(a -> a.getStepSeq() > assignment.getStepSeq() && "PENDING_ASSIGNMENT".equals(a.getStepStatus()))
+                .min(Comparator.comparing(TaskStepAssignment::getStepSeq));
+        if (next.isPresent()) assignStep(task.getId(), assignment.getPlanVersionId(), next.get().getStepSeq());
+        else completeAvailableChannels(task.getId(), assignment.getPlanVersionId(), all);
+    }
+
+    /** SRS §5.6.3 / DEF-S3-124: 超规行李无移动机器人时跳过导航步骤，降级为仅信息提示与测量。 */
+    private void skipUnavailableNavigationChannel(Task task, TaskStepAssignment assignment, String capabilityType) {
+        String channel = CoreScenarioChannelPolicy.requiredType(task.getTaskFamily(), capabilityType);
+        assignment.setStepStatus("SKIPPED");
+        assignment.setReasonCode("NAVIGATION_CHANNEL_UNAVAILABLE");
+        assignment.setOutputParams(toJson(Map.of(
+                "channelResult", "UNCOVERED",
+                "capabilityType", capabilityType,
+                "requiredDeviceType", channel != null ? channel : "MOBILE_ROBOT",
+                "guidanceStatus", "UNCOMPLETED",
+                "reason", "NO_ONLINE_IDLE_CANDIDATE")));
+        assignment.setUpdatedAt(LocalDateTime.now());
+        assignmentMapper.update(assignment);
+        taskEventService.append(task.getId(), "GUIDANCE_UNCOVERED", "SYSTEM", "NAVIGATION_CHANNEL_UNAVAILABLE",
+                "步骤" + assignment.getStepSeq() + "所需" + channel + "移动机器人无在线候选，未完成现场引导，降级保留信息提示与测量");
 
         List<TaskStepAssignment> all = assignmentMapper.findByPlanVersionIdOrderByStepSeqAsc(assignment.getPlanVersionId());
         Optional<TaskStepAssignment> next = all.stream()
@@ -636,6 +697,7 @@ public class TaskExecutionOrchestrator {
         }
 
         if ("OVERSIZE_BAGGAGE_HANDLING".equals(task.getTaskFamily()) && !Boolean.TRUE.equals(task.getIsDryRun())) {
+            boolean guidanceUncovered = all.stream().anyMatch(a -> "NAVIGATION_CHANNEL_UNAVAILABLE".equals(a.getReasonCode()));
             task.setStatus(TaskStatus.COMPLETED);
             task.setUpdatedAt(LocalDateTime.now());
             taskMapper.update(task);
@@ -644,8 +706,13 @@ public class TaskExecutionOrchestrator {
             Map<String, Object> scene = fromJsonMap(task.getSceneParams());
             String baggageId = String.valueOf(scene.getOrDefault("baggageId", "临时业务编号"));
             String targetLoc = String.valueOf(scene.getOrDefault("targetCounter", scene.getOrDefault("targetLocation", "F2_TEST_GATE")));
-            String detail = "超规行李处置闭环完成（临时业务编号: " + baggageId + "）：已完成行李测量、超规告警上报、航显办理说明发布，以及移动机器人至" + targetLoc + "的空间引导；全部步骤均已执行完成。";
-            taskEventService.append(taskId, "TASK_COMPLETED", "SYSTEM", "OVERSIZE_HANDLING_CLOSED_LOOP", detail);
+            if (guidanceUncovered) {
+                String detail = "超规行李信息提示与测量完成（临时业务编号: " + baggageId + "）：已完成行李测量、超规告警上报、航显办理说明发布；移动机器人未完成引导（无可用移动机器人候选）";
+                taskEventService.append(taskId, "TASK_COMPLETED", "SYSTEM", "OVERSIZE_HANDLING_INFO_ONLY", detail);
+            } else {
+                String detail = "超规行李处置闭环完成（临时业务编号: " + baggageId + "）：已完成行李测量、超规告警上报、航显办理说明发布，以及移动机器人至" + targetLoc + "的空间引导；全部步骤均已执行完成。";
+                taskEventService.append(taskId, "TASK_COMPLETED", "SYSTEM", "OVERSIZE_HANDLING_CLOSED_LOOP", detail);
+            }
             return;
         }
 

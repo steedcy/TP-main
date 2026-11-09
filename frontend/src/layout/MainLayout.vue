@@ -9,7 +9,7 @@
         <a-menu-item key="TaskTrace" v-if="isOperator || isSystemAdmin" @click="$router.push('/task-trace')">过程追溯</a-menu-item>
         <a-menu-item key="Situation" @click="$router.push('/situation')">二维态势</a-menu-item>
         <a-menu-item key="Devices" v-if="isConfigAdmin" @click="$router.push('/devices')">设备管理</a-menu-item>
-        <a-menu-item key="Simulators" v-if="isConfigAdmin" @click="$router.push('/simulators')">仿真控制</a-menu-item>
+        <a-menu-item key="Simulators" v-if="isConfigAdmin || isOperator || isSystemAdmin" @click="$router.push('/simulators')">仿真控制</a-menu-item>
         <a-menu-item key="DeviceAgents" @click="$router.push('/device-agents')">设备代理</a-menu-item>
         <a-menu-item key="DeviceTypes" v-if="isConfigAdmin" @click="$router.push('/device-types')">能力边界配置</a-menu-item>
         <a-menu-item key="BaselineTemplates" v-if="isConfigAdmin" @click="$router.push('/baseline-templates')">基线模板</a-menu-item>

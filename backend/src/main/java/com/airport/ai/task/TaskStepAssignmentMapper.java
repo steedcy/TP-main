@@ -21,4 +21,6 @@ public interface TaskStepAssignmentMapper {
     List<TaskStepAssignment> findActiveByAgentId(@Param("agentId") Long agentId);
     int insert(TaskStepAssignment assignment);
     int update(TaskStepAssignment assignment);
+    int deleteByPlanVersionIdAndStepSeqGreaterThan(@Param("planVersionId") Long planVersionId,
+                                                    @Param("stepSeq") Integer stepSeq);
 }

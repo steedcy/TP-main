@@ -43,9 +43,11 @@ public class BaggageMeasurementEventRequest {
     private Double weight;
 
     /** 超规判定三边和阈值，默认 158.0 cm */
+    @Positive(message = "尺寸阈值必须为大于0的正数")
     private Double dimensionThresholdCm;
 
     /** 超规判定重量阈值，默认 23.0 kg */
+    @Positive(message = "重量阈值必须为大于0的正数")
     private Double weightThresholdKg;
 
     /** 超规判定阈值来源，默认“民航旅客行李运输标准（2026版）” */
