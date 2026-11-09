@@ -45,7 +45,7 @@
 
 V1.184 后端离线测试为 494 项、0 失败、0 错误、2 跳过；`mvn -o package -DskipTests` 成功。前端 `npm run build` 成功（3272 modules，保留既有大 chunk 警告）。测试期间使用五个合成协议设备、受控模型和生产打包 JAR；不作真实商业模型或物理设备认证声明。
 
-清理证据确认：所有本轮任务均为终态、五个自有设备均 INACTIVE/IDLE/无占用、风险规则恢复、任务定义未修改、触发器数量为 0、历史 pending 行未改变。18117、18129、18132–18137、15179 及 5173 端口均已释放；自有 JAR/支持进程已停止。产品 SHA 与 `main` 不同，未合并、未创建 PR。
+清理证据确认：所有本轮任务均为终态、五个自有设备均 INACTIVE/IDLE/无占用、任务定义未修改、触发器数量为 0、历史 pending 行未改变。风险规则的启用状态已恢复，但追加的 `operation_logs` 原始查询显示 `RULE_RESOURCE_CRITICAL` 从原始 `V15/enabled=true` 被测试改为 `V15.1/enabled=false`，清理时变为 `V15.2/enabled=true`；因此规则版本及完整规则状态未恢复，清理状态为 `PARTIAL_RESTORE`，不覆盖原清理记录。详见 `acceptance/stage3/evidence/SRS_F024-V1.184-operation-log-risk-rules-20261109.json`。13:08（+08:00）复核18117、18129、18132–18137、15179及5173均无监听，未发现匹配的产品/测试进程；Codex CUA 宿主进程不是本轮测试进程。产品 SHA 与 `main` 不同，未合并、未创建 PR。
 
 原始记录与机器索引：
 
@@ -55,5 +55,6 @@ V1.184 后端离线测试为 494 项、0 失败、0 错误、2 跳过；`mvn -o 
 - `acceptance/stage3/evidence/SRS_F024-V1.184-DEF-S3-119-minimal-20261109.json`
 - `acceptance/stage3/evidence/SRS_F024-V1.184-DEF-S3-032-minimal-20261109.json`
 - `acceptance/stage3/evidence/SRS_F024-V1.184-cleanup-and-main-20261109.json`
+- `acceptance/stage3/evidence/SRS_F024-V1.184-operation-log-risk-rules-20261109.json`
 
 交接状态：**READY_FOR_CLAUDE（实际接收者 Germini）**。因 DEF-S3-119 仍 F，禁止合入 `main`，禁止推进 F025。

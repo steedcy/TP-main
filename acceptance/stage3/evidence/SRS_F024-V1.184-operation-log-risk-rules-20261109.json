@@ -1,0 +1,84 @@
+{
+  "requirement": "SRS_F024",
+  "tag": "V1.184",
+  "productSha": "d4a1125c94e62686d0481d4df5371a90c9e9a12d",
+  "queriedAt": "2026-11-09T13:05:31.634672+08:00",
+  "database": "tip",
+  "schema": "tip_gpt_f006_v118_20261030",
+  "table": "operation_logs",
+  "query": "SELECT id,user_id,username,role,operation_type,operation_target,operation_result,source_ip,detail,created_at FROM tip_gpt_f006_v118_20261030.operation_logs WHERE id IN (8105,8228) ORDER BY id",
+  "rows": [
+    {
+      "id": 8105,
+      "user_id": 4,
+      "username": "set",
+      "role": "CONFIG_ADMIN",
+      "operation_type": "RISK_RULE_CHANGE",
+      "operation_target": "RULE_RESOURCE_CRITICAL",
+      "operation_result": "SUCCESS",
+      "source_ip": "127.0.0.1",
+      "detail": {
+        "before": {
+          "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+          "ruleVersion": "V15",
+          "enabled": true
+        },
+        "ruleSetVersion": "V1.150",
+        "action": "UPDATE",
+        "after": {
+          "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+          "ruleVersion": "V15.1",
+          "enabled": false
+        }
+      },
+      "created_at": "2026-11-09 12:17:46.832872"
+    },
+    {
+      "id": 8228,
+      "user_id": 4,
+      "username": "set",
+      "role": "CONFIG_ADMIN",
+      "operation_type": "RISK_RULE_CHANGE",
+      "operation_target": "RULE_RESOURCE_CRITICAL",
+      "operation_result": "SUCCESS",
+      "source_ip": "127.0.0.1",
+      "detail": {
+        "before": {
+          "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+          "ruleVersion": "V15.1",
+          "enabled": false
+        },
+        "ruleSetVersion": "V1.151",
+        "action": "UPDATE",
+        "after": {
+          "ruleContent": "任务申请资源时可用备用候选设备数量低于配置阈值（默认1）命中",
+          "ruleVersion": "V15.2",
+          "enabled": true
+        }
+      },
+      "created_at": "2026-11-09 12:35:18.132769"
+    }
+  ],
+  "assessment": {
+    "enabledStateRestored": true,
+    "versionRestored": false,
+    "expectedRuleVersion": "V15",
+    "finalRuleVersion": "V15.2",
+    "fullRuleStateRestored": false,
+    "status": "PARTIAL_RESTORE",
+    "reason": "Cleanup restored enabled=true but did not restore the original V15 rule version; the original V15.1 setup mutation and V15.2 cleanup mutation remain auditable."
+  },
+  "sourceEvidence": [
+    "acceptance/stage3/evidence/SRS_F024-V1.184-http-sql-protocol-20261109.json",
+    "acceptance/stage3/evidence/SRS_F024-V1.184-cleanup-and-main-20261109.json"
+  ],
+  "resourceCheck": {
+    "checkedAt": "2026-11-09T13:08:16.632+08:00",
+    "portsChecked": [18117, 18129, 18132, 18133, 18134, 18135, 18136, 18137, 15179, 5173],
+    "listeningPorts": [],
+    "matchingProductTestProcesses": [],
+    "method": "Get-NetTCPConnection -State Listen and Win32_Process command-line inspection; Codex CUA host processes excluded by executable/command path."
+  },
+  "appendOnly": true,
+  "productCodeModified": false
+}
