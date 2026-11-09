@@ -1,0 +1,37 @@
+{
+  "issue": "DEF-S3-121",
+  "title": "新模拟测量UI可见角色与事件接口权限不相容",
+  "productSha": "fc55f713e5d74d6fb41761f53fed84b4bc4efd7b",
+  "tag": "V1.183",
+  "expected": "对齐仿真事件合法操作者、页面路由与后端授权/受控仿真入口；保持正式任务写权限隔离；真实UI重测两样本、柜台缺省及输入拒绝。",
+  "actual": "生产dist真实浏览器：仅CONFIG_ADMIN可访问/simulators，新正常/超规按钮均POST /api/v1/tasks/measurement-event→403；OPERATOR/SYSTEM_ADMIN接口可用却无此页面路由，正常UI路径无法触发。既有API未授权403在请求校验前正确，不应删除既有权限门禁绕过。",
+  "rawObservations": [],
+  "uiObservations": [
+    {
+      "name": "simulator-normal-event-role-denied",
+      "at": "2026-11-08T12:59:02.399Z",
+      "state": "Browser tab: 1, Title: \"智慧机场人工智能集群协同服务平台\", URL: \"http://127.0.0.1:15179/simulators\".\nThe following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.\nRemoved element IDs: 500-507\n~\t\t\t\t\t\t290 text 2026/11/8 20:58:55\n~\t\t\t\t\t\t303 text 2026/11/8 20:58:55\n~\t\t\t\t\t\t433 text 2026/11/8 20:58:56\n~\t\t\t\t\t\t446 text 2026/11/8 20:58:56\n~\t\t\t\t\t\t498 text 2026/11/8 20:58:55\nThe focused UI element is 80 button 触发测量事件",
+      "expected": "配置管理员可见并可操作的模拟测量入口能触发正常任务",
+      "actual": "POST测量事件403，无权限访问"
+    },
+    {
+      "name": "simulator-oversize-event-role-denied",
+      "at": "2026-11-08T13:01:06.551Z",
+      "state": "Browser tab: 1, Title: \"智慧机场人工智能集群协同服务平台\", URL: \"http://127.0.0.1:15179/simulators\".\nThe following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.\nRemoved element IDs: 501-508\n~\t\t\t\t\t\t290 text 2026/11/8 21:01:00\n~\t\t\t\t\t\t303 text 2026/11/8 21:01:00\n~\t\t\t\t\t\t433 text 2026/11/8 21:01:01\n~\t\t\t\t\t\t446 text 2026/11/8 21:01:01\n~\t\t\t\t\t\t498 text 2026/11/8 21:01:00\nThe focused UI element is 80 button 触发测量事件"
+    }
+  ],
+  "proxy403": [
+    {
+      "at": "2026-11-08T20:58:45.329393+08:00",
+      "method": "POST",
+      "path": "/api/v1/tasks/measurement-event",
+      "http": 403
+    },
+    {
+      "at": "2026-11-08T20:59:09.999993+08:00",
+      "method": "POST",
+      "path": "/api/v1/tasks/measurement-event",
+      "http": 403
+    }
+  ]
+}

@@ -1,0 +1,1655 @@
+{
+  "issue": "DEF-S3-122",
+  "title": "测量恢复成功后后续步骤仍冻结而无法续跑",
+  "productSha": "fc55f713e5d74d6fb41761f53fed84b4bc4efd7b",
+  "tag": "V1.183",
+  "expected": "恢复成功应按当前有效计划解冻合法未执行尾部并继续编排，保留原失败/测量结果/设备归属/重规划次数，不解冻已人工终止或其他任务步骤。",
+  "actual": "1122测量失败一次重试后切备用，备用测量SUCCESS、STEP_COMPLETED/EXCEPTION_RECOVERED宣称计划可继续，但2/3/4仍FROZEN、任务持续EXECUTING超过探针40秒；1138测量执行中真实OFFLINE恢复同类。原始快照保留，取证后才人工终止。引导末步候选恢复1124为合法对照P。",
+  "rawObservations": [
+    {
+      "name": "measure-candidate-success",
+      "at": "2026-11-08T20:48:28.103080+08:00",
+      "taskId": 1122,
+      "request": {
+        "taskGoal": "F183_MEASURE_CANDIDATE_SUCCESS 处理位于F2_TEST_SERVICE的行李并引导至超规柜台",
+        "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+        "sceneParams": {
+          "baggageLocation": "F2_TEST_SERVICE",
+          "targetCounter": "F2_TEST_GATE",
+          "targetLocation": "F2_TEST_GATE",
+          "baggageId": "F183_MEASURE_CANDIDATE_SUCCESS",
+          "tempBusinessId": "F183_MEASURE_CANDIDATE_SUCCESS",
+          "dimensionThresholdCm": 158,
+          "weightThresholdKg": 32,
+          "thresholdSource": "SYNTHETIC_DEPLOYMENT_F024_158CM_32KG",
+          "routePreference": "BARRIER_FREE",
+          "alertLevel": "WARNING",
+          "contentType": "TEXT",
+          "contentData": "超规行李办理提示",
+          "handlingInstructions": "虚构部署办理说明：前往超规柜台核验，费用以承运人现场政策为准，完成托运并遵守安全须知。"
+        }
+      },
+      "response": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 1122,
+            "taskCode": "TASK-20261108-1112",
+            "taskGoal": "F183_MEASURE_CANDIDATE_SUCCESS 处理位于F2_TEST_SERVICE的行李并引导至超规柜台",
+            "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+            "sceneParams": {
+              "baggageLocation": "F2_TEST_SERVICE",
+              "targetCounter": "F2_TEST_GATE",
+              "targetLocation": "F2_TEST_GATE",
+              "baggageId": "F183_MEASURE_CANDIDATE_SUCCESS",
+              "tempBusinessId": "F183_MEASURE_CANDIDATE_SUCCESS",
+              "dimensionThresholdCm": 158,
+              "weightThresholdKg": 32,
+              "thresholdSource": "SYNTHETIC_DEPLOYMENT_F024_158CM_32KG",
+              "routePreference": "BARRIER_FREE",
+              "alertLevel": "WARNING",
+              "contentType": "TEXT",
+              "contentData": "超规行李办理提示",
+              "handlingInstructions": "虚构部署办理说明：前往超规柜台核验，费用以承运人现场政策为准，完成托运并遵守安全须知。"
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=true",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F183_MEASURE_CANDIDATE_SUCCESS 处理位于F2_TEST_SERVICE的行李并引导至超规柜台",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "PLANNING",
+            "currentPlanVersionId": null,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": null,
+            "failureReason": null,
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-08T20:48:27.6871879",
+            "updatedAt": "2026-11-08T20:48:27.6871879",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-08T20:48:27.845425900+08:00"
+        }
+      },
+      "actions": [
+        {
+          "deviceCode": "G183_F024_SCAN2",
+          "message": {
+            "commandId": "CMD-20261108204827-5D7F0032",
+            "commandType": "TASK_ACCEPT",
+            "attemptNo": 0,
+            "taskId": "TASK-20261108-1112",
+            "stepSeq": 1,
+            "capabilityType": "CAP_BAGGAGE_MEASURE",
+            "inputParams": {
+              "measureMode": "AUTO",
+              "timeout": 30
+            },
+            "issuedAt": 1794142107.841763,
+            "deadline": 1794142167.841763
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-08T20:48:28.186617200+08:00"
+            }
+          }
+        },
+        {
+          "deviceCode": "G183_F024_SCAN2",
+          "message": {
+            "commandId": "CMD-20261108204828-5D7F0033",
+            "commandType": "EXECUTE_CAPABILITY",
+            "attemptNo": 0,
+            "taskId": "TASK-20261108-1112",
+            "stepSeq": 1,
+            "capabilityType": "CAP_BAGGAGE_MEASURE",
+            "inputParams": {
+              "measureMode": "AUTO",
+              "timeout": 30
+            },
+            "issuedAt": 1794142108.182988,
+            "deadline": 1794142168.182988
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-08T20:48:28.395473300+08:00"
+            }
+          }
+        },
+        {
+          "deviceCode": "G183_F024_SCAN2",
+          "message": {
+            "commandId": "CMD-20261108204828-5D7F0033",
+            "commandType": "EXECUTE_CAPABILITY",
+            "attemptNo": 1,
+            "taskId": "TASK-20261108-1112",
+            "stepSeq": 1,
+            "capabilityType": "CAP_BAGGAGE_MEASURE",
+            "inputParams": {
+              "measureMode": "AUTO",
+              "timeout": 30
+            },
+            "issuedAt": 1794142108.3913755,
+            "deadline": 1794142168.3913755
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-08T20:48:28.636100500+08:00"
+            }
+          }
+        },
+        {
+          "deviceCode": "G145_F013_SCAN",
+          "message": {
+            "commandId": "CMD-20261108204828-5D7F0034",
+            "commandType": "TASK_ACCEPT",
+            "attemptNo": 0,
+            "taskId": "TASK-20261108-1112",
+            "stepSeq": 1,
+            "capabilityType": "CAP_BAGGAGE_MEASURE",
+            "inputParams": {
+              "measureMode": "AUTO",
+              "timeout": 30
+            },
+            "issuedAt": 1794142108.6295874,
+            "deadline": 1794142168.6295874
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-08T20:48:28.848463100+08:00"
+            }
+          }
+        },
+        {
+          "deviceCode": "G145_F013_SCAN",
+          "message": {
+            "commandId": "CMD-20261108204828-5D7F0035",
+            "commandType": "EXECUTE_CAPABILITY",
+            "attemptNo": 0,
+            "taskId": "TASK-20261108-1112",
+            "stepSeq": 1,
+            "capabilityType": "CAP_BAGGAGE_MEASURE",
+            "inputParams": {
+              "measureMode": "AUTO",
+              "timeout": 30
+            },
+            "issuedAt": 1794142108.8435931,
+            "deadline": 1794142168.8435931
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-08T20:48:29.055614900+08:00"
+            }
+          }
+        }
+      ],
+      "after": {
+        "task": {
+          "id": 1122,
+          "taskCode": "TASK-20261108-1112",
+          "taskGoal": "F183_MEASURE_CANDIDATE_SUCCESS 处理位于F2_TEST_SERVICE的行李并引导至超规柜台",
+          "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+          "sceneParams": {
+            "baggageLocation": "F2_TEST_SERVICE",
+            "targetCounter": "F2_TEST_GATE",
+            "targetLocation": "F2_TEST_GATE",
+            "baggageId": "F183_MEASURE_CANDIDATE_SUCCESS",
+            "tempBusinessId": "F183_MEASURE_CANDIDATE_SUCCESS",
+            "dimensionThresholdCm": 158,
+            "weightThresholdKg": 32,
+            "thresholdSource": "SYNTHETIC_DEPLOYMENT_F024_158CM_32KG",
+            "routePreference": "BARRIER_FREE",
+            "alertLevel": "WARNING",
+            "contentType": "TEXT",
+            "contentData": "超规行李办理提示",
+            "handlingInstructions": "虚构部署办理说明：前往超规柜台核验，费用以承运人现场政策为准，完成托运并遵守安全须知。"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F183_MEASURE_CANDIDATE_SUCCESS 处理位于F2_TEST_SERVICE的行李并引导至超规柜台",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "EXECUTING",
+          "currentPlanVersionId": 1098,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": null,
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-08T20:48:27.687188",
+          "updatedAt": "2026-11-08T20:48:28.172431",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 1098,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261108-1139",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "F183 synthetic CAP_BAGGAGE_MEASURE",
+                "capabilityType": "CAP_BAGGAGE_MEASURE",
+                "inputParams": {
+                  "measureMode": "AUTO",
+                  "timeout": 30
+                },
+                "precondition": "device online",
+                "completionCondition": "measureStatus=SUCCESS",
+                "failureHandling": "失败重试一次后候选切换，仍失败局部重规划",
+                "stepTimeout": 180
+              },
+              {
+                "stepSeq": 2,
+                "stepGoal": "F183 synthetic CAP_OVERSIZE_ALERT",
+                "capabilityType": "CAP_OVERSIZE_ALERT",
+                "inputParams": {
+                  "baggageInfo": "{\"length\": 80, \"width\": 55, \"height\": 35, \"weight\": 35}",
+                  "alertLevel": "WARNING"
+                },
+                "precondition": "device online",
+                "completionCondition": "reportStatus=SUCCESS",
+                "failureHandling": "失败重试一次后候选切换，仍失败局部重规划",
+                "stepTimeout": 180
+              },
+              {
+                "stepSeq": 3,
+                "stepGoal": "F183 synthetic CAP_INFO_DISPLAY",
+                "capabilityType": "CAP_INFO_DISPLAY",
+                "inputParams": {
+                  "contentType": "TEXT",
+                  "contentData": "测试信息：请前往F2服务点",
+                  "displayDuration": 60
+                },
+                "precondition": "device online",
+                "completionCondition": "displayStatus=SUCCESS",
+                "failureHandling": "失败重试一次后候选切换，仍失败局部重规划",
+                "stepTimeout": 180
+              },
+              {
+                "stepSeq": 4,
+                "stepGoal": "F183 synthetic CAP_NAVIGATION",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "失败重试一次后候选切换，仍失败局部重规划",
+                "stepTimeout": 180
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "LOW",
+            "riskReasonCode": null,
+            "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.148",
+            "frozenAt": "2026-11-08T20:48:27.79893",
+            "createdAt": "2026-11-08T20:48:27.777837"
+          }
+        ],
+        "events": [
+          {
+            "id": 16698,
+            "taskId": 1122,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-08T20:48:27.689251",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F183_MEASURE_CANDIDATE_SUCCESS 处理位于F2_TEST_SERVICE的行李并引导至超规柜台",
+            "detail": "运行操作员oprator提交任务目标: F183_MEASURE_CANDIDATE_SUCCESS 处理位于F2_TEST_SERVICE的行李并引导至超规柜台",
+            "rawDetailSummary": "运行操作员oprator提交任务目标: F183_MEASURE_CANDIDATE_SUCCESS 处理位于F2_TEST_SERVICE的行李并引导至超规柜台"
+          },
+          {
+            "id": 16699,
+            "taskId": 1122,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-08T20:48:27.719142",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建",
+            "detail": "目标理解完成，关键信息已完整，进入规划上下文构建",
+            "rawDetailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 16700,
+            "taskId": 1122,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-08T20:48:27.75292",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261108-1139",
+            "detail": "生成规划上下文快照CTX-20261108-1139",
+            "rawDetailSummary": "生成规划上下文快照CTX-20261108-1139"
+          },
+          {
+            "id": 16701,
+            "taskId": 1122,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-08T20:48:27.796999",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1",
+            "detail": "候选计划生成完成，来源AUTONOMOUS，版本1",
+            "rawDetailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 16702,
+            "taskId": 1122,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-08T20:48:27.799938",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本",
+            "detail": "候选计划三类校验全部通过，已冻结版本",
+            "rawDetailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 16703,
+            "taskId": 1122,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-08T20:48:27.817586",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.148；推荐处置=AUTO_EXECUTE（自动执行）",
+            "detail": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.148；推荐处置=AUTO_EXECUTE（自动执行）",
+            "rawDetailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.148；推荐处置=AUTO_EXECUTE（自动执行）"
+          },
+          {
+            "id": 16704,
+            "taskId": 1122,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-08T20:48:27.834651",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-42B77D25(匹配度1.0,距离0.0,负载0)；AGT-F8CA3C99(匹配度1.0,距离0.0,负载0)，向候选AGT-42B77D25发起承接请求",
+            "detail": "步骤1候选排序（能力匹配->距离->负载）: AGT-42B77D25(匹配度1.0,距离0.0,负载0)；AGT-F8CA3C99(匹配度1.0,距离0.0,负载0)，向候选AGT-42B77D25发起承接请求",
+            "rawDetailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-42B77D25(匹配度1.0,距离0.0,负载0)；AGT-F8CA3C99(匹配度1.0,距离0.0,负载0)，向候选AGT-42B77D25发起承接请求"
+          },
+          {
+            "id": 16705,
+            "taskId": 1122,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-08T20:48:28.170445",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-42B77D25接受步骤1承接请求",
+            "detail": "设备代理AGT-42B77D25接受步骤1承接请求",
+            "rawDetailSummary": "设备代理AGT-42B77D25接受步骤1承接请求"
+          },
+          {
+            "id": 16706,
+            "taskId": 1122,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-08T20:48:28.174983",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261108204828-5D7F0033已下发至设备代理AGT-42B77D25，业务意图: F183 synthetic CAP_BAGGAGE_MEASURE",
+            "detail": "指令CMD-20261108204828-5D7F0033已下发至设备代理AGT-42B77D25，业务意图: F183 synthetic CAP_BAGGAGE_MEASURE",
+            "rawDetailSummary": "指令CMD-20261108204828-5D7F0033已下发至设备代理AGT-42B77D25，业务意图: F183 synthetic CAP_BAGGAGE_MEASURE"
+          },
+          {
+            "id": 16707,
+            "taskId": 1122,
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "occurredAt": "2026-11-08T20:48:28.376693",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_F183_SYNTHETIC_FAILURE",
+            "detailSummary": "指令CMD-20261108204828-5D7F0033收到设备代理AGT-42B77D25执行反馈: FAILED",
+            "detail": "指令CMD-20261108204828-5D7F0033收到设备代理AGT-42B77D25执行反馈: FAILED",
+            "rawDetailSummary": "指令CMD-20261108204828-5D7F0033收到设备代理AGT-42B77D25执行反馈: FAILED"
+          },
+          {
+            "id": 16708,
+            "taskId": 1122,
+            "eventType": "STEP_RETRY_DISPATCHED",
+            "occurredAt": "2026-11-08T20:48:28.38101",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_F183_SYNTHETIC_FAILURE",
+            "detailSummary": "步骤1自动重试1次，沿用执行指令编号CMD-20261108204828-5D7F0033，尝试序号1，原因: 执行结果: FAILED，原因: ERR_F183_SYNTHETIC_FAILURE",
+            "detail": "步骤1自动重试1次，沿用执行指令编号CMD-20261108204828-5D7F0033，尝试序号1，原因: 执行结果: FAILED，原因: ERR_F183_SYNTHETIC_FAILURE",
+            "rawDetailSummary": "步骤1自动重试1次，沿用执行指令编号CMD-20261108204828-5D7F0033，尝试序号1，原因: 执行结果: FAILED，原因: ERR_F183_SYNTHETIC_FAILURE"
+          },
+          {
+            "id": 16709,
+            "taskId": 1122,
+            "eventType": "EXCEPTION_DETECTED",
+            "occurredAt": "2026-11-08T20:48:28.385047",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_F183_SYNTHETIC_FAILURE",
+            "detailSummary": "识别到异常: STEP_FAILED，步骤1，详情: 执行结果: FAILED，原因: ERR_F183_SYNTHETIC_FAILURE",
+            "detail": "识别到异常: STEP_FAILED，步骤1，详情: 执行结果: FAILED，原因: ERR_F183_SYNTHETIC_FAILURE",
+            "rawDetailSummary": "识别到异常: STEP_FAILED，步骤1，详情: 执行结果: FAILED，原因: ERR_F183_SYNTHETIC_FAILURE"
+          },
+          {
+            "id": 16710,
+            "taskId": 1122,
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "occurredAt": "2026-11-08T20:48:28.588484",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_F183_SYNTHETIC_FAILURE",
+            "detailSummary": "指令CMD-20261108204828-5D7F0033收到设备代理AGT-42B77D25执行反馈: FAILED",
+            "detail": "指令CMD-20261108204828-5D7F0033收到设备代理AGT-42B77D25执行反馈: FAILED",
+            "rawDetailSummary": "指令CMD-20261108204828-5D7F0033收到设备代理AGT-42B77D25执行反馈: FAILED"
+          },
+          {
+            "id": 16711,
+            "taskId": 1122,
+            "eventType": "STEP_FAILED",
+            "occurredAt": "2026-11-08T20:48:28.596251",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_F183_SYNTHETIC_FAILURE",
+            "detailSummary": "步骤1重试后仍失败: 执行结果: FAILED，原因: ERR_F183_SYNTHETIC_FAILURE",
+            "detail": "步骤1重试后仍失败: 执行结果: FAILED，原因: ERR_F183_SYNTHETIC_FAILURE",
+            "rawDetailSummary": "步骤1重试后仍失败: 执行结果: FAILED，原因: ERR_F183_SYNTHETIC_FAILURE"
+          },
+          {
+            "id": 16712,
+            "taskId": 1122,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-08T20:48:28.621963",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-F8CA3C99(匹配度1.0,距离0.0,负载0)，向候选AGT-F8CA3C99发起承接请求",
+            "detail": "步骤1候选排序（能力匹配->距离->负载）: AGT-F8CA3C99(匹配度1.0,距离0.0,负载0)，向候选AGT-F8CA3C99发起承接请求",
+            "rawDetailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-F8CA3C99(匹配度1.0,距离0.0,负载0)，向候选AGT-F8CA3C99发起承接请求"
+          },
+          {
+            "id": 16713,
+            "taskId": 1122,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-08T20:48:28.830864",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-F8CA3C99接受步骤1承接请求",
+            "detail": "设备代理AGT-F8CA3C99接受步骤1承接请求",
+            "rawDetailSummary": "设备代理AGT-F8CA3C99接受步骤1承接请求"
+          },
+          {
+            "id": 16714,
+            "taskId": 1122,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-08T20:48:28.83583",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261108204828-5D7F0035已下发至设备代理AGT-F8CA3C99，业务意图: F183 synthetic CAP_BAGGAGE_MEASURE",
+            "detail": "指令CMD-20261108204828-5D7F0035已下发至设备代理AGT-F8CA3C99，业务意图: F183 synthetic CAP_BAGGAGE_MEASURE",
+            "rawDetailSummary": "指令CMD-20261108204828-5D7F0035已下发至设备代理AGT-F8CA3C99，业务意图: F183 synthetic CAP_BAGGAGE_MEASURE"
+          },
+          {
+            "id": 16715,
+            "taskId": 1122,
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "occurredAt": "2026-11-08T20:48:29.033351",
+            "trigger": "SYSTEM",
+            "reasonCode": "DEVICE_SUCCESS",
+            "detailSummary": "指令CMD-20261108204828-5D7F0035收到设备代理AGT-F8CA3C99执行反馈: SUCCESS",
+            "detail": "指令CMD-20261108204828-5D7F0035收到设备代理AGT-F8CA3C99执行反馈: SUCCESS",
+            "rawDetailSummary": "指令CMD-20261108204828-5D7F0035收到设备代理AGT-F8CA3C99执行反馈: SUCCESS"
+          },
+          {
+            "id": 16716,
+            "taskId": 1122,
+            "eventType": "STEP_COMPLETED",
+            "occurredAt": "2026-11-08T20:48:29.038898",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1完成条件已满足: measureStatus=SUCCESS",
+            "detail": "步骤1完成条件已满足: measureStatus=SUCCESS",
+            "rawDetailSummary": "步骤1完成条件已满足: measureStatus=SUCCESS"
+          },
+          {
+            "id": 16717,
+            "taskId": 1122,
+            "eventType": "EXCEPTION_RECOVERED",
+            "occurredAt": "2026-11-08T20:48:29.043609",
+            "trigger": "SYSTEM",
+            "reasonCode": "STEP_FAILED",
+            "detailSummary": "恢复动作: 候选设备切换，结果: 成功，步骤1已重新分配，异常类型: STEP_FAILED，影响结论: 计划可继续执行",
+            "detail": "恢复动作: 候选设备切换，结果: 成功，步骤1已重新分配，异常类型: STEP_FAILED，影响结论: 计划可继续执行",
+            "rawDetailSummary": "恢复动作: 候选设备切换，结果: 成功，步骤1已重新分配，异常类型: STEP_FAILED，影响结论: 计划可继续执行"
+          }
+        ],
+        "assignments": [
+          {
+            "id": 1629,
+            "stepSeq": 1,
+            "deviceAgentCode": "AGT-F8CA3C99",
+            "commandId": "CMD-20261108204828-5D7F0034",
+            "stepStatus": "COMPLETED",
+            "retryCount": 0,
+            "executionResult": "SUCCESS",
+            "reasonCode": "DEVICE_SUCCESS",
+            "outputParams": {
+              "measureStatus": "SUCCESS",
+              "length": 80.0,
+              "width": 55.0,
+              "height": 35.0,
+              "weight": 35.0,
+              "isOversize": true,
+              "baggageInfo": "synthetic baggage F183",
+              "reportStatus": "SUCCESS",
+              "alertId": "F183-ALERT",
+              "displayStatus": "SUCCESS",
+              "routeGenerated": true,
+              "dimensionThresholdCm": 158,
+              "weightThresholdKg": 32,
+              "thresholdSource": "SYNTHETIC_DEPLOYMENT_F024_158CM_32KG",
+              "totalDimensionCm": 170.0
+            },
+            "dispatchedAt": "2026-11-08T20:48:28.832477",
+            "feedbackAt": "2026-11-08T20:48:29.033351",
+            "rejectedAgentIds": [
+              "AGT-42B77D25"
+            ],
+            "acceptanceRequestedAt": "2026-11-08T20:48:28.623573",
+            "acceptedAt": "2026-11-08T20:48:28.828169",
+            "acceptanceDurationMs": 204,
+            "acceptanceResponseTime": "204ms"
+          },
+          {
+            "id": 1630,
+            "stepSeq": 2,
+            "deviceAgentCode": null,
+            "commandId": null,
+            "stepStatus": "FROZEN",
+            "retryCount": 0,
+            "executionResult": null,
+            "reasonCode": null,
+            "outputParams": null,
+            "dispatchedAt": null,
+            "feedbackAt": null,
+            "rejectedAgentIds": [],
+            "acceptanceRequestedAt": null,
+            "acceptedAt": null,
+            "acceptanceDurationMs": null,
+            "acceptanceResponseTime": null
+          },
+          {
+            "id": 1631,
+            "stepSeq": 3,
+            "deviceAgentCode": null,
+            "commandId": null,
+            "stepStatus": "FROZEN",
+            "retryCount": 0,
+            "executionResult": null,
+            "reasonCode": null,
+            "outputParams": null,
+            "dispatchedAt": null,
+            "feedbackAt": null,
+            "rejectedAgentIds": [],
+            "acceptanceRequestedAt": null,
+            "acceptedAt": null,
+            "acceptanceDurationMs": null,
+            "acceptanceResponseTime": null
+          },
+          {
+            "id": 1632,
+            "stepSeq": 4,
+            "deviceAgentCode": null,
+            "commandId": null,
+            "stepStatus": "FROZEN",
+            "retryCount": 0,
+            "executionResult": null,
+            "reasonCode": null,
+            "outputParams": null,
+            "dispatchedAt": null,
+            "feedbackAt": null,
+            "rejectedAgentIds": [],
+            "acceptanceRequestedAt": null,
+            "acceptedAt": null,
+            "acceptanceDurationMs": null,
+            "acceptanceResponseTime": null
+          }
+        ],
+        "commands": [
+          "3821|TASK_ACCEPT|ACCEPTED",
+          "3822|EXECUTE_CAPABILITY|FAILED",
+          "3823|EXECUTE_CAPABILITY|FAILED",
+          "3824|TASK_ACCEPT|ACCEPTED",
+          "3825|EXECUTE_CAPABILITY|SUCCEEDED"
+        ],
+        "bypassAuditRows": [],
+        "commandRows": [
+          {
+            "id": 3821,
+            "command_id": "CMD-20261108204827-5D7F0032",
+            "agent_code": "AGT-42B77D25",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 1122,
+            "step_seq": 1,
+            "capability_type": "CAP_BAGGAGE_MEASURE",
+            "command_payload": "{\"commandId\":\"CMD-20261108204827-5D7F0032\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261108-1112\",\"stepSeq\":1,\"capabilityType\":\"CAP_BAGGAGE_MEASURE\",\"inputParams\":{\"measureMode\":\"AUTO\",\"timeout\":30},\"issuedAt\":\"2026-11-08T20:48:27.8417631+08:00\",\"deadline\":\"2026-11-08T20:49:27.8417631+08:00\"}",
+            "command_status": "ACCEPTED",
+            "response_payload": "{\"commandId\":\"CMD-20261108204827-5D7F0032\",\"accepted\":true,\"rejectReason\":null}",
+            "created_at": "2026-11-08T20:48:27.841763",
+            "updated_at": "2026-11-08T20:48:28.165469"
+          },
+          {
+            "id": 3822,
+            "command_id": "CMD-20261108204828-5D7F0033",
+            "agent_code": "AGT-42B77D25",
+            "command_type": "EXECUTE_CAPABILITY",
+            "attempt_no": 0,
+            "task_id": 1122,
+            "step_seq": 1,
+            "capability_type": "CAP_BAGGAGE_MEASURE",
+            "command_payload": "{\"commandId\":\"CMD-20261108204828-5D7F0033\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261108-1112\",\"stepSeq\":1,\"capabilityType\":\"CAP_BAGGAGE_MEASURE\",\"inputParams\":{\"measureMode\":\"AUTO\",\"timeout\":30},\"issuedAt\":\"2026-11-08T20:48:28.182988+08:00\",\"deadline\":\"2026-11-08T20:49:28.182988+08:00\"}",
+            "command_status": "FAILED",
+            "response_payload": "{\"commandId\":\"CMD-20261108204828-5D7F0033\",\"attemptNo\":0,\"executionResult\":\"FAILED\",\"reasonCode\":\"ERR_F183_SYNTHETIC_FAILURE\",\"outputParams\":{}}",
+            "created_at": "2026-11-08T20:48:28.182988",
+            "updated_at": "2026-11-08T20:48:28.374044"
+          },
+          {
+            "id": 3823,
+            "command_id": "CMD-20261108204828-5D7F0033",
+            "agent_code": "AGT-42B77D25",
+            "command_type": "EXECUTE_CAPABILITY",
+            "attempt_no": 1,
+            "task_id": 1122,
+            "step_seq": 1,
+            "capability_type": "CAP_BAGGAGE_MEASURE",
+            "command_payload": "{\"commandId\":\"CMD-20261108204828-5D7F0033\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":1,\"taskId\":\"TASK-20261108-1112\",\"stepSeq\":1,\"capabilityType\":\"CAP_BAGGAGE_MEASURE\",\"inputParams\":{\"measureMode\":\"AUTO\",\"timeout\":30},\"issuedAt\":\"2026-11-08T20:48:28.3913755+08:00\",\"deadline\":\"2026-11-08T20:49:28.3913755+08:00\"}",
+            "command_status": "FAILED",
+            "response_payload": "{\"commandId\":\"CMD-20261108204828-5D7F0033\",\"attemptNo\":1,\"executionResult\":\"FAILED\",\"reasonCode\":\"ERR_F183_SYNTHETIC_FAILURE\",\"outputParams\":{}}",
+            "created_at": "2026-11-08T20:48:28.391376",
+            "updated_at": "2026-11-08T20:48:28.584035"
+          },
+          {
+            "id": 3824,
+            "command_id": "CMD-20261108204828-5D7F0034",
+            "agent_code": "AGT-F8CA3C99",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 1122,
+            "step_seq": 1,
+            "capability_type": "CAP_BAGGAGE_MEASURE",
+            "command_payload": "{\"commandId\":\"CMD-20261108204828-5D7F0034\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261108-1112\",\"stepSeq\":1,\"capabilityType\":\"CAP_BAGGAGE_MEASURE\",\"inputParams\":{\"measureMode\":\"AUTO\",\"timeout\":30},\"issuedAt\":\"2026-11-08T20:48:28.6295873+08:00\",\"deadline\":\"2026-11-08T20:49:28.6295873+08:00\"}",
+            "command_status": "ACCEPTED",
+            "response_payload": "{\"commandId\":\"CMD-20261108204828-5D7F0034\",\"accepted\":true,\"rejectReason\":null}",
+            "created_at": "2026-11-08T20:48:28.63138",
+            "updated_at": "2026-11-08T20:48:28.826045"
+          },
+          {
+            "id": 3825,
+            "command_id": "CMD-20261108204828-5D7F0035",
+            "agent_code": "AGT-F8CA3C99",
+            "command_type": "EXECUTE_CAPABILITY",
+            "attempt_no": 0,
+            "task_id": 1122,
+            "step_seq": 1,
+            "capability_type": "CAP_BAGGAGE_MEASURE",
+            "command_payload": "{\"commandId\":\"CMD-20261108204828-5D7F0035\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261108-1112\",\"stepSeq\":1,\"capabilityType\":\"CAP_BAGGAGE_MEASURE\",\"inputParams\":{\"measureMode\":\"AUTO\",\"timeout\":30},\"issuedAt\":\"2026-11-08T20:48:28.8435931+08:00\",\"deadline\":\"2026-11-08T20:49:28.8435931+08:00\"}",
+            "command_status": "SUCCEEDED",
+            "response_payload": "{\"commandId\":\"CMD-20261108204828-5D7F0035\",\"attemptNo\":0,\"executionResult\":\"SUCCESS\",\"reasonCode\":\"DEVICE_SUCCESS\",\"outputParams\":{\"measureStatus\":\"SUCCESS\",\"length\":80.0,\"width\":55.0,\"height\":35.0,\"weight\":35.0,\"isOversize\":true,\"baggageInfo\":\"synthetic baggage F183\",\"reportStatus\":\"SUCCESS\",\"alertId\":\"F183-ALERT\",\"displayStatus\":\"SUCCESS\",\"routeGenerated\":true,\"dimensionThresholdCm\":158,\"weightThresholdKg\":32,\"thresholdSource\":\"SYNTHETIC_DEPLOYMENT_F024_158CM_32KG\",\"totalDimensionCm\":170.0}}",
+            "created_at": "2026-11-08T20:48:28.843593",
+            "updated_at": "2026-11-08T20:48:29.031337"
+          }
+        ],
+        "exceptions": [
+          {
+            "id": 661,
+            "task_id": 1122,
+            "step_seq": 1,
+            "exception_type": "STEP_FAILED",
+            "occurred_at": "2026-11-08T20:48:28.38263",
+            "recovery_action": "指令重试",
+            "recovery_result": "SUCCESS",
+            "impact_conclusion": "已切换候选设备重新分配，计划可继续执行，不触发重新规划",
+            "reason_code": "ERR_F183_SYNTHETIC_FAILURE",
+            "exception_status": "RESOLVED",
+            "resolved_at": "2026-11-08T20:48:29.041919",
+            "resolved_by": "SYSTEM"
+          }
+        ],
+        "transport": {
+          "G160_F016_A": [],
+          "G145_F013_SCAN": [
+            {
+              "at": "2026-11-08T20:48:28.657841+08:00",
+              "message": {
+                "commandId": "CMD-20261108204828-5D7F0034",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261108-1112",
+                "stepSeq": 1,
+                "capabilityType": "CAP_BAGGAGE_MEASURE",
+                "inputParams": {
+                  "measureMode": "AUTO",
+                  "timeout": 30
+                },
+                "issuedAt": 1794142108.6295874,
+                "deadline": 1794142168.6295874
+              }
+            },
+            {
+              "at": "2026-11-08T20:48:28.860109+08:00",
+              "message": {
+                "commandId": "CMD-20261108204828-5D7F0035",
+                "commandType": "EXECUTE_CAPABILITY",
+                "attemptNo": 0,
+                "taskId": "TASK-20261108-1112",
+                "stepSeq": 1,
+                "capabilityType": "CAP_BAGGAGE_MEASURE",
+                "inputParams": {
+                  "measureMode": "AUTO",
+                  "timeout": 30
+                },
+                "issuedAt": 1794142108.8435931,
+                "deadline": 1794142168.8435931
+              }
+            }
+          ],
+          "G145_F013_DISPLAY": [],
+          "G160_F016_B": [],
+          "G183_F024_SCAN2": [
+            {
+              "at": "2026-11-08T20:48:27.848953+08:00",
+              "message": {
+                "commandId": "CMD-20261108204827-5D7F0032",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261108-1112",
+                "stepSeq": 1,
+                "capabilityType": "CAP_BAGGAGE_MEASURE",
+                "inputParams": {
+                  "measureMode": "AUTO",
+                  "timeout": 30
+                },
+                "issuedAt": 1794142107.841763,
+                "deadline": 1794142167.841763
+              }
+            },
+            {
+              "at": "2026-11-08T20:48:28.205069+08:00",
+              "message": {
+                "commandId": "CMD-20261108204828-5D7F0033",
+                "commandType": "EXECUTE_CAPABILITY",
+                "attemptNo": 0,
+                "taskId": "TASK-20261108-1112",
+                "stepSeq": 1,
+                "capabilityType": "CAP_BAGGAGE_MEASURE",
+                "inputParams": {
+                  "measureMode": "AUTO",
+                  "timeout": 30
+                },
+                "issuedAt": 1794142108.182988,
+                "deadline": 1794142168.182988
+              }
+            },
+            {
+              "at": "2026-11-08T20:48:28.411654+08:00",
+              "message": {
+                "commandId": "CMD-20261108204828-5D7F0033",
+                "commandType": "EXECUTE_CAPABILITY",
+                "attemptNo": 1,
+                "taskId": "TASK-20261108-1112",
+                "stepSeq": 1,
+                "capabilityType": "CAP_BAGGAGE_MEASURE",
+                "inputParams": {
+                  "measureMode": "AUTO",
+                  "timeout": 30
+                },
+                "issuedAt": 1794142108.3913755,
+                "deadline": 1794142168.3913755
+              }
+            }
+          ]
+        }
+      },
+      "checks": {
+        "feedback200": true,
+        "outcome": false,
+        "atMostOneReplan": true,
+        "retryObserved": true,
+        "twoDistinctDevices": true
+      },
+      "result": "F"
+    },
+    {
+      "name": "measurement-device-offline-recovery",
+      "at": "2026-11-08T20:52:34.432439+08:00",
+      "taskId": 1138,
+      "request": {
+        "taskGoal": "F183_MEASUREMENT_DEVICE_OFFLINE_RECOVERY 处理位于F2_TEST_SERVICE的行李并引导至超规柜台",
+        "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+        "sceneParams": {
+          "baggageLocation": "F2_TEST_SERVICE",
+          "targetCounter": "F2_TEST_GATE",
+          "targetLocation": "F2_TEST_GATE",
+          "baggageId": "F183_MEASUREMENT_DEVICE_OFFLINE_RECOVERY",
+          "tempBusinessId": "F183_MEASUREMENT_DEVICE_OFFLINE_RECOVERY",
+          "dimensionThresholdCm": 158,
+          "weightThresholdKg": 32,
+          "thresholdSource": "SYNTHETIC_DEPLOYMENT_F024_158CM_32KG",
+          "routePreference": "BARRIER_FREE",
+          "alertLevel": "WARNING",
+          "contentType": "TEXT",
+          "contentData": "超规行李办理提示",
+          "handlingInstructions": "虚构部署办理说明：前往超规柜台核验，费用以承运人现场政策为准，完成托运并遵守安全须知。"
+        }
+      },
+      "response": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 1138,
+            "taskCode": "TASK-20261108-1128",
+            "taskGoal": "F183_MEASUREMENT_DEVICE_OFFLINE_RECOVERY 处理位于F2_TEST_SERVICE的行李并引导至超规柜台",
+            "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+            "sceneParams": {
+              "baggageLocation": "F2_TEST_SERVICE",
+              "targetCounter": "F2_TEST_GATE",
+              "targetLocation": "F2_TEST_GATE",
+              "baggageId": "F183_MEASUREMENT_DEVICE_OFFLINE_RECOVERY",
+              "tempBusinessId": "F183_MEASUREMENT_DEVICE_OFFLINE_RECOVERY",
+              "dimensionThresholdCm": 158,
+              "weightThresholdKg": 32,
+              "thresholdSource": "SYNTHETIC_DEPLOYMENT_F024_158CM_32KG",
+              "routePreference": "BARRIER_FREE",
+              "alertLevel": "WARNING",
+              "contentType": "TEXT",
+              "contentData": "超规行李办理提示",
+              "handlingInstructions": "虚构部署办理说明：前往超规柜台核验，费用以承运人现场政策为准，完成托运并遵守安全须知。"
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=true",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F183_MEASUREMENT_DEVICE_OFFLINE_RECOVERY 处理位于F2_TEST_SERVICE的行李并引导至超规柜台",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "PLANNING",
+            "currentPlanVersionId": null,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": null,
+            "failureReason": null,
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-08T20:52:34.0750865",
+            "updatedAt": "2026-11-08T20:52:34.0750865",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-08T20:52:34.185827100+08:00"
+        }
+      },
+      "offlineReport": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "timestamp": "2026-11-08T20:52:34.520944+08:00"
+        }
+      },
+      "preOfflineMessages": [
+        {
+          "at": "2026-11-08T20:52:34.189407+08:00",
+          "message": {
+            "commandId": "CMD-20261108205234-5D7F0080",
+            "commandType": "TASK_ACCEPT",
+            "attemptNo": 0,
+            "taskId": "TASK-20261108-1128",
+            "stepSeq": 1,
+            "capabilityType": "CAP_BAGGAGE_MEASURE",
+            "inputParams": {
+              "measureMode": "AUTO",
+              "timeout": 30
+            },
+            "issuedAt": 1794142354.183094,
+            "deadline": 1794142414.183094
+          }
+        },
+        {
+          "at": "2026-11-08T20:52:34.683992+08:00",
+          "message": {
+            "commandId": "CMD-20261108205234-5D7F0081",
+            "commandType": "EXECUTE_CAPABILITY",
+            "attemptNo": 0,
+            "taskId": "TASK-20261108-1128",
+            "stepSeq": 1,
+            "capabilityType": "CAP_BAGGAGE_MEASURE",
+            "inputParams": {
+              "measureMode": "AUTO",
+              "timeout": 30
+            },
+            "issuedAt": 1794142354.5180883,
+            "deadline": 1794142414.5180883
+          }
+        }
+      ],
+      "actions": [
+        {
+          "deviceCode": "G145_F013_SCAN",
+          "message": {
+            "commandId": "CMD-20261108205234-5D7F0082",
+            "commandType": "TASK_ACCEPT",
+            "attemptNo": 0,
+            "taskId": "TASK-20261108-1128",
+            "stepSeq": 1,
+            "capabilityType": "CAP_BAGGAGE_MEASURE",
+            "inputParams": {
+              "measureMode": "AUTO",
+              "timeout": 30
+            },
+            "issuedAt": 1794142354.691988,
+            "deadline": 1794142414.691988
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-08T20:52:34.773364800+08:00"
+            }
+          }
+        },
+        {
+          "deviceCode": "G145_F013_SCAN",
+          "message": {
+            "commandId": "CMD-20261108205234-5D7F0083",
+            "commandType": "EXECUTE_CAPABILITY",
+            "attemptNo": 0,
+            "taskId": "TASK-20261108-1128",
+            "stepSeq": 1,
+            "capabilityType": "CAP_BAGGAGE_MEASURE",
+            "inputParams": {
+              "measureMode": "AUTO",
+              "timeout": 30
+            },
+            "issuedAt": 1794142354.7687552,
+            "deadline": 1794142414.7687552
+          },
+          "response": {
+            "http": 200,
+            "body": {
+              "code": 200,
+              "message": "success",
+              "timestamp": "2026-11-08T20:52:35.038702900+08:00"
+            }
+          }
+        }
+      ],
+      "after": {
+        "task": {
+          "id": 1138,
+          "taskCode": "TASK-20261108-1128",
+          "taskGoal": "F183_MEASUREMENT_DEVICE_OFFLINE_RECOVERY 处理位于F2_TEST_SERVICE的行李并引导至超规柜台",
+          "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+          "sceneParams": {
+            "baggageLocation": "F2_TEST_SERVICE",
+            "targetCounter": "F2_TEST_GATE",
+            "targetLocation": "F2_TEST_GATE",
+            "baggageId": "F183_MEASUREMENT_DEVICE_OFFLINE_RECOVERY",
+            "tempBusinessId": "F183_MEASUREMENT_DEVICE_OFFLINE_RECOVERY",
+            "dimensionThresholdCm": 158,
+            "weightThresholdKg": 32,
+            "thresholdSource": "SYNTHETIC_DEPLOYMENT_F024_158CM_32KG",
+            "routePreference": "BARRIER_FREE",
+            "alertLevel": "WARNING",
+            "contentType": "TEXT",
+            "contentData": "超规行李办理提示",
+            "handlingInstructions": "虚构部署办理说明：前往超规柜台核验，费用以承运人现场政策为准，完成托运并遵守安全须知。"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F183_MEASUREMENT_DEVICE_OFFLINE_RECOVERY 处理位于F2_TEST_SERVICE的行李并引导至超规柜台",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "EXECUTING",
+          "currentPlanVersionId": 1115,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": null,
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-08T20:52:34.075087",
+          "updatedAt": "2026-11-08T20:52:34.507015",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 1115,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261108-1158",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "F183 synthetic CAP_BAGGAGE_MEASURE",
+                "capabilityType": "CAP_BAGGAGE_MEASURE",
+                "inputParams": {
+                  "measureMode": "AUTO",
+                  "timeout": 30
+                },
+                "precondition": "device online",
+                "completionCondition": "measureStatus=SUCCESS",
+                "failureHandling": "失败重试一次后候选切换，仍失败局部重规划",
+                "stepTimeout": 180
+              },
+              {
+                "stepSeq": 2,
+                "stepGoal": "F183 synthetic CAP_OVERSIZE_ALERT",
+                "capabilityType": "CAP_OVERSIZE_ALERT",
+                "inputParams": {
+                  "baggageInfo": "{\"length\": 80, \"width\": 55, \"height\": 35, \"weight\": 35}",
+                  "alertLevel": "WARNING"
+                },
+                "precondition": "device online",
+                "completionCondition": "reportStatus=SUCCESS",
+                "failureHandling": "失败重试一次后候选切换，仍失败局部重规划",
+                "stepTimeout": 180
+              },
+              {
+                "stepSeq": 3,
+                "stepGoal": "F183 synthetic CAP_INFO_DISPLAY",
+                "capabilityType": "CAP_INFO_DISPLAY",
+                "inputParams": {
+                  "contentType": "TEXT",
+                  "contentData": "测试信息：请前往F2服务点",
+                  "displayDuration": 60
+                },
+                "precondition": "device online",
+                "completionCondition": "displayStatus=SUCCESS",
+                "failureHandling": "失败重试一次后候选切换，仍失败局部重规划",
+                "stepTimeout": 180
+              },
+              {
+                "stepSeq": 4,
+                "stepGoal": "F183 synthetic CAP_NAVIGATION",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "失败重试一次后候选切换，仍失败局部重规划",
+                "stepTimeout": 180
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "PASS",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [],
+            "riskLevel": "LOW",
+            "riskReasonCode": null,
+            "judgmentBasis": "未命中确定性高风险规则，风险信号数量不足以触发降级",
+            "confidence": 0.99,
+            "ruleSetVersion": "V1.148",
+            "frozenAt": "2026-11-08T20:52:34.151931",
+            "createdAt": "2026-11-08T20:52:34.145423"
+          }
+        ],
+        "events": [
+          {
+            "id": 17051,
+            "taskId": 1138,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-08T20:52:34.07761",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F183_MEASUREMENT_DEVICE_OFFLINE_RECOVERY 处理位于F2_TEST_SERVICE的行李并引导至超规柜台",
+            "detail": "运行操作员oprator提交任务目标: F183_MEASUREMENT_DEVICE_OFFLINE_RECOVERY 处理位于F2_TEST_SERVICE的行李并引导至超规柜台",
+            "rawDetailSummary": "运行操作员oprator提交任务目标: F183_MEASUREMENT_DEVICE_OFFLINE_RECOVERY 处理位于F2_TEST_SERVICE的行李并引导至超规柜台"
+          },
+          {
+            "id": 17052,
+            "taskId": 1138,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-08T20:52:34.109839",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建",
+            "detail": "目标理解完成，关键信息已完整，进入规划上下文构建",
+            "rawDetailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 17053,
+            "taskId": 1138,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-08T20:52:34.122015",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261108-1158",
+            "detail": "生成规划上下文快照CTX-20261108-1158",
+            "rawDetailSummary": "生成规划上下文快照CTX-20261108-1158"
+          },
+          {
+            "id": 17054,
+            "taskId": 1138,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-08T20:52:34.149207",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1",
+            "detail": "候选计划生成完成，来源AUTONOMOUS，版本1",
+            "rawDetailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 17055,
+            "taskId": 1138,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-08T20:52:34.152558",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划三类校验全部通过，已冻结版本",
+            "detail": "候选计划三类校验全部通过，已冻结版本",
+            "rawDetailSummary": "候选计划三类校验全部通过，已冻结版本"
+          },
+          {
+            "id": 17056,
+            "taskId": 1138,
+            "eventType": "SUPERVISION_JUDGED",
+            "occurredAt": "2026-11-08T20:52:34.1589",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.148；推荐处置=AUTO_EXECUTE（自动执行）",
+            "detail": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.148；推荐处置=AUTO_EXECUTE（自动执行）",
+            "rawDetailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则，风险信号数量不足以触发降级；置信度=0.99（仅作参考，不覆盖三类校验结果）；规则集版本=V1.148；推荐处置=AUTO_EXECUTE（自动执行）"
+          },
+          {
+            "id": 17057,
+            "taskId": 1138,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-08T20:52:34.173242",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-42B77D25(匹配度1.0,距离0.0,负载0)；AGT-F8CA3C99(匹配度1.0,距离0.0,负载0)，向候选AGT-42B77D25发起承接请求",
+            "detail": "步骤1候选排序（能力匹配->距离->负载）: AGT-42B77D25(匹配度1.0,距离0.0,负载0)；AGT-F8CA3C99(匹配度1.0,距离0.0,负载0)，向候选AGT-42B77D25发起承接请求",
+            "rawDetailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-42B77D25(匹配度1.0,距离0.0,负载0)；AGT-F8CA3C99(匹配度1.0,距离0.0,负载0)，向候选AGT-42B77D25发起承接请求"
+          },
+          {
+            "id": 17058,
+            "taskId": 1138,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-08T20:52:34.504497",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-42B77D25接受步骤1承接请求",
+            "detail": "设备代理AGT-42B77D25接受步骤1承接请求",
+            "rawDetailSummary": "设备代理AGT-42B77D25接受步骤1承接请求"
+          },
+          {
+            "id": 17059,
+            "taskId": 1138,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-08T20:52:34.511785",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261108205234-5D7F0081已下发至设备代理AGT-42B77D25，业务意图: F183 synthetic CAP_BAGGAGE_MEASURE",
+            "detail": "指令CMD-20261108205234-5D7F0081已下发至设备代理AGT-42B77D25，业务意图: F183 synthetic CAP_BAGGAGE_MEASURE",
+            "rawDetailSummary": "指令CMD-20261108205234-5D7F0081已下发至设备代理AGT-42B77D25，业务意图: F183 synthetic CAP_BAGGAGE_MEASURE"
+          },
+          {
+            "id": 17060,
+            "taskId": 1138,
+            "eventType": "EXCEPTION_DETECTED",
+            "occurredAt": "2026-11-08T20:52:34.620471",
+            "trigger": "SYSTEM",
+            "reasonCode": "AGENT_OFFLINE",
+            "detailSummary": "识别到异常: AGENT_OFFLINE，步骤1，详情: 设备代理AGT-42B77D25心跳超时离线，正占用该任务步骤",
+            "detail": "识别到异常: AGENT_OFFLINE，步骤1，详情: 设备代理AGT-42B77D25心跳超时离线，正占用该任务步骤",
+            "rawDetailSummary": "识别到异常: AGENT_OFFLINE，步骤1，详情: 设备代理AGT-42B77D25心跳超时离线，正占用该任务步骤"
+          },
+          {
+            "id": 17061,
+            "taskId": 1138,
+            "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+            "occurredAt": "2026-11-08T20:52:34.682423",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-F8CA3C99(匹配度1.0,距离0.0,负载0)，向候选AGT-F8CA3C99发起承接请求",
+            "detail": "步骤1候选排序（能力匹配->距离->负载）: AGT-F8CA3C99(匹配度1.0,距离0.0,负载0)，向候选AGT-F8CA3C99发起承接请求",
+            "rawDetailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-F8CA3C99(匹配度1.0,距离0.0,负载0)，向候选AGT-F8CA3C99发起承接请求"
+          },
+          {
+            "id": 17062,
+            "taskId": 1138,
+            "eventType": "AGENT_ASSIGNED",
+            "occurredAt": "2026-11-08T20:52:34.756422",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-F8CA3C99接受步骤1承接请求",
+            "detail": "设备代理AGT-F8CA3C99接受步骤1承接请求",
+            "rawDetailSummary": "设备代理AGT-F8CA3C99接受步骤1承接请求"
+          },
+          {
+            "id": 17063,
+            "taskId": 1138,
+            "eventType": "STEP_DISPATCHED",
+            "occurredAt": "2026-11-08T20:52:34.762705",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "指令CMD-20261108205234-5D7F0083已下发至设备代理AGT-F8CA3C99，业务意图: F183 synthetic CAP_BAGGAGE_MEASURE",
+            "detail": "指令CMD-20261108205234-5D7F0083已下发至设备代理AGT-F8CA3C99，业务意图: F183 synthetic CAP_BAGGAGE_MEASURE",
+            "rawDetailSummary": "指令CMD-20261108205234-5D7F0083已下发至设备代理AGT-F8CA3C99，业务意图: F183 synthetic CAP_BAGGAGE_MEASURE"
+          },
+          {
+            "id": 17064,
+            "taskId": 1138,
+            "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+            "occurredAt": "2026-11-08T20:52:35.017044",
+            "trigger": "SYSTEM",
+            "reasonCode": "DEVICE_SUCCESS",
+            "detailSummary": "指令CMD-20261108205234-5D7F0083收到设备代理AGT-F8CA3C99执行反馈: SUCCESS",
+            "detail": "指令CMD-20261108205234-5D7F0083收到设备代理AGT-F8CA3C99执行反馈: SUCCESS",
+            "rawDetailSummary": "指令CMD-20261108205234-5D7F0083收到设备代理AGT-F8CA3C99执行反馈: SUCCESS"
+          },
+          {
+            "id": 17065,
+            "taskId": 1138,
+            "eventType": "STEP_COMPLETED",
+            "occurredAt": "2026-11-08T20:52:35.023416",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "步骤1完成条件已满足: measureStatus=SUCCESS",
+            "detail": "步骤1完成条件已满足: measureStatus=SUCCESS",
+            "rawDetailSummary": "步骤1完成条件已满足: measureStatus=SUCCESS"
+          },
+          {
+            "id": 17066,
+            "taskId": 1138,
+            "eventType": "EXCEPTION_RECOVERED",
+            "occurredAt": "2026-11-08T20:52:35.027959",
+            "trigger": "SYSTEM",
+            "reasonCode": "AGENT_OFFLINE",
+            "detailSummary": "恢复动作: 候选设备切换，结果: 成功，步骤1已重新分配，异常类型: AGENT_OFFLINE，影响结论: 计划可继续执行",
+            "detail": "恢复动作: 候选设备切换，结果: 成功，步骤1已重新分配，异常类型: AGENT_OFFLINE，影响结论: 计划可继续执行",
+            "rawDetailSummary": "恢复动作: 候选设备切换，结果: 成功，步骤1已重新分配，异常类型: AGENT_OFFLINE，影响结论: 计划可继续执行"
+          },
+          {
+            "id": 17067,
+            "taskId": 1138,
+            "eventType": "AGENT_ONLINE_RECOVERED",
+            "occurredAt": "2026-11-08T20:52:37.031645",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-42B77D25恢复上报，重新置为在线并纳入候选集合",
+            "detail": "设备代理AGT-42B77D25恢复上报，重新置为在线并纳入候选集合",
+            "rawDetailSummary": "设备代理AGT-42B77D25恢复上报，重新置为在线并纳入候选集合"
+          },
+          {
+            "id": 17068,
+            "taskId": 1138,
+            "eventType": "AGENT_ONLINE_RECOVERED",
+            "occurredAt": "2026-11-08T20:52:41.066366",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-42B77D25恢复上报，重新置为在线并纳入候选集合",
+            "detail": "设备代理AGT-42B77D25恢复上报，重新置为在线并纳入候选集合",
+            "rawDetailSummary": "设备代理AGT-42B77D25恢复上报，重新置为在线并纳入候选集合"
+          },
+          {
+            "id": 17069,
+            "taskId": 1138,
+            "eventType": "AGENT_ONLINE_RECOVERED",
+            "occurredAt": "2026-11-08T20:52:45.099602",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-42B77D25恢复上报，重新置为在线并纳入候选集合",
+            "detail": "设备代理AGT-42B77D25恢复上报，重新置为在线并纳入候选集合",
+            "rawDetailSummary": "设备代理AGT-42B77D25恢复上报，重新置为在线并纳入候选集合"
+          },
+          {
+            "id": 17070,
+            "taskId": 1138,
+            "eventType": "AGENT_ONLINE_RECOVERED",
+            "occurredAt": "2026-11-08T20:52:49.125408",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-42B77D25恢复上报，重新置为在线并纳入候选集合",
+            "detail": "设备代理AGT-42B77D25恢复上报，重新置为在线并纳入候选集合",
+            "rawDetailSummary": "设备代理AGT-42B77D25恢复上报，重新置为在线并纳入候选集合"
+          },
+          {
+            "id": 17071,
+            "taskId": 1138,
+            "eventType": "AGENT_ONLINE_RECOVERED",
+            "occurredAt": "2026-11-08T20:52:53.144831",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-42B77D25恢复上报，重新置为在线并纳入候选集合",
+            "detail": "设备代理AGT-42B77D25恢复上报，重新置为在线并纳入候选集合",
+            "rawDetailSummary": "设备代理AGT-42B77D25恢复上报，重新置为在线并纳入候选集合"
+          },
+          {
+            "id": 17072,
+            "taskId": 1138,
+            "eventType": "AGENT_ONLINE_RECOVERED",
+            "occurredAt": "2026-11-08T20:52:57.158287",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-42B77D25恢复上报，重新置为在线并纳入候选集合",
+            "detail": "设备代理AGT-42B77D25恢复上报，重新置为在线并纳入候选集合",
+            "rawDetailSummary": "设备代理AGT-42B77D25恢复上报，重新置为在线并纳入候选集合"
+          },
+          {
+            "id": 17073,
+            "taskId": 1138,
+            "eventType": "AGENT_ONLINE_RECOVERED",
+            "occurredAt": "2026-11-08T20:53:01.2075",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-42B77D25恢复上报，重新置为在线并纳入候选集合",
+            "detail": "设备代理AGT-42B77D25恢复上报，重新置为在线并纳入候选集合",
+            "rawDetailSummary": "设备代理AGT-42B77D25恢复上报，重新置为在线并纳入候选集合"
+          },
+          {
+            "id": 17074,
+            "taskId": 1138,
+            "eventType": "AGENT_ONLINE_RECOVERED",
+            "occurredAt": "2026-11-08T20:53:05.231686",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-42B77D25恢复上报，重新置为在线并纳入候选集合",
+            "detail": "设备代理AGT-42B77D25恢复上报，重新置为在线并纳入候选集合",
+            "rawDetailSummary": "设备代理AGT-42B77D25恢复上报，重新置为在线并纳入候选集合"
+          },
+          {
+            "id": 17075,
+            "taskId": 1138,
+            "eventType": "AGENT_ONLINE_RECOVERED",
+            "occurredAt": "2026-11-08T20:53:09.248718",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-42B77D25恢复上报，重新置为在线并纳入候选集合",
+            "detail": "设备代理AGT-42B77D25恢复上报，重新置为在线并纳入候选集合",
+            "rawDetailSummary": "设备代理AGT-42B77D25恢复上报，重新置为在线并纳入候选集合"
+          },
+          {
+            "id": 17076,
+            "taskId": 1138,
+            "eventType": "AGENT_ONLINE_RECOVERED",
+            "occurredAt": "2026-11-08T20:53:13.271046",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "设备代理AGT-42B77D25恢复上报，重新置为在线并纳入候选集合",
+            "detail": "设备代理AGT-42B77D25恢复上报，重新置为在线并纳入候选集合",
+            "rawDetailSummary": "设备代理AGT-42B77D25恢复上报，重新置为在线并纳入候选集合"
+          }
+        ],
+        "assignments": [
+          {
+            "id": 1670,
+            "stepSeq": 1,
+            "deviceAgentCode": "AGT-F8CA3C99",
+            "commandId": "CMD-20261108205234-5D7F0082",
+            "stepStatus": "COMPLETED",
+            "retryCount": 0,
+            "executionResult": "SUCCESS",
+            "reasonCode": "DEVICE_SUCCESS",
+            "outputParams": {
+              "measureStatus": "SUCCESS",
+              "length": 80.0,
+              "width": 55.0,
+              "height": 35.0,
+              "weight": 35.0,
+              "isOversize": true,
+              "baggageInfo": "synthetic baggage F183",
+              "reportStatus": "SUCCESS",
+              "alertId": "F183-ALERT",
+              "displayStatus": "SUCCESS",
+              "routeGenerated": true,
+              "dimensionThresholdCm": 158,
+              "weightThresholdKg": 32,
+              "thresholdSource": "SYNTHETIC_DEPLOYMENT_F024_158CM_32KG",
+              "totalDimensionCm": 170.0
+            },
+            "dispatchedAt": "2026-11-08T20:52:34.761673",
+            "feedbackAt": "2026-11-08T20:52:35.017044",
+            "rejectedAgentIds": [
+              "AGT-42B77D25"
+            ],
+            "acceptanceRequestedAt": "2026-11-08T20:52:34.684093",
+            "acceptedAt": "2026-11-08T20:52:34.754156",
+            "acceptanceDurationMs": 70,
+            "acceptanceResponseTime": "70ms"
+          },
+          {
+            "id": 1671,
+            "stepSeq": 2,
+            "deviceAgentCode": null,
+            "commandId": null,
+            "stepStatus": "FROZEN",
+            "retryCount": 0,
+            "executionResult": null,
+            "reasonCode": null,
+            "outputParams": null,
+            "dispatchedAt": null,
+            "feedbackAt": null,
+            "rejectedAgentIds": [],
+            "acceptanceRequestedAt": null,
+            "acceptedAt": null,
+            "acceptanceDurationMs": null,
+            "acceptanceResponseTime": null
+          },
+          {
+            "id": 1672,
+            "stepSeq": 3,
+            "deviceAgentCode": null,
+            "commandId": null,
+            "stepStatus": "FROZEN",
+            "retryCount": 0,
+            "executionResult": null,
+            "reasonCode": null,
+            "outputParams": null,
+            "dispatchedAt": null,
+            "feedbackAt": null,
+            "rejectedAgentIds": [],
+            "acceptanceRequestedAt": null,
+            "acceptedAt": null,
+            "acceptanceDurationMs": null,
+            "acceptanceResponseTime": null
+          },
+          {
+            "id": 1673,
+            "stepSeq": 4,
+            "deviceAgentCode": null,
+            "commandId": null,
+            "stepStatus": "FROZEN",
+            "retryCount": 0,
+            "executionResult": null,
+            "reasonCode": null,
+            "outputParams": null,
+            "dispatchedAt": null,
+            "feedbackAt": null,
+            "rejectedAgentIds": [],
+            "acceptanceRequestedAt": null,
+            "acceptedAt": null,
+            "acceptanceDurationMs": null,
+            "acceptanceResponseTime": null
+          }
+        ],
+        "commands": [
+          "3906|TASK_ACCEPT|ACCEPTED",
+          "3907|EXECUTE_CAPABILITY|SENT",
+          "3908|TASK_ACCEPT|ACCEPTED",
+          "3909|EXECUTE_CAPABILITY|SUCCEEDED"
+        ],
+        "bypassAuditRows": [],
+        "commandRows": [
+          {
+            "id": 3906,
+            "command_id": "CMD-20261108205234-5D7F0080",
+            "agent_code": "AGT-42B77D25",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 1138,
+            "step_seq": 1,
+            "capability_type": "CAP_BAGGAGE_MEASURE",
+            "command_payload": "{\"commandId\":\"CMD-20261108205234-5D7F0080\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261108-1128\",\"stepSeq\":1,\"capabilityType\":\"CAP_BAGGAGE_MEASURE\",\"inputParams\":{\"measureMode\":\"AUTO\",\"timeout\":30},\"issuedAt\":\"2026-11-08T20:52:34.1830941+08:00\",\"deadline\":\"2026-11-08T20:53:34.1830941+08:00\"}",
+            "command_status": "ACCEPTED",
+            "response_payload": "{\"commandId\":\"CMD-20261108205234-5D7F0080\",\"accepted\":true,\"rejectReason\":null}",
+            "created_at": "2026-11-08T20:52:34.183094",
+            "updated_at": "2026-11-08T20:52:34.500733"
+          },
+          {
+            "id": 3907,
+            "command_id": "CMD-20261108205234-5D7F0081",
+            "agent_code": "AGT-42B77D25",
+            "command_type": "EXECUTE_CAPABILITY",
+            "attempt_no": 0,
+            "task_id": 1138,
+            "step_seq": 1,
+            "capability_type": "CAP_BAGGAGE_MEASURE",
+            "command_payload": "{\"commandId\":\"CMD-20261108205234-5D7F0081\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261108-1128\",\"stepSeq\":1,\"capabilityType\":\"CAP_BAGGAGE_MEASURE\",\"inputParams\":{\"measureMode\":\"AUTO\",\"timeout\":30},\"issuedAt\":\"2026-11-08T20:52:34.5180883+08:00\",\"deadline\":\"2026-11-08T20:53:34.5180883+08:00\"}",
+            "command_status": "SENT",
+            "response_payload": null,
+            "created_at": "2026-11-08T20:52:34.518088",
+            "updated_at": "2026-11-08T20:52:34.684893"
+          },
+          {
+            "id": 3908,
+            "command_id": "CMD-20261108205234-5D7F0082",
+            "agent_code": "AGT-F8CA3C99",
+            "command_type": "TASK_ACCEPT",
+            "attempt_no": 0,
+            "task_id": 1138,
+            "step_seq": 1,
+            "capability_type": "CAP_BAGGAGE_MEASURE",
+            "command_payload": "{\"commandId\":\"CMD-20261108205234-5D7F0082\",\"commandType\":\"TASK_ACCEPT\",\"attemptNo\":0,\"taskId\":\"TASK-20261108-1128\",\"stepSeq\":1,\"capabilityType\":\"CAP_BAGGAGE_MEASURE\",\"inputParams\":{\"measureMode\":\"AUTO\",\"timeout\":30},\"issuedAt\":\"2026-11-08T20:52:34.6919881+08:00\",\"deadline\":\"2026-11-08T20:53:34.6919881+08:00\"}",
+            "command_status": "ACCEPTED",
+            "response_payload": "{\"commandId\":\"CMD-20261108205234-5D7F0082\",\"accepted\":true,\"rejectReason\":null}",
+            "created_at": "2026-11-08T20:52:34.692463",
+            "updated_at": "2026-11-08T20:52:34.751318"
+          },
+          {
+            "id": 3909,
+            "command_id": "CMD-20261108205234-5D7F0083",
+            "agent_code": "AGT-F8CA3C99",
+            "command_type": "EXECUTE_CAPABILITY",
+            "attempt_no": 0,
+            "task_id": 1138,
+            "step_seq": 1,
+            "capability_type": "CAP_BAGGAGE_MEASURE",
+            "command_payload": "{\"commandId\":\"CMD-20261108205234-5D7F0083\",\"commandType\":\"EXECUTE_CAPABILITY\",\"attemptNo\":0,\"taskId\":\"TASK-20261108-1128\",\"stepSeq\":1,\"capabilityType\":\"CAP_BAGGAGE_MEASURE\",\"inputParams\":{\"measureMode\":\"AUTO\",\"timeout\":30},\"issuedAt\":\"2026-11-08T20:52:34.7687552+08:00\",\"deadline\":\"2026-11-08T20:53:34.7687552+08:00\"}",
+            "command_status": "SUCCEEDED",
+            "response_payload": "{\"commandId\":\"CMD-20261108205234-5D7F0083\",\"attemptNo\":0,\"executionResult\":\"SUCCESS\",\"reasonCode\":\"DEVICE_SUCCESS\",\"outputParams\":{\"measureStatus\":\"SUCCESS\",\"length\":80.0,\"width\":55.0,\"height\":35.0,\"weight\":35.0,\"isOversize\":true,\"baggageInfo\":\"synthetic baggage F183\",\"reportStatus\":\"SUCCESS\",\"alertId\":\"F183-ALERT\",\"displayStatus\":\"SUCCESS\",\"routeGenerated\":true,\"dimensionThresholdCm\":158,\"weightThresholdKg\":32,\"thresholdSource\":\"SYNTHETIC_DEPLOYMENT_F024_158CM_32KG\",\"totalDimensionCm\":170.0}}",
+            "created_at": "2026-11-08T20:52:34.768755",
+            "updated_at": "2026-11-08T20:52:35.01425"
+          }
+        ],
+        "exceptions": [
+          {
+            "id": 669,
+            "task_id": 1138,
+            "step_seq": 1,
+            "exception_type": "AGENT_OFFLINE",
+            "occurred_at": "2026-11-08T20:52:34.611571",
+            "recovery_action": "候选设备切换",
+            "recovery_result": "SUCCESS",
+            "impact_conclusion": "已切换候选设备重新分配，计划可继续执行，不触发重新规划",
+            "reason_code": "设备代理AGT-42B77D25心跳超时离线，正占用该任务步骤",
+            "exception_status": "RESOLVED",
+            "resolved_at": "2026-11-08T20:52:35.026791",
+            "resolved_by": "SYSTEM"
+          }
+        ],
+        "transport": {
+          "G160_F016_A": [],
+          "G145_F013_SCAN": [
+            {
+              "at": "2026-11-08T20:52:34.703361+08:00",
+              "message": {
+                "commandId": "CMD-20261108205234-5D7F0082",
+                "commandType": "TASK_ACCEPT",
+                "attemptNo": 0,
+                "taskId": "TASK-20261108-1128",
+                "stepSeq": 1,
+                "capabilityType": "CAP_BAGGAGE_MEASURE",
+                "inputParams": {
+                  "measureMode": "AUTO",
+                  "timeout": 30
+                },
+                "issuedAt": 1794142354.691988,
+                "deadline": 1794142414.691988
+              }
+            },
+            {
+              "at": "2026-11-08T20:52:34.821898+08:00",
+              "message": {
+                "commandId": "CMD-20261108205234-5D7F0083",
+                "commandType": "EXECUTE_CAPABILITY",
+                "attemptNo": 0,
+                "taskId": "TASK-20261108-1128",
+                "stepSeq": 1,
+                "capabilityType": "CAP_BAGGAGE_MEASURE",
+                "inputParams": {
+                  "measureMode": "AUTO",
+                  "timeout": 30
+                },
+                "issuedAt": 1794142354.7687552,
+                "deadline": 1794142414.7687552
+              }
+            }
+          ],
+          "G145_F013_DISPLAY": [],
+          "G160_F016_B": [],
+          "G183_F024_SCAN2": []
+        }
+      },
+      "checks": {
+        "recoveryObserved": true,
+        "noFalseCompletion": true,
+        "completedWithBackup": false
+      },
+      "result": "F"
+    }
+  ],
+  "uiObservations": [],
+  "proxy403": []
+}

@@ -1,4 +1,4 @@
-ruleId,requirement,text,candidateStep,status,verifiedBy,evidence,issue
+﻿ruleId,requirement,text,candidateStep,status,verifiedBy,evidence,issue
 SRS_F001.R01,SRS_F001,密码不得明文保存，使用不可逆摘要（加盐）存储；数据库与日志中不得出现密码原值,TC-001.S3,P,TC-001.S3,acceptance/stage3/evidence/TC-001-password-storage-20261026124902.json;acceptance/stage3/evidence/SRS_F001-V1.110-live-api-audit-expanded-20261029.json;acceptance/stage3/evidence/SRS_F001-V1.110-audit-20261029.json,
 SRS_F001.R02,SRS_F001,会话空闲30分钟后失效，失效后任何操作跳转登录页并提示重新登录,TC-002.S4,P,TC-087.S1,acceptance/stage3/evidence/TC-087-idle-session.json;acceptance/stage3/evidence/SRS_F001-V1.110-idle-session-20261029.json,
 SRS_F001.R03,SRS_F001,停用账号拒绝登录，且不得建立会话,TC-002.S1,P,TC-002.S1,acceptance/stage3/evidence/TC-002-lockout.json;acceptance/stage3/evidence/SRS_F001-V1.110-browser-role-matrix-20261029.json;acceptance/stage3/evidence/SRS_F001-V1.110-live-api-audit-expanded-20261029.json,
@@ -218,15 +218,15 @@ SRS_F023.R07,SRS_F023,位置坐标缺失的设备在图外列表区展示，不�
 SRS_F023.R08,SRS_F023,设备位置使用底图像素坐标，以左上角为原点；底图按原始宽高比缩放时，设备图标须按相同比例换算显示坐标,TC-070.S1,P,V1.182当前整轮实测；原点/最大像素、1260x6895原比例、125%/100%/全图/80%缩小几何、拖动/滚轮通过。,acceptance/stage3/evidence/SRS_F023-V1.182-complete-verification-20261108.json;acceptance/stage3/SRS_F023-V1.182-整轮独立复测与验收.md,
 SRS_F023.R09,SRS_F023,替换为不同像素尺寸或裁剪范围的底图时，实施方须重新标定全部设备坐标后方可用于验收,TC-070.S3,P,V1.182当前整轮实测；BL008本版固定底图未替换，资源真实尺寸/几何/重标提示通过；未来换尺寸裁剪仍须全设备重标另验。,acceptance/stage3/evidence/SRS_F023-V1.182-complete-verification-20261108.json;acceptance/stage3/SRS_F023-V1.182-整轮独立复测与验收.md,
 SRS_F023.R10,SRS_F023,态势图仅展示设备状态，不提供直接下发设备指令的入口,TC-070.S3,P,V1.182当前整轮实测；真实浏览器除登录POST外全GET，无设备指令入口。,acceptance/stage3/evidence/SRS_F023-V1.182-complete-verification-20261108.json;acceptance/stage3/SRS_F023-V1.182-整轮独立复测与验收.md,
-SRS_F024.R01,SRS_F024,支持两种触发方式：运行操作员提交超规行李处置目标，或系统接收模拟测量事件,TC-073.S1,NOT_RUN,,,
-SRS_F024.R02,SRS_F024,测量设备须返回尺寸、重量和超规结果三项数据,TC-073.S1,P,TC-072.S3,acceptance/stage3/evidence/TC-072-073-baggage-202230.json,
-SRS_F024.R03,SRS_F024,非超规时记录测量结果并结束任务，任务置为已完成，不生成引导步骤,TC-073.S2,F,TC-073.S1,acceptance/stage3/evidence/TC-072-073-baggage-202259.json,DEF-S3-003
-SRS_F024.R04,SRS_F024,超规时生成信息提示、办理说明和柜台引导候选计划，经三类校验和监督判定后自动执行,TC-072.S2,NOT_RUN,,,
-SRS_F024.R05,SRS_F024,计划受五步限制约束，最多5个可执行步骤,TC-072.S2,NOT_RUN,,,
-SRS_F024.R06,SRS_F024,引导步骤只下发空间引导业务意图，不下发运动安全控制指令,TC-072.S2,NOT_RUN,,,
-SRS_F024.R07,SRS_F024,引导失败时按5.5.3异常恢复与计划影响判断处理，必要时触发一次局部重新规划或转人工,TC-075.S1,NOT_RUN,,,
-SRS_F024.R08,SRS_F024,完成后记录处置闭环，含测量结果、发布结果、引导结果和事件时间线,TC-072.S3,P,TC-072.S3,acceptance/stage3/evidence/TC-072-073-baggage-202230.json,
-SRS_F024.R09,SRS_F024,本场景不保存旅客真实身份信息，行李与旅客关联仅使用临时业务编号,TC-072.S1,F,TC-031.S2,acceptance/stage3/evidence/TC-031-identity-canary-20261026T035059Z.json,DEF-S3-032
+SRS_F024.R01,SRS_F024,支持两种触发方式：运行操作员提交超规行李处置目标，或系统接收模拟测量事件,TC-073.S1,F,V1.183 current independent round / 两入口API、事件别名及实际操作员UI提交/澄清可运行；模拟控制台正常和超规按钮受121权限矛盾阻断。,acceptance/stage3/evidence/SRS_F024-V1.183-http-sql-protocol-20261108.json;acceptance/stage3/SRS_F024-V1.183-整轮独立复测与统一交修.md,DEF-S3-121
+SRS_F024.R02,SRS_F024,测量设备须返回尺寸、重量和超规结果三项数据,TC-073.S1,F,V1.183 current independent round / 完整三项/158cm与32kg声明边界P；120额外参数覆盖事实，125缺尺寸/重量/超规结果仍完成测量。,acceptance/stage3/evidence/TC-072-073-baggage-202230.json;acceptance/stage3/evidence/SRS_F024-V1.183-http-sql-protocol-20261108.json;acceptance/stage3/SRS_F024-V1.183-整轮独立复测与统一交修.md,DEF-S3-120;DEF-S3-125
+SRS_F024.R03,SRS_F024,非超规时记录测量结果并结束任务，任务置为已完成，不生成引导步骤,TC-073.S2,F,V1.183 current independent round / 正常测量后完成且仅一次测量指令P；1104仍生成冻结引导计划和SKIPPED后续，违反“不生成”原文。,acceptance/stage3/evidence/TC-072-073-baggage-202259.json;acceptance/stage3/evidence/SRS_F024-V1.183-http-sql-protocol-20261108.json;acceptance/stage3/SRS_F024-V1.183-整轮独立复测与统一交修.md,DEF-S3-119
+SRS_F024.R04,SRS_F024,超规时生成信息提示、办理说明和柜台引导候选计划，经三类校验和监督判定后自动执行,TC-072.S2,F,V1.183 current independent round / 四渠道自主三类PASS/LOW执行、高风险合格基线和办理说明UI均P；1137无移动资源未执行可用信息提示降级。,acceptance/stage3/evidence/SRS_F024-V1.183-http-sql-protocol-20261108.json;acceptance/stage3/SRS_F024-V1.183-整轮独立复测与统一交修.md,DEF-S3-124
+SRS_F024.R05,SRS_F024,计划受五步限制约束，最多5个可执行步骤,TC-072.S2,P,V1.183 current independent round / 真实五动作1127完成，六动作1128在持久计划前以ERR_STEP_LIMIT_EXCEEDED拒绝；0下发。,acceptance/stage3/evidence/SRS_F024-V1.183-http-sql-protocol-20261108.json;acceptance/stage3/SRS_F024-V1.183-整轮独立复测与统一交修.md,
+SRS_F024.R06,SRS_F024,引导步骤只下发空间引导业务意图，不下发运动安全控制指令,TC-072.S2,P,V1.183 current independent round / 真实导航仅空间业务参数；运动安全speed反例1131未冻结/下发，其余三类拒绝及正确物理渠道P。,acceptance/stage3/evidence/SRS_F024-V1.183-http-sql-protocol-20261108.json;acceptance/stage3/SRS_F024-V1.183-整轮独立复测与统一交修.md,
+SRS_F024.R07,SRS_F024,引导失败时按5.5.3异常恢复与计划影响判断处理，必要时触发一次局部重新规划或转人工,TC-075.S1,P,V1.183 current independent round / 引导一次重试、候选切换、一次局部重规划成功/失败转人工当前P；保留三已完成前序与版本，1153真实待人工UI。测量恢复故障单独归TC074，不冒充引导失败。,acceptance/stage3/evidence/SRS_F024-V1.183-http-sql-protocol-20261108.json;acceptance/stage3/SRS_F024-V1.183-整轮独立复测与统一交修.md,
+SRS_F024.R08,SRS_F024,完成后记录处置闭环，含测量结果、发布结果、引导结果和事件时间线,TC-072.S3,F,V1.183 current independent round / 完整超规闭环/步骤结果/完成时间/事件/进度UI当前P；1146/1147无必要测量数据仍COMPLETED，不能视为完整测量闭环记录。,acceptance/stage3/evidence/TC-072-073-baggage-202230.json;acceptance/stage3/evidence/SRS_F024-V1.183-http-sql-protocol-20261108.json;acceptance/stage3/SRS_F024-V1.183-整轮独立复测与统一交修.md,DEF-S3-125
+SRS_F024.R09,SRS_F024,本场景不保存旅客真实身份信息，行李与旅客关联仅使用临时业务编号,TC-072.S1,F,V1.183 current independent round / 临时号及顶层/嵌套Map/List/JSON/澄清拒绝P；新事件文本说明等未保护，1151入模、1152目标/事件持久身份哨兵。,acceptance/stage3/evidence/TC-031-identity-canary-20261026T035059Z.json;acceptance/stage3/evidence/SRS_F024-V1.183-http-sql-protocol-20261108.json;acceptance/stage3/SRS_F024-V1.183-整轮独立复测与统一交修.md,DEF-S3-032
 SRS_F025.R01,SRS_F025,系统只检查必要信息（协助类型、起点、目的地），不保存旅客真实身份信息,TC-077.S1,F,TC-077.S1,acceptance/stage3/evidence/TC-077-special-202424.json,DEF-S3-004
 SRS_F025.R02,SRS_F025,信息不完整时请求补充起点、目的地或协助要求，补充完成前不进入计划生成,TC-077.S1,NOT_RUN,,,
 SRS_F025.R03,SRS_F025,系统查询移动机器人、航显和仿真体可用性后生成会合提示和陪同计划,TC-077.S2,NOT_RUN,,,

@@ -1,0 +1,326 @@
+{
+  "issue": "DEF-S3-120",
+  "title": "测量事件额外参数可覆盖计算事实且非正阈值未校验",
+  "productSha": "fc55f713e5d74d6fb41761f53fed84b4bc4efd7b",
+  "tag": "V1.183",
+  "expected": "隔离/白名单化额外字段，禁止覆盖可信测量、临时号、阈值、判定与触发来源；校验有限正数阈值并记录真实部署来源，补合法边界和无副作用拒绝。",
+  "actual": "1120输入length=55、weightThresholdKg=32，extraParams覆盖后持久化length=999、weightThresholdKg=0，而totalDimensionCm仍115、任务判定仍正常；1115/1116零尺寸阈值/负重量阈值HTTP200并建任务。事件记录的值、比较依据与判定缺乏一致性。",
+  "rawObservations": [
+    {
+      "name": "event-extra-computed-override",
+      "at": "2026-11-08T20:46:25.885351+08:00",
+      "taskId": 1120,
+      "request": {
+        "baggageLocation": "F2_TEST_SERVICE",
+        "length": 55,
+        "width": 40,
+        "height": 20,
+        "weight": 10,
+        "dimensionThresholdCm": 158,
+        "weightThresholdKg": 32,
+        "thresholdSource": "SYNTHETIC_DEPLOYMENT_F024_158CM_32KG",
+        "isOversize": true,
+        "extraParams": {
+          "length": 999,
+          "weightThresholdKg": 0,
+          "tempBusinessId": "F183-OVERRIDE"
+        }
+      },
+      "response": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 1120,
+            "taskCode": "TASK-20261108-1110",
+            "taskGoal": "处理位于 F2_TEST_SERVICE 的行李测量事件（临时业务编号: BAG-985873，尺寸: 55.0×40.0×20.0 cm，重量: 10.0 kg，判定: 非超规）",
+            "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+            "sceneParams": {
+              "baggageId": "BAG-985873",
+              "tempBusinessId": "F183-OVERRIDE",
+              "baggageLocation": "F2_TEST_SERVICE",
+              "targetCounter": "F2_TEST_GATE",
+              "targetLocation": "F2_TEST_GATE",
+              "length": 999,
+              "width": 40.0,
+              "height": 20.0,
+              "weight": 10.0,
+              "totalDimensionCm": 115.0,
+              "dimensionThresholdCm": 158.0,
+              "weightThresholdKg": 0,
+              "thresholdSource": "SYNTHETIC_DEPLOYMENT_F024_158CM_32KG",
+              "isOversize": false,
+              "measureMode": "EVENT_TRIGGERED",
+              "routePreference": "BARRIER_FREE",
+              "alertLevel": "WARNING",
+              "contentType": "TEXT",
+              "contentData": "超规行李（临时编号BAG-985873）请前往F2_TEST_GATE办理托运",
+              "handlingInstructions": "超规行李办理流程：1. 前往指定柜台办理称重核验；2. 打印并粘贴超规挂牌；3. 办理专属托运；4. 凭凭证通过安检。",
+              "triggerSource": "MEASUREMENT_EVENT"
+            },
+            "goalParsingResult": null,
+            "status": "COMPLETED",
+            "currentPlanVersionId": null,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": null,
+            "failureReason": null,
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-08T20:46:25.8736559",
+            "updatedAt": "2026-11-08T20:46:25.8747759",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-08T20:46:25.881845900+08:00"
+        }
+      },
+      "after": {
+        "task": {
+          "id": 1120,
+          "taskCode": "TASK-20261108-1110",
+          "taskGoal": "处理位于 F2_TEST_SERVICE 的行李测量事件（临时业务编号: BAG-985873，尺寸: 55.0×40.0×20.0 cm，重量: 10.0 kg，判定: 非超规）",
+          "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+          "sceneParams": {
+            "baggageId": "BAG-985873",
+            "tempBusinessId": "F183-OVERRIDE",
+            "baggageLocation": "F2_TEST_SERVICE",
+            "targetCounter": "F2_TEST_GATE",
+            "targetLocation": "F2_TEST_GATE",
+            "length": 999,
+            "width": 40.0,
+            "height": 20.0,
+            "weight": 10.0,
+            "totalDimensionCm": 115.0,
+            "dimensionThresholdCm": 158.0,
+            "weightThresholdKg": 0,
+            "thresholdSource": "SYNTHETIC_DEPLOYMENT_F024_158CM_32KG",
+            "isOversize": false,
+            "measureMode": "EVENT_TRIGGERED",
+            "routePreference": "BARRIER_FREE",
+            "alertLevel": "WARNING",
+            "contentType": "TEXT",
+            "contentData": "超规行李（临时编号BAG-985873）请前往F2_TEST_GATE办理托运",
+            "handlingInstructions": "超规行李办理流程：1. 前往指定柜台办理称重核验；2. 打印并粘贴超规挂牌；3. 办理专属托运；4. 凭凭证通过安检。",
+            "triggerSource": "MEASUREMENT_EVENT"
+          },
+          "goalParsingResult": null,
+          "status": "COMPLETED",
+          "currentPlanVersionId": null,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": null,
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-08T20:46:25.873656",
+          "updatedAt": "2026-11-08T20:46:25.874776",
+          "createdBy": "oprator"
+        },
+        "plans": [],
+        "events": [
+          {
+            "id": 16665,
+            "taskId": 1120,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-08T20:46:25.875914",
+            "trigger": "SYSTEM",
+            "reasonCode": "MEASUREMENT_EVENT",
+            "detailSummary": "接收模拟行李测量事件，临时业务编号: BAG-985873，位置: F2_TEST_SERVICE，尺寸: 55.0×40.0×20.0cm，重量: 10.0kg，判定: 非超规",
+            "detail": "接收模拟行李测量事件，临时业务编号: BAG-985873，位置: F2_TEST_SERVICE，尺寸: 55.0×40.0×20.0cm，重量: 10.0kg，判定: 非超规",
+            "rawDetailSummary": "接收模拟行李测量事件，临时业务编号: BAG-985873，位置: F2_TEST_SERVICE，尺寸: 55.0×40.0×20.0cm，重量: 10.0kg，判定: 非超规"
+          },
+          {
+            "id": 16666,
+            "taskId": 1120,
+            "eventType": "TASK_COMPLETED",
+            "occurredAt": "2026-11-08T20:46:25.877745",
+            "trigger": "SYSTEM",
+            "reasonCode": "BAGGAGE_WITHIN_LIMIT",
+            "detailSummary": "行李未超规，结束处置；三边和115.0cm（阈值158.0cm），重量10.0kg（阈值32.0kg）；来源：SYNTHETIC_DEPLOYMENT_F024_158CM_32KG",
+            "detail": "行李未超规，结束处置；三边和115.0cm（阈值158.0cm），重量10.0kg（阈值32.0kg）；来源：SYNTHETIC_DEPLOYMENT_F024_158CM_32KG",
+            "rawDetailSummary": "行李未超规，结束处置；三边和115.0cm（阈值158.0cm），重量10.0kg（阈值32.0kg）；来源：SYNTHETIC_DEPLOYMENT_F024_158CM_32KG"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": [],
+        "commandRows": [],
+        "exceptions": [],
+        "transport": {
+          "G160_F016_A": [],
+          "G145_F013_SCAN": [],
+          "G145_F013_DISPLAY": [],
+          "G160_F016_B": [],
+          "G183_F024_SCAN2": []
+        }
+      },
+      "checks": {
+        "consistentNormal": true,
+        "lengthMatchesMeasurement": false,
+        "thresholdMatchesInput": false
+      },
+      "result": "F"
+    },
+    {
+      "name": "event-invalid-dimensionThresholdCm-0",
+      "at": "2026-11-08T20:46:12.813756+08:00",
+      "taskId": 1115,
+      "request": {
+        "baggageLocation": "F2_TEST_SERVICE",
+        "length": 55,
+        "width": 40,
+        "height": 20,
+        "weight": 10,
+        "dimensionThresholdCm": 0,
+        "weightThresholdKg": 32,
+        "thresholdSource": "SYNTHETIC_DEPLOYMENT_F024_158CM_32KG"
+      },
+      "response": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 1115,
+            "taskCode": "TASK-20261108-1105",
+            "taskGoal": "处理位于 F2_TEST_SERVICE 的行李测量事件（临时业务编号: BAG-972663，尺寸: 55.0×40.0×20.0 cm，重量: 10.0 kg，判定: 超规）",
+            "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+            "sceneParams": {
+              "baggageId": "BAG-972663",
+              "tempBusinessId": "BAG-972663",
+              "baggageLocation": "F2_TEST_SERVICE",
+              "targetCounter": "F2_TEST_GATE",
+              "targetLocation": "F2_TEST_GATE",
+              "length": 55.0,
+              "width": 40.0,
+              "height": 20.0,
+              "weight": 10.0,
+              "totalDimensionCm": 115.0,
+              "dimensionThresholdCm": 0.0,
+              "weightThresholdKg": 32.0,
+              "thresholdSource": "SYNTHETIC_DEPLOYMENT_F024_158CM_32KG",
+              "isOversize": true,
+              "measureMode": "EVENT_TRIGGERED",
+              "routePreference": "BARRIER_FREE",
+              "alertLevel": "WARNING",
+              "contentType": "TEXT",
+              "contentData": "超规行李（临时编号BAG-972663）请前往F2_TEST_GATE办理托运",
+              "handlingInstructions": "超规行李办理流程：1. 前往指定柜台办理称重核验；2. 打印并粘贴超规挂牌；3. 办理专属托运；4. 凭凭证通过安检。",
+              "triggerSource": "MEASUREMENT_EVENT"
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=true",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "处理位于 F2_TEST_SERVICE 的行李测量事件（临时业务编号: BAG-972663，尺寸: 55.0×40.0×20.0 cm，重量: 10.0 kg，判定: 超规）",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "PENDING_MANUAL",
+            "currentPlanVersionId": 1095,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": null,
+            "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_REQUIRED_CHANNEL_MISSING；且无匹配的已启用基线模板",
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-08T20:46:12.663588",
+            "updatedAt": "2026-11-08T20:46:12.802978",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-08T20:46:12.810306800+08:00"
+        }
+      },
+      "checks": {
+        "http400": false,
+        "noTaskCreated": false
+      },
+      "result": "F"
+    },
+    {
+      "name": "event-invalid-weightThresholdKg--1",
+      "at": "2026-11-08T20:46:14.311013+08:00",
+      "taskId": 1116,
+      "request": {
+        "baggageLocation": "F2_TEST_SERVICE",
+        "length": 55,
+        "width": 40,
+        "height": 20,
+        "weight": 10,
+        "dimensionThresholdCm": 158,
+        "weightThresholdKg": -1,
+        "thresholdSource": "SYNTHETIC_DEPLOYMENT_F024_158CM_32KG"
+      },
+      "response": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 1116,
+            "taskCode": "TASK-20261108-1106",
+            "taskGoal": "处理位于 F2_TEST_SERVICE 的行李测量事件（临时业务编号: BAG-974210，尺寸: 55.0×40.0×20.0 cm，重量: 10.0 kg，判定: 超规）",
+            "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+            "sceneParams": {
+              "baggageId": "BAG-974210",
+              "tempBusinessId": "BAG-974210",
+              "baggageLocation": "F2_TEST_SERVICE",
+              "targetCounter": "F2_TEST_GATE",
+              "targetLocation": "F2_TEST_GATE",
+              "length": 55.0,
+              "width": 40.0,
+              "height": 20.0,
+              "weight": 10.0,
+              "totalDimensionCm": 115.0,
+              "dimensionThresholdCm": 158.0,
+              "weightThresholdKg": -1.0,
+              "thresholdSource": "SYNTHETIC_DEPLOYMENT_F024_158CM_32KG",
+              "isOversize": true,
+              "measureMode": "EVENT_TRIGGERED",
+              "routePreference": "BARRIER_FREE",
+              "alertLevel": "WARNING",
+              "contentType": "TEXT",
+              "contentData": "超规行李（临时编号BAG-974210）请前往F2_TEST_GATE办理托运",
+              "handlingInstructions": "超规行李办理流程：1. 前往指定柜台办理称重核验；2. 打印并粘贴超规挂牌；3. 办理专属托运；4. 凭凭证通过安检。",
+              "triggerSource": "MEASUREMENT_EVENT"
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=true",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "处理位于 F2_TEST_SERVICE 的行李测量事件（临时业务编号: BAG-974210，尺寸: 55.0×40.0×20.0 cm，重量: 10.0 kg，判定: 超规）",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "PENDING_MANUAL",
+            "currentPlanVersionId": 1096,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": null,
+            "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_REQUIRED_CHANNEL_MISSING；且无匹配的已启用基线模板",
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-08T20:46:14.210822",
+            "updatedAt": "2026-11-08T20:46:14.302924",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-08T20:46:14.309144+08:00"
+        }
+      },
+      "checks": {
+        "http400": false,
+        "noTaskCreated": false
+      },
+      "result": "F"
+    }
+  ],
+  "uiObservations": [],
+  "proxy403": []
+}

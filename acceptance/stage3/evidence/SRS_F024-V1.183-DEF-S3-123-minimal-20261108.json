@@ -1,0 +1,317 @@
+{
+  "issue": "DEF-S3-123",
+  "title": "无可承接扫描器未生成能力缺口异常",
+  "productSha": "fc55f713e5d74d6fb41761f53fed84b4bc4efd7b",
+  "tag": "V1.183",
+  "expected": "记录可追溯的CAP_BAGGAGE_MEASURE缺口异常/原因和关联事件，并维持无虚构结果及安全转人工。",
+  "actual": "1136两扫描器协议OFFLINE，任务安全转PENDING_MANUAL、0业务指令且不虚构测量；但task_exceptions为空，只有PLAN_VALIDATED/基线不可用等通用事件，缺少要求的CAPABILITY_GAP异常与明确测量能力缺口。",
+  "rawObservations": [
+    {
+      "name": "no-scanner",
+      "at": "2026-11-08T20:52:31.094959+08:00",
+      "taskId": 1136,
+      "request": {
+        "taskGoal": "F183_NO_SCANNER 处理位于F2_TEST_SERVICE的行李并引导至超规柜台",
+        "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+        "sceneParams": {
+          "baggageLocation": "F2_TEST_SERVICE",
+          "targetCounter": "F2_TEST_GATE",
+          "targetLocation": "F2_TEST_GATE",
+          "baggageId": "F183_NO_SCANNER",
+          "tempBusinessId": "F183_NO_SCANNER",
+          "dimensionThresholdCm": 158,
+          "weightThresholdKg": 32,
+          "thresholdSource": "SYNTHETIC_DEPLOYMENT_F024_158CM_32KG",
+          "routePreference": "BARRIER_FREE",
+          "alertLevel": "WARNING",
+          "contentType": "TEXT",
+          "contentData": "超规行李办理提示",
+          "handlingInstructions": "虚构部署办理说明：前往超规柜台核验，费用以承运人现场政策为准，完成托运并遵守安全须知。"
+        }
+      },
+      "response": {
+        "http": 200,
+        "body": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": 1136,
+            "taskCode": "TASK-20261108-1126",
+            "taskGoal": "F183_NO_SCANNER 处理位于F2_TEST_SERVICE的行李并引导至超规柜台",
+            "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+            "sceneParams": {
+              "baggageLocation": "F2_TEST_SERVICE",
+              "targetCounter": "F2_TEST_GATE",
+              "targetLocation": "F2_TEST_GATE",
+              "baggageId": "F183_NO_SCANNER",
+              "tempBusinessId": "F183_NO_SCANNER",
+              "dimensionThresholdCm": 158,
+              "weightThresholdKg": 32,
+              "thresholdSource": "SYNTHETIC_DEPLOYMENT_F024_158CM_32KG",
+              "routePreference": "BARRIER_FREE",
+              "alertLevel": "WARNING",
+              "contentType": "TEXT",
+              "contentData": "超规行李办理提示",
+              "handlingInstructions": "虚构部署办理说明：前往超规柜台核验，费用以承运人现场政策为准，完成托运并遵守安全须知。"
+            },
+            "goalParsingResult": {
+              "completionCondition": "routeGenerated=true",
+              "origin": "F2_SERVICE_POINT",
+              "destination": "F2_TEST_GATE",
+              "originalGoal": "F183_NO_SCANNER 处理位于F2_TEST_SERVICE的行李并引导至超规柜台",
+              "constraints": [
+                "synthetic test"
+              ]
+            },
+            "status": "PLANNING",
+            "currentPlanVersionId": null,
+            "replanUsed": false,
+            "replanningReason": null,
+            "manualTerminateReason": null,
+            "failureReason": null,
+            "missingInfoQuestions": null,
+            "downgradeReason": null,
+            "isDryRun": false,
+            "createdAt": "2026-11-08T20:52:30.7633479",
+            "updatedAt": "2026-11-08T20:52:30.7633479",
+            "createdBy": "oprator"
+          },
+          "timestamp": "2026-11-08T20:52:30.840972100+08:00"
+        }
+      },
+      "after": {
+        "task": {
+          "id": 1136,
+          "taskCode": "TASK-20261108-1126",
+          "taskGoal": "F183_NO_SCANNER 处理位于F2_TEST_SERVICE的行李并引导至超规柜台",
+          "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+          "sceneParams": {
+            "baggageLocation": "F2_TEST_SERVICE",
+            "targetCounter": "F2_TEST_GATE",
+            "targetLocation": "F2_TEST_GATE",
+            "baggageId": "F183_NO_SCANNER",
+            "tempBusinessId": "F183_NO_SCANNER",
+            "dimensionThresholdCm": 158,
+            "weightThresholdKg": 32,
+            "thresholdSource": "SYNTHETIC_DEPLOYMENT_F024_158CM_32KG",
+            "routePreference": "BARRIER_FREE",
+            "alertLevel": "WARNING",
+            "contentType": "TEXT",
+            "contentData": "超规行李办理提示",
+            "handlingInstructions": "虚构部署办理说明：前往超规柜台核验，费用以承运人现场政策为准，完成托运并遵守安全须知。"
+          },
+          "goalParsingResult": {
+            "completionCondition": "routeGenerated=true",
+            "origin": "F2_SERVICE_POINT",
+            "destination": "F2_TEST_GATE",
+            "originalGoal": "F183_NO_SCANNER 处理位于F2_TEST_SERVICE的行李并引导至超规柜台",
+            "constraints": [
+              "synthetic test"
+            ]
+          },
+          "status": "PENDING_MANUAL",
+          "currentPlanVersionId": 1113,
+          "replanUsed": false,
+          "replanningReason": null,
+          "manualTerminateReason": null,
+          "failureReason": "候选计划三类校验未通过，转基线模板降级: ERR_NO_ONLINE_CANDIDATE；且无匹配的已启用基线模板",
+          "missingInfoQuestions": null,
+          "downgradeReason": null,
+          "isDryRun": false,
+          "createdAt": "2026-11-08T20:52:30.763348",
+          "updatedAt": "2026-11-08T20:52:30.837343",
+          "createdBy": "oprator"
+        },
+        "plans": [
+          {
+            "id": 1113,
+            "versionNo": 1,
+            "source": "AUTONOMOUS",
+            "baselineTemplateId": null,
+            "snapshotId": "CTX-20261108-1156",
+            "planSteps": [
+              {
+                "stepSeq": 1,
+                "stepGoal": "F183 synthetic CAP_BAGGAGE_MEASURE",
+                "capabilityType": "CAP_BAGGAGE_MEASURE",
+                "inputParams": {
+                  "measureMode": "AUTO",
+                  "timeout": 30
+                },
+                "precondition": "device online",
+                "completionCondition": "measureStatus=SUCCESS",
+                "failureHandling": "失败重试一次后候选切换，仍失败局部重规划",
+                "stepTimeout": 180
+              },
+              {
+                "stepSeq": 2,
+                "stepGoal": "F183 synthetic CAP_OVERSIZE_ALERT",
+                "capabilityType": "CAP_OVERSIZE_ALERT",
+                "inputParams": {
+                  "baggageInfo": "{\"length\": 80, \"width\": 55, \"height\": 35, \"weight\": 35}",
+                  "alertLevel": "WARNING"
+                },
+                "precondition": "device online",
+                "completionCondition": "reportStatus=SUCCESS",
+                "failureHandling": "失败重试一次后候选切换，仍失败局部重规划",
+                "stepTimeout": 180
+              },
+              {
+                "stepSeq": 3,
+                "stepGoal": "F183 synthetic CAP_INFO_DISPLAY",
+                "capabilityType": "CAP_INFO_DISPLAY",
+                "inputParams": {
+                  "contentType": "TEXT",
+                  "contentData": "测试信息：请前往F2服务点",
+                  "displayDuration": 60
+                },
+                "precondition": "device online",
+                "completionCondition": "displayStatus=SUCCESS",
+                "failureHandling": "失败重试一次后候选切换，仍失败局部重规划",
+                "stepTimeout": 180
+              },
+              {
+                "stepSeq": 4,
+                "stepGoal": "F183 synthetic CAP_NAVIGATION",
+                "capabilityType": "CAP_NAVIGATION",
+                "inputParams": {
+                  "targetLocation": "F2_TEST_GATE",
+                  "routePreference": "BARRIER_FREE",
+                  "targetX": 0.0,
+                  "targetY": 0.0
+                },
+                "precondition": "device online",
+                "completionCondition": "routeGenerated=true",
+                "failureHandling": "失败重试一次后候选切换，仍失败局部重规划",
+                "stepTimeout": 180
+              }
+            ],
+            "structureCheckResult": "PASS",
+            "capabilityCheckResult": "FAIL",
+            "constraintCheckResult": "PASS",
+            "validationErrors": [
+              {
+                "errorType": "CAPABILITY",
+                "description": "能力类型CAP_BAGGAGE_MEASURE无在线候选代理（要求渠道BAGGAGE_SCANNER）",
+                "stepSeq": 1,
+                "reasonCode": "ERR_NO_ONLINE_CANDIDATE"
+              },
+              {
+                "errorType": "CAPABILITY",
+                "description": "能力类型CAP_OVERSIZE_ALERT无在线候选代理（要求渠道BAGGAGE_SCANNER）",
+                "stepSeq": 2,
+                "reasonCode": "ERR_NO_ONLINE_CANDIDATE"
+              }
+            ],
+            "riskLevel": null,
+            "riskReasonCode": null,
+            "judgmentBasis": null,
+            "confidence": 0.99,
+            "ruleSetVersion": null,
+            "frozenAt": null,
+            "createdAt": "2026-11-08T20:52:30.823582"
+          }
+        ],
+        "events": [
+          {
+            "id": 17033,
+            "taskId": 1136,
+            "eventType": "GOAL_SUBMITTED",
+            "occurredAt": "2026-11-08T20:52:30.765844",
+            "trigger": "OPERATOR",
+            "reasonCode": null,
+            "detailSummary": "运行操作员oprator提交任务目标: F183_NO_SCANNER 处理位于F2_TEST_SERVICE的行李并引导至超规柜台",
+            "detail": "运行操作员oprator提交任务目标: F183_NO_SCANNER 处理位于F2_TEST_SERVICE的行李并引导至超规柜台",
+            "rawDetailSummary": "运行操作员oprator提交任务目标: F183_NO_SCANNER 处理位于F2_TEST_SERVICE的行李并引导至超规柜台"
+          },
+          {
+            "id": 17034,
+            "taskId": 1136,
+            "eventType": "GOAL_CLARIFIED",
+            "occurredAt": "2026-11-08T20:52:30.794023",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建",
+            "detail": "目标理解完成，关键信息已完整，进入规划上下文构建",
+            "rawDetailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+          },
+          {
+            "id": 17035,
+            "taskId": 1136,
+            "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+            "occurredAt": "2026-11-08T20:52:30.804164",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "生成规划上下文快照CTX-20261108-1156",
+            "detail": "生成规划上下文快照CTX-20261108-1156",
+            "rawDetailSummary": "生成规划上下文快照CTX-20261108-1156"
+          },
+          {
+            "id": 17036,
+            "taskId": 1136,
+            "eventType": "PLAN_GENERATED",
+            "occurredAt": "2026-11-08T20:52:30.828356",
+            "trigger": "SYSTEM",
+            "reasonCode": null,
+            "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1",
+            "detail": "候选计划生成完成，来源AUTONOMOUS，版本1",
+            "rawDetailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+          },
+          {
+            "id": 17037,
+            "taskId": 1136,
+            "eventType": "PLAN_VALIDATED",
+            "occurredAt": "2026-11-08T20:52:30.830371",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_ONLINE_CANDIDATE",
+            "detailSummary": "候选计划三类校验未通过: 2项错误 [CAPABILITY 步骤1: 能力类型CAP_BAGGAGE_MEASURE无在线候选代理（要求渠道BAGGAGE_SCANNER）(ERR_NO_ONLINE_CANDIDATE); CAPABILITY 步骤2: 能力类型CAP_OVERSIZE_ALERT无在线候选代理（要求渠道BAGGAGE_SCANNER）(ERR_NO_ONLINE_CANDIDATE)]",
+            "detail": "候选计划三类校验未通过: 2项错误 [CAPABILITY 步骤1: 能力类型CAP_BAGGAGE_MEASURE无在线候选代理（要求渠道BAGGAGE_SCANNER）(ERR_NO_ONLINE_CANDIDATE); CAPABILITY 步骤2: 能力类型CAP_OVERSIZE_ALERT无在线候选代理（要求渠道BAGGAGE_SCANNER）(ERR_NO_ONLINE_CANDIDATE)]",
+            "rawDetailSummary": "候选计划三类校验未通过: 2项错误 [CAPABILITY 步骤1: 能力类型CAP_BAGGAGE_MEASURE无在线候选代理（要求渠道BAGGAGE_SCANNER）(ERR_NO_ONLINE_CANDIDATE); CAPABILITY 步骤2: 能力类型CAP_OVERSIZE_ALERT无在线候选代理（要求渠道BAGGAGE_SCANNER）(ERR_NO_ONLINE_CANDIDATE)]"
+          },
+          {
+            "id": 17038,
+            "taskId": 1136,
+            "eventType": "BASELINE_DOWNGRADED",
+            "occurredAt": "2026-11-08T20:52:30.835487",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_NO_BASELINE_TEMPLATE",
+            "detailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_NO_ONLINE_CANDIDATE",
+            "detail": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_NO_ONLINE_CANDIDATE",
+            "rawDetailSummary": "无匹配的已启用基线模板: 候选计划三类校验未通过，转基线模板降级: ERR_NO_ONLINE_CANDIDATE"
+          },
+          {
+            "id": 17039,
+            "taskId": 1136,
+            "eventType": "TASK_PENDING_MANUAL",
+            "occurredAt": "2026-11-08T20:52:30.838321",
+            "trigger": "SYSTEM",
+            "reasonCode": "ERR_PLANNING_FAILED",
+            "detailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_NO_ONLINE_CANDIDATE；且无匹配的已启用基线模板",
+            "detail": "候选计划三类校验未通过，转基线模板降级: ERR_NO_ONLINE_CANDIDATE；且无匹配的已启用基线模板",
+            "rawDetailSummary": "候选计划三类校验未通过，转基线模板降级: ERR_NO_ONLINE_CANDIDATE；且无匹配的已启用基线模板"
+          }
+        ],
+        "assignments": [],
+        "commands": [],
+        "bypassAuditRows": [],
+        "commandRows": [],
+        "exceptions": [],
+        "transport": {
+          "G160_F016_A": [],
+          "G145_F013_SCAN": [],
+          "G145_F013_DISPLAY": [],
+          "G160_F016_B": [],
+          "G183_F024_SCAN2": []
+        }
+      },
+      "checks": {
+        "noFakeMeasurement": true,
+        "capabilityGapRecorded": false,
+        "safeManual": true
+      },
+      "result": "F"
+    }
+  ],
+  "uiObservations": [],
+  "proxy403": []
+}
