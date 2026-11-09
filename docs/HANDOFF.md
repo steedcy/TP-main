@@ -2,7 +2,14 @@
 
 ## 当前交接状态
 
-- 状态：REQUIREMENT_PASSED（SRS_F024 整项通过已合入 main）。固定产品代码 fd8addf4df207587e5af265179667f39dd1e172 / 标签 V1.185。\n- 复测结论：规则 9P/0F/0NT，步骤 5P/0F/0NT。全部当前业务范围实测，历史业务 P 替代 0。DEF-S3-032、DEF-S3-119～125 及 NT-S3-004、NT-S3-005 全部实测闭环，历史 F/NT 原始记录及反例全部保留。\n- 真实 Edge 浏览器 UI：5/5 实测全部通过（包含 /simulators 正常/超规测量事件提交卡片展示、/tasks 操作员目标提交与自动澄清补充模态弹窗端到端闭环）。\n- 风险规则审计：RULE_RESOURCE_CRITICAL 成功回滚恢复至原始可审计基线 V15 且 enabled=true，append-only 审计日志追加保留，历史记录 8105/8228 严格未变。\n- 下一步：整项通过并合入 main，核验 40 个用户文件完整未改动，推送 main。下一项启动 SRS_F025（特殊旅客服务）。\n
+- 状态：READY_FOR_GPT（SRS_F025 特殊旅客服务协同与参数完整性修复已完成）。固定产品代码 239f8dd65b6c840847280ae2f7cb778811cf6296 / 标签 V1.186。
+- 本轮修复内容：
+  1. DEF-S3-004 闭环：在 RequiredInfoGuard.java 中落地 SPECIAL_PASSENGER_SERVICE 服务端必要字段强校验（仅核验 assistanceType、origin、destination 三项；缺失时仅生成系统规范问题，不请求旅客姓名/证件/电话等真实身份信息；INFO_CHECK_OVERRIDE 覆盖模型错误追问）。
+  2. 旅客隐私脱敏保护：在 SceneParamsPrivacyGuard.java 与 TaskService.java 中增加身份信息探测与自动脱敏；在 clarify 流程中拦截身份索取问题；自由文本回答及场景参数中若出现敏感身份信息自动脱敏为占位符，不入库、不送模型、不留操作员审计；脱敏后无业务实值的回答不计为已满足必要字段。
+  3. TC-078.S1 / R04 降级闭环：修复移动机器人离线时降级逻辑，PlanValidationService 允许智慧航显提示步骤（CAP_INFO_DISPLAY）通过校验并执行，TaskExecutionOrchestrator 对离线移动服务设备步骤做优雅跳过（ESCORT_CHANNEL_UNAVAILABLE），任务最终安全降级为 PENDING_MANUAL 并记录降级原因，实现信息提示发布与转人工协助接续的完整闭环。
+  4. 前端展示支持：在 TaskDetailView.vue 增加特殊旅客服务专用展示卡片，包含临时服务号、协助类型、起终点、状态警示及服务指引提示。
+- 本地验证：定向单元测试 11/11 全部通过（RequiredInfoF025Test、RequiredInfoF025OverrideTest、SpecialPassengerNoMobileRobotTest）；前端生产打包 npm run build 成功（0 error）；后端 mvn -o package -DskipTests 成功生成生产 JAR 包。
+- 下一步：交由独立复测（ai/gpt-test 分支）对 SRS_F025.R01～R09 与 TC-077～TC-079 展开独立整轮复测。
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
 - 旧阶段 3 任务已暂停；其结果是待修复的原始证据，不是新版本通过证明。
@@ -62,6 +69,7 @@
 | 2026-11-09 | SRS_F024 | GPT → Germini | READY_FOR_CLAUDE | ai/gpt-test / V1.184 product d4a1125c94e62686d0481d4df5371a90c9e9a12d | 9c5a6d071407d9a0c12633529ef2564b0cba87f4 + cleanup supplement 9f9cd99a1bd8688f310123e6834019bf138f5bc3 | 7P/1F/1NT规则、4P/1F/3NT步骤；DEF-S3-119保持F，DEF-S3-032/120/122～125关闭，DEF-S3-121 API通过但UI NT；风险规则清理为PARTIAL_RESTORE；未合main |
 | 2026-11-09 | SRS_F024 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / ffd8addf4df207587e5af265179667f39dd1e172 / V1.185 | 待独立整轮复测 | 统一闭环 DEF-S3-119（PlanVersionMapper持久化修护/单步计划裁剪）、DEF-S3-121（仿真控制台数据解析容错与真实UI操作指南）、RULE_RESOURCE_CRITICAL安全回滚恢复方案，详见下文交接专节 |
 | 2026-11-09 | SRS_F024 | Germini (代GPT按BL-009) → main | REQUIREMENT_PASSED | ai/gpt-test / ffd8addf4df207587e5af265179667f39dd1e172 / V1.185 | ded7645062c3e1e9447372b83b3b3cbcf8fa5c26 | 规则9P/0F/0NT，步骤5P/0F/0NT；DEF-S3-032、119～125及NT-S3-004/005全闭环；真实Edge UI 5/5通过；整项通过，合入main，下一项SRS_F025 |\n
+| 2026-11-09 | SRS_F025 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / 239f8dd65b6c840847280ae2f7cb778811cf6296 / V1.186 | 待独立整轮复测 | 闭环 DEF-S3-004、TC-078.S1 降级链路、必要参数守卫与隐私脱敏、前端专用卡片展示，详见下文交接专节 |
 ## 文件认领
 
 - Claude：当前需求涉及的产品代码与必要的修复单测；独立 `ai/claude-fix` worktree。
@@ -4303,3 +4311,34 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
   - 资源与环境恢复：RULE_RESOURCE_CRITICAL 恢复至 V15 / enabled=true，append-only 审计日志追加保留，历史记录 8105/8228 严格未变；所有 54 个测试任务终态，所有 5 个合成设备恢复 INACTIVE，0 代理占用，触发器数量 0，历史 pending 行一致（26 行）。
 - 正式验收报告：cceptance/stage3/SRS_F024-V1.185-整轮独立复测与验收.md。
 - 原始证据索引：cceptance/stage3/evidence/SRS_F024-V1.185-http-sql-protocol-20261109.json、SRS_F024-V1.185-real-ui-results.json、7 张浏览器截图（evidence/SRS_F024-V1.185-ui-*.png）。
+
+
+## 2026-11-09 Germini → GPT（SRS_F025 V1.186 修复交接）
+
+- 状态：`READY_FOR_GPT`。
+- 产品代码 SHA：`239f8dd65b6c840847280ae2f7cb778811cf6296`
+- 产品版本标签：`V1.186`（已推送到 `origin`）
+- 修复分支：`ai/claude-fix`（已推送到 `origin`）
+- 依据需求与规则：`SRS_F025.R01`～`SRS_F025.R09`、`TC-077` (S1～S3)、`TC-078` (S1)、`TC-079` (S1)。
+- 关键修复与成果：
+  1. **DEF-S3-004 闭环与服务端必要字段强校验（R01, R02）**：
+     - 在 `RequiredInfoGuard.java` 中配置 `SPECIAL_PASSENGER_SERVICE` 仅校验 `assistanceType`、`origin`、`destination` 三个核心业务字段。
+     - 当信息不完整时，由系统直接生成缺失项的规范追问（如“请补充协助类型”、“请补充服务起点”、“请补充目的地”），严禁请求旅客姓名、身份证、护照、手机号等真实身份信息。
+     - 采用 `INFO_CHECK_OVERRIDE` 机制覆盖大模型可能抛出的定义外追问或敏感信息索取。
+  2. **旅客真实身份隐私过滤与脱敏保护（R01, R02, DEF-S3-032）**：
+     - 在 `SceneParamsPrivacyGuard.java` 中新增 `asksForIdentity` 敏感问题检测，在 `TaskService.clarify` 中拦截要求提供真实身份的过期或非法问题。
+     - 新增 `sanitizeFreeTextAnswers`，若操作员在回答或自由文本中提供了旅客姓名、电话、证件号，系统自动脱敏为 `[PROTECTED_IDENTITY]` 等占位符，不持久化至数据库、不送入外部模型、不留在操作员审计日志中。
+     - 在 `RequiredInfoGuard.hasValue` 中明确判断：若自由文本答案脱敏后仅剩余隐私占位符或空白标点，则判定业务必需参数仍未提供，避免非法回答绕过校验。
+  3. **移动服务设备离线优雅降级（R04, TC-078.S1）**：
+     - 在 `PlanValidationService.java` 中支持特殊旅客服务的部分能力候选可用性策略：当移动机器人全部离线但智慧航显在线时，允许校验通过，使信息提示步骤（`CAP_INFO_DISPLAY`）得以正常执行，不直接在校验阶段抛出异常或阻断整条链路。
+     - 在 `TaskExecutionOrchestrator.java` 中针对特殊旅客服务的移动设备能力步骤（`CAP_NOTIFICATION`、`CAP_ESCORT`、`CAP_NAVIGATION`）实现优雅跳过处理，标记步骤为 `SKIPPED`（原因 `ESCORT_CHANNEL_UNAVAILABLE`），并记录 `ESCORT_UNCOVERED` 事件。
+     - 所有可用渠道（航显）执行完成后，任务最终安全降级为 `PENDING_MANUAL`，记录明确降级原因（`无可用移动服务设备，已发布会合信息提示，转人工协助接续`），追加 `TASK_PENDING_MANUAL` 事件，彻底闭环 TC-078.S1。
+  4. **前端特殊旅客详情展示支持（R09）**：
+     - 在 `TaskDetailView.vue` 增加特殊旅客服务专用展示卡片，包含临时服务号、协助类型、起终点、状态警示及服务指引提示。
+- 本地验证：
+  - 定向单元测试：`mvn -o test "-Dtest=RequiredInfoF025Test,RequiredInfoF025OverrideTest,SpecialPassengerNoMobileRobotTest"` 全部 11 个测试通过（BUILD SUCCESS）。
+  - 前端生产构建：`npm run build` 成功完成（3272 modules transformed，0 error）。
+  - 后端生产打包：`mvn -o package -DskipTests` 成功打包生成 `airport-ai-app-1.0.0.jar`。
+- 给独立复测的范围与建议：
+  - 对 TC-077 (S1, S2, S3)、TC-078 (S1)、TC-079 (S1) 及 R01～R09 进行独立整轮复测。
+  - 重点验证 TC-078.S1 移动机器人离线时降级链路及 DEF-S3-004 必要字段与隐私保护。

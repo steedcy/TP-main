@@ -2,8 +2,8 @@
 
 > **当前基准**：V2.4（2026-11-04 用户追加整轮复测授权；继承V2.3，见BL-005；下方既有产品验收/交接记录保留原执行版本）
 > **主干验收合入提交**：F001～F023已验收安全合main；F023验收锚点`52dabfc647931d0a3ac3b2297fc1b5f9a8e98c62`已远端核对，40用户文件哈希不变，无PR；最终证明随本提交同步。
-> **最新产品代码提交**：`ffd8addf4df207587e5af265179667f39dd1e172` / `V1.185`（SRS_F024）
-> **当前状态**：REQUIREMENT_PASSED。SRS_F024 整项通过，规则 9P/0F/0NT，步骤 5P/0F/0NT，缺陷 DEF-S3-032、119～125 及 NT-S3-004/005 全部实测闭环。安全合入 main，下一项启动 SRS_F025。\n> **文档定位**：本文件为跨会话、跨需求修复推进的**唯一全景进度与依据底账**。每轮需求修复与复测验收后必须同步更新本文件。
+> **最新产品代码提交**：`239f8dd65b6c840847280ae2f7cb778811cf6296` / `V1.186`（SRS_F025）
+> **当前状态**：READY_FOR_GPT。SRS_F025 特殊旅客服务协同与参数完整性修复已完成，产品代码已打标签 V1.186 并推送。交接写入权交 GPT 开展独立整轮复测。\n> **文档定位**：本文件为跨会话、跨需求修复推进的**唯一全景进度与依据底账**。每轮需求修复与复测验收后必须同步更新本文件。
 
 ---
 
@@ -560,3 +560,20 @@ V1.184 独立复测交接仍为 `READY_FOR_CLAUDE`（实际接收者 Germini）�
   - 资源与环境恢复：RULE_RESOURCE_CRITICAL 恢复至 V15 / enabled=true，append-only 审计日志追加保留，历史记录 8105/8228 严格未变；所有 54 个测试任务终态，所有 5 个合成设备恢复 INACTIVE，0 代理占用，触发器数量 0，历史 pending 行一致（26 行）。
 - 正式验收报告：cceptance/stage3/SRS_F024-V1.185-整轮独立复测与验收.md。
 - 原始证据索引：cceptance/stage3/evidence/SRS_F024-V1.185-http-sql-protocol-20261109.json、SRS_F024-V1.185-real-ui-results.json、7 张浏览器截图（evidence/SRS_F024-V1.185-ui-*.png）。
+
+
+## 2026-11-09 Germini SRS_F025 修复与交接 (V1.186)
+
+- 依据执行基线：V2.4 / 2026-11-08 用户自动串行协同授权。
+- 固定产品代码：`239f8dd65b6c840847280ae2f7cb778811cf6296`，标签 `V1.186`。
+- 修复分支：`ai/claude-fix`，独立工作区 `tip-claude-f022`。
+- 修复内容与成果：
+  1. **DEF-S3-004 闭环**：`RequiredInfoGuard.java` 为 `SPECIAL_PASSENGER_SERVICE` 配置强校验，仅核验 `assistanceType`、`origin`、`destination`；大模型追问多余/身份字段时使用 `INFO_CHECK_OVERRIDE` 拦截。
+  2. **旅客真实身份隐私过滤与脱敏**：`SceneParamsPrivacyGuard.java` 与 `TaskService.java` 中增加身份信息检测与自动脱敏；自由文本及场景参数中的敏感身份信息自动脱敏为占位符，不入库、不送模型、不留审计。
+  3. **移动设备离线优雅降级闭环（TC-078.S1 / R04）**：`PlanValidationService.java` 允许无移动机器人时航显提示步骤通过；`TaskExecutionOrchestrator.java` 对移动设备步骤做优雅跳过（`ESCORT_CHANNEL_UNAVAILABLE`），任务发布信息提示后降级为 `PENDING_MANUAL` 并记录降级原因，实现信息发布与人工接续闭环。
+  4. **前端展示专用支持**：`TaskDetailView.vue` 增加特殊旅客服务专用展示卡片（临时服务号、协助类型、起终点、状态警示及服务指引）。
+- 本地验证：
+  - 定向单元测试：11/11 全部通过（`RequiredInfoF025Test`、`RequiredInfoF025OverrideTest`、`SpecialPassengerNoMobileRobotTest`）。
+  - 前端生产构建：`npm run build` 成功完成（0 error）。
+  - 后端生产打包：`mvn -o package -DskipTests` 成功打包生成 `airport-ai-app-1.0.0.jar`。
+- 当前交接状态：`READY_FOR_GPT`，交接写入权交 GPT 独立整轮复测。
