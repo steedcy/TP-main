@@ -63,7 +63,7 @@
 | 2026-11-08 | SRS_F024 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / fc55f713e5d74d6fb41761f53fed84b4bc4efd7b / V1.183 | 待独立测试 | 闭环 DEF-S3-003、DEF-S3-032、DEF-S3-069、NT-S3-004、NT-S3-005，实现双触发入口、RequiredInfoGuard、4渠道计划、前端办理说明与柜台引导、模拟测量事件触发，详见下文交接专节 |
 | 2026-11-09 | SRS_F024 | GPT → Germini | READY_FOR_CLAUDE | ai/gpt-test / fc55f713e5d74d6fb41761f53fed84b4bc4efd7b / V1.183 | 05f1047a23a1b47fce0a691d6e50b7953357e735 | 3P/6F/0NT，DEF-S3-032、119～125统一交修，未合main |
 | 2026-11-09 | SRS_F024 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / d4a1125c94e62686d0481d4df5371a90c9e9a12d / V1.184 | 待独立整轮复测 | 统一闭环 DEF-S3-032 及 DEF-S3-119～125（8项缺陷），详见下文交接专节 |
-| 2026-11-09 | SRS_F024 | GPT → Germini | READY_FOR_CLAUDE | ai/gpt-test / V1.184 product d4a1125c94e62686d0481d4df5371a90c9e9a12d | 9c5a6d0 | 7P/1F/1NT规则、4P/1F/3NT步骤；DEF-S3-119保持F，DEF-S3-032/120/122～125关闭，DEF-S3-121 API通过但UI NT；未合main |
+| 2026-11-09 | SRS_F024 | GPT → Germini | READY_FOR_CLAUDE | ai/gpt-test / V1.184 product d4a1125c94e62686d0481d4df5371a90c9e9a12d | 9c5a6d071407d9a0c12633529ef2564b0cba87f4 | 7P/1F/1NT规则、4P/1F/3NT步骤；DEF-S3-119保持F，DEF-S3-032/120/122～125关闭，DEF-S3-121 API通过但UI NT；未合main |
 
 ## 文件认领
 
@@ -4168,7 +4168,7 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
 
 ## 2026-11-09 GPT → Germini：SRS_F024 V1.184 独立整轮复测交接（READY_FOR_CLAUDE）
 
-- 证据已先提交并推送：`9c5a6d0`（分支 `ai/gpt-test`）。固定产品为 `d4a1125c94e62686d0481d4df5371a90c9e9a12d` / `V1.184`；产品 SHA 不同于 main，未合并、未创建 PR。
+- 证据已先提交并推送：`9c5a6d071407d9a0c12633529ef2564b0cba87f4`（分支 `ai/gpt-test`）。固定产品为 `d4a1125c94e62686d0481d4df5371a90c9e9a12d` / `V1.184`；产品 SHA 不同于 main，未合并、未创建 PR。
 - 规则结果 **7P/1F/1NT**，步骤结果 **4P/1F/3NT**。真实浏览器 UI 未能执行，用户在主线程独立确认相同 CUA 阻断：读取 Chrome 前，Windows URL 置信度策略报 `could not determine the current browser URL on Windows with enough confidence to enforce policy`。不再重试 CUA；TC-072.S1～S3 与完整 DEF-S3-121 按 NT 交接。
 - 原始业务观察 87 行：81P/1F/3OBS，另有2条原始夹具空结果保留；清理核验另1P。原始 HTTP/SQL/协议、模型请求、最小缺陷证据和清理索引均在 `acceptance/stage3/evidence/SRS_F024-V1.184-*`，报告为 `acceptance/stage3/SRS_F024-V1.184-独立复测与交接.md`。
 - **DEF-S3-119 保持 F**：任务1159正常测量后已COMPLETED，但 plan version 1132仍保存测量、告警、展示、导航四步；仅第1步完成，后三步SKIPPED，违反“不生成引导步骤”。请修复后用新版本重测。
