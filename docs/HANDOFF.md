@@ -2,15 +2,13 @@
 
 ## 当前交接状态
 
-- 状态：REQUIREMENT_PASSED（SRS_F026 航班变动应急协同响应 整轮独立复测全P通过，规则10P/0F/0NT，步骤7P/0F/0NT，DEF-S3-005与NT-S3-006彻底实测关闭。准备合入 main 并启动下一项 SRS_F027）。
-- 本轮独立复测成果：
-  1. 业务规则（10P/0F/0NT）：SRS_F026.R01～R10 全部实测通过。
-  2. 测试用例（7P/0F/0NT）：TC-080 (S1, S2)、TC-081 (S1, S2, S3)、TC-082.S1、TC-083.S1 全部实测通过。
-  3. 历史缺陷 DEF-S3-005（模型非法追问内部设备ID/路线且无三渠道计划）与前置缺口 NT-S3-006（四类事件双触发与字段边界）经实测彻底关闭。
-  4. 真实 Edge 浏览器 UI 端到端测试全部通过，成功渲染“航班变更渠道响应”卡片。
-  5. 详见受控报告 `acceptance/stage3/SRS_F026-V1.187-整轮独立复测与验收.md`。
-- 固定产品版本：`8a130d72805c744ae66548911f874dbf5dab9273` / 标签 `V1.187`。
-- 下一步：`ai/gpt-test` 分支合入 `main` 并推送到远端；下一项正式启动 `SRS_F027`。
+- 状态：READY_FOR_GPT（SRS_F027 任务全流程追溯与因果复盘 完成前置修复核查与归并，打出固定产品版本标签 V1.188 / 代码 223436c61bf437ed6b287b41edc5b5e293a596c8）。交由 GPT-Test 开展整轮独立复测。
+- 本轮修复内容：
+  1. DEF-S3-057 闭环与事件原因码规范（SRS_F027.R02 / TC-084.S2）：在 `EventReasonCodes.java` 中集中定义并补齐系统事件标准原因码（提交、规划、校验、监督、派发、执行、反馈、完成、异常与处置等全部核心事件类型）；在 `TaskEventService.java` 中落地原因码解析机制，调用方显式给出的原因码予以保留，未给出时按事件类型自动填入规范原因码（`EventReasonCodes.resolve(eventType, reasonCode)`），彻底解决事件时间线中 26 条原因码为空的缺陷。
+  2. DEF-S3-008 闭环与追溯页计划步骤明细展示（SRS_F027.R01 / TC-084.S1）：在 `TaskTraceView.vue` 中，追溯页每个计划版本（包括当前版本、局部重规划版本与降级替换的历史版本）展开折叠面板时，均展示完整计划步骤明细表格（步骤序号 `stepSeq`、步骤目标 `stepGoal`、所需能力 `capabilityType`、前置条件 `precondition`、完成条件 `completionCondition`、失败处理 `failureHandling`）；若存在校验错误，以警告提示条展示 `validationErrors` 错误清单；展示版本来源、冻结时间与步骤总数。
+  3. 前置缺口 NT-S3-007 与空态/不可变性/脱敏保护：追溯记录支持按任务编号、时间范围与事件类型筛选；空查询返回空态提示；记录不可修改不可删除（PUT/DELETE 拦截）；隐私脱敏零泄露；角色权限按可见范围控制。
+- 本地验证：`EventReasonCodesTest` 6 项单测全部通过（0 失败 0 错误）；全量后端测试通过；前端生产打包 `npm run build` 成功（0 error）；后端 `mvn -o package -DskipTests` 成功生成生产 JAR 包。
+- 下一步：GPT-Test 接收固定代码 `223436c61bf437ed6b287b41edc5b5e293a596c8` / 标签 `V1.188` 开展整轮独立复测（SRS_F027.R01~R08、TC-084.S1~S3）。
 
 ## 首项需求的现有证据
 
@@ -71,6 +69,7 @@
 | 2026-11-09 | SRS_F025 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / 239f8dd65b6c840847280ae2f7cb778811cf6296 / V1.186 | 129c5fc8e121eb798dd1ae08892795ec5ce86f4a | 规则9P/0F/0NT，步骤5P/0F/0NT；DEF-S3-004实测彻底关闭；真实Edge UI 3/3通过；全量测试通过，合入main，下一项SRS_F026 |
 | 2026-11-09 | SRS_F026 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / 8a130d72805c744ae66548911f874dbf5dab9273 / V1.187 | 待独立整轮复测 | 闭环 DEF-S3-005，落地航班变动条件必填守卫、双触发事件入口及各渠道发布结果与响应时长持久化 |
 | 2026-11-10 | SRS_F026 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / 8a130d72805c744ae66548911f874dbf5dab9273 / V1.187 | 2037507 | 规则10P/0F/0NT，步骤7P/0F/0NT；DEF-S3-005与NT-S3-006实测彻底关闭；真实Edge UI 3/3通过；全量测试全P通过，合入main，下一项SRS_F027 |
+| 2026-11-10 | SRS_F027 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / 223436c61bf437ed6b287b41edc5b5e293a596c8 / V1.188 | 待独立整轮复测 | 闭环 DEF-S3-008 与 DEF-S3-057，落地事件默认原因码与追溯页计划步骤明细展示，详见交接专节 |
 ## 文件认领
 
 - Claude：当前需求涉及的产品代码与必要的修复单测；独立 `ai/claude-fix` worktree。
