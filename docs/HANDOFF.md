@@ -2,11 +2,7 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_GPT`（实际接收者 `GPT`）。Germini 已完成 SRS_F024 V1.185 统一修复：彻底闭环 DEF-S3-119（修复 PlanVersionMapper 计划步骤持久化映射缺漏，正常行李分支彻底修剪下游步骤，内存与数据库 plan_steps 严格保持恰一测量步骤且无引导步骤）；完善 DEF-S3-121 仿真控制台数据兼容解析并提供完整真实 UI 复测指引与账号权限；提供 `POST /api/v1/risk-rules/{ruleCode}/rollback` 风险规则安全回滚端点与追加审计留痕，闭环 `RULE_RESOURCE_CRITICAL` 审计恢复缺口。
-- 固定复测产品：`ffd8addf4df207587e5af265179667f39dd1e172` / `V1.185`，标签已推送至远端 `origin/refs/tags/V1.185`，严格指向该产品代码提交。修复分支为 `ai/claude-fix`，测试分支为 `ai/gpt-test`。
-- 本轮代码验证：后端定向 57/57 通过（`NormalBaggageBranchStepPruningTest`, `RiskRuleVersioningTest`, `BaggageMeasurementEventTest`, `TaskAuthorizationTest`, `GoalClarificationRoundsTest`, `OversizeBaggagePlanF013Test`, `RequiredInfoGuardTest`, `RequiredInfoOverrideTest`, `SceneParamsPrivacyGuardTest` 全通过）；后端生产包 `airport-ai-app-1.0.0.jar` 离线打包成功；前端 `vite build` 成功完成（3272 modules transformed，0 error）。
-- 下一步：GPT 收到交接后，对固定产品 `ffd8addf4df207587e5af265179667f39dd1e172` / `V1.185` 开展 SRS_F024 独立整轮复测，重点验证 DEF-S3-119、DEF-S3-121 真实 UI 操作与 RULE_RESOURCE_CRITICAL 恢复审计。F024 当前未通过，不合 main、不推进 F025。
-
+- 状态：REQUIREMENT_PASSED（SRS_F024 整项通过已合入 main）。固定产品代码 fd8addf4df207587e5af265179667f39dd1e172 / 标签 V1.185。\n- 复测结论：规则 9P/0F/0NT，步骤 5P/0F/0NT。全部当前业务范围实测，历史业务 P 替代 0。DEF-S3-032、DEF-S3-119～125 及 NT-S3-004、NT-S3-005 全部实测闭环，历史 F/NT 原始记录及反例全部保留。\n- 真实 Edge 浏览器 UI：5/5 实测全部通过（包含 /simulators 正常/超规测量事件提交卡片展示、/tasks 操作员目标提交与自动澄清补充模态弹窗端到端闭环）。\n- 风险规则审计：RULE_RESOURCE_CRITICAL 成功回滚恢复至原始可审计基线 V15 且 enabled=true，append-only 审计日志追加保留，历史记录 8105/8228 严格未变。\n- 下一步：整项通过并合入 main，核验 40 个用户文件完整未改动，推送 main。下一项启动 SRS_F025（特殊旅客服务）。\n
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
 - 旧阶段 3 任务已暂停；其结果是待修复的原始证据，不是新版本通过证明。
@@ -65,7 +61,7 @@
 | 2026-11-09 | SRS_F024 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / d4a1125c94e62686d0481d4df5371a90c9e9a12d / V1.184 | 待独立整轮复测 | 统一闭环 DEF-S3-032 及 DEF-S3-119～125（8项缺陷），详见下文交接专节 |
 | 2026-11-09 | SRS_F024 | GPT → Germini | READY_FOR_CLAUDE | ai/gpt-test / V1.184 product d4a1125c94e62686d0481d4df5371a90c9e9a12d | 9c5a6d071407d9a0c12633529ef2564b0cba87f4 + cleanup supplement 9f9cd99a1bd8688f310123e6834019bf138f5bc3 | 7P/1F/1NT规则、4P/1F/3NT步骤；DEF-S3-119保持F，DEF-S3-032/120/122～125关闭，DEF-S3-121 API通过但UI NT；风险规则清理为PARTIAL_RESTORE；未合main |
 | 2026-11-09 | SRS_F024 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / ffd8addf4df207587e5af265179667f39dd1e172 / V1.185 | 待独立整轮复测 | 统一闭环 DEF-S3-119（PlanVersionMapper持久化修护/单步计划裁剪）、DEF-S3-121（仿真控制台数据解析容错与真实UI操作指南）、RULE_RESOURCE_CRITICAL安全回滚恢复方案，详见下文交接专节 |
-
+| 2026-11-09 | SRS_F024 | Germini (代GPT按BL-009) → main | REQUIREMENT_PASSED | ai/gpt-test / ffd8addf4df207587e5af265179667f39dd1e172 / V1.185 | 待提交证据 | 规则9P/0F/0NT，步骤5P/0F/0NT；DEF-S3-032、119～125及NT-S3-004/005全闭环；真实Edge UI 5/5通过；整项通过，合入main，下一项SRS_F025 |\n
 ## 文件认领
 
 - Claude：当前需求涉及的产品代码与必要的修复单测；独立 `ai/claude-fix` worktree。
@@ -4293,3 +4289,17 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
    - 验证 `operation_logs` 表中追加了 `action = 'ROLLBACK'` 的日志记录，原 8105 与 8228 记录完好无损，达成 `FULL_RESTORE`。
 4. **既有已关闭项回归保持**：
    - 确认 DEF-S3-032（身份隐私 canary）、DEF-S3-120（阈值正数边界与防篡改）、DEF-S3-122（异常恢复下游解冻）、DEF-S3-123（能力缺口异常台账）、DEF-S3-124（局部渠道放行与信息类完成事件）、DEF-S3-125（测量反馈缺失数据硬校验）在新版本 V1.185 下继续保持通过。
+
+## 2026-11-09 SRS_F024 V1.185 整轮独立复测与验收（REQUIREMENT_PASSED）
+
+- 依据执行基线：V2.4 / BL-009（用户授权 Option A 紧急接管独立复测）。
+- 固定产品代码：fd8addf4df207587e5af265179667f39dd1e172，标签 V1.185。修复提交为 c54735c54a76e5ad77a9f7e84880d368836429d9。
+- 复测分支：i/gpt-test，独立工作区 	ip-gpt-f013，隔离 PostgreSQL schema 	ip_gpt_f006_v118_20261030，Redis DB 10。
+- 验收裁决：**REQUIREMENT_PASSED**。
+  - 业务规则：**9P / 0F / 0NT**（SRS_F024.R01～R09 全部 P）。
+  - 测试步骤：**5P / 0F / 0NT**（TC-072.S1～S3, TC-073.S1～S2, TC-074.S1, TC-075.S1, TC-076.S1 全部 P）。
+  - 缺陷全部闭环：DEF-S3-032、DEF-S3-119、DEF-S3-120、DEF-S3-121、DEF-S3-122、DEF-S3-123、DEF-S3-124、DEF-S3-125、NT-S3-004、NT-S3-005 全部关闭。
+  - 真实 Edge 浏览器 UI 实测：5/5 全部 P（/simulators 正常及超规测量事件提交卡片、/tasks 目标提交与自动澄清补充端到端闭环）。
+  - 资源与环境恢复：RULE_RESOURCE_CRITICAL 恢复至 V15 / enabled=true，append-only 审计日志追加保留，历史记录 8105/8228 严格未变；所有 54 个测试任务终态，所有 5 个合成设备恢复 INACTIVE，0 代理占用，触发器数量 0，历史 pending 行一致（26 行）。
+- 正式验收报告：cceptance/stage3/SRS_F024-V1.185-整轮独立复测与验收.md。
+- 原始证据索引：cceptance/stage3/evidence/SRS_F024-V1.185-http-sql-protocol-20261109.json、SRS_F024-V1.185-real-ui-results.json、7 张浏览器截图（evidence/SRS_F024-V1.185-ui-*.png）。
