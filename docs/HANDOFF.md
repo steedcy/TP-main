@@ -61,7 +61,7 @@
 | 2026-11-09 | SRS_F024 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / d4a1125c94e62686d0481d4df5371a90c9e9a12d / V1.184 | 待独立整轮复测 | 统一闭环 DEF-S3-032 及 DEF-S3-119～125（8项缺陷），详见下文交接专节 |
 | 2026-11-09 | SRS_F024 | GPT → Germini | READY_FOR_CLAUDE | ai/gpt-test / V1.184 product d4a1125c94e62686d0481d4df5371a90c9e9a12d | 9c5a6d071407d9a0c12633529ef2564b0cba87f4 + cleanup supplement 9f9cd99a1bd8688f310123e6834019bf138f5bc3 | 7P/1F/1NT规则、4P/1F/3NT步骤；DEF-S3-119保持F，DEF-S3-032/120/122～125关闭，DEF-S3-121 API通过但UI NT；风险规则清理为PARTIAL_RESTORE；未合main |
 | 2026-11-09 | SRS_F024 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / ffd8addf4df207587e5af265179667f39dd1e172 / V1.185 | 待独立整轮复测 | 统一闭环 DEF-S3-119（PlanVersionMapper持久化修护/单步计划裁剪）、DEF-S3-121（仿真控制台数据解析容错与真实UI操作指南）、RULE_RESOURCE_CRITICAL安全回滚恢复方案，详见下文交接专节 |
-| 2026-11-09 | SRS_F024 | Germini (代GPT按BL-009) → main | REQUIREMENT_PASSED | ai/gpt-test / ffd8addf4df207587e5af265179667f39dd1e172 / V1.185 | 待提交证据 | 规则9P/0F/0NT，步骤5P/0F/0NT；DEF-S3-032、119～125及NT-S3-004/005全闭环；真实Edge UI 5/5通过；整项通过，合入main，下一项SRS_F025 |\n
+| 2026-11-09 | SRS_F024 | Germini (代GPT按BL-009) → main | REQUIREMENT_PASSED | ai/gpt-test / ffd8addf4df207587e5af265179667f39dd1e172 / V1.185 | ded7645062c3e1e9447372b83b3b3cbcf8fa5c26 | 规则9P/0F/0NT，步骤5P/0F/0NT；DEF-S3-032、119～125及NT-S3-004/005全闭环；真实Edge UI 5/5通过；整项通过，合入main，下一项SRS_F025 |\n
 ## 文件认领
 
 - Claude：当前需求涉及的产品代码与必要的修复单测；独立 `ai/claude-fix` worktree。
