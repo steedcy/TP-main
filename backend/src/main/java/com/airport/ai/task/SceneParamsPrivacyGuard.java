@@ -111,6 +111,33 @@ public final class SceneParamsPrivacyGuard {
         }
     }
 
+    /** 检测澄清问题是否索要身份或联系方式，供特殊旅客流程拒绝过期/错误问题。 */
+    public static boolean asksForIdentity(String question) {
+        if (question == null || question.isBlank()) return false;
+        String normalized = question.toLowerCase(Locale.ROOT).replaceAll("[_\\-\\s]", "");
+        return normalized.contains("姓名")
+                || normalized.contains("身份证")
+                || normalized.contains("证件")
+                || normalized.contains("护照")
+                || normalized.contains("手机号")
+                || normalized.contains("电话号码")
+                || normalized.contains("联系电话")
+                || normalized.contains("电子邮箱")
+                || normalized.contains("邮箱")
+                || normalized.contains("identity")
+                || normalized.contains("passport")
+                || normalized.contains("phone")
+                || normalized.contains("email");
+    }
+
+    /** 特殊旅客澄清值持久化或送模前，脱敏其中可识别的身份字段和联系方式。 */
+    public static Map<String, String> sanitizeFreeTextAnswers(Map<String, String> answers) {
+        if (answers == null) return null;
+        Map<String, String> cleaned = new LinkedHashMap<>();
+        answers.forEach((question, answer) -> cleaned.put(question, sanitizeGoal(answer)));
+        return cleaned;
+    }
+
     private static void scanObject(String path, Object obj, List<String> hits) {
         if (obj == null) return;
         if (obj instanceof Map<?, ?> map) {

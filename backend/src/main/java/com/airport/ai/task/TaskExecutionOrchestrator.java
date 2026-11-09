@@ -204,6 +204,12 @@ public class TaskExecutionOrchestrator {
                 skipUnavailableNavigationChannel(currentTask, assignment, capabilityType);
                 return;
             }
+            if (!Boolean.TRUE.equals(currentTask.getIsDryRun()) && rejected.isEmpty()
+                    && "SPECIAL_PASSENGER_SERVICE".equals(currentTask.getTaskFamily())
+                    && ("CAP_NOTIFICATION".equals(capabilityType) || "CAP_ESCORT".equals(capabilityType) || "CAP_NAVIGATION".equals(capabilityType))) {
+                skipUnavailableSpecialPassengerChannel(currentTask, assignment, capabilityType);
+                return;
+            }
             // 异常路径2a/4b：无候选(CAPABILITY_GAP)或全部候选已拒绝(ASSIGNMENT_FAILED)，进入5.5.3异常识别与恢复
             boolean hasRejected = !rejected.isEmpty();
             String errReasonCode = hasRejected ? "ERR_ALL_CANDIDATES_REJECTED" : "ERR_NO_CANDIDATE_AVAILABLE";
@@ -670,6 +676,30 @@ public class TaskExecutionOrchestrator {
         else completeAvailableChannels(task.getId(), assignment.getPlanVersionId(), all);
     }
 
+    /** SRS §5.6.4 / SRS_F025.R04: 特殊旅客服务在无移动机器人时跳过现场通知与陪同步骤，降级为仅信息提示并转人工协助。 */
+    private void skipUnavailableSpecialPassengerChannel(Task task, TaskStepAssignment assignment, String capabilityType) {
+        String channel = CoreScenarioChannelPolicy.requiredType(task.getTaskFamily(), capabilityType);
+        assignment.setStepStatus("SKIPPED");
+        assignment.setReasonCode("ESCORT_CHANNEL_UNAVAILABLE");
+        assignment.setOutputParams(toJson(Map.of(
+                "channelResult", "UNCOVERED",
+                "capabilityType", capabilityType,
+                "requiredDeviceType", channel != null ? channel : "MOBILE_ROBOT",
+                "escortStatus", "UNCOMPLETED",
+                "reason", "NO_ONLINE_IDLE_CANDIDATE")));
+        assignment.setUpdatedAt(LocalDateTime.now());
+        assignmentMapper.update(assignment);
+        taskEventService.append(task.getId(), "ESCORT_UNCOVERED", "SYSTEM", "ESCORT_CHANNEL_UNAVAILABLE",
+                "步骤" + assignment.getStepSeq() + "所需" + channel + "移动机器人无在线候选，未完成现场陪同/通知，降级保留信息提示并转人工协助");
+
+        List<TaskStepAssignment> all = assignmentMapper.findByPlanVersionIdOrderByStepSeqAsc(assignment.getPlanVersionId());
+        Optional<TaskStepAssignment> next = all.stream()
+                .filter(a -> a.getStepSeq() > assignment.getStepSeq() && "PENDING_ASSIGNMENT".equals(a.getStepStatus()))
+                .min(Comparator.comparing(TaskStepAssignment::getStepSeq));
+        if (next.isPresent()) assignStep(task.getId(), assignment.getPlanVersionId(), next.get().getStepSeq());
+        else completeAvailableChannels(task.getId(), assignment.getPlanVersionId(), all);
+    }
+
     private void completeAvailableChannels(Long taskId, Long planVersionId, List<TaskStepAssignment> all) {
         Task task = taskMapper.findById(taskId).orElseThrow();
         if ("FLIGHT_CHANGE_RESPONSE".equals(task.getTaskFamily()) && !Boolean.TRUE.equals(task.getIsDryRun())) {
@@ -714,6 +744,39 @@ public class TaskExecutionOrchestrator {
             } else {
                 String detail = "超规行李处置闭环完成（临时业务编号: " + baggageId + "）：已完成行李测量、超规告警上报、航显办理说明发布，以及移动机器人至" + targetLoc + "的空间引导；全部步骤均已执行完成。";
                 taskEventService.append(taskId, "TASK_COMPLETED", "SYSTEM", "OVERSIZE_HANDLING_CLOSED_LOOP", detail);
+            }
+            return;
+        }
+
+        if ("SPECIAL_PASSENGER_SERVICE".equals(task.getTaskFamily()) && !Boolean.TRUE.equals(task.getIsDryRun())) {
+            boolean escortUncovered = all.stream().anyMatch(a -> "ESCORT_CHANNEL_UNAVAILABLE".equals(a.getReasonCode()));
+            taskExceptionService.archiveAllUnresolvedOnTaskComplete(taskId);
+
+            Map<String, Object> scene = fromJsonMap(task.getSceneParams());
+            String assistanceType = String.valueOf(scene.getOrDefault("assistanceType", "特殊协助"));
+            String origin = String.valueOf(scene.getOrDefault("origin", scene.getOrDefault("startLocation", "服务起点")));
+            String destination = String.valueOf(scene.getOrDefault("destination", scene.getOrDefault("targetLocation", "服务目的地")));
+
+            if (escortUncovered) {
+                // TC-078.S1 / SRS_F025.R04: 无可用移动服务设备时降级为信息提示并转人工协助，记录降级原因
+                task.setStatus(TaskStatus.PENDING_MANUAL);
+                task.setFailureReason("无可用移动服务设备（机器人离线或无候选），已完成航显会合信息提示发布，转人工协助接续");
+                task.setDowngradeReason("无可用移动服务设备，降级为信息提示并转人工协助");
+                task.setUpdatedAt(LocalDateTime.now());
+                taskMapper.update(task);
+
+                String detail = "特殊旅客服务（" + assistanceType + "，" + origin + "->" + destination
+                        + "）：已发布智慧航显会合信息提示；移动服务设备无可用候选，已记录未完成陪同并转人工协助接续。";
+                taskEventService.append(taskId, "TASK_PENDING_MANUAL", "SYSTEM", "MOBILE_ROBOT_UNAVAILABLE", detail);
+            } else {
+                // TC-077.S3 / SRS_F025.R09: 完成后记录服务处理结果与完整事件时间线
+                task.setStatus(TaskStatus.COMPLETED);
+                task.setUpdatedAt(LocalDateTime.now());
+                taskMapper.update(task);
+
+                String detail = "特殊旅客服务闭环完成（" + assistanceType + "，" + origin + "->" + destination
+                        + "）：已完成智慧航显会合提示发布、移动机器人现场通知与全程陪同引导服务；全部步骤均已执行完成。";
+                taskEventService.append(taskId, "TASK_COMPLETED", "SYSTEM", "SPECIAL_PASSENGER_SERVICE_COMPLETED", detail);
             }
             return;
         }

@@ -210,6 +210,33 @@
       </a-descriptions>
     </a-card>
 
+    <a-card v-if="task.taskFamily === 'SPECIAL_PASSENGER_SERVICE'"
+            title="特殊旅客协助与陪同协同服务"
+            style="margin-top: 16px"
+            data-testid="special-passenger-service-card">
+      <a-descriptions bordered :column="2">
+        <a-descriptions-item label="服务临时识别码">
+          <span data-testid="special-passenger-temp-id">{{ specialPassengerTempId }}</span>
+          <span style="margin-left: 8px; color: #8c8c8c; font-size: 12px">（脱敏服务代号，不存储旅客真实身份信息）</span>
+        </a-descriptions-item>
+        <a-descriptions-item label="协助类型">
+          <a-tag color="blue" data-testid="special-assistance-type">{{ specialAssistanceType }}</a-tag>
+        </a-descriptions-item>
+        <a-descriptions-item label="服务起点 / 会合地点">
+          <span data-testid="special-passenger-origin">{{ specialPassengerOrigin }}</span>
+        </a-descriptions-item>
+        <a-descriptions-item label="服务目的地">
+          <span data-testid="special-passenger-destination">{{ specialPassengerDestination }}</span>
+        </a-descriptions-item>
+        <a-descriptions-item label="会合与陪同状态" :span="2">
+          <a-alert :type="specialPassengerStatusType" :message="specialPassengerStatusText" show-icon />
+        </a-descriptions-item>
+        <a-descriptions-item label="服务说明与协同保障" :span="2">
+          <pre data-testid="special-passenger-instructions" style="white-space: pre-wrap; font-family: inherit; margin: 0; background: #fafafa; padding: 12px; border-radius: 4px;">{{ specialPassengerInstructions }}</pre>
+        </a-descriptions-item>
+      </a-descriptions>
+    </a-card>
+
     <a-card title="事件时间线（只读，事件仅可追加不可修改删除，对应5.7.1）" style="margin-top: 16px">
       <a-timeline>
         <a-timeline-item v-for="e in events" :key="e.id">
@@ -438,6 +465,46 @@ const baggageHandlingInstructions = computed(() => {
 - 严禁在托运行李中夹带锂电池、移动电源、易燃易爆等违禁品。
 - 异形或易碎超规行李需签署免责托运声明。
 - 现场智能服务终端与导引机器人持续提供路线指引与状态播报。`
+})
+
+const specialPassengerTempId = computed(() => {
+  return task.value?.sceneParams?.tempBusinessId || task.value?.sceneParams?.serviceId || ('SP-' + (task.value?.id || ''))
+})
+
+const specialAssistanceType = computed(() => {
+  return task.value?.sceneParams?.assistanceType || '轮椅协助 / 特殊旅客陪同'
+})
+
+const specialPassengerOrigin = computed(() => {
+  return task.value?.sceneParams?.origin || task.value?.sceneParams?.startLocation || 'F2_SERVICE_POINT'
+})
+
+const specialPassengerDestination = computed(() => {
+  return task.value?.sceneParams?.destination || task.value?.sceneParams?.targetLocation || 'F2_TEST_GATE'
+})
+
+const specialPassengerStatusType = computed(() => {
+  if (task.value?.status === 'COMPLETED') return 'success'
+  if (task.value?.status === 'PENDING_MANUAL') return 'warning'
+  return 'info'
+})
+
+const specialPassengerStatusText = computed(() => {
+  if (task.value?.status === 'COMPLETED') {
+    return '特殊旅客服务已闭环完成：航显会合提示已发布，移动服务机器人已完成全程陪同与安全引导。'
+  }
+  if (task.value?.status === 'PENDING_MANUAL') {
+    return task.value?.failureReason || '当前无可用移动服务机器人，已完成航显会合提示发布，转人工协助接续。'
+  }
+  return '特殊旅客协同服务执行中：智慧航显与移动机器人协同保障旅客出行。'
+})
+
+const specialPassengerInstructions = computed(() => {
+  return `【特殊旅客服务保障指引】
+1. 服务类型：${specialAssistanceType.value}（服务代号：${specialPassengerTempId.value}）。
+2. 会合地点：前往指定会合点（${specialPassengerOrigin.value}），现场智慧航显持续提供服务对接提示。
+3. 行程陪同：移动服务机器人由会合点引导陪同至目的地（${specialPassengerDestination.value}）。
+4. 隐私保护：系统仅记录服务必要起终点与协助类型，严格遵守民航旅客隐私保护规范，不采集和留存真实旅客身份。`
 })
 const flightChannelResults = computed(() => [
   { name: '航延屏', capabilities: ['CAP_FLIGHT_UPDATE'] },

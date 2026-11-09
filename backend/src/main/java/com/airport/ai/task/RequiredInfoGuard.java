@@ -34,6 +34,11 @@ public final class RequiredInfoGuard {
     private RequiredInfoGuard() {}
 
     /** 预置三类任务族的必要信息；扩展定义取其声明的必填场景参数；其余返回 null 表示无法核对。 */
+    public static List<Requirement> requirementsFor(String taskFamily) {
+        return requirementsFor(taskFamily, null);
+    }
+
+    /** 预置三类任务族的必要信息；扩展定义取其声明的必填场景参数；其余返回 null 表示无法核对。 */
     public static List<Requirement> requirementsFor(String taskFamily, TaskDefinition definition) {
         if (taskFamily == null || taskFamily.isBlank()) return null;
         switch (taskFamily) {
@@ -113,7 +118,10 @@ public final class RequiredInfoGuard {
 
     private static boolean hasValue(Object value) {
         if (value == null) return false;
-        if (value instanceof String s) return !s.isBlank();
+        if (value instanceof String s) {
+            String stripped = s.replaceAll("\\[PROTECTED_[A-Z]+\\]|[;；,，\\s]", "");
+            return !stripped.isBlank();
+        }
         if (value instanceof Iterable<?> it) return it.iterator().hasNext();
         if (value instanceof Map<?, ?> m) return !m.isEmpty();
         return true;

@@ -241,13 +241,24 @@ public class TaskService {
             throw new BusinessException(ErrorCode.TASK_STATUS_NOT_ALLOWED, "任务已离开待规划状态，不可补充信息");
         }
 
-        SceneParamsPrivacyGuard.reject(request.getAnswers());
+        boolean specialPassenger = "SPECIAL_PASSENGER_SERVICE".equals(task.getTaskFamily());
+        if (!specialPassenger) {
+            SceneParamsPrivacyGuard.reject(request.getAnswers());
+        }
         List<String> pendingQuestions = fromJsonQuestions(task.getMissingInfoQuestions());
+        if (specialPassenger && pendingQuestions.stream().anyMatch(SceneParamsPrivacyGuard::asksForIdentity)) {
+            throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR,
+                    "特殊旅客服务不得请求或接收旅客真实身份信息，请刷新任务问题后重试");
+        }
         if (pendingQuestions.isEmpty() || request.getAnswers() == null
                 || pendingQuestions.stream().anyMatch(q -> request.getAnswers().get(q) == null
                         || request.getAnswers().get(q).isBlank())) {
             throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, "请逐条回答当前待补充问题");
         }
+
+        Map<String, String> answersToStore = specialPassenger
+                ? SceneParamsPrivacyGuard.sanitizeFreeTextAnswers(request.getAnswers())
+                : new HashMap<>(request.getAnswers());
 
         Map<String, Object> mergedSceneParams = new HashMap<>(fromJsonMap(task.getSceneParams()));
         List<Map<String, Object>> rounds = new ArrayList<>();
@@ -257,20 +268,27 @@ public class TaskService {
                 if (round instanceof Map<?, ?> values) {
                     Map<String, Object> copy = new HashMap<>();
                     values.forEach((key, value) -> copy.put(String.valueOf(key), value));
+                    if (specialPassenger) sanitizeSpecialPassengerRound(copy);
                     rounds.add(copy);
                 }
             }
         } else if (saved instanceof Map<?, ?> previousAnswers) {
-            rounds.add(Map.of("answers", previousAnswers));
+            Map<String, Object> legacyRound = new HashMap<>();
+            legacyRound.put("answers", specialPassenger
+                    ? sanitizeSpecialPassengerAnswers(previousAnswers)
+                    : previousAnswers);
+            rounds.add(legacyRound);
         }
-        rounds.add(Map.of("questions", pendingQuestions, "answers", new HashMap<>(request.getAnswers())));
+        rounds.add(Map.of("questions", pendingQuestions, "answers", answersToStore));
         mergedSceneParams.put("clarificationAnswers", rounds);
 
         task.setSceneParams(toJson(SceneParamsPrivacyGuard.sanitize(mergedSceneParams)));
         taskMapper.update(task);
 
         taskEventService.append(task.getId(), "GOAL_CLARIFIED", "OPERATOR", null,
-                "运行操作员" + operator.getUsername() + "补充信息: " + request.getAnswers());
+                specialPassenger
+                        ? "运行操作员" + operator.getUsername() + "补充信息（问题数: " + pendingQuestions.size() + "）"
+                        : "运行操作员" + operator.getUsername() + "补充信息: " + request.getAnswers());
 
         runGoalUnderstanding(task, mergedSceneParams, rounds);
         return task;
@@ -849,5 +867,34 @@ public class TaskService {
         } catch (Exception e) {
             throw new RuntimeException("待补充问题反序列化失败", e);
         }
+    }
+
+    private void sanitizeSpecialPassengerRound(Map<String, Object> round) {
+        Object questions = round.get("questions");
+        if (questions instanceof Iterable<?> iterable) {
+            List<String> allowedQuestions = new ArrayList<>();
+            for (Object question : iterable) {
+                if (question instanceof String text && !SceneParamsPrivacyGuard.asksForIdentity(text)) {
+                    allowedQuestions.add(text);
+                }
+            }
+            round.put("questions", allowedQuestions);
+        }
+
+        Object answers = round.get("answers");
+        if (answers instanceof Map<?, ?> answerMap) {
+            round.put("answers", sanitizeSpecialPassengerAnswers(answerMap));
+        }
+    }
+
+    private Map<String, String> sanitizeSpecialPassengerAnswers(Map<?, ?> answers) {
+        Map<String, String> safe = new java.util.LinkedHashMap<>();
+        answers.forEach((key, value) -> {
+            String question = String.valueOf(key);
+            if (!SceneParamsPrivacyGuard.asksForIdentity(question) && value != null) {
+                safe.put(question, String.valueOf(value));
+            }
+        });
+        return SceneParamsPrivacyGuard.sanitizeFreeTextAnswers(safe);
     }
 }

@@ -250,6 +250,11 @@ public class PlanValidationService {
         boolean partialBaggageAvailable = "OVERSIZE_BAGGAGE_HANDLING".equals(taskFamily)
                 && countOnlineCandidates(snapshotAgents, "CAP_BAGGAGE_MEASURE", taskFamily) > 0;
 
+        // SRS §5.6.4 / SRS_F025.R04: 特殊旅客服务在无移动资源（CAP_NOTIFICATION, CAP_ESCORT, CAP_NAVIGATION）时，
+        // 允许保留信息提示渠道（CAP_INFO_DISPLAY）执行，并在执行完后转人工协助
+        boolean partialSpecialPassengerAvailable = "SPECIAL_PASSENGER_SERVICE".equals(taskFamily)
+                && countOnlineCandidates(snapshotAgents, "CAP_INFO_DISPLAY", taskFamily) > 0;
+
         // 2. 能力校验：所需能力存在且已启用、存在可承接该步骤的候选代理、代理在线
         for (int i = 0; i < steps.size(); i++) {
             Map<String, Object> step = steps.get(i);
@@ -271,7 +276,8 @@ public class PlanValidationService {
             long onlineCandidates = countOnlineCandidates(snapshotAgents, capabilityType, taskFamily);
             if (onlineCandidates == 0) {
                 boolean canSkipCandidate = (partialFlightAvailable && CoreScenarioChannelPolicy.isFlightChannel(taskFamily, capabilityType))
-                        || (partialBaggageAvailable && "CAP_NAVIGATION".equals(capabilityType));
+                        || (partialBaggageAvailable && "CAP_NAVIGATION".equals(capabilityType))
+                        || (partialSpecialPassengerAvailable && ("CAP_NOTIFICATION".equals(capabilityType) || "CAP_ESCORT".equals(capabilityType) || "CAP_NAVIGATION".equals(capabilityType)));
                 if (!canSkipCandidate) {
                     String required = CoreScenarioChannelPolicy.requiredType(taskFamily, capabilityType);
                     result.failCapability("能力类型" + capabilityType + "无在线候选代理"
@@ -319,7 +325,8 @@ public class PlanValidationService {
             String capabilityType = asString(step.get("capabilityType"));
             if (capabilityType != null && !capabilityType.isBlank()) {
                 boolean channelExempt = (partialFlightAvailable && CoreScenarioChannelPolicy.isFlightChannel(taskFamily, capabilityType))
-                        || (partialBaggageAvailable && "CAP_NAVIGATION".equals(capabilityType));
+                        || (partialBaggageAvailable && "CAP_NAVIGATION".equals(capabilityType))
+                        || (partialSpecialPassengerAvailable && ("CAP_NOTIFICATION".equals(capabilityType) || "CAP_ESCORT".equals(capabilityType) || "CAP_NAVIGATION".equals(capabilityType)));
                 if (!channelExempt) {
                     long onlineCandidates = countOnlineCandidates(snapshotAgents, capabilityType, taskFamily);
                     long idleCandidates = countIdleCandidates(snapshotAgents, capabilityType, taskFamily, currentTaskId);
