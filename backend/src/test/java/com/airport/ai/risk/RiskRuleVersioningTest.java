@@ -112,4 +112,17 @@ class RiskRuleVersioningTest {
         assertEquals("V1.1", after.getRuleSetVersion());
         assertEquals("LOW", after.getRiskLevel());
     }
+
+    @Test
+    void rollbackRestoresTargetVersionAndEnabledState() {
+        RiskRule r = rule("V15.2", true);
+        Map<String, Object> body = new HashMap<>();
+        body.put("targetVersion", "V15");
+        body.put("enabled", true);
+        body.put("reason", "安全回滚恢复至原始可审计基线版本");
+        controller.rollback("RULE_CROSS_ZONE", body);
+        assertEquals("V15", r.getRuleVersion());
+        assertTrue(r.getEnabled());
+        verify(mapper).update(r);
+    }
 }

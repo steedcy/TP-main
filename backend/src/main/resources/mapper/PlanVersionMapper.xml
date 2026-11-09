@@ -57,18 +57,25 @@
     </insert>
 
     <update id="update" parameterType="com.airport.ai.task.PlanVersion">
-        UPDATE plan_versions SET
-            structure_check_result = #{structureCheckResult},
-            capability_check_result = #{capabilityCheckResult},
-            constraint_check_result = #{constraintCheckResult},
-            validation_errors = #{validationErrors}::json,
-            risk_level = #{riskLevel},
-            risk_reason_code = #{riskReasonCode},
-            judgment_basis = #{judgmentBasis},
-            confidence = #{confidence},
-            rule_set_version = #{ruleSetVersion},
-            frozen_at = #{frozenAt}
+        UPDATE plan_versions
+        <set>
+            <if test="planSteps != null">plan_steps = #{planSteps}::json,</if>
+            <if test="structureCheckResult != null">structure_check_result = #{structureCheckResult},</if>
+            <if test="capabilityCheckResult != null">capability_check_result = #{capabilityCheckResult},</if>
+            <if test="constraintCheckResult != null">constraint_check_result = #{constraintCheckResult},</if>
+            <if test="validationErrors != null">validation_errors = #{validationErrors}::json,</if>
+            <if test="riskLevel != null">risk_level = #{riskLevel},</if>
+            <if test="riskReasonCode != null">risk_reason_code = #{riskReasonCode},</if>
+            <if test="judgmentBasis != null">judgment_basis = #{judgmentBasis},</if>
+            <if test="confidence != null">confidence = #{confidence},</if>
+            <if test="ruleSetVersion != null">rule_set_version = #{ruleSetVersion},</if>
+            <if test="frozenAt != null">frozen_at = #{frozenAt},</if>
+        </set>
         WHERE id = #{id}
+    </update>
+
+    <update id="updatePlanSteps">
+        UPDATE plan_versions SET plan_steps = #{planSteps}::json WHERE id = #{id}
     </update>
 
 </mapper>

@@ -588,8 +588,10 @@ public class TaskExecutionOrchestrator {
                             return seq != null && seq <= measuredStepSeq;
                         })
                         .toList();
-                pv.setPlanSteps(toJson(remainingSteps));
+                String newPlanStepsJson = toJson(remainingSteps);
+                pv.setPlanSteps(newPlanStepsJson);
                 planVersionMapper.update(pv);
+                planVersionMapper.updatePlanSteps(planVersionId, newPlanStepsJson);
             } catch (Exception ignored) {}
         });
         task.setStatus(TaskStatus.COMPLETED);

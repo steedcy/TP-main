@@ -13,4 +13,5 @@ public interface PlanVersionMapper {
     long countByTaskId(Long taskId);
     int insert(PlanVersion planVersion);
     int update(PlanVersion planVersion);
+    int updatePlanSteps(@org.apache.ibatis.annotations.Param("id") Long id, @org.apache.ibatis.annotations.Param("planSteps") String planSteps);
 }

@@ -135,6 +135,60 @@ public class RiskRuleController {
         return ApiResponse.ok(rule);
     }
 
+    /**
+     * 规则版本回滚/恢复（支持将规则版本及状态安全回滚至可审计的指定基线版本，记录完整审计留痕）：
+     * action: ROLLBACK，保留 before/after，记录 targetVersion 及回滚原因。
+     */
+    @PostMapping({"/{ruleCode}/rollback", "/{ruleCode}/restore"})
+    public ApiResponse<RiskRule> rollback(@PathVariable String ruleCode, @RequestBody(required = false) Map<String, Object> body) {
+        Map<String, Object> input = body == null ? Map.of() : body;
+        String targetVersion = input.containsKey("targetVersion")
+                ? requiredText(input.get("targetVersion"), "目标版本", 32)
+                : (input.containsKey("ruleVersion") ? requiredText(input.get("ruleVersion"), "目标版本", 32) : null);
+        if (targetVersion == null) {
+            throw new BusinessException(ErrorCode.PARAM_MISSING, "请提供目标回滚版本号（targetVersion）");
+        }
+        RiskRule rule = riskRuleMapper.findByRuleCode(ruleCode)
+                .orElseThrow(() -> new BusinessException(ErrorCode.RISK_RULE_NOT_FOUND, "风险规则不存在：" + ruleCode));
+
+        Map<String, Object> before = Map.of(
+                "ruleContent", rule.getRuleContent(),
+                "enabled", rule.getEnabled(),
+                "ruleVersion", rule.getRuleVersion()
+        );
+
+        if (input.containsKey("ruleContent")) {
+            rule.setRuleContent(requiredText(input.get("ruleContent"), "规则内容", RULE_CONTENT_MAX));
+        }
+        if (input.containsKey("enabled")) {
+            rule.setEnabled(requiredBoolean(input.get("enabled")));
+        }
+        rule.setRuleVersion(targetVersion);
+        rule.setUpdatedAt(java.time.LocalDateTime.now());
+        User operator = currentUser.get();
+        rule.setUpdatedBy(operator == null ? null : operator.getUsername());
+        riskRuleMapper.update(rule);
+
+        Map<String, Object> after = Map.of(
+                "ruleContent", rule.getRuleContent(),
+                "enabled", rule.getEnabled(),
+                "ruleVersion", rule.getRuleVersion()
+        );
+        Map<String, Object> detail = new java.util.HashMap<>();
+        detail.put("action", "ROLLBACK");
+        detail.put("before", before);
+        detail.put("after", after);
+        detail.put("targetVersion", targetVersion);
+        detail.put("reason", input.getOrDefault("reason", "安全回滚恢复至原始可审计基线版本"));
+        detail.put("ruleSetVersion", currentRuleSetVersion());
+        operationLogService.record(operator == null ? null : operator.getId(),
+                operator == null ? "SYSTEM" : operator.getUsername(),
+                operator == null ? "CONFIG_ADMIN" : operator.getRole(),
+                "RISK_RULE_CHANGE", ruleCode, "SUCCESS", null, detail);
+
+        return ApiResponse.ok(rule);
+    }
+
     private String currentRuleSetVersion() {
         List<RiskRule> all = riskRuleMapper.findAll();
         return all == null ? null : RiskRuleSetVersion.of(all);

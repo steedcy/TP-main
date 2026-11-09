@@ -167,11 +167,14 @@ async function handleSendMeasurementEvent() {
   try {
     const res = await submitMeasurementEvent(measurementForm.value)
     const task = res.data
+    const scene = typeof task.sceneParams === 'string'
+      ? JSON.parse(task.sceneParams || '{}')
+      : (task.sceneParams || {})
     lastMeasurementResult.value = {
       taskId: task.id,
       taskCode: task.taskCode,
       status: task.status,
-      isOversize: task.sceneParams?.isOversize
+      isOversize: scene.isOversize === true || scene.isOversize === 'true'
     }
     message.success(`已触发行李测量事件，生成任务：${task.taskCode || task.id}`)
   } catch (err) {
