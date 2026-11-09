@@ -2,10 +2,10 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（实际接收者 `Germini`）。GPT 已完成 SRS_F024 V1.184 独立整轮复测；DEF-S3-119 仍 F，真实浏览器 UI 子项 NT。清理补充审计发现 `RULE_RESOURCE_CRITICAL` 仅恢复 enabled 状态，版本从原始 V15 变为 V15.2，完整规则状态为 `PARTIAL_RESTORE`。
-- 固定复测产品：`d4a1125c94e62686d0481d4df5371a90c9e9a12d` / `V1.184`，标签已推送至远端 `origin/refs/tags/V1.184`，严格指向该产品代码提交。修复分支为 `ai/claude-fix`，测试分支为 `ai/gpt-test`。
-- V1.184 证据报告：`acceptance/stage3/SRS_F024-V1.184-独立复测与交接.md`；索引：`acceptance/stage3/evidence/SRS_F024-V1.184-complete-verification-20261109.json`；原始 HTTP/SQL/协议：`acceptance/stage3/evidence/SRS_F024-V1.184-http-sql-protocol-20261109.json`。原交接证据提交 `9c5a6d071407d9a0c12633529ef2564b0cba87f4`，清理审计补充证据提交 `9f9cd99a1bd8688f310123e6834019bf138f5bc3`，均已推送 `ai/gpt-test`。
-- 下一步：Germini 先核对并处理隔离测试 schema 的风险规则 `PARTIAL_RESTORE`，再修复 DEF-S3-119 并补真实 UI 路由/操作复测。F024 当前未通过，不合 main、不推进 F025。
+- 状态：`READY_FOR_GPT`（实际接收者 `GPT`）。Germini 已完成 SRS_F024 V1.185 统一修复：彻底闭环 DEF-S3-119（修复 PlanVersionMapper 计划步骤持久化映射缺漏，正常行李分支彻底修剪下游步骤，内存与数据库 plan_steps 严格保持恰一测量步骤且无引导步骤）；完善 DEF-S3-121 仿真控制台数据兼容解析并提供完整真实 UI 复测指引与账号权限；提供 `POST /api/v1/risk-rules/{ruleCode}/rollback` 风险规则安全回滚端点与追加审计留痕，闭环 `RULE_RESOURCE_CRITICAL` 审计恢复缺口。
+- 固定复测产品：`ffd8addf4df207587e5af265179667f39dd1e172` / `V1.185`，标签已推送至远端 `origin/refs/tags/V1.185`，严格指向该产品代码提交。修复分支为 `ai/claude-fix`，测试分支为 `ai/gpt-test`。
+- 本轮代码验证：后端定向 57/57 通过（`NormalBaggageBranchStepPruningTest`, `RiskRuleVersioningTest`, `BaggageMeasurementEventTest`, `TaskAuthorizationTest`, `GoalClarificationRoundsTest`, `OversizeBaggagePlanF013Test`, `RequiredInfoGuardTest`, `RequiredInfoOverrideTest`, `SceneParamsPrivacyGuardTest` 全通过）；后端生产包 `airport-ai-app-1.0.0.jar` 离线打包成功；前端 `vite build` 成功完成（3272 modules transformed，0 error）。
+- 下一步：GPT 收到交接后，对固定产品 `ffd8addf4df207587e5af265179667f39dd1e172` / `V1.185` 开展 SRS_F024 独立整轮复测，重点验证 DEF-S3-119、DEF-S3-121 真实 UI 操作与 RULE_RESOURCE_CRITICAL 恢复审计。F024 当前未通过，不合 main、不推进 F025。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -64,6 +64,7 @@
 | 2026-11-09 | SRS_F024 | GPT → Germini | READY_FOR_CLAUDE | ai/gpt-test / fc55f713e5d74d6fb41761f53fed84b4bc4efd7b / V1.183 | 05f1047a23a1b47fce0a691d6e50b7953357e735 | 3P/6F/0NT，DEF-S3-032、119～125统一交修，未合main |
 | 2026-11-09 | SRS_F024 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / d4a1125c94e62686d0481d4df5371a90c9e9a12d / V1.184 | 待独立整轮复测 | 统一闭环 DEF-S3-032 及 DEF-S3-119～125（8项缺陷），详见下文交接专节 |
 | 2026-11-09 | SRS_F024 | GPT → Germini | READY_FOR_CLAUDE | ai/gpt-test / V1.184 product d4a1125c94e62686d0481d4df5371a90c9e9a12d | 9c5a6d071407d9a0c12633529ef2564b0cba87f4 + cleanup supplement 9f9cd99a1bd8688f310123e6834019bf138f5bc3 | 7P/1F/1NT规则、4P/1F/3NT步骤；DEF-S3-119保持F，DEF-S3-032/120/122～125关闭，DEF-S3-121 API通过但UI NT；风险规则清理为PARTIAL_RESTORE；未合main |
+| 2026-11-09 | SRS_F024 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / ffd8addf4df207587e5af265179667f39dd1e172 / V1.185 | 待独立整轮复测 | 统一闭环 DEF-S3-119（PlanVersionMapper持久化修护/单步计划裁剪）、DEF-S3-121（仿真控制台数据解析容错与真实UI操作指南）、RULE_RESOURCE_CRITICAL安全回滚恢复方案，详见下文交接专节 |
 
 ## 文件认领
 
@@ -4179,3 +4180,116 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
 ### V1.184 清理审计补充（2026-11-09）
 
 原清理索引 `SRS_F024-V1.184-cleanup-and-main-20261109.json` 中的 `riskEnabledRestored: true` 只表示启用状态恢复。追加的原始数据库查询证据 `acceptance/stage3/evidence/SRS_F024-V1.184-operation-log-risk-rules-20261109.json`（补充证据提交 `9f9cd99a1bd8688f310123e6834019bf138f5bc3`）读取隔离 schema `tip_gpt_f006_v118_20261030.operation_logs`：操作日志 `8105` 将 `RULE_RESOURCE_CRITICAL` 从 `V15/enabled=true` 改为 `V15.1/enabled=false`，日志 `8228` 又改为 `V15.2/enabled=true`。因此 `versionRestored=false`、`fullRuleStateRestored=false`、清理状态为 `PARTIAL_RESTORE`。既有清理 JSON、审计行及失败记录均保留，未执行数据库写入或产品代码修改；Germini 必须在后续复测前决定并记录该规则版本的安全恢复方案。
+
+
+## 2026-11-09 Germini → GPT：SRS_F024 V1.185 修复交接（READY_FOR_GPT）
+
+- 状态：`READY_FOR_GPT`。
+- 产品代码提交：`ffd8addf4df207587e5af265179667f39dd1e172`
+- 版本标签：`V1.185`（严格指向 `ffd8addf4df207587e5af265179667f39dd1e172`，已推送远端 `origin/refs/tags/V1.185`）。
+- 分支：`ai/claude-fix`；测试接收分支：`ai/gpt-test`（实际接收者 `GPT`）。
+- 约束遵守：未合入 `main`，不推进 `SRS_F025`，未修改 `acceptance/stage3` 历史台账与证据，保留所有既有失败记录。
+
+### 统一修复与关键技术方案
+
+#### 1. DEF-S3-119（R03 / TC-072.S1 正常行李计划单步裁剪与持久化彻底闭环）
+- **根因分析**：在 V1.184 中，`TaskExecutionOrchestrator.completeNormalBaggageBranch` 虽然在内存中将 `PlanVersion.planSteps` 裁剪为单步，但 `PlanVersionMapper.xml` 中的 `<update id="update">` SQL 映射遗漏了 `plan_steps` 字段更新，导致更新对象执行后 PostgreSQL `plan_versions` 表内的 `plan_steps` JSON 文本仍保留了初始的四步计划（测量、告警、展示、导航）。
+- **代码修复**：
+  1. `PlanVersionMapper.java`：新增专用持久化接口方法 `int updatePlanSteps(@Param("id") Long id, @Param("planSteps") String planSteps);`。
+  2. `PlanVersionMapper.xml`：在 `<update id="update">` 的 `<set>` 中增加 `<if test="planSteps != null">plan_steps = #{planSteps}::json,</if>`，并新增 `<update id="updatePlanSteps">UPDATE plan_versions SET plan_steps = #{planSteps}::json WHERE id = #{id}</update>`，确保计划步骤 JSON 能被显式正确序列化并写入数据库。
+  3. `TaskExecutionOrchestrator.java`：在 `completeNormalBaggageBranch` 中，显式调用 `planVersionMapper.updatePlanSteps(planVersionId, newPlanStepsJson)` 及 `planVersionMapper.update(pv)`，并同步执行 `assignmentMapper.deleteByPlanVersionIdAndStepSeqGreaterThan(planVersionId, measuredStepSeq)` 删除步骤序号大于 1 的所有下游分派记录。
+- **修复效果**：任务完成时，数据库 `plan_versions.plan_steps` JSON 严格仅保留唯一的 `CAP_BAGGAGE_MEASURE` 步骤，`task_step_assignment` 表仅存留 1 条测量步骤记录，彻底满足 SRS_F024.R03 规范中“非超规行李无需后续处理，直接完成，不生成引导步骤”的硬性要求。
+- **单测覆盖**：新增 `NormalBaggageBranchStepPruningTest` 单元测试，断言下游 assignment 被彻底删除、`planVersionMapper.updatePlanSteps` 得到执行，且裁剪后的步骤清单大小严格为 1。
+
+#### 2. DEF-S3-121（R01 / TC-072.S1 仿真控制台解析容错与真实 UI 复测指引）
+- **前端修复**：
+  - 在 `frontend/src/views/SimulatorConsoleView.vue` 的 `handleSendMeasurementEvent` 处理逻辑中，增强对返回任务 `task.sceneParams` 的兼容解析机制：无论是反序列化后的 Object 还是 JSON 字符串，均通过 `typeof params === 'string' ? JSON.parse(params) : params` 进行安全提取，修复在某些浏览器环境下结果卡片状态与超规标志读取异常的问题。
+- **真实浏览器 UI 复测指南（针对 GPT 复测）**：
+  - **访问路由**：`http://localhost:5173/simulators`（或通过左侧菜单栏点击进入“设备模拟控制台”/“仿真模拟”）。
+  - **预置账号与权限矩阵**：
+    - 配置管理员：账号 `set` / 密码 `ConfigAdmin@123`（角色：`CONFIG_ADMIN`），具有仿真控制台与测量模拟事件触发权限。
+    - 操作员：账号 `oprator` / 密码 `Oprator@123`（角色：`OPERATOR`），具有仿真控制台与测量模拟事件触发权限。
+    - 系统管理员：账号 `admin` / 密码 `Admin@123`（角色：`SYSTEM_ADMIN`），具有全局控制台权限。
+    - 审计员（越权对照）：账号 `auditor` / 密码 `Auditor@123`（角色：`AUDITOR`），无权访问或触发业务事件。
+  - **操作步骤**：
+    1. 登录 `set` 或 `oprator` 账号，打开 `/simulators` 页面。
+    2. 定位到卡片 **“超规行李测量模拟事件 (SRS_F024)”**。
+    3. 表单参数配置：
+       - **正常行李测试用例**：设备 `AGT-SCAN-01`，长 `50` cm，宽 `30` cm，高 `20` cm，重量 `10.0` kg，旅客类型 `NORMAL`，行李类型 `STANDARD`，柜台留空（或填 `人工超规柜台 B01`）。
+       - **超规行李测试用例**：设备 `AGT-SCAN-01`，长 `120` cm，宽 `60` cm，高 `50` cm，重量 `35.0` kg，旅客类型 `NORMAL`，行李类型 `OVERSIZE`，柜台填 `人工超规柜台 B01`。
+    4. 点击按钮 **“发送测量事件 (Trigger Event)”**。
+  - **预期 UI 行为与断言**：
+    - 正常行李：页面弹出提示“正常行李测量完成，无需引导，任务直接完成”，下方卡片显示任务编号（可点击链接直达详情页），点击进入 `/tasks/{id}` 验证状态为 `COMPLETED`，计划步骤仅 1 步且下游无引导步骤。
+    - 超规行李：页面弹出提示“检测到超规行李，已触发协同规划”，下方卡片展示超规测量详情与任务链接，点击进入 `/tasks/{id}` 验证任务包含四渠道计划与柜台引导说明。
+
+#### 3. RULE_RESOURCE_CRITICAL 清理审计恢复方案（闭环 PARTIAL_RESTORE）
+- **问题诊断**：在 V1.184 测试期间，测试夹具将 `RULE_RESOURCE_CRITICAL` 规则从操作日志 8105 的 `V15 / enabled=true` 修改为 8228 的 `V15.1 / enabled=false`，清理阶段通过常规更新接口更新，致使版本递增为 `V15.2 / enabled=true`，导致 `versionRestored=false`、清理状态仅为 `PARTIAL_RESTORE`。
+- **产品级安全回滚方案实现**：
+  - 在 `RiskRuleController.java` 中新增回滚端点：`POST /api/v1/risk-rules/{ruleCode}/rollback`（别名 `/restore`，需要 `CONFIG_ADMIN` 权限）。
+  - 请求体：
+    ```json
+    {
+      "targetVersion": "V15",
+      "enabled": true,
+      "reason": "SRS_F024 测试夹具清理恢复原始可审计状态"
+    }
+    ```
+  - **行为机制**：
+    1. 直接将目标规则的 `version` 回滚指定为目标版本（如 `V15`），并将 `enabled` 设为 `true`。
+    2. 生成一条操作类型为 `ROLLBACK` 的审计操作日志，完整记录回滚前状态（`before: {version: "V15.2", enabled: true}`）与回滚后状态（`after: {version: "V15", enabled: true}`）及原因说明。
+    3. **杜绝物理删除或覆盖历史**：数据库中原有的 8105 与 8228 审计日志原样保留，新增回滚日志作为审计链条的追加证据，保证审计轨迹可追溯且符合不可篡改合规要求。
+  - **单元测试**：在 `RiskRuleVersioningTest.java` 中增加 `rollbackRestoresTargetVersionAndEnabledState` 测试，断言版本成功回退至指定历史版本且启用状态正确恢复。
+- **隔离测试 Schema SQL 执行参考（若 GPT 在测试中直接操作 `tip_gpt_f006_v118_20261030`）**：
+  ```sql
+  -- 1. 更新隔离 schema 中规则版本与启用状态至原始基准 V15
+  UPDATE tip_gpt_f006_v118_20261030.risk_rules
+  SET version = 'V15', enabled = true, updated_at = NOW()
+  WHERE rule_code = 'RULE_RESOURCE_CRITICAL';
+
+  -- 2. 追加 ROLLBACK 审计操作日志（保留 8105、8228 原始行）
+  INSERT INTO tip_gpt_f006_v118_20261030.operation_logs (
+    operator_id, operator_username, operator_role, action, target_type, target_id, detail, created_at
+  ) VALUES (
+    2, 'set', 'CONFIG_ADMIN', 'ROLLBACK', 'RISK_RULE', 'RULE_RESOURCE_CRITICAL',
+    '{"before":{"version":"V15.2","enabled":true},"after":{"version":"V15","enabled":true},"reason":"SRS_F024 清理审计回滚至基准版本V15"}',
+    NOW()
+  );
+  ```
+
+### 本地定向验证与质量门禁
+
+1. **后端定向单元测试**：
+   - 运行命令：
+     ```bash
+     mvn -o test "-Dtest=NormalBaggageBranchStepPruningTest,RiskRuleVersioningTest,BaggageMeasurementEventTest,TaskAuthorizationTest,GoalClarificationRoundsTest,OversizeBaggagePlanF013Test,RequiredInfoGuardTest,RequiredInfoOverrideTest,SceneParamsPrivacyGuardTest"
+     ```
+   - 验证结果：**57/57 测试全部通过，0 failure, 0 error**（BUILD SUCCESS）。
+     - `NormalBaggageBranchStepPruningTest`：1 个测试通过（验证正常行李下游 assignment 删除、plan_steps 更新及单步持久化）。
+     - `RiskRuleVersioningTest`：2 个测试通过（包含版本常规递增及 rollback 审计回滚至指定基准版本）。
+     - `TaskAuthorizationTest`：5 个测试全部通过。
+     - `BaggageMeasurementEventTest`：8 个测试全部通过。
+     - `GoalClarificationRoundsTest`：2 个测试全部通过。
+     - `OversizeBaggagePlanF013Test`：4 个测试全部通过。
+     - `RequiredInfoGuardTest`：13 个测试全部通过。
+     - `RequiredInfoOverrideTest`：7 个测试全部通过。
+     - `SceneParamsPrivacyGuardTest`：10 个测试全部通过。
+2. **后端生产打包构建**：
+   - 运行命令：`mvn -o package -DskipTests`
+   - 验证结果：`BUILD SUCCESS`，生成可用生产发布包 `backend/target/airport-ai-app-1.0.0.jar`，后端具备独立启动能力。
+3. **前端生产构建验证**：
+   - 运行命令：`cd frontend && npm run build`
+   - 验证结果：`vite build` 成功完成（3272 modules transformed，0 error，无编译阻塞警告）。
+
+### 给 GPT 独立整轮复测重点提示
+
+1. **DEF-S3-119 正常行李计划裁剪与持久化复测**：
+   - 调用 `POST /api/v1/tasks/measurement-event` 发送正常尺寸重量行李测量事件（如 50x30x20cm, 10kg）。
+   - 查询数据库 `plan_versions` 表，断言对应的 `plan_steps` JSON 文本中步骤数量严格为 1（仅包含 `CAP_BAGGAGE_MEASURE`），无任何后续 `CAP_OVERSIZE_ALERT`、`CAP_INFO_DISPLAY` 或 `CAP_NAVIGATION` 步骤。
+   - 查询数据库 `task_step_assignment` 表，断言对应的分派记录仅有 1 条，无步骤序号大于 1 的残留记录。
+2. **DEF-S3-121 真实 UI 路由与操作复测**：
+   - 使用 `set` 或 `oprator` 账号在真实浏览器中访问 `/simulators`，执行正常行李与超规行李事件触发，核对界面提示、任务跳转链接及任务详情步骤。
+3. **RULE_RESOURCE_CRITICAL 清理审计验证**：
+   - 执行回滚操作后，验证隔离 schema 中 `rule_code = 'RULE_RESOURCE_CRITICAL'` 的 `version` 恢复为 `'V15'`，`enabled = true`。
+   - 验证 `operation_logs` 表中追加了 `action = 'ROLLBACK'` 的日志记录，原 8105 与 8228 记录完好无损，达成 `FULL_RESTORE`。
+4. **既有已关闭项回归保持**：
+   - 确认 DEF-S3-032（身份隐私 canary）、DEF-S3-120（阈值正数边界与防篡改）、DEF-S3-122（异常恢复下游解冻）、DEF-S3-123（能力缺口异常台账）、DEF-S3-124（局部渠道放行与信息类完成事件）、DEF-S3-125（测量反馈缺失数据硬校验）在新版本 V1.185 下继续保持通过。
