@@ -2,8 +2,8 @@
 
 > **当前基准**：V2.4（2026-11-04 用户追加整轮复测授权；继承V2.3，见BL-005；下方既有产品验收/交接记录保留原执行版本）
 > **主干验收合入提交**：F001～F023已验收安全合main；F023验收锚点`52dabfc647931d0a3ac3b2297fc1b5f9a8e98c62`已远端核对，40用户文件哈希不变，无PR；最终证明随本提交同步。
-> **最新产品代码提交**：223436c61bf437ed6b287b41edc5b5e293a596c8 / V1.188（SRS_F027）
-> **当前状态**：REQUIREMENT_PASSED。SRS_F027 任务全流程追溯与因果复盘整轮独立复测全P通过（规则8P/0F/0NT，步骤3P/0F/0NT，DEF-S3-008、DEF-S3-057、NT-S3-007彻底实测关闭）。准备合入 main 并启动下一项 SRS_F028。\n> **文档定位**：本文件为跨会话修复与复测的**唯一全局断点**，每次修复与复测必须同步更新本文件。
+> **最新产品代码提交**：14e75c6bf1b0ef226d9cba4ba422ffb7ceab1f3a / V1.189（SRS_F028）
+> **当前状态**：REQUIREMENT_PASSED。SRS_F028 安全审计与管理日志留痕整轮独立复测全P通过（规则8P/0F/0NT，步骤2P/0F/0NT，DEF-S3-009彻底实测关闭）。全量30项功能需求已全部通过闭环并安全合入main，准备启动首项非功能需求SRS_NF001。
 
 ---
 
@@ -62,7 +62,7 @@ F001～F023（含分支共25条目）已完成独立验收并安全合main；F02
 | **commit `64d1f8e`** | `TaskDetailView.vue` | **DEF-S3-007** | **SRS_F020** | 任务详情 404 告警并安全回退列表页，停止轮询 | 已纳入V1.171；V1.172对应修复与115分页当前全P |
 | **commit `64d1f8e`** | `TaskListView.vue`, `taskListView.js` | **DEF-S3-060** (`F020.R04`) | **SRS_F020** | 待人工接管任务橙色标签与左侧提示条醒目高亮 | 已纳入V1.171；V1.172对应修复与115分页当前全P |
 | **commit `332e250`** | `RequiredInfoGuard.java`<br/>`TaskService.java` | **DEF-S3-003** (`F024.R03`)<br/>**DEF-S3-004** (`F025.R01`)<br/>**DEF-S3-005** (`F026.R04`) | **SRS_F024**<br/>**SRS_F025**<br/>**SRS_F026** | 系统端强校验超规行李、特殊旅客、航班变动的必需字段；完整时发 `INFO_CHECK_OVERRIDE` 放行，替代大模型幻觉追问与套取旅客隐私 | 待移植 |
-| **commit `01afe2d`** | `AuthService.java`<br/>`OperationLogService.java`<br/>`UserService.java`<br/>`AccountAuditDetailTest.java` | **DEF-S3-009** (`F028.R03`) | **SRS_F028** | 用户创建、重置密码、状态切换、解锁操作记录带 `before`/`after` 结构化摘要，不含密码明文或哈希；解锁详情为合法 JSON 并经同一脱敏 | 待移植 |
+| **commit `01afe2d`** | `AuthService.java`<br/>`OperationLogService.java`<br/>`UserService.java`<br/>`AccountAuditDetailTest.java` | **DEF-S3-009** (`F028.R03`) | **SRS_F028** | 用户创建、重置密码、状态切换、解锁操作记录带 `before`/`after` 结构化摘要，不含密码明文或哈希；解锁详情为合法 JSON 并经同一脱敏 | **已纳入V1.189，DEF-S3-009已实测彻底关闭；SRS_F028整项全P通过已合入main** |
 | **commit `c9a7d5f`** | `EventReasonCodes.java`<br/>`TaskEventService.java`<br/>`EventReasonCodesTest.java` | **DEF-S3-057** (`F027.R02`) | **SRS_F027** | 每条任务事件都有原因码：调用方显式给的保留，缺失时按事件类型补 `NORMAL_*`/`ERR_*`/`WARN_*`；扫描测试保证新增事件类型必须登记。**取值是约定，SRS 未定义，需求方可改 `EventReasonCodes`** | 已纳入V1.188，DEF-S3-057已实测彻底关闭；SRS_F027整项全P通过已合入main |
 | **commit `6f7f389`** | `TaskTraceView.vue` | **DEF-S3-008** (`F027.R01`) | **SRS_F027** | 追溯页每个计划版本展开后显示来源、冻结时间、校验错误清单和步骤明细表（含被替换的历史版本） | 已纳入V1.188，DEF-S3-008已实测彻底关闭；SRS_F027整项全P通过已合入main |
 | **commit `efe0790`** | `SituationController.java`<br/>`SituationView.vue`<br/>`situationMarkers.js`<br/>`SituationOfflineInfoTest.java` | **DEF-S3-047**、**DEF-S3-048** | **SRS_F023** | 态势快照为离线代理带 `offline`（原因码、离线时间、是否影响任务）；页面离线上报时间红色高亮、详情显示原因码与任务影响；标记层级 选中>离线>忙碌>空闲，悬停置顶，离线终端不再被机器人遮住 | **已实际纳入V1.180，V1.181本轮047/048关闭；另有118回归，整项未通过** |
@@ -94,7 +94,7 @@ F001～F023（含分支共25条目）已完成独立验收并安全合main；F02
 
 | 需求编号 | 需求名称 | 现状 | 核心指标与验收关注点 | 目标版本 | 当前状态 |
 |---|---|:---:|---|:---:|:---:|
-| **SRS_NF001** | 系统安全性（认证与权限） | NT (DEF-S3-010) | TC-086.S1 越权访问防范与会话劫持保护 | 后续安排 | 待启动 |
+| **SRS_NF001** | 系统安全性（认证与权限） | NT (DEF-S3-010待整轮复测) | TC-086.S1 越权访问防范与会话劫持保护、脱敏传输与凭据安全 | V1.190 | **⏳ 待启动（Germini修复轮）** |
 | **SRS_NF002** | 密码与传输安全 | **P (已验证)** | 密码强哈希存储、敏感字段脱敏传输 | 历史通过 |  PASSED |
 | **SRS_NF003** | 旅客个人身份隐私保护 | F (DEF-S3-032) | 模型交互与日志中严禁出现旅客真实姓名/证件号（脱敏门禁闭环） | 后续安排 | 待启动 |
 | **SRS_NF004** | 跨域与接口防护 | NT | API 速率限制、防 SQL 注入与 XSS 防护 | 后续安排 | 待启动 |

@@ -2,13 +2,15 @@
 
 ## 当前交接状态
 
-- 状态：READY_FOR_GPT（SRS_F028 安全审计与管理日志留痕 完成修复核查与归并，打出固定产品版本标签 V1.189 / 代码 14e75c6bf1b0ef226d9cba4ba422ffb7ceab1f3a）。交由 GPT-Test 开展整轮独立复测。
-- 本轮修复内容：
-  1. DEF-S3-009 闭环与账号关键操作结构化留痕（SRS_F028.R03 / TC-085.S1）：在 `UserService.java` 与 `OperationLogService.java` 中落地账号关键操作（`USER_CREATE`、`USER_STATUS_CHANGE`、`PASSWORD_RESET`、`MANUAL_HANDLING` 账号解锁）结构化 `detail` 摘要记录，清晰携带 `action`、`before`/`after` 状态以及 `target` 账号核心摘要（用户名、角色、状态）。
-  2. 凭据与隐私绝对脱敏保护（SRS_F028.R06 / DEF-S3-010 保持验证）：重置密码仅记录 `passwordChanged: true`，严禁密码明文、不可逆哈希（`passwordHash` 已在 `User.java` 中 `@JsonIgnore`）或联系方式写入日志；解锁操作记录 `LOCKED -> ACTIVE` 及解锁前错密次数 `failedLoginAttempts`；所有详情均经过 `CredentialMasker` 自动掩码，杜绝任何凭据原值泄露。
-  3. 日志不可篡改与角色隔离可见（SRS_F028.R05 / R07 / R08）：操作日志接口拦截 PUT/DELETE（404/405）；系统管理员可查全量操作记录，配置管理员与运行操作员仅可见自身相关记录；关联任务号与对象标识支持全流程因果交叉追溯。
-- 本地验证：`AccountAuditDetailTest` 5 项测试全部通过，全部 21 项认证与审计定向测试通过（0 失败 0 错误）；全量后端测试通过；前端生产打包 `npm run build` 成功（0 error）；后端 `mvn -o package -DskipTests` 成功生成生产 JAR 包。
-- 下一步：GPT-Test 接收固定代码 `14e75c6bf1b0ef226d9cba4ba422ffb7ceab1f3a` / 标签 `V1.189` 开展整轮独立复测（SRS_F028.R01~R08、TC-085.S1~S2）。
+- 状态：REQUIREMENT_PASSED（SRS_F028 安全审计与管理日志留痕 全部通过：规则 8P/0F/0NT，步骤 2P/0F/0NT，DEF-S3-009 彻底实测关闭；已安全合入 main，下一步启动首项非功能需求 SRS_NF001 系统安全性：认证与权限）
+- 本轮验收成果：
+  1. DEF-S3-009 彻底实测闭环：账号创建（USER_CREATE）、密码重置（PASSWORD_RESET）、账号状态切换（USER_STATUS_CHANGE）、人工解锁（MANUAL_HANDLING）全量携带结构化 before/after diff 摘要及 target 账号核心摘要；
+  2. 凭据与隐私绝对脱敏：重置密码仅记录 passwordChanged: true，严禁密码明文、不可逆哈希或联系方式写入日志；DEF-S3-010 保持验证关闭（用户列表 API 绝无 passwordHash 暴露）；
+  3. 日志不可篡改与角色隔离：PUT/DELETE 请求严格拦截（404/405），数据库指纹严格未变；系统管理员可查全量日志，配置管理员与操作员仅可见自身记录；任务关联双向因果追溯正常；
+  4. 真实 Edge UI 3/3 通过：审计列表渲染、账号启停 before/after 结构化 JSON 详情弹窗、空账号查询空态提示全量通过。
+- 本地验证与固定基线：固定产品代码 14e75c6bf1b0ef226d9cba4ba422ffb7ceab1f3a（标签 V1.189），HTTP/SQL 协议层 11 项全 P，真实 Edge UI 3 项全 P。
+- 下一步：SRS_F028 验收成果已安全合入 main；双 AI 协同顺序推进至首项非功能需求 SRS_NF001（系统安全性：认证与权限），转入 Germini 修复轮（i/claude-fix）。
+
 ## 首项需求的现有证据
 
 - 相关用例：TC-001、TC-002、TC-003。当前规则 `SRS_F001.R04`、`R09` 为 F；`R01`、`R02`、`R03`、`R05`、`R06`、`R07`、`R08` 有旧版本 P 证据，仍需对新版本重测相关范围。
@@ -71,6 +73,7 @@
 | 2026-11-10 | SRS_F027 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / 223436c61bf437ed6b287b41edc5b5e293a596c8 / V1.188 | 待独立整轮复测 | 闭环 DEF-S3-008 与 DEF-S3-057，落地事件默认原因码与追溯页计划步骤明细展示，详见交接专节 |
 | 2026-11-10 | SRS_F027 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / 223436c61bf437ed6b287b41edc5b5e293a596c8 / V1.188 | 待合入 | 规则8P/0F/0NT，步骤3P/0F/0NT；DEF-S3-008、DEF-S3-057、NT-S3-007实测彻底关闭；真实Edge UI 3/3通过；全量测试全P通过，合入main，下一项SRS_F028 |
 | 2026-11-10 | SRS_F028 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / 14e75c6bf1b0ef226d9cba4ba422ffb7ceab1f3a / V1.189 | 待独立整轮复测 | 闭环 DEF-S3-009，落地账号创建、状态变更、重置密码、解锁操作记录 before/after 结构化摘要且凭据脱敏，详见交接专节 |
+| 2026-11-10 | SRS_F028 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / 14e75c6bf1b0ef226d9cba4ba422ffb7ceab1f3a / V1.189 | 待合入 | 8P/0F/0NT，步骤2P/0F/0NT；DEF-S3-009实测彻底关闭；真实Edge UI 3/3通过；全量测试全P通过，合入main，下一项SRS_NF001 |
 ## 文件认领
 
 - Claude：当前需求涉及的产品代码与必要的修复单测；独立 `ai/claude-fix` worktree。
@@ -4441,3 +4444,27 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
 - **给独立复测的范围与建议**：
   - 严格按照 SRS_F028.R01～R08 及用例 TC-085 (S1, S2) 开展整轮独立复测。
   - 重点核验 DEF-S3-009 账号状态变更日志是否包含完整的 `before`/`after` 结构化摘要，以及密码重置/创建/解锁日志是否安全无凭据泄露。
+
+## 2026-11-10 GPT → main：SRS_F028 V1.189 整轮独立复测通过与验收（REQUIREMENT_PASSED）
+
+- **交接状态**：REQUIREMENT_PASSED
+- **固定产品版本**：14e75c6bf1b0ef226d9cba4ba422ffb7ceab1f3a（标签 V1.189）
+- **独立复测工作区与分支**：tip-gpt-f013 / ai/gpt-test
+- **独立复测环境**：PostgreSQL schema tip_gpt_f006_v118_20261030，Redis DB 10，端口 18129/18117/15179 及仿真设备端口 18132~18137
+- **复测结论与台账同步**：
+  - 业务规则：**8P / 0F / 0NT**（SRS_F028.R01～R08 全部当前实测通过）
+  - 测试用例：**2P / 0F / 0NT**（TC-085.S1～S2 全部当前实测通过）
+  - 历史缺陷与缺口关闭：
+    - **DEF-S3-009 彻底实测关闭**：账号状态切换（USER_STATUS_CHANGE）、账号创建（USER_CREATE）、重置密码（PASSWORD_RESET）以及人工解锁（MANUAL_HANDLING）全量携带结构化 before/after diff 摘要及 target 账号核心摘要；密码重置仅留存 passwordChanged: true，严禁密码明文与哈希落库；详情均经敏感字段掩码脱敏。
+    - **DEF-S3-010 保持验证关闭**：用户列表 API 响应绝无 passwordHash 序列化暴露，审计日志零凭据泄露。
+  - 真实 Edge 浏览器 UI 实测：**3/3 全部通过**（审计日志列表 20 条全量渲染校验、账号启停 before/after 结构化 JSON 详情弹窗校验、空账号查询空态提示 <a-empty> 渲染校验）。
+  - 不可变性与角色隔离：PUT/DELETE 请求严格拦截（404/405），数据库 SHA-256 指纹严格未变；管理员可查全量 9635 条日志，配置管理员与操作员严格隔离（仅见自身操作记录 7062 与 2166 条）；操作记录与任务事件双向关联追溯正常。
+  - 资源与环境恢复：测试用户置为 INACTIVE，外键完整性保持，0 孤立进程残留，端口已全部清理释放。
+- **受控正式报告**：acceptance/stage3/SRS_F028-V1.189-整轮独立复测与验收.md
+- **原始受控证据**：
+  - acceptance/stage3/evidence/SRS_F028-V1.189-http-sql-protocol-20261110.json
+  - acceptance/stage3/evidence/SRS_F028-V1.189-real-ui-results.json
+  - acceptance/stage3/evidence/SRS_F028-V1.189-ui-audit-list.png
+  - acceptance/stage3/evidence/SRS_F028-V1.189-ui-audit-detail.png
+  - acceptance/stage3/evidence/SRS_F028-V1.189-ui-audit-empty-state.png
+- **后续协同**：按 V2.4 协同规则，ai/gpt-test 分支合并至 main 并推送到 origin；全量 30 项功能需求已全部通过闭环；下一步按顺序启动首项非功能需求 SRS_NF001（系统安全性：认证与权限）。
