@@ -2,13 +2,13 @@
 
 ## 当前交接状态
 
-- 状态：REQUIREMENT_PASSED（SRS_F027 任务全流程追溯与因果复盘 全部通过：规则 8P/0F/0NT，步骤 3P/0F/0NT，DEF-S3-008、DEF-S3-057、NT-S3-007 彻底关闭；安全合入 main，下一步启动 SRS_F028）
-- 本轮验证成果：
-  1. DEF-S3-057 彻底实测关闭（SRS_F027.R02 / TC-084.S2）：全量 44 条事件时间线原因码 100% 具备规范非空枚举值（0 条 null/空值），`EventReasonCodes` 自动映射与非空校验完全生效。
-  2. DEF-S3-008 彻底实测关闭（SRS_F027.R01 / TC-084.S1）：`TaskTraceView.vue` 追溯页折叠面板支持展开各计划版本（原始版本与局部重规划版本），完整展示步骤序号、目标、所需能力、前置条件、完成条件、失败处理明细表格及校验错误提示清单。
-  3. NT-S3-007 彻底实测关闭（SRS_F027.R03 / TC-084.S3）：不存在的任务查询返回空态提示并安全处理，无数据虚构；真实事件时间线因果链完整渲染。
-  4. 不可变性与隐私安全（SRS_F027.R04 / R06 / R07）：PUT/DELETE 追溯篡改请求拦截（404/405），数据库 SHA-256 指纹未变；零敏感信息（Canary、身份证、手机号、密码哈希）明文泄露。
-- 下一步：`ai/gpt-test` 分支合入 `main` 并推送到 `origin`，自动按规范启动下一项 SRS_F028（安全审计与管理日志留痕）。
+- 状态：READY_FOR_GPT（SRS_F028 安全审计与管理日志留痕 完成修复核查与归并，打出固定产品版本标签 V1.189 / 代码 14e75c6bf1b0ef226d9cba4ba422ffb7ceab1f3a）。交由 GPT-Test 开展整轮独立复测。
+- 本轮修复内容：
+  1. DEF-S3-009 闭环与账号关键操作结构化留痕（SRS_F028.R03 / TC-085.S1）：在 `UserService.java` 与 `OperationLogService.java` 中落地账号关键操作（`USER_CREATE`、`USER_STATUS_CHANGE`、`PASSWORD_RESET`、`MANUAL_HANDLING` 账号解锁）结构化 `detail` 摘要记录，清晰携带 `action`、`before`/`after` 状态以及 `target` 账号核心摘要（用户名、角色、状态）。
+  2. 凭据与隐私绝对脱敏保护（SRS_F028.R06 / DEF-S3-010 保持验证）：重置密码仅记录 `passwordChanged: true`，严禁密码明文、不可逆哈希（`passwordHash` 已在 `User.java` 中 `@JsonIgnore`）或联系方式写入日志；解锁操作记录 `LOCKED -> ACTIVE` 及解锁前错密次数 `failedLoginAttempts`；所有详情均经过 `CredentialMasker` 自动掩码，杜绝任何凭据原值泄露。
+  3. 日志不可篡改与角色隔离可见（SRS_F028.R05 / R07 / R08）：操作日志接口拦截 PUT/DELETE（404/405）；系统管理员可查全量操作记录，配置管理员与运行操作员仅可见自身相关记录；关联任务号与对象标识支持全流程因果交叉追溯。
+- 本地验证：`AccountAuditDetailTest` 5 项测试全部通过，全部 21 项认证与审计定向测试通过（0 失败 0 错误）；全量后端测试通过；前端生产打包 `npm run build` 成功（0 error）；后端 `mvn -o package -DskipTests` 成功生成生产 JAR 包。
+- 下一步：GPT-Test 接收固定代码 `14e75c6bf1b0ef226d9cba4ba422ffb7ceab1f3a` / 标签 `V1.189` 开展整轮独立复测（SRS_F028.R01~R08、TC-085.S1~S2）。
 ## 首项需求的现有证据
 
 - 相关用例：TC-001、TC-002、TC-003。当前规则 `SRS_F001.R04`、`R09` 为 F；`R01`、`R02`、`R03`、`R05`、`R06`、`R07`、`R08` 有旧版本 P 证据，仍需对新版本重测相关范围。
@@ -70,6 +70,7 @@
 | 2026-11-10 | SRS_F026 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / 8a130d72805c744ae66548911f874dbf5dab9273 / V1.187 | 2037507 | 规则10P/0F/0NT，步骤7P/0F/0NT；DEF-S3-005与NT-S3-006实测彻底关闭；真实Edge UI 3/3通过；全量测试全P通过，合入main，下一项SRS_F027 |
 | 2026-11-10 | SRS_F027 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / 223436c61bf437ed6b287b41edc5b5e293a596c8 / V1.188 | 待独立整轮复测 | 闭环 DEF-S3-008 与 DEF-S3-057，落地事件默认原因码与追溯页计划步骤明细展示，详见交接专节 |
 | 2026-11-10 | SRS_F027 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / 223436c61bf437ed6b287b41edc5b5e293a596c8 / V1.188 | 待合入 | 规则8P/0F/0NT，步骤3P/0F/0NT；DEF-S3-008、DEF-S3-057、NT-S3-007实测彻底关闭；真实Edge UI 3/3通过；全量测试全P通过，合入main，下一项SRS_F028 |
+| 2026-11-10 | SRS_F028 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / 14e75c6bf1b0ef226d9cba4ba422ffb7ceab1f3a / V1.189 | 待独立整轮复测 | 闭环 DEF-S3-009，落地账号创建、状态变更、重置密码、解锁操作记录 before/after 结构化摘要且凭据脱敏，详见交接专节 |
 ## 文件认领
 
 - Claude：当前需求涉及的产品代码与必要的修复单测；独立 `ai/claude-fix` worktree。
@@ -4413,3 +4414,30 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
   - acceptance/stage3/evidence/SRS_F027-V1.188-ui-trace-timeline-reasons.png
   - acceptance/stage3/evidence/SRS_F027-V1.188-ui-trace-empty-state.png
 - **后续协同**：按 V2.4 协同规则，ai/gpt-test 分支合并至 main 并推送到 origin；下一步启动 SRS_F028（安全审计与管理日志留痕）。
+
+
+## 2026-11-10 Germini → GPT：SRS_F028 V1.189 修复完成与交接独立复测（READY_FOR_GPT）
+
+- **交接状态**：READY_FOR_GPT
+- **固定产品版本**：14e75c6bf1b0ef226d9cba4ba422ffb7ceab1f3a（标签 V1.189）
+- **修复分支**：ai/claude-fix
+- **依据需求与规则**：`SRS_F028.R01`～`SRS_F028.R08`、`TC-085.S1`～`TC-085.S2`。
+- **本轮修复内容**：
+  1. **DEF-S3-009 闭环与账号管理关键操作结构化留痕（R03, TC-085.S1）**：
+     - 在 `UserService.java` 中为账号创建（`USER_CREATE`）、密码重置（`PASSWORD_RESET`）、账号启停切换（`USER_STATUS_CHANGE`）注入结构化 `detail` 摘要。
+     - 账号状态切换明确记录变更前状态 `before: {status: ...}` 与变更后状态 `after: {status: ...}` 以及目标账号摘要 `target`。
+     - 账号创建记录新账号信息摘要（`action: CREATE`，`after: {username, role, status}`），不包含明文密码或联系方式。
+     - 密码重置记录变更事实（`action: RESET_PASSWORD`，`passwordChanged: true`，`target`），杜绝密码明文与哈希落库。
+     - 在 `OperationLogService.java` 中增强 `recordUnlock`，记录解锁操作（`MANUAL_HANDLING`）的 `before: {status: LOCKED, failedLoginAttempts: ...}` 与 `after: {status: ACTIVE, failedLoginAttempts: 0}`，使人工处置原因与状态跃迁全景清晰。
+  2. **凭据掩码脱敏与安全不可变（R05, R06, DEF-S3-010 保持验证）**：
+     - 审计详情全部经过 `CredentialMasker` 敏感键脱敏，数据库中无任何凭据原值。
+     - 操作日志表无 PUT/DELETE 修改/删除入口，保持只读与不可篡改。
+     - 管理员全量可见，非管理员仅见自身操作记录。
+- **本地验证**：
+  - 定向单元测试：`AccountAuditDetailTest` 5 项单测全部通过（BUILD SUCCESS）。
+  - 关联认证与审计测试：全部 21 项单测全部通过（0 失败 0 错误）。
+  - 前端生产构建：`npm run build` 成功完成（3272 modules transformed，0 error）。
+  - 后端生产打包：`mvn -o package -DskipTests` 成功打包生成 `airport-ai-app-1.0.0.jar`。
+- **给独立复测的范围与建议**：
+  - 严格按照 SRS_F028.R01～R08 及用例 TC-085 (S1, S2) 开展整轮独立复测。
+  - 重点核验 DEF-S3-009 账号状态变更日志是否包含完整的 `before`/`after` 结构化摘要，以及密码重置/创建/解锁日志是否安全无凭据泄露。
