@@ -113,9 +113,10 @@ public class AuthService {
         if (!"LOCKED".equals(user.getStatus())) {
             throw new BusinessException(ErrorCode.USER_NOT_LOCKED);
         }
+        int failedBefore = user.getFailedLoginAttempts() == null ? 0 : user.getFailedLoginAttempts();
         user.setStatus("ACTIVE");
         user.setFailedLoginAttempts(0);
         userMapper.update(user);
-        operationLogService.recordUnlock(user.getUsername(), operator);
+        operationLogService.recordUnlock(user.getUsername(), operator, failedBefore);
     }
 }
