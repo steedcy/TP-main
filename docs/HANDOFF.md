@@ -2,10 +2,10 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（实际接收者 `Germini`）。GPT 已完成 SRS_F024 V1.184 独立整轮复测；DEF-S3-119 仍 F，真实浏览器 UI 子项 NT。
+- 状态：`READY_FOR_CLAUDE`（实际接收者 `Germini`）。GPT 已完成 SRS_F024 V1.184 独立整轮复测；DEF-S3-119 仍 F，真实浏览器 UI 子项 NT。清理补充审计发现 `RULE_RESOURCE_CRITICAL` 仅恢复 enabled 状态，版本从原始 V15 变为 V15.2，完整规则状态为 `PARTIAL_RESTORE`。
 - 固定复测产品：`d4a1125c94e62686d0481d4df5371a90c9e9a12d` / `V1.184`，标签已推送至远端 `origin/refs/tags/V1.184`，严格指向该产品代码提交。修复分支为 `ai/claude-fix`，测试分支为 `ai/gpt-test`。
-- V1.184 证据报告：`acceptance/stage3/SRS_F024-V1.184-独立复测与交接.md`；索引：`acceptance/stage3/evidence/SRS_F024-V1.184-complete-verification-20261109.json`；原始 HTTP/SQL/协议：`acceptance/stage3/evidence/SRS_F024-V1.184-http-sql-protocol-20261109.json`。
-- 下一步：Germini 处理 DEF-S3-119 并补真实 UI 路由/操作复测。F024 当前未通过，不合 main、不推进 F025。
+- V1.184 证据报告：`acceptance/stage3/SRS_F024-V1.184-独立复测与交接.md`；索引：`acceptance/stage3/evidence/SRS_F024-V1.184-complete-verification-20261109.json`；原始 HTTP/SQL/协议：`acceptance/stage3/evidence/SRS_F024-V1.184-http-sql-protocol-20261109.json`。原交接证据提交 `9c5a6d071407d9a0c12633529ef2564b0cba87f4`，清理审计补充证据提交 `9f9cd99a1bd8688f310123e6834019bf138f5bc3`，均已推送 `ai/gpt-test`。
+- 下一步：Germini 先核对并处理隔离测试 schema 的风险规则 `PARTIAL_RESTORE`，再修复 DEF-S3-119 并补真实 UI 路由/操作复测。F024 当前未通过，不合 main、不推进 F025。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -63,7 +63,7 @@
 | 2026-11-08 | SRS_F024 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / fc55f713e5d74d6fb41761f53fed84b4bc4efd7b / V1.183 | 待独立测试 | 闭环 DEF-S3-003、DEF-S3-032、DEF-S3-069、NT-S3-004、NT-S3-005，实现双触发入口、RequiredInfoGuard、4渠道计划、前端办理说明与柜台引导、模拟测量事件触发，详见下文交接专节 |
 | 2026-11-09 | SRS_F024 | GPT → Germini | READY_FOR_CLAUDE | ai/gpt-test / fc55f713e5d74d6fb41761f53fed84b4bc4efd7b / V1.183 | 05f1047a23a1b47fce0a691d6e50b7953357e735 | 3P/6F/0NT，DEF-S3-032、119～125统一交修，未合main |
 | 2026-11-09 | SRS_F024 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / d4a1125c94e62686d0481d4df5371a90c9e9a12d / V1.184 | 待独立整轮复测 | 统一闭环 DEF-S3-032 及 DEF-S3-119～125（8项缺陷），详见下文交接专节 |
-| 2026-11-09 | SRS_F024 | GPT → Germini | READY_FOR_CLAUDE | ai/gpt-test / V1.184 product d4a1125c94e62686d0481d4df5371a90c9e9a12d | 9c5a6d071407d9a0c12633529ef2564b0cba87f4 | 7P/1F/1NT规则、4P/1F/3NT步骤；DEF-S3-119保持F，DEF-S3-032/120/122～125关闭，DEF-S3-121 API通过但UI NT；未合main |
+| 2026-11-09 | SRS_F024 | GPT → Germini | READY_FOR_CLAUDE | ai/gpt-test / V1.184 product d4a1125c94e62686d0481d4df5371a90c9e9a12d | 9c5a6d071407d9a0c12633529ef2564b0cba87f4 + cleanup supplement 9f9cd99a1bd8688f310123e6834019bf138f5bc3 | 7P/1F/1NT规则、4P/1F/3NT步骤；DEF-S3-119保持F，DEF-S3-032/120/122～125关闭，DEF-S3-121 API通过但UI NT；风险规则清理为PARTIAL_RESTORE；未合main |
 
 ## 文件认领
 
@@ -4175,3 +4175,7 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
 - **DEF-S3-032、120、122、123、124、125 当前通过**。**DEF-S3-121 API授权结果通过、真实UI路由仍NT**。配置管理员事件合法请求200、非法空请求400；不据此声称前端 `/simulators` 权限矩阵通过。
 - V1.184 后端494项测试0失败/0错误/2跳过，离线 package 成功；前端3272模块 build 成功并保留既有大 chunk 警告。隔离 schema/Redis 与合成设备均已恢复；本轮端口和自有进程清理完成，main 未合入。
 - 下一步由 Germini 修复 DEF-S3-119、安排 UI 路由及任务操作复测，然后按统一修复交接流程生成新产品版本；在整轮全 P 前不得合入 main 或推进 F025。
+
+### V1.184 清理审计补充（2026-11-09）
+
+原清理索引 `SRS_F024-V1.184-cleanup-and-main-20261109.json` 中的 `riskEnabledRestored: true` 只表示启用状态恢复。追加的原始数据库查询证据 `acceptance/stage3/evidence/SRS_F024-V1.184-operation-log-risk-rules-20261109.json`（补充证据提交 `9f9cd99a1bd8688f310123e6834019bf138f5bc3`）读取隔离 schema `tip_gpt_f006_v118_20261030.operation_logs`：操作日志 `8105` 将 `RULE_RESOURCE_CRITICAL` 从 `V15/enabled=true` 改为 `V15.1/enabled=false`，日志 `8228` 又改为 `V15.2/enabled=true`。因此 `versionRestored=false`、`fullRuleStateRestored=false`、清理状态为 `PARTIAL_RESTORE`。既有清理 JSON、审计行及失败记录均保留，未执行数据库写入或产品代码修改；Germini 必须在后续复测前决定并记录该规则版本的安全恢复方案。
