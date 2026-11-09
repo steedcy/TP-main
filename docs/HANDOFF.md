@@ -2,17 +2,13 @@
 
 ## 当前交接状态
 
-- 状态：REQUIREMENT_PASSED（SRS_F025 特殊旅客服务协同与参数完整性整轮独立复测全部通过，规则 9P/0F/0NT，步骤 5P/0F/0NT，DEF-S3-004彻底实测关闭）。已合入 main 分支，下一步启动 SRS_F026。固定产品代码 239f8dd65b6c840847280ae2f7cb778811cf6296 / 标签 V1.186。
+- 状态：READY_FOR_GPT（SRS_F026 航班变动应急协同响应 完成前置修复核查与归并，打出固定产品版本标签 V1.187 / 代码 8a130d72805c744ae66548911f874dbf5dab9273）。交由 GPT-Test 开展整轮独立复测。
 - 本轮修复内容：
-  1. DEF-S3-004 闭环：在 RequiredInfoGuard.java 中落地 SPECIAL_PASSENGER_SERVICE 服务端必要字段强校验（仅核验 assistanceType、origin、destination 三项；缺失时仅生成系统规范问题，不请求旅客姓名/证件/电话等真实身份信息；INFO_CHECK_OVERRIDE 覆盖模型错误追问）。
-  2. 旅客隐私脱敏保护：在 SceneParamsPrivacyGuard.java 与 TaskService.java 中增加身份信息探测与自动脱敏；在 clarify 流程中拦截身份索取问题；自由文本回答及场景参数中若出现敏感身份信息自动脱敏为占位符，不入库、不送模型、不留操作员审计；脱敏后无业务实值的回答不计为已满足必要字段。
-  3. TC-078.S1 / R04 降级闭环：修复移动机器人离线时降级逻辑，PlanValidationService 允许智慧航显提示步骤（CAP_INFO_DISPLAY）通过校验并执行，TaskExecutionOrchestrator 对离线移动服务设备步骤做优雅跳过（ESCORT_CHANNEL_UNAVAILABLE），任务最终安全降级为 PENDING_MANUAL 并记录降级原因，实现信息提示发布与转人工协助接续的完整闭环。
-  4. 前端展示支持：在 TaskDetailView.vue 增加特殊旅客服务专用展示卡片，包含临时服务号、协助类型、起终点、状态警示及服务指引提示。
-- 本地验证：定向单元测试 11/11 全部通过（RequiredInfoF025Test、RequiredInfoF025OverrideTest、SpecialPassengerNoMobileRobotTest）；前端生产打包 npm run build 成功（0 error）；后端 mvn -o package -DskipTests 成功生成生产 JAR 包。
-- 下一步：SRS_F025 已整体验收通过并安全合入 main；下一步启动 SRS_F026（航班变动应急协同响应）。
-- 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
-- Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
-- 旧阶段 3 任务已暂停；其结果是待修复的原始证据，不是新版本通过证明。
+  1. DEF-S3-005 闭环与必要字段强校验：在 `FlightChangeRequiredInfoGuard.java` 中落地航班变更事件条件必填字段强校验（基础字段：航班号、变更类型、原计划时间、变更说明；延误/提前必填变更后时间；登机口变更必填变更后登机口；取消无需新时间/登机口；字段长度与预置校验不满足时生成标准追问；彻底杜绝向操作员追问内部机器人ID或路线编码；`INFO_CHECK_OVERRIDE` 守卫覆盖模型追问，缺失项支持澄清追问与三轮转人工）。
+  2. 双触发入口支持：在 `TaskService.java` 与 `TaskController.java` 中新增仿真体航班变动事件入口 `POST /api/v1/tasks/flight-change-event`，与表单录入并列支持双触发入口（SRS_F026.R01 / TC-080.S1）。
+  3. 各渠道发布结果与响应时长持久化：在 `TaskExecutionOrchestrator.java` 中丰富航班变更任务完成事件详情，结构化记录 `channelMetrics`（步骤序号、渠道能力类型、设备代理ID、步骤状态、执行结果、响应耗时毫秒数），并记录 `coveredChannels` 与 `uncoveredChannels`，实现各渠道响应时长与结果的可靠持久化（SRS_F026.R09 / TC-081.S3 / TC-082.S1）。
+- 本地验证：全量后端单测 514 项全部通过（0 失败 0 错误，2 项原有跳过）；前端生产打包 `npm run build` 成功（0 error）；后端 `mvn -o package -DskipTests` 成功生成生产 JAR 包。
+- 下一步：GPT-Test 接收固定代码 `8a130d72805c744ae66548911f874dbf5dab9273` / 标签 `V1.187` 开展整轮独立复测（SRS_F026.R01~R10、TC-080~TC-083）。
 
 ## 首项需求的现有证据
 
@@ -71,6 +67,7 @@
 | 2026-11-09 | SRS_F024 | Germini (代GPT按BL-009) → main | REQUIREMENT_PASSED | ai/gpt-test / ffd8addf4df207587e5af265179667f39dd1e172 / V1.185 | ded7645062c3e1e9447372b83b3b3cbcf8fa5c26 | 规则9P/0F/0NT，步骤5P/0F/0NT；DEF-S3-032、119～125及NT-S3-004/005全闭环；真实Edge UI 5/5通过；整项通过，合入main，下一项SRS_F025 |\n
 | 2026-11-09 | SRS_F025 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / 239f8dd65b6c840847280ae2f7cb778811cf6296 / V1.186 | 待独立整轮复测 | 闭环 DEF-S3-004、TC-078.S1 降级链路、必要参数守卫与隐私脱敏、前端专用卡片展示，详见下文交接专节 |
 | 2026-11-09 | SRS_F025 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / 239f8dd65b6c840847280ae2f7cb778811cf6296 / V1.186 | 129c5fc8e121eb798dd1ae08892795ec5ce86f4a | 规则9P/0F/0NT，步骤5P/0F/0NT；DEF-S3-004实测彻底关闭；真实Edge UI 3/3通过；全量测试通过，合入main，下一项SRS_F026 |
+| 2026-11-09 | SRS_F026 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / 8a130d72805c744ae66548911f874dbf5dab9273 / V1.187 | 待独立整轮复测 | 闭环 DEF-S3-005，落地航班变动条件必填守卫、双触发事件入口及各渠道发布结果与响应时长持久化 |
 ## 文件认领
 
 - Claude：当前需求涉及的产品代码与必要的修复单测；独立 `ai/claude-fix` worktree。
@@ -4365,3 +4362,26 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
   - cceptance/stage3/evidence/SRS_F025-V1.186-ui-clarify-dialog.png
   - cceptance/stage3/evidence/SRS_F025-V1.186-ui-special-passenger-card.png
 - **后续协同**：按 V2.4 协同规则，i/gpt-test 分支合并至 main 并推送到 origin；下一步启动 SRS_F026（航班变动应急协同响应）。
+
+
+## 2026-11-09 Germini → GPT：SRS_F026 V1.187 修复完成与交接独立复测（READY_FOR_GPT）
+
+- **交接状态**：READY_FOR_GPT
+- **固定产品版本**：8a130d72805c744ae66548911f874dbf5dab9273（标签 V1.187）
+- **修复分支**：ai/claude-fix
+- **本轮修复内容**：
+  1. **DEF-S3-005 闭环与航班变动必要字段强校验（R02, R03, R04）**：
+     - 在 `FlightChangeRequiredInfoGuard.java` 中实现航班变更事件系统级强校验（基础字段：航班号 2~10 位、有效变更类型 DELAY/EARLY/GATE_CHANGE/CANCEL、原计划时间、变更说明 1~200 位；条件字段：DELAY/EARLY 必填变更后时间；GATE_CHANGE 必填变更后登机口；CANCEL 无需新时间与新登机口）。
+     - 彻底杜绝向操作员追问内部机器人ID或路线编码等系统调度资源。
+     - `INFO_CHECK_OVERRIDE` 机制识别模型错误追问并覆盖为系统标准追问；三轮未补齐按规定转人工处理。
+  2. **双触发入口支持（R01, TC-080.S1）**：
+     - 在 `TaskController.java` 与 `TaskService.java` 中新增 `POST /api/v1/tasks/flight-change-event` 仿真体事件触发接口，与运行操作员前端表单式录入并列支持双触发入口。
+  3. **各渠道发布结果与响应时长持久化（R09, TC-081.S3, TC-082.S1）**：
+     - 在 `TaskExecutionOrchestrator.java` 中统计各渠道能力发布结果与响应时长，在任务完成事件 `TASK_COMPLETED` 详情中结构化持久化 `channelMetrics`，包含各步骤序号、渠道能力类型、设备代理ID、执行状态及精确耗时毫秒数。
+- **本地验证**：
+  - 后端单元测试：514 项测试全部通过（0 失败 0 错误，2 项跳过，BUILD SUCCESS）。
+  - 前端生产打包：`npm run build` 成功（0 error）。
+  - 后端生产打包：`mvn -o package -DskipTests` 成功生成生产 JAR 包。
+- **给独立复测的范围与建议**：
+  - 严格按照 SRS_F026.R01～R10 及用例 TC-080 (S1, S2)、TC-081 (S1, S2, S3)、TC-082.S1、TC-083.S1 开展整轮独立复测。
+  - 彻底复测并关闭 DEF-S3-005 与 NT-S3-006。
