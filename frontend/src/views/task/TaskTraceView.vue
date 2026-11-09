@@ -47,6 +47,19 @@
                 <a-descriptions-item label="风险等级" v-if="pv.riskLevel">{{ pv.riskLevel }}</a-descriptions-item>
                 <a-descriptions-item label="判定依据" :span="2" v-if="pv.judgmentBasis">{{ pv.judgmentBasis }}</a-descriptions-item>
               </a-descriptions>
+              <!-- 每个版本（包括被重规划或降级替换的历史版本）都展示步骤和校验错误（DEF-S3-008、F027.R01） -->
+              <a-alert v-if="pv.validationErrors?.length" type="error" show-icon style="margin-top: 8px" message="校验错误清单">
+                <template #description>
+                  <ul style="margin: 0; padding-left: 18px">
+                    <li v-for="(err, i) in pv.validationErrors" :key="i">
+                      [{{ err.errorType }}] 步骤{{ err.stepSeq ?? '—' }}：{{ err.description }}（{{ err.reasonCode }}）
+                    </li>
+                  </ul>
+                </template>
+              </a-alert>
+              <p style="margin: 8px 0 4px"><b>步骤明细（{{ pv.planSteps?.length ?? 0 }}步）：</b></p>
+              <a-table :dataSource="pv.planSteps || []" :columns="planStepColumns" rowKey="stepSeq" size="small"
+                       :pagination="false" :data-testid="`plan-steps-${pv.versionNo}`" />
             </a-collapse-panel>
           </a-collapse>
         </a-card>
@@ -138,6 +151,14 @@ const statusOptions = [
 function statusLabel(status) {
   return statusOptions.find((s) => s.key === status)?.label || status
 }
+const planStepColumns = [
+  { title: '步骤', dataIndex: 'stepSeq', width: 60 },
+  { title: '步骤目标', dataIndex: 'stepGoal' },
+  { title: '所需能力', dataIndex: 'capabilityType' },
+  { title: '前置条件', dataIndex: 'precondition' },
+  { title: '完成条件', dataIndex: 'completionCondition' },
+  { title: '失败处理', dataIndex: 'failureHandling' }
+]
 function sourceLabel(source) {
   return source === 'BASELINE_TEMPLATE' ? '基线模板' : '自主规划'
 }

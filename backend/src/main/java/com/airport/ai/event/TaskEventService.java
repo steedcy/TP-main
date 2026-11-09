@@ -18,7 +18,8 @@ public class TaskEventService {
         event.setTaskId(taskId);
         event.setEventType(eventType);
         event.setTrigger(trigger);
-        event.setReasonCode(reasonCode);
+        // 每条事件都要有原因码（F027.R02）：调用方给了就保留，没给则按事件类型补默认码
+        event.setReasonCode(EventReasonCodes.resolve(eventType, reasonCode));
         event.setDetailSummary(detailSummary);
         taskEventMapper.insert(event);
         return event;
