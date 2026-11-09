@@ -2,10 +2,10 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_CLAUDE`（兼容状态名，实际接收者 Germini）。GPT 已完成 SRS_F024 V1.183 整轮独立复测；规则 3P/6F/0NT、步骤 3P/5F/0NT，缺陷 DEF-S3-032、DEF-S3-119～125 统一交修。
-- 固定复测产品：`fc55f713e5d74d6fb41761f53fed84b4bc4efd7b` / `V1.183`，标签已推送至远端 `origin/refs/tags/V1.183`，严格指向该产品代码提交。修复分支为 `ai/claude-fix`，测试分支为 `ai/gpt-test`。
+- 状态：`READY_FOR_GPT`。Germini 已完成 SRS_F024 独立修复（针对 GPT V1.183 整轮独立复测报告中的 DEF-S3-032 与 DEF-S3-119～125 统一交修项）。
+- 固定复测产品：`d4a1125c94e62686d0481d4df5371a90c9e9a12d` / `V1.184`，标签已推送至远端 `origin/refs/tags/V1.184`，严格指向该产品代码提交。修复分支为 `ai/claude-fix`，测试分支为 `ai/gpt-test`。
 - 完整证据已先提交并推送：`05f1047a23a1b47fce0a691d6e50b7953357e735`。完整报告 `acceptance/stage3/SRS_F024-V1.183-整轮独立复测与统一交修.md`，索引 `acceptance/stage3/evidence/SRS_F024-V1.183-complete-verification-20261108.json`。
-- 下一步：Germini 在独立修复工作区接收 F024 统一交修并发布新版本；GPT 收到新版本后重新独立整轮复测。F024 未通过，不合 main、不推进 F025。
+- 下一步：GPT 在独立测试工作区收到本交接后，独立开展 SRS_F024 V1.184 整轮复测。F024 未通过，不合 main、不推进 F025。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -61,6 +61,8 @@
 
 | 2026-11-08 | SRS_F023 | GPT → Germini | REQUIREMENT_PASSED | ai/gpt-test / 5745d6279afac0149e2c614088734dbb2272211a / V1.182 | 4e5e609229d3669354e7acc0454f871e81633c44 | 10P/0F/0NT，步骤5P/0F/0NT；118关闭，安全同步main后下一仅F024 |
 | 2026-11-08 | SRS_F024 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / fc55f713e5d74d6fb41761f53fed84b4bc4efd7b / V1.183 | 待独立测试 | 闭环 DEF-S3-003、DEF-S3-032、DEF-S3-069、NT-S3-004、NT-S3-005，实现双触发入口、RequiredInfoGuard、4渠道计划、前端办理说明与柜台引导、模拟测量事件触发，详见下文交接专节 |
+| 2026-11-09 | SRS_F024 | GPT → Germini | READY_FOR_CLAUDE | ai/gpt-test / fc55f713e5d74d6fb41761f53fed84b4bc4efd7b / V1.183 | 05f1047a23a1b47fce0a691d6e50b7953357e735 | 3P/6F/0NT，DEF-S3-032、119～125统一交修，未合main |
+| 2026-11-09 | SRS_F024 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / d4a1125c94e62686d0481d4df5371a90c9e9a12d / V1.184 | 待独立整轮复测 | 统一闭环 DEF-S3-032 及 DEF-S3-119～125（8项缺陷），详见下文交接专节 |
 
 ## 文件认领
 
@@ -4079,3 +4081,86 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
 - **整轮结论**：9 条规则 **3P/6F/0NT**，8 个正式步骤 **3P/5F/0NT**；83 组去重业务观察 **67P/16F**，52 个真实任务最终 37 `COMPLETED`、15 `MANUAL_TERMINATED`。DEF-S3-003、DEF-S3-069、NT-S3-005 当前关闭；NT-S3-004 已执行并发现权限/页面路径缺陷，未留 NT。统一交修 **DEF-S3-032、DEF-S3-119、DEF-S3-120、DEF-S3-121、DEF-S3-122、DEF-S3-123、DEF-S3-124、DEF-S3-125**。原失败、诊断及探针更正均保留，无标准放宽、无产品代码修改。
 - **证据与清理**：报告为 `acceptance/stage3/SRS_F024-V1.183-整轮独立复测与统一交修.md`；总索引为 `acceptance/stage3/evidence/SRS_F024-V1.183-complete-verification-20261108.json`；现场补充为 `acceptance/stage3/evidence/SRS_F024-V1.183-current-resource-desktop-20261109.json`。17 个目标端口均无监听，无匹配测试 Java/Python/探针进程或产品 UI；清理记录、原始证据和 40 个用户未跟踪文件均按原状保留。
 - **待 Germini 处理**：先 fetch `origin/ai/gpt-test` 并将证据提交及本交接合入 `ai/claude-fix`，逐项修复 DEF-S3-032、119～125，保留已关闭行为与原始反例；定向回归、发布下一唯一递增标签并更新为 `READY_FOR_GPT` 后交还 GPT。GPT 收到新版本后重测 F024 全部适用项。当前未合 main、无 PR，不推进 F025。
+
+
+## 2026-11-09 Germini → GPT：SRS_F024 V1.184 修复交接（READY_FOR_GPT）
+
+- **交接状态**：`READY_FOR_GPT`。
+- **分支与标签**：分支 `ai/claude-fix`，代码提交 SHA `d4a1125c94e62686d0481d4df5371a90c9e9a12d`，全局唯一递增版本标签 `V1.184`（已推送至 origin，标签严格指向该代码提交，后续文档提交不移动该标签）。
+- **待测需求**：`SRS_F024`（超规行李处置），关联用例 `TC-072`、`TC-073`、`TC-075` 引导异常分支映射，涵盖正式规则 `SRS_F024.R01` ～ `SRS_F024.R09`。
+- **未合入 main**：保持独立分支 `ai/claude-fix`，未修改 main 分支，未修改 `acceptance/stage3/` 下的 P/F/NT 台账和复测证据。
+
+### 纳入修复与缺陷闭环清单（DEF-S3-032 及 DEF-S3-119～125）
+
+1. **DEF-S3-121（R01 / NT-S3-004 测量事件端点权限与仿真控制台路由角色对齐）**：
+   - 在 `TaskController.java` 中，将 `/measurement-event` 及 `/baggage-measurement-event` 端点权限由 `@PreAuthorize("hasRole('OPERATOR')")` 调整为 `@PreAuthorize("hasAnyRole('OPERATOR', 'SYSTEM_ADMIN', 'CONFIG_ADMIN')")`，允许配置管理员与系统管理员在仿真演练或系统调试中直接调用。
+   - 在前端 `router/index.js` 中将 `/simulators` 路由 meta roles 拓展为 `['CONFIG_ADMIN', 'OPERATOR', 'SYSTEM_ADMIN']`；并在 `MainLayout.vue` 中对“仿真场景”菜单项放开给 `isConfigAdmin || isOperator || isSystemAdmin`，彻底消除 `CONFIG_ADMIN` 访问 403 及菜单不可见的权限割裂。
+
+2. **DEF-S3-119（R03 / TC-072.S1 非超规正常行李分支删除下游引导步骤）**：
+   - 在 `TaskStepAssignmentMapper` 与 XML 中新增 `deleteByPlanVersionIdAndStepSeqGreaterThan` 方法。
+   - 在 `TaskExecutionOrchestrator.completeNormalBaggageBranch` 处理中，当测量判定行李未超规时，立即物理删除当前计划版本中 `stepSeq > 1` 的所有下游分派记录（即引导与航显步骤），并将内存中 `planVersion.planSteps` 截断仅保留第一步测量步骤。任务直接置为 `COMPLETED`，状态机与数据库层面均不残留未执行的引导指令与分派，严格符合 R03“不生成引导步骤”之规定。
+
+3. **DEF-S3-120（R02 / NT-S3-004 尺寸与重量阈值严格校验及 extraParams 保留参数防护）**：
+   - 在 `BaggageMeasurementEventRequest` 中为 `dimensionThresholdCm` 与 `weightThresholdKg` 添加 `@Positive` 注解，声明式阻断负数或零阈值。
+   - 在 `TaskService.submitMeasurementEvent` 中实施强制双重把关：若显式传入的尺寸或重量阈值 `<= 0`，严格抛出 `BusinessException(PARAM_FORMAT_ERROR, "尺寸阈值与重量阈值必须大于0")`，返回 HTTP 400。
+   - 防篡改保护：过滤 `extraParams` 中传入的保留键（如 `isOversize`、`length`、`width`、`height`、`weight`、`thresholdSource` 等），确保系统实际测量的三边、重量、判定结果以核心入参为准，彻底杜绝外部恶意参数覆盖核心业务判定。
+
+4. **DEF-S3-032（R09 / TC-072.S3 旅客身份信息深度正则拦截与文本穿透防护）**：
+   - 强化 `SceneParamsPrivacyGuard.java`：新增 `containsIdentityText` 深度正则扫描逻辑，不仅检测 Map 键名，更对所有字符串内容进行文本穿透扫描（包括 `passengerName=...`、`旅客姓名=...`、身份证号、手机号、邮箱等模式）。
+   - 在 `scanJsonNode` 与 `scanObject` 中递归扫描所有 String 类型值，发现 canary 身份文本立即判定违规；在 `sanitizeValue` 中对 String 值递归执行 `sanitizeGoal` 替换。
+   - 在 `TaskService.submitTaskGoal` 中，在落库与发布 `GOAL_SUBMITTED` 事件前调用 `SceneParamsPrivacyGuard.sanitizeGoal` 进行清洗脱敏；在 `TaskService.submitMeasurementEvent` 中对 `handlingInstructions`、`thresholdSource`、`deviceCode` 等字段显式调用 `SceneParamsPrivacyGuard.reject` 校验，全面杜绝隐私信息随文本入库或记录事件。
+
+5. **DEF-S3-122（R07 / TC-075 步骤单次恢复后解冻下游全部步骤）**：
+   - 在 `TaskExceptionService.onStepRecovered` 中，当某个步骤通过局部重规划或参数修复恢复成功后，检索该计划版本中所有 `stepSeq > recoveredStepSeq` 且状态为 `FROZEN` 的后续步骤，批量将其状态重置为 `PENDING_ASSIGNMENT`。
+   - 在 `TaskExecutionOrchestrator.advanceAfterStepCompleted` 推进下一步分派前，同样核验下一步若为 `FROZEN` 则自动解除冻结，恢复为 `PENDING_ASSIGNMENT` 并正常调用 `assignStep`，彻底消除步骤恢复后后续流程永久被锁在 `FROZEN` 状态的阻塞缺陷。
+
+6. **DEF-S3-123（R07 / TC-075 规划因能力或无在线设备失败时写入任务异常记录）**：
+   - 在 `TaskPlanningOrchestrator.java` 中注入 `TaskExceptionMapper`。在规划流程 `plan(taskId)` 中，当三类校验因 `CAPABILITY` 或 `ERR_NO_ONLINE_CANDIDATE` 失败时，主动生成并插入一条 `TaskException` 异常记录（`exceptionType = "CAPABILITY_GAP"`，记录对应错误描述及时间）。
+   - 在 `toPendingManual` 转人工接管时，联动更新上述活跃异常状态为 `FAILED`，记录人工介入说明，保证异常追踪表与审计时间线完整留痕。
+
+7. **DEF-S3-124（R04 / TC-072.S2 局部可用放行与信息类完成事件 OVERSIZE_HANDLING_INFO_ONLY）**：
+   - 在 `PlanValidationService.validate` 中增强业务弹性策略：针对 `OVERSIZE_BAGGAGE_HANDLING` 任务族，若测量设备在线可用但导航渠道暂无候选设备时，免除导航渠道缺失引起的硬性拦截报错，允许生成部分渠道可用计划。
+   - 在 `TaskExecutionOrchestrator.assignStep` 中，若执行到 `CAP_NAVIGATION` 步骤且候选设备为空，主动调用 `skipUnavailableNavigationChannel` 跳过该步骤，将步骤记录为 `SKIPPED`、引导状态标记为 `UNCOMPLETED`，并发布 `GUIDANCE_UNCOVERED`（原因码 `NAVIGATION_CHANNEL_UNAVAILABLE`）事件。
+   - 在任务收口 `completeAvailableChannels` 中，若存在未完成的导航步骤，发布 `TASK_COMPLETED` 时携带 `OVERSIZE_HANDLING_INFO_ONLY` 原因码替代全闭环 `OVERSIZE_HANDLING_CLOSED_LOOP`，真实记录仅完成航显发布而未完成物理引导的业务现状。
+
+8. **DEF-S3-125（R02 / TC-072.S1 测量反馈完整性与核心数据硬性强校验）**：
+   - 在 `TaskExecutionOrchestrator.handleExecutionFeedback` 中，针对 `CAP_BAGGAGE_MEASURE` 步骤增加了对反馈数据结构的深度校验：严格校验反馈 payload 中必须完整包含数值型的 `length`、`width`、`height`、`weight` 以及非空的布尔型 `isOversize`。
+   - 若任一必要测量指标缺失或非数值，判定完成条件不满足（`completionSatisfied = false`），记录原因码 `ERR_MEASUREMENT_DATA_INCOMPLETE` 并抛出错误说明，触发单次重规划或异常处理流程，坚决杜绝在缺失关键测量数据的情况下将测量步骤标记为 `COMPLETED`。
+
+### 本地定向验证与质量门禁
+
+1. **后端定向单元测试**：
+   - 运行命令：`mvn -o test "-Dtest=TaskAuthorizationTest,BaggageMeasurementEventTest,GoalClarificationRoundsTest,OversizeBaggagePlanF013Test,RequiredInfoGuardTest,RequiredInfoOverrideTest,SceneParamsPrivacyGuardTest"`
+   - 验证结果：**55/55 测试通过，0 failure, 0 error**（BUILD SUCCESS）。
+     - `TaskAuthorizationTest`：5 个测试全部通过（包含 `OPERATOR`、`CONFIG_ADMIN`、`SYSTEM_ADMIN` 及未授权角色的测量事件端点权限验证）。
+     - `BaggageMeasurementEventTest`：8 个测试全部通过（包含尺寸重量正数阈值校验、非超规直接完成无引导步骤、超规进规划、目标柜台可选、保留字 extraParams 防篡改、文本隐私 canary 拦截、有效/无效边界）。
+     - `GoalClarificationRoundsTest`：2 个测试全部通过。
+     - `OversizeBaggagePlanF013Test`：4 个测试全部通过。
+     - `RequiredInfoGuardTest`：13 个测试全部通过。
+     - `RequiredInfoOverrideTest`：7 个测试全部通过。
+     - `SceneParamsPrivacyGuardTest`：10 个测试全部通过。
+2. **后端生产打包验证**：
+   - 运行命令：`mvn -o package -DskipTests`
+   - 验证结果：`BUILD SUCCESS`，成功生成生产包 `backend/target/airport-ai-app-1.0.0.jar`，后端发布物可直接独立启动。
+3. **前端生产构建验证**：
+   - 运行命令：`cd frontend && npm run build`
+   - 验证结果：`vite build` 成功完成（3272 modules transformed，0 error，无编译阻塞警告）。
+
+### 给 GPT 独立复测重点提示
+
+1. **DEF-S3-121 权限与路径**：
+   - 复测 `CONFIG_ADMIN` 及 `OPERATOR` 访问 `/simulators` 前端页面及调用 `POST /api/v1/tasks/measurement-event`，验证均可正常操作。
+2. **DEF-S3-119 正常行李分支无引导步骤**：
+   - 发送非超规行李测量事件，验证任务状态直接为 `COMPLETED`，且数据库 `task_step_assignment` 与详情计划中不存在第 2 步及后续引导步骤。
+3. **DEF-S3-120 阈值正数边界与防篡改**：
+   - 验证负数/零尺寸阈值或重量阈值被 400 拦截；验证 `extraParams` 携带 `isOversize: false` 不会篡改系统计算出的超规结果。
+4. **DEF-S3-032 深度文本隐私拦截**：
+   - 验证输入文本（如 `taskGoal`、`handlingInstructions`、`thresholdSource`）携带 `passengerName=张三` 或身份证号 canary 时被系统拦截或脱敏，不泄露真实身份。
+5. **DEF-S3-122 恢复后下游解冻**：
+   - 验证步骤异常恢复后，下游原本 `FROZEN` 的步骤解冻为 `PENDING_ASSIGNMENT` 并能继续推进。
+6. **DEF-S3-123 异常台账留痕**：
+   - 验证规划因无在线设备或能力缺失转人工接管时，记录了类型为 `CAPABILITY_GAP` 的 `TaskException` 记录。
+7. **DEF-S3-124 局部渠道放行与信息类完成**：
+   - 验证当移动机器人离线但测量设备在线时，计划允许生成并执行航显通知，任务完成时事件原因为 `OVERSIZE_HANDLING_INFO_ONLY`，引导状态为 `UNCOMPLETED`。
+8. **DEF-S3-125 测量反馈缺失数据硬校验**：
+   - 验证测量设备反馈缺少长宽高、重量或 `isOversize` 字段时，步骤不能被标记为 `COMPLETED`，且记录数据不完整错误。
