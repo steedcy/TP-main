@@ -2,13 +2,15 @@
 
 ## 当前交接状态
 
-- 状态：READY_FOR_GPT（SRS_F026 航班变动应急协同响应 完成前置修复核查与归并，打出固定产品版本标签 V1.187 / 代码 8a130d72805c744ae66548911f874dbf5dab9273）。交由 GPT-Test 开展整轮独立复测。
-- 本轮修复内容：
-  1. DEF-S3-005 闭环与必要字段强校验：在 `FlightChangeRequiredInfoGuard.java` 中落地航班变更事件条件必填字段强校验（基础字段：航班号、变更类型、原计划时间、变更说明；延误/提前必填变更后时间；登机口变更必填变更后登机口；取消无需新时间/登机口；字段长度与预置校验不满足时生成标准追问；彻底杜绝向操作员追问内部机器人ID或路线编码；`INFO_CHECK_OVERRIDE` 守卫覆盖模型追问，缺失项支持澄清追问与三轮转人工）。
-  2. 双触发入口支持：在 `TaskService.java` 与 `TaskController.java` 中新增仿真体航班变动事件入口 `POST /api/v1/tasks/flight-change-event`，与表单录入并列支持双触发入口（SRS_F026.R01 / TC-080.S1）。
-  3. 各渠道发布结果与响应时长持久化：在 `TaskExecutionOrchestrator.java` 中丰富航班变更任务完成事件详情，结构化记录 `channelMetrics`（步骤序号、渠道能力类型、设备代理ID、步骤状态、执行结果、响应耗时毫秒数），并记录 `coveredChannels` 与 `uncoveredChannels`，实现各渠道响应时长与结果的可靠持久化（SRS_F026.R09 / TC-081.S3 / TC-082.S1）。
-- 本地验证：全量后端单测 514 项全部通过（0 失败 0 错误，2 项原有跳过）；前端生产打包 `npm run build` 成功（0 error）；后端 `mvn -o package -DskipTests` 成功生成生产 JAR 包。
-- 下一步：GPT-Test 接收固定代码 `8a130d72805c744ae66548911f874dbf5dab9273` / 标签 `V1.187` 开展整轮独立复测（SRS_F026.R01~R10、TC-080~TC-083）。
+- 状态：REQUIREMENT_PASSED（SRS_F026 航班变动应急协同响应 整轮独立复测全P通过，规则10P/0F/0NT，步骤7P/0F/0NT，DEF-S3-005与NT-S3-006彻底实测关闭。准备合入 main 并启动下一项 SRS_F027）。
+- 本轮独立复测成果：
+  1. 业务规则（10P/0F/0NT）：SRS_F026.R01～R10 全部实测通过。
+  2. 测试用例（7P/0F/0NT）：TC-080 (S1, S2)、TC-081 (S1, S2, S3)、TC-082.S1、TC-083.S1 全部实测通过。
+  3. 历史缺陷 DEF-S3-005（模型非法追问内部设备ID/路线且无三渠道计划）与前置缺口 NT-S3-006（四类事件双触发与字段边界）经实测彻底关闭。
+  4. 真实 Edge 浏览器 UI 端到端测试全部通过，成功渲染“航班变更渠道响应”卡片。
+  5. 详见受控报告 `acceptance/stage3/SRS_F026-V1.187-整轮独立复测与验收.md`。
+- 固定产品版本：`8a130d72805c744ae66548911f874dbf5dab9273` / 标签 `V1.187`。
+- 下一步：`ai/gpt-test` 分支合入 `main` 并推送到远端；下一项正式启动 `SRS_F027`。
 
 ## 首项需求的现有证据
 
@@ -68,6 +70,7 @@
 | 2026-11-09 | SRS_F025 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / 239f8dd65b6c840847280ae2f7cb778811cf6296 / V1.186 | 待独立整轮复测 | 闭环 DEF-S3-004、TC-078.S1 降级链路、必要参数守卫与隐私脱敏、前端专用卡片展示，详见下文交接专节 |
 | 2026-11-09 | SRS_F025 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / 239f8dd65b6c840847280ae2f7cb778811cf6296 / V1.186 | 129c5fc8e121eb798dd1ae08892795ec5ce86f4a | 规则9P/0F/0NT，步骤5P/0F/0NT；DEF-S3-004实测彻底关闭；真实Edge UI 3/3通过；全量测试通过，合入main，下一项SRS_F026 |
 | 2026-11-09 | SRS_F026 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / 8a130d72805c744ae66548911f874dbf5dab9273 / V1.187 | 待独立整轮复测 | 闭环 DEF-S3-005，落地航班变动条件必填守卫、双触发事件入口及各渠道发布结果与响应时长持久化 |
+| 2026-11-10 | SRS_F026 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / 8a130d72805c744ae66548911f874dbf5dab9273 / V1.187 | 2037507 | 规则10P/0F/0NT，步骤7P/0F/0NT；DEF-S3-005与NT-S3-006实测彻底关闭；真实Edge UI 3/3通过；全量测试全P通过，合入main，下一项SRS_F027 |
 ## 文件认领
 
 - Claude：当前需求涉及的产品代码与必要的修复单测；独立 `ai/claude-fix` worktree。
