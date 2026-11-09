@@ -2,10 +2,10 @@
 
 ## 当前交接状态
 
-- 状态：`READY_FOR_GPT`。Germini AI 已完成 SRS_F024（超规行李处置）独立修复轮，闭环 DEF-S3-003、DEF-S3-032、DEF-S3-069、NT-S3-004、NT-S3-005。
-- 固定产品：`fc55f713e5d74d6fb41761f53fed84b4bc4efd7b` / `V1.183`，标签已推送至远端 `origin/refs/tags/V1.183`，严格指向该产品代码提交。修复分支为 `ai/claude-fix`（已推送到 `origin/ai/claude-fix`）。
-- 本地质量门禁：后端定向单测 40/40 全通（BUILD SUCCESS），生产 jar 打包成功，前端 `npm run build` 成功（0 error）。
-- 下一步：交接写入权交还 ChatGPT，启动 SRS_F024 独立整轮复测。GPT 将在独立复测对话中拉取 `ai/claude-fix` 与 `V1.183` 开展独立整轮复测与台账记录。
+- 状态：`READY_FOR_CLAUDE`（兼容状态名，实际接收者 Germini）。GPT 已完成 SRS_F024 V1.183 整轮独立复测；规则 3P/6F/0NT、步骤 3P/5F/0NT，缺陷 DEF-S3-032、DEF-S3-119～125 统一交修。
+- 固定复测产品：`fc55f713e5d74d6fb41761f53fed84b4bc4efd7b` / `V1.183`，标签已推送至远端 `origin/refs/tags/V1.183`，严格指向该产品代码提交。修复分支为 `ai/claude-fix`，测试分支为 `ai/gpt-test`。
+- 完整证据已先提交并推送：`05f1047a23a1b47fce0a691d6e50b7953357e735`。完整报告 `acceptance/stage3/SRS_F024-V1.183-整轮独立复测与统一交修.md`，索引 `acceptance/stage3/evidence/SRS_F024-V1.183-complete-verification-20261108.json`。
+- 下一步：Germini 在独立修复工作区接收 F024 统一交修并发布新版本；GPT 收到新版本后重新独立整轮复测。F024 未通过，不合 main、不推进 F025。
 
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
@@ -4071,3 +4071,11 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
    - 验证 `TaskDetailView.vue` 中 `data-testid="baggage-handling-instructions"` 卡片内容完整，包含办理流程、收费标准、托运须知及指定柜台。
 5. **四渠道计划三类校验与执行**：
    - 验证超规计划包含 4 渠道能力（测量、告警、航显、导航），通过三类校验及监督判定（最多 5 步，无运动安全控制），执行完成时留存 `OVERSIZE_HANDLING_CLOSED_LOOP` 事件。
+
+
+## 2026-11-09 GPT → Germini：SRS_F024 V1.183 整轮独立复测完成（READY_FOR_CLAUDE，兼容状态名）
+
+- **交接状态**：`READY_FOR_CLAUDE`，实际接收者 Germini。测试工作区 `tip-gpt-f013`、分支 `ai/gpt-test`；产品固定为 `fc55f713e5d74d6fb41761f53fed84b4bc4efd7b` / `V1.183`。完整证据提交 `05f1047a23a1b47fce0a691d6e50b7953357e735` 已先推送并核对远端；随后由 GPT 单独写入交接文档。
+- **整轮结论**：9 条规则 **3P/6F/0NT**，8 个正式步骤 **3P/5F/0NT**；83 组去重业务观察 **67P/16F**，52 个真实任务最终 37 `COMPLETED`、15 `MANUAL_TERMINATED`。DEF-S3-003、DEF-S3-069、NT-S3-005 当前关闭；NT-S3-004 已执行并发现权限/页面路径缺陷，未留 NT。统一交修 **DEF-S3-032、DEF-S3-119、DEF-S3-120、DEF-S3-121、DEF-S3-122、DEF-S3-123、DEF-S3-124、DEF-S3-125**。原失败、诊断及探针更正均保留，无标准放宽、无产品代码修改。
+- **证据与清理**：报告为 `acceptance/stage3/SRS_F024-V1.183-整轮独立复测与统一交修.md`；总索引为 `acceptance/stage3/evidence/SRS_F024-V1.183-complete-verification-20261108.json`；现场补充为 `acceptance/stage3/evidence/SRS_F024-V1.183-current-resource-desktop-20261109.json`。17 个目标端口均无监听，无匹配测试 Java/Python/探针进程或产品 UI；清理记录、原始证据和 40 个用户未跟踪文件均按原状保留。
+- **待 Germini 处理**：先 fetch `origin/ai/gpt-test` 并将证据提交及本交接合入 `ai/claude-fix`，逐项修复 DEF-S3-032、119～125，保留已关闭行为与原始反例；定向回归、发布下一唯一递增标签并更新为 `READY_FOR_GPT` 后交还 GPT。GPT 收到新版本后重测 F024 全部适用项。当前未合 main、无 PR，不推进 F025。
