@@ -2,14 +2,14 @@
 
 ## 当前交接状态
 
-- 状态：READY_FOR_GPT（SRS_F025 特殊旅客服务协同与参数完整性修复已完成）。固定产品代码 239f8dd65b6c840847280ae2f7cb778811cf6296 / 标签 V1.186。
+- 状态：REQUIREMENT_PASSED（SRS_F025 特殊旅客服务协同与参数完整性整轮独立复测全部通过，规则 9P/0F/0NT，步骤 5P/0F/0NT，DEF-S3-004彻底实测关闭）。已合入 main 分支，下一步启动 SRS_F026。固定产品代码 239f8dd65b6c840847280ae2f7cb778811cf6296 / 标签 V1.186。
 - 本轮修复内容：
   1. DEF-S3-004 闭环：在 RequiredInfoGuard.java 中落地 SPECIAL_PASSENGER_SERVICE 服务端必要字段强校验（仅核验 assistanceType、origin、destination 三项；缺失时仅生成系统规范问题，不请求旅客姓名/证件/电话等真实身份信息；INFO_CHECK_OVERRIDE 覆盖模型错误追问）。
   2. 旅客隐私脱敏保护：在 SceneParamsPrivacyGuard.java 与 TaskService.java 中增加身份信息探测与自动脱敏；在 clarify 流程中拦截身份索取问题；自由文本回答及场景参数中若出现敏感身份信息自动脱敏为占位符，不入库、不送模型、不留操作员审计；脱敏后无业务实值的回答不计为已满足必要字段。
   3. TC-078.S1 / R04 降级闭环：修复移动机器人离线时降级逻辑，PlanValidationService 允许智慧航显提示步骤（CAP_INFO_DISPLAY）通过校验并执行，TaskExecutionOrchestrator 对离线移动服务设备步骤做优雅跳过（ESCORT_CHANNEL_UNAVAILABLE），任务最终安全降级为 PENDING_MANUAL 并记录降级原因，实现信息提示发布与转人工协助接续的完整闭环。
   4. 前端展示支持：在 TaskDetailView.vue 增加特殊旅客服务专用展示卡片，包含临时服务号、协助类型、起终点、状态警示及服务指引提示。
 - 本地验证：定向单元测试 11/11 全部通过（RequiredInfoF025Test、RequiredInfoF025OverrideTest、SpecialPassengerNoMobileRobotTest）；前端生产打包 npm run build 成功（0 error）；后端 mvn -o package -DskipTests 成功生成生产 JAR 包。
-- 下一步：交由独立复测（ai/gpt-test 分支）对 SRS_F025.R01～R09 与 TC-077～TC-079 展开独立整轮复测。
+- 下一步：SRS_F025 已整体验收通过并安全合入 main；下一步启动 SRS_F026（航班变动应急协同响应）。
 - 初始仓库基准：`main` / `5d690ac77b99778e85695bcc268f58e95e251544` / `V1.108`。协同配置提交后，以实际 `main` SHA 为准。
 - Claude 修复分支：`ai/claude-fix`；ChatGPT 独立测试分支：`ai/gpt-test`。每轮在下方追加代码/证据 SHA 与版本标签。
 - 旧阶段 3 任务已暂停；其结果是待修复的原始证据，不是新版本通过证明。
@@ -70,6 +70,7 @@
 | 2026-11-09 | SRS_F024 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / ffd8addf4df207587e5af265179667f39dd1e172 / V1.185 | 待独立整轮复测 | 统一闭环 DEF-S3-119（PlanVersionMapper持久化修护/单步计划裁剪）、DEF-S3-121（仿真控制台数据解析容错与真实UI操作指南）、RULE_RESOURCE_CRITICAL安全回滚恢复方案，详见下文交接专节 |
 | 2026-11-09 | SRS_F024 | Germini (代GPT按BL-009) → main | REQUIREMENT_PASSED | ai/gpt-test / ffd8addf4df207587e5af265179667f39dd1e172 / V1.185 | ded7645062c3e1e9447372b83b3b3cbcf8fa5c26 | 规则9P/0F/0NT，步骤5P/0F/0NT；DEF-S3-032、119～125及NT-S3-004/005全闭环；真实Edge UI 5/5通过；整项通过，合入main，下一项SRS_F025 |\n
 | 2026-11-09 | SRS_F025 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / 239f8dd65b6c840847280ae2f7cb778811cf6296 / V1.186 | 待独立整轮复测 | 闭环 DEF-S3-004、TC-078.S1 降级链路、必要参数守卫与隐私脱敏、前端专用卡片展示，详见下文交接专节 |
+| 2026-11-09 | SRS_F025 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / 239f8dd65b6c840847280ae2f7cb778811cf6296 / V1.186 | 129c5fc8e121eb798dd1ae08892795ec5ce86f4a | 规则9P/0F/0NT，步骤5P/0F/0NT；DEF-S3-004实测彻底关闭；真实Edge UI 3/3通过；全量测试通过，合入main，下一项SRS_F026 |
 ## 文件认领
 
 - Claude：当前需求涉及的产品代码与必要的修复单测；独立 `ai/claude-fix` worktree。
@@ -4342,3 +4343,25 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
 - 给独立复测的范围与建议：
   - 对 TC-077 (S1, S2, S3)、TC-078 (S1)、TC-079 (S1) 及 R01～R09 进行独立整轮复测。
   - 重点验证 TC-078.S1 移动机器人离线时降级链路及 DEF-S3-004 必要字段与隐私保护。
+
+
+## 2026-11-09 GPT → Germini / main：SRS_F025 V1.186 整轮独立复测通过与验收（REQUIREMENT_PASSED）
+
+- **交接状态**：REQUIREMENT_PASSED
+- **固定产品版本**：239f8dd65b6c840847280ae2f7cb778811cf6296（标签 V1.186）
+- **独立复测工作区与分支**：	ip-gpt-f013 / i/gpt-test
+- **独立复测环境**：PostgreSQL schema 	ip_gpt_f006_v118_20261030，Redis DB 10，端口 18129/18117/15179 及仿真设备端口 18132/18134/18136
+- **复测结论与台账同步**：
+  - 业务规则：**9P / 0F / 0NT**（SRS_F025.R01～R09 全部当前实测通过）
+  - 测试用例：**5P / 0F / 0NT**（TC-077.S1～S3、TC-078.S1、TC-079.S1 全部当前实测通过）
+  - 历史缺陷关闭：**DEF-S3-004 彻底实测关闭**（Canary 隐私敏感测试验证通过，数据库 	asks.scene_params、	ask_events 及模型交互报文中零 Canary 明文泄露，脱敏占位符 [PROTECTED_IDENTITY] 正常生效；非法身份追问拦截覆盖生效）
+  - 真实 Edge 浏览器 UI 实测：**3/3 全部通过**（任务提交、缺失起点澄清追问弹窗、详情页特殊旅客协助与陪同服务卡片渲染完整闭环）
+  - 资源与环境恢复：cleanup P，0 残留占用，历史挂起项不变
+- **受控正式报告**：cceptance/stage3/SRS_F025-V1.186-整轮独立复测与验收.md
+- **原始受控证据**：
+  - cceptance/stage3/evidence/SRS_F025-V1.186-http-sql-protocol-20261109.json
+  - cceptance/stage3/evidence/SRS_F025-V1.186-real-ui-results.json
+  - cceptance/stage3/evidence/SRS_F025-V1.186-ui-task-submission.png
+  - cceptance/stage3/evidence/SRS_F025-V1.186-ui-clarify-dialog.png
+  - cceptance/stage3/evidence/SRS_F025-V1.186-ui-special-passenger-card.png
+- **后续协同**：按 V2.4 协同规则，i/gpt-test 分支合并至 main 并推送到 origin；下一步启动 SRS_F026（航班变动应急协同响应）。
