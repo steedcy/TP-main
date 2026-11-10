@@ -2,14 +2,15 @@
 
 ## 当前交接状态
 
-- 状态：READY_FOR_GPT（SRS_NF001 系统安全性：认证与权限 产品加固与定向单测完成，移交 ai/gpt-test 独立复测）
+- 状态：REQUIREMENT_PASSED（SRS_NF001 系统安全性：认证与权限 整轮独立复测全部通过，DEF-S3-010 彻底关闭，NT-S3-009 彻底闭环，合并入 main，准备启动下一项 SRS_NF002）
 - 依据需求与规则：SRS_NF001.R01、TC-086.S1、TC-086.S2、DEF-S3-010、NT-S3-009
-- 本轮加固成果：
-  1. 越权访问防护与会话安全：Spring Security 过滤器链 + PreAuthorizeInterceptor + AccessDeniedHandlerImpl + GlobalExceptionHandler 严密闭环，非管理员调用用户管理、非配置管理员调用设备管理、非操作员调用任务提交/终止统一快速拦截为 403 Forbidden（错误码 2003）并落库 ACCESS_DENIED 审计日志，杜绝越权漏洞；
-  2. 敏感凭据脱敏传输与存储隔离：加固 User.toString() 与 CredentialMasker，涵盖 password、token、secret、credential 及各类变体（accessToken、deviceToken、secretKey、apiKey 等），支持嵌套 Map 与 Collection 递归掩码；User 实体对外序列化严格忽略 passwordHash（DEF-S3-010 闭环）；
-  3. 会话时效与防劫持机制：SessionService 建立 user_sessions:<userId> 集合反查索引；空白/过期/篡改/伪造 JWT 签名的 Token 均快速拦截为 401 Unauthorized（2001/2000）；密码重置（resetPassword）及账号停用/锁定（updateStatus）联动执行 invalidateUserSessions 立即注销该用户所有活跃会话；TokenAuthenticationFilter 增加账号非 ACTIVE 状态拦截（NT-S3-009 闭环）。
-- 本地验证与固定基线：固定产品代码 0e16b31dc2c01e965f8848897940c2885b1ba99a（标签 V1.190），全量单测 543 项全部通过（0 失败 0 错误），前端打包 npm run build 成功（3272 modules transformed，0 error），后端生产打包 mvn -o package -DskipTests 成功生成生产 JAR airport-ai-app-1.0.0.jar。
-- 下一步：ai/gpt-test 基于固定版本 V1.190 开展 SRS_NF001 整轮独立复测（TC-086.S1、TC-086.S2、DEF-S3-010、NT-S3-009）。
+- 本轮独立复测成果：
+  1. 数据库存储与接口脱敏：测试库 14 个账号全量 BCrypt 加盐哈希，0 明文；GET /users 与 POST /users 响应绝无 passwordHash（DEF-S3-010 彻底关闭）；设备凭据脱敏掩码回显；全量 908 条审计日志 0 处敏感密码暴露；
+  2. 越权访问防护与时序拦截：非管理员调用用户管理、非配置管理员调用设备管理统一快速拦截为 403 Forbidden（错误码 2003）并生成 ACCESS_DENIED 审计日志，数据库零落库；无权角色发送空请求体优先触发 403 权限拦截，杜绝被参数校验提前误判为 400；
+  3. 会话时效与防伪造：未带 Token（401/2000）、篡改伪造 Token（401/2001）快速拦截；账号停用（INACTIVE）或管理员重置密码（resetPassword）及主动登出（logout）联动注销 Redis 活跃会话，旧 Token 立即失效（401/2001，NT-S3-009 彻底闭环）；
+  4. 真实 Edge 浏览器 UI 实测：3/3 全部通过（管理员用户列表无哈希泄露、操作员菜单隔离/路由拦截/浏览器内 fetch 越权 403 拦截、登出安全重定向与后退阻断）。
+- 验证基线与固定版本：固定产品代码 0e16b31dc2c01e965f8848897940c2885b1ba99a（标签 V1.190），规则 1P/0F/0NT，步骤 2P/0F/0NT，UI 3/3 通过。
+- 下一步：ai/gpt-test 合并入 main 并推送到远端，启动第二项非功能需求 SRS_NF002（会话空闲失效与数据完整性）。
 
 ## 首项需求的现有证据
 
@@ -75,6 +76,7 @@
 | 2026-11-10 | SRS_F028 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / 14e75c6bf1b0ef226d9cba4ba422ffb7ceab1f3a / V1.189 | 待独立整轮复测 | 闭环 DEF-S3-009，落地账号创建、状态变更、重置密码、解锁操作记录 before/after 结构化摘要且凭据脱敏，详见交接专节 |
 | 2026-11-10 | SRS_F028 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / 14e75c6bf1b0ef226d9cba4ba422ffb7ceab1f3a / V1.189 | 待合入 | 8P/0F/0NT，步骤2P/0F/0NT；DEF-S3-009实测彻底关闭；真实Edge UI 3/3通过；全量测试全P通过，合入main，下一项SRS_NF001 |
 | 2026-11-10 | SRS_NF001 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / 0e16b31dc2c01e965f8848897940c2885b1ba99a / V1.190 | 待独立测试 | 闭环 DEF-S3-010、NT-S3-009，越权访问 403 留痕、敏感凭据递归掩码、会话重置/停用即时失效与防伪造，详见下文交接专节 |
+| 2026-11-10 | SRS_NF001 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / 0e16b31dc2c01e965f8848897940c2885b1ba99a / V1.190 | 待提交 | 规则1P/0F/0NT，步骤2P/0F/0NT；DEF-S3-010与NT-S3-009彻底闭环；真实Edge UI 3/3通过；全量测试全P通过，合入main，下一项SRS_NF002 |
 ## 文件认领
 
 - Claude：当前需求涉及的产品代码与必要的修复单测；独立 `ai/claude-fix` worktree。
@@ -4498,4 +4500,39 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
   - 重点执行 TC-086（S1, S2）全场景独立复测，验证账号密码 bcrypt 哈希存储、接口响应与日志中无敏感凭据泄露（DEF-S3-010 关闭复核）；
   - 验证跨角色越权调用返回 403 及 ACCESS_DENIED 审计日志；
   - 验证非法/伪造/过期 Token 拦截（401）以及密码重置/注销后旧 Token 即时失效（NT-S3-009 关闭复核）。
+
+## 2026-11-10 GPT → main：SRS_NF001 V1.190 整轮独立复测全部通过与验收（REQUIREMENT_PASSED）
+
+- **交接状态**：REQUIREMENT_PASSED
+- **需求编号**：SRS_NF001（系统安全性：认证与权限）
+- **固定产品版本**：0e16b31dc2c01e965f8848897940c2885b1ba99a（标签 V1.190）
+- **测试分支**：ai/gpt-test
+- **独立环境与测试隔离**：
+  - PostgreSQL 独立 Schema：`tip_gpt_f006_v118_20261030`
+  - Redis 独立 DB：`11`
+  - 后端服务端口：`18130`
+  - 前端代理端口：`15180`
+  - 真实 Edge 无头浏览器（`msedge.exe`，分辨率 1440x900）
+- **整轮独立复测核验结论**：
+  1. **业务规则全部实测通过**：
+     - `SRS_NF001.R01`：**P**（密码使用加盐不可逆摘要保存；敏感凭据不在页面回显原值，数据库与日志中不得出现密码或凭据原值）；
+  2. **测试用例步骤全部实测通过**：
+     - `TC-086.S1`：**P**（查看测试账号密码保存方式及登录相关日志；重新打开设备接入参数及操作/追溯详情）；
+     - `TC-086.S2`：**P**（核对与功能登录、设备配置、审计用例的证据，覆盖越权与状态变更分支）；
+  3. **历史缺陷与缺口彻底闭环**：
+     - **DEF-S3-010 彻底关闭**：`GET /api/v1/users`、`POST /api/v1/users` 与 `POST /api/v1/auth/login` 响应 JSON 严格剔除 `passwordHash` 与明文密码，真实 Edge 浏览器 DOM 审查与网络捕获 0 凭据泄露；
+     - **NT-S3-009 彻底闭环**：跨角色越权写操作严格 403 Forbidden（错误码 2003）拦截且记 `ACCESS_DENIED` 审计日志，参数绑定前拦截时序校验通过；未带/空/篡改 Token 拦截为 401；账号停用（INACTIVE）、管理员重置密码（resetPassword）及主动登出（logout）联动注销 Redis 活跃会话，旧 Token 立即失效（401）；全量 908 条审计日志 detail 脱敏核查 0 明文泄露；
+  4. **真实 Edge 浏览器 UI 自动化实测**：
+     - 3/3 全部通过（场景 1 管理员用户管理脱敏审查通过、场景 2 操作员菜单隔离与直接路由拦截及前端 fetch 越权 403 拦截通过、场景 3 会话注销重定向与后退拦截通过）。
+- **受控正式报告与证据**：
+  - 正式报告：`acceptance/stage3/SRS_NF001-V1.190-整轮独立复测与验收.md`
+  - 协议与数据库汇总：`acceptance/stage3/evidence/SRS_NF001-V1.190-protocol-summary.json`
+  - 敏感凭据脱敏受控台账：`acceptance/stage3/evidence/TC-086-sensitive.json`
+  - 真实 Edge UI 自动化结果：`acceptance/stage3/evidence/SRS_NF001-V1.190-real-ui-results.json`
+  - 真实 Edge 浏览器实测截图：
+    - `acceptance/stage3/evidence/SRS_NF001-V1.190-ui-admin-users.png`
+    - `acceptance/stage3/evidence/SRS_NF001-V1.190-ui-operator-restricted.png`
+    - `acceptance/stage3/evidence/SRS_NF001-V1.190-ui-logout-redirect.png`
+- **后续协同**：按 V2.4 协同规则，ai/gpt-test 分支合并至 main 并推送到 origin；准备启动第二项非功能需求 SRS_NF002（会话空闲失效与数据完整性）。
+
 
