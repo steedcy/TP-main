@@ -10,6 +10,7 @@ public enum ErrorCode {
     // 系统错误 1xxx
     SYSTEM_ERROR(1000, "系统内部错误", HttpStatus.INTERNAL_SERVER_ERROR),
     SERVICE_UNAVAILABLE(1001, "服务不可用", HttpStatus.SERVICE_UNAVAILABLE),
+    DATABASE_POOL_BUSY(1002, "数据库连接繁忙，正在排队重试，请稍后刷新", HttpStatus.SERVICE_UNAVAILABLE),
 
     // 认证授权错误 2xxx
     UNAUTHORIZED(2000, "未授权访问", HttpStatus.UNAUTHORIZED),
@@ -98,6 +99,10 @@ public enum ErrorCode {
     PRESET_DEFINITION_CANNOT_DELETE(4603, "预置任务族不可删除", HttpStatus.BAD_REQUEST),
     TASK_DEFINITION_CAPABILITY_GAP(4604, "引用的能力类型未启用或不存在", HttpStatus.BAD_REQUEST),
     TASK_FAMILY_INVALID(4605, "任务族不存在或已停用", HttpStatus.BAD_REQUEST),
+
+    // 并发与事务冲突 47xx（对应SRS_NF010/TC-090高频并发保护）
+    DATA_CONCURRENCY_CONFLICT(4701, "数据库操作并发竞争冲突，请稍后重试", HttpStatus.CONFLICT),
+    DUPLICATE_KEY_CONFLICT(4702, "数据并发冲突或唯一标识已存在，请勿重复提交", HttpStatus.CONFLICT),
 
     // 外部依赖错误 5xxx
     PLANNING_MODEL_CALL_FAILED(5001, "规划模型服务调用失败", HttpStatus.INTERNAL_SERVER_ERROR),

@@ -110,6 +110,59 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(ErrorCode.RESOURCE_NOT_FOUND.getHttpStatus()).body(resp);
     }
 
+    /**
+     * SRS_NF010 / NT-S3-011: 数据库连接池耗尽、排队等待超时或连接获取失败。
+     * 保证瞬时高频并发访问时连接排队超时能够返回友好的服务不可用(503)提示，而非未捕获的500崩溃。
+     */
+    @ExceptionHandler({
+            org.springframework.jdbc.CannotGetJdbcConnectionException.class,
+            java.sql.SQLTransientConnectionException.class
+    })
+    public ResponseEntity<ApiResponse<Void>> handleConnectionPoolTimeout(Exception ex, HttpServletRequest req) {
+        log.error("数据库连接池排队超时或连接不可用: {} {} - {}", req.getMethod(), req.getRequestURI(), ex.getMessage());
+        ApiResponse<Void> resp = ApiResponse.error(ErrorCode.DATABASE_POOL_BUSY.getCode(),
+                "数据库连接繁忙，正在排队重试，请稍后刷新");
+        resp.setPath(req.getRequestURI());
+        resp.setMethod(req.getMethod());
+        return ResponseEntity.status(ErrorCode.DATABASE_POOL_BUSY.getHttpStatus()).body(resp);
+    }
+
+    /**
+     * SRS_NF010 / NT-S3-011: 数据库并发事务死锁、悲观锁/行锁竞争超时。
+     * 杜绝数据库连接死锁导致服务挂死，通过409 Conflict向客户端提供友好的重试提示。
+     */
+    @ExceptionHandler({
+            org.springframework.dao.CannotAcquireLockException.class,
+            org.springframework.dao.PessimisticLockingFailureException.class,
+            org.springframework.dao.DeadlockLoserDataAccessException.class,
+            org.springframework.dao.ConcurrencyFailureException.class
+    })
+    public ResponseEntity<ApiResponse<Void>> handleConcurrencyLockException(Exception ex, HttpServletRequest req) {
+        log.warn("数据库操作并发竞争冲突或锁超时: {} {} - {}", req.getMethod(), req.getRequestURI(), ex.getMessage());
+        ApiResponse<Void> resp = ApiResponse.error(ErrorCode.DATA_CONCURRENCY_CONFLICT.getCode(),
+                "数据库操作并发竞争冲突，系统已自动防护，请稍后重试");
+        resp.setPath(req.getRequestURI());
+        resp.setMethod(req.getMethod());
+        return ResponseEntity.status(ErrorCode.DATA_CONCURRENCY_CONFLICT.getHttpStatus()).body(resp);
+    }
+
+    /**
+     * SRS_NF010 / NT-S3-011: 双浏览器/多客户端并发提交导致唯一键冲突或数据完整性约束异常。
+     * 返回明确的409 Conflict防竞争提示，避免抛出500未预期异常。
+     */
+    @ExceptionHandler({
+            org.springframework.dao.DuplicateKeyException.class,
+            org.springframework.dao.DataIntegrityViolationException.class
+    })
+    public ResponseEntity<ApiResponse<Void>> handleDataIntegrityViolation(Exception ex, HttpServletRequest req) {
+        log.warn("并发操作唯一键冲突或数据完整性约束异常: {} {} - {}", req.getMethod(), req.getRequestURI(), ex.getMessage());
+        ApiResponse<Void> resp = ApiResponse.error(ErrorCode.DUPLICATE_KEY_CONFLICT.getCode(),
+                "数据并发冲突或唯一标识已存在，请勿重复提交");
+        resp.setPath(req.getRequestURI());
+        resp.setMethod(req.getMethod());
+        return ResponseEntity.status(ErrorCode.DUPLICATE_KEY_CONFLICT.getHttpStatus()).body(resp);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleUnexpectedException(Exception ex, HttpServletRequest req) {
         // 未预期异常必须打日志，否则根因被"系统繁忙"吞掉，后续排查无从下手

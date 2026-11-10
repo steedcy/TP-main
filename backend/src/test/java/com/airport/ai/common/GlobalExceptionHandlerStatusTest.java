@@ -50,6 +50,40 @@ class GlobalExceptionHandlerStatusTest {
     }
 
     @Test
+    void connectionPoolTimeoutReturns503WithGracefulPrompt() {
+        var ex1 = new org.springframework.jdbc.CannotGetJdbcConnectionException("Failed to obtain JDBC Connection",
+                new java.sql.SQLTransientConnectionException("Connection is not available, request timed out after 30000ms."));
+        ResponseEntity<ApiResponse<Void>> r1 = handler.handleConnectionPoolTimeout(ex1, request("POST", "/api/v1/tasks"));
+        assertEquals(HttpStatus.SERVICE_UNAVAILABLE, r1.getStatusCode());
+        assertEquals(ErrorCode.DATABASE_POOL_BUSY.getCode(), r1.getBody().getCode());
+        assertEquals("数据库连接繁忙，正在排队重试，请稍后刷新", r1.getBody().getMessage());
+        assertEquals("/api/v1/tasks", r1.getBody().getPath());
+
+        var ex2 = new java.sql.SQLTransientConnectionException("HikariPool-1 - Connection is not available");
+        ResponseEntity<ApiResponse<Void>> r2 = handler.handleConnectionPoolTimeout(ex2, request("POST", "/api/v1/devices"));
+        assertEquals(HttpStatus.SERVICE_UNAVAILABLE, r2.getStatusCode());
+        assertEquals(ErrorCode.DATABASE_POOL_BUSY.getCode(), r2.getBody().getCode());
+    }
+
+    @Test
+    void concurrencyLockExceptionReturns409Conflict() {
+        var ex = new org.springframework.dao.CannotAcquireLockException("deadlock detected");
+        ResponseEntity<ApiResponse<Void>> r = handler.handleConcurrencyLockException(ex, request("PUT", "/api/v1/devices/1"));
+        assertEquals(HttpStatus.CONFLICT, r.getStatusCode());
+        assertEquals(ErrorCode.DATA_CONCURRENCY_CONFLICT.getCode(), r.getBody().getCode());
+        assertEquals("数据库操作并发竞争冲突，系统已自动防护，请稍后重试", r.getBody().getMessage());
+    }
+
+    @Test
+    void dataIntegrityViolationReturns409Conflict() {
+        var ex = new org.springframework.dao.DuplicateKeyException("duplicate key value violates unique constraint");
+        ResponseEntity<ApiResponse<Void>> r = handler.handleDataIntegrityViolation(ex, request("POST", "/api/v1/devices"));
+        assertEquals(HttpStatus.CONFLICT, r.getStatusCode());
+        assertEquals(ErrorCode.DUPLICATE_KEY_CONFLICT.getCode(), r.getBody().getCode());
+        assertEquals("数据并发冲突或唯一标识已存在，请勿重复提交", r.getBody().getMessage());
+    }
+
+    @Test
     void genuinelyUnexpectedExceptionsAreStillReportedAs500() {
         ResponseEntity<ApiResponse<Void>> r = handler.handleUnexpectedException(new IllegalStateException("boom"), request("GET", "/x"));
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, r.getStatusCode());
