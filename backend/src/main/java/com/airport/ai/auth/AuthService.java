@@ -72,6 +72,8 @@ public class AuthService {
 
         // 登录成功：失败计数清零
         user.setFailedLoginAttempts(0);
+        user.setLockedAt(null);
+        user.setLockedReason(null);
         user.setLastLoginAt(LocalDateTime.now());
         userMapper.update(user);
 
@@ -116,6 +118,9 @@ public class AuthService {
         int failedBefore = user.getFailedLoginAttempts() == null ? 0 : user.getFailedLoginAttempts();
         user.setStatus("ACTIVE");
         user.setFailedLoginAttempts(0);
+        user.setLockedAt(null);
+        user.setLockedReason(null);
+        user.setUpdatedAt(LocalDateTime.now());
         userMapper.update(user);
         operationLogService.recordUnlock(user.getUsername(), operator, failedBefore);
     }

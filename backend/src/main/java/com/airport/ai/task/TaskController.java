@@ -119,6 +119,20 @@ public class TaskController {
         return ApiResponse.ok(taskEventService.listByTask(taskId));
     }
 
+    /**
+     * 按事件ID只读查询单条任务过程追溯事件（SRS_NF016.R01）：事件仅可追加，不开放任何PUT/DELETE/PATCH方法，
+     * 使得针对 /api/v1/tasks/{taskId}/events/{eventId} 的修改或删除请求统一返回 405 Method Not Allowed。
+     */
+    @GetMapping("/{taskId}/events/{eventId}")
+    public ApiResponse<TaskEvent> getEvent(@PathVariable Long taskId, @PathVariable Long eventId) {
+        return taskEventService.listByTask(taskId).stream()
+                .filter(e -> eventId.equals(e.getId()))
+                .findFirst()
+                .map(ApiResponse::ok)
+                .orElseThrow(() -> new com.airport.ai.common.BusinessException(
+                        com.airport.ai.common.ErrorCode.RESOURCE_NOT_FOUND, "任务事件不存在"));
+    }
+
     @PostMapping("/{taskId}/manual-actions")
     @PreAuthorize("hasRole('OPERATOR')")
     public ApiResponse<TaskView> manualAction(@PathVariable Long taskId, @Valid @RequestBody ManualActionRequest request) {

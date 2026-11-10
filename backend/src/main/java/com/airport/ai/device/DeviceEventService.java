@@ -16,10 +16,10 @@ public class DeviceEventService {
     public DeviceEvent append(Long deviceAgentId, String eventType, String trigger, String reasonCode, String detailSummary) {
         DeviceEvent event = new DeviceEvent();
         event.setDeviceAgentId(deviceAgentId);
-        event.setEventType(eventType);
-        event.setTrigger(trigger);
-        event.setReasonCode(reasonCode);
-        event.setDetailSummary(detailSummary);
+        event.setEventType(safeCodeColumn(eventType == null || eventType.isBlank() ? "UNKNOWN" : eventType, 128));
+        event.setTrigger("OPERATOR".equalsIgnoreCase(trigger) ? "OPERATOR" : "SYSTEM");
+        event.setReasonCode(safeCodeColumn(reasonCode, 256));
+        event.setDetailSummary(com.airport.ai.task.SceneParamsPrivacyGuard.sanitizeText(detailSummary));
         deviceEventMapper.insert(event);
         return event;
     }
@@ -29,14 +29,22 @@ public class DeviceEventService {
                                      String reasonCode, String detailSummary) {
         DeviceEvent event = new DeviceEvent();
         event.setDeviceAgentId(deviceAgentId);
-        event.setEventType(eventType);
+        event.setEventType(safeCodeColumn(eventType == null || eventType.isBlank() ? "UNKNOWN" : eventType, 128));
         event.setTrigger("SYSTEM");
-        event.setCommandId(commandId);
-        event.setResult(result);
-        event.setReasonCode(reasonCode);
-        event.setDetailSummary(detailSummary);
+        event.setCommandId(safeCodeColumn(commandId, 64));
+        event.setResult(safeCodeColumn(result, 64));
+        event.setReasonCode(safeCodeColumn(reasonCode, 256));
+        event.setDetailSummary(com.airport.ai.task.SceneParamsPrivacyGuard.sanitizeText(detailSummary));
         deviceEventMapper.insert(event);
         return event;
+    }
+
+    private String safeCodeColumn(String input, int maxCodePoints) {
+        if (input == null) return null;
+        if (input.length() <= maxCodePoints) return input;
+        int count = input.codePointCount(0, input.length());
+        if (count <= maxCodePoints) return input;
+        return input.substring(0, input.offsetByCodePoints(0, maxCodePoints));
     }
 
     public List<DeviceEvent> listByAgent(Long deviceAgentId) {

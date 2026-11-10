@@ -12,6 +12,7 @@ import java.util.List;
  */
 @Mapper
 public interface OperationLogMapper {
+    OperationLog findById(@Param("id") Long id);
     List<OperationLog> searchPaged(@Param("username") String username,
                                     @Param("operationType") String operationType,
                                     @Param("operationResult") String operationResult,

@@ -47,19 +47,24 @@ public final class CredentialMasker {
         if (detail == null) return null;
         try {
             for (Map.Entry<String, Object> entry : detail.entrySet()) {
+                String key = entry.getKey();
                 Object value = entry.getValue();
                 if (value instanceof String s) {
-                    if (isSensitiveKey(entry.getKey())) {
+                    if (isSensitiveKey(key)) {
                         entry.setValue(mask(s));
                     }
                 } else if (value instanceof Map<?, ?> nested) {
-                    maskSensitiveFields((Map<String, Object>) nested);
-                } else if (value instanceof Collection<?> col) {
-                    for (Object item : col) {
-                        if (item instanceof Map<?, ?> nestedItem) {
-                            maskSensitiveFields((Map<String, Object>) nestedItem);
-                        }
+                    Map<String, Object> maskedNested = maskSensitiveFields((Map<String, Object>) nested);
+                    if (maskedNested != nested) {
+                        entry.setValue(maskedNested);
                     }
+                } else if (value instanceof Collection<?> col) {
+                    Collection<?> maskedCol = maskCollection(col);
+                    if (maskedCol != col) {
+                        entry.setValue(maskedCol);
+                    }
+                } else if (value instanceof Object[] arr) {
+                    entry.setValue(maskArray(arr));
                 }
             }
             return detail;
@@ -77,20 +82,58 @@ public final class CredentialMasker {
                 } else if (value instanceof Map<?, ?> nested) {
                     copy.put(key, maskSensitiveFields((Map<String, Object>) nested));
                 } else if (value instanceof Collection<?> col) {
-                    java.util.List<Object> copyList = new java.util.ArrayList<>();
-                    for (Object item : col) {
-                        if (item instanceof Map<?, ?> nestedItem) {
-                            copyList.add(maskSensitiveFields((Map<String, Object>) nestedItem));
-                        } else {
-                            copyList.add(item);
-                        }
-                    }
-                    copy.put(key, copyList);
+                    copy.put(key, maskCollection(col));
+                } else if (value instanceof Object[] arr) {
+                    copy.put(key, maskArray(arr));
                 } else {
                     copy.put(key, value);
                 }
             }
             return copy;
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Collection<?> maskCollection(Collection<?> col) {
+        java.util.List<Object> copyList = new java.util.ArrayList<>(col.size());
+        boolean changed = false;
+        for (Object item : col) {
+            if (item instanceof Map<?, ?> nestedItem) {
+                Map<String, Object> masked = maskSensitiveFields((Map<String, Object>) nestedItem);
+                if (masked != nestedItem) {
+                    changed = true;
+                }
+                copyList.add(masked);
+            } else if (item instanceof Collection<?> nestedCol) {
+                Collection<?> masked = maskCollection(nestedCol);
+                if (masked != nestedCol) {
+                    changed = true;
+                }
+                copyList.add(masked);
+            } else if (item instanceof Object[] arr) {
+                changed = true;
+                copyList.add(maskArray(arr));
+            } else {
+                copyList.add(item);
+            }
+        }
+        return changed ? copyList : col;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static java.util.List<Object> maskArray(Object[] arr) {
+        java.util.List<Object> copyList = new java.util.ArrayList<>(arr.length);
+        for (Object item : arr) {
+            if (item instanceof Map<?, ?> nestedItem) {
+                copyList.add(maskSensitiveFields((Map<String, Object>) nestedItem));
+            } else if (item instanceof Collection<?> nestedCol) {
+                copyList.add(maskCollection(nestedCol));
+            } else if (item instanceof Object[] nestedArr) {
+                copyList.add(maskArray(nestedArr));
+            } else {
+                copyList.add(item);
+            }
+        }
+        return copyList;
     }
 }

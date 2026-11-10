@@ -20,6 +20,10 @@
         source_ip, detail, created_at
     </sql>
 
+    <select id="findById" resultMap="OperationLogResult">
+        SELECT <include refid="Columns"/> FROM operation_logs WHERE id = #{id}
+    </select>
+
     <select id="searchPaged" resultMap="OperationLogResult">
         SELECT <include refid="Columns"/> FROM operation_logs
         <where>

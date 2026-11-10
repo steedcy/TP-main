@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
  * 递归检查顶层及任意层级嵌套（Map、List、JSON 文本等），键名忽略大小写与下划线/连字符/点号。
  */
 public final class SceneParamsPrivacyGuard {
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = new ObjectMapper().findAndRegisterModules();
 
     private static final Set<String> EXACT_IDENTITY_KEYS = Set.of(
             "passengername", "passengerid", "passenger", "pname", "passname",
@@ -192,7 +192,12 @@ public final class SceneParamsPrivacyGuard {
             for (Map.Entry<?, ?> entry : map.entrySet()) {
                 String key = String.valueOf(entry.getKey());
                 if (isIdentityKey(key)) continue;
-                cleanedMap.put(key, sanitizeValue(entry.getValue()));
+                Object entryVal = entry.getValue();
+                if (entryVal instanceof String strVal && com.airport.ai.common.CredentialMasker.isSensitiveKey(key)) {
+                    cleanedMap.put(key, com.airport.ai.common.CredentialMasker.mask(strVal));
+                } else {
+                    cleanedMap.put(key, sanitizeValue(entryVal));
+                }
             }
             return cleanedMap;
         } else if (value instanceof Iterable<?> iterable) {

@@ -96,6 +96,8 @@ public class GlobalExceptionHandler {
         ResponseEntity.BodyBuilder builder = ResponseEntity.status(ErrorCode.METHOD_NOT_ALLOWED.getHttpStatus());
         if (ex.getSupportedHttpMethods() != null && !ex.getSupportedHttpMethods().isEmpty()) {
             builder.allow(ex.getSupportedHttpMethods().toArray(new org.springframework.http.HttpMethod[0]));
+        } else {
+            builder.allow(org.springframework.http.HttpMethod.GET);
         }
         return builder.body(resp);
     }

@@ -38,4 +38,23 @@ public class OperationLogController {
         String effectiveUsername = "SYSTEM_ADMIN".equals(operator.getRole()) ? username : operator.getUsername();
         return ApiResponse.ok(operationLogService.search(effectiveUsername, operationType, operationResult, startTime, endTime, page, size));
     }
+
+    /**
+     * 按ID只读查询单条审计记录（SRS_NF016.R01）：不开放任何PUT/DELETE/PATCH写方法，
+     * 使得针对 /api/v1/operation-logs/{id} 的修改或删除请求由框架统一拦截并返回 405 Method Not Allowed。
+     */
+    @GetMapping("/{id}")
+    public ApiResponse<OperationLog> getById(@PathVariable Long id) {
+        User operator = currentUser.get();
+        OperationLog log = operationLogService.getById(id);
+        if (log == null) {
+            throw new com.airport.ai.common.BusinessException(
+                    com.airport.ai.common.ErrorCode.RESOURCE_NOT_FOUND, "操作记录不存在");
+        }
+        if (operator != null && !"SYSTEM_ADMIN".equals(operator.getRole())
+                && !operator.getUsername().equals(log.getUsername())) {
+            throw new org.springframework.security.access.AccessDeniedException("无权访问他人操作记录");
+        }
+        return ApiResponse.ok(log);
+    }
 }
