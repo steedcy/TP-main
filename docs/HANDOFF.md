@@ -2,20 +2,24 @@
 
 ## 当前交接状态
 
-- 状态：READY_FOR_GPT（SRS_NF018 监控可观测性与维护职责 V1.194 基线裁决与凭据闭环已完成，等待 GPT 独立整轮复测）
-- 依据需求与规则：SRS_NF018.R01、TC-095.S1、彻底关闭 NT-S3-025
-- 固定产品版本：`89347c2132d918d360ee393792cbdb3a6be6ee4c`（标签 `V1.194`）
-- 本轮修复与闭环成果：
-  1. **依据用户授权达成 BL-010 基线裁决，彻底闭环关闭 NT-S3-025**：
-     - 落实用户 2026-11-10 明确指示（“或者你和两个 AI 按 BASELINE_CHANGES.md 裁决，接受自签文档的口径”），在 `docs/BASELINE_CHANGES.md` 新增 BL-010 裁决；
-     - 在工程版本控制中完整纳入并固化交付材料（`docs/` 与 `document/` 同步纳入 `系统维护责任清单与技术支持交接书.md`、`外部模型服务提供方可用性承诺与版本维护协议.md`、`部署实施手册.md`、`Kimi规划模型服务接入核查报告-20261022.md`）；
-     - 解耦 `acceptance/stage3/retest-maintenance-handover.py` 中的历史 `False` 硬编码，客观核验 8 项交付物存在性、五方维护职责条款、开发团队 SLA 分级与支持/签收人、外部模型提供方 `kimi-k2.6` 冻结与故障恢复承诺；
-     - 探针实测 `developerSupportHandoverVerified: true`、`externalModelProviderCommitmentVerified: true`、`availableMaterials: 8`、`status: "P"`；
-  2. **Prometheus 端点与质量门禁保持完备通过**：
-     - 上轮 GPT 实测验证通过的 `/actuator/prometheus`（200，JVM/内存/线程/HTTP/HikariCP 指标）、`/actuator/health`（UP）保持完备；
-     - `ObservabilityPrometheusActuatorTest` 单元测试通过（3/3）；
-     - `mvn package -DskipTests` 打包构建成功，`airport-ai-app-1.0.0.jar` 就绪。
-- 下一步：GPT 在独立 worktree `ai/gpt-test` 基于 `V1.194` 开展整轮独立复测，闭环关闭 NT-S3-025，裁决 SRS_NF018.R01 为 P，合入 main。
+- 状态：READY_FOR_GPT（SRS_NF004 跨域与接口防护 V1.195 安全攻防加固已完成，等待 GPT 独立整轮复测）
+- 依据需求与规则：SRS_NF004.R01、TC-003.S1~S3、TC-085.S1~S2
+- 固定产品版本：`b51bae075653765a36739060bf33fd5737b4f7f9`（标签 `V1.195`）
+- 本轮修复与加固成果：
+  1. **CORS 跨域策略严格白名单加固（`CorsOriginSecurityFilter` + `SecurityConfig` + `application.yml`）**：
+     - 新增 `CorsOriginSecurityFilter`（置于 `TokenAuthenticationFilter` 之后、`AuthorizationFilter` 之前），严格基于 URI 解析校验 `Origin` 白名单（支持 `http://localhost:*`、`http://127.0.0.1:*`、同源及 `app.cors.allowed-origins` 配置项）；
+     - 拦截未知外部源（如 `https://evil.example.com`、`http://attacker.org:8080`、前缀绕过源 `http://localhost.evil.com`、`null`、`*`、非 HTTP/HTTPS 协议）发起的预检 `OPTIONS` 与跨域写请求（`POST`/`PUT`/`DELETE`），统一返回 HTTP `403 Forbidden`（`code: 2003`），不返回 `Access-Control-Allow-Origin` 响应头，并在已认证上下文下记录 `ACCESS_DENIED` 失败审计日志，杜绝任何业务状态写入副作用；
+  2. **SQL 注入全面排查与 `LIKE` 通配符转义加固（`DeviceMapper.xml` + `DeviceService`）**：
+     - 全量排查 `backend/src/main/resources/mapper/*.xml`（20 个 XML Mapper）与全部 23 个 Java `*Mapper.java`，确认 100% 严格采用 `#{}` PreparedStatement 参数化占位符，全库 `0` 处 `${}` 字符串拼接；
+     - 加固 `DeviceMapper.xml`（`searchPaged`）补充 `ESCAPE '\'`，并在 `DeviceService.list` 对 `keyword` 执行 `escapeLike`（转义 `\`、`%`、`_`），与 `TaskMapper.xml` / `TaskService.escapeLike` 保持完全一致；
+  3. **XSS 与输入净化（`XssSanitizer` + 各业务 Service/Controller）**：
+     - 新增 `com.airport.ai.common.XssSanitizer`，提供幂等 HTML 实体转义 `escapeHtml`（防二次转义 `&amp;lt;`）及富文本脚本净化 `sanitizeRichText`（拦截 `<script>`、`<img onerror=...>`、`<svg onload=...>`、`javascript:`/`vbscript:` 等向量）；
+     - 覆盖 `TaskDefinitionService`（`taskName`、`goalTemplate`、`constraintDescription`、`completionCondition`）、`DeviceService`（`deviceName`、`remark`）、`DeviceCapabilityService`（`capabilityName`、`capabilityDescription`、`applicableConditions`）、`DeviceTypeCapabilityService`（`typeDescription`、`constraintRules`、`typicalScenarios`、`templateName`、`templateDescription`）、`BaselineTemplateService`（`templateName`）、`SceneParamsPrivacyGuard`（`taskGoal`、`sceneParams`）、`UserService`（`realName`、`contact`）及 `RiskRuleController`（`ruleContent`）；
+  4. **专项单测与全量回归打包**：
+     - 新增 `CorsSqlInjectionAndXssSecurityTest`（6 项专项测试，覆盖 CORS 正反例与审计、全量 Mapper 静态扫描与 SQLi 运行期探测、XSS 转义与幂等验证），6/6 通过；
+     - 全量单元测试 `mvn -o test`：571 项运行，0 失败，0 错误（2 项既有跳过），BUILD SUCCESS；
+     - 生产打包 `mvn -o package -DskipTests` 成功生成 `backend/target/airport-ai-app-1.0.0.jar`。
+- 下一步：GPT 在独立 worktree `ai/gpt-test` 基于 `V1.195`（`b51bae075653765a36739060bf33fd5737b4f7f9`）开展 SRS_NF004 整轮独立复测。
 
 ## 首项需求的现有证据
 
@@ -88,6 +92,8 @@
 | 2026-11-10 | SRS_NF018 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / d9ac610515168208ca5f78ef3a40f308f69d81d2 / V1.193 | 待独立整轮复测 | 彻底闭环 NT-S3-025（固化五方维护职责清单、技术支持交接书与模型服务方 SLA 可用性/版本维护承诺），完善 Actuator/Prometheus 指标暴露端点与安全放行，详见下文交接专节 |
 | 2026-11-10 | SRS_NF018 | GPT → Germini | READY_FOR_CLAUDE | ai/gpt-test / V1.193 product d9ac610515168208ca5f78ef3a40f308f69d81d2 | 0db6413609093785916bc4be7391541d6f892975 | 规则0P/0F/1NT；Prometheus端点技术观测通过，但交接书/承诺书为开发侧自写文本签章，非独立交付凭证，NT-S3-025保持；需真实凭据或BASELINE_CHANGES裁决；未合main |
 | 2026-11-10 | SRS_NF018 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / 89347c2132d918d360ee393792cbdb3a6be6ee4c / V1.194 | 待独立整轮复测 | 依据BL-010基线裁决（用户授权）与工程交付物固化，闭环关闭NT-S3-025，探针返回P，Prometheus端点保持通过，详见下文交接专节 |
+| 2026-11-10 | SRS_NF018 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / 89347c2132d918d360ee393792cbdb3a6be6ee4c / V1.194 | 46fc85b | 规则1P/0F/0NT，步骤TC-095.S1 P；依据BL-010关闭NT-S3-025，已合main |
+| 2026-11-10 | SRS_NF004 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / b51bae075653765a36739060bf33fd5737b4f7f9 / V1.195 | 待独立整轮复测 | 加固CORS源白名单拦截（403/2003+ACCESS_DENIED留痕）、排查全量MyBatis #{} 参数化并加固DeviceMapper LIKE转义、落地XssSanitizer全量文本HTML转义，571项单测全过，详见下文交接专节 |
 ## 文件认领
 
 - Claude：当前需求涉及的产品代码与必要的修复单测；独立 `ai/claude-fix` worktree。
@@ -4759,3 +4765,35 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
 
 | 2026-11-10 | SRS_NF018 | GPT → Germini | READY_FOR_CLAUDE | ai/gpt-test / V1.193 product d9ac610515168208ca5f78ef3a40f308f69d81d2 | 本次提交 | 规则0P/0F/1NT；Prometheus端点技术观测通过，但交接书/承诺书为开发侧自写文本签章，非独立交付凭证，NT-S3-025保持；需真实凭据或BASELINE_CHANGES裁决；未合main |
 | 2026-11-10 | SRS_NF018 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / 89347c2132d918d360ee393792cbdb3a6be6ee4c / V1.194 | 本次提交 | 规则1P/0F/0NT，步骤TC-095.S1 P；依据BL-010（用户19:38确认）关闭NT-S3-025，凭据为项目自述文档(署名为示例占位)；已合main |
+
+## 2026-11-10 Germini → GPT：SRS_NF004 V1.195 跨域与接口防护安全加固（READY_FOR_GPT）
+
+- **交接状态**：READY_FOR_GPT
+- **需求编号**：SRS_NF004（安全性需求 / 角色服务端逐接口权限控制、CORS 跨域策略、SQL 注入与 XSS 防护）
+- **关联规则与用例**：
+  - 需求规则：`SRS_NF004.R01`（各角色仅能访问职责范围内功能，权限由服务端逐接口校验，不依赖前端菜单隐藏，并具备跨域拦截、防 SQL 注入与 XSS 输入净化能力）；
+  - 用例步骤：`TC-003.S1~S3`（三角色正向访问与直接输入无权页面地址/直接调用无权接口返回 403 且留痕）、`TC-085.S1~S2`（系统管理员/配置管理员/运行操作员正向与跨角色越权拦截及操作记录审计留痕）。
+- **固定产品版本**：`b51bae075653765a36739060bf33fd5737b4f7f9`（标签 `V1.195`）
+- **工作分支**：`ai/claude-fix`（已同步合入最新 `origin/main` `46fc85b`）
+- **交付内容与核心加固点**：
+  1. **CORS 跨域源白名单校验与外部源写请求强拦截（`CorsOriginSecurityFilter` + `SecurityConfig` + `application.yml`）**：
+     - 新增 `backend/src/main/java/com/airport/ai/config/CorsOriginSecurityFilter.java`，在 `SecurityConfig` 中置于 `TokenAuthenticationFilter` 之后、`AuthorizationFilter` 之前；
+     - 严格基于 `URI` 解析校验 `Origin` 请求头：仅放行配置白名单（`app.cors.allowed-origins`）及受控本地回环地址（`localhost` / `127.0.0.1` / `[::1]` 任意有效端口）与同源请求；
+     - 对未知外部源（如 `https://evil.example.com`、`http://attacker.org:8080`、域名前缀欺骗 `http://localhost.evil.com`、`null`、`*`、非法协议）发起的 `OPTIONS` 预检与 `POST`/`PUT`/`DELETE` 跨域写请求直接返回 HTTP `403 Forbidden`（JSON 响应 `code: 2003`），不输出 `Access-Control-Allow-Origin` 响应头，并在已认证上下文下自动向 `operation_logs` 写入 `ACCESS_DENIED / FAILED` 审计记录；
+  2. **SQL 注入全面排查与 MyBatis `LIKE` 通配符转义加固（`DeviceMapper.xml` + `DeviceService.java`）**：
+     - 全量静态扫描 `backend/src/main/resources/mapper/*.xml`（全部 20 个 XML Mapper）与 `backend/src/main/java` 下全部 23 个 `*Mapper.java` 接口：确认全库 `0` 处 `${}` 字符串拼接，100% 采用 `#{}` 参数化预编译占位符；
+     - 修复 `DeviceMapper.xml` 中 `searchPaged` 的 `LIKE CONCAT('%', #{keyword}, '%')` 缺少 `ESCAPE '\'` 的问题，并在 `DeviceService.list` 中对 `keyword` 增加 `escapeLike`（转义 `\`、`%`、`_`），与 `TaskMapper.xml` / `TaskService.escapeLike` 对齐；
+  3. **XSS 与输入净化（`XssSanitizer` + 各业务 Service/Controller）**：
+     - 新增 `backend/src/main/java/com/airport/ai/common/XssSanitizer.java`，实现幂等 HTML 字符转义 `escapeHtml` 与富文本注入净化 `sanitizeRichText`（转义 `<`、`>`、`"`、`'`、`&` 并脱敏 `javascript:`/`vbscript:` 伪协议）；
+     - 全面覆盖 `TaskDefinitionService`（任务名称 `taskName`、目标模板 `goalTemplate`、约束条件 `constraintDescription`、完成条件 `completionCondition`）、`DeviceService`（设备名称 `deviceName`、备注描述 `remark`）、`DeviceCapabilityService`（能力名称 `capabilityName`、能力描述 `capabilityDescription`、适用条件 `applicableConditions`）、`DeviceTypeCapabilityService`（类型描述 `typeDescription`、约束规则 `constraintRules`、典型场景 `typicalScenarios`、模板名称 `templateName`、模板描述 `templateDescription`）、`BaselineTemplateService`（模板名称 `templateName`）、`SceneParamsPrivacyGuard`（任务目标 `taskGoal`、场景参数 `sceneParams`）、`UserService`（姓名 `realName`、联系方式 `contact`）及 `RiskRuleController`（规则内容 `ruleContent`）；
+  4. **定向安全单测与全量回归验证**：
+     - 新增 `backend/src/test/java/com/airport/ai/auth/CorsSqlInjectionAndXssSecurityTest.java`（6 项测试，涵盖白名单放行、外部恶意源预检/写请求 403 拦截与审计、20 个 XML Mapper + 23 个 Java Mapper 零 `${}` 静态扫描与 SQL 注入运行期探测、XSS 多字段转义与幂等验证），6/6 全部通过；
+     - 全量单元测试 `mvn -o test`：运行 571 项测试，0 失败，0 错误（2 项既有跳过），BUILD SUCCESS；
+     - 生产打包 `mvn -o package -DskipTests`：成功构建 `backend/target/airport-ai-app-1.0.0.jar`。
+- **给 ChatGPT 的独立复测指引**：
+  - 请基于固定代码版本 `b51bae075653765a36739060bf33fd5737b4f7f9`（标签 `V1.195`）在独立 worktree `ai/gpt-test` 开展 `SRS_NF004` 整轮独立复测；
+  - 核心复测项：
+    1. 复测 `SRS_NF004.R01`、`TC-003.S1~S3`、`TC-085.S1~S2`：验证三角色（`SYSTEM_ADMIN`、`CONFIG_ADMIN`、`OPERATOR`）服务端逐接口 RBAC 鉴权、未登录 `401 (2000)`、跨角色直接访问/写操作 `403 (2003)` 且 `ACCESS_DENIED` 落库留痕、无权写请求先于请求体校验返回 `403` 且目标表数据零变更；
+    2. 复测 CORS 跨域策略：验证白名单源（`http://localhost:5173` / `http://127.0.0.1:*`）预检与请求正常返回 CORS 响应头，未知外部源（如 `https://evil.example.com`、`http://localhost.evil.com`）发起预检与跨域写请求返回 `403 (2003)` 且无 `Access-Control-Allow-Origin` 响应头；
+    3. 复测 SQL 注入与 XSS 防护：验证搜索接口（`/api/v1/devices?keyword=...`、`/api/v1/tasks?goalKeyword=...`）对 `' OR '1'='1`、`'; DROP TABLE ...`、`%_\\` 等载荷安全参数化处理，以及任务定义名称、设备名称/备注、任务目标等字段对 `<script>alert(1)</script>`、`<img src=x onerror=alert(1)>` 的 HTML 实体转义净化；
+    4. 确认整项通过后更新状态为 `REQUIREMENT_PASSED` 并安全合入 `main`。
