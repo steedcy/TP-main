@@ -2,24 +2,28 @@
 
 ## 当前交接状态
 
-- 状态：REQUIREMENT_PASSED（SRS_NF003 旅客个人身份隐私保护 整轮独立复测全部通过，1P/0F/0NT，6P/0F/0NT，DEF-S3-032 彻底关闭，ai/gpt-test 合入 main）
-- 依据需求与规则：SRS_NF003.R01、TC-031.S2、TC-077.S1~S3、TC-086.S1~S2、DEF-S3-032
-- 本轮独立复测成果：
-  1. 场景参数多层深度拦截与 400 强拦截（DEF-S3-032 彻底实测关闭）：
-     - 顶层参数、嵌套 Map、多层嵌套 List、嵌套 JSON 字符串以及包含自然语言身份键值的参数 100% 触发 400 Bad Request（错误码 3001）；
-     - 初始任务数 1349，注入 19 批次敏感参数测试后任务数严格保持 1349，违规建任务数严格为 0；
-     - 行李测量事件（/measurement-event）与澄清补充接口（/clarify）敏感注入 100% 强拦截；
-  2. 全链路递归脱敏与 0 敏感信息落库：
-     - 自然语言目标中的姓名、18位身份证号、手机号、护照号、邮箱递归脱敏为 [PROTECTED_*]；
-     - 任务表（tasks）、事件表（task_events）、审计表（operation_logs）及任务详情出参（TaskView）严格不含敏感明文；
-     - 外部大模型交互（/v1/goal/understand、/v1/planning/generate）全程审计 11 次交互报文，0 处敏感信息外发；
-     - 全库 7 张核心表所有文本/JSON 列深度审计扫描，0 处个人敏感信息落库；
-  3. 合法业务编号安全放行（零误拒）：
-     - 航班号（CA1234、MU5182 等）、行李编号（BAG-123456、P-R08-OVERSIZE 等）、区域代号安全放行，无误拒；
-  4. 真实 Edge 浏览器 UI 实测：
-     - 3/3 全部通过（操作员主页正常、敏感字段提交 400 拦截并触发 Ant Design 错误 Toast 提示、任务详情页安全渲染且 DOM 0 泄露）。
-- 验证基线与固定版本：固定产品代码 443ccbd1b28de9971affe6253f3b80652f8fd132（标签 V1.191），规则 1P/0F/0NT，步骤 6P/0F/0NT，UI 3/3 通过。
-- 下一步：ai/gpt-test 合并入 main 并推送到远端。
+- 状态：READY_FOR_GPT（SRS_NF010 数据库高可用与连接池加固及双浏览器并发数据隔离防竞争，固定产品版本 2dd346949eae90f636ec0170487122ea20931885，标签 V1.192）
+- 依据需求与规则：SRS_NF010.R01、TC-090.S1、NT-S3-011
+- 本轮修复成果：
+  1. HikariCP 连接池高可用与并发保护参数全面加固（NT-S3-011 前置闭环）：
+     - 显式配置 `maximum-pool-size: 30`、`minimum-idle: 5`、`connection-timeout: 30000`、`idle-timeout: 600000`、`max-lifetime: 1800000`、`keepalive-time: 30000`（心跳保活检测周期）、`validation-timeout: 5000`、`leak-detection-threshold: 60000`（连接泄漏检测与防死锁）、`connection-test-query: SELECT 1`、`pool-name: AirportAiHikariPool`；
+     - 在 `GlobalExceptionHandler` 中增加 `CannotGetJdbcConnectionException`、`SQLTransientConnectionException` 捕获，瞬时突发高频并发连接排队超时返回友好 503（`DATABASE_POOL_BUSY` 1002，"数据库连接繁忙，正在排队重试，请稍后刷新"）；
+     - 增加数据库事务悲观锁/行锁竞争与死锁异常（`CannotAcquireLockException`、`PessimisticLockingFailureException`、`DeadlockLoserDataAccessException`、`ConcurrencyFailureException`）防护，返回 409（`DATA_CONCURRENCY_CONFLICT` 4701，"数据库操作并发竞争冲突，系统已自动防护，请稍后重试"），彻底杜绝死锁与服务挂死；
+     - 增加唯一键约束冲突（`DuplicateKeyException`、`DataIntegrityViolationException`）防护，返回 409（`DUPLICATE_KEY_CONFLICT` 4702，"数据并发冲突或唯一标识已存在，请勿重复提交"）；
+  2. 补齐双浏览器客户端并发保存配置与任务提交时的数据隔离与防竞争单测：
+     - `HikariConnectionPoolConcurrencyTest`（5项测试通过）：验证连接池参数、排队超时 503 友好提示、死锁 409 防护、唯一约束冲突 409 防护、多线程并发连接排队借还与零泄漏；
+     - `DualBrowserConcurrentConfigAndTaskTest`（4项测试通过）：
+       - 双浏览器客户端并发保存不同配置（数据完全隔离、独立审计留痕）；
+       - 双浏览器客户端并发保存相同配置（防竞争互斥保护、恰好1条入库、落败客户端友好冲突提示）；
+       - 双浏览器客户端并发提交不同业务任务（数据隔离、`TaskCodeGenerator` 全局唯一递增编号、零碰撞）；
+       - 瞬时突发 20 并发任务提交（零编号碰撞、优雅排队、零死锁）；
+     - `GlobalExceptionHandlerStatusTest` 同步补齐 3 项新增错误处理器断言并通过全量错误码唯一性校验。
+  3. 本地质量门禁验证记录：
+     - 后端单元测试：`mvn -o test`，运行 562 项单测全部通过（0 失败，0 错误，2 跳过），耗时 01:37 min；
+     - 前端生产构建：`npm run build`，3272 modules transformed，0 error，构建成功（耗时 25.98s）；
+     - 后端生产打包：`mvn -o package -DskipTests`，成功构建可执行生产 JAR 包 `airport-ai-app-1.0.0.jar`（耗时 17.46s）。
+- 固定产品版本：`2dd346949eae90f636ec0170487122ea20931885`（标签 `V1.192`）
+- 下一步：交接 ChatGPT 在独立 worktree `ai/gpt-test` 开展整轮独立复测与验收。
 
 ## 首项需求的现有证据
 
@@ -88,6 +92,7 @@
 | 2026-11-10 | SRS_NF001 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / 0e16b31dc2c01e965f8848897940c2885b1ba99a / V1.190 | 待提交 | 规则1P/0F/0NT，步骤2P/0F/0NT；DEF-S3-010与NT-S3-009彻底闭环；真实Edge UI 3/3通过；全量测试全P通过，合入main，下一项SRS_NF002 |
 | 2026-11-10 | SRS_NF003 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / 443ccbd1b28de9971affe6253f3b80652f8fd132 / V1.191 | 待独立整轮复测 | 彻底闭环 DEF-S3-032，全链路旅客个人身份隐私保护（哨兵拒绝/脱敏掩码/模型请求防泄漏/业务编号放行），详见下文交接专节 |
 | 2026-11-10 | SRS_NF003 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / 443ccbd1b28de9971affe6253f3b80652f8fd132 / V1.191 | 本次提交 | 规则1P/0F/0NT，步骤6P/0F/0NT；DEF-S3-032实测彻底关闭；真实Edge UI 3/3通过；全量测试全P通过，合入main，下一项SRS_NF004 |
+| 2026-11-10 | SRS_NF010 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / 2dd346949eae90f636ec0170487122ea20931885 / V1.192 | 待独立整轮复测 | 闭环 NT-S3-011，加固 HikariCP 连接池配置（心跳保活/泄漏检测/排队保护/死锁防护）与双浏览器并发配置保存/任务提交数据隔离防竞争，详见交接专节 |
 ## 文件认领
 
 - Claude：当前需求涉及的产品代码与必要的修复单测；独立 `ai/claude-fix` worktree。
@@ -4625,6 +4630,58 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
     - `acceptance/stage3/evidence/SRS_NF003-V1.191-ui-submit-interception.png`
     - `acceptance/stage3/evidence/SRS_NF003-V1.191-ui-task-detail-masked.png`
 - **后续协同**：按 V2.4 协同规则，ai/gpt-test 分支合并至 main 并推送到 origin；准备启动下一项非功能需求 SRS_NF004。
+
+## 2026-11-10 Germini → GPT：SRS_NF010 V1.192 数据库高可用与连接池加固（READY_FOR_GPT）
+
+- **交接状态**：READY_FOR_GPT
+- **需求编号**：SRS_NF010（数据库高可用与连接池）
+- **关联规则与用例**：
+  - 需求规则：`SRS_NF010.R01`（系统应保证数据库高可用与连接池可靠性，支持Chrome、Edge当前主版本与高频并发保护）；
+  - 用例步骤：`TC-090.S1`（分别在Chrome、Edge操作登录、配置、任务提交监控、态势及追溯；两个当前主版本核心操作正常，关键字段、提示和按钮可用）；
+  - 核心闭环前置缺口：`NT-S3-011`（加固HikariCP连接池配置与关闭排队超时漏洞，补齐双浏览器并发保存配置与任务提交时的数据隔离与防竞争单测）。
+- **固定产品版本**：`2dd346949eae90f636ec0170487122ea20931885`（标签 `V1.192`）
+- **工作分支**：`ai/claude-fix`（已提交打标并推送到远端）
+- **交付内容与核心加固点**：
+  1. **HikariCP 连接池高可用全面加固与心跳保活检测**：
+     - 在 `application.yml` 中显式固化生产连接池参数：
+       - `pool-name: AirportAiHikariPool`
+       - `minimum-idle: 5`
+       - `maximum-pool-size: 30`
+       - `connection-timeout: 30000`（排队超时 30 秒）
+       - `idle-timeout: 600000`（空闲回收 10 分钟）
+       - `max-lifetime: 1800000`（连接最大生命周期 30 分钟）
+       - `keepalive-time: 30000`（心跳保活周期 30 秒，防止空闲连接断开）
+       - `validation-timeout: 5000`（有效性探测 5 秒）
+       - `leak-detection-threshold: 60000`（连接泄漏检测 60 秒，打印长耗时调用栈杜绝连接泄露导致死锁）
+       - `connection-test-query: SELECT 1`
+  2. **并发瞬时高频排队超时与死锁友好防护**：
+     - 在 `GlobalExceptionHandler` 中增加 `CannotGetJdbcConnectionException` 与 `SQLTransientConnectionException` 捕获：返回 HTTP 503 与错误码 1002（`DATABASE_POOL_BUSY`），向操作员返回友好提示“数据库连接繁忙，正在排队重试，请稍后刷新”；
+     - 增加数据库事务悲观锁/行锁竞争与死锁异常（`CannotAcquireLockException`、`PessimisticLockingFailureException`、`DeadlockLoserDataAccessException`、`ConcurrencyFailureException`）防护：返回 HTTP 409 与错误码 4701（`DATA_CONCURRENCY_CONFLICT`），友好提示“数据库操作并发竞争冲突，系统已自动防护，请稍后重试”，彻底杜绝死锁引发的服务进程假死；
+     - 增加并发写入唯一键冲突（`DuplicateKeyException`、`DataIntegrityViolationException`）防护：返回 HTTP 409 与错误码 4702（`DUPLICATE_KEY_CONFLICT`），友好提示“数据并发冲突或唯一标识已存在，请勿重复提交”。
+  3. **双浏览器客户端并发保存配置与任务提交数据隔离与防竞争单测**：
+     - 新增 `HikariConnectionPoolConcurrencyTest`（5/5 全部通过）：
+       - `verifyHikariConfigurationProperties`：核验连接池全部生产参数与心跳保活配置；
+       - `connectionPoolQueueTimeoutReturns503FriendlyResponse`：核验排队超时 503 友好提示；
+       - `databaseDeadlockAndLockContentionReturns409Conflict`：核验数据库死锁 409 防护提示；
+       - `duplicateKeyViolationReturns409Conflict`：核验并发唯一键冲突 409 防护提示；
+       - `simulateConcurrentConnectionQueueingAndReleaseWithoutDeadlock`：20 并发客户端借还排队压力模拟，验证限流保护与连接 0 泄漏。
+     - 新增 `DualBrowserConcurrentConfigAndTaskTest`（4/4 全部通过）：
+       - `dualBrowserConcurrentConfigSave_isolatedDataAndAudit`：Chrome 与 Edge 客户端并发创建不同配置，验证数据完全隔离与两浏览器独立审计留痕；
+       - `dualBrowserConcurrentConfigSave_antiCompetitionConflict`：Chrome 与 Edge 客户端并发提交相同配置编码，验证防竞争互斥保护（恰好 1 条成功入库，竞争方获得友好冲突提示，0 脏数据，0 死锁）；
+       - `dualBrowserConcurrentTaskSubmission_isolatedDataAndSequencing`：Chrome 与 Edge 客户端并发提交不同业务任务，验证数据隔离、`TaskCodeGenerator` 全局唯一递增编号生成与零碰撞；
+       - `burstConcurrentTaskSubmission_zeroCollisionAndZeroDeadlock`：瞬时突发 20 并发任务提交，验证 20 个任务编码 100% 全局唯一递增入库，零碰撞、零死锁。
+     - 同步更新 `GlobalExceptionHandlerStatusTest`（8/8 全部通过）：补齐连接池超时、并发死锁与唯一键冲突断言，并通过全局错误码唯一性校验。
+- **本地质量门禁验证记录**：
+  - 后端单元测试：`mvn -o test`，运行 562 项单测全部通过（0 失败，0 错误，2 跳过），耗时 01:37 min；
+  - 前端生产构建：`npm run build`，3272 modules transformed，0 error，构建成功（耗时 25.98s）；
+  - 后端生产打包：`mvn -o package -DskipTests`，成功构建生产 JAR 包 `airport-ai-app-1.0.0.jar`（耗时 17.46s）。
+- **给 ChatGPT 的独立复测指引**：
+  - 请基于固定代码版本 `2dd346949eae90f636ec0170487122ea20931885`（标签 `V1.192`）在独立 worktree `ai/gpt-test` 开展整轮独立复测；
+  - 核心复测项：
+    1. 校验 NT-S3-011 闭环：双浏览器客户端（Chrome 与 Edge）分别执行登录、设备配置保存、任务提交监控、态势与追溯；
+    2. 校验并发配置保存与任务提交时的数据隔离、防竞争冲突与零死锁；
+    3. 校验瞬时高并发或连接池排队时的友好错误提示；
+    4. 独立核实 TC-090.S1 与 SRS_NF010.R01。
 
 
 
