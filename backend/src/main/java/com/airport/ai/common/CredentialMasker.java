@@ -41,26 +41,56 @@ public final class CredentialMasker {
         return raw.substring(0, 2) + "****" + raw.substring(raw.length() - 2);
     }
 
-    /** 就地对detail Map中命中敏感key的value做掩码，返回同一个Map便于链式调用 */
+    /** 就地对detail Map中命中敏感key的value做掩码，返回同一个Map（不可变Map则返回脱敏副本）便于链式调用 */
     @SuppressWarnings("unchecked")
     public static Map<String, Object> maskSensitiveFields(Map<String, Object> detail) {
         if (detail == null) return null;
-        for (Map.Entry<String, Object> entry : detail.entrySet()) {
-            Object value = entry.getValue();
-            if (value instanceof String s) {
-                if (isSensitiveKey(entry.getKey())) {
-                    entry.setValue(mask(s));
-                }
-            } else if (value instanceof Map<?, ?> nested) {
-                maskSensitiveFields((Map<String, Object>) nested);
-            } else if (value instanceof Collection<?> col) {
-                for (Object item : col) {
-                    if (item instanceof Map<?, ?> nestedItem) {
-                        maskSensitiveFields((Map<String, Object>) nestedItem);
+        try {
+            for (Map.Entry<String, Object> entry : detail.entrySet()) {
+                Object value = entry.getValue();
+                if (value instanceof String s) {
+                    if (isSensitiveKey(entry.getKey())) {
+                        entry.setValue(mask(s));
+                    }
+                } else if (value instanceof Map<?, ?> nested) {
+                    maskSensitiveFields((Map<String, Object>) nested);
+                } else if (value instanceof Collection<?> col) {
+                    for (Object item : col) {
+                        if (item instanceof Map<?, ?> nestedItem) {
+                            maskSensitiveFields((Map<String, Object>) nestedItem);
+                        }
                     }
                 }
             }
+            return detail;
+        } catch (UnsupportedOperationException ex) {
+            Map<String, Object> copy = new java.util.LinkedHashMap<>();
+            for (Map.Entry<String, Object> entry : detail.entrySet()) {
+                String key = entry.getKey();
+                Object value = entry.getValue();
+                if (value instanceof String s) {
+                    if (isSensitiveKey(key)) {
+                        copy.put(key, mask(s));
+                    } else {
+                        copy.put(key, s);
+                    }
+                } else if (value instanceof Map<?, ?> nested) {
+                    copy.put(key, maskSensitiveFields((Map<String, Object>) nested));
+                } else if (value instanceof Collection<?> col) {
+                    java.util.List<Object> copyList = new java.util.ArrayList<>();
+                    for (Object item : col) {
+                        if (item instanceof Map<?, ?> nestedItem) {
+                            copyList.add(maskSensitiveFields((Map<String, Object>) nestedItem));
+                        } else {
+                            copyList.add(item);
+                        }
+                    }
+                    copy.put(key, copyList);
+                } else {
+                    copy.put(key, value);
+                }
+            }
+            return copy;
         }
-        return detail;
     }
 }

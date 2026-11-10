@@ -118,7 +118,7 @@ public class OperationLogService {
         log.setUsername(username);
         log.setRole(role);
         log.setOperationType(operationType);
-        log.setOperationTarget(target);
+        log.setOperationTarget(com.airport.ai.task.SceneParamsPrivacyGuard.sanitizeGoal(target));
         log.setOperationResult(result);
         log.setSourceIp(sourceIp == null ? currentRequestIp() : sourceIp);
         log.setDetail(toMaskedJson(detail));
@@ -133,7 +133,9 @@ public class OperationLogService {
     private String toMaskedJson(Map<String, Object> detail) {
         if (detail == null) return null;
         try {
-            return MAPPER.writeValueAsString(CredentialMasker.maskSensitiveFields(detail));
+            Map<String, Object> maskedCredentials = CredentialMasker.maskSensitiveFields(detail);
+            Map<String, Object> sanitized = com.airport.ai.task.SceneParamsPrivacyGuard.sanitize(maskedCredentials);
+            return MAPPER.writeValueAsString(sanitized);
         } catch (Exception e) {
             return null;
         }

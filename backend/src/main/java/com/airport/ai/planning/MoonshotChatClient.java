@@ -74,8 +74,10 @@ public class MoonshotChatClient {
         try {
             Map<String, Object> body = new LinkedHashMap<>();
             body.put("model", model);
+            String userContent = mapper.writeValueAsString(input);
+            userContent = com.airport.ai.task.SceneParamsPrivacyGuard.sanitizeText(userContent);
             body.put("messages", List.of(Map.of("role", "system", "content", instruction),
-                    Map.of("role", "user", "content", mapper.writeValueAsString(input))));
+                    Map.of("role", "user", "content", userContent)));
             body.put("response_format", Map.of("type", "json_object"));
             body.put("max_tokens", maxTokens);
             body.put("stream", false);

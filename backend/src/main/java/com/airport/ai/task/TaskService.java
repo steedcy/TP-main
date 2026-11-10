@@ -245,6 +245,13 @@ public class TaskService {
         if (!specialPassenger) {
             SceneParamsPrivacyGuard.reject(request.getAnswers());
         }
+        if (specialPassenger && request.getAnswers() != null) {
+            for (String key : request.getAnswers().keySet()) {
+                if (SceneParamsPrivacyGuard.isIdentityKey(key)) {
+                    throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, "特殊旅客服务不得直接以旅客身份字段提交回答: " + key);
+                }
+            }
+        }
         List<String> pendingQuestions = fromJsonQuestions(task.getMissingInfoQuestions());
         if (specialPassenger && pendingQuestions.stream().anyMatch(SceneParamsPrivacyGuard::asksForIdentity)) {
             throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR,
@@ -288,7 +295,7 @@ public class TaskService {
         taskEventService.append(task.getId(), "GOAL_CLARIFIED", "OPERATOR", null,
                 specialPassenger
                         ? "运行操作员" + operator.getUsername() + "补充信息（问题数: " + pendingQuestions.size() + "）"
-                        : "运行操作员" + operator.getUsername() + "补充信息: " + request.getAnswers());
+                        : "运行操作员" + operator.getUsername() + "补充信息: " + SceneParamsPrivacyGuard.sanitizeText(toJson(request.getAnswers())));
 
         runGoalUnderstanding(task, mergedSceneParams, rounds);
         return task;
@@ -313,8 +320,8 @@ public class TaskService {
     @Transactional
     public Task manualAction(Long taskId, String action, String reason, String taskGoal, User operator) {
         Task task = get(taskId);
-        String cleanReason = reason == null || reason.isBlank() ? null : reason.trim();
-        String cleanGoal = taskGoal == null || taskGoal.isBlank() ? null : taskGoal.trim();
+        String cleanReason = reason == null || reason.isBlank() ? null : SceneParamsPrivacyGuard.sanitizeGoal(reason.trim());
+        String cleanGoal = taskGoal == null || taskGoal.isBlank() ? null : SceneParamsPrivacyGuard.sanitizeGoal(taskGoal.trim());
         String upperAction = action == null ? "" : action.trim().toUpperCase();
 
         // 对应5.4.4硬性闸门与业务规则7（SRS_F013.R07）：硬性校验失败严禁进入监督判定中，
@@ -415,15 +422,16 @@ public class TaskService {
                     "任务当前状态为" + task.getStatus() + "，已离开待规划阶段，不可再取消");
         }
 
+        String cleanReason = reason == null ? "" : SceneParamsPrivacyGuard.sanitizeGoal(reason.trim());
         task.setStatus(TaskStatus.MANUAL_TERMINATED);
-        task.setManualTerminateReason(reason);
+        task.setManualTerminateReason(cleanReason);
         task.setUpdatedAt(LocalDateTime.now());
         taskMapper.update(task);
 
-        String timelineSummary = "运行操作员" + operator.getUsername() + "在计划生成前取消任务: " + reason;
+        String timelineSummary = "运行操作员" + operator.getUsername() + "在计划生成前取消任务: " + cleanReason;
         Map<String, Object> cancelDetail = new LinkedHashMap<>();
         cancelDetail.put("summary", timelineSummary);
-        cancelDetail.put("reason", reason);
+        cancelDetail.put("reason", cleanReason);
         cancelDetail.put("previousStatus", TaskStatus.PLANNING.name());
         cancelDetail.put("operator", operator.getUsername());
         cancelDetail.put("deviceCancelResults", java.util.Collections.emptyList());
@@ -434,7 +442,7 @@ public class TaskService {
         try {
             cancelEventJson = MAPPER.writeValueAsString(cancelDetail);
         } catch (Exception e) {
-            cancelEventJson = "{\"summary\":\"" + reason + "\"}";
+            cancelEventJson = "{\"summary\":\"" + cleanReason + "\"}";
         }
 
         taskEventService.append(task.getId(), "MANUAL_TERMINATED", "OPERATOR", null, cancelEventJson);
@@ -452,7 +460,7 @@ public class TaskService {
      */
     @Transactional
     public Task terminate(Long taskId, String reason, User operator) {
-        String cleanReason = reason == null ? "" : reason.trim();
+        String cleanReason = reason == null ? "" : SceneParamsPrivacyGuard.sanitizeGoal(reason.trim());
         if (cleanReason.isEmpty()) {
             throw new BusinessException(ErrorCode.TERMINATE_REASON_REQUIRED, "请填写终止原因");
         }
@@ -654,7 +662,7 @@ public class TaskService {
         parsingResult.put("destination", response.getDestination());
         parsingResult.put("constraints", response.getConstraints());
         parsingResult.put("completionCondition", response.getCompletionCondition());
-        task.setGoalParsingResult(toJson(parsingResult));
+        task.setGoalParsingResult(toJson(SceneParamsPrivacyGuard.sanitize(parsingResult)));
 
         if (task.getTaskFamily() == null || task.getTaskFamily().isBlank()) {
             task.setTaskFamily(response.getInferredTaskFamily());
@@ -881,6 +889,7 @@ public class TaskService {
             sceneParams.put("newGate", request.getNewGate().trim());
             sceneParams.put("targetLocation", request.getNewGate().trim());
         }
+        SceneParamsPrivacyGuard.reject(sceneParams);
 
         String changeLabel = switch (request.getChangeType().trim()) {
             case "DELAY" -> "延误";

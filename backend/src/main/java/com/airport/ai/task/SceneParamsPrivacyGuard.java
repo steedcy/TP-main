@@ -30,15 +30,23 @@ public final class SceneParamsPrivacyGuard {
             "contactphone", "contactnumber",
             "email", "emailaddress",
             "realname", "fullname", "travelername", "guestname", "customername", "clientname",
-            "旅客姓名", "乘客姓名", "旅客身份", "乘客身份", "身份证号", "身份证号码", "身份证",
-            "证件号码", "证件号", "护照号码", "护照号", "护照", "手机号码", "手机号",
-            "联系电话", "联系方式", "电话号码", "电话", "电子邮箱", "邮箱", "真实姓名", "姓名");
+            "passengerphone", "passengermobile", "passengeremail", "passengerpassport", "passengeridcard",
+            "旅客姓名", "乘客姓名", "旅客身份", "乘客身份", "身份证号", "身份证号码", "身份证", "身份证件",
+            "证件号码", "证件号", "证件", "护照号码", "护照号", "护照", "手机号码", "手机号", "手机",
+            "联系电话", "联系方式", "电话号码", "电话", "电子邮箱", "邮箱", "真实姓名", "姓名",
+            "旅客电话", "旅客手机", "旅客护照", "旅客身份证", "旅客", "乘客", "身份");
 
     private static final Pattern IDENTITY_KV_PATTERN = Pattern.compile(
-            "(?i)(?<prefix>[;；,，]?\\s*)(?<key>[a-zA-Z_\\u4e00-\\u9fa5][a-zA-Z0-9_\\-\\u4e00-\\u9fa5]*)\\s*(?:[:=＝：]|(?:为|是))\\s*(?<val>\"[^\"]*\"|'[^']*'|[^;；,，\\n\\r\\)）\\]\\}]+)");
+            "(?i)(?<prefix>[;；,，]?\\s*)(?<key>[a-zA-Z_\\u4e00-\\u9fa5][a-zA-Z0-9_\\-\\u4e00-\\u9fa5]*)\\s*(?:[:=＝：]|(?:为|是))\\s*(?<val>\"[^\"]*\"|'[^']*'|[^;；,，\\s\\n\\r\\)）\\]\\}]+(?:\\s+(?![a-zA-Z_\\u4e00-\\u9fa5]+[\\s]*[:=＝：为是]|(?:前往|去往|到达|在|到|并|由|从|并由|并在|且))[a-zA-Z0-9_\\-\\u4e00-\\u9fa5]+){0,2})");
 
     private static final Pattern CHINESE_NAME_PATTERN = Pattern.compile(
-            "(?:旅客姓名|乘客姓名|真实姓名|姓名)\\s*[:：=＝为是\\s]\\s*([\u4e00-\u9fa5]{2,4})");
+            "(?i)(?:旅客姓名|乘客姓名|真实姓名|姓名|passenger\\s*name)\\s*[:：=＝为是\\s]\\s*([\\u4e00-\\u9fa5]{2,4}|[A-Za-z0-9_\\-]{2,30})");
+
+    private static final Pattern PASSPORT_PATTERN = Pattern.compile(
+            "(?i)(?:护照(?:号码?|号)?|passport(?:\\s*(?:no|number))?)\\s*[:：=＝为是\\s]\\s*([A-Za-z0-9_\\-]{6,16})");
+
+    private static final Pattern TEL_PATTERN = Pattern.compile(
+            "(?i)(?:联系电话|联系方式|电话(?:号码?|号)?|手机(?:号码?|号)?|phone(?:\\s*(?:no|number))?|tel|mobile)\\s*[:：=＝为是\\s]\\s*(\\+?\\d[\\d\\-\\s]{6,15}\\d)");
 
     private static final Pattern ID_CARD_PATTERN = Pattern.compile(
             "\\b[1-9]\\d{5}(?:18|19|20)\\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\\d|3[01])\\d{3}[\\dXx]\\b");
@@ -74,6 +82,8 @@ public final class SceneParamsPrivacyGuard {
             if (isIdentityKey(key)) return true;
         }
         if (CHINESE_NAME_PATTERN.matcher(text).find()) return true;
+        if (PASSPORT_PATTERN.matcher(text).find()) return true;
+        if (TEL_PATTERN.matcher(text).find()) return true;
         if (ID_CARD_PATTERN.matcher(text).find()) return true;
         if (PHONE_PATTERN.matcher(text).find()) return true;
         if (EMAIL_PATTERN.matcher(text).find()) return true;
@@ -119,14 +129,14 @@ public final class SceneParamsPrivacyGuard {
                 || normalized.contains("身份证")
                 || normalized.contains("证件")
                 || normalized.contains("护照")
-                || normalized.contains("手机号")
-                || normalized.contains("电话号码")
-                || normalized.contains("联系电话")
+                || normalized.contains("手机")
+                || normalized.contains("电话")
                 || normalized.contains("电子邮箱")
                 || normalized.contains("邮箱")
                 || normalized.contains("identity")
                 || normalized.contains("passport")
                 || normalized.contains("phone")
+                || normalized.contains("mobile")
                 || normalized.contains("email");
     }
 
@@ -213,9 +223,24 @@ public final class SceneParamsPrivacyGuard {
         return value;
     }
 
-    static boolean isIdentityKey(String key) {
+    public static String sanitizeText(String text) {
+        if (text == null || text.isBlank()) return text;
+        String trimmed = text.trim();
+        if ((trimmed.startsWith("{") && trimmed.endsWith("}")) || (trimmed.startsWith("[") && trimmed.endsWith("]"))) {
+            try {
+                Object parsed = MAPPER.readValue(trimmed, Object.class);
+                Object cleaned = sanitizeValue(parsed);
+                return MAPPER.writeValueAsString(cleaned);
+            } catch (Exception ignored) {
+                return sanitizeGoal(text);
+            }
+        }
+        return sanitizeGoal(text);
+    }
+
+    public static boolean isIdentityKey(String key) {
         if (key == null) return false;
-        String normalized = key.replaceAll("[_\\-\\s\\.]", "").toLowerCase();
+        String normalized = key.replaceAll("[_\\-\\s\\.]", "").toLowerCase(Locale.ROOT);
         if (EXACT_IDENTITY_KEYS.contains(normalized)) return true;
         if (normalized.contains("passengername")
                 || normalized.contains("identitydocument")
@@ -226,23 +251,33 @@ public final class SceneParamsPrivacyGuard {
                 || normalized.contains("socialsecurity")) {
             return true;
         }
-        if (normalized.contains("passenger") && (normalized.contains("name") || normalized.contains("id") || normalized.contains("doc"))) {
+        if (normalized.contains("passenger") && (normalized.contains("name") || normalized.contains("id") || normalized.contains("doc") || normalized.contains("phone") || normalized.contains("mobile") || normalized.contains("passport") || normalized.contains("card") || normalized.contains("mail"))) {
             return true;
         }
-        if (normalized.contains("identity") && (normalized.contains("number") || normalized.contains("no") || normalized.contains("card") || normalized.contains("doc"))) {
+        if (normalized.contains("identity") && (normalized.contains("number") || normalized.contains("no") || normalized.contains("card") || normalized.contains("doc") || normalized.contains("text"))) {
             return true;
         }
-        if (normalized.contains("旅客") && (normalized.contains("名") || normalized.contains("身份") || normalized.contains("号"))) {
+        if (normalized.contains("旅客") && (normalized.contains("名") || normalized.contains("身份") || normalized.contains("号") || normalized.contains("证") || normalized.contains("手机") || normalized.contains("电话") || normalized.contains("护照"))) {
             return true;
         }
-        if (normalized.contains("身份证") || normalized.contains("护照") || normalized.contains("手机号") || normalized.contains("电话")) {
+        if (normalized.contains("乘客") && (normalized.contains("名") || normalized.contains("身份") || normalized.contains("号") || normalized.contains("证") || normalized.contains("手机") || normalized.contains("电话") || normalized.contains("护照"))) {
+            return true;
+        }
+        if (normalized.contains("身份证") || normalized.contains("护照") || normalized.contains("手机") || normalized.contains("电话") || normalized.contains("证件")) {
+            return true;
+        }
+        if (normalized.contains("phone") || normalized.contains("mobile") || normalized.contains("telephone")
+                || normalized.contains("passport") || normalized.contains("idcard")
+                || normalized.contains("email") || normalized.contains("idnumber")
+                || normalized.contains("idno") || normalized.contains("docnumber")
+                || normalized.contains("docno") || normalized.contains("ssn")) {
             return true;
         }
         return false;
     }
 
     /**
-     * 对送模副本中的自然语言任务目标进行旅客身份信息脱敏（SRS_F011.R06、DEF-S3-088）。
+     * 对送模副本中的自然语言任务目标进行旅客身份信息脱敏（SRS_F011.R06、DEF-S3-088、SRS_NF003.R01）。
      * 内部持久化及任务追溯保留原始目标，送外部模型前剥离或替换身份字段与敏感值。
      */
     public static String sanitizeGoal(String goal) {
@@ -265,16 +300,22 @@ public final class SceneParamsPrivacyGuard {
         m.appendTail(sb);
         text = sb.toString();
 
-        // 2. 中文自然语言姓名脱敏
+        // 2. 中英文自然语言姓名脱敏
         text = CHINESE_NAME_PATTERN.matcher(text).replaceAll("[PROTECTED_IDENTITY]");
 
-        // 3. 独立身份证号脱敏（18位身份证）
+        // 3. 护照号码脱敏
+        text = PASSPORT_PATTERN.matcher(text).replaceAll("[PROTECTED_IDENTITY]");
+
+        // 4. 电话/手机关键字组合脱敏
+        text = TEL_PATTERN.matcher(text).replaceAll("[PROTECTED_PHONE]");
+
+        // 5. 独立身份证号脱敏（18位身份证）
         text = ID_CARD_PATTERN.matcher(text).replaceAll("[PROTECTED_ID]");
 
-        // 4. 独立手机号脱敏（11位中国手机号）
+        // 6. 独立手机号脱敏（11位中国手机号）
         text = PHONE_PATTERN.matcher(text).replaceAll("[PROTECTED_PHONE]");
 
-        // 5. 独立电子邮箱脱敏
+        // 7. 独立电子邮箱脱敏
         text = EMAIL_PATTERN.matcher(text).replaceAll("[PROTECTED_EMAIL]");
 
         return text;

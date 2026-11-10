@@ -26,7 +26,19 @@ public class GoalUnderstandingRequest {
     public String getTaskFamily() { return taskFamily; }
     public void setTaskFamily(String taskFamily) { this.taskFamily = taskFamily; }
     public Map<String, Object> getSceneParams() { return sceneParams; }
-    public void setSceneParams(Map<String, Object> sceneParams) { this.sceneParams = sceneParams; }
+    public void setSceneParams(Map<String, Object> sceneParams) {
+        this.sceneParams = com.airport.ai.task.SceneParamsPrivacyGuard.sanitize(sceneParams);
+    }
     public List<Map<String, Object>> getClarificationAnswers() { return clarificationAnswers; }
-    public void setClarificationAnswers(List<Map<String, Object>> clarificationAnswers) { this.clarificationAnswers = clarificationAnswers; }
+    public void setClarificationAnswers(List<Map<String, Object>> clarificationAnswers) {
+        if (clarificationAnswers == null) {
+            this.clarificationAnswers = null;
+        } else {
+            java.util.List<Map<String, Object>> cleaned = new java.util.ArrayList<>();
+            for (Map<String, Object> round : clarificationAnswers) {
+                cleaned.add(com.airport.ai.task.SceneParamsPrivacyGuard.sanitize(round));
+            }
+            this.clarificationAnswers = cleaned;
+        }
+    }
 }

@@ -26,13 +26,29 @@ public class PlanningRequest {
     public String getTaskFamily() { return taskFamily; }
     public void setTaskFamily(String taskFamily) { this.taskFamily = taskFamily; }
     public Map<String, Object> getSceneParams() { return sceneParams; }
-    public void setSceneParams(Map<String, Object> sceneParams) { this.sceneParams = sceneParams; }
+    public void setSceneParams(Map<String, Object> sceneParams) {
+        this.sceneParams = com.airport.ai.task.SceneParamsPrivacyGuard.sanitize(sceneParams);
+    }
     public List<String> getConstraints() { return constraints; }
-    public void setConstraints(List<String> constraints) { this.constraints = constraints; }
+    public void setConstraints(List<String> constraints) {
+        this.constraints = constraints != null
+                ? constraints.stream().map(com.airport.ai.task.SceneParamsPrivacyGuard::sanitizeGoal).toList()
+                : null;
+    }
     public List<Map<String, Object>> getCapabilityContext() { return capabilityContext; }
     public void setCapabilityContext(List<Map<String, Object>> capabilityContext) { this.capabilityContext = capabilityContext; }
     public int getRemainingStepQuota() { return remainingStepQuota; }
     public void setRemainingStepQuota(int remainingStepQuota) { this.remainingStepQuota = remainingStepQuota; }
     public List<Map<String, Object>> getCompletedSteps() { return completedSteps; }
-    public void setCompletedSteps(List<Map<String, Object>> completedSteps) { this.completedSteps = completedSteps; }
+    public void setCompletedSteps(List<Map<String, Object>> completedSteps) {
+        if (completedSteps == null) {
+            this.completedSteps = null;
+        } else {
+            java.util.List<Map<String, Object>> cleaned = new java.util.ArrayList<>();
+            for (Map<String, Object> step : completedSteps) {
+                cleaned.add(com.airport.ai.task.SceneParamsPrivacyGuard.sanitize(step));
+            }
+            this.completedSteps = cleaned;
+        }
+    }
 }

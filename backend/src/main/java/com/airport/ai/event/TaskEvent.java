@@ -68,9 +68,10 @@ public class TaskEvent {
     }
 
     public void setDetailSummary(String detailSummary) {
-        this.detailSummary = detailSummary;
+        String clean = com.airport.ai.task.SceneParamsPrivacyGuard.sanitizeText(detailSummary);
+        this.detailSummary = clean;
         if (this.detail == null || this.detail.isBlank()) {
-            this.detail = detailSummary;
+            this.detail = clean;
         }
     }
 
@@ -85,9 +86,10 @@ public class TaskEvent {
     }
 
     public void setDetail(String detail) {
-        this.detail = detail;
+        String clean = com.airport.ai.task.SceneParamsPrivacyGuard.sanitizeText(detail);
+        this.detail = clean;
         if (this.detailSummary == null || this.detailSummary.isBlank()) {
-            this.detailSummary = detail;
+            this.detailSummary = clean;
         }
     }
 }
