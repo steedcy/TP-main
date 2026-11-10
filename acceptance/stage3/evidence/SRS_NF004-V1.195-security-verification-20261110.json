@@ -1,0 +1,124 @@
+{
+  "requirementId": "SRS_NF004",
+  "requirementName": "跨域与接口防护（角色服务端逐接口权限控制、CORS白名单、防SQL注入与XSS净化）",
+  "productVersionTag": "V1.195",
+  "productCommitSha": "b51bae075653765a36739060bf33fd5737b4f7f9",
+  "handoffCommitSha": "7e484732661066d3f21dded526e603039a0b6eaa",
+  "observedAt": "2026-11-10T22:14:48+08:00",
+  "worktree": "tip-gpt-f013",
+  "branch": "ai/gpt-test",
+  "rulesResult": {
+    "SRS_NF004.R01": "P"
+  },
+  "stepsResult": {
+    "TC-003.S1": "P",
+    "TC-003.S2": "P",
+    "TC-003.S3": "P",
+    "TC-085.S1": "P",
+    "TC-085.S2": "P",
+    "TC-086.S1": "P",
+    "TC-086.S2": "P"
+  },
+  "unitTestSuiteSummary": {
+    "command": "mvn -f ../tip-gpt-f013/backend/pom.xml -o test -Dtest=CorsSqlInjectionAndXssSecurityTest,SecurityAccessControlAndSessionTest,UserAccessOrderTest,WriteEndpointAuthorizationOrderTest,AccountAuditDetailTest",
+    "testsRun": 35,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "buildStatus": "SUCCESS",
+    "testClasses": [
+      {
+        "className": "com.airport.ai.auth.CorsSqlInjectionAndXssSecurityTest",
+        "testsRun": 6,
+        "status": "PASS"
+      },
+      {
+        "className": "com.airport.ai.auth.SecurityAccessControlAndSessionTest",
+        "testsRun": 14,
+        "status": "PASS"
+      },
+      {
+        "className": "com.airport.ai.auth.UserAccessOrderTest",
+        "testsRun": 4,
+        "status": "PASS"
+      },
+      {
+        "className": "com.airport.ai.auth.WriteEndpointAuthorizationOrderTest",
+        "testsRun": 6,
+        "status": "PASS"
+      },
+      {
+        "className": "com.airport.ai.auth.AccountAuditDetailTest",
+        "testsRun": 5,
+        "status": "PASS"
+      }
+    ]
+  },
+  "rbacAndAuditVerification": {
+    "serverSidePerEndpointCheck": true,
+    "preValidationRoleDeny403": true,
+    "unauthenticated401Code2000": true,
+    "unauthorizedWrite403Code2003": true,
+    "accessDeniedAuditRecorded": true,
+    "auditScopeIsolation": {
+      "SYSTEM_ADMIN": "ALL_RECORDS",
+      "CONFIG_ADMIN": "SELF_ONLY",
+      "OPERATOR": "SELF_ONLY"
+    },
+    "keyOperationsLogged": [
+      "LOGIN",
+      "LOGOUT",
+      "ACCESS_DENIED",
+      "USER_CREATE",
+      "USER_STATUS_CHANGE",
+      "PASSWORD_RESET",
+      "MANUAL_HANDLING",
+      "DEVICE_CREATE",
+      "DEVICE_UPDATE",
+      "DEVICE_DELETE",
+      "TASK_SUBMIT",
+      "TASK_TERMINATE"
+    ]
+  },
+  "sqlParameterizationAndEscapingVerification": {
+    "xmlMapperCount": 20,
+    "javaMapperCount": 23,
+    "dollarStringInterpolationCount": 0,
+    "sharpPreparedStatementPlaceholderCount": 146,
+    "likeWildcardEscapeVerified": true,
+    "deviceMapperEscapeClausePresent": true,
+    "taskMapperEscapeClausePresent": true,
+    "schemaAndDataIntact": true
+  },
+  "xssInputSanitizationVerification": {
+    "sanitizerClass": "com.airport.ai.common.XssSanitizer",
+    "idempotentHtmlEscape": true,
+    "dangerousProtocolNeutralized": true,
+    "coveredServices": [
+      "TaskDefinitionService",
+      "DeviceService",
+      "DeviceCapabilityService",
+      "DeviceTypeCapabilityService",
+      "BaselineTemplateService",
+      "SceneParamsPrivacyGuard",
+      "UserService",
+      "RiskRuleController"
+    ],
+    "rawScriptOrEventHandlerPersisted": false
+  },
+  "corsOriginProtectionVerification": {
+    "filterClass": "com.airport.ai.config.CorsOriginSecurityFilter",
+    "whitelistedOriginsAllowed": [
+      "http://localhost:5173",
+      "http://127.0.0.1:5173",
+      "http://localhost:8080",
+      "http://127.0.0.1:8080",
+      "http://127.0.0.1:15180"
+    ],
+    "untrustedExternalOriginsBlockedWith403": true,
+    "accessControlAllowOriginOmittedOnDeny": true,
+    "authenticatedCrossOriginDenyAudited": true,
+    "writeSideEffectsOnDeny": 0
+  },
+  "overallVerdict": "REQUIREMENT_PASSED"
+}

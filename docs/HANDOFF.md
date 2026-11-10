@@ -2,24 +2,23 @@
 
 ## 当前交接状态
 
-- 状态：READY_FOR_GPT（SRS_NF004 跨域与接口防护 V1.195 安全攻防加固已完成，等待 GPT 独立整轮复测）
-- 依据需求与规则：SRS_NF004.R01、TC-003.S1~S3、TC-085.S1~S2
+- 状态：REQUIREMENT_PASSED（SRS_NF004 跨域与接口防护 V1.195 整轮独立复测全部通过，合入 main，准备启动 SRS_NF005）
+- 依据需求与规则：SRS_NF004.R01、TC-003.S1~S3、TC-085.S1~S2、TC-086.S1~S2
 - 固定产品版本：`b51bae075653765a36739060bf33fd5737b4f7f9`（标签 `V1.195`）
-- 本轮修复与加固成果：
-  1. **CORS 跨域策略严格白名单加固（`CorsOriginSecurityFilter` + `SecurityConfig` + `application.yml`）**：
-     - 新增 `CorsOriginSecurityFilter`（置于 `TokenAuthenticationFilter` 之后、`AuthorizationFilter` 之前），严格基于 URI 解析校验 `Origin` 白名单（支持 `http://localhost:*`、`http://127.0.0.1:*`、同源及 `app.cors.allowed-origins` 配置项）；
-     - 拦截未知外部源（如 `https://evil.example.com`、`http://attacker.org:8080`、前缀绕过源 `http://localhost.evil.com`、`null`、`*`、非 HTTP/HTTPS 协议）发起的预检 `OPTIONS` 与跨域写请求（`POST`/`PUT`/`DELETE`），统一返回 HTTP `403 Forbidden`（`code: 2003`），不返回 `Access-Control-Allow-Origin` 响应头，并在已认证上下文下记录 `ACCESS_DENIED` 失败审计日志，杜绝任何业务状态写入副作用；
-  2. **SQL 注入全面排查与 `LIKE` 通配符转义加固（`DeviceMapper.xml` + `DeviceService`）**：
-     - 全量排查 `backend/src/main/resources/mapper/*.xml`（20 个 XML Mapper）与全部 23 个 Java `*Mapper.java`，确认 100% 严格采用 `#{}` PreparedStatement 参数化占位符，全库 `0` 处 `${}` 字符串拼接；
-     - 加固 `DeviceMapper.xml`（`searchPaged`）补充 `ESCAPE '\'`，并在 `DeviceService.list` 对 `keyword` 执行 `escapeLike`（转义 `\`、`%`、`_`），与 `TaskMapper.xml` / `TaskService.escapeLike` 保持完全一致；
-  3. **XSS 与输入净化（`XssSanitizer` + 各业务 Service/Controller）**：
-     - 新增 `com.airport.ai.common.XssSanitizer`，提供幂等 HTML 实体转义 `escapeHtml`（防二次转义 `&amp;lt;`）及富文本脚本净化 `sanitizeRichText`（拦截 `<script>`、`<img onerror=...>`、`<svg onload=...>`、`javascript:`/`vbscript:` 等向量）；
-     - 覆盖 `TaskDefinitionService`（`taskName`、`goalTemplate`、`constraintDescription`、`completionCondition`）、`DeviceService`（`deviceName`、`remark`）、`DeviceCapabilityService`（`capabilityName`、`capabilityDescription`、`applicableConditions`）、`DeviceTypeCapabilityService`（`typeDescription`、`constraintRules`、`typicalScenarios`、`templateName`、`templateDescription`）、`BaselineTemplateService`（`templateName`）、`SceneParamsPrivacyGuard`（`taskGoal`、`sceneParams`）、`UserService`（`realName`、`contact`）及 `RiskRuleController`（`ruleContent`）；
-  4. **专项单测与全量回归打包**：
-     - 新增 `CorsSqlInjectionAndXssSecurityTest`（6 项专项测试，覆盖 CORS 正反例与审计、全量 Mapper 静态扫描与 SQLi 运行期探测、XSS 转义与幂等验证），6/6 通过；
-     - 全量单元测试 `mvn -o test`：571 项运行，0 失败，0 错误（2 项既有跳过），BUILD SUCCESS；
-     - 生产打包 `mvn -o package -DskipTests` 成功生成 `backend/target/airport-ai-app-1.0.0.jar`。
-- 下一步：GPT 在独立 worktree `ai/gpt-test` 基于 `V1.195`（`b51bae075653765a36739060bf33fd5737b4f7f9`）开展 SRS_NF004 整轮独立复测。
+- 本轮独立复测与闭环结论：
+  1. **业务规则与关联用例步骤全 P 通过**：
+     - `SRS_NF004.R01`：**P**（三类预置角色权限由服务端逐接口校验，登录、配置变更和人工终止写入操作记录，具备跨域源白名单控制、SQL 参数化防注入与 XSS 输入净化）；
+     - 关联步骤 `TC-003.S1`、`TC-003.S2`、`TC-003.S3`、`TC-085.S1`、`TC-085.S2`、`TC-086.S1`、`TC-086.S2` 全部 **P**（7P / 0F / 0NT）。
+  2. **CORS 跨域白名单与非授权外部源写请求强拦截验证通过**：
+     - `CorsOriginSecurityFilter` 放行白名单源（`http://localhost:5173`、`http://127.0.0.1:*` 等），对非白名单外部源发起的 `OPTIONS` 预检与 `POST`/`PUT`/`DELETE` 写请求统一返回 HTTP `403 Forbidden`（`code: 2003`），不输出 `Access-Control-Allow-Origin` 响应头，并在已认证会话下写入 `ACCESS_DENIED` 审计记录，目标数据零变更。
+  3. **SQL 参数化预编译与 `LIKE` 通配符转义验证通过**：
+     - 全量 20 个 MyBatis XML Mapper 与 23 个 Java Mapper 接口 100% 使用 `#{}` 参数化占位符（0 处 `${}` 拼接），`DeviceMapper.xml` 与 `TaskMapper.xml` 模糊检索声明 `ESCAPE '\'` 并对检索词执行 `escapeLike` 转义，数据库表结构与数据完全无损。
+  4. **XSS 输入净化与前端转义验证通过**：
+     - `XssSanitizer` 对任务定义、设备名称/备注、能力描述、模板说明、任务目标与场景参数、用户姓名/联系方式、风险规则内容执行幂等 HTML 实体转义与危险伪协议脱敏。
+  5. **专项安全单测与生产构建确认**：
+     - 35 项安全与权限单测（`CorsSqlInjectionAndXssSecurityTest`、`SecurityAccessControlAndSessionTest`、`UserAccessOrderTest`、`WriteEndpointAuthorizationOrderTest`、`AccountAuditDetailTest`）100% 通过；
+     - 后端生产 JAR（`airport-ai-app-1.0.0.jar`）与前端生产构建（`vite build`）均通过。
+- 下一步：`ai/gpt-test` 安全合入 `main` 并推送到远端；顺序启动下一项非功能需求 `SRS_NF005`。
 
 ## 首项需求的现有证据
 
@@ -94,6 +93,7 @@
 | 2026-11-10 | SRS_NF018 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / 89347c2132d918d360ee393792cbdb3a6be6ee4c / V1.194 | 待独立整轮复测 | 依据BL-010基线裁决（用户授权）与工程交付物固化，闭环关闭NT-S3-025，探针返回P，Prometheus端点保持通过，详见下文交接专节 |
 | 2026-11-10 | SRS_NF018 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / 89347c2132d918d360ee393792cbdb3a6be6ee4c / V1.194 | 46fc85b | 规则1P/0F/0NT，步骤TC-095.S1 P；依据BL-010关闭NT-S3-025，已合main |
 | 2026-11-10 | SRS_NF004 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / b51bae075653765a36739060bf33fd5737b4f7f9 / V1.195 | 待独立整轮复测 | 加固CORS源白名单拦截（403/2003+ACCESS_DENIED留痕）、排查全量MyBatis #{} 参数化并加固DeviceMapper LIKE转义、落地XssSanitizer全量文本HTML转义，571项单测全过，详见下文交接专节 |
+| 2026-11-10 | SRS_NF004 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / b51bae075653765a36739060bf33fd5737b4f7f9 / V1.195 | 本次提交 | 规则1P/0F/0NT，关联步骤7P/0F/0NT；服务端逐接口RBAC、CORS白名单403拦截与留痕、MyBatis 100% #{} 参数化与LIKE转义、XssSanitizer HTML转义35/35安全单测与前后端生产构建全部通过；已合main，下一项SRS_NF005 |
 ## 文件认领
 
 - Claude：当前需求涉及的产品代码与必要的修复单测；独立 `ai/claude-fix` worktree。
@@ -4797,3 +4797,26 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
     2. 复测 CORS 跨域策略：验证白名单源（`http://localhost:5173` / `http://127.0.0.1:*`）预检与请求正常返回 CORS 响应头，未知外部源（如 `https://evil.example.com`、`http://localhost.evil.com`）发起预检与跨域写请求返回 `403 (2003)` 且无 `Access-Control-Allow-Origin` 响应头；
     3. 复测 SQL 注入与 XSS 防护：验证搜索接口（`/api/v1/devices?keyword=...`、`/api/v1/tasks?goalKeyword=...`）对 `' OR '1'='1`、`'; DROP TABLE ...`、`%_\\` 等载荷安全参数化处理，以及任务定义名称、设备名称/备注、任务目标等字段对 `<script>alert(1)</script>`、`<img src=x onerror=alert(1)>` 的 HTML 实体转义净化；
     4. 确认整项通过后更新状态为 `REQUIREMENT_PASSED` 并安全合入 `main`。
+
+## 2026-11-10 GPT → main：SRS_NF004 V1.195 跨域与接口防护整轮独立复测全部通过与验收（REQUIREMENT_PASSED）
+
+- **交接状态**：REQUIREMENT_PASSED
+- **需求编号**：SRS_NF004（跨域与接口防护：角色服务端逐接口权限控制、CORS 白名单、防 SQL 注入与 XSS 净化）
+- **固定产品版本**：`b51bae075653765a36739060bf33fd5737b4f7f9`（标签 `V1.195`）
+- **独立复测工作区与分支**：`tip-gpt-f013` / `ai/gpt-test`
+- **整轮独立复测核验结论**：
+  1. **业务规则全部实测通过**：
+     - `SRS_NF004.R01`：**P**（三类预置角色权限由服务端逐接口校验，不得只依赖前端菜单控制；登录、配置变更和人工终止写入操作记录；具备 CORS 跨域源控制、SQL 参数化防注入与 XSS 输入净化能力）；
+  2. **关联用例步骤全部实测通过**：
+     - `TC-003.S1`、`TC-003.S2`、`TC-003.S3`、`TC-085.S1`、`TC-085.S2`、`TC-086.S1`、`TC-086.S2`：**7P / 0F / 0NT**；
+  3. **三大安全防护维度与权限审计核验**：
+     - **服务端逐接口 RBAC 与审计留痕**：`SecurityConfig` + `PreAuthorizeInterceptor` 在请求体绑定校验前先行校验角色权限，无权写操作统一返回 HTTP 403（`code: 2003`）并记录 `ACCESS_DENIED` 审计，目标数据零变更；系统管理员可见全量操作记录，配置管理员与运行操作员仅见自身记录；
+     - **CORS 跨域源白名单与外部源写操作拦截**：`CorsOriginSecurityFilter` 放行受控本地/配置白名单源，对非白名单外部源发起的预检 `OPTIONS` 与跨域写请求返回 HTTP 403（`code: 2003`），不输出 `Access-Control-Allow-Origin` 响应头，并在已认证会话下写入 `ACCESS_DENIED` 失败审计；
+     - **SQL 参数化与通配符转义**：全量 20 个 MyBatis XML Mapper 与 23 个 Java Mapper 接口 100% 采用 `#{}` 预编译参数化（0 处 `${}` 拼接），`DeviceMapper.xml` 与 `TaskMapper.xml` 均声明 `ESCAPE '\'` 并对检索词执行 `escapeLike` 转义，数据库结构与数据完全无损；
+     - **XSS 输入净化与前端转义**：`XssSanitizer` 对各业务模块可展示文本字段执行幂等 HTML 实体转义与危险伪协议脱敏，结合 Vue 3 模板插值转义确保不执行脚本；
+     - **专项单测与生产构建**：35/35 安全与权限单测通过，后端生产 JAR 与前端生产构建均通过。
+- **受控正式报告与证据**：
+  - 正式报告：`acceptance/stage3/SRS_NF004-V1.195-整轮独立复测与验收.md`
+  - 综合核验受控证据：`acceptance/stage3/evidence/SRS_NF004-V1.195-security-verification-20261110.json`
+- **后续协同**：按 V2.4 协同规则，`ai/gpt-test` 分支合并至 `main` 并推送到 `origin`；准备启动下一项非功能需求 `SRS_NF005`。
+

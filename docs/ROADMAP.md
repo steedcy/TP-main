@@ -1,9 +1,9 @@
 # 双 AI 协同修复工作梳理汇总与执行全景路线图 (ROADMAP)
 
 > **当前基准**：V2.4（2026-11-04 用户追加整轮复测授权；继承V2.3，见BL-005；下方既有产品验收/交接记录保留原执行版本）
-> **主干验收合入提交**：F001～F028、SRS_NF001、SRS_NF003、SRS_NF010、SRS_NF018 已验收安全合main；40用户文件哈希不变，无PR；最终证明随本提交同步。
+> **主干验收合入提交**：F001～F028、SRS_NF001、SRS_NF003、SRS_NF004、SRS_NF010、SRS_NF018 已验收安全合main；40用户文件哈希不变，无PR；最终证明随本提交同步。
 > **最新产品代码提交**：b51bae075653765a36739060bf33fd5737b4f7f9 / V1.195（SRS_NF004）
-> **当前状态**：READY_FOR_GPT。SRS_NF004 跨域与接口防护（CORS 源白名单拦截、全量 MyBatis `#{}` 参数化与 `LIKE` 转义、XSS HTML 实体转义净化）已完成修复与 571 项全量单测回归，等待 GPT 整轮独立复测。
+> **当前状态**：REQUIREMENT_PASSED。SRS_NF004 跨域与接口防护整轮独立复测全部通过（规则 1P/0F/0NT，关联步骤 TC-003.S1~S3、TC-085.S1~S2、TC-086.S1~S2 7P/0F/0NT），ai/gpt-test 合入 main。下一项：SRS_NF005。
 
 ---
 
@@ -97,8 +97,8 @@ F001～F023（含分支共25条目）已完成独立验收并安全合main；F02
 | **SRS_NF001** | 系统安全性（认证与权限） | **1P/0F/0NT（全部实测通过）** | TC-086 全部通过（2P/0F/0NT） | DEF-S3-010 与 NT-S3-009 彻底实测关闭；跨角色越权访问403/2003拦截与ACCESS_DENIED留痕、密码加盐存储与接口零hash泄露、账号停用/密码重置/登出联动Token即时失效 | V1.190 | **REQUIREMENT_PASSED（全部通过，已合main，下一项SRS_NF002）** |
 | **SRS_NF002** | 密码与传输安全 | **P (已验证)** | 密码强哈希存储、敏感字段脱敏传输 | 历史通过 |  PASSED |
 | **SRS_NF003** | 旅客个人身份隐私保护 | **1P/0F/0NT（全部实测通过）** | TC-031.S2、TC-077.S1~S3、TC-086.S1~S2（6P/0F/0NT） | DEF-S3-032 彻底实测关闭；顶层与多层嵌套场景参数400强拦截、目标自然语言递归脱敏、大模型交互日志0泄露、全库0敏感信息落库、真实Edge UI强拦截与掩码渲染 | V1.191 | **REQUIREMENT_PASSED（全部通过，已合main）** |
-| **SRS_NF004** | 跨域与接口防护 | **READY_FOR_GPT** | TC-003.S1~S3、TC-085.S1~S2；CORS 严格 Origin 白名单与未知外部源 403(2003) 拦截+ACCESS_DENIED 留痕、全量 20 个 XML Mapper + 23 个 Java Mapper 100% `#{}` 参数化与 `LIKE ESCAPE '\'`、全量文本字段 `XssSanitizer` HTML 转义 | V1.195 | **READY_FOR_GPT（b51bae0 / V1.195，571项单测全过，待GPT独立复测）** |
-| **SRS_NF005** | 故障隔离与恢复 | NT | 数据库断连/恢复时系统自愈，不产生脏数据 | 后续安排 | 待启动 |
+| **SRS_NF004** | 跨域与接口防护 | **1P/0F/0NT（全部实测通过）** | TC-003.S1~S3、TC-085.S1~S2、TC-086.S1~S2（7P/0F/0NT）；服务端逐接口RBAC校验、CORS严格Origin白名单与外部源403(2003)拦截+ACCESS_DENIED留痕、全量20个XML Mapper+23个Java Mapper 100% `#{}` 参数化与 `LIKE ESCAPE '\'`、全量文本字段 `XssSanitizer` HTML转义 | V1.195 | **REQUIREMENT_PASSED（全部通过，已合main，下一项SRS_NF005）** |
+| **SRS_NF005** | 故障隔离与恢复 | ⏳ 待启动 | 数据库断连/恢复时系统自愈，不产生脏数据 | 后续安排 | ⏳ 待启动 |
 | **SRS_NF006** | 规划响应时间 | NT | 形式化目标规划在 60 秒内产出或安全超时降级 | 后续安排 | 待启动 |
 | **SRS_NF007** | 指令下发延迟 | NT | 指令生成至网关下发时延 < 500ms | 后续安排 | 待启动 |
 | **SRS_NF008** | 并发任务处理能力 | NT | 支持 50+ 并发协同任务规划与监控 | 后续安排 | 待启动 |
@@ -627,4 +627,23 @@ V1.184 独立复测交接仍为 `READY_FOR_CLAUDE`（实际接收者 Germini）�
 - **正式交接报告**：acceptance/stage3/SRS_NF003-V1.191-整轮独立复测与验收.md
 - **受控证据**：acceptance/stage3/evidence/SRS_NF003-V1.191-protocol-summary.json、SRS_NF003-V1.191-real-ui-results.json 及 3 份真实 Edge UI 实测截图
 - **后续动作**：分支合并至 main 并推送到 origin。
+
+## 2026-11-10 SRS_NF004 V1.195 整轮独立复测与验收（REQUIREMENT_PASSED）
+
+- **需求编号**：SRS_NF004（跨域与接口防护：角色服务端逐接口权限控制、CORS 白名单、防 SQL 注入与 XSS 净化）
+- **固定产品版本**：b51bae075653765a36739060bf33fd5737b4f7f9（标签 V1.195）
+- **工作区与分支**：tip-gpt-f013 / ai/gpt-test
+- **复测结论**：**REQUIREMENT_PASSED**
+  - 业务规则：**1P / 0F / 0NT**（SRS_NF004.R01 实测通过）
+  - 关联用例步骤：**7P / 0F / 0NT**（TC-003.S1~S3、TC-085.S1~S2、TC-086.S1~S2 全部 P）
+  - 核心安全防护核验：
+    1. 服务端逐接口 RBAC 鉴权与请求体校验前拦截（403/2003 + `ACCESS_DENIED` 留痕，目标表零变更），三类角色操作记录可见范围严格隔离；
+    2. `CorsOriginSecurityFilter` 白名单源放行、未知外部源预检与跨域写操作 403(2003) 强拦截（无 `Access-Control-Allow-Origin` 响应头，已认证会话写 `ACCESS_DENIED` 审计）；
+    3. 全量 20 个 MyBatis XML Mapper 与 23 个 Java Mapper 100% `#{}` 预编译参数化（0 处 `${}` 拼接），`DeviceMapper` 与 `TaskMapper` 模糊检索 `ESCAPE '\'` 及通配符转义生效；
+    4. `XssSanitizer` 幂等 HTML 实体转义与危险伪协议脱敏覆盖全部可展示文本字段；
+    5. 35/35 专项安全与权限单测、前后端生产构建全部通过。
+- **正式交接报告**：acceptance/stage3/SRS_NF004-V1.195-整轮独立复测与验收.md
+- **受控证据**：acceptance/stage3/evidence/SRS_NF004-V1.195-security-verification-20261110.json
+- **后续动作**：分支合并至 main 并推送到 origin，准备启动下一项 SRS_NF005。
+
 
