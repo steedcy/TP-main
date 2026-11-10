@@ -28,7 +28,8 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     private final SessionService sessionService;
     private final UserMapper userMapper;
 
-    public TokenAuthenticationFilter(SessionService sessionService, UserMapper userMapper) {
+    public TokenAuthenticationFilter(@org.springframework.context.annotation.Lazy SessionService sessionService,
+                                   @org.springframework.context.annotation.Lazy UserMapper userMapper) {
         this.sessionService = sessionService;
         this.userMapper = userMapper;
     }

@@ -1,0 +1,72 @@
+{
+  "timestamp": "2026-11-10T07:27:18.900782+00:00",
+  "requirement": "SRS_NF010",
+  "productCommit": "2dd346949eae90f636ec0170487122ea20931885",
+  "tag": "V1.192",
+  "subchecks": [
+    {
+      "name": "SUBCHECK-1: Dual-Role Authentication Tokens",
+      "status": "PASSED",
+      "detail": "Successfully authenticated oprator and set with valid JWTs"
+    },
+    {
+      "name": "SUBCHECK-2: HikariCP Production Configuration Properties",
+      "status": "PASSED",
+      "expectedProperties": {
+        "pool-name": "AirportAiHikariPool",
+        "minimum-idle": "5",
+        "maximum-pool-size": "30",
+        "connection-timeout": "30000",
+        "idle-timeout": "600000",
+        "max-lifetime": "1800000",
+        "keepalive-time": "30000",
+        "validation-timeout": "5000",
+        "leak-detection-threshold": "60000"
+      },
+      "matched": {
+        "pool-name": true,
+        "minimum-idle": true,
+        "maximum-pool-size": true,
+        "connection-timeout": true,
+        "idle-timeout": true,
+        "max-lifetime": true,
+        "keepalive-time": true,
+        "validation-timeout": true,
+        "leak-detection-threshold": true
+      }
+    },
+    {
+      "name": "SUBCHECK-4: High-Pressure Connection Pool Queueing Burst Test",
+      "status": "PASSED",
+      "concurrentClients": 35,
+      "totalRequests": 140,
+      "successCount": 140,
+      "failureCount": 0,
+      "avgLatencyMs": 366.27,
+      "p95LatencyMs": 679.1,
+      "maxLatencyMs": 1012.85,
+      "durationSec": 2.09
+    },
+    {
+      "name": "SUBCHECK-5: Zero Connection Leak and Deadlock Verification",
+      "status": "PASSED",
+      "idleInTransactionCount": 0,
+      "totalBackendConnections": 8,
+      "maxPoolSizeCap": 30
+    },
+    {
+      "name": "SUBCHECK-6: HikariPool Realtime Logging & Metrics Evidence",
+      "status": "PASSED",
+      "logLineCount": 197,
+      "poolLogFile": "SRS_NF010-V1.192-connection-pool.log"
+    },
+    {
+      "name": "SUBCHECK-7: Database Exception Safety Guard Contracts",
+      "status": "PASSED",
+      "poolBusy503": true,
+      "deadlock409": true,
+      "duplicateKey409": true
+    }
+  ],
+  "overallStatus": "PASSED"
+}

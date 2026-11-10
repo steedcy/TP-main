@@ -19,9 +19,10 @@ import java.util.List;
 public class DeviceTokenAuthenticationFilter extends OncePerRequestFilter {
     private final DeviceCredentialService credentialService;
     @org.springframework.beans.factory.annotation.Autowired(required = false)
+    @org.springframework.context.annotation.Lazy
     private com.airport.ai.device.ReportRejectionRecorder rejectionRecorder;
 
-    public DeviceTokenAuthenticationFilter(DeviceCredentialService credentialService) {
+    public DeviceTokenAuthenticationFilter(@org.springframework.context.annotation.Lazy DeviceCredentialService credentialService) {
         this.credentialService = credentialService;
     }
 
