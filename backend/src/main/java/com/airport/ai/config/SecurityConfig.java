@@ -52,7 +52,7 @@ public class SecurityConfig {
             )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/v1/auth/login").permitAll()
-                .requestMatchers("/actuator/health").permitAll()
+                .requestMatchers("/actuator/**").permitAll()
                 .requestMatchers("/ws/**").permitAll()
                 .requestMatchers("/device-api/v1/agents/*/report").hasRole("DEVICE_AGENT")
                 .requestMatchers("/api/v1/device-agents/report/*").hasRole("DEVICE_AGENT")
