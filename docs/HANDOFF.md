@@ -2,14 +2,14 @@
 
 ## 当前交接状态
 
-- 状态：REQUIREMENT_PASSED（SRS_F028 安全审计与管理日志留痕 全部通过：规则 8P/0F/0NT，步骤 2P/0F/0NT，DEF-S3-009 彻底实测关闭；已安全合入 main，下一步启动首项非功能需求 SRS_NF001 系统安全性：认证与权限）
-- 本轮验收成果：
-  1. DEF-S3-009 彻底实测闭环：账号创建（USER_CREATE）、密码重置（PASSWORD_RESET）、账号状态切换（USER_STATUS_CHANGE）、人工解锁（MANUAL_HANDLING）全量携带结构化 before/after diff 摘要及 target 账号核心摘要；
-  2. 凭据与隐私绝对脱敏：重置密码仅记录 passwordChanged: true，严禁密码明文、不可逆哈希或联系方式写入日志；DEF-S3-010 保持验证关闭（用户列表 API 绝无 passwordHash 暴露）；
-  3. 日志不可篡改与角色隔离：PUT/DELETE 请求严格拦截（404/405），数据库指纹严格未变；系统管理员可查全量日志，配置管理员与操作员仅可见自身记录；任务关联双向因果追溯正常；
-  4. 真实 Edge UI 3/3 通过：审计列表渲染、账号启停 before/after 结构化 JSON 详情弹窗、空账号查询空态提示全量通过。
-- 本地验证与固定基线：固定产品代码 14e75c6bf1b0ef226d9cba4ba422ffb7ceab1f3a（标签 V1.189），HTTP/SQL 协议层 11 项全 P，真实 Edge UI 3 项全 P。
-- 下一步：SRS_F028 验收成果已安全合入 main；双 AI 协同顺序推进至首项非功能需求 SRS_NF001（系统安全性：认证与权限），转入 Germini 修复轮（i/claude-fix）。
+- 状态：READY_FOR_GPT（SRS_NF001 系统安全性：认证与权限 产品加固与定向单测完成，移交 ai/gpt-test 独立复测）
+- 依据需求与规则：SRS_NF001.R01、TC-086.S1、TC-086.S2、DEF-S3-010、NT-S3-009
+- 本轮加固成果：
+  1. 越权访问防护与会话安全：Spring Security 过滤器链 + PreAuthorizeInterceptor + AccessDeniedHandlerImpl + GlobalExceptionHandler 严密闭环，非管理员调用用户管理、非配置管理员调用设备管理、非操作员调用任务提交/终止统一快速拦截为 403 Forbidden（错误码 2003）并落库 ACCESS_DENIED 审计日志，杜绝越权漏洞；
+  2. 敏感凭据脱敏传输与存储隔离：加固 User.toString() 与 CredentialMasker，涵盖 password、token、secret、credential 及各类变体（accessToken、deviceToken、secretKey、apiKey 等），支持嵌套 Map 与 Collection 递归掩码；User 实体对外序列化严格忽略 passwordHash（DEF-S3-010 闭环）；
+  3. 会话时效与防劫持机制：SessionService 建立 user_sessions:<userId> 集合反查索引；空白/过期/篡改/伪造 JWT 签名的 Token 均快速拦截为 401 Unauthorized（2001/2000）；密码重置（resetPassword）及账号停用/锁定（updateStatus）联动执行 invalidateUserSessions 立即注销该用户所有活跃会话；TokenAuthenticationFilter 增加账号非 ACTIVE 状态拦截（NT-S3-009 闭环）。
+- 本地验证与固定基线：固定产品代码 0e16b31dc2c01e965f8848897940c2885b1ba99a（标签 V1.190），全量单测 543 项全部通过（0 失败 0 错误），前端打包 npm run build 成功（3272 modules transformed，0 error），后端生产打包 mvn -o package -DskipTests 成功生成生产 JAR airport-ai-app-1.0.0.jar。
+- 下一步：ai/gpt-test 基于固定版本 V1.190 开展 SRS_NF001 整轮独立复测（TC-086.S1、TC-086.S2、DEF-S3-010、NT-S3-009）。
 
 ## 首项需求的现有证据
 
@@ -74,6 +74,7 @@
 | 2026-11-10 | SRS_F027 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / 223436c61bf437ed6b287b41edc5b5e293a596c8 / V1.188 | 待合入 | 规则8P/0F/0NT，步骤3P/0F/0NT；DEF-S3-008、DEF-S3-057、NT-S3-007实测彻底关闭；真实Edge UI 3/3通过；全量测试全P通过，合入main，下一项SRS_F028 |
 | 2026-11-10 | SRS_F028 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / 14e75c6bf1b0ef226d9cba4ba422ffb7ceab1f3a / V1.189 | 待独立整轮复测 | 闭环 DEF-S3-009，落地账号创建、状态变更、重置密码、解锁操作记录 before/after 结构化摘要且凭据脱敏，详见交接专节 |
 | 2026-11-10 | SRS_F028 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / 14e75c6bf1b0ef226d9cba4ba422ffb7ceab1f3a / V1.189 | 待合入 | 8P/0F/0NT，步骤2P/0F/0NT；DEF-S3-009实测彻底关闭；真实Edge UI 3/3通过；全量测试全P通过，合入main，下一项SRS_NF001 |
+| 2026-11-10 | SRS_NF001 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / 0e16b31dc2c01e965f8848897940c2885b1ba99a / V1.190 | 待独立测试 | 闭环 DEF-S3-010、NT-S3-009，越权访问 403 留痕、敏感凭据递归掩码、会话重置/停用即时失效与防伪造，详见下文交接专节 |
 ## 文件认领
 
 - Claude：当前需求涉及的产品代码与必要的修复单测；独立 `ai/claude-fix` worktree。
@@ -4468,3 +4469,33 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
   - acceptance/stage3/evidence/SRS_F028-V1.189-ui-audit-detail.png
   - acceptance/stage3/evidence/SRS_F028-V1.189-ui-audit-empty-state.png
 - **后续协同**：按 V2.4 协同规则，ai/gpt-test 分支合并至 main 并推送到 origin；全量 30 项功能需求已全部通过闭环；下一步按顺序启动首项非功能需求 SRS_NF001（系统安全性：认证与权限）。
+
+## 2026-11-10 Germini → GPT：SRS_NF001 V1.190 修复完成与交接独立复测（READY_FOR_GPT）
+
+- **交接状态**：READY_FOR_GPT
+- **固定产品版本**：0e16b31dc2c01e965f8848897940c2885b1ba99a（标签 V1.190）
+- **修复分支**：ai/claude-fix
+- **依据需求与规则**：`SRS_NF001.R01`、`TC-086.S1`、`TC-086.S2`、`DEF-S3-010`、`NT-S3-009`。
+- **本轮修复与加固内容**：
+  1. **越权访问防护与会话安全（TC-086.S1, TC-086.S2）**：
+     - 在 `SecurityConfig.java` 过滤器链、`PreAuthorizeInterceptor.java` 方法级拦截器及 `AccessDeniedHandlerImpl.java` / `GlobalExceptionHandler.java` 统一对越权访问进行快速拦截并返回 `403 Forbidden`（错误码 2003）。
+     - 操作员/配置管理员调用用户管理、操作员/管理员调用设备管理、配置管理员/管理员调用任务提交及人工终止等跨权限行为，一律触发 `ACCESS_DENIED` 审计日志落库，杜绝越权漏洞。
+  2. **敏感凭据脱敏传输与存储隔离（DEF-S3-010 闭环）**：
+     - `User.java` 实体 `passwordHash` 添加 `@JsonIgnore`，同时重写 `toString()` 彻底剔除密码哈希字段，确保任何对象打印或日志输出均不泄露哈希。
+     - 加固 `CredentialMasker.java`，扩大敏感凭据识别范围（`password`、`passwordhash`、`credential`、`token`、`secret`、`accesstoken`、`devicetoken`、`secretkey`、`apikey` 等），支持对嵌套 `Map` 和 `Collection` 结构的递归掩码脱敏。
+     - `GET /api/v1/users` 用户列表、`POST /api/v1/users` 创建响应、`POST /api/v1/auth/login` 登录响应绝无 `passwordHash`、密码明文或未脱敏凭据暴露。
+  3. **会话时效与防劫持机制（NT-S3-009 闭环）**：
+     - 在 `SessionService.java` 中建立 `user_sessions:<userId>` 集合反查索引，支持按用户维度全量注销会话（`invalidateUserSessions`）。
+     - 在 `UserService.java` 的密码重置（`resetPassword`）及账号停用/锁定（`updateStatus`）操作中，联动调用 `invalidateUserSessions`，实现重置或停用后旧 Token 立即失效。
+     - 在 `TokenAuthenticationFilter.java` 中加固 Bearer Token 解析校验，过滤空 Token，并在查得用户为 `INACTIVE` 或 `LOCKED` 状态时快速标记 `sessionExpired` 拒绝认证（401 Unauthorized）。
+     - 验证未携带 Token（401 UNAUTHORIZED 2000）、过期 Token、伪造 JWT 签名 Token（401 SESSION_EXPIRED 2001）均被快速拦截。
+- **本地验证与构建确认**：
+  - 定向单元测试：新增 `SecurityAccessControlAndSessionTest.java`（涵盖越权防护、Token 防伪防篡改、会话联动失效 14 项测试），增强 `UserSerializationTest.java`（涵盖脱敏与序列化保护 5 项测试），结合 `UserAccessOrderTest`、`WriteEndpointAuthorizationOrderTest`、`AccountAuditDetailTest` 全部 34 项认证安全单测 100% 通过。
+  - 全量后端单测：`mvn -o test` 全部 543 项单测 100% 通过（0 失败，0 错误，2 项跳过（原有），BUILD SUCCESS）。
+  - 前端生产构建：`npm run build` 成功完成（3272 modules transformed，0 error）。
+  - 后端生产打包：`mvn -o package -DskipTests` 成功打包生成 `airport-ai-app-1.0.0.jar`。
+- **给独立复测的范围与建议**：
+  - 重点执行 TC-086（S1, S2）全场景独立复测，验证账号密码 bcrypt 哈希存储、接口响应与日志中无敏感凭据泄露（DEF-S3-010 关闭复核）；
+  - 验证跨角色越权调用返回 403 及 ACCESS_DENIED 审计日志；
+  - 验证非法/伪造/过期 Token 拦截（401）以及密码重置/注销后旧 Token 即时失效（NT-S3-009 关闭复核）。
+
