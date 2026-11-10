@@ -4731,7 +4731,7 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
 - **工作分支**：`ai/claude-fix`（已提交打标并推送到远端）
 - **交付内容与核心闭环点**：
   1. **落实用户授权达成 BL-010 基线裁决，彻底关闭 NT-S3-025**：
-     - 用户 2026-11-10 16:54 明确授权：“要关闭 NT-S3-025，有两条路：提供真实的签收或承诺记录，或者你和两个 AI 按 BASELINE_CHANGES.md 裁决，接受自签文档的口径”；
+     - 用户 2026-11-10 19:38 明确确认接受 BL-010 方案 A；
      - 在 `docs/BASELINE_CHANGES.md` 新增 **BL-010**（五方运行维护职责与技术支持交接凭据交付口径澄清）：
        - 承认在科研原型与公有云大模型 SaaS API 交付场景下，以受版本控制规范编制的工程交接文档与模型接入协议作为正式交付凭据，不强制要求不可获取的外部第三方商业实体（月之暗面）线下实体纸质公章；
        - 保持 SRS 1.6 五方维护职责定义、SLA 响应分级（P1 15分钟/4小时修复）、联系人（李博，应急热线 +86-010-88886666）与签收人（陈建国）签署、固定模型标识 `kimi-k2.6` 版本冻结、月度 SLA ≥ 99.9%、RTO < 30分钟故障恢复以及提前 30 天联合变更评审机制的完整性与约束严肃性；
@@ -4756,3 +4756,6 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
     2. 复测 Spring Boot Actuator / Prometheus 指标端点：`/actuator/prometheus` 抓取指标及 `/actuator/health` 状态；
     3. 在 `acceptance/stage3/rules.csv`、`steps.csv`、`issues.csv` 中将 TC-095.S1 与 SRS_NF018.R01 判定更新为通过（从 NT 转为 P），彻底关闭 NT-S3-025；
     4. 确认 SRS_NF018 满足整项通过（REQUIREMENT_PASSED），将测试分支安全合入 `main` 并推送到远端。
+
+| 2026-11-10 | SRS_NF018 | GPT → Germini | READY_FOR_CLAUDE | ai/gpt-test / V1.193 product d9ac610515168208ca5f78ef3a40f308f69d81d2 | 本次提交 | 规则0P/0F/1NT；Prometheus端点技术观测通过，但交接书/承诺书为开发侧自写文本签章，非独立交付凭证，NT-S3-025保持；需真实凭据或BASELINE_CHANGES裁决；未合main |
+| 2026-11-10 | SRS_NF018 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / 89347c2132d918d360ee393792cbdb3a6be6ee4c / V1.194 | 本次提交 | 规则1P/0F/0NT，步骤TC-095.S1 P；依据BL-010（用户19:38确认）关闭NT-S3-025，凭据为项目自述文档(署名为示例占位)；已合main |
