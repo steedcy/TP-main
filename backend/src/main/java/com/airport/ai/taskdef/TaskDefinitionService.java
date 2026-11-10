@@ -72,19 +72,20 @@ public class TaskDefinitionService {
      */
     @Transactional
     public TaskDefinition create(CreateTaskDefinitionRequest request, User operator) {
-        if (mapper.existsByTaskName(request.getTaskName())) {
+        String sanitizedTaskName = com.airport.ai.common.XssSanitizer.escapeHtml(request.getTaskName());
+        if (mapper.existsByTaskName(sanitizedTaskName) || mapper.existsByTaskName(request.getTaskName())) {
             throw new BusinessException(ErrorCode.TASK_DEFINITION_NAME_TAKEN);
         }
         validateCapabilityTypes(request.getAvailableCapabilityTypes());
 
         TaskDefinition def = new TaskDefinition();
         def.setDefinitionCode(generateDefinitionCode());
-        def.setTaskName(request.getTaskName());
-        def.setGoalTemplate(request.getGoalTemplate());
+        def.setTaskName(sanitizedTaskName);
+        def.setGoalTemplate(com.airport.ai.common.XssSanitizer.escapeHtml(request.getGoalTemplate()));
         def.setSceneParams(toJson(request.getSceneParams()));
         def.setAvailableCapabilityTypes(toJson(request.getAvailableCapabilityTypes()));
-        def.setConstraintDescription(request.getConstraintDescription());
-        def.setCompletionCondition(request.getCompletionCondition());
+        def.setConstraintDescription(com.airport.ai.common.XssSanitizer.escapeHtml(request.getConstraintDescription()));
+        def.setCompletionCondition(com.airport.ai.common.XssSanitizer.escapeHtml(request.getCompletionCondition()));
         def.setIsPreset(false);
         def.setUpdatedBy(operator.getUsername());
         mapper.insert(def);
@@ -100,11 +101,11 @@ public class TaskDefinitionService {
         TaskDefinition def = get(id);
         validateCapabilityTypes(request.getAvailableCapabilityTypes());
 
-        def.setGoalTemplate(request.getGoalTemplate());
+        def.setGoalTemplate(com.airport.ai.common.XssSanitizer.escapeHtml(request.getGoalTemplate()));
         def.setSceneParams(toJson(request.getSceneParams()));
         def.setAvailableCapabilityTypes(toJson(request.getAvailableCapabilityTypes()));
-        def.setConstraintDescription(request.getConstraintDescription());
-        def.setCompletionCondition(request.getCompletionCondition());
+        def.setConstraintDescription(com.airport.ai.common.XssSanitizer.escapeHtml(request.getConstraintDescription()));
+        def.setCompletionCondition(com.airport.ai.common.XssSanitizer.escapeHtml(request.getCompletionCondition()));
         def.setUpdatedBy(operator.getUsername());
         def.setUpdatedAt(LocalDateTime.now());
         mapper.update(def);

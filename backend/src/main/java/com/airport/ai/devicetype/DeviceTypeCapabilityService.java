@@ -79,9 +79,9 @@ public class DeviceTypeCapabilityService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        entity.setTypeDescription(request.getTypeDescription());
-        entity.setConstraintRules(request.getConstraintRules());
-        entity.setTypicalScenarios(request.getTypicalScenarios());
+        entity.setTypeDescription(com.airport.ai.common.XssSanitizer.escapeHtml(request.getTypeDescription()));
+        entity.setConstraintRules(com.airport.ai.common.XssSanitizer.escapeHtml(request.getConstraintRules()));
+        entity.setTypicalScenarios(com.airport.ai.common.XssSanitizer.escapeHtml(request.getTypicalScenarios()));
         entity.setUpdatedBy(operator.getUsername());
         entity.setUpdatedAt(LocalDateTime.now());
         deviceTypeCapabilityMapper.update(entity);
@@ -146,11 +146,11 @@ public class DeviceTypeCapabilityService {
         CapabilityTemplate template = new CapabilityTemplate();
         template.setDeviceTypeCode(deviceTypeCode);
         template.setTemplateCode(request.getTemplateCode());
-        template.setTemplateName(request.getTemplateName());
+        template.setTemplateName(com.airport.ai.common.XssSanitizer.escapeHtml(request.getTemplateName()));
         template.setCapabilityType(request.getCapabilityType());
         template.setInputParams(writeParams(request.getInputParams()));
         template.setOutputParams(writeParams(request.getOutputParams()));
-        template.setTemplateDescription(request.getTemplateDescription());
+        template.setTemplateDescription(com.airport.ai.common.XssSanitizer.escapeHtml(request.getTemplateDescription()));
         template.setTemplateVersion("V1.0");
         capabilityTemplateMapper.insert(template);
         CapabilityTemplate saved = template;
@@ -167,10 +167,10 @@ public class DeviceTypeCapabilityService {
                                               UpdateCapabilityTemplateRequest request, User operator) {
         CapabilityTemplate template = getTemplate(deviceTypeCode, templateCode);
         requireContract(template.getCapabilityType(), request.getInputParams(), request.getOutputParams());
-        template.setTemplateName(request.getTemplateName());
+        template.setTemplateName(com.airport.ai.common.XssSanitizer.escapeHtml(request.getTemplateName()));
         template.setInputParams(writeParams(request.getInputParams()));
         template.setOutputParams(writeParams(request.getOutputParams()));
-        template.setTemplateDescription(request.getTemplateDescription());
+        template.setTemplateDescription(com.airport.ai.common.XssSanitizer.escapeHtml(request.getTemplateDescription()));
         template.setTemplateVersion(nextVersion(template.getTemplateVersion()));
         template.setUpdatedAt(LocalDateTime.now());
         capabilityTemplateMapper.update(template);

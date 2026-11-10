@@ -93,7 +93,7 @@
                 AND device_type_code = #{deviceTypeCode}
             </if>
             <if test="keyword != null">
-                AND (device_name LIKE CONCAT('%', #{keyword}, '%') OR device_code LIKE CONCAT('%', #{keyword}, '%'))
+                AND (device_name LIKE CONCAT('%', #{keyword}, '%') ESCAPE '\' OR device_code LIKE CONCAT('%', #{keyword}, '%') ESCAPE '\')
             </if>
         </where>
         ORDER BY id

@@ -89,7 +89,7 @@ public class DeviceService {
 
         Device device = new Device();
         device.setDeviceCode(request.getDeviceCode());
-        device.setDeviceName(request.getDeviceName());
+        device.setDeviceName(com.airport.ai.common.XssSanitizer.escapeHtml(request.getDeviceName()));
         device.setDeviceTypeCode(request.getDeviceTypeCode());
         device.setIsSimulator(Boolean.TRUE.equals(request.getIsSimulator()));
         device.setSimulatedDeviceType(request.getSimulatedDeviceType());
@@ -99,7 +99,7 @@ public class DeviceService {
         device.setAccessEndpoint(request.getAccessEndpoint());
         device.setAccessCredentialRef(request.getAccessCredentialRef());
         device.setStatusReportInterval(request.getStatusReportInterval());
-        device.setRemark(request.getRemark());
+        device.setRemark(com.airport.ai.common.XssSanitizer.escapeHtml(request.getRemark()));
         device.setCreatedBy(operator.getUsername());
         device.setUpdatedBy(operator.getUsername());
         deviceMapper.insert(device);
@@ -120,11 +120,18 @@ public class DeviceService {
 
     public PageResult<Device> list(String deviceTypeCode, String onlineFilter, String keyword, int page, int size) {
         PageHelper.startPage(page, size);
+        String safeKeyword = (keyword == null || keyword.isBlank()) ? null : escapeLike(keyword.trim());
         java.util.List<Device> result = deviceMapper.searchPaged(
                 (deviceTypeCode == null || deviceTypeCode.isBlank()) ? null : deviceTypeCode,
-                (keyword == null || keyword.isBlank()) ? null : keyword,
+                safeKeyword,
                 (onlineFilter == null || onlineFilter.isBlank()) ? null : onlineFilter);
         return PageResult.of(new PageInfo<>(result));
+    }
+
+    private static String escapeLike(String raw) {
+        return raw.replace("\\", "\\\\")
+                  .replace("%", "\\%")
+                  .replace("_", "\\_");
     }
 
     public Device get(Long deviceId) {
@@ -170,7 +177,7 @@ public class DeviceService {
         if (!java.util.Objects.equals(device.getAreaCode(), request.getAreaCode())) {
             requirePresetArea(request.getAreaCode());
         }
-        device.setDeviceName(request.getDeviceName());
+        device.setDeviceName(com.airport.ai.common.XssSanitizer.escapeHtml(request.getDeviceName()));
         device.setAreaCode(request.getAreaCode());
         device.setPositionX(request.getPositionX());
         device.setPositionY(request.getPositionY());
@@ -179,7 +186,7 @@ public class DeviceService {
             device.setAccessCredentialRef(request.getAccessCredentialRef());
         }
         device.setStatusReportInterval(request.getStatusReportInterval());
-        device.setRemark(request.getRemark());
+        device.setRemark(com.airport.ai.common.XssSanitizer.escapeHtml(request.getRemark()));
         device.setUpdatedBy(operator.getUsername());
         device.setUpdatedAt(java.time.LocalDateTime.now());
 

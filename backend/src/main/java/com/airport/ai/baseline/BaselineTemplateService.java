@@ -59,7 +59,8 @@ public class BaselineTemplateService {
      */
     @Transactional
     public BaselineTemplate create(CreateBaselineTemplateRequest request, User operator) {
-        if (mapper.existsByTemplateName(request.getTemplateName())) {
+        String sanitizedTemplateName = com.airport.ai.common.XssSanitizer.escapeHtml(request.getTemplateName());
+        if (mapper.existsByTemplateName(sanitizedTemplateName) || mapper.existsByTemplateName(request.getTemplateName())) {
             throw new BusinessException(ErrorCode.TEMPLATE_NAME_TAKEN);
         }
         // 对应5.6.1联动：模板意图须为已存在的任务定义编码，取代此前硬编码4值枚举@Pattern，
@@ -71,7 +72,7 @@ public class BaselineTemplateService {
         validateSteps(request.getSteps(), request.getInputParams());
 
         BaselineTemplate template = new BaselineTemplate();
-        template.setTemplateName(request.getTemplateName());
+        template.setTemplateName(sanitizedTemplateName);
         template.setTaskFamily(request.getTemplateIntent());
         template.setIsPreset(false);
         template.setInputParams(toJson(request.getInputParams()));

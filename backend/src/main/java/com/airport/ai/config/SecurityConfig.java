@@ -1,5 +1,9 @@
 package com.airport.ai.config;
 
+import com.airport.ai.auth.OperationLogService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -25,6 +29,21 @@ public class SecurityConfig {
     private final AuthEntryPoint authEntryPoint;
     private final AccessDeniedHandlerImpl accessDeniedHandler;
 
+    @Autowired(required = false)
+    private CorsOriginSecurityFilter corsOriginSecurityFilter;
+
+    @Autowired(required = false)
+    private ObjectMapper objectMapper;
+
+    @Autowired(required = false)
+    private OperationLogService operationLogService;
+
+    @Value("${app.cors.allowed-origins:http://localhost:5173,http://127.0.0.1:5173,http://localhost:8080,http://127.0.0.1:8080}")
+    private String allowedOriginsConfig = "http://localhost:5173,http://127.0.0.1:5173,http://localhost:8080,http://127.0.0.1:8080";
+
+    @Value("${app.cors.allow-localhost-patterns:true}")
+    private boolean allowLocalhostPatterns = true;
+
     public SecurityConfig(TokenAuthenticationFilter tokenAuthenticationFilter,
                            DeviceTokenAuthenticationFilter deviceTokenAuthenticationFilter,
                            AuthEntryPoint authEntryPoint,
@@ -43,8 +62,12 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        CorsOriginSecurityFilter effectiveCorsFilter = corsOriginSecurityFilter != null
+                ? corsOriginSecurityFilter
+                : new CorsOriginSecurityFilter(objectMapper, operationLogService, allowedOriginsConfig, allowLocalhostPatterns);
         http
             .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.disable())
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .exceptionHandling(eh -> eh
                 .authenticationEntryPoint(authEntryPoint)
@@ -64,7 +87,8 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(deviceTokenAuthenticationFilter, TokenAuthenticationFilter.class);
+            .addFilterBefore(deviceTokenAuthenticationFilter, TokenAuthenticationFilter.class)
+            .addFilterAfter(effectiveCorsFilter, TokenAuthenticationFilter.class);
         return http.build();
     }
 }

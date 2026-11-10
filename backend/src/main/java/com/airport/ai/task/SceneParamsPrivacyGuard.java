@@ -318,6 +318,9 @@ public final class SceneParamsPrivacyGuard {
         // 7. 独立电子邮箱脱敏
         text = EMAIL_PATTERN.matcher(text).replaceAll("[PROTECTED_EMAIL]");
 
+        // 8. XSS 与 HTML 注入字符转义净化（SRS_NF004）
+        text = com.airport.ai.common.XssSanitizer.sanitizeRichText(text);
+
         return text;
     }
 }

@@ -205,7 +205,7 @@ public class RiskRuleController {
         if (trimmed.length() > maxLength) {
             throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, label + "不得超过" + maxLength + "个字符");
         }
-        return trimmed;
+        return com.airport.ai.common.XssSanitizer.sanitizeRichText(trimmed);
     }
 
     static boolean requiredBoolean(Object value) {

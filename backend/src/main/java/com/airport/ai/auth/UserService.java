@@ -49,9 +49,9 @@ public class UserService {
         User user = new User();
         user.setUsername(request.getUsername());
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-        user.setRealName(request.getRealName());
+        user.setRealName(com.airport.ai.common.XssSanitizer.escapeHtml(request.getRealName()));
         user.setRole(request.getRole());
-        user.setContact(request.getContact());
+        user.setContact(com.airport.ai.common.XssSanitizer.escapeHtml(request.getContact()));
         user.setStatus("ACTIVE");
         userMapper.insert(user);
         // 详情只放非敏感的关键字段，不含密码或摘要（DEF-S3-009、F028.R03）

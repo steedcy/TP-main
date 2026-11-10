@@ -77,12 +77,12 @@ public class DeviceCapabilityService {
         DeviceCapability capability = new DeviceCapability();
         capability.setDeviceId(deviceId);
         capability.setCapabilityCode(request.getCapabilityCode());
-        capability.setCapabilityName(request.getCapabilityName());
+        capability.setCapabilityName(com.airport.ai.common.XssSanitizer.escapeHtml(request.getCapabilityName()));
         capability.setCapabilityType(request.getCapabilityType());
         capability.setInputParams(writeParams(request.getInputParams()));
         capability.setOutputParams(writeParams(request.getOutputParams()));
-        capability.setApplicableConditions(request.getApplicableCondition());
-        capability.setCapabilityDescription(request.getCapabilityDescription());
+        capability.setApplicableConditions(com.airport.ai.common.XssSanitizer.escapeHtml(request.getApplicableCondition()));
+        capability.setCapabilityDescription(com.airport.ai.common.XssSanitizer.escapeHtml(request.getCapabilityDescription()));
 
         if (request.getTemplateId() != null) {
             CapabilityTemplate template = capabilityTemplateMapper.findById(request.getTemplateId())
@@ -103,11 +103,11 @@ public class DeviceCapabilityService {
     @Transactional
     public DeviceCapability update(Long deviceId, String capabilityCode, UpdateDeviceCapabilityRequest request, User operator) {
         DeviceCapability capability = get(deviceId, capabilityCode);
-        capability.setCapabilityName(request.getCapabilityName());
+        capability.setCapabilityName(com.airport.ai.common.XssSanitizer.escapeHtml(request.getCapabilityName()));
         capability.setInputParams(writeParams(request.getInputParams()));
         capability.setOutputParams(writeParams(request.getOutputParams()));
-        capability.setApplicableConditions(request.getApplicableCondition());
-        capability.setCapabilityDescription(request.getCapabilityDescription());
+        capability.setApplicableConditions(com.airport.ai.common.XssSanitizer.escapeHtml(request.getApplicableCondition()));
+        capability.setCapabilityDescription(com.airport.ai.common.XssSanitizer.escapeHtml(request.getCapabilityDescription()));
         capability.setCapabilityStatus("UNTESTED");
         capability.setTestPassed(false);
         capability.setTestResult(null);
