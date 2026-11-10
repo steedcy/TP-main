@@ -2,15 +2,28 @@
 
 ## 当前交接状态
 
-- 状态：REQUIREMENT_PASSED（SRS_NF001 系统安全性：认证与权限 整轮独立复测全部通过，DEF-S3-010 彻底关闭，NT-S3-009 彻底闭环，合并入 main，准备启动下一项 SRS_NF002）
-- 依据需求与规则：SRS_NF001.R01、TC-086.S1、TC-086.S2、DEF-S3-010、NT-S3-009
-- 本轮独立复测成果：
-  1. 数据库存储与接口脱敏：测试库 14 个账号全量 BCrypt 加盐哈希，0 明文；GET /users 与 POST /users 响应绝无 passwordHash（DEF-S3-010 彻底关闭）；设备凭据脱敏掩码回显；全量 908 条审计日志 0 处敏感密码暴露；
-  2. 越权访问防护与时序拦截：非管理员调用用户管理、非配置管理员调用设备管理统一快速拦截为 403 Forbidden（错误码 2003）并生成 ACCESS_DENIED 审计日志，数据库零落库；无权角色发送空请求体优先触发 403 权限拦截，杜绝被参数校验提前误判为 400；
-  3. 会话时效与防伪造：未带 Token（401/2000）、篡改伪造 Token（401/2001）快速拦截；账号停用（INACTIVE）或管理员重置密码（resetPassword）及主动登出（logout）联动注销 Redis 活跃会话，旧 Token 立即失效（401/2001，NT-S3-009 彻底闭环）；
-  4. 真实 Edge 浏览器 UI 实测：3/3 全部通过（管理员用户列表无哈希泄露、操作员菜单隔离/路由拦截/浏览器内 fetch 越权 403 拦截、登出安全重定向与后退阻断）。
-- 验证基线与固定版本：固定产品代码 0e16b31dc2c01e965f8848897940c2885b1ba99a（标签 V1.190），规则 1P/0F/0NT，步骤 2P/0F/0NT，UI 3/3 通过。
-- 下一步：ai/gpt-test 合并入 main 并推送到远端，启动第二项非功能需求 SRS_NF002（会话空闲失效与数据完整性）。
+- 状态：READY_FOR_GPT（SRS_NF003 旅客个人身份隐私保护 全链路隐私加固与哨兵拦截完成，彻底闭环 DEF-S3-032，移交 ai/gpt-test 独立整轮复测）
+- 依据需求与规则：SRS_NF003.R01、TC-031.S2、TC-077.S1~S3、TC-086.S1~S2、DEF-S3-032
+- 本轮加固成果：
+  1. 全系统全链路旅客身份信息与非法哨兵深度拦截（彻底闭环 DEF-S3-032）：
+     - 参数守卫层（`SceneParamsPrivacyGuard.reject`）严密拦截非法旅客个人身份字段（旅客姓名、18位身份证号、护照号、手机号、邮箱等），拒绝非法哨兵注入并返回 400 Bad Request（错误提示明确指出“目标文本包含旅客个人身份隐私信息，系统已拒绝处理”或具体字段违规），杜绝非法哨兵入库；
+     - 合法脱敏字段自动掩码脱敏，业务临时编号（如 `BAG-123456`, `P-R08-OVERSIZE`, `TEMP-*`）、航班号（如 `CA1234`, `MU5182`）等业务代号安全放行不误拒、不误脱敏；
+  2. 全流程多层级自动递归脱敏与大模型 Prompt 防泄漏防护：
+     - 目标解析与规划请求入参（`GoalUnderstandingRequest`、`PlanningRequest`）：`sceneParams`、`clarificationAnswers`、`constraints`、`completedSteps` 在入口 setter 处递归脱敏；
+     - 大模型请求体（`MoonshotChatClient`）：外部大模型 Prompt 请求体在序列化后、发送前调用 `SceneParamsPrivacyGuard.sanitizeText` 进行最后一道防线脱敏，杜绝任何敏感隐私外发；
+     - 任务执行事件与时间线详情（`TaskEvent` / `TaskEventService`）：`detail` 与 `detailSummary` 写入前统一递归脱敏；
+     - 系统审计操作日志（`OperationLogService`）：`operationTarget` 与 `detail` 经 `SceneParamsPrivacyGuard.sanitizeGoal` 及 `sanitize` 过滤，严禁个人身份与非法哨兵写入审计记录；
+     - 前端视图展示（`TaskView`）：任务目标、规划理解结果、失败/终止/重规划/降级原因在输出前完成脱敏展示；
+     - 任务生命周期控制（`TaskService`）：澄清补充、人工介入、取消与终止原因均全链路脱敏与哨兵拦截。
+  3. 复合结构与自然语言文本智能脱敏增强：
+     - `SceneParamsPrivacyGuard` 扩充中英文护照号（支持中英文前后缀及多种分隔符）、手机号变体、中文身份关键词（`旅客姓名`、`身份证件`、`旅客手机`、`旅客护照`、`passengerphone` 等）；
+     - 优化自然语言键值对提取正则，增加前瞻否定界定，彻底解决跨空格/标点贪婪吞噬后续正常业务词（如“前往登机口”、“航班”）的缺陷；
+     - `CredentialMasker` 兼顾不可变集合（如 `Map.of`）的自动降级脱敏副本，保障只读集合安全；
+  4. 本地验证与质量门禁：
+     - 后端单元测试：全量 550 项单测全部通过（0 失败 0 错误 2 跳过，耗时 49.88s），其中包含新增的 `PassengerPrivacyEndToEndTest` 全链路端到端隐私防护套件及 `SceneParamsPrivacyGuardTest` 专项扩展测试；
+     - 前端构建打包：`npm run build` 成功（3272 modules transformed，0 error，耗时 28.99s）。
+- 验证基线与固定版本：固定产品代码 `443ccbd1b28de9971affe6253f3b80652f8fd132`（标签 `V1.191`）。
+- 下一步：ai/gpt-test 基于固定代码 V1.191 开展 SRS_NF003 整轮独立复测与验收（重点核验 DEF-S3-032 闭环、TC-031.S2、TC-077.S1~S3、TC-086.S1~S2）。
 
 ## 首项需求的现有证据
 
@@ -77,6 +90,7 @@
 | 2026-11-10 | SRS_F028 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / 14e75c6bf1b0ef226d9cba4ba422ffb7ceab1f3a / V1.189 | 待合入 | 8P/0F/0NT，步骤2P/0F/0NT；DEF-S3-009实测彻底关闭；真实Edge UI 3/3通过；全量测试全P通过，合入main，下一项SRS_NF001 |
 | 2026-11-10 | SRS_NF001 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / 0e16b31dc2c01e965f8848897940c2885b1ba99a / V1.190 | 待独立测试 | 闭环 DEF-S3-010、NT-S3-009，越权访问 403 留痕、敏感凭据递归掩码、会话重置/停用即时失效与防伪造，详见下文交接专节 |
 | 2026-11-10 | SRS_NF001 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / 0e16b31dc2c01e965f8848897940c2885b1ba99a / V1.190 | 待提交 | 规则1P/0F/0NT，步骤2P/0F/0NT；DEF-S3-010与NT-S3-009彻底闭环；真实Edge UI 3/3通过；全量测试全P通过，合入main，下一项SRS_NF002 |
+| 2026-11-10 | SRS_NF003 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / 443ccbd1b28de9971affe6253f3b80652f8fd132 / V1.191 | 待独立整轮复测 | 彻底闭环 DEF-S3-032，全链路旅客个人身份隐私保护（哨兵拒绝/脱敏掩码/模型请求防泄漏/业务编号放行），详见下文交接专节 |
 ## 文件认领
 
 - Claude：当前需求涉及的产品代码与必要的修复单测；独立 `ai/claude-fix` worktree。
@@ -4534,5 +4548,45 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
     - `acceptance/stage3/evidence/SRS_NF001-V1.190-ui-operator-restricted.png`
     - `acceptance/stage3/evidence/SRS_NF001-V1.190-ui-logout-redirect.png`
 - **后续协同**：按 V2.4 协同规则，ai/gpt-test 分支合并至 main 并推送到 origin；准备启动第二项非功能需求 SRS_NF002（会话空闲失效与数据完整性）。
+
+## 2026-11-10 Germini → GPT：SRS_NF003 V1.191 旅客个人身份隐私保护全链路加固交接（READY_FOR_GPT）
+
+- **交接状态**：READY_FOR_GPT
+- **需求编号**：SRS_NF003（旅客个人身份隐私保护）
+- **关联规则与用例**：
+  - 需求规则：`SRS_NF003.R01`（系统应严格保护旅客个人身份隐私，禁止在任务目标、场景参数、执行日志、事件详情、前端展示及大模型交互中泄露或持久化明文旅客个人身份信息）；
+  - 用例步骤：`TC-031.S2`、`TC-077.S1`、`TC-077.S2`、`TC-077.S3`、`TC-086.S1`、`TC-086.S2`；
+  - 核心闭环缺陷：`DEF-S3-032`（全系统全链路旅客个人身份信息泄露与非法哨兵字段拦截漏洞）。
+- **固定产品版本**：`443ccbd1b28de9971affe6253f3b80652f8fd132`（标签 `V1.191`）
+- **工作分支**：`ai/claude-fix`（已提交打标并推送到远端）
+- **交付内容与核心加固点**：
+  1. **全系统全链路非法哨兵拦截与 400 快速失败**：
+     - 在 `SceneParamsPrivacyGuard.reject(Map<String, Object> params)` 中完善身份字段检测与值正则扫描（涵盖中文旅客姓名、18位身份证号、护照号、手机号、邮箱等）；
+     - 在 `SceneParamsPrivacyGuard.rejectIfContainsIdentity(String text)` 中精准识别哨兵文本，当目标或参数包含真实身份时立即抛出 `IllegalArgumentException`（HTTP 400），拒绝入库并向操作员清晰提示；
+     - 任务澄清、人工干预、参数追加等入口统一接入守卫校验，杜绝任何带哨兵身份参数注入数据库。
+  2. **合法业务编号与航班代号安全放行**：
+     - 严格区分业务临时编号（如 `BAG-123456`、`P-R08-OVERSIZE`、`TEMP-*`、`TASK-*`）及航班号（如 `CA1234`、`MU5182`）；
+     - 正则匹配边界优化：避免自然语言中介词（`前往`、`到`、`在`等）被贪婪误捕获为姓名，不破坏正常业务目标解析。
+  3. **模型 Prompt 发送前防泄漏安全防线**：
+     - 在 `MoonshotChatClient.chat(String systemPrompt, String userPrompt)` 中，请求 JSON 序列化并发送至外部 LLM 之前，统一执行 `SceneParamsPrivacyGuard.sanitizeText(requestBody)`，杜绝真实敏感信息出域。
+  4. **事件时间线与操作审计全方位脱敏**：
+     - `TaskEvent.setDetail` 与 `setDetailSummary` 统一接入 `SceneParamsPrivacyGuard.sanitizeText`；
+     - `OperationLogService` 的 `operationTarget` 与 `detail` 经 `SceneParamsPrivacyGuard.sanitizeGoal` 和 `sanitize` 过滤，严禁落库未脱敏数据。
+  5. **视图对象（TaskView）出参脱敏**：
+     - `TaskView` 对任务目标、澄清结果、失败原因、取消/终止原因等字段进行脱敏防护，前端接收到的任何任务数据均受脱敏保护。
+- **本地质量门禁验证记录**：
+  - 后端单元测试：`mvn -o test`，运行 550 项单测全部通过（0 失败，0 错误，2 跳过），耗时 49.88s。
+    - 专项测试 `SceneParamsPrivacyGuardTest`：13/13 通过；
+    - 端到端测试 `PassengerPrivacyEndToEndTest`：4/4 通过（覆盖哨兵 400 拦截、大模型 Prompt 脱敏、TaskEvent 时间线脱敏、审计日志 OperationLog 脱敏）；
+    - 敏感凭据测试 `UserSerializationTest`：5/5 通过。
+  - 前端生产构建：`npm run build`，3272 modules transformed，0 error，构建成功（耗时 28.99s）。
+- **给 ChatGPT 的独立复测指引**：
+  - 请基于固定代码版本 `443ccbd1b28de9971affe6253f3b80652f8fd132`（`V1.191`）在独立 worktree `ai/gpt-test` 开展整轮独立复测；
+  - 核心复测项：
+    1. 校验 DEF-S3-032 闭环：使用包含旅客姓名、身份证号、护照号、手机号的哨兵字段请求，确认接口返回 400 拦截且数据库中无明文记录；
+    2. 校验合法业务标识放行：包含行李号（`BAG-*`）、航班号（`CA1234` 等）的业务任务正常创建且不被误拒；
+    3. 校验事件详情、操作审计日志、模型 Prompt 中的敏感脱敏情况（掩码为 `[PROTECTED_IDENTITY]` / `[PROTECTED_PHONE]` 等）；
+    4. 独立复测 `TC-031.S2`、`TC-077.S1~S3`、`TC-086.S1~S2`。
+
 
 
