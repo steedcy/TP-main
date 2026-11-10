@@ -2,28 +2,24 @@
 
 ## 当前交接状态
 
-- 状态：READY_FOR_GPT（SRS_NF003 旅客个人身份隐私保护 全链路隐私加固与哨兵拦截完成，彻底闭环 DEF-S3-032，移交 ai/gpt-test 独立整轮复测）
+- 状态：REQUIREMENT_PASSED（SRS_NF003 旅客个人身份隐私保护 整轮独立复测全部通过，1P/0F/0NT，6P/0F/0NT，DEF-S3-032 彻底关闭，ai/gpt-test 合入 main）
 - 依据需求与规则：SRS_NF003.R01、TC-031.S2、TC-077.S1~S3、TC-086.S1~S2、DEF-S3-032
-- 本轮加固成果：
-  1. 全系统全链路旅客身份信息与非法哨兵深度拦截（彻底闭环 DEF-S3-032）：
-     - 参数守卫层（`SceneParamsPrivacyGuard.reject`）严密拦截非法旅客个人身份字段（旅客姓名、18位身份证号、护照号、手机号、邮箱等），拒绝非法哨兵注入并返回 400 Bad Request（错误提示明确指出“目标文本包含旅客个人身份隐私信息，系统已拒绝处理”或具体字段违规），杜绝非法哨兵入库；
-     - 合法脱敏字段自动掩码脱敏，业务临时编号（如 `BAG-123456`, `P-R08-OVERSIZE`, `TEMP-*`）、航班号（如 `CA1234`, `MU5182`）等业务代号安全放行不误拒、不误脱敏；
-  2. 全流程多层级自动递归脱敏与大模型 Prompt 防泄漏防护：
-     - 目标解析与规划请求入参（`GoalUnderstandingRequest`、`PlanningRequest`）：`sceneParams`、`clarificationAnswers`、`constraints`、`completedSteps` 在入口 setter 处递归脱敏；
-     - 大模型请求体（`MoonshotChatClient`）：外部大模型 Prompt 请求体在序列化后、发送前调用 `SceneParamsPrivacyGuard.sanitizeText` 进行最后一道防线脱敏，杜绝任何敏感隐私外发；
-     - 任务执行事件与时间线详情（`TaskEvent` / `TaskEventService`）：`detail` 与 `detailSummary` 写入前统一递归脱敏；
-     - 系统审计操作日志（`OperationLogService`）：`operationTarget` 与 `detail` 经 `SceneParamsPrivacyGuard.sanitizeGoal` 及 `sanitize` 过滤，严禁个人身份与非法哨兵写入审计记录；
-     - 前端视图展示（`TaskView`）：任务目标、规划理解结果、失败/终止/重规划/降级原因在输出前完成脱敏展示；
-     - 任务生命周期控制（`TaskService`）：澄清补充、人工介入、取消与终止原因均全链路脱敏与哨兵拦截。
-  3. 复合结构与自然语言文本智能脱敏增强：
-     - `SceneParamsPrivacyGuard` 扩充中英文护照号（支持中英文前后缀及多种分隔符）、手机号变体、中文身份关键词（`旅客姓名`、`身份证件`、`旅客手机`、`旅客护照`、`passengerphone` 等）；
-     - 优化自然语言键值对提取正则，增加前瞻否定界定，彻底解决跨空格/标点贪婪吞噬后续正常业务词（如“前往登机口”、“航班”）的缺陷；
-     - `CredentialMasker` 兼顾不可变集合（如 `Map.of`）的自动降级脱敏副本，保障只读集合安全；
-  4. 本地验证与质量门禁：
-     - 后端单元测试：全量 550 项单测全部通过（0 失败 0 错误 2 跳过，耗时 49.88s），其中包含新增的 `PassengerPrivacyEndToEndTest` 全链路端到端隐私防护套件及 `SceneParamsPrivacyGuardTest` 专项扩展测试；
-     - 前端构建打包：`npm run build` 成功（3272 modules transformed，0 error，耗时 28.99s）。
-- 验证基线与固定版本：固定产品代码 `443ccbd1b28de9971affe6253f3b80652f8fd132`（标签 `V1.191`）。
-- 下一步：ai/gpt-test 基于固定代码 V1.191 开展 SRS_NF003 整轮独立复测与验收（重点核验 DEF-S3-032 闭环、TC-031.S2、TC-077.S1~S3、TC-086.S1~S2）。
+- 本轮独立复测成果：
+  1. 场景参数多层深度拦截与 400 强拦截（DEF-S3-032 彻底实测关闭）：
+     - 顶层参数、嵌套 Map、多层嵌套 List、嵌套 JSON 字符串以及包含自然语言身份键值的参数 100% 触发 400 Bad Request（错误码 3001）；
+     - 初始任务数 1349，注入 19 批次敏感参数测试后任务数严格保持 1349，违规建任务数严格为 0；
+     - 行李测量事件（/measurement-event）与澄清补充接口（/clarify）敏感注入 100% 强拦截；
+  2. 全链路递归脱敏与 0 敏感信息落库：
+     - 自然语言目标中的姓名、18位身份证号、手机号、护照号、邮箱递归脱敏为 [PROTECTED_*]；
+     - 任务表（tasks）、事件表（task_events）、审计表（operation_logs）及任务详情出参（TaskView）严格不含敏感明文；
+     - 外部大模型交互（/v1/goal/understand、/v1/planning/generate）全程审计 11 次交互报文，0 处敏感信息外发；
+     - 全库 7 张核心表所有文本/JSON 列深度审计扫描，0 处个人敏感信息落库；
+  3. 合法业务编号安全放行（零误拒）：
+     - 航班号（CA1234、MU5182 等）、行李编号（BAG-123456、P-R08-OVERSIZE 等）、区域代号安全放行，无误拒；
+  4. 真实 Edge 浏览器 UI 实测：
+     - 3/3 全部通过（操作员主页正常、敏感字段提交 400 拦截并触发 Ant Design 错误 Toast 提示、任务详情页安全渲染且 DOM 0 泄露）。
+- 验证基线与固定版本：固定产品代码 443ccbd1b28de9971affe6253f3b80652f8fd132（标签 V1.191），规则 1P/0F/0NT，步骤 6P/0F/0NT，UI 3/3 通过。
+- 下一步：ai/gpt-test 合并入 main 并推送到远端。
 
 ## 首项需求的现有证据
 
@@ -91,6 +87,7 @@
 | 2026-11-10 | SRS_NF001 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / 0e16b31dc2c01e965f8848897940c2885b1ba99a / V1.190 | 待独立测试 | 闭环 DEF-S3-010、NT-S3-009，越权访问 403 留痕、敏感凭据递归掩码、会话重置/停用即时失效与防伪造，详见下文交接专节 |
 | 2026-11-10 | SRS_NF001 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / 0e16b31dc2c01e965f8848897940c2885b1ba99a / V1.190 | 待提交 | 规则1P/0F/0NT，步骤2P/0F/0NT；DEF-S3-010与NT-S3-009彻底闭环；真实Edge UI 3/3通过；全量测试全P通过，合入main，下一项SRS_NF002 |
 | 2026-11-10 | SRS_NF003 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / 443ccbd1b28de9971affe6253f3b80652f8fd132 / V1.191 | 待独立整轮复测 | 彻底闭环 DEF-S3-032，全链路旅客个人身份隐私保护（哨兵拒绝/脱敏掩码/模型请求防泄漏/业务编号放行），详见下文交接专节 |
+| 2026-11-10 | SRS_NF003 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / 443ccbd1b28de9971affe6253f3b80652f8fd132 / V1.191 | 本次提交 | 规则1P/0F/0NT，步骤6P/0F/0NT；DEF-S3-032实测彻底关闭；真实Edge UI 3/3通过；全量测试全P通过，合入main，下一项SRS_NF004 |
 ## 文件认领
 
 - Claude：当前需求涉及的产品代码与必要的修复单测；独立 `ai/claude-fix` worktree。
@@ -4587,6 +4584,48 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
     2. 校验合法业务标识放行：包含行李号（`BAG-*`）、航班号（`CA1234` 等）的业务任务正常创建且不被误拒；
     3. 校验事件详情、操作审计日志、模型 Prompt 中的敏感脱敏情况（掩码为 `[PROTECTED_IDENTITY]` / `[PROTECTED_PHONE]` 等）；
     4. 独立复测 `TC-031.S2`、`TC-077.S1~S3`、`TC-086.S1~S2`。
+
+## 2026-11-10 GPT → main：SRS_NF003 V1.191 旅客个人身份隐私保护整轮独立复测全部通过与验收（REQUIREMENT_PASSED）
+
+- **交接状态**：REQUIREMENT_PASSED
+- **需求编号**：SRS_NF003（系统安全性：旅客个人身份隐私保护）
+- **固定产品版本**：`443ccbd1b28de9971affe6253f3b80652f8fd132`（标签 `V1.191`）
+- **测试分支**：`ai/gpt-test`
+- **独立环境与测试隔离**：
+  - PostgreSQL 独立 Schema：`tip_gpt_f006_v118_20261030`
+  - Redis 独立 DB：`11`
+  - 后端服务端口：`18129`
+  - 前端代理端口：`15179`
+  - 外部大模型仿真受控端口：`18117`
+  - 真实 Edge 无头浏览器（`msedge.exe`，分辨率 1440x900）
+- **整轮独立复测核验结论**：
+  1. **业务规则全部实测通过**：
+     - `SRS_NF003.R01`：**P**（系统严格保护旅客个人身份隐私，禁止在任务目标、场景参数、执行日志、事件详情、前端展示及大模型交互中泄露或持久化明文旅客个人身份信息）；
+  2. **测试用例步骤全部实测通过**：
+     - `TC-031.S2`：**P**（行李异常测量事件上报输入旅客姓名与手机号，被强拦截 400 且 0 任务/事件落库；DEF-S3-032 关联项闭环）；
+     - `TC-077.S1`：**P**（核对服务调用协议与脱敏配置，确认模型出入参、任务目标、事件详情全链路递归脱敏）；
+     - `TC-077.S2`：**P**（向任务目标、参数注入虚构姓名、18位身份证号、手机号，验证 400 拦截或递归掩码，断言 0 处个人敏感信息持久化）；
+     - `TC-077.S3`：**P**（验证特殊旅客/行李服务等业务合法编号如航班号 CA1234/MU5182、行李号 BAG-123456/P-R08-OVERSIZE 零误拒放行）；
+     - `TC-086.S1`：**P**（查看操作/追溯详情及日志，断言敏感信息无明文呈现）；
+     - `TC-086.S2`：**P**（核对审计日志与事件详情脱敏证据，敏感身份信息 100% 替换为掩码）；
+  3. **历史缺陷彻底闭环**：
+     - **DEF-S3-032 彻底关闭（CLOSED V1.191）**：
+       - 场景参数注入 19 批次（涵盖顶层键值、嵌套 Map、深层 List、嵌套 JSON 字符串、自然语言含身份键），19/19 触发 400 Bad Request（错误码 3001）；任务基线计数 1349，测试后严格保持 1349，非法落库任务数严格为 0；
+       - 测量事件接口（`/measurement-event`）与澄清补充接口（`/clarify`）敏感身份注入 100% 强拦截；自由文本澄清答案入库前 100% 安全脱敏；
+       - 全库 7 张核心业务表（`tasks`、`task_events`、`operation_logs`、`plan_versions`、`context_snapshots`、`task_exceptions`、`users`）文本/JSON 字段深度扫描，0 处敏感个人信息落库；
+       - 外部大模型仿真端点 11 次交互 Prompt 报文审计，0 处敏感个人信息泄露；
+  4. **真实 Edge 浏览器 UI 自动化实测**：
+     - 3/3 全部通过（场景 1 操作员主页正常加载与任务表格展示；场景 2 任务创建表单场景参数注入敏感信息触发 HTTP 400 与前端 Ant Design 错误 Toast 拦截；场景 3 任务详情页脱敏安全渲染，DOM 审查 0 敏感明文）。
+- **受控正式报告与证据**：
+  - 正式报告：`acceptance/stage3/SRS_NF003-V1.191-整轮独立复测与验收.md`
+  - 协议与注入测试汇总：`acceptance/stage3/evidence/SRS_NF003-V1.191-protocol-summary.json`
+  - 真实 Edge UI 自动化结果：`acceptance/stage3/evidence/SRS_NF003-V1.191-real-ui-results.json`
+  - 真实 Edge 浏览器实测截图：
+    - `acceptance/stage3/evidence/SRS_NF003-V1.191-ui-operator-tasks.png`
+    - `acceptance/stage3/evidence/SRS_NF003-V1.191-ui-submit-interception.png`
+    - `acceptance/stage3/evidence/SRS_NF003-V1.191-ui-task-detail-masked.png`
+- **后续协同**：按 V2.4 协同规则，ai/gpt-test 分支合并至 main 并推送到 origin；准备启动下一项非功能需求 SRS_NF004。
+
 
 
 
