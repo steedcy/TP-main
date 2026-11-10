@@ -57,4 +57,16 @@ public class User {
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
     public String getCreatedBy() { return createdBy; }
     public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", realName='" + realName + '\'' +
+                ", role='" + role + '\'' +
+                ", status='" + status + '\'' +
+                ", failedLoginAttempts=" + failedLoginAttempts +
+                '}';
+    }
 }

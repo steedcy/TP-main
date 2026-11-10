@@ -46,18 +46,27 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String header = request.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer ")) {
-            String token = header.substring(7);
-            Long userId = sessionService.touchAndGetUserId(token);
-            if (userId != null) {
-                userMapper.findById(userId).ifPresentOrElse(user -> {
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            user, null, List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole())));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                    request.setAttribute("currentUser", user);
-                }, () -> request.setAttribute("sessionExpired", true));
-            } else {
-                // 携带了Bearer Token但Redis中找不到对应会话：已过期或已被登出
+            String token = header.substring(7).trim();
+            if (token.isEmpty()) {
                 request.setAttribute("sessionExpired", true);
+            } else {
+                Long userId = sessionService.touchAndGetUserId(token);
+                if (userId != null) {
+                    userMapper.findById(userId).ifPresentOrElse(user -> {
+                        // 账号已停用或已锁定时，拒绝建立已认证上下文并标记会话失效（SRS_NF001防越权/防劫持）
+                        if (!"ACTIVE".equals(user.getStatus())) {
+                            request.setAttribute("sessionExpired", true);
+                            return;
+                        }
+                        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                                user, null, List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole())));
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                        request.setAttribute("currentUser", user);
+                    }, () -> request.setAttribute("sessionExpired", true));
+                } else {
+                    // 携带了Bearer Token但Redis中找不到对应会话：已过期、已被登出或伪造Token
+                    request.setAttribute("sessionExpired", true);
+                }
             }
         }
         filterChain.doFilter(request, response);

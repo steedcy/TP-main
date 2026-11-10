@@ -24,12 +24,21 @@ public class UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final OperationLogService operationLogService;
+    private final SessionService sessionService;
 
     public UserService(UserMapper userMapper, PasswordEncoder passwordEncoder,
                         OperationLogService operationLogService) {
+        this(userMapper, passwordEncoder, operationLogService, null);
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public UserService(UserMapper userMapper, PasswordEncoder passwordEncoder,
+                        OperationLogService operationLogService,
+                        @org.springframework.beans.factory.annotation.Autowired(required = false) SessionService sessionService) {
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
         this.operationLogService = operationLogService;
+        this.sessionService = sessionService;
     }
 
     @Transactional
@@ -69,6 +78,10 @@ public class UserService {
         user.setPasswordHash(passwordEncoder.encode(newPassword));
         user.setUpdatedAt(LocalDateTime.now());
         userMapper.update(user);
+        // 会话注销或重置后旧Token立即失效（SRS_NF001防劫持）
+        if (sessionService != null) {
+            sessionService.invalidateUserSessions(userId);
+        }
         // 只记录“已重置”这一事实，新密码和哈希都不进日志
         Map<String, Object> reset = new LinkedHashMap<>();
         reset.put("action", "RESET_PASSWORD");
@@ -89,6 +102,10 @@ public class UserService {
         user.setStatus(status);
         user.setUpdatedAt(LocalDateTime.now());
         userMapper.update(user);
+        // 账号停用或锁定后旧Token立即失效（SRS_NF001防劫持）
+        if (!"ACTIVE".equals(status) && sessionService != null) {
+            sessionService.invalidateUserSessions(userId);
+        }
         // 变更前后的状态摘要，便于在操作记录详情里直接看出改了什么（DEF-S3-009）
         Map<String, Object> change = new LinkedHashMap<>();
         change.put("action", "STATUS_CHANGE");
