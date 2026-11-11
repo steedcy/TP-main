@@ -4,6 +4,7 @@
 > **主干验收合入提交**：F001～F028、SRS_NF001、SRS_NF003、SRS_NF004、SRS_NF010、SRS_NF016、SRS_NF018 已验收安全合main；40用户文件哈希不变，无PR；最终证明随本提交同步。
 > **最新产品代码提交**：c34deba / V1.197（SRS_NF005）
 > **当前状态**：REQUIREMENT_PASSED（SRS_NF005 V1.197 独立复测通过，已安全合入 main）。
+> **2026-11-11整体整理口径**：当前数字、名称、版本和需求状态以 `docs/OVERALL_RECONCILIATION-20261111.md`、`acceptance/stage3/rules.csv`、`acceptance/stage3/steps.csv` 和最新 `docs/HANDOFF.md` 为准。下方较早表格保留历史叙述；其中 F002A 的“5/5 P”、NF018 V1.193 READY_FOR_GPT、F029/F030 及旧 NF 指标名称均已被当前受控台账 supersede，不作为当前结论。
 
 ---
 
