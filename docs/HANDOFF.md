@@ -2,7 +2,7 @@
 
 ## 当前交接状态
 
-- 状态：REQUIREMENT_PASSED（SRS_NF005 故障隔离与自愈恢复 V1.197 独立复测通过，待合入 main）
+- 状态：REQUIREMENT_PASSED（SRS_NF005 故障隔离与自愈恢复 V1.197 独立复测通过，已合入 main）
 - 依据需求与规则：SRS_NF005.R01、TC-024.S1~S2、TC-040.S1~S2、TC-056.S1~S2
 - 固定产品版本：`c34deba`（标签 `V1.197`，已推送到 `origin/ai/claude-fix`）
 - 本轮修复与自测验证结论：
@@ -4922,5 +4922,5 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
 - **验收结论**：SRS_NF005.R01 **1P / 0F / 0NT**。单终端宕机接管、任务创建模型网络超时回滚、分派阶段设备异常隔离、故障终端自动重连四类观察均 P；模型异常保留任务与诊断事件用于人工追溯，但 plan_versions、task_step_assignments、device_commands、task_exceptions 均无新增下游脏行。
 - **关联复核**：TC-024.S1~S2、TC-040.S1~S2、TC-056.S1~S2 的 V1.197 证据已追加至 steps.csv；FaultIsolationAndSelfHealingNF005Test 30/30、MotionSafetyFieldsTest 2/2、CommandDispatchAndExecutionF017Test 10/10 通过，后端与仿真器生产构建成功。
 - **口径记录**：docs/BASELINE_CHANGES.md 已登记 BL-011，将 R01 补充为故障隔离、自愈、事务边界和安全拦截的统一规则，历史证据保留。
-- **正式报告与证据**：acceptance/stage3/SRS_NF005-V1.197-整轮独立复测与验收.md；acceptance/stage3/evidence/SRS_NF005-V1.197-fault-injection.json；acceptance/stage3/evidence/SRS_NF005-V1.197-test-build.json 及四份原始注入快照。
-- **后续动作**：提交并推送 ai/gpt-test，核对远端后将测试分支安全合入 main；产品源码不在 GPT 测试分支修改。
+- **正式报告与证据**：acceptance/stage3/SRS_NF005-V1.197-整轮独立复测与验收.md；acceptance/stage3/evidence/SRS_NF005-V1.197-fault-injection.json；acceptance/stage3/evidence/SRS_NF005-V1.197-test-build.json 及四份原始注入快照；main 合入证明 acceptance/stage3/evidence/SRS_NF005-V1.197-main-integration-verified.json。
+- **后续动作**：ai/gpt-test 已推送，远端 main 已快进至 400a634；产品源码不在 GPT 测试分支修改。
