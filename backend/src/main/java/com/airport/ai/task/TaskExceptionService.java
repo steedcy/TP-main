@@ -145,9 +145,12 @@ public class TaskExceptionService {
         freezeRemainingSteps(task.getId(), stepSeq);
 
         // 业务规则4/6/7：先尝试一次候选设备切换作为恢复动作（能力缺口无候选可切换时恢复直接失败）
+        // SRS_NF005.R01 / TC-056.S1：若因指令本身检出运动安全控制字段被拦截，不得切换候选设备重发违规指令
+        boolean isMotionSafetyIntercept = "ERR_MOTION_SAFETY_FIELD".equals(reasonCode)
+                || (detail != null && detail.contains("运动安全控制字段"));
         String excludeAgentCode = findOfflineAgentCode(taskId, stepSeq);
-        boolean canRetry = ("CAPABILITY_GAP".equals(exceptionType) || "ASSIGNMENT_FAILED".equals(exceptionType))
-                ? false // 无候选场景或全部候选已拒绝场景下"切换候选"已尝试穷尽，不重复
+        boolean canRetry = ("CAPABILITY_GAP".equals(exceptionType) || "ASSIGNMENT_FAILED".equals(exceptionType) || isMotionSafetyIntercept)
+                ? false // 无候选场景、全部候选已拒绝或运动安全字段硬拦截场景下不执行切换候选
                 : taskExecutionOrchestrator.hasAvailableCandidate(task.getCurrentPlanVersionId(), stepSeq,
                         excludeAgentCode == null ? List.of() : List.of(excludeAgentCode));
 

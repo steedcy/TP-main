@@ -20,6 +20,8 @@ import java.util.Map;
 public class DeviceAgentMessagingService {
     @org.springframework.beans.factory.annotation.Autowired
     private org.springframework.context.ApplicationEventPublisher events;
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private DeviceEventService deviceEventService;
     public record DeliveryFailure(String agentCode, String commandId, String commandType, int attemptNo) {}
     private final DeviceAgentMapper agentMapper;
     private final DeviceMapper deviceMapper;
@@ -73,9 +75,13 @@ public class DeviceAgentMessagingService {
         if (!deviceTypeCapabilityService.isCapabilityTypeSupported(device.getDeviceTypeCode(),
                 device.getSimulatedDeviceType(), capability.getCapabilityType()))
             throw new BusinessException(ErrorCode.CAPABILITY_OUT_OF_BOUNDARY);
-        if (!MotionSafetyGuard.detect(java.util.Map.of("inputParams", params)).isEmpty())
-            throw new BusinessException(ErrorCode.MOTION_SAFETY_FIELD_DETECTED);
         String commandId = "TEST-" + java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 26);
+        java.util.List<String> motionErrors = MotionSafetyGuard.detect(java.util.Map.of("inputParams", params == null ? java.util.Map.of() : params));
+        if (!motionErrors.isEmpty()) {
+            recordBlockedEvent(agent.getId(), "CAPABILITY_TEST", commandId,
+                    "ERR_MOTION_SAFETY_FIELD", String.join("；", motionErrors));
+            throw new BusinessException(ErrorCode.MOTION_SAFETY_FIELD_DETECTED);
+        }
         DeviceCommandRecord record = new DeviceCommandRecord();
         record.setCommandId(commandId); record.setAgentCode(agent.getAgentCode());
         record.setCommandType("CAPABILITY_TEST"); record.setAttemptNo(0);
@@ -127,8 +133,12 @@ public class DeviceAgentMessagingService {
         Task task = taskId == null ? null : taskMapper.findById(taskId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.TASK_NOT_FOUND));
         inputParams = inputParams == null ? Map.of() : inputParams;
-        if (!MotionSafetyGuard.detect(Map.of("inputParams", inputParams)).isEmpty())
+        java.util.List<String> motionErrors = MotionSafetyGuard.detect(Map.of("inputParams", inputParams));
+        if (!motionErrors.isEmpty()) {
+            recordBlockedEvent(agent.getId(), "AGENT_MESSAGE_" + commandType, commandId,
+                    "ERR_MOTION_SAFETY_FIELD", String.join("；", motionErrors));
             throw new BusinessException(ErrorCode.MOTION_SAFETY_FIELD_DETECTED);
+        }
         if (("TASK_ACCEPT".equals(commandType) || "EXECUTE_CAPABILITY".equals(commandType))) {
             if (capabilityType == null || capabilityType.isBlank()) {
                 throw new BusinessException(ErrorCode.PARAM_MISSING, "capabilityType不可为空");
@@ -146,7 +156,10 @@ public class DeviceAgentMessagingService {
             try { inputParams = ParameterValues.materialize(configured.getInputParams(), inputParams); }
             catch (IllegalArgumentException ex) { throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, ex.getMessage()); }
         }
-        if (!MotionSafetyGuard.detect(Map.of("inputParams", inputParams == null ? Map.of() : inputParams)).isEmpty()) {
+        java.util.List<String> postMaterializeErrors = MotionSafetyGuard.detect(Map.of("inputParams", inputParams == null ? Map.of() : inputParams));
+        if (!postMaterializeErrors.isEmpty()) {
+            recordBlockedEvent(agent.getId(), "AGENT_MESSAGE_" + commandType, commandId,
+                    "ERR_MOTION_SAFETY_FIELD", String.join("；", postMaterializeErrors));
             throw new BusinessException(ErrorCode.MOTION_SAFETY_FIELD_DETECTED,
                     "设备业务消息包含运动安全控制字段");
         }
@@ -239,6 +252,13 @@ public class DeviceAgentMessagingService {
 
     public java.util.List<DeviceCapability> enabledCapabilities(Long deviceId) {
         return capabilityMapper.findByDeviceIdAndCapabilityStatus(deviceId, "ENABLED");
+    }
+
+    private void recordBlockedEvent(Long agentId, String eventType, String commandId,
+                                    String reasonCode, String detailSummary) {
+        if (deviceEventService != null && agentId != null) {
+            deviceEventService.appendBlockedMessage(agentId, eventType, commandId, reasonCode, detailSummary);
+        }
     }
 
     private String toJson(Object value) {

@@ -38,6 +38,8 @@ public class TaskExecutionOrchestrator {
     private final TaskEventService taskEventService;
     private final TaskExceptionService taskExceptionService;
     private final com.airport.ai.device.DeviceAgentMessagingService deviceAgentMessagingService;
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private com.airport.ai.device.DeviceEventService deviceEventService;
 
     public TaskExecutionOrchestrator(TaskMapper taskMapper,
                                       PlanVersionMapper planVersionMapper,
@@ -380,11 +382,20 @@ public class TaskExecutionOrchestrator {
         }
 
         Map<String, Object> step = findStep(assignment.getPlanVersionId(), assignment.getStepSeq());
+        Map<String, Object> resolvedParams = parameterResolver.resolve(assignment.getTaskId(), assignment.getPlanVersionId(), step);
         List<String> motionSafetyHits = MotionSafetyGuard.detect(step);
+        if (motionSafetyHits.isEmpty() && resolvedParams != null) {
+            motionSafetyHits = MotionSafetyGuard.detect(Map.of("inputParams", resolvedParams));
+        }
         if (!motionSafetyHits.isEmpty()) {
+            String blockDetail = "步骤" + assignment.getStepSeq() + "指令内容检出运动安全控制字段: " + motionSafetyHits + "，已拦截下发";
             taskEventService.append(assignment.getTaskId(), "COMMAND_DISPATCH_BLOCKED", "SYSTEM",
-                    "ERR_MOTION_SAFETY_FIELD",
-                    "步骤" + assignment.getStepSeq() + "指令内容检出运动安全控制字段: " + motionSafetyHits + "，已拦截下发");
+                    "ERR_MOTION_SAFETY_FIELD", blockDetail);
+            if (deviceEventService != null && assignment.getDeviceAgentId() != null) {
+                deviceEventService.appendBlockedMessage(assignment.getDeviceAgentId(), "COMMAND_DISPATCH_BLOCKED",
+                        assignment.getExecuteCommandId() != null ? assignment.getExecuteCommandId() : assignment.getCommandId(),
+                        "ERR_MOTION_SAFETY_FIELD", blockDetail);
+            }
             releaseAgent(assignment.getDeviceAgentId(), assignment.getTaskId());
             markStepFailed(assignment, "ERR_MOTION_SAFETY_FIELD", "指令内容检出运动安全控制字段，已拦截");
             return;
@@ -404,7 +415,7 @@ public class TaskExecutionOrchestrator {
         try {
             deviceAgentMessagingService.executeCapability(agent.getAgentCode(), assignment.getExecuteCommandId(),
                     assignment.getTaskId(), assignment.getStepSeq(), String.valueOf(step.get("capabilityType")),
-                    assignment.getRetryCount(), parameterResolver.resolve(assignment.getTaskId(), assignment.getPlanVersionId(), step));
+                    assignment.getRetryCount(), resolvedParams);
         } catch (RuntimeException ex) {
             onExecutionFeedback(agent.getAgentCode(), assignment.getExecuteCommandId(), assignment.getRetryCount(),
                     "FAILED", "DEVICE_API_ERROR", Map.of("message", ex.getMessage() == null ? "device call failed" : ex.getMessage()));

@@ -39,6 +39,14 @@ public class DeviceEventService {
         return event;
     }
 
+    /** 运动安全控制字段或边界拦截事件：使用独立事务持久化，确保外层业务事务回滚时拦截留痕不丢失（SRS_NF005.R01） */
+    @org.springframework.transaction.annotation.Transactional(
+            propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
+    public DeviceEvent appendBlockedMessage(Long deviceAgentId, String eventType, String commandId,
+                                            String reasonCode, String detailSummary) {
+        return appendMessage(deviceAgentId, eventType, commandId, "BLOCKED", reasonCode, detailSummary);
+    }
+
     private String safeCodeColumn(String input, int maxCodePoints) {
         if (input == null) return null;
         if (input.length() <= maxCodePoints) return input;

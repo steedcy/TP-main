@@ -59,46 +59,50 @@ public class StepTimeoutMonitorTask {
         LocalDateTime threshold = LocalDateTime.now();
         List<TaskStepAssignment> timedOut = assignmentMapper.findByStepStatusAndDispatchedAtBefore("EXECUTING", threshold);
         for (TaskStepAssignment assignment : timedOut) {
-            int timeout = stepTimeoutSeconds;
-            if (plans != null && assignment.getPlanVersionId() != null) {
-                try {
-                    var plan = plans.findById(assignment.getPlanVersionId()).orElseThrow();
-                    java.util.List<java.util.Map<String, Object>> steps = new com.fasterxml.jackson.databind.ObjectMapper().readValue(plan.getPlanSteps(), java.util.List.class);
-                    timeout = steps.stream().filter(step -> assignment.getStepSeq().equals(((Number) step.get("stepSeq")).intValue()))
-                            .map(step -> ((Number) step.getOrDefault("stepTimeout", stepTimeoutSeconds)).intValue()).findFirst().orElse(stepTimeoutSeconds);
-                } catch (Exception ignored) { /* Use the documented default for legacy plans. */ }
+            try {
+                int timeout = stepTimeoutSeconds;
+                if (plans != null && assignment.getPlanVersionId() != null) {
+                    try {
+                        var plan = plans.findById(assignment.getPlanVersionId()).orElseThrow();
+                        java.util.List<java.util.Map<String, Object>> steps = new com.fasterxml.jackson.databind.ObjectMapper().readValue(plan.getPlanSteps(), java.util.List.class);
+                        timeout = steps.stream().filter(step -> assignment.getStepSeq().equals(((Number) step.get("stepSeq")).intValue()))
+                                .map(step -> ((Number) step.getOrDefault("stepTimeout", stepTimeoutSeconds)).intValue()).findFirst().orElse(stepTimeoutSeconds);
+                    } catch (Exception ignored) { /* Use the documented default for legacy plans. */ }
+                }
+                if (assignment.getDispatchedAt() == null || assignment.getDispatchedAt().plusSeconds(timeout).isAfter(LocalDateTime.now())) continue;
+                assignment.setStepStatus("FAILED");
+                assignment.setExecutionResult("TIMEOUT");
+                assignment.setReasonCode("ERR_EXECUTION_TIMEOUT");
+                assignment.setUpdatedAt(LocalDateTime.now());
+                assignmentMapper.update(assignment);
+
+                taskEventService.append(assignment.getTaskId(), "STEP_TIMEOUT_DETECTED", "SYSTEM",
+                        "ERR_EXECUTION_TIMEOUT",
+                        "第" + assignment.getStepSeq() + "步指令" + executeId(assignment) + "下发后超过"
+                                + timeout + "秒未收到执行反馈，判定执行超时");
+
+                if (assignment.getDeviceAgentId() != null) {
+                    deviceAgentMapper.findById(assignment.getDeviceAgentId()).ifPresent(agent -> {
+                        if (agent.getCurrentTaskId() != null && !assignment.getTaskId().equals(agent.getCurrentTaskId())) {
+                            return;
+                        }
+                        agent.setWorkStatus("IDLE");
+                        agent.setCurrentTaskId(null);
+                        agent.setCurrentStepSeq(null);
+                        deviceAgentMapper.update(agent);
+                        if (deviceCommandMapper != null) {
+                            deviceCommandMapper.updateStatus(agent.getAgentCode(), executeId(assignment),
+                                    "EXECUTE_CAPABILITY", assignment.getRetryCount(), "TIMED_OUT",
+                                    "{\"message\":\"STEP_TIMEOUT_DETECTED\"}");
+                        }
+                    });
+                }
+
+                taskExceptionService.handleException(assignment.getTaskId(), assignment.getStepSeq(),
+                        "EXECUTION_TIMEOUT", "指令" + executeId(assignment) + "执行超时未收到");
+            } catch (RuntimeException ignored) {
+                // SRS_NF005：单个步骤超时处置异常隔离，不阻断同批次其余超时步骤的巡检与自愈
             }
-            if (assignment.getDispatchedAt() == null || assignment.getDispatchedAt().plusSeconds(timeout).isAfter(LocalDateTime.now())) continue;
-            assignment.setStepStatus("FAILED");
-            assignment.setExecutionResult("TIMEOUT");
-            assignment.setReasonCode("ERR_EXECUTION_TIMEOUT");
-            assignment.setUpdatedAt(LocalDateTime.now());
-            assignmentMapper.update(assignment);
-
-            taskEventService.append(assignment.getTaskId(), "STEP_TIMEOUT_DETECTED", "SYSTEM",
-                    "ERR_EXECUTION_TIMEOUT",
-                    "第" + assignment.getStepSeq() + "步指令" + executeId(assignment) + "下发后超过"
-                            + timeout + "秒未收到执行反馈，判定执行超时");
-
-            if (assignment.getDeviceAgentId() != null) {
-                deviceAgentMapper.findById(assignment.getDeviceAgentId()).ifPresent(agent -> {
-                    if (agent.getCurrentTaskId() != null && !assignment.getTaskId().equals(agent.getCurrentTaskId())) {
-                        return;
-                    }
-                    agent.setWorkStatus("IDLE");
-                    agent.setCurrentTaskId(null);
-                    agent.setCurrentStepSeq(null);
-                    deviceAgentMapper.update(agent);
-                    if (deviceCommandMapper != null) {
-                        deviceCommandMapper.updateStatus(agent.getAgentCode(), executeId(assignment),
-                                "EXECUTE_CAPABILITY", assignment.getRetryCount(), "TIMED_OUT",
-                                "{\"message\":\"STEP_TIMEOUT_DETECTED\"}");
-                    }
-                });
-            }
-
-            taskExceptionService.handleException(assignment.getTaskId(), assignment.getStepSeq(),
-                    "EXECUTION_TIMEOUT", "指令" + executeId(assignment) + "执行超时未收到");
         }
     }
 

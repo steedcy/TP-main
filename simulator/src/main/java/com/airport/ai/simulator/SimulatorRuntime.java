@@ -18,9 +18,16 @@ import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class SimulatorRuntime {
-    private static final Set<String> FORBIDDEN = Set.of("speed", "velocity", "acceleration", "pose", "waypoints",
-            "obstacleAvoidance", "emergencyStop", "speedLimit", "safeStopOnDisconnect",
-            "attitude", "orientation", "pathPoints", "lostConnectionParking");
+    private static final Set<String> FORBIDDEN = Set.of("speed", "velocity", "maxSpeed", "minSpeed", "targetSpeed",
+            "acceleration", "accel", "deceleration", "maxAcceleration",
+            "pose", "attitude", "orientation", "yaw", "pitch", "roll", "heading",
+            "waypoints", "waypoint", "pathPoints", "pathPoint", "trajectory",
+            "obstacleAvoidance", "avoidance", "avoidObstacle",
+            "emergencyStop", "eStop", "emergencyBrake",
+            "speedLimit", "maxVelocity",
+            "safeStopOnDisconnect", "lostConnectionParking", "disconnectStop", "disconnectPark", "failSafeStop",
+            "速度", "加速度", "姿态", "路径点", "轨迹点", "避障", "急停", "紧急停车",
+            "限速", "速度限制", "失联停靠", "失联安全停靠");
     private static final Set<String> FORBIDDEN_NORMALIZED = FORBIDDEN.stream()
             .map(k -> k.toLowerCase().replaceAll("[\\s_\\-]", "")).collect(java.util.stream.Collectors.toSet());
     private final SimulatorProperties properties;
@@ -113,7 +120,12 @@ public class SimulatorRuntime {
 
     public void accept(SimulatorProtocol.Command command) {
         if (command.commandId() == null || command.commandId().isBlank()) throw new IllegalArgumentException("commandId不能为空");
-        rejectSafetyFields(command.inputParams() == null ? Map.of() : command.inputParams());
+        try {
+            rejectSafetyFields(command.inputParams() == null ? Map.of() : command.inputParams());
+        } catch (IllegalArgumentException ex) {
+            commandStates.put(command.commandId() + ":blocked", "BLOCKED_MOTION_SAFETY");
+            throw ex;
+        }
         String commandType = command.commandType();
         if (!online.get() && !"TASK_CANCEL".equals(commandType)) {
             throw new IllegalStateException("仿真体已停止，不能接收业务命令");
@@ -246,6 +258,7 @@ public class SimulatorRuntime {
         reportStatus();
     }
     public String agentCode() { return agentCode; }
+    public Map<String, String> commandStates() { return Map.copyOf(commandStates); }
 
     @SuppressWarnings("unchecked")
     public Map<String, Object> testCapability(Map<String, Object> body) {
@@ -256,7 +269,12 @@ public class SimulatorRuntime {
             String type = String.valueOf(body.get("capabilityType"));
             Map<String, Object> params = body.get("inputParams") instanceof Map<?, ?> map
                     ? (Map<String, Object>)map : Map.of();
-            rejectSafetyFields(params);
+            try {
+                rejectSafetyFields(params);
+            } catch (IllegalArgumentException ex) {
+                commandStates.put(id + ":blocked", "BLOCKED_MOTION_SAFETY");
+                throw ex;
+            }
             if (!"SUCCESS".equals(properties.getScenarioResult())) throw new IllegalStateException("SIMULATED_" + properties.getScenarioResult());
             Map<String, Object> output = executeCapability(type, params);
             return Map.of("commandId", id, "result", "SUCCESS", "outputParams", output,

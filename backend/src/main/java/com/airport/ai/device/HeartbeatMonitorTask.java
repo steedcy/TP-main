@@ -45,21 +45,25 @@ public class HeartbeatMonitorTask {
         LocalDateTime threshold = LocalDateTime.now().minusSeconds(timeoutSeconds);
         List<DeviceAgent> timedOut = deviceAgentMapper.findByOnlineStatusAndLastReportedAtBefore("ONLINE", threshold);
         for (DeviceAgent agent : timedOut) {
-            agent.setOnlineStatus("OFFLINE");
-            deviceAgentMapper.update(agent);
+            try {
+                agent.setOnlineStatus("OFFLINE");
+                deviceAgentMapper.update(agent);
 
-            deviceEventService.append(agent.getId(), "AGENT_OFFLINE_DETECTED", "SYSTEM",
-                    "ERR_HEARTBEAT_TIMEOUT",
-                    "设备代理" + agent.getAgentCode() + "超过" + timeoutSeconds + "秒未上报，判定离线");
-
-            if (agent.getCurrentTaskId() != null) {
-                taskEventService.append(agent.getCurrentTaskId(), "AGENT_OFFLINE_DETECTED", "SYSTEM",
+                deviceEventService.append(agent.getId(), "AGENT_OFFLINE_DETECTED", "SYSTEM",
                         "ERR_HEARTBEAT_TIMEOUT",
-                        "设备代理" + agent.getAgentCode() + "心跳超时，判定离线，待5.5异常恢复流程判断是否影响任务");
+                        "设备代理" + agent.getAgentCode() + "超过" + timeoutSeconds + "秒未上报，判定离线");
+
+                if (agent.getCurrentTaskId() != null) {
+                    taskEventService.append(agent.getCurrentTaskId(), "AGENT_OFFLINE_DETECTED", "SYSTEM",
+                            "ERR_HEARTBEAT_TIMEOUT",
+                            "设备代理" + agent.getAgentCode() + "心跳超时，判定离线，待5.5异常恢复流程判断是否影响任务");
+                }
+                // 对应5.5.3业务规则2/5：仅当离线设备正占用某任务步骤才触发异常恢复流程；
+                // 未占用或占用其他已终止任务的离线仅记录设备事件，不触发任何流程（TaskExceptionService内部判断）
+                taskExceptionService.handleAgentOffline(agent);
+            } catch (RuntimeException ignored) {
+                // SRS_NF005：单个设备代理超时处置异常隔离，不阻断同批次其余超时代理的巡检与自愈
             }
-            // 对应5.5.3业务规则2/5：仅当离线设备正占用某任务步骤才触发异常恢复流程；
-            // 未占用或占用其他已终止任务的离线仅记录设备事件，不触发任何流程（TaskExceptionService内部判断）
-            taskExceptionService.handleAgentOffline(agent);
         }
     }
 }

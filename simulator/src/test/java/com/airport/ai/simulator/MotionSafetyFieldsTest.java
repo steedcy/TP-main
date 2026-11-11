@@ -26,9 +26,15 @@ class MotionSafetyFieldsTest {
     void everySafetyFieldAndItsCommonSpellingsIsRejected() {
         for (String key : List.of("speed", "velocity", "acceleration", "attitude", "orientation", "pathPoints", "path_points",
                 "waypoints", "obstacleAvoidance", "emergencyStop", "emergency-stop", "speedLimit", "speed_limit",
-                "lostConnectionParking", "lost_connection_parking", "safeStopOnDisconnect")) {
-            assertEquals("FAILED", run(Map.of("contentType", "TEXT", "contentData", "x", "displayDuration", 5, key, 1)).get("result"),
-                    key + " 应被适配器拒绝");
+                "lostConnectionParking", "lost_connection_parking", "safeStopOnDisconnect",
+                "速度", "加速度", "姿态", "路径点", "避障", "急停", "限速", "失联停靠")) {
+            SimulatorRuntime rt = runtime();
+            Map<String, Object> res = rt.testCapability(Map.of("commandId", "T-" + key,
+                    "capabilityType", "CAP_INFO_DISPLAY",
+                    "inputParams", Map.of("contentType", "TEXT", "contentData", "x", "displayDuration", 5, key, 1)));
+            assertEquals("FAILED", res.get("result"), key + " 应被适配器拒绝");
+            assertEquals("BLOCKED_MOTION_SAFETY", rt.commandStates().get("T-" + key + ":blocked"),
+                    key + " 应记录运动安全拦截状态");
         }
     }
 
