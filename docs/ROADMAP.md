@@ -1,9 +1,9 @@
 # 双 AI 协同修复工作梳理汇总与执行全景路线图 (ROADMAP)
 
 > **当前基准**：V2.4（2026-11-04 用户追加整轮复测授权；继承V2.3，见BL-005；下方既有产品验收/交接记录保留原执行版本）
-> **主干验收合入提交**：F001～F028、SRS_NF001、SRS_NF003、SRS_NF004、SRS_NF010、SRS_NF018 已验收安全合main；40用户文件哈希不变，无PR；最终证明随本提交同步。
+> **主干验收合入提交**：F001～F028、SRS_NF001、SRS_NF003、SRS_NF004、SRS_NF010、SRS_NF016、SRS_NF018 已验收安全合main；40用户文件哈希不变，无PR；最终证明随本提交同步。
 > **最新产品代码提交**：b57c66f580cd74581c890b5739796a746fd2ad5c / V1.196（SRS_NF016）
-> **当前状态**：READY_FOR_GPT。SRS_NF016 审计日志完整性与防篡改已完成修复加固（V1.196），576 项后端单测全绿并完成生产 JAR 打包，交由 ChatGPT 独立整轮复测。
+> **当前状态**：REQUIREMENT_PASSED（SRS_NF016 V1.196 整轮独立复测 1P/0F/0NT 全部通过，已合入 main）。
 
 ---
 
@@ -109,7 +109,7 @@ F001～F023（含分支共25条目）已完成独立验收并安全合main；F02
 | **SRS_NF013** | 接口标准化与 OpenApi | **P (已验证)** | RESTful API 规范与 Swagger/OpenAPI 完备性 | 历史通过 |  PASSED |
 | **SRS_NF014** | 模块化与可维护性 | **P (已验证)** | 分层解耦、服务化边界清晰 | 历史通过 |  PASSED |
 | **SRS_NF015** | 系统可用性 SLA (99.9%) | NT | 无单点故障，异常自愈与健康探针 | 后续安排 | 待启动 |
-| **SRS_NF016** | 审计日志完整性与防篡改 | **待复测** | 审计与事件接口绝对只读（PUT/DELETE/PATCH 405拦截）、V30长字段与复杂JSON防截断防乱码、创建/调度/终止/接管/锁定/解锁全生命周期100%留痕 | V1.196 | **READY_FOR_GPT** |
+| **SRS_NF016** | 审计日志完整性与防篡改 | **1P/0F/0NT（全部实测通过）** | TC-002.S1~S4（4P/0F/0NT）；94次伪造/真实管理员PUT/DELETE/PATCH篡改请求全部405/401拦截、3张审计/事件表SHA-256指纹零变动、5906字符URI与12KB+长字段落库无截断无乱码、全表191条审计零凭据泄露 | V1.196 | **REQUIREMENT_PASSED（全部通过，已合main）** |
 | **SRS_NF017** | 降级机制完备性 | **P (已验证)** | 模型失效时 100% 成功降级至基线模板或转人工 | 历史通过 |  PASSED |
 | **SRS_NF018** | 监控可观测性 (Prometheus) | **待复测 (NT-S3-025已闭环)** | 指标采集、JVM、内存、线程与 HTTP 监控暴露，固化五方维护职责与模型 SLA 协议 | Germini 修复完成待复测 | V1.193 | READY_FOR_GPT |
 
@@ -645,5 +645,24 @@ V1.184 独立复测交接仍为 `READY_FOR_CLAUDE`（实际接收者 Germini）�
 - **正式交接报告**：acceptance/stage3/SRS_NF004-V1.195-整轮独立复测与验收.md
 - **受控证据**：acceptance/stage3/evidence/SRS_NF004-V1.195-security-verification-20261110.json
 - **后续动作**：分支合并至 main 并推送到 origin，准备启动下一项 SRS_NF005。
+
+## 2026-11-11 SRS_NF016 V1.196 整轮独立复测与验收（REQUIREMENT_PASSED）
+
+- **需求编号**：SRS_NF016（审计日志完整性与防篡改）
+- **固定产品版本**：b57c66f580cd74581c890b5739796a746fd2ad5c（标签 V1.196）
+- **工作区与分支**：tip-gpt-f013 / ai/gpt-test
+- **独立环境**：PostgreSQL schema tip_gpt_nf016_v196_20261111（本地 TCP 代理 15516），Redis DB 11，后端生产 JAR 端口 18131
+- **复测结论**：**REQUIREMENT_PASSED**
+  - 业务规则：**1P / 0F / 0NT**（SRS_NF016.R01 实测通过）
+  - 关联用例步骤：**4P / 0F / 0NT**（TC-002.S1~S4 全部 P）
+  - 核心复测核验：
+    1. 真实管理员与 5 类伪造管理员身份对 `/api/v1/operation-logs`、`/{id}`、`/{nonExistentId}`、`/api/v1/tasks/{taskId}/events`、`/{eventId}` 发起 94 次 `PUT`/`DELETE`/`PATCH` 及方法覆盖篡改请求，全部严格拦截（已认证会话 405/3004 + `Allow: GET`，伪造凭据 401/2000-2001，不存在 ID 只读查询 404/3005，非管理员越权查他人记录 403/2003 并记 `ACCESS_DENIED`）；
+    2. 94 次越权写请求前后，`operation_logs`（187 行，指纹 `3695af7b...53ee22ce`）、`task_events`（4 行，指纹 `19d7f3b9...9a337a33`）、`device_events`（1 行，指纹 `a7f9d05b...d62057aa`）及目标单行记录（`id=181`，指纹 `99ab3fe2...b5fc30ca`）SHA-256 指纹零变动；
+    3. 5,906 字符越权 URI、64 位 UTF-16 中文+Emoji 设备名/任务名、239 字符端点、128 位脱敏凭据、12KB 完成条件及 32 位含 Emoji 登录名完整落库，零截断、零 `\ufffd` 乱码，全表 191 条审计记录零密码/凭据明文泄露；
+    4. 18/18 专项审计与认证单测、生产 JAR 构建与隔离数据库故障注入恢复实测全部通过。
+- **正式交接报告**：acceptance/stage3/SRS_NF016-V1.196-整轮独立复测与验收.md
+- **受控证据**：acceptance/stage3/evidence/SRS_NF016-V1.196-protocol-db-evidence-20261111T014646Z.json
+- **后续动作**：分支合并至 main 并推送到 origin。
+
 
 

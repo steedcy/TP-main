@@ -2,23 +2,23 @@
 
 ## 当前交接状态
 
-- 状态：READY_FOR_GPT（SRS_NF016 审计日志完整性与防篡改 V1.196 修复加固完成，交由 ChatGPT 独立整轮复测）
+- 状态：REQUIREMENT_PASSED（SRS_NF016 审计日志完整性与防篡改 V1.196 整轮独立复测全部通过，合入 main）
 - 依据需求与规则：SRS_NF016.R01、TC-002.S1~S4
 - 固定产品版本：`b57c66f580cd74581c890b5739796a746fd2ad5c`（标签 `V1.196`）
-- 本轮修复与加固总结：
-  1. **审计日志与过程事件接口绝对只读，全面拦截 PUT/DELETE/PATCH 修改或删除操作**：
-     - 在 `OperationLogController` 新增 `@GetMapping("/{id}")`（严格执行角色可见性：系统管理员可见全量，非系统管理员仅可见自身记录，越权访问返回 403 并记录 `ACCESS_DENIED`），在 `TaskController` 新增 `@GetMapping("/{taskId}/events/{eventId}")`；
-     - 针对 `/api/v1/operation-logs`、`/api/v1/operation-logs/{id}`、`/api/v1/tasks/{taskId}/events`、`/api/v1/tasks/{taskId}/events/{eventId}` 发起的任何 `PUT`、`DELETE`、`PATCH` 修改或删除请求均被统一拦截并返回 HTTP `405 Method Not Allowed`（`code: 1005`，提示“该资源不支持...方法（记录不可修改或删除）”，带 `Allow: GET` 响应头），底层数据 100% 零篡改；
-     - `OperationLogMapper`、`TaskEventMapper`、`DeviceEventMapper` 接口与 XML 严格只暴露 `insert` 与 `SELECT`，0 处 `UPDATE`/`DELETE` 语句。
-  2. **完善日志长字段（如复杂嵌套 JSON、10KB+ 长错误描述）落库机制，杜绝乱码与意外截断**：
-     - 新增 Flyway 迁移脚本 `V30__widen_audit_and_event_columns.sql`，将 `operation_logs.operation_target` 扩宽为 `TEXT`，扩宽 `operation_logs`（`username` `VARCHAR(256)`、`role` `VARCHAR(64)`、`operation_type` `VARCHAR(64)`、`source_ip` `VARCHAR(128)`）及 `task_events`/`device_events` 的 `event_type`（`VARCHAR(128)`）与 `reason_code`（`VARCHAR(256)`），彻底消除因长操作目标、长错误原因或脱敏展开引发的 SQL 截断或写库异常；
-     - 加固 `CredentialMasker.maskSensitiveFields`、`SceneParamsPrivacyGuard` 与 `OperationLogService.toMaskedJson`：注册 Jackson Java 8 时间模块（`findAndRegisterModules()`），支持任意层级嵌套的不可变 `Map.of`/`List.of`/数组与长文本序列化，提供安全降级兜底，杜绝序列化异常静默丢失 `detail`；按 Unicode 代码点（Code Point）安全处理短编码列边界，杜绝切碎 UTF-16 代理对（Emoji/生僻字）产生乱码。
-  3. **确保关键业务生命周期（创建、调度、终止、接管、锁定、解锁）100% 留痕**：
-     - 登录/登出/锁定/解锁全链路（`TC-002.S1~S4`）：不存在账号、停用账号、锁定账号、错密均统一提示“账号或密码错误”、不建会话、写入带 `operationTarget` 与 `sourceIp` 的 `LOGIN/FAILED` 记录且跨账号计数隔离；连续第 3 次错密立即锁定并额外写入含 `before`/`after` 状态摘要与失败次数的独立 `ACCOUNT_LOCKED` 审计记录；管理员解锁重置计数并清空 `lockedAt`/`lockedReason`，写入含 `before`/`after` 的 `MANUAL_HANDLING` 记录；全部日志 0 密码明文或哈希泄露；
-     - 任务与设备核心生命周期：创建（`TASK_SUBMIT` + `GOAL_SUBMITTED`）、调度（`AGENT_ASSIGNMENT_REQUESTED` -> `AGENT_ASSIGNED` -> `STEP_DISPATCHED`）、人工接管（`TASK_PENDING_MANUAL` -> `TASK_MANUAL_ACTION`）、终止/取消（`TASK_TERMINATE`/`TASK_CANCEL` + `MANUAL_TERMINATED`/`TASK_TERMINATED`）100% 落库可追溯。
-  4. **单测验证与生产打包**：
-     - 新增专项测试 `AuditLogIntegrityAndTamperResistanceNF016Test`（5 项测试全过）；全量单测 `mvn -o test` 576 项全部通过（0 失败，0 错误）；`mvn -o package -DskipTests` 成功构建 `airport-ai-app-1.0.0.jar`。
-- 下一步：由 ChatGPT 在 `ai/gpt-test` 检出 `V1.196`（`b57c66f580cd74581c890b5739796a746fd2ad5c`）开展 `SRS_NF016` 独立整轮复测。
+- 本轮独立复测与闭环结论：
+  1. **业务规则与关联用例步骤全 P 通过**：
+     - `SRS_NF016.R01`：**P**（1P / 0F / 0NT）；
+     - 关联步骤 `TC-002.S1`、`TC-002.S2`、`TC-002.S3`、`TC-002.S4` 全部 **P**（4P / 0F / 0NT），独立实测探针 12/12 检查项全部 PASS。
+  2. **伪造与真实管理员权限篡改日志拦截验证通过**：
+     - 针对 `/api/v1/operation-logs`、`/{id}`、`/{nonExistentId}` 及 `/api/v1/tasks/{taskId}/events`、`/{eventId}`，使用真实管理员 Token、携带伪造管理员头的有效操作员 Token 及 4 类伪造管理员凭据发起 94 次 `PUT`/`DELETE`/`PATCH` 与方法覆盖请求，100% 严格拦截（已认证会话返回 HTTP `405` / `code: 3004` + `Allow: GET`，伪造凭据返回 `401` / `code: 2000/2001`，单条不存在记录只读查询返回 `404` / `code: 3005`）；
+     - 静态核验 `OperationLogMapper`、`TaskEventMapper`、`DeviceEventMapper` 及全量 Java 代码 0 处针对审计/事件表的 `UPDATE`/`DELETE` 语句。
+  3. **数据库审计表 SHA-256 指纹零变动验证通过**：
+     - 94 次越权/篡改写请求前后，`operation_logs`（187 行，SHA-256 `3695af7b73765b1e9792236996bbed0c27e80e9ff3a3dba132ea5bae53ee22ce`）、`task_events`（4 行，SHA-256 `19d7f3b96fc57607380a28998f6136359b96925a57182f5a4573243e9a337a33`）、`device_events`（1 行，SHA-256 `a7f9d05b1495e815b3b5d9e9a2971b605fa838634d1ef1f0378b354ad62057aa`）及目标单行记录（`id=181`，SHA-256 `99ab3fe263566c0d5c25d2faab16eda12ea1a0b235fed1aa64262a70b5fc30ca`）指纹 100% 完全一致。
+  4. **超长入参审计留痕完整性与零凭据泄露验证通过**：
+     - 5,906 字符越权 URI（SHA-256 `b0a85076...5455e714`）、64 位 UTF-16 中文+Emoji 设备名/任务名、239 字符端点、128 位脱敏凭据、12KB 完成条件及 32 位含 Emoji 登录名完整落库，零截断、零 `\ufffd` 乱码，JSON 字段结构完整，全表 191 条审计记录零密码/凭据原值泄露。
+  5. **专项单测与生产 JAR 实测确认**：
+     - 18/18 专项审计与认证单测（`AuditLogIntegrityAndTamperResistanceNF016Test` 等 5 个测试类）及隔离生产 JAR 故障注入/恢复实测全部通过。
+- 下一步：`ai/gpt-test` 安全合入 `main` 并推送到远端。
 
 ## 首项需求的现有证据
 
@@ -95,6 +95,7 @@
 | 2026-11-10 | SRS_NF004 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / b51bae075653765a36739060bf33fd5737b4f7f9 / V1.195 | 待独立整轮复测 | 加固CORS源白名单拦截（403/2003+ACCESS_DENIED留痕）、排查全量MyBatis #{} 参数化并加固DeviceMapper LIKE转义、落地XssSanitizer全量文本HTML转义，571项单测全过，详见下文交接专节 |
 | 2026-11-10 | SRS_NF004 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / b51bae075653765a36739060bf33fd5737b4f7f9 / V1.195 | 本次提交 | 规则1P/0F/0NT，关联步骤7P/0F/0NT；服务端逐接口RBAC、CORS白名单403拦截与留痕、MyBatis 100% #{} 参数化与LIKE转义、XssSanitizer HTML转义35/35安全单测与前后端生产构建全部通过；已合main，下一项SRS_NF005 |
 | 2026-11-10 | SRS_NF016 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / b57c66f580cd74581c890b5739796a746fd2ad5c / V1.196 | 待独立整轮复测 | 加固审计日志与事件接口只读405拦截、V30扩宽长字段与复杂JSON防截断防乱码、关键生命周期（创建/调度/终止/接管/锁定/解锁）100%留痕，576项单测全过，详见下文交接专节 |
+| 2026-11-11 | SRS_NF016 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / b57c66f580cd74581c890b5739796a746fd2ad5c / V1.196 | 本次提交 | 规则1P/0F/0NT，关联步骤TC-002.S1~S4 4P/0F/0NT；94次伪造/真实管理员PUT/DELETE/PATCH篡改请求全部405/401拦截、3张审计/事件表SHA-256指纹零变动、5906字符URI与12KB+长字段无截断无乱码、全表零凭据泄露，已合main |
 ## 文件认领
 
 - Claude：当前需求涉及的产品代码与必要的修复单测；独立 `ai/claude-fix` worktree。
@@ -4853,5 +4854,23 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
     2. 复测审计日志与事件接口只读保护：对 `/api/v1/operation-logs`、`/api/v1/operation-logs/{id}`、`/api/v1/tasks/{taskId}/events`、`/api/v1/tasks/{taskId}/events/{eventId}` 发起 `PUT`/`DELETE`/`PATCH` 验证返回 `405 (1005)` + `Allow: GET` 且数据库记录零改动；
     3. 复测长字段与复杂 JSON 落库及关键业务生命周期（创建、调度、终止、接管、锁定、解锁）100% 留痕；
     4. 确认整项通过后更新状态为 `REQUIREMENT_PASSED` 并安全合入 `main`。
+
+## 2026-11-11 GPT → main：SRS_NF016 V1.196 整轮独立复测与验收通过（REQUIREMENT_PASSED）
+
+- **交接状态**：REQUIREMENT_PASSED
+- **需求编号**：SRS_NF016（审计日志完整性与防篡改）
+- **固定产品版本**：`b57c66f580cd74581c890b5739796a746fd2ad5c`（标签 `V1.196`）
+- **独立复测环境**：`tip-gpt-f013`（分支 `ai/gpt-test`），PostgreSQL 隔离 schema `tip_gpt_nf016_v196_20261111`（经本地 TCP 代理 `127.0.0.1:15516` 连接）、Redis DB `11`、后端生产 JAR 监听 `127.0.0.1:18131`。
+- **整轮复测结论**：
+  1. **业务规则与用例步骤**：`SRS_NF016.R01` **1P / 0F / 0NT**；`TC-002.S1`、`TC-002.S2`、`TC-002.S3`、`TC-002.S4` **4P / 0F / 0NT**；独立协议与数据库探针 12/12 项全部 PASS，18/18 专项审计与认证单测全部通过；
+  2. **伪造/真实管理员防篡改拦截**：6 类身份（真实管理员 Token、携带伪造管理员头的有效操作员 Token、4 类伪造/篡改管理员凭据）对 `/api/v1/operation-logs`、`/{id}`、`/{nonExistentId}`、`/api/v1/tasks/{taskId}/events`、`/{eventId}` 发起 94 次 `PUT`/`DELETE`/`PATCH` 及方法覆盖请求，全部严格拦截（已认证会话 HTTP `405` / `code: 3004` + `Allow: GET`，伪造凭据 `401` / `code: 2000/2001`，单条不存在记录只读查询 `404` / `code: 3005`）；Mapper 层 0 处针对审计/事件表的 `UPDATE`/`DELETE`；
+  3. **数据库审计表 SHA-256 指纹零变动**：94 次篡改写请求前后，`operation_logs`（187 行，SHA-256 `3695af7b73765b1e9792236996bbed0c27e80e9ff3a3dba132ea5bae53ee22ce`）、`task_events`（4 行，SHA-256 `19d7f3b96fc57607380a28998f6136359b96925a57182f5a4573243e9a337a33`）、`device_events`（1 行，SHA-256 `a7f9d05b1495e815b3b5d9e9a2971b605fa838634d1ef1f0378b354ad62057aa`）及目标单行记录（`id=181`，SHA-256 `99ab3fe263566c0d5c25d2faab16eda12ea1a0b235fed1aa64262a70b5fc30ca`）100% 一致；
+  4. **超长入参审计留痕完整性**：5,906 字符越权 URI、64 位 UTF-16 中文+Emoji 设备名/任务名、239 字符端点、128 位脱敏凭据、12KB 完成条件及 32 位含 Emoji 登录名完整落库，零截断、零 `\ufffd` 乱码，结构化 `detail` JSON 完整，全表 191 条审计记录零密码/凭据明文泄露。
+- **受控正式报告与证据**：
+  - 正式验收报告：`acceptance/stage3/SRS_NF016-V1.196-整轮独立复测与验收.md`
+  - 协议与数据库证据：`acceptance/stage3/evidence/SRS_NF016-V1.196-protocol-db-evidence-20261111T014646Z.json`
+  - 独立可重跑探针：`acceptance/stage3/probe-nf016-v196.py`
+- **后续协同**：按 V2.4 协同规则，`ai/gpt-test` 安全合入 `main` 并推送到 `origin`。
+
 
 

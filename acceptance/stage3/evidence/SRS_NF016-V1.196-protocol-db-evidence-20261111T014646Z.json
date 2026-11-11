@@ -1,0 +1,1327 @@
+{
+  "requirement": "SRS_NF016",
+  "rule": "SRS_NF016.R01",
+  "productSha": "b57c66f580cd74581c890b5739796a746fd2ad5c",
+  "productTag": "V1.196",
+  "schema": "tip_gpt_nf016_v196_20261111",
+  "backendPort": 18131,
+  "dbProxyPort": 15516,
+  "redisDb": "11",
+  "observedAtUtc": "20261111T014646Z",
+  "tester": "GPT (ai/gpt-test, tip-gpt-f013)",
+  "checks": [
+    {
+      "id": "TC-002.S1",
+      "desc": "不存在/停用/B错密统一“账号或密码错误”、无会话、留痕且不污染A计数",
+      "result": "P",
+      "responses": [
+        {
+          "case": "unknown",
+          "http": 401,
+          "code": 2002,
+          "message": "账号或密码错误",
+          "token": false
+        },
+        {
+          "case": "inactive",
+          "http": 403,
+          "code": 2004,
+          "message": "账号或密码错误",
+          "token": false
+        },
+        {
+          "case": "B_wrong",
+          "http": 401,
+          "code": 2002,
+          "message": "账号或密码错误",
+          "token": false
+        }
+      ],
+      "A": {
+        "status": "ACTIVE",
+        "failedLoginAttempts": 0,
+        "lockedAtSet": false
+      },
+      "B": {
+        "status": "ACTIVE",
+        "failedLoginAttempts": 1,
+        "lockedAtSet": false
+      },
+      "loginFailedRows": [
+        "nf016nobody014646|LOGIN|FAILED",
+        "nf016c014646|LOGIN|FAILED",
+        "nf016b014646|LOGIN|FAILED"
+      ]
+    },
+    {
+      "id": "TC-002.S2",
+      "desc": "前2次未锁定，第3次锁定；锁定期间正确密码仍统一失败且无会话",
+      "result": "P",
+      "sequence": [
+        {
+          "attempt": 1,
+          "http": 401,
+          "code": 2002,
+          "message": "账号或密码错误",
+          "token": false,
+          "state": {
+            "status": "ACTIVE",
+            "failedLoginAttempts": 1,
+            "lockedAtSet": false
+          }
+        },
+        {
+          "attempt": 2,
+          "http": 401,
+          "code": 2002,
+          "message": "账号或密码错误",
+          "token": false,
+          "state": {
+            "status": "ACTIVE",
+            "failedLoginAttempts": 2,
+            "lockedAtSet": false
+          }
+        },
+        {
+          "attempt": 3,
+          "http": 403,
+          "code": 2006,
+          "message": "账号或密码错误",
+          "token": false,
+          "state": {
+            "status": "LOCKED",
+            "failedLoginAttempts": 3,
+            "lockedAtSet": true
+          }
+        },
+        {
+          "attempt": "correct-while-locked",
+          "http": 403,
+          "code": 2005,
+          "message": "账号或密码错误",
+          "token": false,
+          "state": {
+            "status": "LOCKED",
+            "failedLoginAttempts": 3,
+            "lockedAtSet": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "TC-002.S3",
+      "desc": "仅系统管理员可解锁；解锁清零，2错后正确登录再清零，后续1错不锁；失败/锁定/解锁全程留痕且无密码原值",
+      "result": "P",
+      "nonAdminUnlockHttp": {
+        "operator": 403,
+        "configAdmin": 403
+      },
+      "adminUnlockHttp": 200,
+      "states": {
+        "afterUnlock": {
+          "status": "ACTIVE",
+          "failedLoginAttempts": 0,
+          "lockedAtSet": false
+        },
+        "after2Wrong": {
+          "status": "ACTIVE",
+          "failedLoginAttempts": 2,
+          "lockedAtSet": false
+        },
+        "afterCorrect": {
+          "status": "ACTIVE",
+          "failedLoginAttempts": 0,
+          "lockedAtSet": false
+        },
+        "after1Wrong": {
+          "status": "ACTIVE",
+          "failedLoginAttempts": 1,
+          "lockedAtSet": false
+        }
+      },
+      "correctLoginTokenIssued": true,
+      "trailTypes": [
+        [
+          "LOGIN",
+          "FAILED"
+        ],
+        [
+          "LOGIN",
+          "FAILED"
+        ],
+        [
+          "LOGIN",
+          "FAILED"
+        ],
+        [
+          "ACCOUNT_LOCKED",
+          "SUCCESS"
+        ],
+        [
+          "LOGIN",
+          "FAILED"
+        ],
+        [
+          "MANUAL_HANDLING",
+          "SUCCESS"
+        ],
+        [
+          "LOGIN",
+          "FAILED"
+        ],
+        [
+          "LOGIN",
+          "FAILED"
+        ],
+        [
+          "LOGIN",
+          "SUCCESS"
+        ],
+        [
+          "LOGIN",
+          "FAILED"
+        ]
+      ],
+      "lockDetail": {
+        "action": "LOCK",
+        "reason": "连续密码错误",
+        "failedAttempts": 3,
+        "before": {
+          "status": "ACTIVE",
+          "failedLoginAttempts": 2
+        },
+        "after": {
+          "status": "LOCKED",
+          "failedLoginAttempts": 3
+        }
+      },
+      "unlockDetail": {
+        "target": "nf016a014646",
+        "after": {
+          "status": "ACTIVE",
+          "failedLoginAttempts": 0
+        },
+        "action": "UNLOCK",
+        "before": {
+          "status": "LOCKED",
+          "failedLoginAttempts": 3
+        }
+      },
+      "trailRowsWithoutPasswordValue": true
+    },
+    {
+      "id": "NF016.READ-VISIBILITY",
+      "desc": "单条审计只读查询：管理员可查任意、非管理员仅本人、越权403并留ACCESS_DENIED、不存在404",
+      "result": "P",
+      "adminGetOther": 200,
+      "operatorGetOwn": 200,
+      "operatorGetOther": 403,
+      "missing": 404,
+      "accessDeniedRowsAdded": 1
+    },
+    {
+      "id": "NF016.TAMPER-HTTP",
+      "desc": "真实/伪造管理员身份对审计与事件接口PUT/DELETE/PATCH及方法覆盖全部拦截（已认证405+Allow:GET，伪造/无凭据401）",
+      "result": "P",
+      "attemptCount": 94,
+      "statusHistogram": {
+        "realAdminToken:405": 19,
+        "operatorTokenWithSpoofedAdminHeaders:405": 15,
+        "forgedAlgNoneAdminJwt:401": 15,
+        "forgedRandomBearer:401": 15,
+        "tamperedAdminToken:401": 15,
+        "noTokenSpoofedHeadersAndCookie:401": 15
+      },
+      "nonBlocked": [],
+      "sampleAttempts": [
+        {
+          "identity": "realAdminToken",
+          "method": "PUT",
+          "path": "/operation-logs",
+          "http": 405,
+          "code": 3004,
+          "message": "该资源不支持PUT方法（记录不可修改或删除）",
+          "allow": "GET"
+        },
+        {
+          "identity": "realAdminToken",
+          "method": "DELETE",
+          "path": "/operation-logs",
+          "http": 405,
+          "code": 3004,
+          "message": "该资源不支持DELETE方法（记录不可修改或删除）",
+          "allow": "GET"
+        },
+        {
+          "identity": "realAdminToken",
+          "method": "PATCH",
+          "path": "/operation-logs",
+          "http": 405,
+          "code": 3004,
+          "message": "该资源不支持PATCH方法（记录不可修改或删除）",
+          "allow": "GET"
+        },
+        {
+          "identity": "realAdminToken",
+          "method": "PUT",
+          "path": "/operation-logs/181",
+          "http": 405,
+          "code": 3004,
+          "message": "该资源不支持PUT方法（记录不可修改或删除）",
+          "allow": "GET"
+        },
+        {
+          "identity": "realAdminToken",
+          "method": "DELETE",
+          "path": "/operation-logs/181",
+          "http": 405,
+          "code": 3004,
+          "message": "该资源不支持DELETE方法（记录不可修改或删除）",
+          "allow": "GET"
+        },
+        {
+          "identity": "realAdminToken",
+          "method": "PATCH",
+          "path": "/operation-logs/181",
+          "http": 405,
+          "code": 3004,
+          "message": "该资源不支持PATCH方法（记录不可修改或删除）",
+          "allow": "GET"
+        }
+      ]
+    },
+    {
+      "id": "NF016.TAMPER-FINGERPRINT",
+      "desc": "越权写请求前后审计表SHA-256指纹（既有行前缀）不变，目标记录逐字节不变",
+      "result": "P",
+      "before": {
+        "operation_logs": {
+          "sha256": "3695af7b73765b1e9792236996bbed0c27e80e9ff3a3dba132ea5bae53ee22ce",
+          "rows": 187,
+          "maxId": 187
+        },
+        "task_events": {
+          "sha256": "19d7f3b96fc57607380a28998f6136359b96925a57182f5a4573243e9a337a33",
+          "rows": 4,
+          "maxId": 4
+        },
+        "device_events": {
+          "sha256": "a7f9d05b1495e815b3b5d9e9a2971b605fa838634d1ef1f0378b354ad62057aa",
+          "rows": 1,
+          "maxId": 1
+        }
+      },
+      "afterSamePrefix": {
+        "operation_logs": {
+          "sha256": "3695af7b73765b1e9792236996bbed0c27e80e9ff3a3dba132ea5bae53ee22ce",
+          "rows": 187,
+          "maxId": 187
+        },
+        "task_events": {
+          "sha256": "19d7f3b96fc57607380a28998f6136359b96925a57182f5a4573243e9a337a33",
+          "rows": 4,
+          "maxId": 4
+        },
+        "device_events": {
+          "sha256": "a7f9d05b1495e815b3b5d9e9a2971b605fa838634d1ef1f0378b354ad62057aa",
+          "rows": 1,
+          "maxId": 1
+        }
+      },
+      "afterFull": {
+        "operation_logs": {
+          "sha256": "3695af7b73765b1e9792236996bbed0c27e80e9ff3a3dba132ea5bae53ee22ce",
+          "rows": 187,
+          "maxId": 187
+        },
+        "task_events": {
+          "sha256": "19d7f3b96fc57607380a28998f6136359b96925a57182f5a4573243e9a337a33",
+          "rows": 4,
+          "maxId": 4
+        },
+        "device_events": {
+          "sha256": "a7f9d05b1495e815b3b5d9e9a2971b605fa838634d1ef1f0378b354ad62057aa",
+          "rows": 1,
+          "maxId": 1
+        }
+      },
+      "fullTableUnchanged": {
+        "operation_logs": true,
+        "task_events": true,
+        "device_events": true
+      },
+      "targetRowSha256Before": "99ab3fe263566c0d5c25d2faab16eda12ea1a0b235fed1aa64262a70b5fc30ca",
+      "targetRowSha256After": "99ab3fe263566c0d5c25d2faab16eda12ea1a0b235fed1aa64262a70b5fc30ca"
+    },
+    {
+      "id": "NF016.STATIC-APPEND-ONLY",
+      "desc": "审计/事件Mapper无UPDATE/DELETE语句（仅insert+select）",
+      "result": "P",
+      "mappers": {
+        "OperationLogMapper.xml": {
+          "exists": true,
+          "update": 0,
+          "delete": 0
+        },
+        "TaskEventMapper.xml": {
+          "exists": true,
+          "update": 0,
+          "delete": 0
+        },
+        "DeviceEventMapper.xml": {
+          "exists": true,
+          "update": 0,
+          "delete": 0
+        }
+      },
+      "javaSqlHits": []
+    },
+    {
+      "id": "NF016.LONG-L1",
+      "desc": "5906字符越权请求URI写入ACCESS_DENIED：operation_target与detail.target完整无截断、哈希一致、结构完整",
+      "result": "P",
+      "http": 403,
+      "code": 2003,
+      "uriLength": 5906,
+      "storedLength": 5906,
+      "storedOctets": 5906,
+      "uriSha256": "b0a850764d38f04ecd8bd08490995fe207061be1de3ff49b961f6a5f5455e714",
+      "storedSha256": "b0a850764d38f04ecd8bd08490995fe207061be1de3ff49b961f6a5f5455e714",
+      "detailKeys": [
+        "operationType",
+        "result",
+        "target"
+      ],
+      "detailTargetLength": 5906,
+      "detailTargetEqual": true,
+      "logId": "188"
+    },
+    {
+      "id": "NF016.LONG-L2",
+      "desc": "边界长度(64 UTF-16)中文+Emoji设备名/任务名、239字符端点、128位凭据脱敏与12KB完成条件写入DEVICE_CREATE/TASK_DEFINITION_CREATE：无截断无乱码；65位无效边界被拒且不留成功记录",
+      "result": "P",
+      "invalid65Http": 400,
+      "invalid65Code": 3001,
+      "valid64DeviceHttp": 200,
+      "valid64TaskDefHttp": 200,
+      "storedTargetEqual": true,
+      "deviceNameEqual": true,
+      "deviceNameCodePoints": 63,
+      "taskDefNameEqual": true,
+      "taskDefNameCodePoints": 62,
+      "endpointLength": 239,
+      "endpointEqual": true,
+      "credentialMasked": true,
+      "replacementChar": false,
+      "detailKeys": [
+        "accessCredentialRef",
+        "accessEndpoint",
+        "deviceName",
+        "deviceTypeCode"
+      ],
+      "auditRowsBySet": [
+        "DEVICE_CREATE",
+        "TASK_DEFINITION_CREATE"
+      ]
+    },
+    {
+      "id": "NF016.LONG-L3",
+      "desc": "最大长度(32 UTF-16)含Emoji账号登录失败留痕：username/target/detail逐字一致；33位无效边界400且不留痕",
+      "result": "P",
+      "http32": 401,
+      "http33": 400,
+      "rows": 1,
+      "usernameEqual": true,
+      "targetEqual": true,
+      "detailKeys": [
+        "action",
+        "result",
+        "target"
+      ]
+    },
+    {
+      "id": "NF016.NO-CREDENTIAL",
+      "desc": "全量operation_logs detail/target不含任何测试口令原值",
+      "result": "P",
+      "inspectedRows": 191
+    },
+    {
+      "id": "TC-002.S4-DB",
+      "desc": "数据库不可达时登录提示“系统繁忙，请稍后重试”且不建立会话；恢复后可正常登录",
+      "result": "P",
+      "beforeFaultLogin": true,
+      "faultHttp": 500,
+      "faultCode": 1000,
+      "faultMessage": "系统繁忙，请稍后重试",
+      "faultTokenIssued": false,
+      "faultLatencySec": 3.07,
+      "recoveredLogin": true
+    }
+  ],
+  "fixtures": {
+    "accounts": {
+      "A": "nf016a014646",
+      "B": "nf016b014646",
+      "C_inactive": "nf016c014646"
+    },
+    "operationLogMaxIdBeforeTc002": 170
+  },
+  "taskEventFixture": {
+    "submitHttp": 503,
+    "taskId": 1,
+    "eventId": 1,
+    "deviceAgentId": 2
+  },
+  "tamperAttempts": [
+    {
+      "identity": "realAdminToken",
+      "method": "PUT",
+      "path": "/operation-logs",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持PUT方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "realAdminToken",
+      "method": "DELETE",
+      "path": "/operation-logs",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持DELETE方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "realAdminToken",
+      "method": "PATCH",
+      "path": "/operation-logs",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持PATCH方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "realAdminToken",
+      "method": "PUT",
+      "path": "/operation-logs/181",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持PUT方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "realAdminToken",
+      "method": "DELETE",
+      "path": "/operation-logs/181",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持DELETE方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "realAdminToken",
+      "method": "PATCH",
+      "path": "/operation-logs/181",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持PATCH方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "realAdminToken",
+      "method": "PUT",
+      "path": "/operation-logs/999999999",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持PUT方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "realAdminToken",
+      "method": "DELETE",
+      "path": "/operation-logs/999999999",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持DELETE方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "realAdminToken",
+      "method": "PATCH",
+      "path": "/operation-logs/999999999",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持PATCH方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "realAdminToken",
+      "method": "PUT",
+      "path": "/tasks/1/events",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持PUT方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "realAdminToken",
+      "method": "DELETE",
+      "path": "/tasks/1/events",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持DELETE方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "realAdminToken",
+      "method": "PATCH",
+      "path": "/tasks/1/events",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持PATCH方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "realAdminToken",
+      "method": "PUT",
+      "path": "/tasks/1/events/1",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持PUT方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "realAdminToken",
+      "method": "DELETE",
+      "path": "/tasks/1/events/1",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持DELETE方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "realAdminToken",
+      "method": "PATCH",
+      "path": "/tasks/1/events/1",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持PATCH方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "operatorTokenWithSpoofedAdminHeaders",
+      "method": "PUT",
+      "path": "/operation-logs",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持PUT方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "operatorTokenWithSpoofedAdminHeaders",
+      "method": "DELETE",
+      "path": "/operation-logs",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持DELETE方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "operatorTokenWithSpoofedAdminHeaders",
+      "method": "PATCH",
+      "path": "/operation-logs",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持PATCH方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "operatorTokenWithSpoofedAdminHeaders",
+      "method": "PUT",
+      "path": "/operation-logs/181",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持PUT方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "operatorTokenWithSpoofedAdminHeaders",
+      "method": "DELETE",
+      "path": "/operation-logs/181",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持DELETE方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "operatorTokenWithSpoofedAdminHeaders",
+      "method": "PATCH",
+      "path": "/operation-logs/181",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持PATCH方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "operatorTokenWithSpoofedAdminHeaders",
+      "method": "PUT",
+      "path": "/operation-logs/999999999",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持PUT方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "operatorTokenWithSpoofedAdminHeaders",
+      "method": "DELETE",
+      "path": "/operation-logs/999999999",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持DELETE方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "operatorTokenWithSpoofedAdminHeaders",
+      "method": "PATCH",
+      "path": "/operation-logs/999999999",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持PATCH方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "operatorTokenWithSpoofedAdminHeaders",
+      "method": "PUT",
+      "path": "/tasks/1/events",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持PUT方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "operatorTokenWithSpoofedAdminHeaders",
+      "method": "DELETE",
+      "path": "/tasks/1/events",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持DELETE方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "operatorTokenWithSpoofedAdminHeaders",
+      "method": "PATCH",
+      "path": "/tasks/1/events",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持PATCH方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "operatorTokenWithSpoofedAdminHeaders",
+      "method": "PUT",
+      "path": "/tasks/1/events/1",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持PUT方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "operatorTokenWithSpoofedAdminHeaders",
+      "method": "DELETE",
+      "path": "/tasks/1/events/1",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持DELETE方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "operatorTokenWithSpoofedAdminHeaders",
+      "method": "PATCH",
+      "path": "/tasks/1/events/1",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持PATCH方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "forgedAlgNoneAdminJwt",
+      "method": "PUT",
+      "path": "/operation-logs",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "forgedAlgNoneAdminJwt",
+      "method": "DELETE",
+      "path": "/operation-logs",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "forgedAlgNoneAdminJwt",
+      "method": "PATCH",
+      "path": "/operation-logs",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "forgedAlgNoneAdminJwt",
+      "method": "PUT",
+      "path": "/operation-logs/181",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "forgedAlgNoneAdminJwt",
+      "method": "DELETE",
+      "path": "/operation-logs/181",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "forgedAlgNoneAdminJwt",
+      "method": "PATCH",
+      "path": "/operation-logs/181",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "forgedAlgNoneAdminJwt",
+      "method": "PUT",
+      "path": "/operation-logs/999999999",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "forgedAlgNoneAdminJwt",
+      "method": "DELETE",
+      "path": "/operation-logs/999999999",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "forgedAlgNoneAdminJwt",
+      "method": "PATCH",
+      "path": "/operation-logs/999999999",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "forgedAlgNoneAdminJwt",
+      "method": "PUT",
+      "path": "/tasks/1/events",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "forgedAlgNoneAdminJwt",
+      "method": "DELETE",
+      "path": "/tasks/1/events",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "forgedAlgNoneAdminJwt",
+      "method": "PATCH",
+      "path": "/tasks/1/events",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "forgedAlgNoneAdminJwt",
+      "method": "PUT",
+      "path": "/tasks/1/events/1",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "forgedAlgNoneAdminJwt",
+      "method": "DELETE",
+      "path": "/tasks/1/events/1",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "forgedAlgNoneAdminJwt",
+      "method": "PATCH",
+      "path": "/tasks/1/events/1",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "forgedRandomBearer",
+      "method": "PUT",
+      "path": "/operation-logs",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "forgedRandomBearer",
+      "method": "DELETE",
+      "path": "/operation-logs",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "forgedRandomBearer",
+      "method": "PATCH",
+      "path": "/operation-logs",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "forgedRandomBearer",
+      "method": "PUT",
+      "path": "/operation-logs/181",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "forgedRandomBearer",
+      "method": "DELETE",
+      "path": "/operation-logs/181",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "forgedRandomBearer",
+      "method": "PATCH",
+      "path": "/operation-logs/181",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "forgedRandomBearer",
+      "method": "PUT",
+      "path": "/operation-logs/999999999",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "forgedRandomBearer",
+      "method": "DELETE",
+      "path": "/operation-logs/999999999",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "forgedRandomBearer",
+      "method": "PATCH",
+      "path": "/operation-logs/999999999",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "forgedRandomBearer",
+      "method": "PUT",
+      "path": "/tasks/1/events",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "forgedRandomBearer",
+      "method": "DELETE",
+      "path": "/tasks/1/events",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "forgedRandomBearer",
+      "method": "PATCH",
+      "path": "/tasks/1/events",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "forgedRandomBearer",
+      "method": "PUT",
+      "path": "/tasks/1/events/1",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "forgedRandomBearer",
+      "method": "DELETE",
+      "path": "/tasks/1/events/1",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "forgedRandomBearer",
+      "method": "PATCH",
+      "path": "/tasks/1/events/1",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "tamperedAdminToken",
+      "method": "PUT",
+      "path": "/operation-logs",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "tamperedAdminToken",
+      "method": "DELETE",
+      "path": "/operation-logs",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "tamperedAdminToken",
+      "method": "PATCH",
+      "path": "/operation-logs",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "tamperedAdminToken",
+      "method": "PUT",
+      "path": "/operation-logs/181",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "tamperedAdminToken",
+      "method": "DELETE",
+      "path": "/operation-logs/181",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "tamperedAdminToken",
+      "method": "PATCH",
+      "path": "/operation-logs/181",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "tamperedAdminToken",
+      "method": "PUT",
+      "path": "/operation-logs/999999999",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "tamperedAdminToken",
+      "method": "DELETE",
+      "path": "/operation-logs/999999999",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "tamperedAdminToken",
+      "method": "PATCH",
+      "path": "/operation-logs/999999999",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "tamperedAdminToken",
+      "method": "PUT",
+      "path": "/tasks/1/events",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "tamperedAdminToken",
+      "method": "DELETE",
+      "path": "/tasks/1/events",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "tamperedAdminToken",
+      "method": "PATCH",
+      "path": "/tasks/1/events",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "tamperedAdminToken",
+      "method": "PUT",
+      "path": "/tasks/1/events/1",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "tamperedAdminToken",
+      "method": "DELETE",
+      "path": "/tasks/1/events/1",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "tamperedAdminToken",
+      "method": "PATCH",
+      "path": "/tasks/1/events/1",
+      "http": 401,
+      "code": 2001,
+      "message": "会话已过期",
+      "allow": ""
+    },
+    {
+      "identity": "noTokenSpoofedHeadersAndCookie",
+      "method": "PUT",
+      "path": "/operation-logs",
+      "http": 401,
+      "code": 2000,
+      "message": "未授权访问",
+      "allow": ""
+    },
+    {
+      "identity": "noTokenSpoofedHeadersAndCookie",
+      "method": "DELETE",
+      "path": "/operation-logs",
+      "http": 401,
+      "code": 2000,
+      "message": "未授权访问",
+      "allow": ""
+    },
+    {
+      "identity": "noTokenSpoofedHeadersAndCookie",
+      "method": "PATCH",
+      "path": "/operation-logs",
+      "http": 401,
+      "code": 2000,
+      "message": "未授权访问",
+      "allow": ""
+    },
+    {
+      "identity": "noTokenSpoofedHeadersAndCookie",
+      "method": "PUT",
+      "path": "/operation-logs/181",
+      "http": 401,
+      "code": 2000,
+      "message": "未授权访问",
+      "allow": ""
+    },
+    {
+      "identity": "noTokenSpoofedHeadersAndCookie",
+      "method": "DELETE",
+      "path": "/operation-logs/181",
+      "http": 401,
+      "code": 2000,
+      "message": "未授权访问",
+      "allow": ""
+    },
+    {
+      "identity": "noTokenSpoofedHeadersAndCookie",
+      "method": "PATCH",
+      "path": "/operation-logs/181",
+      "http": 401,
+      "code": 2000,
+      "message": "未授权访问",
+      "allow": ""
+    },
+    {
+      "identity": "noTokenSpoofedHeadersAndCookie",
+      "method": "PUT",
+      "path": "/operation-logs/999999999",
+      "http": 401,
+      "code": 2000,
+      "message": "未授权访问",
+      "allow": ""
+    },
+    {
+      "identity": "noTokenSpoofedHeadersAndCookie",
+      "method": "DELETE",
+      "path": "/operation-logs/999999999",
+      "http": 401,
+      "code": 2000,
+      "message": "未授权访问",
+      "allow": ""
+    },
+    {
+      "identity": "noTokenSpoofedHeadersAndCookie",
+      "method": "PATCH",
+      "path": "/operation-logs/999999999",
+      "http": 401,
+      "code": 2000,
+      "message": "未授权访问",
+      "allow": ""
+    },
+    {
+      "identity": "noTokenSpoofedHeadersAndCookie",
+      "method": "PUT",
+      "path": "/tasks/1/events",
+      "http": 401,
+      "code": 2000,
+      "message": "未授权访问",
+      "allow": ""
+    },
+    {
+      "identity": "noTokenSpoofedHeadersAndCookie",
+      "method": "DELETE",
+      "path": "/tasks/1/events",
+      "http": 401,
+      "code": 2000,
+      "message": "未授权访问",
+      "allow": ""
+    },
+    {
+      "identity": "noTokenSpoofedHeadersAndCookie",
+      "method": "PATCH",
+      "path": "/tasks/1/events",
+      "http": 401,
+      "code": 2000,
+      "message": "未授权访问",
+      "allow": ""
+    },
+    {
+      "identity": "noTokenSpoofedHeadersAndCookie",
+      "method": "PUT",
+      "path": "/tasks/1/events/1",
+      "http": 401,
+      "code": 2000,
+      "message": "未授权访问",
+      "allow": ""
+    },
+    {
+      "identity": "noTokenSpoofedHeadersAndCookie",
+      "method": "DELETE",
+      "path": "/tasks/1/events/1",
+      "http": 401,
+      "code": 2000,
+      "message": "未授权访问",
+      "allow": ""
+    },
+    {
+      "identity": "noTokenSpoofedHeadersAndCookie",
+      "method": "PATCH",
+      "path": "/tasks/1/events/1",
+      "http": 401,
+      "code": 2000,
+      "message": "未授权访问",
+      "allow": ""
+    },
+    {
+      "identity": "realAdminToken",
+      "method": "POST+X-HTTP-Method-Override",
+      "path": "/operation-logs/181",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持POST方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "realAdminToken",
+      "method": "POST _method=DELETE",
+      "path": "/operation-logs/181",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持POST方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "realAdminToken",
+      "method": "POST+X-HTTP-Method-Override",
+      "path": "/tasks/1/events/1",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持POST方法（记录不可修改或删除）",
+      "allow": "GET"
+    },
+    {
+      "identity": "realAdminToken",
+      "method": "POST _method=DELETE",
+      "path": "/tasks/1/events/1",
+      "http": 405,
+      "code": 3004,
+      "message": "该资源不支持POST方法（记录不可修改或删除）",
+      "allow": "GET"
+    }
+  ],
+  "summary": {
+    "P": 12,
+    "F": 0
+  }
+}
