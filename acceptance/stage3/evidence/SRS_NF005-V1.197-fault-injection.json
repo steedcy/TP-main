@@ -1,0 +1,168 @@
+{
+  "requirement": "SRS_NF005",
+  "rule": "SRS_NF005.R01",
+  "ruleScope": "故障隔离与自愈恢复、异常事务回滚及运动安全控制字段硬拦截",
+  "productSha": "c34deba33c401791d976e36ab826a8e8cc66847d",
+  "productTag": "V1.197",
+  "tester": "GPT (ai/gpt-test, tip-gpt-f013)",
+  "workspace": "C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013",
+  "observedAt": "2026-11-11",
+  "isolatedEnvironment": {
+    "postgresSchema": "tip_gpt_nf005_v197_20261111",
+    "redisDb": "12",
+    "backendPort": 18138,
+    "simulators": [
+      "G126_ROBOT:18132",
+      "NF005_HEALTHY_18137:18137"
+    ],
+    "sharedPostgresTouched": false,
+    "sharedPortsTouched": false
+  },
+  "checks": [
+    {
+      "id": "FAULT-CRASH-DISPATCH",
+      "mapsTo": [
+        "SRS_NF005.R01",
+        "TC-024.S1",
+        "TC-057.S1",
+        "TC-057.S2"
+      ],
+      "result": "P",
+      "injection": "taskkill 终止单个仿真终端 G126_ROBOT:18132 / AGT-803437A3。",
+      "observed": {
+        "offlineAfterHeartbeatTimeout": true,
+        "offlineReason": "ERR_HEARTBEAT_TIMEOUT",
+        "healthyAgent": "AGT-DD76E82F",
+        "taskId": 1375,
+        "taskStatus": "COMPLETED",
+        "healthyDispatch": true,
+        "unrelatedSchedulingContinued": true
+      },
+      "evidenceNote": "原始30秒采样中的faultAgentOffline=false是采样过早；后续独立状态查询确认约30秒后OFFLINE，正式判定以该后续确认与任务1375完成为准。",
+      "rawArtifact": "acceptance/stage3/evidence/SRS_NF005-V1.197-raw-nf005-crash-dispatch.json"
+    },
+    {
+      "id": "FAULT-MODEL-TIMEOUT-ROLLBACK",
+      "mapsTo": [
+        "SRS_NF005.R01",
+        "TC-024.S1",
+        "TC-056.S2"
+      ],
+      "result": "P",
+      "injection": "停止独立模型夹具 127.0.0.1:18117 后创建任务。",
+      "observed": {
+        "http": 503,
+        "code": 4113,
+        "status": "PENDING_MANUAL",
+        "diagnosticEvents": [
+          "GOAL_SUBMITTED",
+          "GOAL_UNDERSTANDING_FAILED",
+          "BASELINE_DOWNGRADED",
+          "TASK_PENDING_MANUAL"
+        ],
+        "downstreamBusinessRowsCreated": false,
+        "delta": {
+          "plan_versions": 0,
+          "task_step_assignments": 0,
+          "device_commands": 0,
+          "task_exceptions": 0
+        },
+        "traceabilityTaskRowRetained": true
+      },
+      "rollbackInterpretation": "任务行和四条诊断事件用于可追溯人工处理；计划、分配、指令及异常业务下游事务未生成，无脏状态。",
+      "rawArtifact": "acceptance/stage3/evidence/SRS_NF005-V1.197-raw-nf005-model-timeout.json"
+    },
+    {
+      "id": "FAULT-DISPATCH-EXCEPTION",
+      "mapsTo": [
+        "SRS_NF005.R01",
+        "TC-024.S1",
+        "TC-057.S1",
+        "TC-057.S2"
+      ],
+      "result": "P",
+      "injection": "故障终端保持陈旧ONLINE快照后，在承接/分派阶段触发设备网络异常。",
+      "observed": {
+        "taskId": 1377,
+        "rejectedAgent": "AGT-803437A3",
+        "rejectReason": "DEVICE_API_ERROR",
+        "healthyAgent": "AGT-DD76E82F",
+        "taskStatus": "COMPLETED",
+        "completedAssignments": 1,
+        "danglingExecutionState": false
+      },
+      "rawArtifact": "acceptance/stage3/evidence/SRS_NF005-V1.197-raw-nf005-dispatch-exception.json"
+    },
+    {
+      "id": "FAULT-RECOVERY",
+      "mapsTo": [
+        "SRS_NF005.R01",
+        "TC-056.S2"
+      ],
+      "result": "P",
+      "injection": "重启 G126_ROBOT:18132 并重新绑定 AGT-803437A3。",
+      "observed": {
+        "onlineStatus": "ONLINE",
+        "workStatus": "IDLE",
+        "automaticHeartbeatRecognition": true,
+        "capabilitiesRestored": true
+      },
+      "rawArtifact": "acceptance/stage3/evidence/SRS_NF005-V1.197-raw-nf005-recovery-final.json"
+    }
+  ],
+  "unitAndBuild": {
+    "FaultIsolationAndSelfHealingNF005Test": {
+      "tests": 30,
+      "passed": 30,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "backendProductionBuild": {
+      "result": "BUILD SUCCESS",
+      "jar": "backend/target/airport-ai-app-1.0.0.jar"
+    },
+    "simulatorProductionBuild": {
+      "result": "BUILD SUCCESS",
+      "jar": "simulator/target/device-simulator-runtime.jar"
+    }
+  },
+  "artifactHashes": {
+    "acceptance/stage3/evidence/SRS_NF005-V1.197-raw-nf005-crash-dispatch.json": {
+      "sha256": "9c53ff281ef092ed582e0f2328e902acb0f46dc88f4736b541723debc2cc80b7",
+      "bytes": 31954
+    },
+    "acceptance/stage3/evidence/SRS_NF005-V1.197-raw-nf005-model-timeout.json": {
+      "sha256": "55bc2e6e0b106fc5e994f46258743dcb76aeaf11c16db25c56b55e2295ab4148",
+      "bytes": 1186
+    },
+    "acceptance/stage3/evidence/SRS_NF005-V1.197-raw-nf005-dispatch-exception.json": {
+      "sha256": "9d843e7afa8a7000d820eab749e6938cd6335c77be326cb34a8604262bee5b8c",
+      "bytes": 12394
+    },
+    "acceptance/stage3/evidence/SRS_NF005-V1.197-raw-nf005-recovery-final.json": {
+      "sha256": "dcf27f5b9993d5951b8b99cd8225e8d373bc1bc8041ebef26360eb0e865a4677",
+      "bytes": 1155
+    },
+    "backend/target/surefire-reports/com.airport.ai.task.FaultIsolationAndSelfHealingNF005Test.txt": {
+      "sha256": "c7c28612f6b237516cd6f900a0ae7665dd61b6c1d0f6d246f27ebb5f6966adad",
+      "bytes": 369
+    },
+    "backend/target/surefire-reports/TEST-com.airport.ai.task.FaultIsolationAndSelfHealingNF005Test.xml": {
+      "sha256": "7979155bcfb5976bc159513ce7b622b40989bd06c9c959631a70b25de4479dcd",
+      "bytes": 37365
+    },
+    "backend/target/airport-ai-app-1.0.0.jar": {
+      "sha256": "527822997b263e1ce4cce2b509ce7cd87a66a8919216b3328f395e1e178a1880",
+      "bytes": 45641785
+    },
+    "simulator/target/device-simulator-runtime.jar": {
+      "sha256": "2bca76bb2cd152e7c414b995f895b779b3d486c2487571de83eec3453745e3d3",
+      "bytes": 21353426
+    }
+  },
+  "verdict": {
+    "rule": "P",
+    "summary": "1P / 0F / 0NT"
+  }
+}
