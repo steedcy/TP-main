@@ -105,7 +105,7 @@
 | 2026-11-10 | SRS_NF016 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / b57c66f580cd74581c890b5739796a746fd2ad5c / V1.196 | 待独立整轮复测 | 加固审计日志与事件接口只读405拦截、V30扩宽长字段与复杂JSON防截断防乱码、关键生命周期（创建/调度/终止/接管/锁定/解锁）100%留痕，576项单测全过，详见下文交接专节 |
 | 2026-11-11 | SRS_NF016 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / b57c66f580cd74581c890b5739796a746fd2ad5c / V1.196 | 本次提交 | 规则1P/0F/0NT，关联步骤TC-002.S1~S4 4P/0F/0NT；94次伪造/真实管理员PUT/DELETE/PATCH篡改请求全部405/401拦截、3张审计/事件表SHA-256指纹零变动、5906字符URI与12KB+长字段无截断无乱码、全表零凭据泄露，已合main |
 | 2026-11-11 | SRS_NF005 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / c34deba / V1.197 | 待独立整轮复测 | SRS_NF005 故障隔离与自愈恢复（仿真体断连/超时单点隔离与候选自愈切换、数据库事务100%回滚、八类运动安全拦截与REQUIRES_NEW独立审计留痕）完成，专项单测30/30P，全量606单测及JAR打包全部通过，移交GPT复测 |
-| 2026-11-11 | SRS_NF005 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / c34deba33c401791d976e36ab826a8e8cc66847d / V1.197 | 待本次提交 | 规则1P/0F/0NT；单终端宕机后OFFLINE并由健康代理接管，模型网络超时下游事务零脏行，分派异常自动切换，故障终端重连后ONLINE/IDLE；证据与报告已归档，准备安全合入main |
+| 2026-11-11 | SRS_NF005 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / c34deba33c401791d976e36ab826a8e8cc66847d / V1.197 | 2dde66a | 规则1P/0F/0NT；单终端宕机后OFFLINE并由健康代理接管，模型网络超时下游事务零脏行，分派异常自动切换，故障终端重连后ONLINE/IDLE；证据与报告已归档，准备安全合入main |
 ## 文件认领
 
 - Claude：当前需求涉及的产品代码与必要的修复单测；独立 `ai/claude-fix` worktree。
