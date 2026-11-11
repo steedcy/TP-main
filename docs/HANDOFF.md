@@ -2,23 +2,31 @@
 
 ## 当前交接状态
 
-- 状态：REQUIREMENT_PASSED（SRS_NF016 审计日志完整性与防篡改 V1.196 整轮独立复测全部通过，合入 main）
-- 依据需求与规则：SRS_NF016.R01、TC-002.S1~S4
-- 固定产品版本：`b57c66f580cd74581c890b5739796a746fd2ad5c`（标签 `V1.196`）
-- 本轮独立复测与闭环结论：
-  1. **业务规则与关联用例步骤全 P 通过**：
-     - `SRS_NF016.R01`：**P**（1P / 0F / 0NT）；
-     - 关联步骤 `TC-002.S1`、`TC-002.S2`、`TC-002.S3`、`TC-002.S4` 全部 **P**（4P / 0F / 0NT），独立实测探针 12/12 检查项全部 PASS。
-  2. **伪造与真实管理员权限篡改日志拦截验证通过**：
-     - 针对 `/api/v1/operation-logs`、`/{id}`、`/{nonExistentId}` 及 `/api/v1/tasks/{taskId}/events`、`/{eventId}`，使用真实管理员 Token、携带伪造管理员头的有效操作员 Token 及 4 类伪造管理员凭据发起 94 次 `PUT`/`DELETE`/`PATCH` 与方法覆盖请求，100% 严格拦截（已认证会话返回 HTTP `405` / `code: 3004` + `Allow: GET`，伪造凭据返回 `401` / `code: 2000/2001`，单条不存在记录只读查询返回 `404` / `code: 3005`）；
-     - 静态核验 `OperationLogMapper`、`TaskEventMapper`、`DeviceEventMapper` 及全量 Java 代码 0 处针对审计/事件表的 `UPDATE`/`DELETE` 语句。
-  3. **数据库审计表 SHA-256 指纹零变动验证通过**：
-     - 94 次越权/篡改写请求前后，`operation_logs`（187 行，SHA-256 `3695af7b73765b1e9792236996bbed0c27e80e9ff3a3dba132ea5bae53ee22ce`）、`task_events`（4 行，SHA-256 `19d7f3b96fc57607380a28998f6136359b96925a57182f5a4573243e9a337a33`）、`device_events`（1 行，SHA-256 `a7f9d05b1495e815b3b5d9e9a2971b605fa838634d1ef1f0378b354ad62057aa`）及目标单行记录（`id=181`，SHA-256 `99ab3fe263566c0d5c25d2faab16eda12ea1a0b235fed1aa64262a70b5fc30ca`）指纹 100% 完全一致。
-  4. **超长入参审计留痕完整性与零凭据泄露验证通过**：
-     - 5,906 字符越权 URI（SHA-256 `b0a85076...5455e714`）、64 位 UTF-16 中文+Emoji 设备名/任务名、239 字符端点、128 位脱敏凭据、12KB 完成条件及 32 位含 Emoji 登录名完整落库，零截断、零 `\ufffd` 乱码，JSON 字段结构完整，全表 191 条审计记录零密码/凭据原值泄露。
-  5. **专项单测与生产 JAR 实测确认**：
-     - 18/18 专项审计与认证单测（`AuditLogIntegrityAndTamperResistanceNF016Test` 等 5 个测试类）及隔离生产 JAR 故障注入/恢复实测全部通过。
-- 下一步：`ai/gpt-test` 安全合入 `main` 并推送到远端。
+- 状态：READY_FOR_GPT（SRS_NF005 故障隔离与自愈恢复 V1.197 修复与定向单测完成，移交 GPT 独立复测）
+- 依据需求与规则：SRS_NF005.R01、TC-024.S1~S2、TC-040.S1~S2、TC-056.S1~S2
+- 固定产品版本：`c34deba`（标签 `V1.197`，已推送到 `origin/ai/claude-fix`）
+- 本轮修复与自测验证结论：
+  1. **外部仿真体故障隔离与自愈（HeartbeatMonitorTask / StepTimeoutMonitorTask）**：
+     - 单个设备代理心跳超时断连（`OFFLINE`）或执行反馈超时（`ERR_EXECUTION_TIMEOUT`）时，受影响步骤自动切换至健康可用候选设备完成自愈，协同调度引擎与并发正常任务（如设备 C 上的并发任务 2）完全不受影响；
+     - 巡检批次内增加单项 `try-catch` 异常隔离，单设备/单步骤抛出异常不阻断批次内其余设备自愈与超时流转。
+  2. **事务原子性与 100% 回滚（REQUIRES_NEW 审计留痕独立提交）**：
+     - 步骤执行异常或故障中断时，外层业务数据库事务（`tasks`、`plan_versions`、`task_step_assignments`、`device_commands`）100% 回滚，零脏数据残留；
+     - `DeviceEventService.appendBlockedMessage` 采用 `REQUIRES_NEW` 独立事务提交，确保业务请求因违规字段回滚（HTTP 400）时，运动安全拦截审计留痕不丢失。
+  3. **运动安全控制字段拦截二次防线（SRS_NF005.R01、TC-024.S2、TC-056.S1）**：
+     - 覆盖全部 8 类运动安全控制字段（速度、加速度、姿态、路径点、避障、急停、限速、失联停靠，含中文、英文及驼峰变体）；
+     - 代理消息网关（`DeviceAgentMessagingService`）、设备仿真运行时（`SimulatorRuntime`）及调度下发阶段（`TaskExecutionOrchestrator`）统一拦截并记录 `COMMAND_DISPATCH_BLOCKED` 与 `device_events` `BLOCKED` 状态；
+     - `TaskExceptionService` 硬阻断运动安全拦截场景，严禁切换候选设备重发违规指令。
+  4. **结构硬校验防线（TC-040.S1~S2）**：
+     - 计划超过 5 步不截断，缺失字段/逆序依赖/循环/动态代码/无限协商一次性全量收集报错；
+     - 结构硬校验失败严禁强行放行（`FORCE_RELEASE` / `REQUEST_SUPERVISION`），拦截记录通过 `ForceBypassAuditRecorder` 持久留痕。
+  5. **测试套件与构建验证**：
+     - 专项测试套件 `FaultIsolationAndSelfHealingNF005Test` 30 项测试全部通过（30/30 P）；
+     - `MotionSafetyFieldsTest`（2/2 P）、`CommandDispatchAndExecutionF017Test`（10/10 P）通过；
+     - `backend` 全量 606 项测试全部通过（606 P / 0 F / 2 Skipped），生产 JAR 打包成功（`BUILD SUCCESS`）；
+     - `simulator` 全量 27 项测试全部通过，JAR 打包成功（`BUILD SUCCESS`）。
+- 待 GPT 复测项：
+  - `SRS_NF005.R01`、`TC-024.S1~S2`、`TC-040.S1~S2`、`TC-056.S1~S2` 及故障隔离自愈/事务 100% 回滚独立复测。
+- 下一步：移交 GPT 在独立 worktree `tip-gpt-f013` 分支 `ai/gpt-test` 执行独立复测。
 
 ## 首项需求的现有证据
 
@@ -96,6 +104,7 @@
 | 2026-11-10 | SRS_NF004 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / b51bae075653765a36739060bf33fd5737b4f7f9 / V1.195 | 本次提交 | 规则1P/0F/0NT，关联步骤7P/0F/0NT；服务端逐接口RBAC、CORS白名单403拦截与留痕、MyBatis 100% #{} 参数化与LIKE转义、XssSanitizer HTML转义35/35安全单测与前后端生产构建全部通过；已合main，下一项SRS_NF005 |
 | 2026-11-10 | SRS_NF016 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / b57c66f580cd74581c890b5739796a746fd2ad5c / V1.196 | 待独立整轮复测 | 加固审计日志与事件接口只读405拦截、V30扩宽长字段与复杂JSON防截断防乱码、关键生命周期（创建/调度/终止/接管/锁定/解锁）100%留痕，576项单测全过，详见下文交接专节 |
 | 2026-11-11 | SRS_NF016 | GPT → main | REQUIREMENT_PASSED | ai/gpt-test / b57c66f580cd74581c890b5739796a746fd2ad5c / V1.196 | 本次提交 | 规则1P/0F/0NT，关联步骤TC-002.S1~S4 4P/0F/0NT；94次伪造/真实管理员PUT/DELETE/PATCH篡改请求全部405/401拦截、3张审计/事件表SHA-256指纹零变动、5906字符URI与12KB+长字段无截断无乱码、全表零凭据泄露，已合main |
+| 2026-11-11 | SRS_NF005 | Germini → GPT | READY_FOR_GPT | ai/claude-fix / c34deba / V1.197 | 待独立整轮复测 | SRS_NF005 故障隔离与自愈恢复（仿真体断连/超时单点隔离与候选自愈切换、数据库事务100%回滚、八类运动安全拦截与REQUIRES_NEW独立审计留痕）完成，专项单测30/30P，全量606单测及JAR打包全部通过，移交GPT复测 |
 ## 文件认领
 
 - Claude：当前需求涉及的产品代码与必要的修复单测；独立 `ai/claude-fix` worktree。
@@ -4855,7 +4864,40 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
     3. 复测长字段与复杂 JSON 落库及关键业务生命周期（创建、调度、终止、接管、锁定、解锁）100% 留痕；
     4. 确认整项通过后更新状态为 `REQUIREMENT_PASSED` 并安全合入 `main`。
 
-## 2026-11-11 GPT → main：SRS_NF016 V1.196 整轮独立复测与验收通过（REQUIREMENT_PASSED）
+## 2026-11-11 Germini → GPT：SRS_NF005 V1.197 故障隔离与自愈恢复加固（READY_FOR_GPT）
+
+- **交接状态**：READY_FOR_GPT
+- **需求编号**：SRS_NF005（故障隔离与自愈恢复 / 安全边界拦截）
+- **固定产品版本**：`c34deba`（标签 `V1.197`，已推送至 `origin/ai/claude-fix`）
+- **依据与范围**：
+  - 需求规则：`SRS_NF005.R01`（平台不得下发运动安全控制指令；设备代理对含运动安全字段的消息执行拦截并记录）；
+  - 关联用例步骤：`TC-024.S1~S2`、`TC-040.S1~S2`、`TC-056.S1~S2`；
+  - 核心要求：
+    1. **外部仿真体故障隔离**：单个设备代理断连（心跳超时）或执行超时时，平台协同调度引擎不受影响，其余正常设备继续工作；心跳与步骤超时巡检批内单点故障隔离；
+    2. **事务原子性与回滚**：执行异常或故障中断时，数据库外层事务 100% 回滚，不产生残留脏数据；`DeviceEventService.appendBlockedMessage` 采用 `REQUIRES_NEW` 独立事务提交，确保业务请求回滚时拦截审计留痕不丢失；
+    3. **运动安全二次防线拦截**：全部 8 类运动安全字段（速度、加速度、姿态、路径点、避障、急停、限速、失联停靠，中英/驼峰）在网关、运行时与下发阶段硬拦截并记录 `BLOCKED`，禁止向候选设备重发违规指令；
+    4. **结构硬校验防线**：超过 5 步不截断，结构错误全量汇总，硬校验失败严禁强行放行（`FORCE_RELEASE` / `REQUEST_SUPERVISION`）并记录独立审计。
+- **本轮代码改动与加固**：
+  1. `DeviceEventService`: 新增 `appendBlockedMessage` 方法，注解 `@Transactional(propagation = Propagation.REQUIRES_NEW)`，确保外层业务事务因异常回滚时运动安全拦截留痕不丢失；
+  2. `DeviceAgentMessagingService`: 拦截全部 8 类运动安全字段，在抛出异常前通过 `DeviceEventService.appendBlockedMessage` 记录 `BLOCKED` 事件，下发阶段与能力测试阶段防线闭环；
+  3. `SimulatorRuntime`: 扩充中英文及驼峰运动安全字段集合（`FORBIDDEN`），在 `accept` 与 `testCapability` 统一拦截并记录 `BLOCKED_MOTION_SAFETY` 状态；
+  4. `TaskExecutionOrchestrator`: 下发阶段再次检查运动安全控制字段，检出时记录 `COMMAND_DISPATCH_BLOCKED` 事件并触发代理事件 `BLOCKED` 留痕，步骤标记 `FAILED` 并释放代理；
+  5. `TaskExceptionService`: 运动安全拦截硬阻断，禁止切换其他候选设备重发违规指令；
+  6. `HeartbeatMonitorTask` & `StepTimeoutMonitorTask`: 循环内增加 per-item `try-catch` 隔离，单代理/步骤异常不中断同批次其余设备自愈与超时流转。
+- **验证结论**：
+  1. 专项单测 `backend/src/test/java/com/airport/ai/task/FaultIsolationAndSelfHealingNF005Test.java` 30 项测试全部通过（30/30 P）；
+  2. 定向单测 `CommandDispatchAndExecutionF017Test`（10/10 P）、`MotionSafetyFieldsTest`（2/2 P）全部通过；
+  3. 后端全量测试 `mvn -o package`：606 项单测通过，0 失败，0 错误（2 项跳过），生产 JAR 构建成功（BUILD SUCCESS）；
+  4. 仿真器全量测试 `mvn -o package`：27 项单测通过，生产 JAR 构建成功（BUILD SUCCESS）。
+- **给 ChatGPT 的独立复测指引**：
+  - 请基于固定代码版本 `c34deba`（标签 `V1.197`）在独立 worktree `ai/gpt-test` 开展 `SRS_NF005` 整轮独立复测；
+  - 核心复测点：
+    1. 复测 `SRS_NF005.R01` 与 `TC-024.S1~S2`：验证超时与未知反馈统一归一（`ERR_FEEDBACK_UNRECOGNIZED`），八类运动安全字段在统一代理与适配器两侧硬拦截留痕，五类合法业务意图正常通过；
+    2. 复测 `TC-040.S1~S2`：验证计划超过 5 步不截断并全量返回结构错误清单，强行放行硬拦截（HTTP 400 / code 4110）并持久化留痕；
+    3. 复测 `TC-056.S1~S2`：验证下发阶段运动安全字段硬拦截、步骤 FAILED、0 未校验指令发送至设备，合法意图正常下发；
+    4. 复测外部仿真体故障隔离与自愈恢复（单代理心跳超时/执行超时，调度引擎不受影响且并发正常任务正常推进）及数据库事务 100% 回滚零脏数据；
+    5. 确认整项通过后更新状态为 `REQUIREMENT_PASSED` 并安全合入 `main`。
+
 
 - **交接状态**：REQUIREMENT_PASSED
 - **需求编号**：SRS_NF016（审计日志完整性与防篡改）
