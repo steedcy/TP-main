@@ -2,14 +2,12 @@
 
 ## 当前交接状态
 
-- 状态：READY_FOR_GERMINI（SRS_F002A V1.197 独立复测为 2P / 1F / 1NT，未合入 main）
-- 需求/规则：SRS_F002A.R02=P、R03=P、R04=NOT_RUN、R05=F；R01 保留历史 P，不计为本轮新测。
-- 产品版本：`c34deba33c401791d976e36ab826a8e8cc66847d` / `V1.197`；测试分支 `ai/gpt-test`，测试起始 HEAD `0d25d34`。
-- 证据：`acceptance/stage3/SRS_F002A-V1.197-四条NT独立复测.md`、`acceptance/stage3/evidence/SRS_F002A-V1.197-http-sql.json`、`acceptance/stage3/evidence/SRS_F002A-V1.197-test.json`。
-- 缺陷 `DEF-S3-126`：复位审计虽有操作者/时间/类型/结果/摘要及失败原因，但缺显式请求关联 ID 与复位前后版本对。由 Germini 在独立修复工作树处理，保留原证据并创建递增产品标签后交 GPT。
-- 前置缺口 `NT-S3-127`：V1.197 API/SQL 已验证重复复位版本/摘要/数据库内容一致，但尚未实测真实浏览器页面展示与数据库一致；后续 GPT 复测补齐。
-- 独立资源：数据库 `airport_ai` / schema `tip_f2_reset_20261024` / Flyway v30；隔离后端 8180、前端探测端口 5273。共享 PostgreSQL 未停改或注入；共享端口 8080/5173 未由本轮占用。
-- 本轮完成后测试分支提交并推送；不合入 main。下一步交 Germini 修复 `DEF-S3-126`，同时在后续复测补做 `NT-S3-127`。
+- 状态：READY_FOR_GERMINI（SRS_NF015 V1.197 独立复测当前为 0P / 0F / 1NT；未合入 main）
+- 需求/规则：SRS_NF015.R01=NOT_RUN；TC-047.S1四类入口、TC-047.S2、TC-056.S1/S2及恢复验证未执行。TC-047历史P仅来自SRS_F015/V1.156，不计NF015当前P。
+- 产品版本：`c34deba33c401791d976e36ab826a8e8cc66847d` / `V1.197`；测试分支 `ai/gpt-test`；完整证据提交 `89dadde90e4d1e96ad209e8e06fc608e849306a4`。
+- 证据：`acceptance/stage3/SRS_NF015-V1.197-独立复测与验收.md`、`acceptance/stage3/evidence/SRS_NF015-V1.197-fixture-preparation-20261112.json`、`acceptance/stage3/evidence/SRS_NF015-V1.197-normal-smoke-diagnostic-20261112.json`。
+- 隔离登录、代理能力和模板真实dry-run门禁通过；但正常冒烟进入PENDING_MANUAL，模型桩请求写入失败，且模板缺特殊旅客核心渠道SMART_DISPLAY/CAP_INFO_DISPLAY。本轮不据此登记产品F；问题和复跑要求见`NT-S3-128`。
+- 隔离服务均已停止，指定端口释放，共享PostgreSQL/Redis未停止、修改、清理或注入。下一步修复本地模型桩/夹具，再从正常冒烟开始连续完成全部适用项；未完成前不得合入main。
 
 
 - 状态：REQUIREMENT_PASSED（SRS_NF005 故障隔离与自愈恢复 V1.197 独立复测通过，已合入 main）
