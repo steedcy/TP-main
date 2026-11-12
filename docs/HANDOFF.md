@@ -4934,3 +4934,10 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
 - **口径记录**：docs/BASELINE_CHANGES.md 已登记 BL-011，将 R01 补充为故障隔离、自愈、事务边界和安全拦截的统一规则，历史证据保留。
 - **正式报告与证据**：acceptance/stage3/SRS_NF005-V1.197-整轮独立复测与验收.md；acceptance/stage3/evidence/SRS_NF005-V1.197-fault-injection.json；acceptance/stage3/evidence/SRS_NF005-V1.197-test-build.json 及四份原始注入快照；main 合入证明 acceptance/stage3/evidence/SRS_NF005-V1.197-main-integration-verified.json。
 - **后续动作**：ai/gpt-test 已推送，远端 main 已快进至 400a634；产品源码不在 GPT 测试分支修改。
+
+## SRS_NF015 V1.197 独立复测续跑交接（2026-11-12）
+
+- 状态：`READY_FOR_GERMINI`（本轮尚未完成；实际接收者 Germini）。固定产品 `V1.197 / c34deba33c401791d976e36ab826a8e8cc66847d`，测试分支 `ai/gpt-test`，测试 worktree `tip-gpt-f013`，当前测试 HEAD 待本轮证据提交后记录。
+- 裁决：`SRS_NF015.R01 = 0P / 0F / 1NT`。隔离双角色登录、两台代理/能力和模板5真实 dry-run SUCCESS/ENABLED 已通过，仅为前置夹具，不计验收P。正常冒烟HTTP 200创建合成任务 `TASK-20261112-0003`，实际转 `PENDING_MANUAL`；模型桩请求体写入失败，模板又因缺特殊旅客场景所需 `SMART_DISPLAY/CAP_INFO_DISPLAY` 被硬校验拦截，未成功完成正常路径。本轮没有形成固定产品的可复现功能F。
+- `TC-047.S1` 高风险、规划失败、模型不可用、监督不可用四入口；`TC-047.S2`；`TC-056.S1/S2` 与恢复验证均为 `NOT_RUN`。历史 `SRS_F015/V1.156` 的 `TC-047.S1` P 保留为历史来源，不能计入NF015当前P。详见 `acceptance/stage3/SRS_NF015-V1.197-独立复测与验收.md`、`acceptance/stage3/evidence/SRS_NF015-V1.197-normal-smoke-diagnostic-20261112.json` 和 `NT-S3-128`。
+- 隔离服务均已停止且指定端口释放；共享 PostgreSQL/Redis 未停止、修改、清理或注入。不得合 main。待完善隔离模型桩和特种场景渠道完整模板，仍在V1.197、隔离worktree从正常冒烟继续；完成后再逐项补跑全部当前适用断言。无需改产品代码即可继续测试夹具修复。

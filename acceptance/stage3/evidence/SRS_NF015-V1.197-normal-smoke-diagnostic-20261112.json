@@ -1,0 +1,99 @@
+{
+  "requirement": "SRS_NF015.R01",
+  "testVersion": "V1.197",
+  "productSha": "c34deba33c401791d976e36ab826a8e8cc66847d",
+  "testBranch": "ai/gpt-test",
+  "testWorktree": "C:/Users/savy/Desktop/TIP-main/tip-gpt-f013",
+  "capturedAt": "2026-11-12T15:35:00+08:00",
+  "classification": "PREPARATION_AND_NORMAL_SMOKE_DIAGNOSTIC_NOT_ACCEPTANCE",
+  "isolation": {
+    "postgres": "127.0.0.1:55432/nf015_v197/tip_nf015_v197_20261112",
+    "redis": "127.0.0.1:56379/DB0",
+    "backend": "127.0.0.1:8180",
+    "frontend": "127.0.0.1:5273",
+    "simulators": [
+      18132,
+      18137
+    ],
+    "productShaVerified": true,
+    "sharedPostgresTouched": false,
+    "sharedRedisTouched": false
+  },
+  "credentialGate": {
+    "admin": "HTTP 200; token; CONFIG_ADMIN; authorized device API PASS",
+    "operator": "HTTP 200; token; OPERATOR; authorized tasks API PASS",
+    "passwordOrTokenRecorded": false
+  },
+  "fixture": {
+    "devices": 2,
+    "agents": 2,
+    "onlineAgents": 2,
+    "workStatus": "IDLE at fixture checkpoint",
+    "testedEnabledCapabilityTypes": [
+      "CAP_NAVIGATION",
+      "CAP_NOTIFICATION",
+      "CAP_ESCORT",
+      "CAP_INFO_DISPLAY"
+    ],
+    "realDryRun": "SUCCESS",
+    "templateId": 5,
+    "templateStatus": "ENABLED after re-query",
+    "taskDefinitions": "3 preset enabled definitions observed",
+    "note": "Fixture readiness only, not acceptance P"
+  },
+  "normalSmoke": {
+    "request": "POST /api/v1/tasks",
+    "http": 200,
+    "syntheticModel": "Local endpoint 127.0.0.1:18117",
+    "observedTaskId": 3,
+    "observedStatus": "PENDING_MANUAL",
+    "events": [
+      "GOAL_SUBMITTED",
+      "GOAL_CLARIFIED",
+      "CONTEXT_SNAPSHOT_GENERATED",
+      "PLAN_GENERATED/ERR_PLANNING_MODEL_FAILED",
+      "BASELINE_DOWNGRADED/ERR_REQUIRED_CHANNEL_MISSING",
+      "TASK_PENDING_MANUAL"
+    ],
+    "modelCall": "I/O error writing request body; stable successful plan response not obtained",
+    "templateValidation": "Special passenger core scenario lacked CAP_INFO_DISPLAY / SMART_DISPLAY",
+    "deviceCommandsObserved": "None from task API projection; DB command table not captured",
+    "classification": "Environment/fixture probe failure; no NF015 product verdict"
+  },
+  "scenarioCoverage": {
+    "TC047S1_highRisk": "NOT_RUN",
+    "TC047S1_planningFailure": "NOT_RUN",
+    "TC047S1_modelUnavailable": "NOT_RUN",
+    "TC047S1_supervisionUnavailable": "NOT_RUN",
+    "TC047S2": "NOT_RUN",
+    "TC056S1": "NOT_RUN",
+    "TC056S2": "NOT_RUN",
+    "recovery": "NOT_RUN",
+    "frontend": "NOT_RUN"
+  },
+  "assessment": {
+    "requirement": "NOT_RUN",
+    "currentP": 0,
+    "currentF": 0,
+    "currentNT": 1,
+    "reason": "Normal smoke did not reach expected valid planning and completed execution; no four-entry fault suite or recovery was completed",
+    "historicalTC047S1": "Historical P from SRS_F015/V1.156 remains unchanged and is not NF015 current evidence"
+  },
+  "cleanup": {
+    "backendPid": 6524,
+    "redisPid": 14160,
+    "postgresDataDir": "nf015-pgdata",
+    "simulatorPids": [
+      128,
+      2276
+    ],
+    "syntheticModelPid": 9180,
+    "frontendStarted": false,
+    "allOwnedPortsReleased": true,
+    "sharedPostgresOrRedisChanged": false
+  },
+  "secrets": {
+    "credentialsLocalOnly": ".local-test/nf015.credentials.xml",
+    "plaintextPasswordsTokensOrHashesRecorded": false
+  }
+}
