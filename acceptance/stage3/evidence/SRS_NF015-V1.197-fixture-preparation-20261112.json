@@ -11,7 +11,10 @@
     "redis": "127.0.0.1:56379/0",
     "backend": "127.0.0.1:8180",
     "frontend": "127.0.0.1:5273",
-    "simulatorPorts": [18132, 18137],
+    "simulatorPorts": [
+      18132,
+      18137
+    ],
     "backendAdapterReportBase": "Corrected to http://127.0.0.1:8180 before the successful credential gate and simulator probes"
   },
   "credentialGate": {
@@ -20,11 +23,22 @@
     "plaintextOrTokenRecorded": false
   },
   "fixtureObservations": {
-    "devicesCreated": ["NF015_R01_A", "NF015_R01_B"],
-    "simulatorTypes": ["MOBILE_ROBOT", "MOBILE_ROBOT"],
+    "devicesCreated": [
+      "NF015_R01_A",
+      "NF015_R01_B"
+    ],
+    "simulatorTypes": [
+      "MOBILE_ROBOT",
+      "MOBILE_ROBOT"
+    ],
     "agentStatus": "Both agents observed ONLINE/IDLE after authenticated simulator bindings and heartbeats",
     "capabilityTests": {
-      "perDevice": ["CAP_NAVIGATION", "CAP_NOTIFICATION", "CAP_ESCORT", "CAP_INFO_DISPLAY"],
+      "perDevice": [
+        "CAP_NAVIGATION",
+        "CAP_NOTIFICATION",
+        "CAP_ESCORT",
+        "CAP_INFO_DISPLAY"
+      ],
       "result": "Actual device-agent capability test returned TESTED_PASSED and capabilities were enabled",
       "scope": "Fixture readiness only; not NF015 acceptance evidence"
     },
@@ -63,7 +77,14 @@
     "ownedSimulatorProcessesStopped": true,
     "ownedRedisStopped": true,
     "ownedPostgresStopped": true,
-    "portsReleased": [55432, 56379, 8180, 5273, 18132, 18137],
+    "portsReleased": [
+      55432,
+      56379,
+      8180,
+      5273,
+      18132,
+      18137
+    ],
     "sharedPostgresModifiedOrStopped": false,
     "sharedRedisFlushedOrStopped": false
   },
@@ -71,5 +92,46 @@
     "credentialsAndHashesCommitted": false,
     "tokensOrPasswordsInEvidence": false,
     "deviceTokensStored": "Local encrypted PowerShell CLIXML only"
+  },
+  "continuationObservation": {
+    "capturedAt": "2026-11-12T15:30+08:00",
+    "productSha": "c34deba33c401791d976e36ab826a8e8cc66847d",
+    "isolationGate": "PASS: nf015_admin CONFIG_ADMIN and nf015_operator OPERATOR logins HTTP 200; authorized APIs passed; PostgreSQL isolated 55432, Redis isolated 56379/DB0, backend 8180.",
+    "simulators": {
+      "NF015_R01_A": {
+        "port": 18132,
+        "healthHandshake": "PASS",
+        "agent": "ONLINE/IDLE at fixture checkpoint"
+      },
+      "NF015_R01_B": {
+        "port": 18137,
+        "healthHandshake": "PASS",
+        "agent": "ONLINE/IDLE at fixture checkpoint"
+      }
+    },
+    "capabilities": "Both devices passed real API tests and enabled CAP_NAVIGATION, CAP_NOTIFICATION, CAP_ESCORT, CAP_INFO_DISPLAY.",
+    "dryRun": {
+      "templateId": 5,
+      "result": "SUCCESS",
+      "statusAfterEnableAndRequery": "ENABLED",
+      "scope": "Fixture readiness only; does not count as acceptance P."
+    },
+    "normalSmoke": {
+      "request": "POST /api/v1/tasks, synthetic ordinary task",
+      "http": 200,
+      "taskId": 3,
+      "finalStatus": "PENDING_MANUAL",
+      "events": [
+        "GOAL_SUBMITTED",
+        "GOAL_CLARIFIED",
+        "CONTEXT_SNAPSHOT_GENERATED",
+        "PLAN_GENERATED/ERR_PLANNING_MODEL_FAILED",
+        "BASELINE_DOWNGRADED/ERR_REQUIRED_CHANNEL_MISSING",
+        "TASK_PENDING_MANUAL"
+      ],
+      "assessment": "Smoke gate failed; no acceptance scenarios started."
+    },
+    "faultInjectionCount": 0,
+    "cleanup": "Owned backend, Redis, PostgreSQL, synthetic model endpoint and simulators stopped; requested ports released; shared PostgreSQL/Redis unchanged."
   }
 }
