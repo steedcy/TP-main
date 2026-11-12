@@ -1,0 +1,55 @@
+{
+  "requirement": "SRS_NF015.R01",
+  "testStep": "TC-047.S1",
+  "testVersion": "V1.197",
+  "productSha": "c34deba33c401791d976e36ab826a8e8cc66847d",
+  "productTag": "V1.197",
+  "testBranch": "ai/gpt-test",
+  "testWorktree": "C:/Users/savy/Desktop/TIP-main/tip-gpt-f013",
+  "startedAt": "2026-11-12",
+  "preparationAttempt": {
+    "isolatedPostgres": {"dataDirectory": ".local-test/nf015-pgdata", "database": "nf015_v197", "schema": "tip_nf015_v197_20261112", "port": 55432, "started": true},
+    "isolatedRedis": {"config": ".local-test/nf015-redis.conf", "port": 56379, "database": 0, "started": true},
+    "backend": {"jar": "backend/target/airport-ai-app-1.0.0.jar", "port": 8180, "pid": 10324, "health": "UP", "database": "nf015_v197", "schema": "tip_nf015_v197_20261112", "redisPort": 56379, "redisDatabase": 0},
+    "frontend": {"port": 5273, "started": false, "reason": "Authentication gate prevented business-flow preparation; no UI step was attempted."},
+    "authenticationProbe": {"type": "synthetic local operator login via existing local helper", "httpStatus": 401, "result": "BLOCKED", "response": "账号或密码错误", "requestCredentialsRecorded": false},
+    "isolatedUsersObserved": ["nf015_admin", "nf015_operator"],
+    "faultInjectionIssued": false,
+    "businessRequestsIssued": false,
+    "productSourceModified": false,
+    "formalLedgersModified": false
+  },
+  "assessment": {
+    "requirementResult": "NOT_RUN",
+    "stepResult": "NOT_RUN",
+    "entries": [
+      {"name": "high-risk baseline downgrade", "result": "NOT_RUN", "blockingChain": "Existing login helper credentials do not authenticate against isolated synthetic users -> no authenticated task-definition/device/template fixture preparation -> no business request."},
+      {"name": "planning failure baseline downgrade", "result": "NOT_RUN", "blockingChain": "Existing login helper credentials do not authenticate against isolated synthetic users -> no authenticated task-definition/device/template fixture preparation -> no business request."},
+      {"name": "planning model unavailable", "result": "NOT_RUN", "blockingChain": "Existing login helper credentials do not authenticate against isolated synthetic users -> no authenticated task-definition/device/template fixture preparation -> no model-fault business request."},
+      {"name": "supervision unavailable/manual handling", "result": "NOT_RUN", "blockingChain": "Existing login helper credentials do not authenticate against isolated synthetic users -> no authenticated task-definition/device/template fixture preparation -> no supervision-fault business request."}
+    ],
+    "classification": "Test-environment credential fixture mismatch; no product F inferred. No business result inferred from health UP."
+  },
+  "ledgerReadback": {
+    "SRS_NF015.R01": "NOT_RUN",
+    "TC-047.S1": "P (historical SRS_F015/V1.156 entry currently present in shared step row; not changed because no NF015 behavior run was completed)",
+    "note": "The startup instruction described both rows as NOT_RUN, but the checked-in TC-047.S1 row contains historical F015 observations and a P status. Historical text/evidence were retained; no new NF015 pass is inferred."
+  },
+  "processes": {"postgresPid": 10260, "redisPid": 13208, "backendPid": 10324, "frontendPid": null},
+  "cleanup": {
+    "postgresStoppedByOwnedDataDirectory": true,
+    "redisStoppedAfterCommandLineOwnershipCheck": true,
+    "backendStoppedAfterCommandLineOwnershipCheck": true,
+    "frontendStopped": true,
+    "portsReleased": [55432, 56379, 8180, 5273],
+    "sharedPostgresStoppedOrModified": false,
+    "sharedRedisModifiedOrCleaned": false
+  },
+  "rawLogs": [
+    {"path": ".local-test/nf015-backend-out.log", "contains": "isolated DB/schema migration and backend startup on 8180; generated framework development secret is not reproduced here"},
+    {"path": ".local-test/nf015-backend-err.log", "contains": "stderr"},
+    {"path": ".local-test/nf015-postgres.log", "contains": "isolated PostgreSQL startup/shutdown"},
+    {"path": ".local-test/nf015-redis.log", "contains": "isolated Redis service log"}
+  ],
+  "nextPreparation": "Create/reset passwords only for isolated nf015_admin and nf015_operator using a generated synthetic credential, update an independent local helper to use those synthetic values without recording them, then provision the simulator and trial-passed baseline through public APIs before the four entry-point retest."
+}
