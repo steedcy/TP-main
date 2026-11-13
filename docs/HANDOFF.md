@@ -4933,3 +4933,5 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
 - 代码文件：`backend/src/main/java/com/airport/ai/demo/DemoResetService.java`、`DemoResetWorker.java`；隔离集成测试补充成功/失败审计字段断言：`backend/src/test/java/com/airport/ai/demo/DemoResetIntegrationTest.java`。
 - 验证：`mvn -o -q -DskipTests compile` 通过；`mvn -o -Dtest=DemoResetIntegrationTest test` BUILD SUCCESS（未设置 `DEMO_RESET_TEST_SCHEMA=tip_f2_reset_20261024` 时按隔离门禁跳过 1 项）。
 - 待 GPT 独立复测：在隔离 schema/端口上复测 `SRS_F002A.R05`、`TC-006.S3`、`TC-007.S3`，同时确认 R02/R03/R04 不回归；不得把本修复方测试结果写为独立 P。
+
+- 后续补丁：无历史成功审计时将当前数据集版本按受控标准版本 F2-DEMO-20261024 明确记录，避免出现空或未知版本；本补丁提交后产品标签为 V1.199。

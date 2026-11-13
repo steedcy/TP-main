@@ -99,14 +99,14 @@ public class DemoResetWorker {
                 WHERE operation_type='DEMO_DATA_RESET' AND operation_result='SUCCESS'
                 ORDER BY id DESC LIMIT 1
                 """, String.class);
-        if (details.isEmpty()) return "UNKNOWN";
+        if (details.isEmpty()) return DemoDataset.VERSION;
         try {
             JsonNode detail = mapper.readTree(details.get(0));
             String version = detail.path("afterDatasetVersion").asText("");
             if (!version.isBlank()) return version;
-            return detail.path("datasetVersion").asText("UNKNOWN");
+            return detail.path("datasetVersion").asText(DemoDataset.VERSION);
         } catch (Exception ignored) {
-            return "UNKNOWN";
+            return DemoDataset.VERSION;
         }
     }
 
