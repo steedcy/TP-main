@@ -4,7 +4,7 @@
 
 - **状态**：`READY_FOR_GPT`；接收方：Germini/GPT 独立复测。
 - **需求/缺陷**：`SRS_NF015.R01`、`TC-047.S1` 关联缺陷 `DEF-S3-130`。
-- **修复分支**：`ai/claude-fix`；产品标签：`V1.200`（代码提交 SHA 见本节末尾）。
+- **修复分支**：`ai/claude-fix`；产品标签：`V1.200`；代码提交：`fbffe1cf9d4b457f02d3a3f76929427d7a33e290`。
 - **修复内容**：
   1. 目标理解服务返回失败结果、空响应、连接失败或运行时异常时，统一记录 `GOAL_UNDERSTANDING_FAILED`（`ERR_GOAL_UNDERSTANDING_TIMEOUT`），保留原任务目标和异常原因；
   2. 追加结构化 `GOAL_UNDERSTANDING_FAILURE` 操作审计，包含任务编号、原目标、原因和安全处置动作；
