@@ -1,0 +1,60 @@
+{
+  "requirement": "SRS_NF015.R01",
+  "testVersion": "V1.197",
+  "productSha": "c34deba33c401791d976e36ab826a8e8cc66847d",
+  "capturedAt": "2026-11-13T10:35:32.0644539+08:00",
+  "classification": "TEST_FIXTURE_AND_MODEL_REPAIR_VALIDATION",
+  "isolation": {
+    "postgres": "127.0.0.1:55432/nf015_v197/tip_nf015_v197_20261112",
+    "redis": "127.0.0.1:56379/DB0",
+    "backend": "127.0.0.1:8180",
+    "model": "127.0.0.1:18117",
+    "simulators": [
+      18132,
+      18137,
+      18138
+    ]
+  },
+  "modelFixture": {
+    "script": "acceptance/stage3/fixtures/nf015-v197-controlled-model.py",
+    "chunkedRequestSupport": true,
+    "goalEndpoint": true,
+    "planningEndpoint": true,
+    "deterministicSpecialPassengerPlan": [
+      "CAP_INFO_DISPLAY",
+      "CAP_NOTIFICATION",
+      "CAP_ESCORT"
+    ],
+    "faultMarkers": [
+      "NF015_MODEL_HTTP_503",
+      "NF015_MODEL_MALFORMED",
+      "NF015_MODEL_TIMEOUT"
+    ]
+  },
+  "fixture": {
+    "devices": 3,
+    "deviceAgents": 3,
+    "onlineAgents": 3,
+    "testedEnabledCapabilityTypes": [
+      "CAP_NAVIGATION",
+      "CAP_NOTIFICATION",
+      "CAP_ESCORT",
+      "CAP_INFO_DISPLAY"
+    ],
+    "smartDisplayEndpoint": 18138,
+    "dryRun": "SUCCESS",
+    "enabledTemplateId": 6,
+    "enabledTemplateStatus": "ENABLED"
+  },
+  "normalSmoke": {
+    "taskId": 6,
+    "http": 200,
+    "finalStatus": "COMPLETED",
+    "planVersionId": 6,
+    "downgradeReason": "监督判定高风险: RULE_ESCORT_SPECIAL_PASSENGER",
+    "origin": "F2_TEST_SERVICE",
+    "destination": "F2_TEST_GATE",
+    "result": "PASS_WITH_EXPECTED_HIGH_RISK_DOWNGRADE"
+  },
+  "secretsRecorded": false
+}
