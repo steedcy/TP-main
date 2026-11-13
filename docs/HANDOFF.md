@@ -1,5 +1,19 @@
 # Claude ↔ ChatGPT 工作交接
 
+## 2026-11-13 Germini → GPT：DEF-S3-130 目标理解异常安全归口修复（READY_FOR_GPT）
+
+- **状态**：`READY_FOR_GPT`；接收方：Germini/GPT 独立复测。
+- **需求/缺陷**：`SRS_NF015.R01`、`TC-047.S1` 关联缺陷 `DEF-S3-130`。
+- **修复分支**：`ai/claude-fix`；产品标签：`V1.200`；代码提交：`fbffe1cf9d4b457f02d3a3f76929427d7a33e290`。
+- **修复内容**：
+  1. 目标理解服务返回失败结果、空响应、连接失败或运行时异常时，统一记录 `GOAL_UNDERSTANDING_FAILED`（`ERR_GOAL_UNDERSTANDING_TIMEOUT`），保留原任务目标和异常原因；
+  2. 追加结构化 `GOAL_UNDERSTANDING_FAILURE` 操作审计，包含任务编号、原目标、原因和安全处置动作；
+  3. 通过 `TaskPlanningOrchestrator.downgradeAfterUnderstandingFailure` 进入已启用、真实 dry-run 通过且三类校验通过的基线闸门；无合格模板时进入 `PENDING_MANUAL`，不执行原候选计划或未经校验设备指令；
+  4. 不再抛出 `BusinessException(4113)` 直接结束 HTTP 请求；提交、澄清和事件入口返回重新查询的持久化任务最终状态，避免暴露旧的 `PLANNING` 快照。
+- **验证**：`mvn -q "-Dtest=UnderstandingFailureDowngradeTest,GoalUnderstandingFailureTaskServiceTest,GoalClarificationRoundsTest" test` 通过；`mvn -q -DskipTests package` 通过。
+- **新增回归测试**：`backend/src/test/java/com/airport/ai/task/GoalUnderstandingFailureTaskServiceTest.java`，验证失败响应不抛 503、触发安全降级、写入事件和操作审计。
+- **待 GPT 独立复测**：在隔离 NF015 环境分别注入 HTTP 503、连接失败和超时；确认 POST `/api/v1/tasks` 不再直接返回 503，任务持久化并进入已校验基线或 `PENDING_MANUAL`，原目标/原因/事件/审计完整，`plan_versions`、`task_step_assignments`、`device_commands` 不出现未经校验记录；随后补齐 `TC-047.S2` 三维模板排序复测。
+
 ## 当前交接状态
 
 - 状态：READY_FOR_GERMINI（SRS_NF015 V1.197 独立复测当前为 0P / 0F / 1NT；未合入 main）

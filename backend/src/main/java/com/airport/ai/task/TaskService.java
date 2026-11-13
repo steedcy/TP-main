@@ -226,7 +226,9 @@ public class TaskService {
                 "TASK_SUBMIT", task.getTaskCode(), "SUCCESS", null);
 
         runGoalUnderstanding(task, request.getSceneParams(), null);
-        return task;
+        // 目标理解异常会被安全归口到已校验基线或 PENDING_MANUAL；返回数据库中的最终状态，
+        // 避免把仍为 PLANNING 的内存快照暴露给调用方。
+        return taskMapper.findById(task.getId()).orElse(task);
     }
 
     /**
@@ -298,7 +300,7 @@ public class TaskService {
                         : "运行操作员" + operator.getUsername() + "补充信息: " + SceneParamsPrivacyGuard.sanitizeText(toJson(request.getAnswers())));
 
         runGoalUnderstanding(task, mergedSceneParams, rounds);
-        return task;
+        return taskMapper.findById(task.getId()).orElse(task);
     }
 
     /**
@@ -632,16 +634,20 @@ public class TaskService {
             request.setClarificationAnswers(clarificationAnswers);
         }
 
-        GoalUnderstandingResponse response = goalUnderstandingService.understand(request);
+        GoalUnderstandingResponse response;
+        try {
+            response = goalUnderstandingService.understand(request);
+        } catch (RuntimeException ex) {
+            // 外部服务连接失败、客户端超时或适配器异常都必须进入同一安全降级闸门，
+            // 不能让异常绕过任务持久化并直接变成 HTTP 5xx。
+            handleGoalUnderstandingFailure(task, "目标理解服务调用异常: " + safeExceptionMessage(ex));
+            return;
+        }
 
-        if (!response.isSuccess()) {
-            // 异常路径4b：超时或异常，不进入计划生成，不下发任何设备指令
-            taskEventService.append(task.getId(), "GOAL_UNDERSTANDING_FAILED", "SYSTEM",
-                    "ERR_GOAL_UNDERSTANDING_TIMEOUT",
-                    "目标理解调用规划模型服务失败: " + response.getErrorMessage());
-            // DEF-S3-033：超时/异常后不停在PLANNING，进入基线可用性与校验流程，不可用则转待人工
-            taskPlanningOrchestrator.downgradeAfterUnderstandingFailure(task.getId(), "目标理解超时或异常: " + response.getErrorMessage());
-            throw new BusinessException(ErrorCode.GOAL_UNDERSTANDING_TIMEOUT, response.getErrorMessage());
+        if (response == null || !response.isSuccess()) {
+            String message = response == null ? "目标理解服务返回空响应" : response.getErrorMessage();
+            handleGoalUnderstandingFailure(task, "目标理解调用规划模型服务失败: " + safeText(message));
+            return;
         }
 
         if (response.isUnrelatedToAnyFamily()) {
@@ -718,6 +724,41 @@ public class TaskService {
                         task.getFailureReason());
             }
         }
+    }
+
+    /**
+     * 目标理解异常的统一安全收口（DEF-S3-130）：
+     * 先记录原目标与异常原因，再经过已校验基线闸门；无可用基线时由闸门转 PENDING_MANUAL。
+     * 该路径故意不抛出 4113，提交接口必须返回已持久化任务，而不是以 HTTP 503 结束。
+     */
+    private void handleGoalUnderstandingFailure(Task task, String reason) {
+        String safeReason = safeText(reason);
+        taskEventService.append(task.getId(), "GOAL_UNDERSTANDING_FAILED", "SYSTEM",
+                "ERR_GOAL_UNDERSTANDING_TIMEOUT", safeReason);
+
+        Map<String, Object> audit = new LinkedHashMap<>();
+        audit.put("taskId", task.getId());
+        audit.put("taskCode", task.getTaskCode());
+        audit.put("originalGoal", task.getTaskGoal());
+        audit.put("reason", safeReason);
+        audit.put("action", "DOWNGRADE_AFTER_GOAL_UNDERSTANDING_FAILURE");
+        operationLogService.record(null, task.getCreatedBy(), "OPERATOR",
+                "GOAL_UNDERSTANDING_FAILURE", task.getTaskCode(), "FAILED", null, audit);
+
+        // DEF-S3-130：不执行原候选计划；仅允许已启用、真实 dry-run 通过且三类校验通过的基线，
+        // 否则由 orchestrator 统一转 PENDING_MANUAL。
+        taskPlanningOrchestrator.downgradeAfterUnderstandingFailure(task.getId(), safeReason);
+    }
+
+    private String safeText(String value) {
+        if (value == null || value.isBlank()) return "未提供具体错误原因";
+        return SceneParamsPrivacyGuard.sanitizeText(value);
+    }
+
+    private String safeExceptionMessage(RuntimeException ex) {
+        if (ex == null) return "未提供具体错误原因";
+        String message = ex.getMessage();
+        return message == null || message.isBlank() ? ex.getClass().getSimpleName() : message;
     }
 
     /**
