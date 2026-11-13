@@ -1,5 +1,23 @@
 # SRS_NF015 V1.197 独立复测与验收
 
+## 2026-11-13 连续复测最终补记
+
+在固定 `V1.197 / c34deba33c401791d976e36ab826a8e8cc66847d` 上，已修复并实际使用隔离模型桩和三终端夹具：3 个任务定义、3 台设备、3 个在线代理、4 项能力测试并启用，模板 6 真实 dry-run 为 `SUCCESS` 后启用为 `ENABLED`。
+
+本轮新增真实业务结果：
+
+- TC-047.S1.A 高风险任务 9：`P`。命中 `RULE_ESCORT_SPECIAL_PASSENGER`，自动选择模板 6，任务 `COMPLETED`，原自主候选未执行。
+- TC-047.S1.B 畸形规划响应任务 10：`P`。记录 `ERR_PLANNING_MODEL_FAILED`，自动选择模板 6，任务 `COMPLETED`，无未经校验候选命令。
+- TC-047.S1.C 模型 HTTP 503：`F`。目标理解阶段返回 HTTP 503/业务码 4113，任务未创建，未进入基线或 `PENDING_MANUAL`；后端健康接口仍 HTTP 200。
+- TC-047.S1.C 模型连接失败：`F`。停止隔离模型桩后，目标理解阶段返回 HTTP 503/业务码 4113，任务未创建，后端健康接口 HTTP 200，未产生计划或设备命令。
+- TC-047.S1.C 模型超时：`P`。任务 22 记录 `ERR_GOAL_UNDERSTANDING_TIMEOUT`，自动切换模板 6 并完成，原候选未执行。
+- TC-047.S1.D 监督服务不可用：`P`。任务 24 记录 `ERR_SUPERVISION_UNAVAILABLE`，进入 `PENDING_MANUAL`，没有步骤分派或设备命令。
+- 故障恢复：模型恢复后任务 27、监督恢复后的任务 25 均 `COMPLETED`；三台代理均回到 `ONLINE/IDLE`，后端 HTTP 200。
+
+因此当前裁决为：`SRS_NF015.R01 = 0P / 2F / 0NT`，`TC-047.S1` 当前版本不通过。HTTP 503 与连接失败是固定产品可复现偏差；不能因为平台健康接口可访问或后续恢复成功而改写为通过。`TC-047.S2` 本轮只完成模板精确任务族、三步限制和最近成功 dry-run 选择依据的观察，未完成三维候选比较，完整规则保持 `NT`。`TC-056.S1/S2` 的关联断言由本轮模型异常无未经校验命令、合法基线命令完成的证据支持，但不改变其原需求独立裁决。
+
+新增证据：`SRS_NF015-V1.197-model-connection-failure-clean.json`、`SRS_NF015-V1.197-model-timeout-rerun.json`、`SRS_NF015-V1.197-supervision-unavailable-rerun.json`、`SRS_NF015-V1.197-recovery-after-model-connection-failure.json`、`SRS_NF015-V1.197-recovery-after-supervision.json` 及更新后的 `SRS_NF015-V1.197-round-summary.json`。
+
 日期：2026-11-12（Asia/Shanghai）  
 测试分支：`ai/gpt-test`  
 测试 worktree：`C:\Users\savy\Desktop\TIP-main\tip-gpt-f013`  
@@ -7,6 +25,12 @@
 复测启动时测试分支 HEAD：`1175f833939f97527f4d6eec11d97e9093e5f7a1`
 
 ## 裁决
+
+### 2026-11-13 正式续测结果
+
+本轮在固定 `V1.197 / c34deba33c401791d976e36ab826a8e8cc66847d` 和隔离资源上完成夹具修复并执行了高风险降级、规划畸形响应、模型 HTTP 503 以及恢复冒烟。高风险入口（任务9）和规划失败入口（任务10）均切换到已启用且真实 dry-run `SUCCESS` 的基线模板6，三类校验通过，原候选计划未执行，任务最终 `COMPLETED`。模型 HTTP 503 在目标理解阶段直接返回 HTTP 503，未创建任务，平台未完成预期的基线/人工兜底，构成当前版本可复现 F。连接失败、超时和监督不可用探针受到隔离后端进程中断影响，未取得有效业务响应，保持 NT。恢复后平台 HTTP 200，三台代理均 `ONLINE/IDLE`，恢复任务13 `COMPLETED`。
+
+因此本轮裁决为：`SRS_NF015.R01 = 0P / 1F / 1NT`；`TC-047.S1` 当前版本未通过。完整摘要见 `evidence/SRS_NF015-V1.197-round-summary.json`，逐任务原始证据见 `evidence/SRS_NF015-V1.197-tc047-s1-initial.json`。
 
 本轮没有完成 SRS_NF015.R01 或 TC-047.S1 的行为复测。正式结果保持 `NOT_RUN`；不得将其解释为 P，也未把历史 F015 的通过证据复用为当前结果。四类入口均未提交业务请求、未执行故障注入，因此无法裁决 1P / 0F / 0NT。当前不能合入 main，也不能报告需求通过。
 

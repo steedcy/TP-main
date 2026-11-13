@@ -1,3 +1,7 @@
+param(
+  [ValidateSet('', 'UNAVAILABLE', 'UNDETERMINED')]
+  [string]$RiskFaultMode = ''
+)
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $data = (Resolve-Path (Join-Path $root '.local-test\nf015-pgdata')).Path
@@ -30,8 +34,19 @@ $env:SPRING_FLYWAY_DEFAULT_SCHEMA = 'tip_nf015_v197_20261112'
 $env:SPRING_FLYWAY_SCHEMAS = 'tip_nf015_v197_20261112'
 $env:SERVER_PORT = '8180'
 $env:APP_DEVICE_ADAPTER_PUBLIC_BASE_URL = 'http://127.0.0.1:8180'
+$env:PLANNING_MODEL_PROVIDER = 'external'
+$env:PLANNING_MODEL_ENDPOINT = 'http://127.0.0.1:18117'
+$env:PLANNING_MODEL_API_KEY = 'nf015-synthetic'
+if ([string]::IsNullOrWhiteSpace($RiskFaultMode)) {
+  Remove-Item Env:APP_RISK_FAULT_INJECTION_MODE -ErrorAction SilentlyContinue
+} else {
+  $env:APP_RISK_FAULT_INJECTION_MODE = $RiskFaultMode
+}
 $jar = (Resolve-Path (Join-Path $root 'backend\target\airport-ai-app-1.0.0.jar')).Path
 $java = 'C:\Program Files\jdk-17.0.12\bin\java.exe'
-$proc = Start-Process -FilePath $java -ArgumentList @('-Xms128m','-Xmx512m','-XX:+UseSerialGC','-jar',$jar) -WorkingDirectory $root -RedirectStandardOutput (Join-Path $root '.local-test\nf015-backend-out.log') -RedirectStandardError (Join-Path $root '.local-test\nf015-backend-err.log') -WindowStyle Hidden -PassThru
+$javaArgs = @('-Xms128m','-Xmx512m','-XX:+UseSerialGC','-Dapp.planning-model.provider=external','-Dapp.planning-model.endpoint=http://127.0.0.1:18117','-Dapp.planning-model.api-key=nf015-synthetic')
+if (-not [string]::IsNullOrWhiteSpace($RiskFaultMode)) { $javaArgs += "-Dapp.risk.fault-injection.mode=$RiskFaultMode" }
+$javaArgs += @('-jar',$jar)
+$proc = Start-Process -FilePath $java -ArgumentList $javaArgs -WorkingDirectory $root -RedirectStandardOutput (Join-Path $root '.local-test\nf015-backend-out.log') -RedirectStandardError (Join-Path $root '.local-test\nf015-backend-err.log') -WindowStyle Hidden -PassThru
 Set-Content (Join-Path $root '.local-test\nf015-backend.pid') $proc.Id
 Write-Output "Started isolated backend PID $($proc.Id); credential values suppressed."

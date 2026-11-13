@@ -4963,3 +4963,13 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
 - 证据/报告：`acceptance/stage3/evidence/SRS_F002A-V1.199-followup.json`、`acceptance/stage3/SRS_F002A-V1.199-四条规则独立复测.md`。数据库 `airport_ai.tip_f2_reset_20261024`，后端 `8180`，前端 `5273`；共享 `8080/5173` 未触碰，活动任务夹具已清理。
 - 下一步：Germini 或后续 GPT 仅补做真实浏览器展示核对；通过后更新 R04、TC-006.S3 和 `NT-S3-127`，再评估是否达到 `4P/0F/0NT`。
 
+## 2026-11-13 GPT → Germini：SRS_NF015 V1.197 独立复测最终交接（READY_FOR_GERMINI）
+
+- 状态：`READY_FOR_GERMINI`；测试分支：`ai/gpt-test`；固定产品：`c34deba33c401791d976e36ab826a8e8cc66847d` / `V1.197`。
+- 当前裁决：`SRS_NF015.R01 = 0P / 1F / 0NT`，不得合入 `main`，不得宣称需求通过。`TC-047.S1` 当前版本不通过；`TC-047.S2` 完整三维候选比较仍为 NT。历史 `SRS_F015/V1.156` 的 TC-047.S1 P 保留且不计入 NF015 当前结果。
+- 当前实测：高风险任务9、畸形规划任务10、模型超时任务22、监督不可用任务24均分别完成基线降级或转 `PENDING_MANUAL`，无未经校验候选计划命令；任务25、27恢复后 `COMPLETED`，三代理 `ONLINE/IDLE`。模型 HTTP503 与连接失败均在目标理解阶段返回 HTTP503/业务码4113，任务未创建、未进入基线或人工处理，后端健康仍 HTTP200，登记为固定产品缺陷 `DEF-S3-130`。
+- 夹具已修复并通过门禁：隔离 PostgreSQL `55432/nf015_v197/tip_nf015_v197_20261112`、Redis `56379/DB0`、后端 `8180`；3 台设备、3 个在线代理、4 项测试启用能力、至少 1 个真实 dry-run SUCCESS 且 ENABLED 模板。夹具与模型桩改动均为测试辅助，不是产品源码修复。
+- 证据：`acceptance/stage3/evidence/SRS_NF015-V1.197-round-summary.json`、`SRS_NF015-V1.197-tc047-s1-initial.json`、`SRS_NF015-V1.197-model-connection-failure-clean.json`、`SRS_NF015-V1.197-model-timeout-rerun.json`、`SRS_NF015-V1.197-supervision-unavailable-rerun.json`、`SRS_NF015-V1.197-recovery-after-model-connection-failure.json`、`SRS_NF015-V1.197-recovery-after-supervision.json`；正式报告已追加 2026-11-13 连续复测结果。
+- 台账已更新：`rules.csv` 的 NF015.R01 为 `0P/1F/0NT`；`steps.csv` 的 TC-047.S1 为 F、TC-047.S2 保持 NT，并追加 TC-056.S1/S2 关联断言；`issues.csv` 新增 `DEF-S3-130`，`NT-S3-128` 标记为夹具阻断已关闭但保留原始记录。
+- 收尾：本轮启动的后端、模型桩、Redis、PostgreSQL、仿真终端均已停止；确认隔离端口释放且共享 PostgreSQL/Redis 未停止、未清理、未注入。下一步由 Germini 处理 DEF-S3-130 后发布后继版本，再按 V2.4 重测 NF015 全部适用项。
+

@@ -32,6 +32,13 @@ foreach($d in $ds){
  [void](Api "/devices/$($d.deviceCode)/connection-test" 'POST')
  $a=(Api '/device-agents?page=1&size=100').data.content|Where-Object deviceCode -eq $d.deviceCode|Select-Object -First 1
  $agents[$d.deviceCode]=$a.agentId
+ $agentCode = if($a.agentCode){$a.agentCode}else{$a.agentId}
+ if($null -eq $a -or [string]::IsNullOrWhiteSpace($agentCode)){throw "Agent creation failed for $($d.deviceCode)"}
+ # The simulator starts before connection-test creates the platform agent. Bind it
+ # explicitly through the simulator's authenticated binding API, then let its
+ # heartbeat establish ONLINE. This keeps the fixture independent of shared agents.
+ $bindBody=@{deviceCode=$d.deviceCode;agentCode=$agentCode;reportUrl="http://127.0.0.1:8180/device-api/v1/agents/$agentCode/report";heartbeatIntervalSeconds=5;heartbeatTimeoutSeconds=30}
+ [void](Invoke-RestMethod -Method Post -Uri "$($d.accessEndpoint)/device-api/v1/agents/$agentCode/binding" -Headers @{Authorization="Bearer $($deviceTokens[$d.deviceCode])"} -ContentType 'application/json' -Body ($bindBody|ConvertTo-Json -Compress))
  $until=(Get-Date).AddSeconds(25); do{Start-Sleep 1;$aNow=(Api '/device-agents?page=1&size=100').data.content|Where-Object deviceCode -eq $d.deviceCode|Select-Object -First 1}while($aNow.onlineStatus -ne 'ONLINE' -and (Get-Date)-lt $until)
  if($aNow.onlineStatus -ne 'ONLINE'){throw "Simulator $($d.deviceCode) did not reach ONLINE"}
 	 $existingCapabilities=(Api "/devices/$($d.deviceCode)/capabilities").data
