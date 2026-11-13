@@ -1,0 +1,76 @@
+{
+  "recordedAt": "2026-11-13T13:12:40+08:00",
+  "scope": "SRS_F002A.R04 / TC-006.S3 browser display and database consistency follow-up",
+  "product": {
+    "sha": "846e5aa071e29edb4aa97fb3ef84a4dc720ba503",
+    "tag": "V1.199",
+    "branch": "ai/gpt-test",
+    "testHeadBeforeFollowup": "c36ace8"
+  },
+  "environment": {
+    "browser": "Codex in-app browser tab 2",
+    "frontend": "http://127.0.0.1:5273",
+    "backend": "http://127.0.0.1:8180",
+    "database": "airport_ai",
+    "schema": "tip_f2_reset_20261024",
+    "redisDatabase": 10,
+    "sharedPortsUntouched": [8080, 5173],
+    "credentialsRecorded": false
+  },
+  "browser": {
+    "login": {"username": "admin", "role": "SYSTEM_ADMIN", "tokenRecorded": false},
+    "route": "/demo-data-reset",
+    "pageTitle": "F2 标准演示数据复位",
+    "displayed": {
+      "datasetVersion": "F2-DEMO-20261024",
+      "generatedAt": "2026-10-24T21:10:00+08:00",
+      "sourceDigest": "eb8f5127954dd580ebd20b2a75bcb30a9a1a3ab414ee1ffb5fbb45e9a62de2f0",
+      "currentContentDigest": "a598270fadf686c7aafabfef191b3ea93476dcd598835514c889c78620ebb6c5",
+      "impactScope": "六个 SIM_F2_* 仿真设备档案及其能力画像；三套预置基线模板；超规行李、特殊旅客、航班变更三类预置任务定义",
+      "preservedScope": "历史任务及事件；用户账号；设备令牌和凭据标识；其他设备",
+      "postResetState": "设备连接及能力标记为未测试，基线模板标记为草稿；需要重新连接测试、能力测试和模板试运行后启用"
+    },
+    "domAssertions": {
+      "versionVisible": true,
+      "generatedAtVisible": true,
+      "sourceDigestVisible": true,
+      "currentDigestVisible": true,
+      "impactScopeVisible": true,
+      "preservedScopeVisible": true,
+      "pageShowsConfirmationPhraseOnly": true,
+      "tokenOrPasswordVisible": false
+    }
+  },
+  "database": {
+    "contentDigestFromV1_199Reset": "a598270fadf686c7aafabfef191b3ea93476dcd598835514c889c78620ebb6c5",
+    "deviceCount": 6,
+    "deviceCodes": ["SIM_F2_BAGGAGE", "SIM_F2_BAGGAGE_B", "SIM_F2_DISPLAY", "SIM_F2_FLIGHT", "SIM_F2_ROBOT", "SIM_F2_ROBOT_B"],
+    "capabilityRowCount": 18,
+    "allDeviceConnectionTestStatus": "UNTESTED",
+    "allDeviceStatus": "ACTIVE",
+    "presetTemplateCount": 3,
+    "presetTemplateVersion": "F2.1",
+    "presetTemplateStatus": "DRAFT",
+    "presetScenarioCount": 3,
+    "presetScenarioStatus": "ENABLED",
+    "sqlChecks": {
+      "schemaMatchesRuntime": true,
+      "sixSimF2DevicesPresent": true,
+      "capabilityProfilesPresent": true,
+      "threePresetTemplatesPresent": true,
+      "threePresetScenarioDefinitionsPresent": true,
+      "noSensitiveCredentialValuesRecorded": true
+    }
+  },
+  "consistency": {
+    "datasetVersionMatches": true,
+    "generatedAtMatches": true,
+    "sourceDigestMatches": true,
+    "currentContentDigestMatches": true,
+    "impactScopeMatchesCounts": true,
+    "postResetStateMatchesStatuses": true,
+    "pageAndDatabaseConsistent": true,
+    "result": "PASS"
+  },
+  "evidenceLevel": "real browser DOM/accessibility snapshot plus screenshot observation, cross-checked against direct SQL in isolated schema"
+}
