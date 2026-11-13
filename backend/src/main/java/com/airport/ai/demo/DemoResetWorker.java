@@ -13,8 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /** Runs the entire reset and success audit in one database transaction. */
 @Service
@@ -51,7 +53,8 @@ public class DemoResetWorker {
 
     /** injectFailure is callable from isolated integration tests only; the public API always passes false. */
     @Transactional
-    public String restore(User operator, boolean injectFailure) {
+    public ResetOutcome restore(User operator, boolean injectFailure, String requestId,
+                                String beforeDatasetVersion, String beforeContentDigest) {
         long started = System.nanoTime();
         jdbc.execute("LOCK TABLE tasks IN SHARE ROW EXCLUSIVE MODE");
         List<String> blocked = blockingTasks();
@@ -65,13 +68,50 @@ public class DemoResetWorker {
         for (JsonNode baseline : dataset.baselines()) restoreBaseline(baseline, operator.getUsername());
         for (JsonNode scenario : dataset.scenarios()) restoreScenario(scenario, operator.getUsername());
         String contentDigest = contentDigest();
+        Map<String, Object> detail = new LinkedHashMap<>();
+        detail.put("requestId", requestId);
+        detail.put("beforeDatasetVersion", beforeDatasetVersion);
+        detail.put("afterDatasetVersion", DemoDataset.VERSION);
+        detail.put("beforeContentDigest", beforeContentDigest);
+        detail.put("afterContentDigest", contentDigest);
+        detail.put("sourceDigest", dataset.sourceDigest());
+        detail.put("deviceCount", 6);
+        detail.put("baselineCount", 3);
+        detail.put("scenarioCount", 3);
+        detail.put("durationMs", (System.nanoTime() - started) / 1_000_000);
         audit.record(operator.getId(), operator.getUsername(), operator.getRole(), "DEMO_DATA_RESET",
-                DemoDataset.VERSION, "SUCCESS", null,
-                Map.of("sourceDigest", dataset.sourceDigest(), "contentDigest", contentDigest,
-                        "deviceCount", 6, "baselineCount", 3, "scenarioCount", 3,
-                        "durationMs", (System.nanoTime() - started) / 1_000_000));
-        return contentDigest;
+                DemoDataset.VERSION, "SUCCESS", null, detail);
+        return new ResetOutcome(requestId, beforeDatasetVersion, beforeContentDigest,
+                DemoDataset.VERSION, contentDigest);
     }
+
+    /** Backward-compatible helper for package callers that do not need audit context. */
+    @Transactional
+    public String restore(User operator, boolean injectFailure) {
+        String requestId = UUID.randomUUID().toString();
+        String beforeDigest = contentDigest();
+        return restore(operator, injectFailure, requestId, currentDatasetVersion(), beforeDigest).afterContentDigest();
+    }
+
+    String currentDatasetVersion() {
+        List<String> details = jdbc.queryForList("""
+                SELECT detail::text FROM operation_logs
+                WHERE operation_type='DEMO_DATA_RESET' AND operation_result='SUCCESS'
+                ORDER BY id DESC LIMIT 1
+                """, String.class);
+        if (details.isEmpty()) return "UNKNOWN";
+        try {
+            JsonNode detail = mapper.readTree(details.get(0));
+            String version = detail.path("afterDatasetVersion").asText("");
+            if (!version.isBlank()) return version;
+            return detail.path("datasetVersion").asText("UNKNOWN");
+        } catch (Exception ignored) {
+            return "UNKNOWN";
+        }
+    }
+
+    record ResetOutcome(String requestId, String beforeDatasetVersion, String beforeContentDigest,
+                        String afterDatasetVersion, String afterContentDigest) {}
 
     private void restoreDevice(JsonNode device) {
         String code = device.path("deviceCode").asText();

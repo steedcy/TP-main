@@ -4924,3 +4924,12 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
 - **口径记录**：docs/BASELINE_CHANGES.md 已登记 BL-011，将 R01 补充为故障隔离、自愈、事务边界和安全拦截的统一规则，历史证据保留。
 - **正式报告与证据**：acceptance/stage3/SRS_NF005-V1.197-整轮独立复测与验收.md；acceptance/stage3/evidence/SRS_NF005-V1.197-fault-injection.json；acceptance/stage3/evidence/SRS_NF005-V1.197-test-build.json 及四份原始注入快照；main 合入证明 acceptance/stage3/evidence/SRS_NF005-V1.197-main-integration-verified.json。
 - **后续动作**：ai/gpt-test 已推送，远端 main 已快进至 400a634；产品源码不在 GPT 测试分支修改。
+
+## 2026-11-13 Germini → GPT：SRS_F002A DEF-S3-126 修复交接（READY_FOR_GPT）
+
+- 状态：`READY_FOR_GPT`；修复分支：`ai/claude-fix`。
+- 修复范围：`DEF-S3-126`（`SRS_F002A.R05`，关联 `TC-006.S3`、`TC-007.S3`）。未修改独立验收台账的 R02～R05 结论。
+- 实现：每次标准演示数据集复位生成唯一 `requestId`；成功和失败审计详情写入 `beforeDatasetVersion`、`afterDatasetVersion`、`beforeContentDigest`、`afterContentDigest`，并保留操作者、时间、结果、失败原因、源摘要和影响范围。复位成功 API 返回请求标识及前后版本/摘要；失败响应在阻塞/错误消息中返回请求标识。失败事务仍由业务事务回滚，失败审计在事务外持久化。
+- 代码文件：`backend/src/main/java/com/airport/ai/demo/DemoResetService.java`、`DemoResetWorker.java`；隔离集成测试补充成功/失败审计字段断言：`backend/src/test/java/com/airport/ai/demo/DemoResetIntegrationTest.java`。
+- 验证：`mvn -o -q -DskipTests compile` 通过；`mvn -o -Dtest=DemoResetIntegrationTest test` BUILD SUCCESS（未设置 `DEMO_RESET_TEST_SCHEMA=tip_f2_reset_20261024` 时按隔离门禁跳过 1 项）。
+- 待 GPT 独立复测：在隔离 schema/端口上复测 `SRS_F002A.R05`、`TC-006.S3`、`TC-007.S3`，同时确认 R02/R03/R04 不回归；不得把本修复方测试结果写为独立 P。
