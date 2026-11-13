@@ -1,0 +1,76 @@
+{
+  "product": "V1.200",
+  "productTag": "V1.200",
+  "productSha": "fbffe1cf9d4b457f02d3a3f76929427d7a33e290",
+  "testHead": "6ef7f65ba3a69ebf9d6bbb580cc1a96756e960ff",
+  "branch": "ai/gpt-test",
+  "worktree": "C:\\Users\\savy\\Desktop\\TIP-main\\tip-gpt-f013",
+  "resources": {
+    "postgres": "127.0.0.1:55432/nf015_v197/tip_nf015_v197_20261112",
+    "redis": "127.0.0.1:56379/db0",
+    "backend": "127.0.0.1:8180",
+    "model": "127.0.0.1:18117",
+    "simulators": [
+      "18132",
+      "18137",
+      "18138"
+    ]
+  },
+  "fixture": {
+    "taskDefinitions": 3,
+    "devices": 3,
+    "deviceAgents": 3,
+    "onlineAgents": 3,
+    "testedEnabledCapabilities": 12,
+    "dryRunPassedTemplates": 2,
+    "enabledBaselineTemplates": 2
+  },
+  "SRS_NF015-V1.200-model-connection-failure.json": {
+    "scenario": "model-connection-failure",
+    "http": 200,
+    "taskId": 34,
+    "status": "COMPLETED",
+    "failureReason": null,
+    "downgradeReason": "目标理解调用规划模型服务失败: 目标理解服务调用超时或不可用: I/O error on POST request for \"http://127.0.0.1:18117/v1/goal/understand\": Connection refused: no further information"
+  },
+  "SRS_NF015-V1.200-model-timeout.json": {
+    "scenario": "model-timeout",
+    "http": 200,
+    "taskId": 36,
+    "status": "COMPLETED",
+    "failureReason": null,
+    "downgradeReason": "目标理解调用规划模型服务失败: 目标理解服务调用超时或不可用: I/O error on POST request for \"http://127.0.0.1:18117/v1/goal/understand\": Read timed out"
+  },
+  "SRS_NF015-V1.200-supervision-unavailable.json": {
+    "scenario": "supervision-unavailable",
+    "http": 200,
+    "taskId": 37,
+    "status": "PENDING_MANUAL",
+    "failureReason": "监督服务不可用或判定异常: injected supervision fault: service unavailable",
+    "downgradeReason": null
+  },
+  "SRS_NF015-V1.200-recovery.json": {
+    "scenario": "recovery",
+    "http": 200,
+    "taskId": 38,
+    "status": "COMPLETED",
+    "failureReason": null,
+    "downgradeReason": "监督判定高风险: RULE_ESCORT_SPECIAL_PASSENGER"
+  },
+  "SRS_NF015-V1.200-normal-smoke.json": {
+    "scenario": "normal-smoke",
+    "http": 200,
+    "taskId": 39,
+    "status": "COMPLETED",
+    "failureReason": null,
+    "downgradeReason": "监督判定高风险: RULE_ESCORT_SPECIAL_PASSENGER"
+  },
+  "verdict": {
+    "R01": "NT (TC-047.S2 three-candidate comparison evidence incomplete; no full requirement pass claim)",
+    "TC-047.S1": "P",
+    "TC-047.S2": "NT (no independent three-candidate comparison)",
+    "TC-056.S1": "P (associated assertions)",
+    "TC-056.S2": "P (associated assertions)",
+    "recovery": "P"
+  }
+}

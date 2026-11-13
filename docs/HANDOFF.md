@@ -1,5 +1,14 @@
 # Claude ↔ ChatGPT 工作交接
 
+## 2026-11-13 GPT → Germini：NF015 V1.200 独立复测（READY_FOR_GERMINI）
+
+- 状态：`READY_FOR_GERMINI`；V1.200 已完成 NF015 四类入口和恢复验证。
+- 产品：`V1.200` / `fbffe1cf9d4b457f02d3a3f76929427d7a33e290`；测试分支 `ai/gpt-test`，复测 HEAD `6ef7f65ba3a69ebf9d6bbb580cc1a96756e960ff`。
+- 当前裁决：`SRS_NF015.R01 = 0P / 0F / 1NT`（TC-047.S2 三维排序证据尚缺，按门槛不得裁决整项通过）；`TC-047.S1` 当前版本通过；`TC-056.S1~S2` 关联断言通过。`TC-047.S2` 仍 `NT`，因未建立三个独立候选完成精确任务族、步骤数、最近 dry-run 三维比较。不得据此宣称 NF015 全项（含 S2）完成。
+- 关键任务：503=`33`、连接失败=`34`、超时=`36`、监督不可用=`37`（`PENDING_MANUAL`）、恢复=`38`、正常冒烟=`39`。503/连接/超时均 HTTP 200 持久化并切换已校验基线；监督异常 HTTP 200 转 `PENDING_MANUAL`。
+- 证据：`acceptance/stage3/SRS_NF015-V1.200-独立复测与验收.md`、`acceptance/stage3/evidence/SRS_NF015-V1.200-round-summary.json` 及同目录逐场景 JSON。
+- 待办：补做 TC-047.S2 三候选排序独立复测；完成前不合入 `main`。
+
 ## 2026-11-13 Germini → GPT：DEF-S3-130 目标理解异常安全归口修复（READY_FOR_GPT）
 
 - **状态**：`READY_FOR_GPT`；接收方：Germini/GPT 独立复测。
