@@ -1,0 +1,66 @@
+{
+  "requirement": "SRS_NF015.R01",
+  "testStep": "TC-047.S1",
+  "testVersion": "V1.197",
+  "productSha": "c34deba33c401791d976e36ab826a8e8cc66847d",
+  "productTag": "V1.197",
+  "branch": "ai/gpt-test",
+  "worktree": "C:/Users/savy/Desktop/TIP-main/tip-gpt-f013",
+  "testShaAtCapture": "1175f833939f97527f4d6eec11d97e9093e5f7a1",
+  "capturedAt": "2026-11-12",
+  "isolation": {
+    "postgresDataDirectory": ".local-test/nf015-pgdata",
+    "database": "nf015_v197",
+    "schema": "tip_nf015_v197_20261112",
+    "postgresPort": 55432,
+    "redisPort": 56379,
+    "redisDatabase": 0,
+    "backendPort": 8180,
+    "frontendPort": 5273,
+    "sharedPostgresFaultInjection": false
+  },
+  "setupObservations": {
+    "backendHealthHttp": 200,
+    "syntheticOperatorLogin": "PASS",
+    "taskListApi": "PASS",
+    "vitePageHttp": 200,
+    "initialDbSnapshot": ".local-test/nf015-before-fault-injection.sql",
+    "initialDbSnapshotSha256": "84E219AD54B77EDAA09BC82CDBAD9BABF7F62FCE0C7F2EF07CE31CD2026DE074",
+    "fixtureInventoryAtAttempt": {
+      "taskDefinitions": 0,
+      "devices": 0,
+      "deviceAgents": 0,
+      "usableBaselineTemplates": 0
+    },
+    "businessEntryRequestsIssued": 0,
+    "faultInjectionsIssued": 0,
+    "productSourceModified": false,
+    "ledgerModified": false,
+    "historicalEvidenceReusedAsCurrentResult": false
+  },
+  "testAssessment": {
+    "requirementResult": "NOT_RUN",
+    "stepResult": "NOT_RUN",
+    "entries": [
+      {"name": "high-risk baseline downgrade", "result": "NOT_RUN", "reason": "No valid, trial-passed enabled baseline fixture or simulator was provisioned."},
+      {"name": "planning failure baseline downgrade", "result": "NOT_RUN", "reason": "No valid, trial-passed enabled baseline fixture or simulator was provisioned."},
+      {"name": "planning model unavailable", "result": "NOT_RUN", "reason": "No valid, trial-passed enabled baseline fixture or simulator was provisioned."},
+      {"name": "supervision unavailable/manual handling", "result": "NOT_RUN", "reason": "No valid, trial-passed enabled baseline fixture or simulator was provisioned."}
+    ],
+    "limitations": [
+      "The isolated application and frontend health checks establish setup availability only, not NF015 behavior.",
+      "An earlier setup attempt briefly started the backend against shared Redis DB 15 before the configuration error was detected. The backend was stopped; no shared Redis scan or destructive cleanup was performed. Any test session created in that brief interval was left to expire naturally.",
+      "A later backend run used isolated Redis port 56379 DB 0. The backend, Vite, isolated Redis, and isolated PostgreSQL processes were then stopped. Ports 8180, 5273, 56379, and 55432 were observed released.",
+      "No browser business flow, model/supervision fault injection, task-state SQL assertion, recovery request, or scenario evidence was captured."
+    ]
+  },
+  "cleanup": {
+    "backendStopped": true,
+    "frontendStopped": true,
+    "isolatedRedisStopped": true,
+    "isolatedPostgresStopRequested": true,
+    "checkedPortsReleased": [8180, 5273, 56379, 55432],
+    "sharedPostgresModifiedOrStopped": false,
+    "sharedRedisCleanupAttempted": false
+  }
+}

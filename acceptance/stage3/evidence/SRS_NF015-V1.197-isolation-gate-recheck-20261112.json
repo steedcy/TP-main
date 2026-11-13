@@ -1,0 +1,116 @@
+{
+  "requirement": "SRS_NF015.R01",
+  "testStep": "TC-047.S1",
+  "testVersion": "V1.197",
+  "productSha": "c34deba33c401791d976e36ab826a8e8cc66847d",
+  "productTag": "V1.197",
+  "branch": "ai/gpt-test",
+  "worktree": "C:/Users/savy/Desktop/TIP-main/tip-gpt-f013",
+  "testShaAtCapture": "0d25d3427ea25aef3abc5bff028fe54c87a6a363",
+  "capturedAt": "2026-11-12",
+  "fixedProductVerification": {
+    "branch": "ai/gpt-test",
+    "head": "1dcc4eee5f5dd8356651dc697d967e4ef7babc1c",
+    "tagTarget": "c34deba33c401791d976e36ab826a8e8cc66847d",
+    "tagIsAncestorOfHead": true,
+    "productDirectoryDiffFromTag": false,
+    "worktreeInitiallyClean": true
+  },
+  "isolationGate": {
+    "requiredValues": {
+      "NF015_BASE_URL": "http://127.0.0.1:8180/api/v1",
+      "NF015_DB_HOST": "127.0.0.1",
+      "NF015_DB_PORT": "55432",
+      "NF015_DB_NAME": "nf015_v197",
+      "NF015_DB_SCHEMA": "tip_nf015_v197_20261112",
+      "NF015_REDIS_HOST": "127.0.0.1",
+      "NF015_REDIS_PORT": "56379",
+      "NF015_REDIS_DB": "0"
+    },
+    "gateHelper": "acceptance/stage3/nf015-v197-gate.ps1",
+    "gateHelperReadsGenericUserFile": false,
+    "gateHelperChecksFixedDbRedisBackendPorts": true,
+    "gateHelperTestsBothRolesAndAuthorizedApis": true
+  },
+  "credentialSetup": {
+    "database": "nf015_v197",
+    "schema": "tip_nf015_v197_20261112",
+    "port": 55432,
+    "accounts": [
+      {
+        "username": "nf015_admin",
+        "role": "CONFIG_ADMIN",
+        "status": "ACTIVE",
+        "passwordHash": "BCrypt",
+        "loginTest": "HTTP 200, token, CONFIG_ADMIN, authorized API PASS"
+      },
+      {
+        "username": "nf015_operator",
+        "role": "OPERATOR",
+        "status": "ACTIVE",
+        "passwordHash": "BCrypt",
+        "loginTest": "HTTP 200, token, OPERATOR, authorized API PASS"
+      }
+    ],
+    "plaintextPasswordsRecorded": false,
+    "hashesRecorded": false,
+    "credentialsStoredIn": ".local-test/nf015.credentials.xml (local-only encrypted PowerShell CLIXML)"
+  },
+  "isolationIncidentAndResolution": {
+    "observation": "Before service ownership was verified, an earlier 8180 backend process reported DB/Redis health UP while listeners existed only on shared ports 5432/6379. That backend and its 5273 Vite process were stopped after command-line identity verification; no task/business API request or Redis mutation was issued during this attempt.",
+    "currentSharedServices": "Existing shared PostgreSQL 5432 and Redis 6379 service processes remain running and were not modified or queried by the NF015 business probe.",
+    "currentPort8180": "Verified listener PID 6524 was this worktree V1.197 JAR; JDBC/Flyway fixed to isolated PostgreSQL 55432/schema, Redis configured to 56379 DB0.",
+    "isolatedPostgres": "Started only from .local-test/nf015-pgdata on 55432; identity verified by querying current_database() and inet_server_port(); stopped after gate could not pass.",
+    "isolatedRedis": "Started owned Redis PID 14160 on 56379; redis-cli PING returned PONG.",
+    "platformGate": "PASSED: both synthetic roles logged in HTTP 200 with tokens and role-authorized APIs.",
+    "businessRequestsIssued": 1,
+    "faultInjectionsIssued": 0,
+    "productSourceModified": false,
+    "sharedPostgresModifiedOrStopped": false,
+    "sharedRedisModifiedOrCleaned": false
+  },
+  "assessment": {
+    "requirementResult": "NOT_RUN",
+    "stepResult": "NOT_RUN",
+    "entries": [
+      {
+        "name": "high-risk baseline downgrade",
+        "result": "NOT_RUN",
+        "reason": "No NF015 acceptance scenario completed; see normal-smoke-diagnostic-20261112.json."
+      },
+      {
+        "name": "planning failure baseline downgrade",
+        "result": "NOT_RUN",
+        "reason": "No NF015 acceptance scenario completed; see normal-smoke-diagnostic-20261112.json."
+      },
+      {
+        "name": "planning model unavailable",
+        "result": "NOT_RUN",
+        "reason": "No NF015 acceptance scenario completed; see normal-smoke-diagnostic-20261112.json."
+      },
+      {
+        "name": "supervision unavailable/manual handling",
+        "result": "NOT_RUN",
+        "reason": "No NF015 acceptance scenario completed; see normal-smoke-diagnostic-20261112.json."
+      }
+    ],
+    "historicalTC047S1": "Historical P from SRS_F015/V1.156 retained as historical coverage only; not used as current NF015 result."
+  },
+  "cleanup": {
+    "ownedIsolationPostgresStopped": true,
+    "ownedPriorBackendAndViteStopped": true,
+    "ownedIsolationRedisProcessStarted": true,
+    "unknown8180ListenerStopped": false,
+    "portsAtFinalCheck": {
+      "p55432": "released",
+      "p56379": "released",
+      "p8180": "released",
+      "p5273": "released",
+      "p18117": "released",
+      "p18132": "released",
+      "p18137": "released"
+    },
+    "sharedPostgresStoppedOrModified": false,
+    "sharedRedisStoppedOrModified": false
+  }
+}

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class DemoResetService {
@@ -54,22 +55,56 @@ public class DemoResetService {
 
     private Map<String, Object> restoreInternal(String phrase, boolean confirmed, User operator, boolean injectFailure) {
         if (!enabled) throw new BusinessException(ErrorCode.SERVICE_UNAVAILABLE, "标准演示数据复位仅在隔离演示环境启用");
+        String requestId = UUID.randomUUID().toString();
+        String beforeDatasetVersion = worker.currentDatasetVersion();
+        String beforeContentDigest = worker.contentDigest();
         if (!confirmed || !DemoDataset.CONFIRM_PHRASE.equals(phrase)) {
-            throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, "确认短语或二次确认不正确，数据未变更");
+            recordFailure(operator, requestId, beforeDatasetVersion, beforeContentDigest,
+                    "确认短语或二次确认不正确，数据未变更");
+            throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR,
+                    "确认短语或二次确认不正确，数据未变更；请求标识: " + requestId);
         }
         long started = System.nanoTime();
         try {
-            String digest = worker.restore(operator, injectFailure);
-            return Map.of("result", "SUCCESS", "version", DemoDataset.VERSION,
-                    "sourceDigest", dataset.sourceDigest(), "contentDigest", digest,
+            DemoResetWorker.ResetOutcome outcome = worker.restore(operator, injectFailure, requestId,
+                    beforeDatasetVersion, beforeContentDigest);
+            return Map.of("result", "SUCCESS", "requestId", requestId,
+                    "version", outcome.afterDatasetVersion(),
+                    "beforeDatasetVersion", outcome.beforeDatasetVersion(),
+                    "afterDatasetVersion", outcome.afterDatasetVersion(),
+                    "beforeContentDigest", outcome.beforeContentDigest(),
+                    "sourceDigest", dataset.sourceDigest(), "contentDigest", outcome.afterContentDigest(),
                     "durationMs", (System.nanoTime() - started) / 1_000_000);
         } catch (RuntimeException ex) {
             long duration = (System.nanoTime() - started) / 1_000_000;
             String reason = ex instanceof BusinessException ? ex.getMessage() : ex.getClass().getSimpleName();
-            audit.record(operator.getId(), operator.getUsername(), operator.getRole(), "DEMO_DATA_RESET",
-                    DemoDataset.VERSION, "FAILED", null,
-                    Map.of("sourceDigest", dataset.sourceDigest(), "durationMs", duration, "reason", reason));
+            recordFailure(operator, requestId, beforeDatasetVersion, beforeContentDigest, reason, duration);
+            if (ex instanceof BusinessException business) {
+                throw new BusinessException(business.getErrorCode(), business.getMessage()
+                        + "；请求标识: " + requestId);
+            }
             throw ex;
         }
+    }
+
+    private void recordFailure(User operator, String requestId, String beforeDatasetVersion,
+                               String beforeContentDigest, String reason) {
+        recordFailure(operator, requestId, beforeDatasetVersion, beforeContentDigest, reason, null);
+    }
+
+    private void recordFailure(User operator, String requestId, String beforeDatasetVersion,
+                               String beforeContentDigest, String reason, Long durationMs) {
+        Map<String, Object> detail = new LinkedHashMap<>();
+        detail.put("requestId", requestId);
+        detail.put("beforeDatasetVersion", beforeDatasetVersion);
+        detail.put("afterDatasetVersion", beforeDatasetVersion);
+        detail.put("beforeContentDigest", beforeContentDigest);
+        detail.put("afterContentDigest", beforeContentDigest);
+        detail.put("attemptedDatasetVersion", DemoDataset.VERSION);
+        detail.put("sourceDigest", dataset.sourceDigest());
+        detail.put("reason", reason);
+        if (durationMs != null) detail.put("durationMs", durationMs);
+        audit.record(operator.getId(), operator.getUsername(), operator.getRole(), "DEMO_DATA_RESET",
+                DemoDataset.VERSION, "FAILED", null, detail);
     }
 }

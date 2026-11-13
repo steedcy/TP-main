@@ -1,0 +1,137 @@
+{
+  "requirement": "SRS_NF015.R01",
+  "testVersion": "V1.197",
+  "productSha": "c34deba33c401791d976e36ab826a8e8cc66847d",
+  "testBranch": "ai/gpt-test",
+  "testWorktree": "C:/Users/savy/Desktop/TIP-main/tip-gpt-f013",
+  "capturedAt": "2026-11-12",
+  "classification": "PREPARATION_ONLY_NOT_ACCEPTANCE",
+  "isolation": {
+    "postgres": "127.0.0.1:55432/nf015_v197/tip_nf015_v197_20261112",
+    "redis": "127.0.0.1:56379/0",
+    "backend": "127.0.0.1:8180",
+    "frontend": "127.0.0.1:5273",
+    "simulatorPorts": [
+      18132,
+      18137
+    ],
+    "backendAdapterReportBase": "Corrected to http://127.0.0.1:8180 before the successful credential gate and simulator probes"
+  },
+  "credentialGate": {
+    "admin": "HTTP 200, token returned, CONFIG_ADMIN, authorized device API PASS",
+    "operator": "HTTP 200, token returned, OPERATOR, authorized task API PASS",
+    "plaintextOrTokenRecorded": false
+  },
+  "fixtureObservations": {
+    "devicesCreated": [
+      "NF015_R01_A",
+      "NF015_R01_B"
+    ],
+    "simulatorTypes": [
+      "MOBILE_ROBOT",
+      "MOBILE_ROBOT"
+    ],
+    "agentStatus": "Both agents observed ONLINE/IDLE after authenticated simulator bindings and heartbeats",
+    "capabilityTests": {
+      "perDevice": [
+        "CAP_NAVIGATION",
+        "CAP_NOTIFICATION",
+        "CAP_ESCORT",
+        "CAP_INFO_DISPLAY"
+      ],
+      "result": "Actual device-agent capability test returned TESTED_PASSED and capabilities were enabled",
+      "scope": "Fixture readiness only; not NF015 acceptance evidence"
+    },
+    "taskDefinitions": "Three migration-provided definitions exist and are enabled; no NF015 normal task submitted",
+    "baselineTemplates": "Migration-provided templates remained empty-step DRAFT; an additional synthetic draft was created by authenticated API, but no successful dry-run or enabled NF015 baseline was established",
+    "dryRun": "A dry-run API request was attempted and rejected with business code 4408 because the selected simulator agent was OFFLINE at that observation. No SUCCESS dry-run was observed.",
+    "taskSubmissions": 0,
+    "faultInjections": 0,
+    "normalBusinessSmoke": "NOT_RUN",
+    "nf015CurrentP": 0
+  },
+  "preparationIssues": [
+    {
+      "kind": "test-orchestration",
+      "observation": "A simulator launch overlapped an earlier asynchronous launch and failed because port 18132 was already in use. The existing listener was verified by executable command line to be this worktree's simulator.",
+      "productFinding": false
+    },
+    {
+      "kind": "fixture-stability",
+      "observation": "Agent A had gone OFFLINE by the dry-run request, so the API correctly rejected that precondition. The reason for the heartbeat gap was not isolated during this run.",
+      "productFinding": false
+    }
+  ],
+  "assessment": {
+    "requirementResult": "NOT_RUN",
+    "TC-047.S1": "NOT_RUN",
+    "TC-047.S2": "NOT_RUN",
+    "TC-056.S1": "NOT_RUN",
+    "TC-056.S2": "NOT_RUN",
+    "historicalTC047S1": "Historical P from SRS_F015/V1.156 remains historical only",
+    "currentAcceptanceClaims": []
+  },
+  "cleanup": {
+    "ownedBackendStopped": true,
+    "ownedFrontendStopped": true,
+    "ownedSimulatorProcessesStopped": true,
+    "ownedRedisStopped": true,
+    "ownedPostgresStopped": true,
+    "portsReleased": [
+      55432,
+      56379,
+      8180,
+      5273,
+      18132,
+      18137
+    ],
+    "sharedPostgresModifiedOrStopped": false,
+    "sharedRedisFlushedOrStopped": false
+  },
+  "secrets": {
+    "credentialsAndHashesCommitted": false,
+    "tokensOrPasswordsInEvidence": false,
+    "deviceTokensStored": "Local encrypted PowerShell CLIXML only"
+  },
+  "continuationObservation": {
+    "capturedAt": "2026-11-12T15:30+08:00",
+    "productSha": "c34deba33c401791d976e36ab826a8e8cc66847d",
+    "isolationGate": "PASS: nf015_admin CONFIG_ADMIN and nf015_operator OPERATOR logins HTTP 200; authorized APIs passed; PostgreSQL isolated 55432, Redis isolated 56379/DB0, backend 8180.",
+    "simulators": {
+      "NF015_R01_A": {
+        "port": 18132,
+        "healthHandshake": "PASS",
+        "agent": "ONLINE/IDLE at fixture checkpoint"
+      },
+      "NF015_R01_B": {
+        "port": 18137,
+        "healthHandshake": "PASS",
+        "agent": "ONLINE/IDLE at fixture checkpoint"
+      }
+    },
+    "capabilities": "Both devices passed real API tests and enabled CAP_NAVIGATION, CAP_NOTIFICATION, CAP_ESCORT, CAP_INFO_DISPLAY.",
+    "dryRun": {
+      "templateId": 5,
+      "result": "SUCCESS",
+      "statusAfterEnableAndRequery": "ENABLED",
+      "scope": "Fixture readiness only; does not count as acceptance P."
+    },
+    "normalSmoke": {
+      "request": "POST /api/v1/tasks, synthetic ordinary task",
+      "http": 200,
+      "taskId": 3,
+      "finalStatus": "PENDING_MANUAL",
+      "events": [
+        "GOAL_SUBMITTED",
+        "GOAL_CLARIFIED",
+        "CONTEXT_SNAPSHOT_GENERATED",
+        "PLAN_GENERATED/ERR_PLANNING_MODEL_FAILED",
+        "BASELINE_DOWNGRADED/ERR_REQUIRED_CHANNEL_MISSING",
+        "TASK_PENDING_MANUAL"
+      ],
+      "assessment": "Smoke gate failed; no acceptance scenarios started."
+    },
+    "faultInjectionCount": 0,
+    "cleanup": "Owned backend, Redis, PostgreSQL, synthetic model endpoint and simulators stopped; requested ports released; shared PostgreSQL/Redis unchanged."
+  }
+}

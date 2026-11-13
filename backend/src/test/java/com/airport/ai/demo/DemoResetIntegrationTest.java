@@ -52,6 +52,9 @@ class DemoResetIntegrationTest {
 
         Map<String, Object> first = reset.restore(phrase, true, operator);
         String canonical = (String) first.get("contentDigest");
+        assertNotNull(first.get("requestId"));
+        assertEquals(DemoDataset.VERSION, first.get("afterDatasetVersion"));
+        assertNotNull(first.get("beforeDatasetVersion"));
         assertEquals(6L, jdbc.queryForObject("SELECT count(*) FROM devices WHERE device_code LIKE 'SIM_F2_%'", Long.class));
         assertEquals(3L, jdbc.queryForObject("SELECT count(*) FROM baseline_templates WHERE is_preset=TRUE AND template_status='DRAFT'", Long.class));
         assertEquals(3L, jdbc.queryForObject("SELECT count(*) FROM task_definitions WHERE is_preset=TRUE AND definition_status='ENABLED'", Long.class));
@@ -66,6 +69,19 @@ class DemoResetIntegrationTest {
                 SELECT count(*) FROM operation_logs WHERE operation_type='DEMO_DATA_RESET'
                   AND operation_result='FAILED'
                 """, Integer.class) >= 1);
+        Map<String, Object> failedAudit = jdbc.queryForMap("""
+                SELECT detail->>'requestId' AS request_id,
+                       detail->>'beforeDatasetVersion' AS before_version,
+                       detail->>'afterDatasetVersion' AS after_version,
+                       detail->>'beforeContentDigest' AS before_digest,
+                       detail->>'afterContentDigest' AS after_digest
+                FROM operation_logs WHERE operation_type='DEMO_DATA_RESET'
+                  AND operation_result='FAILED' ORDER BY id DESC LIMIT 1
+                """);
+        assertNotNull(failedAudit.get("request_id"));
+        assertNotNull(failedAudit.get("before_version"));
+        assertNotNull(failedAudit.get("after_version"));
+        assertEquals(failedAudit.get("before_digest"), failedAudit.get("after_digest"));
 
         assertThrows(BusinessException.class, () -> reset.restore("错误短语", true, operator));
         assertEquals(beforeFailure, worker.contentDigest());
@@ -95,6 +111,20 @@ class DemoResetIntegrationTest {
                 SELECT count(*) FROM operation_logs WHERE operation_type='DEMO_DATA_RESET'
                   AND operation_result='SUCCESS' AND detail::text LIKE '%durationMs%'
                 """, Integer.class) >= 1);
+        Map<String, Object> successAudit = jdbc.queryForMap("""
+                SELECT detail->>'requestId' AS request_id,
+                       detail->>'beforeDatasetVersion' AS before_version,
+                       detail->>'afterDatasetVersion' AS after_version,
+                       detail->>'beforeContentDigest' AS before_digest,
+                       detail->>'afterContentDigest' AS after_digest
+                FROM operation_logs WHERE operation_type='DEMO_DATA_RESET'
+                  AND operation_result='SUCCESS' ORDER BY id DESC LIMIT 1
+                """);
+        assertNotNull(successAudit.get("request_id"));
+        assertNotNull(successAudit.get("before_version"));
+        assertEquals(DemoDataset.VERSION, successAudit.get("after_version"));
+        assertNotNull(successAudit.get("before_digest"));
+        assertNotNull(successAudit.get("after_digest"));
         assertEquals(0L, jdbc.queryForObject("""
                 SELECT count(*) FROM device_capabilities c JOIN devices d ON d.id=c.device_id
                 WHERE d.device_code LIKE 'SIM_F2_%' AND c.capability_status<>'UNTESTED'

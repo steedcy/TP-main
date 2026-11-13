@@ -1,0 +1,75 @@
+{
+  "recordedAt": "2026-11-12T14:07:41+08:00",
+  "productSha": "c34deba33c401791d976e36ab826a8e8cc66847d",
+  "productTag": "V1.197",
+  "testBranch": "ai/gpt-test",
+  "testHeadBeforeEvidence": "0d25d3427ea25aef3abc5bff028fe54c87a6a363",
+  "database": "airport_ai",
+  "schema": "tip_f2_reset_20261024",
+  "migrationVersion": 30,
+  "backendPort": 8180,
+  "frontendPort": 5273,
+  "sharedPostgresInstanceModified": false,
+  "sharedPortsChecked": [
+    8080,
+    5173
+  ],
+  "backendHealth": "UP with db and redis UP",
+  "frontendHealth": "HTTP 200 observed at isolated 5273 during startup check; real browser page content verification was not completed (R04 NT)",
+  "junit": {
+    "class": "DemoResetIntegrationTest",
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "assertedBranches": [
+      "five active task statuses rejected in separate rows",
+      "wrong phrase no change",
+      "success restores six devices three templates and three scenarios",
+      "injected mid-transaction failure rolls back digest exactly",
+      "success and failure audit rows persisted",
+      "two repeated restores preserve identical digest and version"
+    ]
+  },
+  "scope": "R02-R05 only; R01 remains historical P",
+  "assertions": {
+    "r02_success_http_200": true,
+    "r02_wrong_phrase_rejected": true,
+    "r02_success_content_digest_present": true,
+    "r03_each_status_rejected": true,
+    "r03_each_status_listed": true,
+    "r04_two_success_digests_equal": true,
+    "r04_version_equal": true,
+    "r05_success_and_failure_audit": true,
+    "r05_no_sensitive_keys": true,
+    "cleanup_no_block_tasks": true
+  },
+  "cleanup": {
+    "blockTasks": 0,
+    "busyDemoAgents": 0,
+    "dirtyCapabilities": 0,
+    "ownedBackendPid16248": "stopped",
+    "ownedFrontendPort5273": "not listening at final check",
+    "sharedPostgres": "not stopped, modified, or fault-injected",
+    "sharedPorts": [
+      8080,
+      5173
+    ],
+    "port8180": "after stopping owned PID 16248, a separate java.exe PID 7488 (Xmx512m, not launched by this run) was listening; left untouched because ownership was not established"
+  },
+  "conclusion": {
+    "R02": "P",
+    "R03": "P",
+    "R04": "NT",
+    "R05": "F",
+    "steps": {
+      "TC-006.S2": "P",
+      "TC-006.S3": "F",
+      "TC-007.S1": "P",
+      "TC-007.S2": "P",
+      "TC-007.S3": "F"
+    },
+    "total": "2P/1F/1NT"
+  },
+  "result": "2P/1F/1NT; not eligible for main integration"
+}

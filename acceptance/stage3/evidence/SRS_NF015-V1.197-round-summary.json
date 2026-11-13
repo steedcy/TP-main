@@ -1,0 +1,90 @@
+{
+  "product": "V1.197",
+  "productSha": "c34deba33c401791d976e36ab826a8e8cc66847d",
+  "fixture": {
+    "taskDefinitions": 3,
+    "devices": 3,
+    "deviceAgents": 3,
+    "onlineAgents": 3,
+    "testedEnabledCapabilities": 4,
+    "dryRunPassedTemplates": 1,
+    "enabledBaselineTemplates": 1,
+    "templateId": 6,
+    "templateVersion": "V1.0"
+  },
+  "cases": {
+    "TC-047.S1.A_high_risk": {
+      "taskId": 9,
+      "result": "P",
+      "status": "COMPLETED",
+      "baselineTemplateId": 6,
+      "reasonCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+      "originalCandidateExecuted": false,
+      "evidence": "SRS_NF015-V1.197-tc047-s1-initial.json"
+    },
+    "TC-047.S1.B_malformed_planning": {
+      "taskId": 10,
+      "result": "P",
+      "status": "COMPLETED",
+      "baselineTemplateId": 6,
+      "reasonCode": "ERR_PLANNING_MODEL_FAILED",
+      "originalCandidateExecuted": false,
+      "evidence": "SRS_NF015-V1.197-tc047-s1-initial.json"
+    },
+    "TC-047.S1.C_http503": {
+      "result": "F",
+      "http": 503,
+      "reasonCode": 4113,
+      "taskCreated": false,
+      "evidence": "SRS_NF015-V1.197-tc047-s1-initial.json"
+    },
+    "TC-047.S1.C_connection_failure": {
+      "result": "F",
+      "http": 503,
+      "reasonCode": 4113,
+      "taskCreated": false,
+      "backendHealth": 200,
+      "evidence": "SRS_NF015-V1.197-model-connection-failure-clean.json"
+    },
+    "TC-047.S1.C_timeout": {
+      "result": "P",
+      "taskId": 22,
+      "status": "COMPLETED",
+      "baselineTemplateId": 6,
+      "reasonCode": "ERR_GOAL_UNDERSTANDING_TIMEOUT",
+      "originalCandidateExecuted": false,
+      "evidence": "SRS_NF015-V1.197-model-timeout-rerun.json"
+    },
+    "TC-047.S1.D_supervision_unavailable": {
+      "result": "P",
+      "taskId": 24,
+      "status": "PENDING_MANUAL",
+      "reasonCode": "ERR_SUPERVISION_UNAVAILABLE",
+      "assignments": 0,
+      "evidence": "SRS_NF015-V1.197-supervision-unavailable-rerun.json"
+    },
+    "recovery_after_connection_failure": {
+      "result": "P",
+      "taskId": 27,
+      "status": "COMPLETED",
+      "agents": "3 ONLINE/IDLE",
+      "evidence": "SRS_NF015-V1.197-recovery-after-model-connection-failure.json"
+    },
+    "recovery_after_supervision": {
+      "result": "P",
+      "taskId": 25,
+      "status": "COMPLETED",
+      "agents": "3 ONLINE/IDLE",
+      "evidence": "SRS_NF015-V1.197-recovery-after-supervision.json"
+    }
+  },
+  "decision": {
+    "SRS_NF015.R01": "0P/1F/0NT",
+    "TC-047.S1": "当前版本不通过；高风险、畸形规划、超时、监督不可用通过；HTTP503与连接失败均未兜底"
+  },
+  "notes": [
+    "HTTP503与连接失败均发生在目标理解阶段，平台健康接口仍HTTP200，但未创建任务、未进入基线或PENDING_MANUAL，违反外部服务异常下平台流程可用性和兜底要求。",
+    "模型超时和监督不可用均保持平台可访问，分别进入已启用基线和PENDING_MANUAL，未下发未经校验候选计划。",
+    "TC-047.S2仅完成当前模板的精确任务族/三步限制/最近dry-run成功选择依据观察，未构造三维候选比较，完整规则保持NT；TC-056.S1/S2关联断言由本轮无未经校验命令及合法基线命令证据支持。"
+  ]
+}
