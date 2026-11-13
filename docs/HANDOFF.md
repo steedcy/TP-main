@@ -4932,6 +4932,7 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
 - **口径记录**：docs/BASELINE_CHANGES.md 已登记 BL-011，将 R01 补充为故障隔离、自愈、事务边界和安全拦截的统一规则，历史证据保留。
 - **正式报告与证据**：acceptance/stage3/SRS_NF005-V1.197-整轮独立复测与验收.md；acceptance/stage3/evidence/SRS_NF005-V1.197-fault-injection.json；acceptance/stage3/evidence/SRS_NF005-V1.197-test-build.json 及四份原始注入快照；main 合入证明 acceptance/stage3/evidence/SRS_NF005-V1.197-main-integration-verified.json。
 - **后续动作**：ai/gpt-test 已推送，远端 main 已快进至 400a634；产品源码不在 GPT 测试分支修改。
+<<<<<<< HEAD
 
 ## SRS_NF015 V1.197 独立复测续跑交接（2026-11-12）
 
@@ -4939,3 +4940,16 @@ Claude下一先fetch并从最新origin/main同步，处理SRS_F023协同态势�
 - 裁决：`SRS_NF015.R01 = 0P / 0F / 1NT`。隔离双角色登录、两台代理/能力和模板5真实 dry-run SUCCESS/ENABLED 已通过，仅为前置夹具，不计验收P。正常冒烟HTTP 200创建合成任务 `TASK-20261112-0003`，实际转 `PENDING_MANUAL`；模型桩请求体写入失败，模板又因缺特殊旅客场景所需 `SMART_DISPLAY/CAP_INFO_DISPLAY` 被硬校验拦截，未成功完成正常路径。本轮没有形成固定产品的可复现功能F。
 - `TC-047.S1` 高风险、规划失败、模型不可用、监督不可用四入口；`TC-047.S2`；`TC-056.S1/S2` 与恢复验证均为 `NOT_RUN`。历史 `SRS_F015/V1.156` 的 `TC-047.S1` P 保留为历史来源，不能计入NF015当前P。详见 `acceptance/stage3/SRS_NF015-V1.197-独立复测与验收.md`、`acceptance/stage3/evidence/SRS_NF015-V1.197-normal-smoke-diagnostic-20261112.json` 和 `NT-S3-128`。
 - 隔离服务均已停止且指定端口释放；共享 PostgreSQL/Redis 未停止、修改、清理或注入。不得合 main。待完善隔离模型桩和特种场景渠道完整模板，仍在V1.197、隔离worktree从正常冒烟继续；完成后再逐项补跑全部当前适用断言。无需改产品代码即可继续测试夹具修复。
+=======
+
+## 2026-11-13 Germini → GPT：SRS_F002A DEF-S3-126 修复交接（READY_FOR_GPT）
+
+- 状态：`READY_FOR_GPT`；修复分支：`ai/claude-fix`。
+- 修复范围：`DEF-S3-126`（`SRS_F002A.R05`，关联 `TC-006.S3`、`TC-007.S3`）。未修改独立验收台账的 R02～R05 结论。
+- 实现：每次标准演示数据集复位生成唯一 `requestId`；成功和失败审计详情写入 `beforeDatasetVersion`、`afterDatasetVersion`、`beforeContentDigest`、`afterContentDigest`，并保留操作者、时间、结果、失败原因、源摘要和影响范围。复位成功 API 返回请求标识及前后版本/摘要；失败响应在阻塞/错误消息中返回请求标识。失败事务仍由业务事务回滚，失败审计在事务外持久化。
+- 代码文件：`backend/src/main/java/com/airport/ai/demo/DemoResetService.java`、`DemoResetWorker.java`；隔离集成测试补充成功/失败审计字段断言：`backend/src/test/java/com/airport/ai/demo/DemoResetIntegrationTest.java`。
+- 验证：`mvn -o -q -DskipTests compile` 通过；`mvn -o -Dtest=DemoResetIntegrationTest test` BUILD SUCCESS（未设置 `DEMO_RESET_TEST_SCHEMA=tip_f2_reset_20261024` 时按隔离门禁跳过 1 项）。
+- 待 GPT 独立复测：在隔离 schema/端口上复测 `SRS_F002A.R05`、`TC-006.S3`、`TC-007.S3`，同时确认 R02/R03/R04 不回归；不得把本修复方测试结果写为独立 P。
+
+- 后续补丁：无历史成功审计时将当前数据集版本按受控标准版本 F2-DEMO-20261024 明确记录，避免出现空或未知版本；本补丁提交后产品标签为 V1.199。
+>>>>>>> origin/ai/claude-fix
