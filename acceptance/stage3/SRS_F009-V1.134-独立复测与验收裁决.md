@@ -1,6 +1,6 @@
 # SRS_F009 V1.134 独立复测与验收裁决
 
-结论：**SRS_F009 整项 P**，`DEF-S3-086`、`DEF-S3-087` 在 V1.134 的真实设备链路上关闭。执行基线 V2.3。`V1.134` 是注解标签，实际指向产品代码 `82166d93e4ff72b325d7f6565edf1bb498b8d132`；修复方通知及上一节 HANDOFF 所写完整 SHA `82166d9b0ca5c898ba1cbb2c74d0e5270685931a` 是笔误，短 SHA `82166d9` 正确。Gemini/Claude 交接 `c6069b27fae4baa558d67a8324eac6dd699938b6`。GPT 在 `ai/gpt-test` 快进合入后独立构建，在自有 PostgreSQL schema `tip_gpt_f006_v118_20261030`、后端 18129、机器人仿真体 18132 实测；未修改产品代码、F008 台账、修复方 worktree 或其资源。
+结论：**SRS_F009 整项 P**，`DEF-S3-086`、`DEF-S3-087` 在 V1.134 的真实设备链路上关闭。执行基线 V2.3。`V1.134` 是注解标签，实际指向产品代码 `82166d93e4ff72b325d7f6565edf1bb498b8d132`；修复方通知及上一节 HANDOFF 所写完整 SHA `82166d93e4ff72b325d7f6565edf1bb498b8d132` 是笔误，短 SHA `82166d9` 正确。Gemini/Claude 交接 `c6069b27fae4baa558d67a8324eac6dd699938b6`。GPT 在 `ai/gpt-test` 快进合入后独立构建，在自有 PostgreSQL schema `tip_gpt_f006_v118_20261030`、后端 18129、机器人仿真体 18132 实测；未修改产品代码、F008 台账、修复方 worktree 或其资源。
 
 ## V1.134 当前版实测
 

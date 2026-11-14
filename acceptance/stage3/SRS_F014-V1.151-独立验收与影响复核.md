@@ -40,7 +40,7 @@ TC-043.S1为V1.150历史影响复用P；TC-043.S2、TC-044.S1/S2、TC-045.S1/S2�
 
 ## 历史复用与界面限制
 
-V1.150原SHA `69b841fbc10afd1c4c1f944cc0cd5a647bed66f7` 的[规则CRUD](evidence/SRS_F014-V1.150-rule-crud-20261104.json)、[真实浏览器新增编辑](evidence/SRS_F014-V1.150-rule-ui-20261104.png)及[原报告](SRS_F014-V1.150-独立复测与信号留痕缺陷交接.md)覆盖TC-043.S1。至当前SHA `9d63572087058fb180b08e362ad7da6aef501e44`，产品只修改RiskAssessmentService信号依据组装；RiskRuleController、RiskRuleSetVersion、RiskRuleView、TaskDetailView、RiskAssessmentResult、TaskPlanningOrchestrator的逐文件哈希均未变，依赖和数据库迁移未改。当前真实启停/版本/审计、六字段事件及核心执行为配套冒烟，故按V2.3引用上述历史观察，不重复制造相同证据。
+V1.150原SHA `69b841fbc10afd1c4c1f944cc0cd5a647bed66f7` 的[规则CRUD](evidence/SRS_F014-V1.150-rule-crud-20261104.json)、[真实浏览器新增编辑](evidence/SRS_F014-V1.150-rule-ui-20261104.png)及[原报告](https://github.com/steedcy/TP-main/blob/1f3bc9697859376ae947096fcb46e06db36dca6f/acceptance/stage3/SRS_F014-V1.150-独立复测与信号留痕缺陷交接.md)覆盖TC-043.S1。至当前SHA `9d63572087058fb180b08e362ad7da6aef501e44`，产品只修改RiskAssessmentService信号依据组装；RiskRuleController、RiskRuleSetVersion、RiskRuleView、TaskDetailView、RiskAssessmentResult、TaskPlanningOrchestrator的逐文件哈希均未变，依赖和数据库迁移未改。当前真实启停/版本/审计、六字段事件及核心执行为配套冒烟，故按V2.3引用上述历史观察，不重复制造相同证据。
 
 本轮IAB两次无法附加webview；随后原生浏览器控制因无法可靠识别Windows当前浏览器URL而被工具停止，已停止所有界面输入，未用其他方式绕过。**没有V1.151新增UI通过或截图**；TC-043.S1界面覆盖明确复用V1.150。该限制未被登记为产品缺陷。
 
