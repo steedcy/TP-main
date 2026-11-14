@@ -24,7 +24,7 @@
         <template v-else-if="column.key === 'action'">
           <a-space>
             <a @click.stop="$router.push(`/tasks/${record.id}`)">详情</a>
-            <a v-if="record.status === 'PLANNING' && record.missingInfoQuestions?.length"
+            <a v-if="['PLANNING', 'PENDING_MANUAL'].includes(record.status) && record.missingInfoQuestions?.length"
                @click.stop="openClarify(record)">补充信息</a>
           </a-space>
         </template>

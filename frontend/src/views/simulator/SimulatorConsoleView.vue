@@ -207,19 +207,29 @@ const demos = [
     key: 'flight', title: '航班变更与旅客引导',
     description: '航延屏发布变更，航显展示引导，机器人通知或导航。',
     requiredTypes: ['FLIGHT_DELAY_BOARD', 'SMART_DISPLAY', 'MOBILE_ROBOT'],
-    taskGoal: '航班CA1234延误30分钟，请在T2候机区发布航班变更信息，并引导旅客前往GATE_A05。'
+    taskFamily: 'FLIGHT_CHANGE_RESPONSE',
+    sceneParams: {
+      eventSource: 'MANUAL_FORM', flightNumber: 'CA1234', changeType: 'DELAY',
+      originalTime: '2026-11-14T22:30:00', newTime: '2026-11-14T23:00:00',
+      newGate: 'GATE_A05', changeDescription: '虚构航班CA1234延误30分钟，登机口GATE_A05不变'
+    },
+    taskGoal: '虚构航班CA1234原计划22:30，延误30分钟至23:00，请通过航延屏发布变更、智慧航显发布提示，并由机器人引导旅客前往GATE_A05。'
   },
   {
     key: 'baggage', title: '超规行李处置',
     description: '测量行李尺寸重量，并对超规结果生成告警。',
-    requiredTypes: ['BAGGAGE_SCANNER'],
-    taskGoal: '请测量当前行李的长宽高和重量；如果超出机场行李标准，请上报超规告警。'
+    requiredTypes: ['BAGGAGE_SCANNER', 'SMART_DISPLAY', 'MOBILE_ROBOT'],
+    taskFamily: 'OVERSIZE_BAGGAGE_HANDLING',
+    sceneParams: { baggageLocation: 'T2值机岛A03', targetCounter: '超规行李专柜B01' },
+    taskGoal: '请测量T2值机岛A03当前行李的长宽高和重量；超规时上报告警、由智慧航显发布超规行李专柜B01办理提示，并由移动机器人提供导航；正常行李留存测量结果后结束。'
   },
   {
     key: 'escort', title: '特殊旅客陪同',
     description: '航显发布会合提示，机器人陪同旅客到登机口。',
     requiredTypes: ['SMART_DISPLAY', 'MOBILE_ROBOT'],
-    taskGoal: '请在T2值机区显示特殊旅客会合提示，并安排服务机器人陪同旅客前往GATE_A05。'
+    taskFamily: 'SPECIAL_PASSENGER_SERVICE',
+    sceneParams: { assistanceType: '轮椅陪同', origin: 'T2值机区', destination: 'GATE_A05' },
+    taskGoal: '请为虚构轮椅旅客在T2值机区通过智慧航显显示会合提示、通知现场人员，并安排服务机器人前往会合后陪同旅客前往GATE_A05。'
   }
 ]
 const columns = [
@@ -271,7 +281,7 @@ function hasOnlineTypes(requiredTypes) {
 async function submitDemo(demo) {
   submitting.value = demo.key
   try {
-    const response = await submitTask({ taskGoal: demo.taskGoal })
+    const response = await submitTask({ taskGoal: demo.taskGoal, taskFamily: demo.taskFamily, sceneParams: demo.sceneParams })
     const task = response.data
     message.success(`已提交演示任务${task?.taskCode ? `：${task.taskCode}` : ''}`)
   } finally { submitting.value = '' }

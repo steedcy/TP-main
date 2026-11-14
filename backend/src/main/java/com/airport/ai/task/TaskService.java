@@ -239,7 +239,9 @@ public class TaskService {
     @Transactional(noRollbackFor = BusinessException.class)
     public Task clarify(Long taskId, ClarifyTaskRequest request, User operator) {
         Task task = get(taskId);
-        if (task.getStatus() != TaskStatus.PLANNING) {
+        boolean manualClarification = task.getStatus() == TaskStatus.PENDING_MANUAL
+                && !fromJsonQuestions(task.getMissingInfoQuestions()).isEmpty();
+        if (task.getStatus() != TaskStatus.PLANNING && !manualClarification) {
             throw new BusinessException(ErrorCode.TASK_STATUS_NOT_ALLOWED, "任务已离开待规划状态，不可补充信息");
         }
 
@@ -290,7 +292,14 @@ public class TaskService {
         }
         rounds.add(Map.of("questions", pendingQuestions, "answers", answersToStore));
         mergedSceneParams.put("clarificationAnswers", rounds);
+        if ("FLIGHT_CHANGE_RESPONSE".equals(task.getTaskFamily())) {
+            FlightChangeRequiredInfoGuard.applyLatestAnswers(mergedSceneParams);
+        }
 
+        if (manualClarification) {
+            task.setStatus(TaskStatus.PLANNING);
+            task.setFailureReason(null);
+        }
         task.setSceneParams(toJson(SceneParamsPrivacyGuard.sanitize(mergedSceneParams)));
         taskMapper.update(task);
 

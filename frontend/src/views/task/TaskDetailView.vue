@@ -21,7 +21,7 @@
       </a-descriptions>
       <a-alert v-if="task.missingInfoQuestions?.length" type="warning" show-icon style="margin-top: 8px"
                message="待补充问题" :description="task.missingInfoQuestions.join('；')" />
-      <a-form v-if="isOperator && task.status === 'PLANNING' && task.missingInfoQuestions?.length"
+      <a-form v-if="isOperator && ['PLANNING', 'PENDING_MANUAL'].includes(task.status) && task.missingInfoQuestions?.length"
               layout="vertical" style="margin-top: 12px" @finish="handleClarify">
         <a-form-item v-for="question in task.missingInfoQuestions" :key="question" :label="question" required>
           <a-input v-model:value="clarificationAnswers[question]" :maxlength="500" />
@@ -180,8 +180,8 @@
         <a-descriptions-item label="长×宽×高">{{ baggageResult.length }}×{{ baggageResult.width }}×{{ baggageResult.height }} cm</a-descriptions-item>
         <a-descriptions-item label="重量">{{ baggageResult.weight }} kg</a-descriptions-item>
         <a-descriptions-item label="超规判定">
-          <a-tag :color="baggageResult.isOversize ? 'red' : 'green'">
-            {{ baggageResult.isOversize ? '超规' : '非超规' }}
+          <a-tag :color="baggageResult.isOversize === true ? 'red' : baggageResult.isOversize === false ? 'green' : 'default'">
+            {{ baggageResult.isOversize === true ? '超规' : baggageResult.isOversize === false ? '非超规' : '待判定' }}
           </a-tag>
         </a-descriptions-item>
         <a-descriptions-item label="阈值">三边和 ＞ {{ baggageResult.dimensionThresholdCm }} cm 或重量 ＞ {{ baggageResult.weightThresholdKg }} kg</a-descriptions-item>
@@ -202,7 +202,7 @@
           <span data-testid="target-counter">{{ targetCounterDisplay }}</span>
         </a-descriptions-item>
         <a-descriptions-item label="状态提示" :span="2">
-          <a-alert :type="isOversizeBaggage ? 'warning' : 'success'" :message="baggageNoticeText" show-icon />
+          <a-alert :type="isOversizeBaggage ? 'warning' : baggageResult?.isOversize === false ? 'success' : 'info'" :message="baggageNoticeText" show-icon />
         </a-descriptions-item>
         <a-descriptions-item label="办理说明与托运须知" :span="2">
           <pre data-testid="handling-instructions-content" style="white-space: pre-wrap; font-family: inherit; margin: 0; background: #fafafa; padding: 12px; border-radius: 4px;">{{ baggageHandlingInstructions }}</pre>
@@ -448,10 +448,13 @@ const targetCounterDisplay = computed(() => {
 })
 
 const baggageNoticeText = computed(() => {
+  if (typeof baggageResult.value?.isOversize !== 'boolean') {
+    return '尚无有效的行李测量判定结果。'
+  }
   if (!isOversizeBaggage.value) {
     return '行李规格尺寸及重量在正常限额范围内，无需转运至超规专柜。'
   }
-  return '该行李已超出标准托运限额（长宽高合计超限或单件超重）。已触发超规预警并生成专柜办理指引。'
+  return '该行李已超出标准托运限额（长宽高合计超限或单件超重），请核对告警步骤执行结果并按专柜指引办理。'
 })
 
 const baggageHandlingInstructions = computed(() => {
@@ -472,19 +475,26 @@ const specialPassengerTempId = computed(() => {
 })
 
 const specialAssistanceType = computed(() => {
+  const rounds = task.value?.sceneParams?.clarificationAnswers
+  if (Array.isArray(rounds)) {
+    const answer = [...rounds].reverse()
+      .find(round => round.answers?.['请补充协助类型（如轮椅、视障或听障陪同）']?.trim())
+    if (answer) return answer.answers['请补充协助类型（如轮椅、视障或听障陪同）']
+  }
   return task.value?.sceneParams?.assistanceType || '轮椅协助 / 特殊旅客陪同'
 })
 
 const specialPassengerOrigin = computed(() => {
-  return task.value?.sceneParams?.origin || task.value?.sceneParams?.startLocation || 'F2_SERVICE_POINT'
+  return task.value?.sceneParams?.origin || task.value?.sceneParams?.startLocation || task.value?.goalParsingResult?.origin || '未记录'
 })
 
 const specialPassengerDestination = computed(() => {
-  return task.value?.sceneParams?.destination || task.value?.sceneParams?.targetLocation || 'F2_TEST_GATE'
+  return task.value?.sceneParams?.destination || task.value?.sceneParams?.targetLocation || task.value?.goalParsingResult?.destination || '未记录'
 })
 
 const specialPassengerStatusType = computed(() => {
   if (task.value?.status === 'COMPLETED') return 'success'
+  if (task.value?.status === 'FAILED') return 'error'
   if (task.value?.status === 'PENDING_MANUAL') return 'warning'
   return 'info'
 })
@@ -494,8 +504,11 @@ const specialPassengerStatusText = computed(() => {
     return '特殊旅客服务已闭环完成：航显会合提示已发布，移动服务机器人已完成全程陪同与安全引导。'
   }
   if (task.value?.status === 'PENDING_MANUAL') {
-    return task.value?.failureReason || '当前无可用移动服务机器人，已完成航显会合提示发布，转人工协助接续。'
+    return task.value?.failureReason || '任务待人工处理，请核对各步骤反馈后接续服务。'
   }
+  if (task.value?.status === 'FAILED') return task.value?.failureReason || '特殊旅客服务失败。'
+  if (task.value?.status === 'MANUAL_TERMINATED') return '特殊旅客服务已人工终止。'
+  if (task.value?.status !== 'EXECUTING') return '特殊旅客服务准备中，请核对任务状态及步骤反馈。'
   return '特殊旅客协同服务执行中：智慧航显与移动机器人协同保障旅客出行。'
 })
 

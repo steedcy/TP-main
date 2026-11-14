@@ -59,6 +59,28 @@ class FlightChangeRequiredInfoOverrideTest {
     }
 
     @Test
+    void manualTaskWithMissingInformationCanAcceptCorrectedAnswersAndResumePlanning() {
+        Task task = task("{\"flightNumber\":\"CA1234\",\"changeType\":\"UNKNOWN\","
+                + "\"originalTime\":\"2026-11-09T12:00:00\",\"newTime\":\"2026-11-09T12:30:00\","
+                + "\"changeDescription\":\"虚构延误\"}");
+        task.setStatus(TaskStatus.PENDING_MANUAL);
+        task.setFailureReason("三轮信息补充后仍缺少关键信息，需人工处理");
+        task.setMissingInfoQuestions("[\"请补充有效的航班变更类型\"]");
+        modelSays(true);
+        ClarifyTaskRequest request = new ClarifyTaskRequest();
+        request.setAnswers(Map.of("请补充有效的航班变更类型", "DELAY"));
+
+        service.clarify(260L, request, operator);
+
+        verify(planning).advance(260L);
+        assertEquals(TaskStatus.PLANNING, task.getStatus());
+        assertNull(task.getFailureReason());
+        assertNull(task.getMissingInfoQuestions());
+        assertTrue(task.getSceneParams().contains("\"changeType\":\"DELAY\""),
+                "Downstream planning and baseline binding must receive the corrected typed value");
+    }
+
+    @Test
     void completeFlightFactsProceedWhenTheModelStillAsksForRobotAndRoute() {
         Task task = task("{\"flightNumber\":\"CA1234\",\"changeType\":\"GATE_CHANGE\","
                 + "\"originalTime\":\"2026-11-09T12:00:00\",\"newGate\":\"F2_TEST_GATE\","

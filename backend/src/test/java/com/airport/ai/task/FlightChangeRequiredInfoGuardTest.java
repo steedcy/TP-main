@@ -8,6 +8,25 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FlightChangeRequiredInfoGuardTest {
+    @Test
+    void latestCorrectionOverridesOldAnswersAndOriginalSceneValue() {
+        Map<String, Object> scene = base("UNKNOWN");
+        scene.put("newTime", "2026-11-09T12:30:00");
+        String question = "请补充有效的航班变更类型";
+        scene.put("clarificationAnswers", java.util.List.of(
+                Map.of("answers", Map.of(question, "INVALID")),
+                Map.of("answers", Map.of(question, "DELAY")),
+                Map.of("answers", Map.of("其他问题", "其他回答"))));
+        assertTrue(FlightChangeRequiredInfoGuard.check(scene).complete());
+    }
+
+    @Test
+    void chineseDelayStillRequiresNewFlightTimeAndSupportsLegacyAnswerMap() {
+        Map<String, Object> scene = base("UNKNOWN");
+        scene.put("clarificationAnswers", Map.of("请补充有效的航班变更类型", "延误"));
+        assertEquals(java.util.List.of("newTime"), FlightChangeRequiredInfoGuard.check(scene).missing());
+    }
+
     private Map<String, Object> base(String changeType) {
         Map<String, Object> scene = new HashMap<>();
         scene.put("flightNumber", "CA1234");
