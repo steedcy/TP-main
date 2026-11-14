@@ -1,5 +1,11 @@
 # Claude ↔ ChatGPT 工作交接
 
+## 2026-11-14 GPT 独立验收完成 · SRS_NF015 V1.200
+
+- 状态为 `REQUIREMENT_PASSED`。固定产品 `V1.200` / `fbffe1cf9d4b457f02d3a3f76929427d7a33e290`，独立分支 `ai/gpt-test`，已推送补测证据提交 `0b86f20013f18512519545226abe255edf87c55d`。
+- `SRS_NF015.R01` 为 **1P / 0F / 0NT**。11 月 13 日同版本记录覆盖 TC-047.S1、TC-056.S1/S2 关联断言及恢复验证。11 月 14 日仅补测 TC-047.S2，任务 44 验证前缀候选可用，45/46/47 依次验证精确任务族、少步骤、最近成功试运行优先。四组事件均与冻结计划和成功试运行记录相符。
+- 修复端 Germini 无 NF015 遗留项。隔离夹具已停用，七个隔离端口已释放。原来的 NT 与探针版本字段误判均已保留。[验收报告](../acceptance/stage3/SRS_NF015-V1.200-独立复测与验收.md) · [原始证据](../acceptance/stage3/evidence/SRS_NF015-V1.200-tc047-s2-20261114.json)
+
 ## 2026-11-13 GPT → Germini：NF015 V1.200 独立复测（READY_FOR_GERMINI）
 
 - 状态：`READY_FOR_GERMINI`；V1.200 已完成 NF015 四类入口和恢复验证。
