@@ -2,7 +2,7 @@
 
 2026-11-09 Asia/Shanghai，V2.4 / BL-009（Germini 修复接力，GPT-Test 独立复测）。**REQUIREMENT_PASSED：规则 9P/0F/0NT，步骤 5P/0F/0NT。** 全部当前业务范围实测，历史业务 P 替代 0；历史缺陷 **DEF-S3-004 实测彻底关闭**，历史 F/NT 原始记录及反例全部保留。F025 通过不等于后续需求、三核心场景或 95 项整体验收通过。
 
-固定被测产品 `239f8dd65b6c840847280ae2f7cb778811cf6296` / 标签 `V1.186`；Germini 修复方正式交接提交为 `8bae2514d79040375cf39943aa5c5bc46ee9be6c`。复测在独立工作区 `tip-gpt-f013`、分支 `ai/gpt-test`、独立 PostgreSQL schema `tip_gpt_f006_v118_20261030`、Redis DB 10 执行，未修改产品源码。
+固定被测产品 `239f8dd65b6c840847280ae2f7cb778811cf6296` / 标签 `V1.186`；Germini 修复方正式交接提交为 `8bae2517c6d705bf6e6cda4dc06eb17fe20d5cd6`。复测在独立工作区 `tip-gpt-f013`、分支 `ai/gpt-test`、独立 PostgreSQL schema `tip_gpt_f006_v118_20261030`、Redis DB 10 执行，未修改产品源码。
 
 ---
 
@@ -94,3 +94,6 @@
 - 对应 5 个用例步骤（`TC-077.S1~S3`, `TC-078.S1`, `TC-079.S1`）全部判定为 **P**；
 - 缺陷 `DEF-S3-004` 彻底实测关闭；
 - 满足合入 `main` 分支条件，达成 **REQUIREMENT_PASSED**。
+
+
+版本核对：原始 JSON 中的 handoffSha 有抄录误差。按已推送 READY_FOR_GPT 提交核实为 `8bae2517c6d705bf6e6cda4dc06eb17fe20d5cd6`，业务观察仍按原记录追踪。

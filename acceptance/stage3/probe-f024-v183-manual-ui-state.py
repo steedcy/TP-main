@@ -1,3 +1,0 @@
-# Prior recovery task's raw PENDING_MANUAL was captured before cleanup; this extra
-# lifecycle supplies the missing real UI assertion while the natural state is live.
-r=q.submit('guide-manual-ui-state',replanHttpStatus=503);o=q.drive(r,failcap='CAP_NAVIGATION',failures=4);r['checks']={'pendingManualForRealUi':o['task']['status']=='PENDING_MANUAL','oneReplan':sum(e['eventType']=='REPLANNING_TRIGGERED' for e in o['events'])==1,'prefixRetained':all(any(a['stepSeq']==i and a['stepStatus']=='COMPLETED' for a in o['assignments']) for i in [1,2,3])};r['result']='P' if all(r['checks'].values()) else 'F';q.save();result={'taskId':r['taskId'],'checks':r['checks']}
