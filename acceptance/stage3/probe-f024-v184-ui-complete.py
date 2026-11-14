@@ -1,4 +1,0 @@
-tid=int(sql(f"select max(id) from {SC}.tasks where task_goal like 'F184_UI_GOAL%'") or '0');assert tid
-if tid not in q.tasks:q.tasks.append(tid)
-r=q.record('real-ui-goal-and-clarification',{'taskId':tid,'before':q.observe(tid),'requestOrigin':'Actual production UI via browser; goal and location entered through visible controls, no API replacement'})
-o=q.drive(r);r['checks']={'completed':o['task']['status']=='COMPLETED','fourExecuted':len([c for c in o['commandRows'] if c['command_type']=='EXECUTE_CAPABILITY'])==4,'actualInstructionDispatch':any('办理说明' in str(a['message'].get('inputParams',{})) for a in r.get('actions',[]) if a['message'].get('capabilityType')=='CAP_INFO_DISPLAY')};r['result']='P' if all(r['checks'].values()) else 'F';q.save();result={'taskId':tid,'result':r['result'],'checks':r['checks']}

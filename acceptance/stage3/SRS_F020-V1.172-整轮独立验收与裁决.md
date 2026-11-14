@@ -2,7 +2,7 @@
 
 结论：**REQUIREMENT_PASSED，9规则9P/0F/0NT、正式六步骤6P/0F/0NT**。DEF-S3-062残留与DEF-S3-115均当前关闭；旧F/NT与原始失败/诊断全部保留。当前需求全部适用项本轮实测，历史P验收复用0；没有放宽基线或修改产品代替独立测试。
 
-- 固定产品 **`b750cb36fc3bef10013050035de7d696ced39b5f` / `V1.172`**；正式Claude交接实际 **`ddcc66f061467a719d6dca477513f6d5f1ec175a`**，远端标签精确一致。用户消息的`ddcc66f1cf14a1a5b46e3d24e12e12faeb35e7bb`对象不存在，保留原声明并核对唯一远端交接链。
+- 固定产品 **`b750cb36fc3bef10013050035de7d696ced39b5f` / `V1.172`**；正式Claude交接实际 **`ddcc66f061467a719d6dca477513f6d5f1ec175a`**，远端标签精确一致。
 - 工作区`C:\Users\savy\Desktop\TIP-main\tip-gpt-f013` / `ai/gpt-test`。开工main`6775491be9118e4aab33c30b4ae81362d4a096d5`；完整证据先推送，再正式交接/按授权安全同步main。此报告写入时尚未合main、无PR；实际main/最终交接SHA由后续HANDOFF与main-integration证据实核，不用产品标签代替文档/证据提交。
 - 基线V2.4：正式stage0 R01～R09、TC063S1～S3/TC064S1～S2/TC065S1，9规则/6步骤；交接仍出现“TC062检索”描述，不移动F019编号或增加F020.R10。无需求/用例语义变更。
 - 时间2026-11-06，Asia/Shanghai；各JSON保留精确时间。入口`evidence/SRS_F020-V1.172-version-scope-20261106.json`、完整索引`evidence/SRS_F020-V1.172-complete-verification-20261106.json`及SHA256 manifest。
