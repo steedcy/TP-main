@@ -36,10 +36,8 @@ public class CreateDeviceRequest {
     @NotNull(message = "请输入位置坐标Y")
     private BigDecimal positionY;
 
-    @NotBlank(message = "请输入接入接口地址")
     private String accessEndpoint;
 
-    @NotBlank(message = "请输入接入凭据标识")
     @Size(max = 128, message = "凭据标识最长128位")
     private String accessCredentialRef;
 
@@ -49,6 +47,13 @@ public class CreateDeviceRequest {
 
     @Size(max = 200, message = "备注最长200位")
     private String remark;
+
+    @AssertTrue(message = "真实设备须填写接入接口地址和接入凭据标识")
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    public boolean isAccessConfigurationValid() {
+        return Boolean.TRUE.equals(isSimulator) || (accessEndpoint != null && !accessEndpoint.isBlank()
+                && accessCredentialRef != null && !accessCredentialRef.isBlank());
+    }
 
     public String getDeviceCode() { return deviceCode; }
     public void setDeviceCode(String deviceCode) { this.deviceCode = deviceCode; }

@@ -177,6 +177,15 @@ public class DeviceService {
         if (!java.util.Objects.equals(device.getAreaCode(), request.getAreaCode())) {
             requirePresetArea(request.getAreaCode());
         }
+        boolean simulatorLocationChanged = Boolean.TRUE.equals(device.getIsSimulator())
+                && (!java.util.Objects.equals(device.getPositionX(), request.getPositionX())
+                || !java.util.Objects.equals(device.getPositionY(), request.getPositionY())
+                || !java.util.Objects.equals(device.getAreaCode(), request.getAreaCode()));
+        if (simulatorLocationChanged) {
+            // Synchronize the running source of heartbeats before persisting the profile, so the next
+            // heartbeat reports the new coordinates instead of restoring the simulator's old position.
+            deviceAdapterClient.updateSimulatorLocation(device, request.getPositionX(), request.getPositionY(), request.getAreaCode());
+        }
         device.setDeviceName(com.airport.ai.common.XssSanitizer.escapeHtml(request.getDeviceName()));
         device.setAreaCode(request.getAreaCode());
         device.setPositionX(request.getPositionX());
@@ -209,6 +218,10 @@ public class DeviceService {
     }
 
     /** Validate identity and one valid state snapshot from the configured device endpoint. */
+    public void checkConnectionReadiness(Device device) {
+        deviceAdapterClient.testConnection(device);
+    }
+
     @Transactional
     public Device testConnection(Long deviceId, User operator) {
         Device device = get(deviceId);
@@ -238,6 +251,9 @@ public class DeviceService {
     @Transactional
     public DeviceAgent createAgent(Long deviceId, User operator) {
         Device device = get(deviceId);
+        if (java.util.Set.of("PENDING", "STARTING", "CONNECTING").contains(device.getOnboardingStatus())) {
+            throw new BusinessException(ErrorCode.DATA_CONCURRENCY_CONFLICT, "自动接入正在执行，请等待连接验证完成");
+        }
         if (!"PASSED".equals(device.getConnectionTestStatus())) {
             throw new BusinessException(ErrorCode.DEVICE_CONNECTION_TEST_FAILED);
         }

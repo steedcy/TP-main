@@ -58,6 +58,14 @@ public class SimulatorController {
         return Map.of("onlineStatus", value ? "ONLINE" : "OFFLINE");
     }
 
+    @PostMapping("/control/location")
+    public Map<String, Object> location(@RequestBody SimulatorProtocol.Location location, HttpServletRequest request) {
+        authenticate(request);
+        try { runtime.updateLocation(location); }
+        catch (IllegalArgumentException ex) { throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage()); }
+        return Map.of("location", Map.of("x", location.x(), "y", location.y(), "zone", location.zone()));
+    }
+
     @PostMapping("/control/scenario")
     public Map<String, String> scenario(@RequestBody Map<String, String> requestBody, HttpServletRequest request) {
         authenticate(request);

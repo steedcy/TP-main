@@ -56,6 +56,31 @@ class SimulatorRuntimeTest {
     }
 
     @Test
+    void updatedLocationIsReflectedInHealthAndSubsequentState() {
+        SimulatorProperties properties = new SimulatorProperties();
+        SimulatorRuntime runtime = new SimulatorRuntime(properties, java.util.List.of(new SmartDisplayDriver()));
+        var location = new SimulatorProtocol.Location(new BigDecimal("321.25"), new BigDecimal("4600.5"), "F2_TEST");
+
+        runtime.updateLocation(location);
+
+        assertEquals(location, runtime.health("nonce").location());
+        var snapshot = runtime.testCapability(Map.of("commandId", "CMD-LOCATION", "capabilityType", "CAP_SIM_STATUS"));
+        assertEquals("SUCCESS", snapshot.get("result"));
+        @SuppressWarnings("unchecked") Map<String, Object> output = (Map<String, Object>) snapshot.get("outputParams");
+        @SuppressWarnings("unchecked") Map<String, Object> reportedLocation = (Map<String, Object>) output.get("location");
+        assertEquals(new BigDecimal("321.25"), reportedLocation.get("x"));
+        assertEquals(new BigDecimal("4600.5"), reportedLocation.get("y"));
+    }
+
+    @Test
+    void locationUpdateRejectsMissingCoordinates() {
+        SimulatorProperties properties = new SimulatorProperties();
+        SimulatorRuntime runtime = new SimulatorRuntime(properties, java.util.List.of(new SmartDisplayDriver()));
+        assertThrows(IllegalArgumentException.class, () -> runtime.updateLocation(
+                new SimulatorProtocol.Location(null, BigDecimal.ONE, "F2_TEST")));
+    }
+
+    @Test
     void startupRejectsScenarioThatDoesNotMatchSimulatedDeviceType() {
         SimulatorProperties properties = new SimulatorProperties();
         properties.setScenarioResult("NO_OBJECT");

@@ -1,0 +1,2 @@
+ALTER TABLE devices ADD COLUMN onboarding_status VARCHAR(20) NOT NULL DEFAULT 'MANUAL';
+ALTER TABLE devices ADD COLUMN onboarding_message VARCHAR(512);

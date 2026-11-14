@@ -17,6 +17,8 @@
         <result column="device_token_hash" property="deviceTokenHash"/>
         <result column="device_token_ciphertext" property="deviceTokenCiphertext"/>
         <result column="device_token_issued_at" property="deviceTokenIssuedAt"/>
+        <result column="onboarding_status" property="onboardingStatus"/>
+        <result column="onboarding_message" property="onboardingMessage"/>
         <result column="status_report_interval" property="statusReportInterval"/>
         <result column="connection_test_status" property="connectionTestStatus"/>
         <result column="connection_test_result" property="connectionTestResult"/>
@@ -38,15 +40,34 @@
         position_x, position_y, access_endpoint, access_credential_ref, device_token_hash,
         device_token_ciphertext, device_token_issued_at, status_report_interval,
         connection_test_status, connection_test_result, remark, device_status, created_at, updated_at,
-        created_by, updated_by
+        created_by, updated_by, onboarding_status, onboarding_message
     </sql>
 
     <select id="findById" resultMap="DeviceResult">
         SELECT <include refid="Columns"/> FROM devices WHERE id = #{id}
     </select>
 
+    <select id="findActiveSimulatorEndpoints" resultType="string">
+        SELECT access_endpoint FROM devices WHERE is_simulator = TRUE AND device_status != 'DELETED'
+    </select>
+
+    <update id="updateOnboarding">
+        UPDATE devices SET onboarding_status = #{status}, onboarding_message = #{message}, updated_at = CURRENT_TIMESTAMP
+        <if test="status == 'PENDING'">, connection_test_status = 'UNTESTED', connection_test_result = NULL</if>
+        WHERE id = #{deviceId} AND device_status != 'DELETED'
+    </update>
+
+    <update id="failInterruptedOnboarding">
+        UPDATE devices SET onboarding_status = 'FAILED', onboarding_message = '后端重启中断了接入，请重试自动接入'
+        WHERE onboarding_status IN ('PENDING', 'STARTING', 'CONNECTING', 'BINDING') AND device_status != 'DELETED'
+    </update>
+
     <select id="findByDeviceCode" resultMap="DeviceResult">
         SELECT <include refid="Columns"/> FROM devices WHERE device_code = #{deviceCode}
+    </select>
+
+    <select id="findByDeviceCodeForUpdate" resultMap="DeviceResult">
+        SELECT <include refid="Columns"/> FROM devices WHERE device_code = #{deviceCode} FOR UPDATE
     </select>
 
     <select id="existsByDeviceCode" resultType="boolean">

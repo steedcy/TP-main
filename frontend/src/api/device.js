@@ -21,6 +21,14 @@ export function testConnection(deviceCode) {
   return request.post(`/devices/${deviceCode}/connection-test`)
 }
 
+export function retryDeviceOnboarding(deviceCode) {
+  return request.post(`/devices/${deviceCode}/onboarding/retry`)
+}
+
+export function rotateDeviceToken(deviceCode) {
+  return request.post(`/devices/${deviceCode}/device-token/rotate`)
+}
+
 export function updateDeviceStatus(deviceCode, status) {
   return request.post(`/devices/${deviceCode}/status`, { status })
 }

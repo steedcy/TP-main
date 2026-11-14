@@ -109,6 +109,8 @@
             current_step_seq = #{stepSeq},
             updated_at = CURRENT_TIMESTAMP
         WHERE id = #{agentId}
+          AND agent_status = 'ENABLED'
+          AND online_status = 'ONLINE'
           AND work_status = 'IDLE'
           AND (current_task_id IS NULL OR current_task_id = #{taskId})
     </update>

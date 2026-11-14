@@ -117,6 +117,11 @@ public class DeviceAdapterClient {
                 java.util.Map.class);
     }
 
+    public void updateSimulatorLocation(Device device, java.math.BigDecimal x, java.math.BigDecimal y, String zone) {
+        exchange(device, "/device-api/v1/control/location", HttpMethod.POST,
+                java.util.Map.of("x", x, "y", y, "zone", zone), java.util.Map.class);
+    }
+
     @SuppressWarnings("unchecked")
     public java.util.Map<String, Object> testCapability(Device device, String agentCode, String commandId,
                                                         String capabilityType, java.util.Map<String, Object> params) {

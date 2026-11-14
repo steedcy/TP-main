@@ -5,6 +5,7 @@ import com.airport.ai.auth.User;
 import com.airport.ai.common.BusinessException;
 import com.airport.ai.common.ErrorCode;
 import com.airport.ai.device.dto.CreateDeviceRequest;
+import com.airport.ai.device.dto.UpdateDeviceRequest;
 import com.airport.ai.task.TaskExceptionService;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -30,8 +31,9 @@ class DeviceServiceF003Test {
     private final com.airport.ai.devicetype.CapabilityTemplateMapper templateMapper =
             mock(com.airport.ai.devicetype.CapabilityTemplateMapper.class);
     private final DeviceEventService eventService = mock(DeviceEventService.class);
+    private final DeviceAdapterClient adapterClient = mock(DeviceAdapterClient.class);
     private final DeviceService service = new DeviceService(deviceMapper, agentMapper, mock(OperationLogService.class),
-            eventService, mock(DeviceAdapterClient.class), mock(ApplicationEventPublisher.class), 20,
+            eventService, adapterClient, mock(ApplicationEventPublisher.class), 20,
             capabilityMapper, taskExceptionService, "F2_TEST,T2_B", templateMapper);
 
     private User operator() {
@@ -66,6 +68,30 @@ class DeviceServiceF003Test {
         d.setConnectionTestStatus(test);
         when(deviceMapper.findById(5L)).thenReturn(Optional.of(d));
         return d;
+    }
+
+    @Test
+    void simulatorProfileUpdateSynchronizesRuntimeCoordinatesBeforeSaving() {
+        Device d = device("ACTIVE", "PASSED");
+        d.setIsSimulator(true);
+        d.setAreaCode("F2_TEST");
+        d.setPositionX(BigDecimal.ONE);
+        d.setPositionY(BigDecimal.ONE);
+        d.setAccessEndpoint("http://127.0.0.1:9001");
+        UpdateDeviceRequest request = new UpdateDeviceRequest();
+        request.setDeviceName("sim");
+        request.setAreaCode("F2_TEST");
+        request.setPositionX(new BigDecimal("321.25"));
+        request.setPositionY(new BigDecimal("4600.5"));
+        request.setAccessEndpoint("http://127.0.0.1:9001");
+        request.setStatusReportInterval(15);
+
+        service.update(5L, request, operator());
+
+        verify(adapterClient).updateSimulatorLocation(d, request.getPositionX(), request.getPositionY(), "F2_TEST");
+        verify(deviceMapper).update(d);
+        assertEquals(request.getPositionX(), d.getPositionX());
+        assertEquals(request.getPositionY(), d.getPositionY());
     }
 
     private DeviceAgent agent(Long currentTaskId) {

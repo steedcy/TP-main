@@ -29,6 +29,9 @@ public class DeviceView {
     private String onlineStatus;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private boolean deviceTokenConfigured;
+    private String onboardingStatus;
+    private String onboardingMessage;
 
     public static DeviceView from(Device d) {
         DeviceView v = new DeviceView();
@@ -52,6 +55,9 @@ public class DeviceView {
         v.onlineStatus = d.getOnlineStatus();
         v.createdAt = d.getCreatedAt();
         v.updatedAt = d.getUpdatedAt();
+        v.deviceTokenConfigured = d.getDeviceTokenHash() != null && !d.getDeviceTokenHash().isBlank();
+        v.onboardingStatus = d.getOnboardingStatus();
+        v.onboardingMessage = d.getOnboardingMessage();
         return v;
     }
 
@@ -60,6 +66,9 @@ public class DeviceView {
     }
 
     public String getAgentStatus() { return agentStatus; }
+    public boolean isDeviceTokenConfigured() { return deviceTokenConfigured; }
+    public String getOnboardingStatus() { return onboardingStatus; }
+    public String getOnboardingMessage() { return onboardingMessage; }
     public String getOnlineStatus() { return onlineStatus; }
     public Long getId() { return id; }
     public String getDeviceCode() { return deviceCode; }

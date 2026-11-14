@@ -117,6 +117,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         WebMvcAuthorizationConfig.class
 })
 class CorsSqlInjectionAndXssSecurityTest {
+    @MockBean com.airport.ai.device.DeviceRegistrationService deviceRegistrationService;
+    @MockBean com.airport.ai.device.ManagedSimulatorService managedSimulatorService;
 
     @Autowired
     private MockMvc mockMvc;

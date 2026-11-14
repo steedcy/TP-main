@@ -27,6 +27,9 @@
         <a-checkbox-group v-model:value="selectedTypes" class="type-filter">
           <a-checkbox v-for="type in DEVICE_TYPES" :key="type.value" :value="type.value">{{ type.label }}</a-checkbox>
         </a-checkbox-group>
+        <span class="cursor-coordinate" aria-live="polite">
+          鼠标坐标：<template v-if="cursorCoordinate">X {{ coordinate(cursorCoordinate.x) }}, Y {{ coordinate(cursorCoordinate.y) }}</template><template v-else>—</template>
+        </span>
         <a-space wrap class="map-legend">
           <span><i class="legend-dot online"></i>在线空闲</span>
           <span><i class="legend-dot busy"></i>在线忙碌</span>
@@ -43,7 +46,7 @@
         @pointermove="movePan"
         @pointerup="endPan"
         @pointercancel="endPan"
-        @pointerleave="endPan"
+        @pointerleave="handlePointerLeave"
       >
         <div
           class="map-canvas"
@@ -199,6 +202,7 @@ const pan = ref({ x: 0, y: 0 })
 const dragging = ref(false)
 const mapLoaded = ref(false)
 const mapError = ref(false)
+const cursorCoordinate = ref(null)
 const selectedDevice = ref(null)
 const candidateAnchorLocation = ref(null)
 const candidateModalVisible = ref(false)
@@ -377,13 +381,37 @@ function startPan(event) {
 }
 
 function movePan(event) {
-  if (!dragging.value || !dragOrigin) return
-  pan.value = { x: dragOrigin.panX + event.clientX - dragOrigin.x, y: dragOrigin.panY + event.clientY - dragOrigin.y }
+  if (dragging.value && dragOrigin) {
+    pan.value = { x: dragOrigin.panX + event.clientX - dragOrigin.x, y: dragOrigin.panY + event.clientY - dragOrigin.y }
+  }
+  updateCursorCoordinate(event)
+}
+
+function updateCursorCoordinate(event) {
+  const rect = viewportRef.value?.getBoundingClientRect()
+  if (!rect || zoom.value <= 0) {
+    cursorCoordinate.value = null
+    return
+  }
+  const mapX = (event.clientX - rect.left - pan.value.x) / zoom.value * MAP_WIDTH / baseWidth.value
+  const mapY = (event.clientY - rect.top - pan.value.y) / zoom.value * MAP_HEIGHT / baseHeight.value
+  cursorCoordinate.value = mapX >= 0 && mapX <= MAP_WIDTH && mapY >= 0 && mapY <= MAP_HEIGHT
+    ? { x: mapX, y: mapY }
+    : null
 }
 
 function endPan() {
   dragging.value = false
   dragOrigin = null
+}
+
+function clearCursorCoordinate() {
+  cursorCoordinate.value = null
+}
+
+function handlePointerLeave() {
+  endPan()
+  clearCursorCoordinate()
 }
 
 onMounted(() => {
@@ -407,6 +435,7 @@ onUnmounted(() => {
 .page-header p, .updated-at { margin: 0; color: #777; }
 .map-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
 .zoom-label { min-width: 54px; color: #555; text-align: right; }
+.cursor-coordinate { color: #1677ff; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .map-legend { color: #555; font-size: 13px; }
 .map-legend span { display: inline-flex; align-items: center; gap: 5px; }
 .legend-dot, .marker-dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; border: 2px solid white; box-shadow: 0 1px 4px #5558; }

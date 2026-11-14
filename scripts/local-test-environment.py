@@ -111,6 +111,15 @@ def start_simulator(device,token,agent=None):
     launch(device['deviceCode'],[shutil.which('java'),'-Xms32m','-Xmx128m','-XX:MaxMetaspaceSize=128m','-XX:+UseSerialGC','-jar',str(ROOT/'simulator/target/device-simulator-runtime.jar')],environment)
     wait_health(device['accessEndpoint']+'/device-api/v1/health?nonce=local-preparation',token)
 
+def wait_auto_onboarding(api, code):
+    """Do not rotate or launch a second process while the backend owns startup."""
+    deadline=time.monotonic()+150
+    while time.monotonic()<deadline:
+        state=api('/devices/'+code).get('onboardingStatus','MANUAL')
+        if state not in ('PENDING','STARTING','CONNECTING','BINDING'): return
+        time.sleep(1)
+    raise RuntimeError(code+' automatic onboarding did not finish; inspect device onboarding status')
+
 def configure():
     api=API(); values=secrets(); evidence={'recordedAt':stamp(),'configurationRole':api.role,'devices':[],'baselines':[]}
     current={d['deviceCode']:d for d in api('/devices?page=1&size=100')['content']}
@@ -118,8 +127,10 @@ def configure():
     for device in load(FIXTURES/'devices.json'):
         code=device['deviceCode']
         if code not in current: api('/devices','POST',{k:v for k,v in device.items() if k!='capabilities'})
+        wait_auto_onboarding(api,code)
         if code not in values:
             values[code]=api('/devices/'+code+'/device-token/rotate','POST')['accessToken']; store_secrets(values)
+            wait_auto_onboarding(api,code)
         start_simulator(device,values[code],agents.get(code))
         connection=api('/devices/'+code+'/connection-test','POST')
         if connection.get('result')!='PASSED': raise RuntimeError(code+' connection test failed')

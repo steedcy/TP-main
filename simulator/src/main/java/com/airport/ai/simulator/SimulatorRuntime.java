@@ -238,6 +238,14 @@ public class SimulatorRuntime {
         boolean changed = online.getAndSet(value) != value;
         if (changed && agentCode != null) reportStatus();
     }
+    /** Update the simulator's authoritative position so subsequent heartbeats cannot restore stale coordinates. */
+    public void updateLocation(SimulatorProtocol.Location location) {
+        if (location == null || location.x() == null || location.y() == null
+                || location.zone() == null || location.zone().isBlank()) {
+            throw new IllegalArgumentException("位置坐标和区域不能为空");
+        }
+        currentLocation.set(location);
+    }
     public void setHeartbeatEnabled(boolean value) { heartbeatEnabled.set(value); if (value) reportStatus(); }
     public void setExecutionDelay(int value) {
         if (value<0 || value>60000) throw new IllegalArgumentException("执行延迟范围0~60000毫秒");

@@ -28,6 +28,12 @@
         <template v-else-if="column.key === 'agentStatus'">
           {{ { ENABLED: '启用', DISABLED: '停用', ARCHIVED: '归档' }[record.agentStatus] || '无代理' }}
         </template>
+        <template v-else-if="column.key === 'onboardingStatus'">
+          <a-tag :color="{ READY: 'green', FAILED: 'red', MANUAL: 'default' }[record.onboardingStatus] || 'blue'">
+            {{ onboardingLabel(record.onboardingStatus) }}
+          </a-tag>
+          <div v-if="record.onboardingMessage" style="max-width: 220px; font-size: 12px">{{ record.onboardingMessage }}</div>
+        </template>
         <template v-else-if="column.key === 'onlineStatus'">
           <a-badge :status="record.onlineStatus === 'ONLINE' ? 'success' : 'default'" :text="record.onlineStatus === 'ONLINE' ? '在线' : '离线'" />
         </template>
@@ -41,6 +47,10 @@
             <a-button size="small" @click="openEdit(record)">编辑</a-button>
             <a-button size="small" @click="$router.push(`/devices/${record.deviceCode}/capabilities`)">能力管理</a-button>
             <a-button size="small" @click="handleTestConnection(record)">连接测试</a-button>
+            <a-button v-if="record.isSimulator" size="small" :disabled="isOnboarding(record) || record.deviceStatus !== 'ACTIVE'" @click="handleRetryOnboarding(record)">重试自动接入</a-button>
+            <a-popconfirm title="轮换后旧令牌立即失效；仿真体会自动重启接入，确认继续？" @confirm="handleRotateToken(record)">
+              <a-button size="small" :disabled="isOnboarding(record) || record.deviceStatus !== 'ACTIVE'">访问令牌</a-button>
+            </a-popconfirm>
             <a-button
               size="small" type="primary"
               :disabled="record.connectionTestStatus !== 'PASSED' || record.deviceStatus !== 'ACTIVE'"
@@ -72,6 +82,7 @@
       :bodyStyle="{ maxHeight: 'calc(100vh - 180px)', overflowY: 'auto' }"
     >
       <a-form ref="formRef" :model="form" :rules="formRules" layout="vertical">
+        <a-alert v-if="!isEdit && form.isSimulator" type="info" show-icon message="保存后自动生成令牌、启动仿真体并连接代理。接入地址和凭据标识留空可自动配置。" style="margin-bottom: 16px" />
         <a-form-item label="设备编码" name="deviceCode">
           <a-input v-model:value="form.deviceCode" :disabled="isEdit" maxlength="32" placeholder="1~32位，仅字母/数字/下划线/短横线" />
         </a-form-item>
@@ -111,10 +122,10 @@
           </a-space>
         </a-form-item>
         <a-form-item label="接入接口地址" name="accessEndpoint">
-          <a-input v-model:value="form.accessEndpoint" placeholder="设备接口地址" />
+          <a-input v-model:value="form.accessEndpoint" :placeholder="!isEdit && form.isSimulator ? '留空自动分配本机仿真端口' : '设备接口地址'" />
         </a-form-item>
         <a-form-item label="接入凭据标识" name="accessCredentialRef">
-          <a-input-password v-model:value="form.accessCredentialRef" :placeholder="isEdit ? '留空则不修改（当前：' + form.accessCredentialRefMasked + '）' : '凭据标识'" />
+          <a-input-password v-model:value="form.accessCredentialRef" :placeholder="isEdit ? '留空则不修改（当前：' + form.accessCredentialRefMasked + '）' : form.isSimulator ? '留空自动生成令牌引用' : '凭据标识'" />
         </a-form-item>
         <a-form-item label="状态上报周期（5~60秒）" name="statusReportInterval">
           <a-input-number v-model:value="form.statusReportInterval" :min="5" :max="60" />
@@ -124,15 +135,19 @@
         </a-form-item>
       </a-form>
     </a-modal>
+    <a-modal v-model:open="tokenVisible" title="设备访问令牌（仅显示本次）" :footer="null" :afterClose="clearToken">
+      <a-alert type="warning" show-icon :message="tokenDeviceIsSimulator ? '新令牌已自动下发，仿真体正在重新接入。关闭后不再显示明文。' : '请将新令牌配置到设备进程；关闭后不再显示明文。'" style="margin-bottom: 16px" />
+      <a-typography-paragraph :copyable="{ text: issuedToken }" style="overflow-wrap: anywhere">{{ issuedToken }}</a-typography-paragraph>
+    </a-modal>
   </div>
 </template>
 
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, onUnmounted, reactive, ref } from 'vue'
 import { message } from 'ant-design-vue'
 import {
   listDevices, createDevice, updateDevice, testConnection,
-  updateDeviceStatus, deleteDevice, createAgent, listPresetAreas
+  updateDeviceStatus, deleteDevice, createAgent, listPresetAreas, retryDeviceOnboarding, rotateDeviceToken
 } from '../../api/device'
 import { DEVICE_TYPES as deviceTypes, deviceTypeLabel } from '../../constants/capability'
 
@@ -150,6 +165,7 @@ const columns = [
   { title: '连接测试', key: 'connectionTestStatus' },
   { title: '代理状态', key: 'agentStatus' },
   { title: '在线状态', key: 'onlineStatus' },
+  { title: '自动接入', key: 'onboardingStatus' },
   { title: '设备状态', key: 'deviceStatus' },
   { title: '操作', key: 'action', width: 360 }
 ]
@@ -158,6 +174,13 @@ const formVisible = ref(false)
 const submitLoading = ref(false)
 const isEdit = ref(false)
 const formRef = ref(null)
+const tokenVisible = ref(false)
+const issuedToken = ref('')
+const tokenDeviceIsSimulator = ref(false)
+let refreshTimer
+const onboardingLabel = status => ({ MANUAL: '人工接入', PENDING: '等待接入', STARTING: '启动中', CONNECTING: '连接中', BINDING: '绑定中', READY: '接入完成', FAILED: '接入失败' }[status] || '人工接入')
+const isOnboarding = record => ['PENDING', 'STARTING', 'CONNECTING', 'BINDING'].includes(record.onboardingStatus)
+function clearToken() { issuedToken.value = '' }
 const emptyForm = () => ({
   deviceCode: '', deviceName: '', deviceTypeCode: 'SIMULATOR',
   isSimulator: true, simulatedDeviceType: undefined,
@@ -176,7 +199,7 @@ const formRules = {
   deviceName: [{ required: true, message: '请输入设备名称' }, { max: 64, message: '最长64位' }],
   deviceTypeCode: [{ required: true, message: '请选择设备类型' }],
   areaCode: [{ required: true, message: '请选择所属区域' }],
-  accessEndpoint: [{ required: true, message: '请输入接入接口地址' }],
+  accessEndpoint: [{ validator: (_, value) => (!isEdit.value && form.isSimulator) || value?.trim() ? Promise.resolve() : Promise.reject('请输入接入接口地址') }],
   statusReportInterval: [{ required: true, message: '请输入状态上报周期' }]
 }
 // 新增时凭据标识必填，编辑时留空表示不修改（对应5.2.1业务规则8），故不在formRules中做静态required校验
@@ -230,7 +253,7 @@ async function handleSubmit() {
   } catch {
     return
   }
-  if (!isEdit.value && !form.accessCredentialRef) {
+  if (!isEdit.value && !form.isSimulator && !form.accessCredentialRef) {
     message.warning('请输入接入凭据标识')
     return
   }
@@ -251,9 +274,24 @@ async function handleSubmit() {
       // 否则后端因未知属性无法解析请求体（DEF-S3-078）。凭据留空即不修改，掩码值不上送。
       await updateDevice(form.deviceCode, buildUpdatePayload(form))
     } else {
-      await createDevice(form)
+      // CreateDeviceRequest 不包含 accessCredentialRefMasked；该字段仅用于编辑时展示
+      // 已保存凭据的掩码，不能随新增请求一并提交，否则后端会按未知属性拒绝请求。
+      await createDevice({
+        deviceCode: form.deviceCode,
+        deviceName: form.deviceName,
+        deviceTypeCode: form.deviceTypeCode,
+        isSimulator: form.isSimulator,
+        simulatedDeviceType: form.simulatedDeviceType,
+        areaCode: form.areaCode,
+        positionX: form.positionX,
+        positionY: form.positionY,
+        accessEndpoint: form.accessEndpoint,
+        accessCredentialRef: form.accessCredentialRef,
+        statusReportInterval: form.statusReportInterval,
+        remark: form.remark
+      })
     }
-    message.success(isEdit.value ? '设备已更新' : '设备创建成功')
+    message.success(isEdit.value ? '设备已更新' : form.isSimulator ? '设备已创建，正在自动接入，请查看接入状态' : '设备已创建并生成访问令牌')
     formVisible.value = false
     fetchList()
   } finally {
@@ -277,6 +315,20 @@ async function handleCreateAgent(record) {
   fetchList()
 }
 
+async function handleRetryOnboarding(record) {
+  await retryDeviceOnboarding(record.deviceCode)
+  message.success('已开始自动接入')
+  await fetchList()
+}
+
+async function handleRotateToken(record) {
+  const resp = await rotateDeviceToken(record.deviceCode)
+  issuedToken.value = resp.data.accessToken
+  tokenDeviceIsSimulator.value = record.isSimulator
+  tokenVisible.value = true
+  await fetchList()
+}
+
 async function handleToggleStatus(record) {
   const newStatus = record.deviceStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'
   await updateDeviceStatus(record.deviceCode, newStatus)
@@ -297,6 +349,11 @@ function onSimulatorChange() {
 
 onMounted(async () => {
   fetchList()
+  refreshTimer = setInterval(() => {
+    if (list.value.some(isOnboarding)) fetchList().catch(() => {})
+  }, 2000)
   presetAreas.value = (await listPresetAreas()).data || []
 })
+
+onUnmounted(() => { clearInterval(refreshTimer); clearToken() })
 </script>

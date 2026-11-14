@@ -37,6 +37,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         TokenAuthenticationFilter.class, DeviceTokenAuthenticationFilter.class, GlobalExceptionHandler.class,
         PreAuthorizeInterceptor.class, WebMvcAuthorizationConfig.class})
 class WriteEndpointAuthorizationOrderTest {
+    @MockBean com.airport.ai.device.DeviceRegistrationService deviceRegistrationService;
+    @MockBean com.airport.ai.device.ManagedSimulatorService managedSimulatorService;
 
     @Autowired MockMvc mvc;
     @MockBean DeviceService deviceService;
@@ -71,6 +73,14 @@ class WriteEndpointAuthorizationOrderTest {
         login("op", 7L, "OPERATOR");
         denied("op", "/api/v1/devices", 7L, "operator-7", "OPERATOR");
         verifyNoInteractions(deviceService);
+    }
+
+    @Test
+    void operatorCannotRotateTokensOrRestartDevices() throws Exception {
+        login("op", 7L, "OPERATOR");
+        denied("op", "/api/v1/devices/AUTO/device-token/rotate", 7L, "operator-7", "OPERATOR");
+        denied("op", "/api/v1/devices/AUTO/onboarding/retry", 7L, "operator-7", "OPERATOR");
+        verifyNoInteractions(deviceRegistrationService, managedSimulatorService);
     }
 
     @Test

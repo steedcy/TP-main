@@ -23,6 +23,8 @@ public class Device {
     private String deviceTokenHash;
     private String deviceTokenCiphertext;
     private LocalDateTime deviceTokenIssuedAt;
+    private String onboardingStatus = "MANUAL";
+    private String onboardingMessage;
     private Integer statusReportInterval = 15;
     /** UNTESTED / PASSED / FAILED */
     private String connectionTestStatus = "UNTESTED";
@@ -41,6 +43,10 @@ public class Device {
     private String updatedBy;
 
     public Long getId() { return id; }
+    public String getOnboardingStatus() { return onboardingStatus; }
+    public void setOnboardingStatus(String value) { onboardingStatus = value; }
+    public String getOnboardingMessage() { return onboardingMessage; }
+    public void setOnboardingMessage(String value) { onboardingMessage = value; }
     public void setId(Long id) { this.id = id; }
     public String getDeviceCode() { return deviceCode; }
     public void setDeviceCode(String deviceCode) { this.deviceCode = deviceCode; }

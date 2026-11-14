@@ -11,6 +11,7 @@ import java.util.Optional;
 public interface DeviceMapper {
     Optional<Device> findById(Long id);
     Optional<Device> findByDeviceCode(String deviceCode);
+    Optional<Device> findByDeviceCodeForUpdate(String deviceCode);
     boolean existsByDeviceCode(String deviceCode);
     List<Device> findByIds(@Param("ids") List<Long> ids);
     long countByDeviceStatusNot(String deviceStatus);
@@ -24,5 +25,9 @@ public interface DeviceMapper {
                               @Param("keyword") String keyword,
                               @Param("onlineStatus") String onlineStatus);
     int insert(Device device);
+    List<String> findActiveSimulatorEndpoints();
+    int updateOnboarding(@Param("deviceId") Long deviceId, @Param("status") String status,
+                         @Param("message") String message);
+    int failInterruptedOnboarding();
     int update(Device device);
 }

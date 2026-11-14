@@ -53,6 +53,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         TokenAuthenticationFilter.class, DeviceTokenAuthenticationFilter.class, GlobalExceptionHandler.class,
         PreAuthorizeInterceptor.class, WebMvcAuthorizationConfig.class})
 class SecurityAccessControlAndSessionTest {
+    @MockBean com.airport.ai.device.DeviceRegistrationService deviceRegistrationService;
+    @MockBean com.airport.ai.device.ManagedSimulatorService managedSimulatorService;
 
     @Autowired MockMvc mvc;
 

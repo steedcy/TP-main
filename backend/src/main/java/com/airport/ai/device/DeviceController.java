@@ -25,21 +25,21 @@ import java.util.Map;
 public class DeviceController {
 
     private final DeviceService deviceService;
-    private final DeviceCredentialService deviceCredentialService;
     private final CurrentUser currentUser;
-    private final com.airport.ai.auth.OperationLogService operationLogService;
+    private final DeviceRegistrationService registrationService;
+    private final ManagedSimulatorService simulators;
 
-    public DeviceController(DeviceService deviceService, DeviceCredentialService deviceCredentialService,
-                            CurrentUser currentUser, com.airport.ai.auth.OperationLogService operationLogService) {
+    public DeviceController(DeviceService deviceService, CurrentUser currentUser,
+                            DeviceRegistrationService registrationService, ManagedSimulatorService simulators) {
         this.deviceService = deviceService;
-        this.deviceCredentialService = deviceCredentialService;
         this.currentUser = currentUser;
-        this.operationLogService = operationLogService;
+        this.registrationService = registrationService;
+        this.simulators = simulators;
     }
 
     @PostMapping
     public ApiResponse<DeviceView> create(@Valid @RequestBody CreateDeviceRequest request) {
-        return ApiResponse.ok(DeviceView.from(deviceService.create(request, currentUser.get())));
+        return ApiResponse.ok(DeviceView.from(registrationService.create(request, currentUser.get())));
     }
 
     @GetMapping
@@ -104,11 +104,14 @@ public class DeviceController {
     /** The generated device token is returned once; only its hash and encrypted copy are persisted. */
     @PostMapping("/{deviceCode}/device-token/rotate")
     public ApiResponse<DeviceTokenRotationView> rotateDeviceToken(@PathVariable String deviceCode) {
-        DeviceCredentialService.IssuedToken issued = deviceCredentialService.rotate(deviceCode);
-        var operator = currentUser.get();
-        operationLogService.record(operator.getId(), operator.getUsername(), operator.getRole(),
-                "DEVICE_TOKEN_ROTATE", deviceCode, "SUCCESS", null);
+        DeviceCredentialService.IssuedToken issued = registrationService.rotate(deviceCode, currentUser.get());
         return ApiResponse.ok(new DeviceTokenRotationView(deviceCode, issued.token(), issued.issuedAt()));
+    }
+
+    @PostMapping("/{deviceCode}/onboarding/retry")
+    public ApiResponse<Void> retryOnboarding(@PathVariable String deviceCode) {
+        registrationService.retry(deviceCode, currentUser.get());
+        return ApiResponse.ok(null);
     }
 
     @PostMapping("/{deviceCode}/status")
@@ -118,12 +121,14 @@ public class DeviceController {
             throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, "status仅支持ACTIVE或INACTIVE");
         }
         deviceService.updateStatusByCode(deviceCode, status, currentUser.get());
+        if ("INACTIVE".equals(status)) simulators.stop(deviceCode);
         return ApiResponse.ok(null);
     }
 
     @DeleteMapping("/{deviceCode}")
     public ApiResponse<Void> delete(@PathVariable String deviceCode) {
         deviceService.deleteByCode(deviceCode, currentUser.get());
+        simulators.stop(deviceCode);
         return ApiResponse.ok(null);
     }
 }
