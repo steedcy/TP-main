@@ -16,7 +16,7 @@ public final class EventReasonCodes {
     private static final Map<String, String> DEFAULTS = Map.ofEntries(
             // 提交与目标理解
             Map.entry("GOAL_SUBMITTED", "NORMAL_GOAL_SUBMITTED"),
-            Map.entry("MEASUREMENT_RECORDED", "MEASUREMENT_EVENT"),
+            Map.entry("MEASUREMENT_RECORDED", "NORMAL_MEASUREMENT_RECORDED"),
             Map.entry("GOAL_CLARIFIED", "NORMAL_GOAL_CLARIFIED"),
             Map.entry("TASK_GOAL_UPDATED", "NORMAL_TASK_GOAL_UPDATED"),
             // 规划与校验
