@@ -353,7 +353,7 @@ public class ReplanningService {
             Map<String, Object> parsedGoal = task.getGoalParsingResult() == null ? Map.of()
                     : MAPPER.readValue(task.getGoalParsingResult(), Map.class);
             // 与首次降级同一规则：显式场景参数 > 目标理解解析值 > 模板默认值（DEF-S3-085）
-            TemplateInputBinder.Result bound = TemplateInputBinder.bind(template.getInputParams(), scene, parsedGoal);
+            TemplateInputBinder.Result bound = TemplateInputBinder.bindScenario(template, task.getTaskFamily(), scene, parsedGoal);
             if (TemplateInputBinder.hasUnresolvedGoalLocation(task.getTaskGoal(), parsedGoal,
                     bound.defaultedLocations(), bound.values())) {
                 taskEventService.append(task.getId(), "BASELINE_INPUT_DEFAULTED", "SYSTEM", "ERR_LOCATION_UNRESOLVED",

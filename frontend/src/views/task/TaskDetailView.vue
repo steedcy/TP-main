@@ -159,6 +159,7 @@
           </template>
           <template v-else-if="column.dataIndex === 'stepStatus'">
             <a-tag>{{ stepStatusLabel(record.stepStatus) }}</a-tag>
+            <span v-if="record.reasonCode === 'MEASUREMENT_EVENT_REUSED'">采用已登记的测量事件</span>
           </template>
           <template v-else-if="column.dataIndex === 'acceptanceResponseTime'">
             <span>{{ formatAcceptanceTime(record) }}</span>
@@ -190,7 +191,7 @@
     </a-card>
 
     <a-card v-if="task.taskFamily === 'OVERSIZE_BAGGAGE_HANDLING'"
-            title="超规行李办理说明与柜台引导"
+            :title="isOversizeBaggage ? '超规行李办理说明与柜台引导' : '行李办理结果'"
             style="margin-top: 16px"
             data-testid="baggage-handling-instructions">
       <a-descriptions bordered :column="2">
@@ -198,13 +199,13 @@
           <span data-testid="baggage-temp-id">{{ baggageTempId }}</span>
           <span style="margin-left: 8px; color: #8c8c8c; font-size: 12px">（脱敏临时业务识别码，不存储真实旅客身份）</span>
         </a-descriptions-item>
-        <a-descriptions-item label="指定办理柜台">
+        <a-descriptions-item v-if="isOversizeBaggage" label="指定办理柜台">
           <span data-testid="target-counter">{{ targetCounterDisplay }}</span>
         </a-descriptions-item>
         <a-descriptions-item label="状态提示" :span="2">
           <a-alert :type="isOversizeBaggage ? 'warning' : baggageResult?.isOversize === false ? 'success' : 'info'" :message="baggageNoticeText" show-icon />
         </a-descriptions-item>
-        <a-descriptions-item label="办理说明与托运须知" :span="2">
+        <a-descriptions-item v-if="isOversizeBaggage" label="办理说明与托运须知" :span="2">
           <pre data-testid="handling-instructions-content" style="white-space: pre-wrap; font-family: inherit; margin: 0; background: #fafafa; padding: 12px; border-radius: 4px;">{{ baggageHandlingInstructions }}</pre>
         </a-descriptions-item>
       </a-descriptions>
@@ -427,7 +428,7 @@ const baggageResult = computed(() => {
       weight: sp.weight != null ? sp.weight : (sp.measurement?.weight),
       isOversize: sp.isOversize != null ? sp.isOversize : (sp.measurement?.isOversize),
       dimensionThresholdCm: sp.dimensionThresholdCm || 158,
-      weightThresholdKg: sp.weightThresholdKg || 20,
+      weightThresholdKg: sp.weightThresholdKg ?? '未记录',
       thresholdSource: sp.thresholdSource || '航司超规行李标准'
     }
   }
@@ -436,7 +437,7 @@ const baggageResult = computed(() => {
 
 const isOversizeBaggage = computed(() => {
   if (task.value?.taskFamily !== 'OVERSIZE_BAGGAGE_HANDLING') return false
-  return baggageResult.value?.isOversize === true || task.value?.sceneParams?.isOversize === true
+  return baggageResult.value?.isOversize === true
 })
 
 const baggageTempId = computed(() => {
@@ -501,7 +502,10 @@ const specialPassengerStatusType = computed(() => {
 
 const specialPassengerStatusText = computed(() => {
   if (task.value?.status === 'COMPLETED') {
-    return '特殊旅客服务已闭环完成：航显会合提示已发布，移动服务机器人已完成全程陪同与安全引导。'
+    const arrival = stepAssignments.value.find(a => a.outputParams?.arrivalLocation === specialPassengerOrigin.value
+      && a.outputParams?.arrivalStatus === 'ARRIVED' && a.stepStatus === 'COMPLETED')
+    return arrival ? `机器人已到达会合点 ${specialPassengerOrigin.value}，陪同任务已完成。`
+      : '陪同任务已完成，未记录机器人到达会合点的反馈。'
   }
   if (task.value?.status === 'PENDING_MANUAL') {
     return task.value?.failureReason || '任务待人工处理，请核对各步骤反馈后接续服务。'

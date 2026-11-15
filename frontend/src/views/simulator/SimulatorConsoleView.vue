@@ -165,7 +165,10 @@ async function handleSendMeasurementEvent() {
   }
   measurementSubmitting.value = true
   try {
-    const res = await submitMeasurementEvent(measurementForm.value)
+    const res = await submitMeasurementEvent({
+      ...measurementForm.value, dimensionThresholdCm: 158, weightThresholdKg: 32,
+      thresholdSource: '附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束'
+    })
     const task = res.data
     const scene = typeof task.sceneParams === 'string'
       ? JSON.parse(task.sceneParams || '{}')
@@ -210,7 +213,6 @@ const demos = [
     taskFamily: 'FLIGHT_CHANGE_RESPONSE',
     sceneParams: {
       eventSource: 'MANUAL_FORM', flightNumber: 'CA1234', changeType: 'DELAY',
-      originalTime: '2026-11-14T22:30:00', newTime: '2026-11-14T23:00:00',
       newGate: 'GATE_A05', changeDescription: '虚构航班CA1234延误30分钟，登机口GATE_A05不变'
     },
     taskGoal: '虚构航班CA1234原计划22:30，延误30分钟至23:00，请通过航延屏发布变更、智慧航显发布提示，并由机器人引导旅客前往GATE_A05。'
@@ -281,7 +283,14 @@ function hasOnlineTypes(requiredTypes) {
 async function submitDemo(demo) {
   submitting.value = demo.key
   try {
-    const response = await submitTask({ taskGoal: demo.taskGoal, taskFamily: demo.taskFamily, sceneParams: demo.sceneParams })
+    const sceneParams = { ...demo.sceneParams }
+    if (demo.key === 'flight') {
+      const now = new Date()
+      const date = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-')
+      sceneParams.originalTime = date + 'T22:30:00'
+      sceneParams.newTime = date + 'T23:00:00'
+    }
+    const response = await submitTask({ taskGoal: demo.taskGoal, taskFamily: demo.taskFamily, sceneParams })
     const task = response.data
     message.success(`已提交演示任务${task?.taskCode ? `：${task.taskCode}` : ''}`)
   } finally { submitting.value = '' }

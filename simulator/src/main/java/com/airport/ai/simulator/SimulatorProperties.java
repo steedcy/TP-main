@@ -12,6 +12,9 @@ public class SimulatorProperties {
     private java.util.Map<String, java.util.List<Double>> landmarks = new java.util.LinkedHashMap<>(java.util.Map.of(
         "F2_SERVICE_POINT", java.util.List.of(810.0,4200.0),
         "F2_BAGGAGE_POINT", java.util.List.of(805.0,4050.0),
+        "T2值机岛A03", java.util.List.of(805.0,4050.0),
+        "T2值机区", java.util.List.of(805.0,4050.0),
+        "超规行李专柜B01", java.util.List.of(810.0,4200.0),
         "F2_TEST_GATE", java.util.List.of(815.0,4600.0),
         "GATE_A05", java.util.List.of(815.0,4600.0)));
     public java.util.Map<String,java.util.List<Double>> getLandmarks() { return landmarks; }

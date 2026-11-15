@@ -113,4 +113,33 @@ class TemplateInputBinderTest {
                 "播放虚构航班延误广播通知",
                 Map.of(), r.defaultedLocations(), r.values()));
     }
+    @Test
+    void delayReplacesPresetExamplesAcrossPublicationChannels() throws Exception {
+        var template = new com.airport.ai.baseline.BaselineTemplate();
+        template.setIsPreset(true);
+        template.setInputParams("""
+            [{"name":"updateType","type":"String","defaultValue":"GATE_CHANGE"},
+             {"name":"updateContent","type":"String"},{"name":"displayContent","type":"String"},
+             {"name":"notificationContent","type":"String"},{"name":"targetLocation","type":"String"}]
+            """);
+        var values = TemplateInputBinder.bindScenario(template, "FLIGHT_CHANGE_RESPONSE", Map.of(
+                "flightNumber", "CA1234", "changeType", "延误", "changeDescription", "延误30分钟",
+                "newTime", "23:00", "newGate", "GATE_A05"), Map.of("destination", "F2_TEST_GATE")).values();
+        assertEquals("DELAY", values.get("updateType"));
+        assertEquals("GATE_A05", values.get("targetLocation"));
+        for (String channel : java.util.List.of("updateContent", "displayContent", "notificationContent")) {
+            String text = (String) values.get(channel);
+            assertTrue(text.contains("CA1234") && text.contains("延误30分钟") && text.contains("23:00") && text.contains("GATE_A05"));
+        }
+    }
+
+    @Test
+    void customTemplateRetainsItsExplicitChannelText() throws Exception {
+        var template = new com.airport.ai.baseline.BaselineTemplate();
+        template.setIsPreset(false);
+        template.setInputParams("[{\"name\":\"displayContent\",\"type\":\"String\"}]");
+        var values = TemplateInputBinder.bindScenario(template, "FLIGHT_CHANGE_RESPONSE",
+                Map.of("changeType", "DELAY", "displayContent", "已审核通知"), Map.of()).values();
+        assertEquals("已审核通知", values.get("displayContent"));
+    }
 }

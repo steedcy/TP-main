@@ -808,7 +808,7 @@ public class TaskService {
         double dimThreshold = request.getDimensionThresholdCm() != null ? request.getDimensionThresholdCm() : 158.0;
         double weightThreshold = request.getWeightThresholdKg() != null ? request.getWeightThresholdKg() : 23.0;
         String thresholdSource = request.getThresholdSource() != null && !request.getThresholdSource().isBlank()
-                ? request.getThresholdSource().trim() : "民航旅客行李运输标准（2026版）";
+                ? request.getThresholdSource().trim() : (request.getWeightThresholdKg() != null || request.getDimensionThresholdCm() != null ? "测量事件指定阈值" : "测量事件默认阈值");
 
         boolean isOversize = totalDimension > dimThreshold || weight > weightThreshold;
 
@@ -855,7 +855,7 @@ public class TaskService {
         sceneParams.put("weightThresholdKg", weightThreshold);
         sceneParams.put("thresholdSource", thresholdSource);
         sceneParams.put("isOversize", isOversize);
-        sceneParams.put("measureMode", "EVENT_TRIGGERED");
+        sceneParams.put("measureMode", "AUTO");
         sceneParams.put("routePreference", "BARRIER_FREE");
         sceneParams.put("alertLevel", "WARNING");
         sceneParams.put("contentType", "TEXT");
@@ -902,6 +902,12 @@ public class TaskService {
                 "接收模拟超规行李测量事件，临时业务编号: " + baggageId + "，位置: " + request.getBaggageLocation()
                         + "，尺寸: " + length + "×" + width + "×" + height + "cm，重量: " + weight + "kg，超规判定: 超规");
 
+        Map<String, Object> sample = new LinkedHashMap<>();
+        for (String key : List.of("length", "width", "height", "weight", "isOversize", "totalDimensionCm",
+                "dimensionThresholdCm", "weightThresholdKg", "thresholdSource", "baggageId")) {
+            sample.put(key, sceneParams.get(key));
+        }
+        taskEventService.append(task.getId(), "MEASUREMENT_RECORDED", "SYSTEM", "MEASUREMENT_EVENT", toJson(sample));
         operationLogService.record(user.getId(), user.getUsername(), user.getRole(),
                 "MEASUREMENT_EVENT_OVERSIZE", task.getTaskCode(), "SUCCESS", null);
 

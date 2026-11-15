@@ -113,6 +113,44 @@ public final class TemplateInputBinder {
         return new Result(values, fromParsed, defaultedLocations);
     }
 
+    /** Translate scenario fields to the public inputs used by preset templates. */
+    static Result bindScenario(com.airport.ai.baseline.BaselineTemplate template, String family, Map<String, Object> scene, Map<String, Object> parsed)
+            throws Exception {
+        String schema = template.getInputParams();
+        if (!Boolean.TRUE.equals(template.getIsPreset())) return bind(schema, scene, parsed);
+        Map<String, Object> inputs = new LinkedHashMap<>(scene);
+        if ("FLIGHT_CHANGE_RESPONSE".equals(family) && !isBlank(scene.get("changeType"))) {
+            String type = FlightChangeRequiredInfoGuard.normalizeChangeType(scene.get("changeType"));
+            String description = String.valueOf(scene.getOrDefault("changeDescription", type));
+            String message = scene.getOrDefault("flightNumber", "") + " " + description;
+            if (("DELAY".equals(type) || "EARLY".equals(type)) && !isBlank(scene.get("newTime"))) {
+                message += "，变更后时间 " + scene.get("newTime");
+            }
+            if (!isBlank(scene.get("newGate"))) {
+                message += "，登机口 " + scene.get("newGate");
+                inputs.put("targetLocation", scene.get("newGate"));
+            }
+            inputs.put("updateType", type);
+            inputs.put("updateContent", message);
+            inputs.put("displayContent", message);
+            inputs.put("notificationContent", message);
+        } else if ("SPECIAL_PASSENGER_SERVICE".equals(family)) {
+            Object origin = scene.getOrDefault("origin", scene.getOrDefault("startLocation", scene.getOrDefault("originLocation", parsed.get("origin"))));
+            Object destination = scene.getOrDefault("destination", scene.getOrDefault("targetLocation", parsed.get("destination")));
+            if (!isBlank(origin) && !isBlank(destination)) {
+                inputs.put("origin", origin);
+                inputs.put("targetLocation", destination);
+                inputs.put("meetingNotice", scene.getOrDefault("assistanceType", "特殊旅客服务")
+                        + "：请在" + origin + "会合，现场人员请协助，由服务机器人陪同前往" + destination + "。");
+            }
+        } else if ("OVERSIZE_BAGGAGE_HANDLING".equals(family) && !isBlank(scene.get("targetCounter"))) {
+            if ("EVENT_TRIGGERED".equals(scene.get("measureMode"))) inputs.put("measureMode", "AUTO");
+            inputs.put("contentData", "超规行李（" + scene.getOrDefault("baggageId", "临时业务号未提供")
+                    + "）请前往" + scene.get("targetCounter") + "办理托运。");
+        }
+        return bind(schema, inputs, parsed);
+    }
+
     private static boolean isBlank(Object v) {
         return v == null || (v instanceof String s && s.isBlank());
     }

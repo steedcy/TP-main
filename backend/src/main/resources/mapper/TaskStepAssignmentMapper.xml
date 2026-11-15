@@ -81,6 +81,13 @@
                 #{rejectedAgentIds}::json, #{createdAt}, #{updatedAt})
     </insert>
 
+    <update id="completeFromMeasurementEvent">
+        UPDATE task_step_assignments SET step_status = 'COMPLETED', execution_result = 'SUCCESS',
+            reason_code = 'MEASUREMENT_EVENT_REUSED', output_params = #{output}::json,
+            feedback_at = #{received}, updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND step_status = 'PENDING_ASSIGNMENT' AND device_agent_id IS NULL AND command_id IS NULL
+    </update>
+
     <update id="update" parameterType="com.airport.ai.task.TaskStepAssignment">
         UPDATE task_step_assignments SET
             device_agent_id = #{deviceAgentId},

@@ -9,6 +9,10 @@ import java.util.Optional;
 
 @Mapper
 public interface TaskStepAssignmentMapper {
+    int completeFromMeasurementEvent(@Param("id") Long id,
+                                     @Param("output") String output,
+                                     @Param("received") LocalDateTime received);
+
     Optional<TaskStepAssignment> findById(Long id);
     List<TaskStepAssignment> findByPlanVersionIdOrderByStepSeqAsc(Long planVersionId);
     Optional<TaskStepAssignment> findByPlanVersionIdAndStepSeq(@Param("planVersionId") Long planVersionId,

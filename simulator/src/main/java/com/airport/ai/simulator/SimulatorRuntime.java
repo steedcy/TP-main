@@ -193,6 +193,12 @@ public class SimulatorRuntime {
             Map<String, Object> output = executeCapability(command.capabilityType(), params);
             progressAlong(stepKey(command), driver.routeLocations(command.capabilityType(), params, location(), output));
             if (isCancelled(command)) return;
+            if ("MOBILE_ROBOT".equals(driver.deviceType()) && "CAP_NAVIGATION".equals(command.capabilityType())) {
+                output = new java.util.LinkedHashMap<>(output);
+                output.put("arrivalStatus", "ARRIVED");
+                output.put("arrivalLocation", params.get("targetLocation"));
+                output.put("arrivalDeviceCode", properties.getDeviceCode());
+            }
             reportFeedback(command, "SUCCESS", null, output);
             commandStates.put(key, "SUCCEEDED");
         } catch (InterruptedException ex) {

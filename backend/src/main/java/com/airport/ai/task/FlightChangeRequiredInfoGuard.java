@@ -74,7 +74,7 @@ public final class FlightChangeRequiredInfoGuard {
         return hasValue(answer) ? answer : scene.get(field.key());
     }
 
-    private static String normalizeChangeType(Object value) {
+    static String normalizeChangeType(Object value) {
         if (value == null) return null;
         return switch (value.toString().trim().toUpperCase(Locale.ROOT)) {
             case "延误" -> "DELAY";

@@ -164,7 +164,7 @@ public class TaskExecutionOrchestrator {
                 }
             }
         }
-        return !findRankedCandidates(capabilityType, step, allExcludes, family).isEmpty();
+        return !findRankedCandidates(capabilityType, step, allExcludes, family, planVersionId, stepSeq).isEmpty();
     }
 
     /**
@@ -185,7 +185,11 @@ public class TaskExecutionOrchestrator {
         if (currentTask.getStatus() == TaskStatus.MANUAL_TERMINATED || "FROZEN".equals(assignment.getStepStatus())) {
             return;
         }
-        List<CandidateScore> candidates = findRankedCandidates(capabilityType, step, rejected, currentTask.getTaskFamily());
+        if ("CAP_BAGGAGE_MEASURE".equals(capabilityType)
+                && "OVERSIZE_BAGGAGE_HANDLING".equals(currentTask.getTaskFamily())
+                && !Boolean.TRUE.equals(currentTask.getIsDryRun())
+                && reuseMeasurementEvent(currentTask, assignment, step)) return;
+        List<CandidateScore> candidates = findRankedCandidates(capabilityType, step, rejected, currentTask.getTaskFamily(), planVersionId, stepSeq);
         if (Boolean.TRUE.equals(currentTask.getIsDryRun())) {
             Long selected = selections.findByTaskId(taskId).stream().filter(s -> stepSeq.equals(s.getStepSeq()))
                     .map(com.airport.ai.baseline.DryRunDeviceSelection::getDeviceAgentId).findFirst().orElseThrow();
@@ -366,6 +370,46 @@ public class TaskExecutionOrchestrator {
         assignStep(assignment.getTaskId(), assignment.getPlanVersionId(), assignment.getStepSeq());
     }
 
+    /** A measurement event supplies the sample. It has no dispatch or device acknowledgement. */
+    private boolean reuseMeasurementEvent(Task task, TaskStepAssignment assignment, Map<String, Object> step) {
+        Map<String, Object> scene = fromJsonMap(task.getSceneParams());
+        if (!"MEASUREMENT_EVENT".equals(scene.get("triggerSource"))) return false;
+        var events = taskEventService.listByTask(task.getId());
+        var receipt = events.stream()
+                .filter(e -> "GOAL_SUBMITTED".equals(e.getEventType()) && "SYSTEM".equals(e.getTrigger())
+                        && "MEASUREMENT_EVENT".equals(e.getReasonCode())).findFirst();
+        if (receipt.isEmpty()) return false;
+        // Older events retained their numeric sample in the task scene only.
+        var source = events.stream().filter(e -> "MEASUREMENT_RECORDED".equals(e.getEventType())
+                && "SYSTEM".equals(e.getTrigger()) && "MEASUREMENT_EVENT".equals(e.getReasonCode())).findFirst();
+        Map<String, Object> sample = source.map(e -> fromJsonMap(e.getDetailSummary())).orElse(scene);
+        Map<String, Object> measurement = new LinkedHashMap<>();
+        for (String key : List.of("length", "width", "height", "weight", "isOversize", "totalDimensionCm",
+                "dimensionThresholdCm", "weightThresholdKg", "thresholdSource", "baggageId")) {
+            measurement.put(key, sample.get(key));
+        }
+        measurement.put("measureStatus", "SUCCESS");
+        measurement.put("measurementSource", "MEASUREMENT_EVENT");
+        measurement.put("baggageInfo", toJson(measurement));
+        if (!Boolean.TRUE.equals(measurement.get("isOversize"))
+                || List.of("length", "width", "height", "weight").stream().anyMatch(k -> !(measurement.get(k) instanceof Number))
+                || !CompletionConditionEvaluator.satisfied(step, measurement)) {
+            task.setStatus(TaskStatus.PENDING_MANUAL);
+            task.setFailureReason("已登记的超规测量结果不满足当前步骤条件，请核对原始事件");
+            task.setUpdatedAt(LocalDateTime.now());
+            taskMapper.update(task);
+            taskEventService.append(task.getId(), "TASK_PENDING_MANUAL", "SYSTEM", "ERR_MEASUREMENT_EVENT_INVALID", task.getFailureReason());
+            return true;
+        }
+        if (assignmentMapper.completeFromMeasurementEvent(assignment.getId(), toJson(measurement),
+                source.orElse(receipt.get()).getOccurredAt()) == 1) {
+            taskEventService.append(task.getId(), "STEP_COMPLETED", "SYSTEM", "MEASUREMENT_EVENT_REUSED",
+                    "步骤" + assignment.getStepSeq() + "使用已登记的测量结果，来源事件 " + source.orElse(receipt.get()).getId());
+            advanceAfterStepCompleted(task.getId(), assignment.getPlanVersionId(), assignment.getStepSeq());
+        }
+        return true;
+    }
+
     /**
      * 对应5.5.2基本路径1~2、业务规则3/5：生成全局唯一指令编号，指令下发前对拼装后的
      * inputParams再次做运动安全控制字段拦截（异常路径2a）——5.4.4三类校验只检查计划模板本身，
@@ -499,8 +543,8 @@ public class TaskExecutionOrchestrator {
                     && "CAP_BAGGAGE_MEASURE".equals(step.get("capabilityType"))) {
                 Map<String, Object> scene = fromJsonMap(currentTask.getSceneParams());
                 outputParams.putIfAbsent("dimensionThresholdCm", scene.getOrDefault("dimensionThresholdCm", 158.0));
-                outputParams.putIfAbsent("weightThresholdKg", scene.getOrDefault("weightThresholdKg", 23.0));
-                outputParams.putIfAbsent("thresholdSource", scene.getOrDefault("thresholdSource", "民航旅客行李运输标准（2026版）"));
+                outputParams.putIfAbsent("weightThresholdKg", scene.getOrDefault("weightThresholdKg", 32.0));
+                outputParams.putIfAbsent("thresholdSource", scene.getOrDefault("thresholdSource", "附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束"));
                 if (outputParams.get("totalDimensionCm") == null && outputParams.get("length") != null && outputParams.get("width") != null && outputParams.get("height") != null) {
                     try {
                         double l = ((Number) outputParams.get("length")).doubleValue();
@@ -578,8 +622,8 @@ public class TaskExecutionOrchestrator {
                                              Map<String, Object> outputParams) {
         Map<String, Object> scene = fromJsonMap(task.getSceneParams());
         outputParams.putIfAbsent("dimensionThresholdCm", scene.getOrDefault("dimensionThresholdCm", 158.0));
-        outputParams.putIfAbsent("weightThresholdKg", scene.getOrDefault("weightThresholdKg", 23.0));
-        outputParams.putIfAbsent("thresholdSource", scene.getOrDefault("thresholdSource", "民航旅客行李运输标准（2026版）"));
+        outputParams.putIfAbsent("weightThresholdKg", scene.getOrDefault("weightThresholdKg", 32.0));
+        outputParams.putIfAbsent("thresholdSource", scene.getOrDefault("thresholdSource", "附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束"));
         if (outputParams.get("totalDimensionCm") == null && outputParams.get("length") != null && outputParams.get("width") != null && outputParams.get("height") != null) {
             try {
                 double l = ((Number) outputParams.get("length")).doubleValue();
@@ -869,7 +913,8 @@ public class TaskExecutionOrchestrator {
      */
     @SuppressWarnings("unchecked")
     private List<CandidateScore> findRankedCandidates(String capabilityType, Map<String, Object> step,
-                                                        List<String> excludeAgentCodes, String taskFamily) {
+                                                        List<String> excludeAgentCodes, String taskFamily,
+                                                        Long planVersionId, Integer stepSeq) {
         List<DeviceAgent> onlineIdle = deviceAgentMapper.findByAgentStatusAndOnlineStatus("ENABLED", "ONLINE")
                 .stream()
                 .filter(a -> "IDLE".equals(a.getWorkStatus()))
@@ -882,6 +927,21 @@ public class TaskExecutionOrchestrator {
         List<Long> deviceIds = onlineIdle.stream().map(DeviceAgent::getDeviceId).distinct().toList();
         Map<Long, Device> deviceById = deviceMapper.findByIds(deviceIds).stream()
                 .collect(Collectors.toMap(Device::getId, d -> d));
+
+        if ("SPECIAL_PASSENGER_SERVICE".equals(taskFamily) && "CAP_ESCORT".equals(capabilityType) && stepSeq > 1) {
+            var previous = parseSteps(planVersionMapper.findById(planVersionId).orElseThrow().getPlanSteps()).stream()
+                    .filter(s -> Objects.equals(asInteger(s.get("stepSeq")), stepSeq - 1)).findFirst().orElse(Map.of());
+            if ("CAP_NAVIGATION".equals(previous.get("capabilityType"))
+                    && "arrivalStatus=ARRIVED".equals(previous.get("completionCondition"))) {
+                var meeting = assignmentMapper.findByPlanVersionIdAndStepSeq(planVersionId, stepSeq - 1);
+                if (meeting.isEmpty() || !"COMPLETED".equals(meeting.get().getStepStatus())) return List.of();
+                var feedback = fromJsonMap(meeting.get().getOutputParams());
+                Long metBy = meeting.get().getDeviceAgentId();
+                onlineIdle = onlineIdle.stream().filter(agent -> metBy != null ? metBy.equals(agent.getId())
+                        : deviceById.get(agent.getDeviceId()) != null && deviceById.get(agent.getDeviceId()).getDeviceCode()
+                                .equals(feedback.get("arrivalDeviceCode"))).toList();
+            }
+        }
 
         Map<String, Object> inputParams = stepInputParams(step);
         BigDecimal targetX = asBigDecimal(step.get("targetX"));
