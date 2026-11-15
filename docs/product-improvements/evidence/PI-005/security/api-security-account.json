@@ -1,0 +1,83 @@
+{
+  "time": "2026-11-15T23:16:12.437039+08:00",
+  "checks": [
+    {
+      "role": "运行操作员",
+      "method": "GET",
+      "path": "/users",
+      "httpStatus": 403,
+      "code": 2003,
+      "message": "无权限访问"
+    },
+    {
+      "role": "配置管理员",
+      "method": "GET",
+      "path": "/users",
+      "httpStatus": 403,
+      "code": 2003,
+      "message": "无权限访问"
+    },
+    {
+      "role": "配置管理员",
+      "method": "GET",
+      "path": "/tasks/273",
+      "httpStatus": 403,
+      "code": 2003,
+      "message": "无权限访问"
+    },
+    {
+      "role": "系统管理员",
+      "method": "GET",
+      "path": "/tasks/273",
+      "httpStatus": 200,
+      "code": 200,
+      "message": "success"
+    }
+  ],
+  "testUsername": "e2e_roles_231611",
+  "testUserId": 31,
+  "lifecycle": [
+    {
+      "action": "create",
+      "httpStatus": 200,
+      "code": 200
+    },
+    {
+      "action": "INACTIVE",
+      "httpStatus": 200,
+      "code": 200
+    },
+    {
+      "action": "login_INACTIVE",
+      "httpStatus": 403,
+      "code": 2004,
+      "message": "账号或密码错误"
+    },
+    {
+      "action": "ACTIVE",
+      "httpStatus": 200,
+      "code": 200
+    },
+    {
+      "action": "login_ACTIVE",
+      "httpStatus": 200,
+      "code": 200,
+      "message": "success"
+    },
+    {
+      "action": "logout",
+      "httpStatus": 200,
+      "code": 200
+    },
+    {
+      "action": "reuse_logged_out_session",
+      "httpStatus": 401,
+      "code": 2001
+    },
+    {
+      "action": "final_disable",
+      "httpStatus": 200,
+      "code": 200
+    }
+  ]
+}

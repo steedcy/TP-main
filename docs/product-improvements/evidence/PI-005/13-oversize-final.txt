@@ -1,0 +1,478 @@
+Browser tab: 1793790709, Title: "智慧机场人工智能集群协同服务平台", URL: "http://localhost:5173/tasks/290".
+0 AXWebArea 智慧机场人工智能集群协同服务平台, URL: localhost:5173/tasks/290
+	1 container
+		2 text 智慧机场AI协同平台
+		3 menu
+			4 运行总览
+			5 任务管理
+			6 异常处置
+			7 过程追溯
+			8 二维态势
+			9 仿真控制
+			10 设备代理
+			11 操作记录
+		12 container
+			13 text oprator（张三，运行操作员）
+			14 button 退出登录
+		15 container
+			16 table
+				17 row
+					18 cell
+						19 text 任务编号
+					20 cell
+						21 text TASK-20261115-0289
+					22 cell
+						23 text 状态
+					24 cell
+						25 text 已完成
+				26 row
+					27 cell
+						28 text 任务目标
+					29 cell
+						30 text 处理位于 T2值机岛A03 的行李测量事件（临时业务编号: BAG-990430，尺寸: 100.0×60.0×40.0 cm，重量: 28.0 kg，判定: 超规）
+				31 row
+					32 cell
+						33 text 任务族
+					34 cell
+						35 text OVERSIZE_BAGGAGE_HANDLING
+					36 cell
+						37 text 重规划次数
+					38 cell
+						39 text 0 / 1
+			40 text 目标理解结果
+			41 table
+				42 row
+					43 cell
+						44 text 起点
+					45 cell
+						46 text T2值机岛A03
+				47 row
+					48 cell
+						49 text 目的地
+					50 cell
+						51 text 超规行李专柜B01
+				52 row
+					53 cell
+						54 text 约束条件
+					55 cell
+						56 text 超规行李处置全程不得引导旅客脱离监控区域；测量结果超标须触发超规事件上报
+				57 row
+					58 cell
+						59 text 完成条件
+					60 cell
+						61 text 行李已完成尺寸重量测量且超规事件（如有）已上报
+			62 text 规划依据（上下文快照）
+			63 button (collapsed) right CTX-20261115-0340 - 生成时间: 2026-11-15T23:19:53.902735, Secondary Actions: Expand
+				64 image right
+				65 text CTX-20261115-0340 - 生成时间: 2026-11-15T23:19:53.902735
+			66 text 计划版本与校验/判定结果
+			67 tab group
+				68 container
+					69 tab (selected, settable, boolean) 版本1（自主规划）, Value: 1, ID: rc-tabs-4-tab-1
+			70 container Description: 版本1（自主规划）, ID: rc-tabs-4-panel-1
+				71 table
+					72 row
+						73 cell
+							74 text 结构校验
+						75 cell
+							76 text 通过
+						77 cell
+							78 text 能力校验
+						79 cell
+							80 text 通过
+					81 row
+						82 cell
+							83 text 约束校验
+						84 cell
+							85 text 通过
+						86 cell
+							87 text 冻结时间
+						88 cell
+							89 text 2026-11-15T23:20:22.410403
+					90 row
+						91 cell
+							92 text 风险等级
+						93 cell
+							94 text LOW
+						95 cell
+							96 text 推荐处置
+						97 cell
+							98 text 自动执行
+					99 row
+						100 cell
+							101 text 判定依据
+						102 cell
+							103 text 未命中确定性高风险规则；命中单一风险信号（候选差异较大），单一信号不直接阻断，低风险自动执行
+					104 row
+						105 cell
+							106 text 置信度
+						107 cell
+							108 text 0.92
+						109 cell
+							110 text 规则集版本
+						111 cell
+							112 text V1.2
+				113 table
+					114 row
+						115 cell
+							116 text 可执行步骤数
+						117 cell
+							118 text 5 / 5
+						119 cell
+							120 text 剩余步骤额度
+						121 cell
+							122 text 0
+					123 row
+						124 cell
+							125 text 规划说明
+						126 cell
+							127 text 规划模型依据上下文快照 CTX-20261115-0340生成 5 步候选计划，置信度 0.92
+				128 text 候选步骤：
+				129 table
+					130 row
+						131 cell
+							132 text 步骤
+						133 cell
+							134 text 步骤目标
+						135 cell
+							136 text 所需能力
+						137 cell
+							138 text 输入参数
+						139 cell
+							140 text 参数来源
+						141 cell
+							142 text 候选设备
+						143 cell
+							144 text 前置条件
+						145 cell
+							146 text 完成条件
+						147 cell
+							148 text 失败处理
+					149 row
+						150 cell
+							151 text 1
+						152 cell
+							153 text 对超规行李执行尺寸重量复核测量
+						154 cell
+							155 text CAP_BAGGAGE_MEASURE
+						156 cell
+							157 text {"measureMode":"AUTO","timeout":30}
+						158 cell
+							159 text 规划模型依据任务目标与场景参数生成
+						160 cell
+							161 text AGT-1C13535E，AGT-D602D701
+						162 cell
+							163 text 行李已放置于T2值机岛A03测量区域，设备SIM_F2_BAGGAGE或SIM_F2_BAGGAGE_B处于在线空闲状态
+						164 cell
+							165 text 设备返回测量结果，包含length/width/height/weight/isOversize/measureStatus/baggageInfo字段
+						166 cell
+							167 text 若测量超时或设备异常，切换至另一台BAGGAGE_SCANNER设备重试；若两次均失败，转为人工测量并记录异常
+					168 row
+						169 cell
+							170 text 2
+						171 cell
+							172 text 上报超规行李事件至平台
+						173 cell
+							174 text CAP_OVERSIZE_ALERT
+						175 cell
+							176 text {"baggageInfo":"{\"baggageId\":\"BAG-990430\",\"length\":100.0,\"width\":60.0,\"height\":40.0,\"weight\":28.0,\"totalDimensionCm\":200.0,\"dimensionThresholdCm\":158.0,\"location\":\"T2值机岛A03\"}","alertLevel":"WARNING"}
+						177 cell
+							178 text 规划模型依据任务目标与场景参数生成
+						179 cell
+							180 text AGT-1C13535E，AGT-D602D701
+						181 cell
+							182 text 步骤1完成且测量结果确认isOversize=true（或依据sceneParams已知超规事实）
+						183 cell
+							184 text 平台返回alertId、reportStatus、reportTime，确认超规事件已成功上报
+						185 cell
+							186 text 若上报失败，重试一次；仍失败则记录告警日志并通知现场人工介入
+					187 row
+						188 cell
+							189 text 3
+						190 cell
+							191 text 生成前往超规行李专柜B01的无障碍导航路线
+						192 cell
+							193 text CAP_NAVIGATION
+						194 cell
+							195 text {"targetLocation":"超规行李专柜B01","routePreference":"BARRIER_FREE"}
+						196 cell
+							197 text 规划模型依据任务目标与场景参数生成
+						198 cell
+							199 text AGT-3A76FECA，AGT-62EAF5EA，AGT-CCDDEB4A，AGT-3A36BBB4
+						200 cell
+							201 text 步骤2超规事件上报成功，旅客需前往指定柜台办理后续托运
+						202 cell
+							203 text 设备返回routeGenerated=true，并提供estimatedDistance/estimatedDuration/waypointCount
+						204 cell
+							205 text 若路线生成失败，检查目标位置编码是否有效；若无效则使用备用位置标识重试
+					206 row
+						207 cell
+							208 text 4
+						209 cell
+							210 text 在值机区域展示超规行李引导信息
+						211 cell
+							212 text CAP_INFO_DISPLAY
+						213 cell
+							214 text {"contentType":"TEXT","contentData":"超规行李（临时编号BAG-990430）请前往超规行李专柜B01办理托运","displayDuration":120}
+						215 cell
+							216 text 规划模型依据任务目标与场景参数生成
+						217 cell
+							218 text AGT-3A76FECA，AGT-62EAF5EA，AGT-CCDDEB4A，AGT-B0D7BDAD，AGT-3A36BBB4
+						219 cell
+							220 text 步骤3导航路线已生成，需在旅客当前位置T2值机岛A03附近展示引导信息
+						221 cell
+							222 text 显示屏或机器人返回displayStatus为成功，确认信息已展示
+						223 cell
+							224 text 若单点展示失败，切换至同区域其他显示设备重试
+					225 row
+						226 cell
+							227 text 5
+						228 cell
+							229 text 向现场服务人员发送超规行李协助通知
+						230 cell
+							231 text CAP_NOTIFICATION
+						232 cell
+							233 text {"notificationType":"BOTH","notificationContent":"T2值机岛A03发现超规行李BAG-990430（尺寸100×60×40cm，重量28kg），旅客已引导至超规行李专柜B01，请柜台人员做好称重核验及专属托运准备","repeatCount":1}
+						234 cell
+							235 text 规划模型依据任务目标与场景参数生成
+						236 cell
+							237 text AGT-CCDDEB4A，AGT-3A36BBB4
+						238 cell
+							239 text 步骤4引导信息已展示，需同步通知目的地柜台及现场服务人员
+						240 cell
+							241 text 通知设备返回notificationStatus为成功，确认现场人员已收到通知
+						242 cell
+							243 text 若通知失败，切换至另一台机器人重试；均失败则通过电话等备用渠道通知
+			244 container step-assignments
+				245 text 步骤设备分配与执行情况
+				246 container
+					247 text 执行进度： 5/5 
+				248 table
+					249 row
+						250 cell
+							251 text 步骤
+						252 cell
+							253 text 分配设备
+						254 cell
+							255 text 指令编号
+						256 cell
+							257 text 步骤状态
+						258 cell
+							259 text 重试次数
+						260 cell
+							261 text 执行结果
+						262 cell
+							263 text 承接响应时间
+						264 cell
+							265 text 下发时间
+						266 cell
+							267 text 反馈时间
+					268 row
+						269 cell
+							270 text 1
+						271 cell
+							272 text 已完成
+							273 text 采用已登记的测量事件
+						274 cell
+							275 text 0
+						276 cell
+							277 text SUCCESS
+						278 cell
+							279 text -
+						280 cell
+							281 text 2026-11-15T23:19:50.653966
+					282 row
+						283 cell
+							284 text 2
+						285 cell
+							286 text AGT-1C13535E
+						287 cell
+							288 text CMD-20261115232022-18CB002D
+						289 cell
+							290 text 已完成
+						291 cell
+							292 text 0
+						293 cell
+							294 text SUCCESS
+						295 cell
+							296 text 232ms
+						297 cell
+							298 text 2026-11-15T23:20:23.169972
+						299 cell
+							300 text 2026-11-15T23:20:23.805582
+					301 row
+						302 cell
+							303 text 3
+						304 cell
+							305 text AGT-3A36BBB4
+						306 cell
+							307 text CMD-20261115232023-18CB002F
+						308 cell
+							309 text 已完成
+						310 cell
+							311 text 0
+						312 cell
+							313 text SUCCESS
+						314 cell
+							315 text 56ms
+						316 cell
+							317 text 2026-11-15T23:20:23.889128
+						318 cell
+							319 text 2026-11-15T23:20:25.090562
+					320 row
+						321 cell
+							322 text 4
+						323 cell
+							324 text AGT-3A76FECA
+						325 cell
+							326 text CMD-20261115232025-18CB0031
+						327 cell
+							328 text 已完成
+						329 cell
+							330 text 0
+						331 cell
+							332 text SUCCESS
+						333 cell
+							334 text 38ms
+						335 cell
+							336 text 2026-11-15T23:20:25.164241
+						337 cell
+							338 text 2026-11-15T23:20:25.714555
+					339 row
+						340 cell
+							341 text 5
+						342 cell
+							343 text AGT-3A36BBB4
+						344 cell
+							345 text CMD-20261115232025-18CB0033
+						346 cell
+							347 text 已完成
+						348 cell
+							349 text 0
+						350 cell
+							351 text SUCCESS
+						352 cell
+							353 text 50ms
+						354 cell
+							355 text 2026-11-15T23:20:25.787831
+						356 cell
+							357 text 2026-11-15T23:20:26.343624
+			358 text 行李测量与超规判定
+			359 table
+				360 row
+					361 cell
+						362 text 长×宽×高
+					363 cell
+						364 text 100×60×40 cm
+					365 cell
+						366 text 重量
+					367 cell
+						368 text 28 kg
+				369 row
+					370 cell
+						371 text 超规判定
+					372 cell
+						373 text 超规
+					374 cell
+						375 text 阈值
+					376 cell
+						377 text 三边和 ＞ 158 cm 或重量 ＞ 32 kg
+				378 row
+					379 cell
+						380 text 阈值来源
+					381 cell
+						382 text 附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束
+			383 text 超规行李办理说明与柜台引导
+			384 table
+				385 row
+					386 cell
+						387 text 临时业务号
+					388 cell
+						389 text BAG-990430 （脱敏临时业务识别码，不存储真实旅客身份）
+					390 cell
+						391 text 指定办理柜台
+					392 cell
+						393 text 超规行李专柜B01
+				394 row
+					395 cell
+						396 text 状态提示
+					397 cell
+						398 container
+							399 image exclamation-circle
+							400 text 该行李已超出标准托运限额（长宽高合计超限或单件超重），请核对告警步骤执行结果并按专柜指引办理。
+				401 row
+					402 cell
+						403 text 办理说明与托运须知
+					404 cell
+						405 text 【超规行李办理流程】
+1. 前往指定超规行李专柜（超规行李专柜B01）进行人工复核与二次称重。
+2. 出示临时业务识别码（BAG-990430），核对托运凭证。
+3. 按照航空公司超限行李费率标准现场补缴逾重/超规附加费。
+4. 完成人工加固或打包（如适用）并领取超规行李提取凭证。
+
+【注意事项与托运须知】
+- 严禁在托运行李中夹带锂电池、移动电源、易燃易爆等违禁品。
+- 异形或易碎超规行李需签署免责托运声明。
+- 现场智能服务终端与导引机器人持续提供路线指引与状态播报。
+			406 text 事件时间线（只读，事件仅可追加不可修改删除，对应5.7.1）
+			407 content list
+				408 container
+					409 text 2026-11-15T23:19:50.602846 - GOAL_SUBMITTED  （原因码: MEASUREMENT_EVENT） ：接收模拟超规行李测量事件，临时业务编号: BAG-990430，位置: T2值机岛A03，尺寸: 100.0×60.0×40.0cm，重量: 28.0kg，超规判定: 超规
+				410 container
+					411 text 2026-11-15T23:19:50.653966 - MEASUREMENT_RECORDED  （原因码: MEASUREMENT_EVENT） ：{"length":100.0,"width":60.0,"height":40.0,"weight":28.0,"isOversize":true,"totalDimensionCm":200.0,"dimensionThresholdCm":158.0,"weightThresholdKg":32.0,"thresholdSource":"附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束","baggageId":"BAG-990430"}
+				412 container
+					413 text 2026-11-15T23:19:53.828254 - GOAL_CLARIFIED  （原因码: NORMAL_GOAL_CLARIFIED） ：目标理解完成，关键信息已完整，进入规划上下文构建
+				414 container
+					415 text 2026-11-15T23:19:53.951727 - CONTEXT_SNAPSHOT_GENERATED  （原因码: NORMAL_CONTEXT_BUILT） ：生成规划上下文快照CTX-20261115-0340
+				416 container
+					417 text 2026-11-15T23:20:22.39946 - PLAN_GENERATED  （原因码: NORMAL_PLAN_GENERATED） ：候选计划生成完成，来源AUTONOMOUS，版本1
+				418 container
+					419 text 2026-11-15T23:20:22.41571 - PLAN_VALIDATED  （原因码: NORMAL_PLAN_VALIDATED） ：候选计划三类校验全部通过，已冻结版本
+				420 container
+					421 text 2026-11-15T23:20:22.515526 - SUPERVISION_JUDGED  （原因码: NORMAL_SUPERVISION_JUDGED） ：监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则；命中单一风险信号（候选差异较大），单一信号不直接阻断，低风险自动执行；置信度=0.92（仅作参考，不覆盖三类校验结果）；规则集版本=V1.2；推荐处置=AUTO_EXECUTE（自动执行）
+				422 container
+					423 text 2026-11-15T23:20:22.681498 - STEP_COMPLETED  （原因码: MEASUREMENT_EVENT_REUSED） ：步骤1使用已登记的测量结果，来源事件 6157
+				424 container
+					425 text 2026-11-15T23:20:22.712997 - AGENT_ASSIGNMENT_REQUESTED  （原因码: NORMAL_ASSIGNMENT_REQUESTED） ：步骤2候选排序（能力匹配->距离->负载）: AGT-1C13535E(匹配度1.0,距离0.0,负载0)；AGT-D602D701(匹配度1.0,距离0.0,负载0)，向候选AGT-1C13535E发起承接请求
+				426 container
+					427 text 2026-11-15T23:20:23.087528 - AGENT_ASSIGNED  （原因码: NORMAL_AGENT_ASSIGNED） ：设备代理AGT-1C13535E接受步骤2承接请求
+				428 container
+					429 text 2026-11-15T23:20:23.180167 - STEP_DISPATCHED  （原因码: NORMAL_STEP_DISPATCHED） ：指令CMD-20261115232023-18CB002E已下发至设备代理AGT-1C13535E，业务意图: 上报超规行李事件至平台
+				430 container
+					431 text 2026-11-15T23:20:23.805582 - EXECUTION_FEEDBACK_RECEIVED  （原因码: DEVICE_SUCCESS） ：指令CMD-20261115232023-18CB002E收到设备代理AGT-1C13535E执行反馈: SUCCESS
+				432 container
+					433 text 2026-11-15T23:20:23.810364 - STEP_COMPLETED  （原因码: NORMAL_STEP_COMPLETED） ：步骤2完成条件已满足: 平台返回alertId、reportStatus、reportTime，确认超规事件已成功上报
+				434 container
+					435 text 2026-11-15T23:20:23.822153 - AGENT_ASSIGNMENT_REQUESTED  （原因码: NORMAL_ASSIGNMENT_REQUESTED） ：步骤3候选排序（能力匹配->距离->负载）: AGT-3A36BBB4(匹配度1.0,距离0.0,负载0)；AGT-CCDDEB4A(匹配度1.0,距离0.0,负载0)，向候选AGT-3A36BBB4发起承接请求
+				436 container
+					437 text 2026-11-15T23:20:23.885216 - AGENT_ASSIGNED  （原因码: NORMAL_AGENT_ASSIGNED） ：设备代理AGT-3A36BBB4接受步骤3承接请求
+				438 container
+					439 text 2026-11-15T23:20:23.892099 - STEP_DISPATCHED  （原因码: NORMAL_STEP_DISPATCHED） ：指令CMD-20261115232023-18CB0030已下发至设备代理AGT-3A36BBB4，业务意图: 生成前往超规行李专柜B01的无障碍导航路线
+				440 container
+					441 text 2026-11-15T23:20:25.090562 - EXECUTION_FEEDBACK_RECEIVED  （原因码: DEVICE_SUCCESS） ：指令CMD-20261115232023-18CB0030收到设备代理AGT-3A36BBB4执行反馈: SUCCESS
+				442 container
+					443 text 2026-11-15T23:20:25.093747 - STEP_COMPLETED  （原因码: NORMAL_STEP_COMPLETED） ：步骤3完成条件已满足: 设备返回routeGenerated=true，并提供estimatedDistance/estimatedDuration/waypointCount
+				444 container
+					445 text 2026-11-15T23:20:25.116179 - AGENT_ASSIGNMENT_REQUESTED  （原因码: NORMAL_ASSIGNMENT_REQUESTED） ：步骤4候选排序（能力匹配->距离->负载）: AGT-3A76FECA(匹配度1.0,距离0.0,负载0)；AGT-62EAF5EA(匹配度1.0,距离0.0,负载0)，向候选AGT-3A76FECA发起承接请求
+				446 container
+					447 text 2026-11-15T23:20:25.158445 - AGENT_ASSIGNED  （原因码: NORMAL_AGENT_ASSIGNED） ：设备代理AGT-3A76FECA接受步骤4承接请求
+				448 container
+					449 text 2026-11-15T23:20:25.165089 - STEP_DISPATCHED  （原因码: NORMAL_STEP_DISPATCHED） ：指令CMD-20261115232025-18CB0032已下发至设备代理AGT-3A76FECA，业务意图: 在值机区域展示超规行李引导信息
+				450 container
+					451 text 2026-11-15T23:20:25.714555 - EXECUTION_FEEDBACK_RECEIVED  （原因码: DEVICE_SUCCESS） ：指令CMD-20261115232025-18CB0032收到设备代理AGT-3A76FECA执行反馈: SUCCESS
+				452 container
+					453 text 2026-11-15T23:20:25.719697 - STEP_COMPLETED  （原因码: NORMAL_STEP_COMPLETED） ：步骤4完成条件已满足: 显示屏或机器人返回displayStatus为成功，确认信息已展示
+				454 container
+					455 text 2026-11-15T23:20:25.732158 - AGENT_ASSIGNMENT_REQUESTED  （原因码: NORMAL_ASSIGNMENT_REQUESTED） ：步骤5候选排序（能力匹配->距离->负载）: AGT-3A36BBB4(匹配度1.0,距离0.0,负载0)；AGT-CCDDEB4A(匹配度1.0,距离0.0,负载0)，向候选AGT-3A36BBB4发起承接请求
+				456 container
+					457 text 2026-11-15T23:20:25.785606 - AGENT_ASSIGNED  （原因码: NORMAL_AGENT_ASSIGNED） ：设备代理AGT-3A36BBB4接受步骤5承接请求
+				458 container
+					459 text 2026-11-15T23:20:25.790163 - STEP_DISPATCHED  （原因码: NORMAL_STEP_DISPATCHED） ：指令CMD-20261115232025-18CB0034已下发至设备代理AGT-3A36BBB4，业务意图: 向现场服务人员发送超规行李协助通知
+				460 container
+					461 text 2026-11-15T23:20:26.343624 - EXECUTION_FEEDBACK_RECEIVED  （原因码: DEVICE_SUCCESS） ：指令CMD-20261115232025-18CB0034收到设备代理AGT-3A36BBB4执行反馈: SUCCESS
+				462 container
+					463 text 2026-11-15T23:20:26.349102 - STEP_COMPLETED  （原因码: NORMAL_STEP_COMPLETED） ：步骤5完成条件已满足: 通知设备返回notificationStatus为成功，确认现场人员已收到通知
+				464 container
+					465 text 2026-11-15T23:20:26.365928 - TASK_COMPLETED  （原因码: OVERSIZE_HANDLING_CLOSED_LOOP） ：超规行李处置闭环完成（临时业务编号: BAG-990430）：已完成行李测量、超规告警上报、航显办理说明发布，以及移动机器人至超规行李专柜B01的空间引导；全部步骤均已执行完成。
+
+The focused UI element is 0 AXWebArea 智慧机场人工智能集群协同服务平台, URL: localhost:5173/tasks/290

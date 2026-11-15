@@ -1,0 +1,714 @@
+{
+  "time": "2026-11-15T23:19:08.560746+08:00",
+  "task": {
+    "id": 289,
+    "taskCode": "TASK-20261115-0288",
+    "taskGoal": "请为虚构轮椅旅客在T2值机区通过智慧航显显示会合提示、通知现场人员，并安排服务机器人前往会合后陪同旅客前往GATE_A05。",
+    "taskFamily": "SPECIAL_PASSENGER_SERVICE",
+    "sceneParams": {
+      "assistanceType": "轮椅陪同",
+      "origin": "T2值机区",
+      "destination": "GATE_A05",
+      "notificationType": "BOTH",
+      "repeatCount": 1,
+      "targetLocation": "GATE_A05",
+      "escortMode": "LEAD",
+      "maxDuration": 600,
+      "contentType": "TEXT",
+      "displayDuration": 60,
+      "meetingNotice": "轮椅陪同：请在T2值机区会合，现场人员请协助，由服务机器人陪同前往GATE_A05。",
+      "routePreference": "BARRIER_FREE"
+    },
+    "goalParsingResult": {
+      "completionCondition": "旅客已到达目标地点",
+      "origin": "T2值机区",
+      "destination": "GATE_A05",
+      "originalGoal": "请为虚构轮椅旅客在T2值机区通过智慧航显显示会合提示、通知现场人员，并安排服务机器人前往会合后陪同旅客前往GATE_A05。",
+      "constraints": [
+        "陪同对象为特殊旅客时优先安排陪同服务而非仅空间引导",
+        "全程与现场人员保持通知联动"
+      ]
+    },
+    "status": "COMPLETED",
+    "currentPlanVersionId": 379,
+    "replanUsed": false,
+    "replanningReason": null,
+    "manualTerminateReason": null,
+    "failureReason": null,
+    "missingInfoQuestions": null,
+    "downgradeReason": "监督判定高风险: RULE_ESCORT_SPECIAL_PASSENGER",
+    "isDryRun": false,
+    "createdAt": "2026-11-15T23:18:19.598836",
+    "updatedAt": "2026-11-15T23:18:52.763253",
+    "createdBy": "oprator"
+  },
+  "commands": [
+    {
+      "step_seq": 1,
+      "agent_code": "AGT-3A76FECA",
+      "capability_type": "CAP_INFO_DISPLAY",
+      "command_status": "SUCCEEDED",
+      "params": {
+        "contentType": "TEXT",
+        "contentData": "轮椅陪同：请在T2值机区会合，现场人员请协助，由服务机器人陪同前往GATE_A05。",
+        "displayDuration": 60
+      }
+    },
+    {
+      "step_seq": 2,
+      "agent_code": "AGT-3A36BBB4",
+      "capability_type": "CAP_NOTIFICATION",
+      "command_status": "SUCCEEDED",
+      "params": {
+        "notificationType": "BOTH",
+        "notificationContent": "轮椅陪同：请在T2值机区会合，现场人员请协助，由服务机器人陪同前往GATE_A05。",
+        "repeatCount": 1
+      }
+    },
+    {
+      "step_seq": 3,
+      "agent_code": "AGT-3A36BBB4",
+      "capability_type": "CAP_NAVIGATION",
+      "command_status": "SUCCEEDED",
+      "params": {
+        "targetLocation": "T2值机区",
+        "routePreference": "BARRIER_FREE"
+      }
+    },
+    {
+      "step_seq": 4,
+      "agent_code": "AGT-3A36BBB4",
+      "capability_type": "CAP_ESCORT",
+      "command_status": "SUCCEEDED",
+      "params": {
+        "targetLocation": "GATE_A05",
+        "escortMode": "LEAD",
+        "maxDuration": 600
+      }
+    }
+  ],
+  "steps": [
+    {
+      "id": 696,
+      "stepSeq": 1,
+      "deviceAgentCode": "AGT-3A76FECA",
+      "commandId": "CMD-20261115231848-18CB0025",
+      "stepStatus": "COMPLETED",
+      "retryCount": 0,
+      "executionResult": "SUCCESS",
+      "reasonCode": "DEVICE_SUCCESS",
+      "outputParams": {
+        "displayStatus": "SUCCESS",
+        "actualDuration": 60,
+        "errorMessage": ""
+      },
+      "dispatchedAt": "2026-11-15T23:18:48.45263",
+      "feedbackAt": "2026-11-15T23:18:49.145864",
+      "rejectedAgentIds": [],
+      "acceptanceRequestedAt": "2026-11-15T23:18:48.231459",
+      "acceptedAt": "2026-11-15T23:18:48.421893",
+      "acceptanceDurationMs": 190,
+      "acceptanceResponseTime": "190ms"
+    },
+    {
+      "id": 697,
+      "stepSeq": 2,
+      "deviceAgentCode": "AGT-3A36BBB4",
+      "commandId": "CMD-20261115231849-18CB0027",
+      "stepStatus": "COMPLETED",
+      "retryCount": 0,
+      "executionResult": "SUCCESS",
+      "reasonCode": "DEVICE_SUCCESS",
+      "outputParams": {
+        "notificationStatus": "SUCCESS",
+        "actualRepeatCount": 1
+      },
+      "dispatchedAt": "2026-11-15T23:18:49.223301",
+      "feedbackAt": "2026-11-15T23:18:49.802323",
+      "rejectedAgentIds": [],
+      "acceptanceRequestedAt": "2026-11-15T23:18:49.169057",
+      "acceptedAt": "2026-11-15T23:18:49.215801",
+      "acceptanceDurationMs": 46,
+      "acceptanceResponseTime": "46ms"
+    },
+    {
+      "id": 698,
+      "stepSeq": 3,
+      "deviceAgentCode": "AGT-3A36BBB4",
+      "commandId": "CMD-20261115231849-18CB0029",
+      "stepStatus": "COMPLETED",
+      "retryCount": 0,
+      "executionResult": "SUCCESS",
+      "reasonCode": "DEVICE_SUCCESS",
+      "outputParams": {
+        "routeGenerated": true,
+        "waypointCount": 8,
+        "estimatedDuration": 157,
+        "estimatedDistance": 379.0,
+        "arrivalStatus": "ARRIVED",
+        "arrivalLocation": "T2值机区",
+        "arrivalDeviceCode": "SIM_F2_ROBOT_B"
+      },
+      "dispatchedAt": "2026-11-15T23:18:49.879602",
+      "feedbackAt": "2026-11-15T23:18:51.083891",
+      "rejectedAgentIds": [],
+      "acceptanceRequestedAt": "2026-11-15T23:18:49.820545",
+      "acceptedAt": "2026-11-15T23:18:49.871636",
+      "acceptanceDurationMs": 51,
+      "acceptanceResponseTime": "51ms"
+    },
+    {
+      "id": 699,
+      "stepSeq": 4,
+      "deviceAgentCode": "AGT-3A36BBB4",
+      "commandId": "CMD-20261115231851-18CB002B",
+      "stepStatus": "COMPLETED",
+      "retryCount": 0,
+      "executionResult": "SUCCESS",
+      "reasonCode": "DEVICE_SUCCESS",
+      "outputParams": {
+        "arrivalStatus": "ARRIVED",
+        "actualDistance": 85.2,
+        "actualDuration": 420
+      },
+      "dispatchedAt": "2026-11-15T23:18:51.165561",
+      "feedbackAt": "2026-11-15T23:18:52.730334",
+      "rejectedAgentIds": [],
+      "acceptanceRequestedAt": "2026-11-15T23:18:51.099092",
+      "acceptedAt": "2026-11-15T23:18:51.161997",
+      "acceptanceDurationMs": 62,
+      "acceptanceResponseTime": "62ms"
+    }
+  ],
+  "events": [
+    {
+      "id": 6127,
+      "taskId": 289,
+      "eventType": "GOAL_SUBMITTED",
+      "occurredAt": "2026-11-15T23:18:19.604248",
+      "trigger": "OPERATOR",
+      "reasonCode": "NORMAL_GOAL_SUBMITTED",
+      "detailSummary": "运行操作员oprator提交任务目标: 请为虚构轮椅旅客在T2值机区通过智慧航显显示会合提示、通知现场人员，并安排服务机器人前往会合后陪同旅客前往GATE_A05。",
+      "detail": "运行操作员oprator提交任务目标: 请为虚构轮椅旅客在T2值机区通过智慧航显显示会合提示、通知现场人员，并安排服务机器人前往会合后陪同旅客前往GATE_A05。",
+      "rawDetailSummary": "运行操作员oprator提交任务目标: 请为虚构轮椅旅客在T2值机区通过智慧航显显示会合提示、通知现场人员，并安排服务机器人前往会合后陪同旅客前往GATE_A05。"
+    },
+    {
+      "id": 6128,
+      "taskId": 289,
+      "eventType": "GOAL_CLARIFIED",
+      "occurredAt": "2026-11-15T23:18:23.919752",
+      "trigger": "SYSTEM",
+      "reasonCode": "INFO_CHECK_OVERRIDE",
+      "detailSummary": "系统按任务族核对必要信息：均已提供，忽略模型的追问（模型判断不完整）",
+      "detail": "系统按任务族核对必要信息：均已提供，忽略模型的追问（模型判断不完整）",
+      "rawDetailSummary": "系统按任务族核对必要信息：均已提供，忽略模型的追问（模型判断不完整）"
+    },
+    {
+      "id": 6129,
+      "taskId": 289,
+      "eventType": "GOAL_CLARIFIED",
+      "occurredAt": "2026-11-15T23:18:23.924323",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_GOAL_CLARIFIED",
+      "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建",
+      "detail": "目标理解完成，关键信息已完整，进入规划上下文构建",
+      "rawDetailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+    },
+    {
+      "id": 6130,
+      "taskId": 289,
+      "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+      "occurredAt": "2026-11-15T23:18:24.07086",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_CONTEXT_BUILT",
+      "detailSummary": "生成规划上下文快照CTX-20261115-0338",
+      "detail": "生成规划上下文快照CTX-20261115-0338",
+      "rawDetailSummary": "生成规划上下文快照CTX-20261115-0338"
+    },
+    {
+      "id": 6131,
+      "taskId": 289,
+      "eventType": "PLAN_GENERATED",
+      "occurredAt": "2026-11-15T23:18:47.914955",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_PLAN_GENERATED",
+      "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1",
+      "detail": "候选计划生成完成，来源AUTONOMOUS，版本1",
+      "rawDetailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+    },
+    {
+      "id": 6132,
+      "taskId": 289,
+      "eventType": "PLAN_VALIDATED",
+      "occurredAt": "2026-11-15T23:18:47.936156",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_PLAN_VALIDATED",
+      "detailSummary": "候选计划三类校验全部通过，已冻结版本",
+      "detail": "候选计划三类校验全部通过，已冻结版本",
+      "rawDetailSummary": "候选计划三类校验全部通过，已冻结版本"
+    },
+    {
+      "id": 6133,
+      "taskId": 289,
+      "eventType": "SUPERVISION_JUDGED",
+      "occurredAt": "2026-11-15T23:18:48.000055",
+      "trigger": "SYSTEM",
+      "reasonCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+      "detailSummary": "监督判定: 风险等级=HIGH；原因码=RULE_ESCORT_SPECIAL_PASSENGER；判定依据=移动机器人会合或陪同对象为特殊旅客，命中确定性高风险规则；命中步骤：步骤3(CAP_NAVIGATION，会合，绑定移动服务机器人)、步骤4(CAP_ESCORT，陪同，绑定移动服务机器人)；置信度=0.85（仅作参考，不覆盖三类校验结果）；规则集版本=V1.2；推荐处置=BASELINE_DOWNGRADE（基线降级）",
+      "detail": "监督判定: 风险等级=HIGH；原因码=RULE_ESCORT_SPECIAL_PASSENGER；判定依据=移动机器人会合或陪同对象为特殊旅客，命中确定性高风险规则；命中步骤：步骤3(CAP_NAVIGATION，会合，绑定移动服务机器人)、步骤4(CAP_ESCORT，陪同，绑定移动服务机器人)；置信度=0.85（仅作参考，不覆盖三类校验结果）；规则集版本=V1.2；推荐处置=BASELINE_DOWNGRADE（基线降级）",
+      "rawDetailSummary": "监督判定: 风险等级=HIGH；原因码=RULE_ESCORT_SPECIAL_PASSENGER；判定依据=移动机器人会合或陪同对象为特殊旅客，命中确定性高风险规则；命中步骤：步骤3(CAP_NAVIGATION，会合，绑定移动服务机器人)、步骤4(CAP_ESCORT，陪同，绑定移动服务机器人)；置信度=0.85（仅作参考，不覆盖三类校验结果）；规则集版本=V1.2；推荐处置=BASELINE_DOWNGRADE（基线降级）"
+    },
+    {
+      "id": 6134,
+      "taskId": 289,
+      "eventType": "BASELINE_DOWNGRADED",
+      "occurredAt": "2026-11-15T23:18:48.163292",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_BASELINE_DOWNGRADED",
+      "detailSummary": "已自动切换至基线模板特殊旅客服务标准模板(V1.16)，原因: 监督判定高风险: RULE_ESCORT_SPECIAL_PASSENGER，选择依据: [任务族精确匹配(SPECIAL_PASSENGER_SERVICE), 步骤数4步少优先, 最近试运行通过时间2026-11-15T23:12:43.202388优先]",
+      "detail": "已自动切换至基线模板特殊旅客服务标准模板(V1.16)，原因: 监督判定高风险: RULE_ESCORT_SPECIAL_PASSENGER，选择依据: [任务族精确匹配(SPECIAL_PASSENGER_SERVICE), 步骤数4步少优先, 最近试运行通过时间2026-11-15T23:12:43.202388优先]",
+      "rawDetailSummary": "已自动切换至基线模板特殊旅客服务标准模板(V1.16)，原因: 监督判定高风险: RULE_ESCORT_SPECIAL_PASSENGER，选择依据: [任务族精确匹配(SPECIAL_PASSENGER_SERVICE), 步骤数4步少优先, 最近试运行通过时间2026-11-15T23:12:43.202388优先]"
+    },
+    {
+      "id": 6135,
+      "taskId": 289,
+      "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+      "occurredAt": "2026-11-15T23:18:48.226414",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_ASSIGNMENT_REQUESTED",
+      "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-3A76FECA(匹配度1.0,距离0.0,负载0)；AGT-62EAF5EA(匹配度1.0,距离0.0,负载0)，向候选AGT-3A76FECA发起承接请求",
+      "detail": "步骤1候选排序（能力匹配->距离->负载）: AGT-3A76FECA(匹配度1.0,距离0.0,负载0)；AGT-62EAF5EA(匹配度1.0,距离0.0,负载0)，向候选AGT-3A76FECA发起承接请求",
+      "rawDetailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-3A76FECA(匹配度1.0,距离0.0,负载0)；AGT-62EAF5EA(匹配度1.0,距离0.0,负载0)，向候选AGT-3A76FECA发起承接请求"
+    },
+    {
+      "id": 6136,
+      "taskId": 289,
+      "eventType": "AGENT_ASSIGNED",
+      "occurredAt": "2026-11-15T23:18:48.425893",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_AGENT_ASSIGNED",
+      "detailSummary": "设备代理AGT-3A76FECA接受步骤1承接请求",
+      "detail": "设备代理AGT-3A76FECA接受步骤1承接请求",
+      "rawDetailSummary": "设备代理AGT-3A76FECA接受步骤1承接请求"
+    },
+    {
+      "id": 6137,
+      "taskId": 289,
+      "eventType": "STEP_DISPATCHED",
+      "occurredAt": "2026-11-15T23:18:48.463437",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_STEP_DISPATCHED",
+      "detailSummary": "指令CMD-20261115231848-18CB0026已下发至设备代理AGT-3A76FECA，业务意图: 执行CAP_INFO_DISPLAY能力（基线模板步骤）",
+      "detail": "指令CMD-20261115231848-18CB0026已下发至设备代理AGT-3A76FECA，业务意图: 执行CAP_INFO_DISPLAY能力（基线模板步骤）",
+      "rawDetailSummary": "指令CMD-20261115231848-18CB0026已下发至设备代理AGT-3A76FECA，业务意图: 执行CAP_INFO_DISPLAY能力（基线模板步骤）"
+    },
+    {
+      "id": 6138,
+      "taskId": 289,
+      "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+      "occurredAt": "2026-11-15T23:18:49.145864",
+      "trigger": "SYSTEM",
+      "reasonCode": "DEVICE_SUCCESS",
+      "detailSummary": "指令CMD-20261115231848-18CB0026收到设备代理AGT-3A76FECA执行反馈: SUCCESS",
+      "detail": "指令CMD-20261115231848-18CB0026收到设备代理AGT-3A76FECA执行反馈: SUCCESS",
+      "rawDetailSummary": "指令CMD-20261115231848-18CB0026收到设备代理AGT-3A76FECA执行反馈: SUCCESS"
+    },
+    {
+      "id": 6139,
+      "taskId": 289,
+      "eventType": "STEP_COMPLETED",
+      "occurredAt": "2026-11-15T23:18:49.152693",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_STEP_COMPLETED",
+      "detailSummary": "步骤1完成条件已满足: displayStatus=SUCCESS",
+      "detail": "步骤1完成条件已满足: displayStatus=SUCCESS",
+      "rawDetailSummary": "步骤1完成条件已满足: displayStatus=SUCCESS"
+    },
+    {
+      "id": 6140,
+      "taskId": 289,
+      "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+      "occurredAt": "2026-11-15T23:18:49.165716",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_ASSIGNMENT_REQUESTED",
+      "detailSummary": "步骤2候选排序（能力匹配->距离->负载）: AGT-3A36BBB4(匹配度1.0,距离0.0,负载0)；AGT-CCDDEB4A(匹配度1.0,距离0.0,负载0)，向候选AGT-3A36BBB4发起承接请求",
+      "detail": "步骤2候选排序（能力匹配->距离->负载）: AGT-3A36BBB4(匹配度1.0,距离0.0,负载0)；AGT-CCDDEB4A(匹配度1.0,距离0.0,负载0)，向候选AGT-3A36BBB4发起承接请求",
+      "rawDetailSummary": "步骤2候选排序（能力匹配->距离->负载）: AGT-3A36BBB4(匹配度1.0,距离0.0,负载0)；AGT-CCDDEB4A(匹配度1.0,距离0.0,负载0)，向候选AGT-3A36BBB4发起承接请求"
+    },
+    {
+      "id": 6141,
+      "taskId": 289,
+      "eventType": "AGENT_ASSIGNED",
+      "occurredAt": "2026-11-15T23:18:49.219137",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_AGENT_ASSIGNED",
+      "detailSummary": "设备代理AGT-3A36BBB4接受步骤2承接请求",
+      "detail": "设备代理AGT-3A36BBB4接受步骤2承接请求",
+      "rawDetailSummary": "设备代理AGT-3A36BBB4接受步骤2承接请求"
+    },
+    {
+      "id": 6142,
+      "taskId": 289,
+      "eventType": "STEP_DISPATCHED",
+      "occurredAt": "2026-11-15T23:18:49.228068",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_STEP_DISPATCHED",
+      "detailSummary": "指令CMD-20261115231849-18CB0028已下发至设备代理AGT-3A36BBB4，业务意图: 执行CAP_NOTIFICATION能力（基线模板步骤）",
+      "detail": "指令CMD-20261115231849-18CB0028已下发至设备代理AGT-3A36BBB4，业务意图: 执行CAP_NOTIFICATION能力（基线模板步骤）",
+      "rawDetailSummary": "指令CMD-20261115231849-18CB0028已下发至设备代理AGT-3A36BBB4，业务意图: 执行CAP_NOTIFICATION能力（基线模板步骤）"
+    },
+    {
+      "id": 6143,
+      "taskId": 289,
+      "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+      "occurredAt": "2026-11-15T23:18:49.803468",
+      "trigger": "SYSTEM",
+      "reasonCode": "DEVICE_SUCCESS",
+      "detailSummary": "指令CMD-20261115231849-18CB0028收到设备代理AGT-3A36BBB4执行反馈: SUCCESS",
+      "detail": "指令CMD-20261115231849-18CB0028收到设备代理AGT-3A36BBB4执行反馈: SUCCESS",
+      "rawDetailSummary": "指令CMD-20261115231849-18CB0028收到设备代理AGT-3A36BBB4执行反馈: SUCCESS"
+    },
+    {
+      "id": 6144,
+      "taskId": 289,
+      "eventType": "STEP_COMPLETED",
+      "occurredAt": "2026-11-15T23:18:49.807861",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_STEP_COMPLETED",
+      "detailSummary": "步骤2完成条件已满足: notificationStatus=SUCCESS",
+      "detail": "步骤2完成条件已满足: notificationStatus=SUCCESS",
+      "rawDetailSummary": "步骤2完成条件已满足: notificationStatus=SUCCESS"
+    },
+    {
+      "id": 6145,
+      "taskId": 289,
+      "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+      "occurredAt": "2026-11-15T23:18:49.819467",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_ASSIGNMENT_REQUESTED",
+      "detailSummary": "步骤3候选排序（能力匹配->距离->负载）: AGT-3A36BBB4(匹配度1.0,距离0.0,负载0)；AGT-CCDDEB4A(匹配度1.0,距离0.0,负载0)，向候选AGT-3A36BBB4发起承接请求",
+      "detail": "步骤3候选排序（能力匹配->距离->负载）: AGT-3A36BBB4(匹配度1.0,距离0.0,负载0)；AGT-CCDDEB4A(匹配度1.0,距离0.0,负载0)，向候选AGT-3A36BBB4发起承接请求",
+      "rawDetailSummary": "步骤3候选排序（能力匹配->距离->负载）: AGT-3A36BBB4(匹配度1.0,距离0.0,负载0)；AGT-CCDDEB4A(匹配度1.0,距离0.0,负载0)，向候选AGT-3A36BBB4发起承接请求"
+    },
+    {
+      "id": 6146,
+      "taskId": 289,
+      "eventType": "AGENT_ASSIGNED",
+      "occurredAt": "2026-11-15T23:18:49.874692",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_AGENT_ASSIGNED",
+      "detailSummary": "设备代理AGT-3A36BBB4接受步骤3承接请求",
+      "detail": "设备代理AGT-3A36BBB4接受步骤3承接请求",
+      "rawDetailSummary": "设备代理AGT-3A36BBB4接受步骤3承接请求"
+    },
+    {
+      "id": 6147,
+      "taskId": 289,
+      "eventType": "STEP_DISPATCHED",
+      "occurredAt": "2026-11-15T23:18:49.881838",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_STEP_DISPATCHED",
+      "detailSummary": "指令CMD-20261115231849-18CB002A已下发至设备代理AGT-3A36BBB4，业务意图: 执行CAP_NAVIGATION能力（基线模板步骤）",
+      "detail": "指令CMD-20261115231849-18CB002A已下发至设备代理AGT-3A36BBB4，业务意图: 执行CAP_NAVIGATION能力（基线模板步骤）",
+      "rawDetailSummary": "指令CMD-20261115231849-18CB002A已下发至设备代理AGT-3A36BBB4，业务意图: 执行CAP_NAVIGATION能力（基线模板步骤）"
+    },
+    {
+      "id": 6148,
+      "taskId": 289,
+      "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+      "occurredAt": "2026-11-15T23:18:51.083891",
+      "trigger": "SYSTEM",
+      "reasonCode": "DEVICE_SUCCESS",
+      "detailSummary": "指令CMD-20261115231849-18CB002A收到设备代理AGT-3A36BBB4执行反馈: SUCCESS",
+      "detail": "指令CMD-20261115231849-18CB002A收到设备代理AGT-3A36BBB4执行反馈: SUCCESS",
+      "rawDetailSummary": "指令CMD-20261115231849-18CB002A收到设备代理AGT-3A36BBB4执行反馈: SUCCESS"
+    },
+    {
+      "id": 6149,
+      "taskId": 289,
+      "eventType": "STEP_COMPLETED",
+      "occurredAt": "2026-11-15T23:18:51.087755",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_STEP_COMPLETED",
+      "detailSummary": "步骤3完成条件已满足: arrivalStatus=ARRIVED",
+      "detail": "步骤3完成条件已满足: arrivalStatus=ARRIVED",
+      "rawDetailSummary": "步骤3完成条件已满足: arrivalStatus=ARRIVED"
+    },
+    {
+      "id": 6150,
+      "taskId": 289,
+      "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+      "occurredAt": "2026-11-15T23:18:51.097947",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_ASSIGNMENT_REQUESTED",
+      "detailSummary": "步骤4候选排序（能力匹配->距离->负载）: AGT-3A36BBB4(匹配度1.0,距离0.0,负载0)，向候选AGT-3A36BBB4发起承接请求",
+      "detail": "步骤4候选排序（能力匹配->距离->负载）: AGT-3A36BBB4(匹配度1.0,距离0.0,负载0)，向候选AGT-3A36BBB4发起承接请求",
+      "rawDetailSummary": "步骤4候选排序（能力匹配->距离->负载）: AGT-3A36BBB4(匹配度1.0,距离0.0,负载0)，向候选AGT-3A36BBB4发起承接请求"
+    },
+    {
+      "id": 6151,
+      "taskId": 289,
+      "eventType": "AGENT_ASSIGNED",
+      "occurredAt": "2026-11-15T23:18:51.164027",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_AGENT_ASSIGNED",
+      "detailSummary": "设备代理AGT-3A36BBB4接受步骤4承接请求",
+      "detail": "设备代理AGT-3A36BBB4接受步骤4承接请求",
+      "rawDetailSummary": "设备代理AGT-3A36BBB4接受步骤4承接请求"
+    },
+    {
+      "id": 6152,
+      "taskId": 289,
+      "eventType": "STEP_DISPATCHED",
+      "occurredAt": "2026-11-15T23:18:51.16805",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_STEP_DISPATCHED",
+      "detailSummary": "指令CMD-20261115231851-18CB002C已下发至设备代理AGT-3A36BBB4，业务意图: 执行CAP_ESCORT能力（基线模板步骤）",
+      "detail": "指令CMD-20261115231851-18CB002C已下发至设备代理AGT-3A36BBB4，业务意图: 执行CAP_ESCORT能力（基线模板步骤）",
+      "rawDetailSummary": "指令CMD-20261115231851-18CB002C已下发至设备代理AGT-3A36BBB4，业务意图: 执行CAP_ESCORT能力（基线模板步骤）"
+    },
+    {
+      "id": 6153,
+      "taskId": 289,
+      "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+      "occurredAt": "2026-11-15T23:18:52.730334",
+      "trigger": "SYSTEM",
+      "reasonCode": "DEVICE_SUCCESS",
+      "detailSummary": "指令CMD-20261115231851-18CB002C收到设备代理AGT-3A36BBB4执行反馈: SUCCESS",
+      "detail": "指令CMD-20261115231851-18CB002C收到设备代理AGT-3A36BBB4执行反馈: SUCCESS",
+      "rawDetailSummary": "指令CMD-20261115231851-18CB002C收到设备代理AGT-3A36BBB4执行反馈: SUCCESS"
+    },
+    {
+      "id": 6154,
+      "taskId": 289,
+      "eventType": "STEP_COMPLETED",
+      "occurredAt": "2026-11-15T23:18:52.752185",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_STEP_COMPLETED",
+      "detailSummary": "步骤4完成条件已满足: arrivalStatus=ARRIVED",
+      "detail": "步骤4完成条件已满足: arrivalStatus=ARRIVED",
+      "rawDetailSummary": "步骤4完成条件已满足: arrivalStatus=ARRIVED"
+    },
+    {
+      "id": 6155,
+      "taskId": 289,
+      "eventType": "TASK_COMPLETED",
+      "occurredAt": "2026-11-15T23:18:52.766232",
+      "trigger": "SYSTEM",
+      "reasonCode": "SPECIAL_PASSENGER_SERVICE_COMPLETED",
+      "detailSummary": "特殊旅客服务闭环完成（轮椅陪同，T2值机区->GATE_A05）：已完成智慧航显会合提示发布、移动机器人现场通知与全程陪同引导服务；全部步骤均已执行完成。",
+      "detail": "特殊旅客服务闭环完成（轮椅陪同，T2值机区->GATE_A05）：已完成智慧航显会合提示发布、移动机器人现场通知与全程陪同引导服务；全部步骤均已执行完成。",
+      "rawDetailSummary": "特殊旅客服务闭环完成（轮椅陪同，T2值机区->GATE_A05）：已完成智慧航显会合提示发布、移动机器人现场通知与全程陪同引导服务；全部步骤均已执行完成。"
+    }
+  ],
+  "plans": [
+    {
+      "id": 378,
+      "versionNo": 1,
+      "source": "AUTONOMOUS",
+      "baselineTemplateId": null,
+      "snapshotId": "CTX-20261115-0338",
+      "planSteps": [
+        {
+          "stepSeq": 1,
+          "stepGoal": "在T2值机区智慧航显显示轮椅旅客会合提示信息",
+          "capabilityType": "CAP_INFO_DISPLAY",
+          "inputParams": {
+            "contentType": "TEXT",
+            "contentData": "轮椅旅客会合提示：请需要轮椅陪同的旅客在T2值机区等候，服务机器人即将前来会合",
+            "displayDuration": 120
+          },
+          "precondition": "智慧航显设备在线且空闲，T2值机区需向旅客展示会合提示",
+          "completionCondition": "航显设备返回displayStatus为成功，提示信息已展示",
+          "failureHandling": "若航显失败，则通过通知能力广播提示信息，并记录异常",
+          "stepTimeout": 30
+        },
+        {
+          "stepSeq": 2,
+          "stepGoal": "通知现场人员轮椅旅客需协助，保持联动",
+          "capabilityType": "CAP_NOTIFICATION",
+          "inputParams": {
+            "notificationType": "BOTH",
+            "notificationContent": "T2值机区有轮椅旅客需要陪同服务，请现场服务人员关注并协助会合",
+            "repeatCount": 2
+          },
+          "precondition": "现场人员通知系统可用，需与航显提示同步联动",
+          "completionCondition": "通知状态返回成功，现场人员已收到语音及文字通知",
+          "failureHandling": "通知失败时重试一次，仍失败则记录并依赖航显提示作为备用",
+          "stepTimeout": 30
+        },
+        {
+          "stepSeq": 3,
+          "stepGoal": "服务机器人导航前往T2值机区与轮椅旅客会合",
+          "capabilityType": "CAP_NAVIGATION",
+          "inputParams": {
+            "targetLocation": "T2值机区",
+            "routePreference": "BARRIER_FREE"
+          },
+          "precondition": "服务机器人已空闲且在线，前序通知与航显已完成",
+          "completionCondition": "机器人成功生成无障碍路线并抵达T2值机区",
+          "failureHandling": "导航失败时尝试重新规划路线，持续失败则通知现场人员人工接应",
+          "stepTimeout": 300
+        },
+        {
+          "stepSeq": 4,
+          "stepGoal": "服务机器人陪同轮椅旅客前往GATE_A05",
+          "capabilityType": "CAP_ESCORT",
+          "inputParams": {
+            "targetLocation": "GATE_A05",
+            "escortMode": "FOLLOW",
+            "maxDuration": 1800
+          },
+          "precondition": "机器人已抵达T2值机区并与旅客会合，旅客准备出发",
+          "completionCondition": "旅客与机器人共同到达GATE_A05，arrivalStatus返回成功",
+          "failureHandling": "陪同过程中异常中断时，机器人原地等待并通知现场人员接管",
+          "stepTimeout": 1800
+        }
+      ],
+      "structureCheckResult": "PASS",
+      "capabilityCheckResult": "PASS",
+      "constraintCheckResult": "PASS",
+      "validationErrors": [],
+      "riskLevel": "HIGH",
+      "riskReasonCode": "RULE_ESCORT_SPECIAL_PASSENGER",
+      "judgmentBasis": "移动机器人会合或陪同对象为特殊旅客，命中确定性高风险规则；命中步骤：步骤3(CAP_NAVIGATION，会合，绑定移动服务机器人)、步骤4(CAP_ESCORT，陪同，绑定移动服务机器人)",
+      "confidence": 0.85,
+      "ruleSetVersion": "V1.2",
+      "frozenAt": "2026-11-15T23:18:47.928146",
+      "createdAt": "2026-11-15T23:18:47.907061"
+    },
+    {
+      "id": 379,
+      "versionNo": 2,
+      "source": "BASELINE_TEMPLATE",
+      "baselineTemplateId": 2,
+      "snapshotId": "CTX-20261115-0339",
+      "planSteps": [
+        {
+          "stepSeq": 1,
+          "capabilityType": "CAP_INFO_DISPLAY",
+          "paramMapping": [
+            {
+              "target": "contentType",
+              "source": "TEMPLATE_INPUT.contentType"
+            },
+            {
+              "target": "contentData",
+              "source": "TEMPLATE_INPUT.meetingNotice"
+            },
+            {
+              "target": "displayDuration",
+              "source": "TEMPLATE_INPUT.displayDuration"
+            }
+          ],
+          "stepTimeout": 60,
+          "completionCondition": "displayStatus=SUCCESS",
+          "stepGoal": "执行CAP_INFO_DISPLAY能力（基线模板步骤）",
+          "precondition": "候选设备在线且空闲",
+          "failureHandling": "重试一次或转人工处理",
+          "inputParams": {
+            "contentType": "TEXT",
+            "contentData": "轮椅陪同：请在T2值机区会合，现场人员请协助，由服务机器人陪同前往GATE_A05。",
+            "displayDuration": 60
+          }
+        },
+        {
+          "stepSeq": 2,
+          "capabilityType": "CAP_NOTIFICATION",
+          "paramMapping": [
+            {
+              "target": "notificationContent",
+              "source": "TEMPLATE_INPUT.meetingNotice"
+            },
+            {
+              "target": "notificationType",
+              "source": "TEMPLATE_INPUT.notificationType"
+            },
+            {
+              "target": "repeatCount",
+              "source": "TEMPLATE_INPUT.repeatCount"
+            }
+          ],
+          "stepTimeout": 60,
+          "completionCondition": "notificationStatus=SUCCESS",
+          "stepGoal": "执行CAP_NOTIFICATION能力（基线模板步骤）",
+          "precondition": "候选设备在线且空闲",
+          "failureHandling": "重试一次或转人工处理",
+          "inputParams": {
+            "notificationContent": "轮椅陪同：请在T2值机区会合，现场人员请协助，由服务机器人陪同前往GATE_A05。",
+            "notificationType": "BOTH",
+            "repeatCount": 1
+          }
+        },
+        {
+          "stepSeq": 3,
+          "capabilityType": "CAP_NAVIGATION",
+          "paramMapping": [
+            {
+              "target": "targetLocation",
+              "source": "TEMPLATE_INPUT.origin"
+            },
+            {
+              "target": "routePreference",
+              "source": "TEMPLATE_INPUT.routePreference"
+            }
+          ],
+          "stepTimeout": 60,
+          "completionCondition": "arrivalStatus=ARRIVED",
+          "stepGoal": "执行CAP_NAVIGATION能力（基线模板步骤）",
+          "precondition": "候选设备在线且空闲",
+          "failureHandling": "重试一次或转人工处理",
+          "inputParams": {
+            "targetLocation": "T2值机区",
+            "routePreference": "BARRIER_FREE"
+          }
+        },
+        {
+          "stepSeq": 4,
+          "capabilityType": "CAP_ESCORT",
+          "paramMapping": [
+            {
+              "target": "targetLocation",
+              "source": "TEMPLATE_INPUT.targetLocation"
+            },
+            {
+              "target": "escortMode",
+              "source": "TEMPLATE_INPUT.escortMode"
+            },
+            {
+              "target": "maxDuration",
+              "source": "TEMPLATE_INPUT.maxDuration"
+            }
+          ],
+          "stepTimeout": 60,
+          "completionCondition": "arrivalStatus=ARRIVED",
+          "stepGoal": "执行CAP_ESCORT能力（基线模板步骤）",
+          "precondition": "候选设备在线且空闲",
+          "failureHandling": "重试一次或转人工处理",
+          "inputParams": {
+            "targetLocation": "GATE_A05",
+            "escortMode": "LEAD",
+            "maxDuration": 600
+          }
+        }
+      ],
+      "structureCheckResult": "PASS",
+      "capabilityCheckResult": "PASS",
+      "constraintCheckResult": "PASS",
+      "validationErrors": [],
+      "riskLevel": null,
+      "riskReasonCode": null,
+      "judgmentBasis": null,
+      "confidence": null,
+      "ruleSetVersion": "V1.16",
+      "frozenAt": "2026-11-15T23:18:48.119767",
+      "createdAt": "2026-11-15T23:18:48.105298"
+    }
+  ],
+  "checks": {
+    "completed": true,
+    "meeting_notices": true,
+    "meeting_then_escort_same_robot": true,
+    "meeting_arrival_feedback": true
+  }
+}

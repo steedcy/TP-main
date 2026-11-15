@@ -1,0 +1,29 @@
+﻿originalCheck,roleAndRequirement,originalScope,result,evidence
+A01,三角色，F001/F002,分别登录，进入总览并显示当前角色和相应菜单,P,01-config-login.txt;21-admin-login.txt;09-flight-final.txt
+A02,系统管理员，F001,账号管理→新增账号→空表单提交,P,22-account-validation.txt
+A03,系统管理员，F001,API 创建虚构 OPERATOR 账号→停用→登录→启用→登录→最终停用,P,security/api-security-account.json
+A04,三角色，F001,浏览器退出登录，API 退出后复用旧会话,P,25-logout.txt;security/api-security-account.json
+A05,三角色，F001,非管理员读取账号接口、配置管理员读任务详情，管理员读任务详情,P,security/api-security-account.json
+A06,系统管理员，F028,查询跨角色操作记录并打开详情,P,23-admin-audit.txt;24-audit-detail.txt
+A07,配置管理员/操作员，F028,API 查询各自操作记录,P,final-state.json
+C01,配置管理员，F003/F004/F005,设备管理→SIM_F2_DISPLAY连接测试，核对代理心跳,P,02-device-connection.txt;final-state.json
+C02,配置管理员，F006,展示能力→模拟调用测试→恢复启用,P,03-capability-result.txt;04-capability-enabled.txt;final-state.json
+C03,配置管理员，F006A,能力边界配置→能力约束矩阵,P,06-capability-matrix.txt
+C04,配置管理员，F022,查询三类核心任务定义,P,07-task-definitions.txt
+C05,配置管理员，F014,查询风险规则,P,08-risk-rules.txt
+C06,配置管理员，F008/F009,草稿B04_TC026_PROBE_20261022 V1.1→绑定航延屏与机器人→开始试运行,P,deployment-readiness.json;final-state.json
+C07,配置管理员，F009,对上述试运行通过模板启用，再停用并确认,P,template-cycle.json
+O01,操作员，F026,航变演示→详情→核对延误时间与目标登机口,P,flight-287.json
+O02,操作员，F024,行李演示→测量→正常/超规判定→相应闭环,P,normal-288.json;manual-workflows.json
+O03,操作员，F024,超规事件100×60×40cm、28kg→告警/办理说明/柜台引导,P,oversize-290.json
+O04,操作员，F024,正常事件50×40×20cm、12kg→结束且无引导指令,P,normal-event-boundary.json
+O05,操作员，F025,特殊旅客演示→会合提示→到起点会合→陪同到GATE_A05,P,escort-289.json
+O06,操作员，F018/F020,0273待人工→重试规划→填写原因并保持原目标→确认,P,manual-workflows.json;14-original-task-recovered.txt
+O07,操作员，F021,0275待人工→终止→填写原因并确认责任边界,P,manual-workflows.json;15-terminated.txt
+O08,操作员，F010,常规提交“请安排一名虚构轮椅旅客的陪同服务”→补充三项信息,P,16-clarification.txt;17-clarified-final.txt
+O09,操作员，F025/F013,核对0277信息补全后业务内容与安全闸门,P,escort-293.json
+O10,操作员，F023,打开二维态势，核对设备位置与状态,P,18-situation.txt;final-state.json
+O11,操作员，F027,按0275编号筛选追溯→查看计划/失败/终止时间线,P,20-trace.txt
+O12,操作员，F018/F020,查询异常处置列表并交叉核对任务,P,19-exceptions.txt;final-state.json
+R01,操作员API复跑，F026,恢复展示能力后，仅用页面原始字段重交航变输入,P,flight-287.json
+R02,操作员API复跑，F024,恢复展示能力后，仅用页面原始字段重交行李目标,P,normal-288.json

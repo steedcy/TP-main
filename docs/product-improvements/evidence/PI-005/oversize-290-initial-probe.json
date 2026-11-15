@@ -1,0 +1,640 @@
+{
+  "time": "2026-11-15T23:21:23.213921+08:00",
+  "task": {
+    "id": 290,
+    "taskCode": "TASK-20261115-0289",
+    "taskGoal": "处理位于 T2值机岛A03 的行李测量事件（临时业务编号: BAG-990430，尺寸: 100.0×60.0×40.0 cm，重量: 28.0 kg，判定: 超规）",
+    "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+    "sceneParams": {
+      "baggageId": "BAG-990430",
+      "tempBusinessId": "BAG-990430",
+      "baggageLocation": "T2值机岛A03",
+      "targetCounter": "超规行李专柜B01",
+      "targetLocation": "超规行李专柜B01",
+      "length": 100.0,
+      "width": 60.0,
+      "height": 40.0,
+      "weight": 28.0,
+      "totalDimensionCm": 200.0,
+      "dimensionThresholdCm": 158.0,
+      "weightThresholdKg": 32.0,
+      "thresholdSource": "附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束",
+      "isOversize": true,
+      "measureMode": "AUTO",
+      "routePreference": "BARRIER_FREE",
+      "alertLevel": "WARNING",
+      "contentType": "TEXT",
+      "contentData": "超规行李（临时编号BAG-990430）请前往超规行李专柜B01办理托运",
+      "handlingInstructions": "超规行李办理流程：1. 前往指定柜台办理称重核验；2. 打印并粘贴超规挂牌；3. 办理专属托运；4. 凭凭证通过安检。",
+      "triggerSource": "MEASUREMENT_EVENT"
+    },
+    "goalParsingResult": {
+      "completionCondition": "行李已完成尺寸重量测量且超规事件（如有）已上报",
+      "origin": "T2值机岛A03",
+      "destination": "超规行李专柜B01",
+      "originalGoal": "处理位于 T2值机岛A03 的行李测量事件（临时业务编号: BAG-990430，尺寸: 100.0×60.0×40.0 cm，重量: 28.0 kg，判定: 超规）",
+      "constraints": [
+        "超规行李处置全程不得引导旅客脱离监控区域",
+        "测量结果超标须触发超规事件上报"
+      ]
+    },
+    "status": "COMPLETED",
+    "currentPlanVersionId": 380,
+    "replanUsed": false,
+    "replanningReason": null,
+    "manualTerminateReason": null,
+    "failureReason": null,
+    "missingInfoQuestions": null,
+    "downgradeReason": null,
+    "isDryRun": false,
+    "createdAt": "2026-11-15T23:19:50.509074",
+    "updatedAt": "2026-11-15T23:20:26.363925",
+    "createdBy": "oprator"
+  },
+  "commands": [
+    {
+      "step_seq": 2,
+      "agent_code": "AGT-1C13535E",
+      "capability_type": "CAP_OVERSIZE_ALERT",
+      "command_status": "SUCCEEDED",
+      "params": {
+        "baggageInfo": "{\"baggageId\":\"BAG-990430\",\"length\":100.0,\"width\":60.0,\"height\":40.0,\"weight\":28.0,\"totalDimensionCm\":200.0,\"dimensionThresholdCm\":158.0,\"location\":\"T2值机岛A03\"}",
+        "alertLevel": "WARNING"
+      }
+    },
+    {
+      "step_seq": 3,
+      "agent_code": "AGT-3A36BBB4",
+      "capability_type": "CAP_NAVIGATION",
+      "command_status": "SUCCEEDED",
+      "params": {
+        "targetLocation": "超规行李专柜B01",
+        "routePreference": "BARRIER_FREE"
+      }
+    },
+    {
+      "step_seq": 4,
+      "agent_code": "AGT-3A76FECA",
+      "capability_type": "CAP_INFO_DISPLAY",
+      "command_status": "SUCCEEDED",
+      "params": {
+        "contentType": "TEXT",
+        "contentData": "超规行李（临时编号BAG-990430）请前往超规行李专柜B01办理托运",
+        "displayDuration": 120
+      }
+    },
+    {
+      "step_seq": 5,
+      "agent_code": "AGT-3A36BBB4",
+      "capability_type": "CAP_NOTIFICATION",
+      "command_status": "SUCCEEDED",
+      "params": {
+        "notificationType": "BOTH",
+        "notificationContent": "T2值机岛A03发现超规行李BAG-990430（尺寸100×60×40cm，重量28kg），旅客已引导至超规行李专柜B01，请柜台人员做好称重核验及专属托运准备",
+        "repeatCount": 1
+      }
+    }
+  ],
+  "steps": [
+    {
+      "id": 700,
+      "stepSeq": 1,
+      "deviceAgentCode": null,
+      "commandId": null,
+      "stepStatus": "COMPLETED",
+      "retryCount": 0,
+      "executionResult": "SUCCESS",
+      "reasonCode": "MEASUREMENT_EVENT_REUSED",
+      "outputParams": {
+        "length": 100.0,
+        "width": 60.0,
+        "height": 40.0,
+        "weight": 28.0,
+        "isOversize": true,
+        "totalDimensionCm": 200.0,
+        "dimensionThresholdCm": 158.0,
+        "weightThresholdKg": 32.0,
+        "thresholdSource": "附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束",
+        "baggageId": "BAG-990430",
+        "measureStatus": "SUCCESS",
+        "measurementSource": "MEASUREMENT_EVENT",
+        "baggageInfo": "{\"length\":100.0,\"width\":60.0,\"height\":40.0,\"weight\":28.0,\"isOversize\":true,\"totalDimensionCm\":200.0,\"dimensionThresholdCm\":158.0,\"weightThresholdKg\":32.0,\"thresholdSource\":\"附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束\",\"baggageId\":\"BAG-990430\",\"measureStatus\":\"SUCCESS\",\"measurementSource\":\"MEASUREMENT_EVENT\"}"
+      },
+      "dispatchedAt": null,
+      "feedbackAt": "2026-11-15T23:19:50.653966",
+      "rejectedAgentIds": [],
+      "acceptanceRequestedAt": null,
+      "acceptedAt": null,
+      "acceptanceDurationMs": null,
+      "acceptanceResponseTime": null
+    },
+    {
+      "id": 701,
+      "stepSeq": 2,
+      "deviceAgentCode": "AGT-1C13535E",
+      "commandId": "CMD-20261115232022-18CB002D",
+      "stepStatus": "COMPLETED",
+      "retryCount": 0,
+      "executionResult": "SUCCESS",
+      "reasonCode": "DEVICE_SUCCESS",
+      "outputParams": {
+        "reportTime": "2026-11-15T23:20:23.784909800+08:00",
+        "reportStatus": "SUCCESS",
+        "alertId": "ALERT-8150eec6-925d-4917-b9f1-b327e90f74fd"
+      },
+      "dispatchedAt": "2026-11-15T23:20:23.169972",
+      "feedbackAt": "2026-11-15T23:20:23.805582",
+      "rejectedAgentIds": [],
+      "acceptanceRequestedAt": "2026-11-15T23:20:22.716346",
+      "acceptedAt": "2026-11-15T23:20:22.948648",
+      "acceptanceDurationMs": 232,
+      "acceptanceResponseTime": "232ms"
+    },
+    {
+      "id": 702,
+      "stepSeq": 3,
+      "deviceAgentCode": "AGT-3A36BBB4",
+      "commandId": "CMD-20261115232023-18CB002F",
+      "stepStatus": "COMPLETED",
+      "retryCount": 0,
+      "executionResult": "SUCCESS",
+      "reasonCode": "DEVICE_SUCCESS",
+      "outputParams": {
+        "routeGenerated": true,
+        "waypointCount": 11,
+        "estimatedDuration": 190,
+        "estimatedDistance": 426.0,
+        "arrivalStatus": "ARRIVED",
+        "arrivalLocation": "超规行李专柜B01",
+        "arrivalDeviceCode": "SIM_F2_ROBOT_B"
+      },
+      "dispatchedAt": "2026-11-15T23:20:23.889128",
+      "feedbackAt": "2026-11-15T23:20:25.090562",
+      "rejectedAgentIds": [],
+      "acceptanceRequestedAt": "2026-11-15T23:20:23.825514",
+      "acceptedAt": "2026-11-15T23:20:23.882451",
+      "acceptanceDurationMs": 56,
+      "acceptanceResponseTime": "56ms"
+    },
+    {
+      "id": 703,
+      "stepSeq": 4,
+      "deviceAgentCode": "AGT-3A76FECA",
+      "commandId": "CMD-20261115232025-18CB0031",
+      "stepStatus": "COMPLETED",
+      "retryCount": 0,
+      "executionResult": "SUCCESS",
+      "reasonCode": "DEVICE_SUCCESS",
+      "outputParams": {
+        "displayStatus": "SUCCESS",
+        "actualDuration": 120,
+        "errorMessage": ""
+      },
+      "dispatchedAt": "2026-11-15T23:20:25.164241",
+      "feedbackAt": "2026-11-15T23:20:25.714555",
+      "rejectedAgentIds": [],
+      "acceptanceRequestedAt": "2026-11-15T23:20:25.119446",
+      "acceptedAt": "2026-11-15T23:20:25.158445",
+      "acceptanceDurationMs": 38,
+      "acceptanceResponseTime": "38ms"
+    },
+    {
+      "id": 704,
+      "stepSeq": 5,
+      "deviceAgentCode": "AGT-3A36BBB4",
+      "commandId": "CMD-20261115232025-18CB0033",
+      "stepStatus": "COMPLETED",
+      "retryCount": 0,
+      "executionResult": "SUCCESS",
+      "reasonCode": "DEVICE_SUCCESS",
+      "outputParams": {
+        "notificationStatus": "SUCCESS",
+        "actualRepeatCount": 1
+      },
+      "dispatchedAt": "2026-11-15T23:20:25.787831",
+      "feedbackAt": "2026-11-15T23:20:26.343624",
+      "rejectedAgentIds": [],
+      "acceptanceRequestedAt": "2026-11-15T23:20:25.733211",
+      "acceptedAt": "2026-11-15T23:20:25.783595",
+      "acceptanceDurationMs": 50,
+      "acceptanceResponseTime": "50ms"
+    }
+  ],
+  "events": [
+    {
+      "id": 6156,
+      "taskId": 290,
+      "eventType": "GOAL_SUBMITTED",
+      "occurredAt": "2026-11-15T23:19:50.602846",
+      "trigger": "SYSTEM",
+      "reasonCode": "MEASUREMENT_EVENT",
+      "detailSummary": "接收模拟超规行李测量事件，临时业务编号: BAG-990430，位置: T2值机岛A03，尺寸: 100.0×60.0×40.0cm，重量: 28.0kg，超规判定: 超规",
+      "detail": "接收模拟超规行李测量事件，临时业务编号: BAG-990430，位置: T2值机岛A03，尺寸: 100.0×60.0×40.0cm，重量: 28.0kg，超规判定: 超规",
+      "rawDetailSummary": "接收模拟超规行李测量事件，临时业务编号: BAG-990430，位置: T2值机岛A03，尺寸: 100.0×60.0×40.0cm，重量: 28.0kg，超规判定: 超规"
+    },
+    {
+      "id": 6157,
+      "taskId": 290,
+      "eventType": "MEASUREMENT_RECORDED",
+      "occurredAt": "2026-11-15T23:19:50.653966",
+      "trigger": "SYSTEM",
+      "reasonCode": "MEASUREMENT_EVENT",
+      "detailSummary": "{\"length\":100.0,\"width\":60.0,\"height\":40.0,\"weight\":28.0,\"isOversize\":true,\"totalDimensionCm\":200.0,\"dimensionThresholdCm\":158.0,\"weightThresholdKg\":32.0,\"thresholdSource\":\"附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束\",\"baggageId\":\"BAG-990430\"}",
+      "detail": "{\"length\":100.0,\"width\":60.0,\"height\":40.0,\"weight\":28.0,\"isOversize\":true,\"totalDimensionCm\":200.0,\"dimensionThresholdCm\":158.0,\"weightThresholdKg\":32.0,\"thresholdSource\":\"附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束\",\"baggageId\":\"BAG-990430\"}",
+      "rawDetailSummary": "{\"length\":100.0,\"width\":60.0,\"height\":40.0,\"weight\":28.0,\"isOversize\":true,\"totalDimensionCm\":200.0,\"dimensionThresholdCm\":158.0,\"weightThresholdKg\":32.0,\"thresholdSource\":\"附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束\",\"baggageId\":\"BAG-990430\"}"
+    },
+    {
+      "id": 6158,
+      "taskId": 290,
+      "eventType": "GOAL_CLARIFIED",
+      "occurredAt": "2026-11-15T23:19:53.828254",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_GOAL_CLARIFIED",
+      "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建",
+      "detail": "目标理解完成，关键信息已完整，进入规划上下文构建",
+      "rawDetailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+    },
+    {
+      "id": 6159,
+      "taskId": 290,
+      "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+      "occurredAt": "2026-11-15T23:19:53.951727",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_CONTEXT_BUILT",
+      "detailSummary": "生成规划上下文快照CTX-20261115-0340",
+      "detail": "生成规划上下文快照CTX-20261115-0340",
+      "rawDetailSummary": "生成规划上下文快照CTX-20261115-0340"
+    },
+    {
+      "id": 6160,
+      "taskId": 290,
+      "eventType": "PLAN_GENERATED",
+      "occurredAt": "2026-11-15T23:20:22.39946",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_PLAN_GENERATED",
+      "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1",
+      "detail": "候选计划生成完成，来源AUTONOMOUS，版本1",
+      "rawDetailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+    },
+    {
+      "id": 6161,
+      "taskId": 290,
+      "eventType": "PLAN_VALIDATED",
+      "occurredAt": "2026-11-15T23:20:22.41571",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_PLAN_VALIDATED",
+      "detailSummary": "候选计划三类校验全部通过，已冻结版本",
+      "detail": "候选计划三类校验全部通过，已冻结版本",
+      "rawDetailSummary": "候选计划三类校验全部通过，已冻结版本"
+    },
+    {
+      "id": 6162,
+      "taskId": 290,
+      "eventType": "SUPERVISION_JUDGED",
+      "occurredAt": "2026-11-15T23:20:22.515526",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_SUPERVISION_JUDGED",
+      "detailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则；命中单一风险信号（候选差异较大），单一信号不直接阻断，低风险自动执行；置信度=0.92（仅作参考，不覆盖三类校验结果）；规则集版本=V1.2；推荐处置=AUTO_EXECUTE（自动执行）",
+      "detail": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则；命中单一风险信号（候选差异较大），单一信号不直接阻断，低风险自动执行；置信度=0.92（仅作参考，不覆盖三类校验结果）；规则集版本=V1.2；推荐处置=AUTO_EXECUTE（自动执行）",
+      "rawDetailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则；命中单一风险信号（候选差异较大），单一信号不直接阻断，低风险自动执行；置信度=0.92（仅作参考，不覆盖三类校验结果）；规则集版本=V1.2；推荐处置=AUTO_EXECUTE（自动执行）"
+    },
+    {
+      "id": 6163,
+      "taskId": 290,
+      "eventType": "STEP_COMPLETED",
+      "occurredAt": "2026-11-15T23:20:22.681498",
+      "trigger": "SYSTEM",
+      "reasonCode": "MEASUREMENT_EVENT_REUSED",
+      "detailSummary": "步骤1使用已登记的测量结果，来源事件 6157",
+      "detail": "步骤1使用已登记的测量结果，来源事件 6157",
+      "rawDetailSummary": "步骤1使用已登记的测量结果，来源事件 6157"
+    },
+    {
+      "id": 6164,
+      "taskId": 290,
+      "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+      "occurredAt": "2026-11-15T23:20:22.712997",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_ASSIGNMENT_REQUESTED",
+      "detailSummary": "步骤2候选排序（能力匹配->距离->负载）: AGT-1C13535E(匹配度1.0,距离0.0,负载0)；AGT-D602D701(匹配度1.0,距离0.0,负载0)，向候选AGT-1C13535E发起承接请求",
+      "detail": "步骤2候选排序（能力匹配->距离->负载）: AGT-1C13535E(匹配度1.0,距离0.0,负载0)；AGT-D602D701(匹配度1.0,距离0.0,负载0)，向候选AGT-1C13535E发起承接请求",
+      "rawDetailSummary": "步骤2候选排序（能力匹配->距离->负载）: AGT-1C13535E(匹配度1.0,距离0.0,负载0)；AGT-D602D701(匹配度1.0,距离0.0,负载0)，向候选AGT-1C13535E发起承接请求"
+    },
+    {
+      "id": 6165,
+      "taskId": 290,
+      "eventType": "AGENT_ASSIGNED",
+      "occurredAt": "2026-11-15T23:20:23.087528",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_AGENT_ASSIGNED",
+      "detailSummary": "设备代理AGT-1C13535E接受步骤2承接请求",
+      "detail": "设备代理AGT-1C13535E接受步骤2承接请求",
+      "rawDetailSummary": "设备代理AGT-1C13535E接受步骤2承接请求"
+    },
+    {
+      "id": 6166,
+      "taskId": 290,
+      "eventType": "STEP_DISPATCHED",
+      "occurredAt": "2026-11-15T23:20:23.180167",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_STEP_DISPATCHED",
+      "detailSummary": "指令CMD-20261115232023-18CB002E已下发至设备代理AGT-1C13535E，业务意图: 上报超规行李事件至平台",
+      "detail": "指令CMD-20261115232023-18CB002E已下发至设备代理AGT-1C13535E，业务意图: 上报超规行李事件至平台",
+      "rawDetailSummary": "指令CMD-20261115232023-18CB002E已下发至设备代理AGT-1C13535E，业务意图: 上报超规行李事件至平台"
+    },
+    {
+      "id": 6167,
+      "taskId": 290,
+      "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+      "occurredAt": "2026-11-15T23:20:23.805582",
+      "trigger": "SYSTEM",
+      "reasonCode": "DEVICE_SUCCESS",
+      "detailSummary": "指令CMD-20261115232023-18CB002E收到设备代理AGT-1C13535E执行反馈: SUCCESS",
+      "detail": "指令CMD-20261115232023-18CB002E收到设备代理AGT-1C13535E执行反馈: SUCCESS",
+      "rawDetailSummary": "指令CMD-20261115232023-18CB002E收到设备代理AGT-1C13535E执行反馈: SUCCESS"
+    },
+    {
+      "id": 6168,
+      "taskId": 290,
+      "eventType": "STEP_COMPLETED",
+      "occurredAt": "2026-11-15T23:20:23.810364",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_STEP_COMPLETED",
+      "detailSummary": "步骤2完成条件已满足: 平台返回alertId、reportStatus、reportTime，确认超规事件已成功上报",
+      "detail": "步骤2完成条件已满足: 平台返回alertId、reportStatus、reportTime，确认超规事件已成功上报",
+      "rawDetailSummary": "步骤2完成条件已满足: 平台返回alertId、reportStatus、reportTime，确认超规事件已成功上报"
+    },
+    {
+      "id": 6169,
+      "taskId": 290,
+      "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+      "occurredAt": "2026-11-15T23:20:23.822153",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_ASSIGNMENT_REQUESTED",
+      "detailSummary": "步骤3候选排序（能力匹配->距离->负载）: AGT-3A36BBB4(匹配度1.0,距离0.0,负载0)；AGT-CCDDEB4A(匹配度1.0,距离0.0,负载0)，向候选AGT-3A36BBB4发起承接请求",
+      "detail": "步骤3候选排序（能力匹配->距离->负载）: AGT-3A36BBB4(匹配度1.0,距离0.0,负载0)；AGT-CCDDEB4A(匹配度1.0,距离0.0,负载0)，向候选AGT-3A36BBB4发起承接请求",
+      "rawDetailSummary": "步骤3候选排序（能力匹配->距离->负载）: AGT-3A36BBB4(匹配度1.0,距离0.0,负载0)；AGT-CCDDEB4A(匹配度1.0,距离0.0,负载0)，向候选AGT-3A36BBB4发起承接请求"
+    },
+    {
+      "id": 6170,
+      "taskId": 290,
+      "eventType": "AGENT_ASSIGNED",
+      "occurredAt": "2026-11-15T23:20:23.885216",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_AGENT_ASSIGNED",
+      "detailSummary": "设备代理AGT-3A36BBB4接受步骤3承接请求",
+      "detail": "设备代理AGT-3A36BBB4接受步骤3承接请求",
+      "rawDetailSummary": "设备代理AGT-3A36BBB4接受步骤3承接请求"
+    },
+    {
+      "id": 6171,
+      "taskId": 290,
+      "eventType": "STEP_DISPATCHED",
+      "occurredAt": "2026-11-15T23:20:23.892099",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_STEP_DISPATCHED",
+      "detailSummary": "指令CMD-20261115232023-18CB0030已下发至设备代理AGT-3A36BBB4，业务意图: 生成前往超规行李专柜B01的无障碍导航路线",
+      "detail": "指令CMD-20261115232023-18CB0030已下发至设备代理AGT-3A36BBB4，业务意图: 生成前往超规行李专柜B01的无障碍导航路线",
+      "rawDetailSummary": "指令CMD-20261115232023-18CB0030已下发至设备代理AGT-3A36BBB4，业务意图: 生成前往超规行李专柜B01的无障碍导航路线"
+    },
+    {
+      "id": 6172,
+      "taskId": 290,
+      "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+      "occurredAt": "2026-11-15T23:20:25.090562",
+      "trigger": "SYSTEM",
+      "reasonCode": "DEVICE_SUCCESS",
+      "detailSummary": "指令CMD-20261115232023-18CB0030收到设备代理AGT-3A36BBB4执行反馈: SUCCESS",
+      "detail": "指令CMD-20261115232023-18CB0030收到设备代理AGT-3A36BBB4执行反馈: SUCCESS",
+      "rawDetailSummary": "指令CMD-20261115232023-18CB0030收到设备代理AGT-3A36BBB4执行反馈: SUCCESS"
+    },
+    {
+      "id": 6173,
+      "taskId": 290,
+      "eventType": "STEP_COMPLETED",
+      "occurredAt": "2026-11-15T23:20:25.093747",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_STEP_COMPLETED",
+      "detailSummary": "步骤3完成条件已满足: 设备返回routeGenerated=true，并提供estimatedDistance/estimatedDuration/waypointCount",
+      "detail": "步骤3完成条件已满足: 设备返回routeGenerated=true，并提供estimatedDistance/estimatedDuration/waypointCount",
+      "rawDetailSummary": "步骤3完成条件已满足: 设备返回routeGenerated=true，并提供estimatedDistance/estimatedDuration/waypointCount"
+    },
+    {
+      "id": 6174,
+      "taskId": 290,
+      "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+      "occurredAt": "2026-11-15T23:20:25.116179",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_ASSIGNMENT_REQUESTED",
+      "detailSummary": "步骤4候选排序（能力匹配->距离->负载）: AGT-3A76FECA(匹配度1.0,距离0.0,负载0)；AGT-62EAF5EA(匹配度1.0,距离0.0,负载0)，向候选AGT-3A76FECA发起承接请求",
+      "detail": "步骤4候选排序（能力匹配->距离->负载）: AGT-3A76FECA(匹配度1.0,距离0.0,负载0)；AGT-62EAF5EA(匹配度1.0,距离0.0,负载0)，向候选AGT-3A76FECA发起承接请求",
+      "rawDetailSummary": "步骤4候选排序（能力匹配->距离->负载）: AGT-3A76FECA(匹配度1.0,距离0.0,负载0)；AGT-62EAF5EA(匹配度1.0,距离0.0,负载0)，向候选AGT-3A76FECA发起承接请求"
+    },
+    {
+      "id": 6175,
+      "taskId": 290,
+      "eventType": "AGENT_ASSIGNED",
+      "occurredAt": "2026-11-15T23:20:25.158445",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_AGENT_ASSIGNED",
+      "detailSummary": "设备代理AGT-3A76FECA接受步骤4承接请求",
+      "detail": "设备代理AGT-3A76FECA接受步骤4承接请求",
+      "rawDetailSummary": "设备代理AGT-3A76FECA接受步骤4承接请求"
+    },
+    {
+      "id": 6176,
+      "taskId": 290,
+      "eventType": "STEP_DISPATCHED",
+      "occurredAt": "2026-11-15T23:20:25.165089",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_STEP_DISPATCHED",
+      "detailSummary": "指令CMD-20261115232025-18CB0032已下发至设备代理AGT-3A76FECA，业务意图: 在值机区域展示超规行李引导信息",
+      "detail": "指令CMD-20261115232025-18CB0032已下发至设备代理AGT-3A76FECA，业务意图: 在值机区域展示超规行李引导信息",
+      "rawDetailSummary": "指令CMD-20261115232025-18CB0032已下发至设备代理AGT-3A76FECA，业务意图: 在值机区域展示超规行李引导信息"
+    },
+    {
+      "id": 6177,
+      "taskId": 290,
+      "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+      "occurredAt": "2026-11-15T23:20:25.714555",
+      "trigger": "SYSTEM",
+      "reasonCode": "DEVICE_SUCCESS",
+      "detailSummary": "指令CMD-20261115232025-18CB0032收到设备代理AGT-3A76FECA执行反馈: SUCCESS",
+      "detail": "指令CMD-20261115232025-18CB0032收到设备代理AGT-3A76FECA执行反馈: SUCCESS",
+      "rawDetailSummary": "指令CMD-20261115232025-18CB0032收到设备代理AGT-3A76FECA执行反馈: SUCCESS"
+    },
+    {
+      "id": 6178,
+      "taskId": 290,
+      "eventType": "STEP_COMPLETED",
+      "occurredAt": "2026-11-15T23:20:25.719697",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_STEP_COMPLETED",
+      "detailSummary": "步骤4完成条件已满足: 显示屏或机器人返回displayStatus为成功，确认信息已展示",
+      "detail": "步骤4完成条件已满足: 显示屏或机器人返回displayStatus为成功，确认信息已展示",
+      "rawDetailSummary": "步骤4完成条件已满足: 显示屏或机器人返回displayStatus为成功，确认信息已展示"
+    },
+    {
+      "id": 6179,
+      "taskId": 290,
+      "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+      "occurredAt": "2026-11-15T23:20:25.732158",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_ASSIGNMENT_REQUESTED",
+      "detailSummary": "步骤5候选排序（能力匹配->距离->负载）: AGT-3A36BBB4(匹配度1.0,距离0.0,负载0)；AGT-CCDDEB4A(匹配度1.0,距离0.0,负载0)，向候选AGT-3A36BBB4发起承接请求",
+      "detail": "步骤5候选排序（能力匹配->距离->负载）: AGT-3A36BBB4(匹配度1.0,距离0.0,负载0)；AGT-CCDDEB4A(匹配度1.0,距离0.0,负载0)，向候选AGT-3A36BBB4发起承接请求",
+      "rawDetailSummary": "步骤5候选排序（能力匹配->距离->负载）: AGT-3A36BBB4(匹配度1.0,距离0.0,负载0)；AGT-CCDDEB4A(匹配度1.0,距离0.0,负载0)，向候选AGT-3A36BBB4发起承接请求"
+    },
+    {
+      "id": 6180,
+      "taskId": 290,
+      "eventType": "AGENT_ASSIGNED",
+      "occurredAt": "2026-11-15T23:20:25.785606",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_AGENT_ASSIGNED",
+      "detailSummary": "设备代理AGT-3A36BBB4接受步骤5承接请求",
+      "detail": "设备代理AGT-3A36BBB4接受步骤5承接请求",
+      "rawDetailSummary": "设备代理AGT-3A36BBB4接受步骤5承接请求"
+    },
+    {
+      "id": 6181,
+      "taskId": 290,
+      "eventType": "STEP_DISPATCHED",
+      "occurredAt": "2026-11-15T23:20:25.790163",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_STEP_DISPATCHED",
+      "detailSummary": "指令CMD-20261115232025-18CB0034已下发至设备代理AGT-3A36BBB4，业务意图: 向现场服务人员发送超规行李协助通知",
+      "detail": "指令CMD-20261115232025-18CB0034已下发至设备代理AGT-3A36BBB4，业务意图: 向现场服务人员发送超规行李协助通知",
+      "rawDetailSummary": "指令CMD-20261115232025-18CB0034已下发至设备代理AGT-3A36BBB4，业务意图: 向现场服务人员发送超规行李协助通知"
+    },
+    {
+      "id": 6182,
+      "taskId": 290,
+      "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+      "occurredAt": "2026-11-15T23:20:26.343624",
+      "trigger": "SYSTEM",
+      "reasonCode": "DEVICE_SUCCESS",
+      "detailSummary": "指令CMD-20261115232025-18CB0034收到设备代理AGT-3A36BBB4执行反馈: SUCCESS",
+      "detail": "指令CMD-20261115232025-18CB0034收到设备代理AGT-3A36BBB4执行反馈: SUCCESS",
+      "rawDetailSummary": "指令CMD-20261115232025-18CB0034收到设备代理AGT-3A36BBB4执行反馈: SUCCESS"
+    },
+    {
+      "id": 6183,
+      "taskId": 290,
+      "eventType": "STEP_COMPLETED",
+      "occurredAt": "2026-11-15T23:20:26.349102",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_STEP_COMPLETED",
+      "detailSummary": "步骤5完成条件已满足: 通知设备返回notificationStatus为成功，确认现场人员已收到通知",
+      "detail": "步骤5完成条件已满足: 通知设备返回notificationStatus为成功，确认现场人员已收到通知",
+      "rawDetailSummary": "步骤5完成条件已满足: 通知设备返回notificationStatus为成功，确认现场人员已收到通知"
+    },
+    {
+      "id": 6184,
+      "taskId": 290,
+      "eventType": "TASK_COMPLETED",
+      "occurredAt": "2026-11-15T23:20:26.365928",
+      "trigger": "SYSTEM",
+      "reasonCode": "OVERSIZE_HANDLING_CLOSED_LOOP",
+      "detailSummary": "超规行李处置闭环完成（临时业务编号: BAG-990430）：已完成行李测量、超规告警上报、航显办理说明发布，以及移动机器人至超规行李专柜B01的空间引导；全部步骤均已执行完成。",
+      "detail": "超规行李处置闭环完成（临时业务编号: BAG-990430）：已完成行李测量、超规告警上报、航显办理说明发布，以及移动机器人至超规行李专柜B01的空间引导；全部步骤均已执行完成。",
+      "rawDetailSummary": "超规行李处置闭环完成（临时业务编号: BAG-990430）：已完成行李测量、超规告警上报、航显办理说明发布，以及移动机器人至超规行李专柜B01的空间引导；全部步骤均已执行完成。"
+    }
+  ],
+  "plans": [
+    {
+      "id": 380,
+      "versionNo": 1,
+      "source": "AUTONOMOUS",
+      "baselineTemplateId": null,
+      "snapshotId": "CTX-20261115-0340",
+      "planSteps": [
+        {
+          "stepSeq": 1,
+          "stepGoal": "对超规行李执行尺寸重量复核测量",
+          "capabilityType": "CAP_BAGGAGE_MEASURE",
+          "inputParams": {
+            "measureMode": "AUTO",
+            "timeout": 30
+          },
+          "precondition": "行李已放置于T2值机岛A03测量区域，设备SIM_F2_BAGGAGE或SIM_F2_BAGGAGE_B处于在线空闲状态",
+          "completionCondition": "设备返回测量结果，包含length/width/height/weight/isOversize/measureStatus/baggageInfo字段",
+          "failureHandling": "若测量超时或设备异常，切换至另一台BAGGAGE_SCANNER设备重试；若两次均失败，转为人工测量并记录异常",
+          "stepTimeout": 45
+        },
+        {
+          "stepSeq": 2,
+          "stepGoal": "上报超规行李事件至平台",
+          "capabilityType": "CAP_OVERSIZE_ALERT",
+          "inputParams": {
+            "baggageInfo": "{\"baggageId\":\"BAG-990430\",\"length\":100.0,\"width\":60.0,\"height\":40.0,\"weight\":28.0,\"totalDimensionCm\":200.0,\"dimensionThresholdCm\":158.0,\"location\":\"T2值机岛A03\"}",
+            "alertLevel": "WARNING"
+          },
+          "precondition": "步骤1完成且测量结果确认isOversize=true（或依据sceneParams已知超规事实）",
+          "completionCondition": "平台返回alertId、reportStatus、reportTime，确认超规事件已成功上报",
+          "failureHandling": "若上报失败，重试一次；仍失败则记录告警日志并通知现场人工介入",
+          "stepTimeout": 30
+        },
+        {
+          "stepSeq": 3,
+          "stepGoal": "生成前往超规行李专柜B01的无障碍导航路线",
+          "capabilityType": "CAP_NAVIGATION",
+          "inputParams": {
+            "targetLocation": "超规行李专柜B01",
+            "routePreference": "BARRIER_FREE"
+          },
+          "precondition": "步骤2超规事件上报成功，旅客需前往指定柜台办理后续托运",
+          "completionCondition": "设备返回routeGenerated=true，并提供estimatedDistance/estimatedDuration/waypointCount",
+          "failureHandling": "若路线生成失败，检查目标位置编码是否有效；若无效则使用备用位置标识重试",
+          "stepTimeout": 30
+        },
+        {
+          "stepSeq": 4,
+          "stepGoal": "在值机区域展示超规行李引导信息",
+          "capabilityType": "CAP_INFO_DISPLAY",
+          "inputParams": {
+            "contentType": "TEXT",
+            "contentData": "超规行李（临时编号BAG-990430）请前往超规行李专柜B01办理托运",
+            "displayDuration": 120
+          },
+          "precondition": "步骤3导航路线已生成，需在旅客当前位置T2值机岛A03附近展示引导信息",
+          "completionCondition": "显示屏或机器人返回displayStatus为成功，确认信息已展示",
+          "failureHandling": "若单点展示失败，切换至同区域其他显示设备重试",
+          "stepTimeout": 30
+        },
+        {
+          "stepSeq": 5,
+          "stepGoal": "向现场服务人员发送超规行李协助通知",
+          "capabilityType": "CAP_NOTIFICATION",
+          "inputParams": {
+            "notificationType": "BOTH",
+            "notificationContent": "T2值机岛A03发现超规行李BAG-990430（尺寸100×60×40cm，重量28kg），旅客已引导至超规行李专柜B01，请柜台人员做好称重核验及专属托运准备",
+            "repeatCount": 1
+          },
+          "precondition": "步骤4引导信息已展示，需同步通知目的地柜台及现场服务人员",
+          "completionCondition": "通知设备返回notificationStatus为成功，确认现场人员已收到通知",
+          "failureHandling": "若通知失败，切换至另一台机器人重试；均失败则通过电话等备用渠道通知",
+          "stepTimeout": 30
+        }
+      ],
+      "structureCheckResult": "PASS",
+      "capabilityCheckResult": "PASS",
+      "constraintCheckResult": "PASS",
+      "validationErrors": [],
+      "riskLevel": "LOW",
+      "riskReasonCode": null,
+      "judgmentBasis": "未命中确定性高风险规则；命中单一风险信号（候选差异较大），单一信号不直接阻断，低风险自动执行",
+      "confidence": 0.92,
+      "ruleSetVersion": "V1.2",
+      "frozenAt": "2026-11-15T23:20:22.410403",
+      "createdAt": "2026-11-15T23:20:22.392145"
+    }
+  ],
+  "checks": {
+    "completed": true,
+    "event_sample_reused": true,
+    "no_second_measurement": true,
+    "alert_display_navigation": false,
+    "counter_reached": true
+  }
+}

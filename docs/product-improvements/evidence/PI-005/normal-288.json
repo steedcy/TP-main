@@ -1,0 +1,265 @@
+{
+  "time": "2026-11-15T23:18:36.330981+08:00",
+  "task": {
+    "id": 288,
+    "taskCode": "TASK-20261115-0287",
+    "taskGoal": "请测量T2值机岛A03当前行李的长宽高和重量；超规时上报告警、由智慧航显发布超规行李专柜B01办理提示，并由移动机器人提供导航；正常行李留存测量结果后结束。",
+    "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+    "sceneParams": {
+      "baggageLocation": "T2值机岛A03",
+      "targetCounter": "超规行李专柜B01",
+      "baggageId": "BAG-828705"
+    },
+    "goalParsingResult": {
+      "completionCondition": "行李已完成尺寸重量测量且超规事件（如有）已上报",
+      "origin": null,
+      "destination": null,
+      "originalGoal": "请测量T2值机岛A03当前行李的长宽高和重量；超规时上报告警、由智慧航显发布超规行李专柜B01办理提示，并由移动机器人提供导航；正常行李留存测量结果后结束。",
+      "constraints": [
+        "超规行李处置全程不得引导旅客脱离监控区域",
+        "测量结果超标须触发超规事件上报"
+      ]
+    },
+    "status": "COMPLETED",
+    "currentPlanVersionId": 377,
+    "replanUsed": false,
+    "replanningReason": null,
+    "manualTerminateReason": null,
+    "failureReason": null,
+    "missingInfoQuestions": null,
+    "downgradeReason": null,
+    "isDryRun": false,
+    "createdAt": "2026-11-15T23:17:08.707484",
+    "updatedAt": "2026-11-15T23:17:36.882665",
+    "createdBy": "oprator"
+  },
+  "commands": [
+    {
+      "step_seq": 1,
+      "agent_code": "AGT-1C13535E",
+      "capability_type": "CAP_BAGGAGE_MEASURE",
+      "command_status": "SUCCEEDED",
+      "params": {
+        "measureMode": "AUTO",
+        "timeout": 30
+      }
+    }
+  ],
+  "steps": [
+    {
+      "id": 692,
+      "stepSeq": 1,
+      "deviceAgentCode": "AGT-1C13535E",
+      "commandId": "CMD-20261115231735-18CB0023",
+      "stepStatus": "COMPLETED",
+      "retryCount": 0,
+      "executionResult": "SUCCESS",
+      "reasonCode": "DEVICE_SUCCESS",
+      "outputParams": {
+        "weight": 10.0,
+        "length": 55.0,
+        "isOversize": false,
+        "height": 20.0,
+        "width": 40.0,
+        "measureStatus": "SUCCESS",
+        "totalDimensionCm": 115.0,
+        "dimensionThresholdCm": 158,
+        "weightThresholdKg": 32,
+        "thresholdSource": "附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束",
+        "baggageInfo": "{\"weight\":10.0,\"length\":55.0,\"isOversize\":false,\"height\":20.0,\"width\":40.0,\"measureStatus\":\"SUCCESS\",\"totalDimensionCm\":115.0,\"dimensionThresholdCm\":158,\"weightThresholdKg\":32,\"thresholdSource\":\"附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束\"}"
+      },
+      "dispatchedAt": "2026-11-15T23:17:35.689519",
+      "feedbackAt": "2026-11-15T23:17:36.846524",
+      "rejectedAgentIds": [],
+      "acceptanceRequestedAt": "2026-11-15T23:17:35.235331",
+      "acceptedAt": "2026-11-15T23:17:35.61841",
+      "acceptanceDurationMs": 383,
+      "acceptanceResponseTime": "383ms"
+    }
+  ],
+  "events": [
+    {
+      "id": 6114,
+      "taskId": 288,
+      "eventType": "GOAL_SUBMITTED",
+      "occurredAt": "2026-11-15T23:17:08.718154",
+      "trigger": "OPERATOR",
+      "reasonCode": "NORMAL_GOAL_SUBMITTED",
+      "detailSummary": "运行操作员oprator提交任务目标: 请测量T2值机岛A03当前行李的长宽高和重量；超规时上报告警、由智慧航显发布超规行李专柜B01办理提示，并由移动机器人提供导航；正常行李留存测量结果后结束。",
+      "detail": "运行操作员oprator提交任务目标: 请测量T2值机岛A03当前行李的长宽高和重量；超规时上报告警、由智慧航显发布超规行李专柜B01办理提示，并由移动机器人提供导航；正常行李留存测量结果后结束。",
+      "rawDetailSummary": "运行操作员oprator提交任务目标: 请测量T2值机岛A03当前行李的长宽高和重量；超规时上报告警、由智慧航显发布超规行李专柜B01办理提示，并由移动机器人提供导航；正常行李留存测量结果后结束。"
+    },
+    {
+      "id": 6115,
+      "taskId": 288,
+      "eventType": "GOAL_CLARIFIED",
+      "occurredAt": "2026-11-15T23:17:16.003023",
+      "trigger": "SYSTEM",
+      "reasonCode": "INFO_CHECK_OVERRIDE",
+      "detailSummary": "系统按任务族核对必要信息：均已提供，忽略模型的追问（模型判断不完整）",
+      "detail": "系统按任务族核对必要信息：均已提供，忽略模型的追问（模型判断不完整）",
+      "rawDetailSummary": "系统按任务族核对必要信息：均已提供，忽略模型的追问（模型判断不完整）"
+    },
+    {
+      "id": 6116,
+      "taskId": 288,
+      "eventType": "GOAL_CLARIFIED",
+      "occurredAt": "2026-11-15T23:17:16.007061",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_GOAL_CLARIFIED",
+      "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建",
+      "detail": "目标理解完成，关键信息已完整，进入规划上下文构建",
+      "rawDetailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+    },
+    {
+      "id": 6117,
+      "taskId": 288,
+      "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+      "occurredAt": "2026-11-15T23:17:16.082231",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_CONTEXT_BUILT",
+      "detailSummary": "生成规划上下文快照CTX-20261115-0337",
+      "detail": "生成规划上下文快照CTX-20261115-0337",
+      "rawDetailSummary": "生成规划上下文快照CTX-20261115-0337"
+    },
+    {
+      "id": 6118,
+      "taskId": 288,
+      "eventType": "PLAN_GENERATED",
+      "occurredAt": "2026-11-15T23:17:35.055815",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_PLAN_GENERATED",
+      "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1",
+      "detail": "候选计划生成完成，来源AUTONOMOUS，版本1",
+      "rawDetailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+    },
+    {
+      "id": 6119,
+      "taskId": 288,
+      "eventType": "PLAN_VALIDATED",
+      "occurredAt": "2026-11-15T23:17:35.066151",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_PLAN_VALIDATED",
+      "detailSummary": "候选计划三类校验全部通过，已冻结版本",
+      "detail": "候选计划三类校验全部通过，已冻结版本",
+      "rawDetailSummary": "候选计划三类校验全部通过，已冻结版本"
+    },
+    {
+      "id": 6120,
+      "taskId": 288,
+      "eventType": "SUPERVISION_JUDGED",
+      "occurredAt": "2026-11-15T23:17:35.181566",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_SUPERVISION_JUDGED",
+      "detailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则；命中单一风险信号（候选差异较大），单一信号不直接阻断，低风险自动执行；置信度=0.85（仅作参考，不覆盖三类校验结果）；规则集版本=V1.2；推荐处置=AUTO_EXECUTE（自动执行）",
+      "detail": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则；命中单一风险信号（候选差异较大），单一信号不直接阻断，低风险自动执行；置信度=0.85（仅作参考，不覆盖三类校验结果）；规则集版本=V1.2；推荐处置=AUTO_EXECUTE（自动执行）",
+      "rawDetailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则；命中单一风险信号（候选差异较大），单一信号不直接阻断，低风险自动执行；置信度=0.85（仅作参考，不覆盖三类校验结果）；规则集版本=V1.2；推荐处置=AUTO_EXECUTE（自动执行）"
+    },
+    {
+      "id": 6121,
+      "taskId": 288,
+      "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+      "occurredAt": "2026-11-15T23:17:35.232739",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_ASSIGNMENT_REQUESTED",
+      "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-1C13535E(匹配度1.0,距离0.0,负载0)；AGT-D602D701(匹配度1.0,距离0.0,负载0)，向候选AGT-1C13535E发起承接请求",
+      "detail": "步骤1候选排序（能力匹配->距离->负载）: AGT-1C13535E(匹配度1.0,距离0.0,负载0)；AGT-D602D701(匹配度1.0,距离0.0,负载0)，向候选AGT-1C13535E发起承接请求",
+      "rawDetailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-1C13535E(匹配度1.0,距离0.0,负载0)；AGT-D602D701(匹配度1.0,距离0.0,负载0)，向候选AGT-1C13535E发起承接请求"
+    },
+    {
+      "id": 6122,
+      "taskId": 288,
+      "eventType": "AGENT_ASSIGNED",
+      "occurredAt": "2026-11-15T23:17:35.631543",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_AGENT_ASSIGNED",
+      "detailSummary": "设备代理AGT-1C13535E接受步骤1承接请求",
+      "detail": "设备代理AGT-1C13535E接受步骤1承接请求",
+      "rawDetailSummary": "设备代理AGT-1C13535E接受步骤1承接请求"
+    },
+    {
+      "id": 6123,
+      "taskId": 288,
+      "eventType": "STEP_DISPATCHED",
+      "occurredAt": "2026-11-15T23:17:35.889524",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_STEP_DISPATCHED",
+      "detailSummary": "指令CMD-20261115231735-18CB0024已下发至设备代理AGT-1C13535E，业务意图: 在T2值机岛A03对行李BAG-828705进行尺寸和重量测量",
+      "detail": "指令CMD-20261115231735-18CB0024已下发至设备代理AGT-1C13535E，业务意图: 在T2值机岛A03对行李BAG-828705进行尺寸和重量测量",
+      "rawDetailSummary": "指令CMD-20261115231735-18CB0024已下发至设备代理AGT-1C13535E，业务意图: 在T2值机岛A03对行李BAG-828705进行尺寸和重量测量"
+    },
+    {
+      "id": 6124,
+      "taskId": 288,
+      "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+      "occurredAt": "2026-11-15T23:17:36.846524",
+      "trigger": "SYSTEM",
+      "reasonCode": "DEVICE_SUCCESS",
+      "detailSummary": "指令CMD-20261115231735-18CB0024收到设备代理AGT-1C13535E执行反馈: SUCCESS",
+      "detail": "指令CMD-20261115231735-18CB0024收到设备代理AGT-1C13535E执行反馈: SUCCESS",
+      "rawDetailSummary": "指令CMD-20261115231735-18CB0024收到设备代理AGT-1C13535E执行反馈: SUCCESS"
+    },
+    {
+      "id": 6125,
+      "taskId": 288,
+      "eventType": "STEP_COMPLETED",
+      "occurredAt": "2026-11-15T23:17:36.858107",
+      "trigger": "SYSTEM",
+      "reasonCode": "NORMAL_STEP_COMPLETED",
+      "detailSummary": "步骤1完成条件已满足: 返回length、width、height、weight及isOversize测量结果，measureStatus为SUCCESS",
+      "detail": "步骤1完成条件已满足: 返回length、width、height、weight及isOversize测量结果，measureStatus为SUCCESS",
+      "rawDetailSummary": "步骤1完成条件已满足: 返回length、width、height、weight及isOversize测量结果，measureStatus为SUCCESS"
+    },
+    {
+      "id": 6126,
+      "taskId": 288,
+      "eventType": "TASK_COMPLETED",
+      "occurredAt": "2026-11-15T23:17:36.886271",
+      "trigger": "SYSTEM",
+      "reasonCode": "BAGGAGE_WITHIN_LIMIT",
+      "detailSummary": "行李未超规，结束处置；三边和115.0cm（阈值158cm），重量10.0kg（阈值32kg）；来源：附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束",
+      "detail": "行李未超规，结束处置；三边和115.0cm（阈值158cm），重量10.0kg（阈值32kg）；来源：附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束",
+      "rawDetailSummary": "行李未超规，结束处置；三边和115.0cm（阈值158cm），重量10.0kg（阈值32kg）；来源：附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束"
+    }
+  ],
+  "plans": [
+    {
+      "id": 377,
+      "versionNo": 1,
+      "source": "AUTONOMOUS",
+      "baselineTemplateId": null,
+      "snapshotId": "CTX-20261115-0337",
+      "planSteps": [
+        {
+          "stepSeq": 1,
+          "stepGoal": "在T2值机岛A03对行李BAG-828705进行尺寸和重量测量",
+          "capabilityType": "CAP_BAGGAGE_MEASURE",
+          "inputParams": {
+            "measureMode": "AUTO",
+            "timeout": 30
+          },
+          "precondition": "行李BAG-828705已放置于T2值机岛A03测量区域，设备处于空闲状态",
+          "completionCondition": "返回length、width、height、weight及isOversize测量结果，measureStatus为SUCCESS",
+          "failureHandling": "测量超时或失败时，根据错误提示排查行李摆放或设备状态后重试，连续失败则上报人工介入",
+          "stepTimeout": 35
+        }
+      ],
+      "structureCheckResult": "PASS",
+      "capabilityCheckResult": "PASS",
+      "constraintCheckResult": "PASS",
+      "validationErrors": [],
+      "riskLevel": "LOW",
+      "riskReasonCode": null,
+      "judgmentBasis": "未命中确定性高风险规则；命中单一风险信号（候选差异较大），单一信号不直接阻断，低风险自动执行",
+      "confidence": 0.85,
+      "ruleSetVersion": "V1.2",
+      "frozenAt": "2026-11-15T23:17:35.061576",
+      "createdAt": "2026-11-15T23:17:35.040275"
+    }
+  ],
+  "checks": {
+    "completed": true,
+    "only_measurement": true,
+    "within_limit": true
+  }
+}
