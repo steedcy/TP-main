@@ -44,7 +44,7 @@ def repair(environment, fixtures):
         template = matches[0]
         path = '/baseline-templates/' + str(template['id'])
         # Update only a differing preset. Re-running retains a successfully enabled version.
-        body = {'inputParams': fixture['inputParams'],
+        body = {'inputParams': [dict(field, range=field.get('range')) for field in fixture['inputParams']],
                 'steps': [dict(step, stepSeq=index + 1) for index, step in enumerate(fixture['steps'])]}
         if any(template.get(key) != value for key, value in body.items()):
             template = api(path, 'PUT', body)

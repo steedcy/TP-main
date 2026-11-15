@@ -12,7 +12,8 @@ spec.loader.exec_module(module)
 
 class DemoRepairTest(unittest.TestCase):
     def environment(self, test_passes=True, trial_passes=True):
-        fixture = {'taskFamily': 'SPECIAL_PASSENGER_SERVICE', 'inputParams': [],
+        fixture = {'taskFamily': 'SPECIAL_PASSENGER_SERVICE',
+                   'inputParams': [{'name': 'origin', 'type': 'String', 'required': True, 'defaultValue': 'F2_SERVICE_POINT'}],
                    'steps': [{'capabilityType': 'CAP_INFO_DISPLAY'}]}
         template = {'id': 2, 'isPreset': True, 'templateIntent': fixture['taskFamily'],
                     'templateVersion': 'V1.13', 'templateStatus': 'ENABLED', 'inputParams': [], 'steps': []}
@@ -37,6 +38,7 @@ class DemoRepairTest(unittest.TestCase):
                 return [copy.deepcopy(template)]
             if method == 'PUT':
                 template.update(data, templateStatus='DRAFT', templateVersion='V1.14')
+                template['inputParams'] = [dict(field, range=field.get('range')) for field in data['inputParams']]
                 return copy.deepcopy(template)
             if path.endswith('/enable'):
                 template['templateStatus'] = 'ENABLED'

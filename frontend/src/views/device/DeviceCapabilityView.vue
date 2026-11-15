@@ -78,6 +78,8 @@
     </a-modal>
 
     <a-modal v-model:open="testResultVisible" title="模拟调用测试结果" :footer="null">
+      <a-alert v-if="testResultData.capabilityStatus === 'TESTED_PASSED'" type="info" show-icon
+        message="测试通过后需启用，才能参与任务调度。" style="margin-bottom: 12px" />
       <a-descriptions :column="1" bordered size="small">
         <a-descriptions-item label="测试结果">
           <a-tag :color="testResultData.capabilityStatus === 'TESTED_PASSED' ? 'green' : 'red'">
@@ -90,6 +92,10 @@
         <a-descriptions-item label="调用请求"><pre style="white-space: pre-wrap; margin: 0">{{ testResultData.testRequest || '—' }}</pre></a-descriptions-item>
         <a-descriptions-item label="设备响应"><pre style="white-space: pre-wrap; margin: 0">{{ testResultData.testResponse || '—' }}</pre></a-descriptions-item>
       </a-descriptions>
+      <a-button v-if="testResultData.capabilityStatus === 'TESTED_PASSED'" type="primary"
+        :loading="enablingTestedCapability" style="margin-top: 16px" @click="enableTestedCapability">
+        启用此能力
+      </a-button>
     </a-modal>
   </div>
 </template>
@@ -247,6 +253,16 @@ async function handleSubmit() {
 
 const testResultVisible = ref(false)
 const testResultData = ref({})
+const enablingTestedCapability = ref(false)
+async function enableTestedCapability() {
+  enablingTestedCapability.value = true
+  try {
+    await handleUpdateStatus(testResultData.value, 'ENABLED')
+    testResultVisible.value = false
+  } finally {
+    enablingTestedCapability.value = false
+  }
+}
 async function handleTest(record) {
   const resp = await testDeviceCapability(deviceCode, record.capabilityCode)
   testResultData.value = resp.data
@@ -257,7 +273,7 @@ async function handleTest(record) {
 async function handleUpdateStatus(record, status) {
   await updateDeviceCapabilityStatus(deviceCode, record.capabilityCode, status)
   message.success('操作成功')
-  fetchList()
+  await fetchList()
 }
 
 onMounted(() => {

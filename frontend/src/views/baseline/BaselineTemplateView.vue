@@ -18,7 +18,7 @@
           <a-space wrap v-if="isConfigAdmin">
             <a-button size="small" @click="openView(record)" data-testid="view-template-btn">查看</a-button>
             <a-button size="small" @click="openForm(record)">编辑</a-button>
-            <a-button size="small" @click="openDryRun(record)">试运行</a-button>
+            <a-button size="small" :disabled="record.templateStatus !== 'DRAFT'" @click="openDryRun(record)">试运行</a-button>
             <a-button
               size="small" type="primary"
               :disabled="record.templateStatus !== 'DRY_RUN_PASSED'"
