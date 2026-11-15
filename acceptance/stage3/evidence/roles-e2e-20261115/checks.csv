@@ -1,0 +1,29 @@
+﻿id,role_requirement,steps_expected,actual_result,evidence
+A01,三角色，F001/F002,分别登录，进入总览并显示当前角色和相应菜单,P。管理员显示账号和全量审计，配置管理员显示设备/能力/模板/定义/风险，操作员显示任务/异常/追溯/态势,本轮浏览器操作，31-final-overview.txt、29-task-definitions-full.txt、14-flight-final.txt
+A02,系统管理员，F001,账号管理→新增账号→空表单提交,P。账号、初始密码、姓名、联系方式分别提示必填，表单保持打开，可取消,浏览器现场观察，原始工具输出及02-admin-validation.txt差分记录
+A03,系统管理员，F001,API 创建虚构 OPERATOR 账号→停用→登录→启用→登录→最终停用,P。创建200，停用登录403/2004且通用提示，启用登录200，最终停用200,api-security-account.json
+A04,三角色，F001,浏览器退出登录，API 退出后复用旧会话,P。页面回登录页，旧会话401/2001,34-logged-out.txt、api-security-account.json
+A05,三角色，F001,非管理员读取账号接口、配置管理员读任务详情，管理员读任务详情,P。前三项403，管理员任务详情200,api-security-account.json
+A06,系统管理员，F028,查询跨角色操作记录并打开详情,P。可见账号、角色、时间、对象、结果及IP，模板停用详情可查,32-final-audit.txt/png、33-template-audit-detail.txt
+A07,配置管理员/操作员，F028,API 查询各自操作记录,P。各读100条，账号集合分别只有set和oprator,final-api-readback.json→ownAuditScope
+C01,配置管理员，F003/F004/F005,设备管理→SIM_F2_DISPLAY连接测试，核对代理心跳,P。提示连接测试通过104ms，7个代理在线，退出时均空闲,本轮浏览器反馈、final-api-readback.json→agents
+C02,配置管理员，F006,展示能力→模拟调用测试→恢复启用,P。实际代理调用138ms，设备SUCCESS，输出displayStatus=SUCCESS。页面启用点击未生效，退场回读发现TESTED_PASSED，后经配置API恢复为ENABLED,07-capability-test.txt、35-capability-final-state.json
+C03,配置管理员，F006A,能力边界配置→能力约束矩阵,P。五类设备与八类能力交叉矩阵可查，可切换列表/矩阵,30-capability-matrix.txt
+C04,配置管理员，F022,查询三类核心任务定义,P。行李、特殊旅客、航变均启用，预置定义删除按钮不可用,29-task-definitions-full.txt
+C05,配置管理员，F014,查询风险规则,P。V1.2规则集，会合陪同、跨区域、资源临界规则均启用,10-risk-rules.txt
+C06,配置管理员，F008/F009,草稿B04_TC026_PROBE_20261022 V1.1→绑定航延屏与机器人→开始试运行,P。两步试运行完成，列表显示试运行通过并允许启用,11-draft-dry-run-passed.txt、后台试运行审计
+C07,配置管理员，F009,对上述试运行通过模板启用，再停用并确认,P。显示已启用，停用二次确认后显示已停用，审计两次成功,27-template-enabled.txt、28b-template-disabled-confirmed.txt、32-final-audit.txt
+O01,操作员，F026,航变演示→详情→核对延误时间与目标登机口,F。0272四步完成但前三步发布错误的登机口变更示例文案，导航为GATE_A05,14-flight-final.txt、final-api-readback.json
+O02,操作员，F024,行李演示→测量→正常/超规判定→相应闭环,F。0273先降级，首步导航T2值机岛A03失败，测量未执行，转人工,15-baggage-final.txt
+O03,操作员，F024,超规事件100×60×40cm、28kg→告警/办理说明/柜台引导,F。0275判定超规成功，导航失败，后续三步冻结,18-oversize-created.txt、19-oversize-final.txt
+O04,操作员，F024,正常事件50×40×20cm、12kg→结束且无引导指令,P。0276以BAGGAGE_WITHIN_LIMIT完成，无计划及设备分配,21-normal-final.txt、final-api-readback.json
+O05,操作员，F025,特殊旅客演示→会合提示→到起点会合→陪同到GATE_A05,F。0274三步SUCCESS，提示仅轮椅陪同，缺会合地点和到起点反馈,17-escort-final.txt
+O06,操作员，F018/F020,0273待人工→重试规划→填写原因并保持原目标→确认,P。人工动作留痕，新计划形成至版本4，保留旧版本，后续同类导航错误再次转人工。业务失败仍保留O02的F,16-baggage-retry.txt、final-api-readback.json→0273
+O07,操作员，F021,0275待人工→终止→填写原因并确认责任边界,P。人工终止，MANUAL_TERMINATED和TASK_TERMINATED追加，前面的失败事件保留,20-manual-terminate.txt、24-trace.txt
+O08,操作员，F010,常规提交“请安排一名虚构轮椅旅客的陪同服务”→补充三项信息,P。0277待规划并请求补充，填轮椅陪同/F2_TEST_GATE/GATE_A05后进入规划并完成,25-clarification-request.txt、26-clarification-after.txt
+O09,操作员，F025/F013,核对0277信息补全后业务内容与安全闸门,F。缺必需展示渠道的自主计划被拦截并转基线，基线完成，但会合文案和会合执行仍缺失,26-clarification-after.txt
+O10,操作员，F023,打开二维态势，核对设备位置与状态,P。底图、坐标、重叠设备说明和状态列表展示，7代理在线空闲,22-situation.txt
+O11,操作员，F027,按0275编号筛选追溯→查看计划/失败/终止时间线,P。仅匹配任务，两个计划版本、重试/切换/转人工/终止完整可查,24-trace.txt
+O12,操作员，F018/F020,查询异常处置列表并交叉核对任务,P。列表关联0273/0275等任务和具体步骤，原失败记录保留,23-exceptions.txt、final-api-readback.json
+R01,操作员API复跑，F026,恢复展示能力后，仅用页面原始字段重交航变输入,F。0280自主计划含不允许能力被拦截，基线仍发布GATE_CHANGE/F2_TEST_GATE，4步成功但内容错误,37-clean-input-recheck.json
+R02,操作员API复跑，F024,恢复展示能力后，仅用页面原始字段重交行李目标,P。0281自主测量成功，55×40×20cm、10kg，三边和115cm，BAGGAGE_WITHIN_LIMIT完成，无后续引导,37-clean-input-recheck.json

@@ -1,0 +1,936 @@
+[
+  {
+    "originalTaskId": 273,
+    "input": {
+      "taskGoal": "虚构航班CA1234原计划22:30，延误30分钟至23:00，请通过航延屏发布变更、智慧航显发布提示，并由机器人引导旅客前往GATE_A05。",
+      "taskFamily": "FLIGHT_CHANGE_RESPONSE",
+      "sceneParams": {
+        "eventSource": "MANUAL_FORM",
+        "flightNumber": "CA1234",
+        "changeType": "DELAY",
+        "originalTime": "2026-11-14T22:30:00",
+        "newTime": "2026-11-14T23:00:00",
+        "newGate": "GATE_A05",
+        "changeDescription": "虚构航班CA1234延误30分钟，登机口GATE_A05不变"
+      }
+    },
+    "task": {
+      "id": 281,
+      "taskCode": "TASK-20261115-0280",
+      "taskGoal": "虚构航班CA1234原计划22:30，延误30分钟至23:00，请通过航延屏发布变更、智慧航显发布提示，并由机器人引导旅客前往GATE_A05。",
+      "taskFamily": "FLIGHT_CHANGE_RESPONSE",
+      "sceneParams": {
+        "eventSource": "MANUAL_FORM",
+        "flightNumber": "CA1234",
+        "changeType": "DELAY",
+        "originalTime": "2026-11-14T22:30:00",
+        "newTime": "2026-11-14T23:00:00",
+        "newGate": "GATE_A05",
+        "changeDescription": "虚构航班CA1234延误30分钟，登机口GATE_A05不变",
+        "updateType": "GATE_CHANGE",
+        "updateContent": "测试航班登机口变更至F2_TEST_GATE",
+        "displayDuration": 60,
+        "targetLocation": "GATE_A05",
+        "routePreference": "BARRIER_FREE",
+        "displayContent": "虚构航班登机口及无障碍路径提示，请前往F2_TEST_GATE。",
+        "contentType": "TEXT",
+        "notificationType": "BOTH",
+        "notificationContent": "虚构航班登机口已变更，请改道至新登机口。",
+        "repeatCount": 1
+      },
+      "goalParsingResult": {
+        "completionCondition": "航班变更信息已送达且旅客后续引导（如需）已完成",
+        "origin": null,
+        "destination": "GATE_A05",
+        "originalGoal": "虚构航班CA1234原计划22:30，延误30分钟至23:00，请通过航延屏发布变更、智慧航显发布提示，并由机器人引导旅客前往GATE_A05。",
+        "constraints": [
+          "航班变更信息发布须在旅客到达登机口前完成；涉及登机口变更时须同步空间引导"
+        ]
+      },
+      "status": "COMPLETED",
+      "currentPlanVersionId": 369,
+      "replanUsed": false,
+      "replanningReason": null,
+      "manualTerminateReason": null,
+      "failureReason": null,
+      "missingInfoQuestions": null,
+      "downgradeReason": "候选计划三类校验未通过，转基线模板降级: ERR_CAPABILITY_NOT_IN_TASK_DEFINITION",
+      "isDryRun": false,
+      "createdAt": "2026-11-15T22:50:29.947352",
+      "updatedAt": "2026-11-15T22:51:00.242777",
+      "createdBy": "oprator"
+    },
+    "events": [
+      {
+        "id": 5969,
+        "taskId": 281,
+        "eventType": "GOAL_SUBMITTED",
+        "occurredAt": "2026-11-15T22:50:29.950687",
+        "trigger": "OPERATOR",
+        "reasonCode": "NORMAL_GOAL_SUBMITTED",
+        "detailSummary": "运行操作员oprator提交任务目标: 虚构航班CA1234原计划22:30，延误30分钟至23:00，请通过航延屏发布变更、智慧航显发布提示，并由机器人引导旅客前往GATE_A05。",
+        "detail": "运行操作员oprator提交任务目标: 虚构航班CA1234原计划22:30，延误30分钟至23:00，请通过航延屏发布变更、智慧航显发布提示，并由机器人引导旅客前往GATE_A05。",
+        "rawDetailSummary": "运行操作员oprator提交任务目标: 虚构航班CA1234原计划22:30，延误30分钟至23:00，请通过航延屏发布变更、智慧航显发布提示，并由机器人引导旅客前往GATE_A05。"
+      },
+      {
+        "id": 5970,
+        "taskId": 281,
+        "eventType": "GOAL_CLARIFIED",
+        "occurredAt": "2026-11-15T22:50:35.801589",
+        "trigger": "SYSTEM",
+        "reasonCode": "INFO_CHECK_OVERRIDE",
+        "detailSummary": "系统按航班变更必需字段核对：关键信息已齐全，忽略模型追问（模型判断不完整）",
+        "detail": "系统按航班变更必需字段核对：关键信息已齐全，忽略模型追问（模型判断不完整）",
+        "rawDetailSummary": "系统按航班变更必需字段核对：关键信息已齐全，忽略模型追问（模型判断不完整）"
+      },
+      {
+        "id": 5971,
+        "taskId": 281,
+        "eventType": "GOAL_CLARIFIED",
+        "occurredAt": "2026-11-15T22:50:35.804331",
+        "trigger": "SYSTEM",
+        "reasonCode": "NORMAL_GOAL_CLARIFIED",
+        "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建",
+        "detail": "目标理解完成，关键信息已完整，进入规划上下文构建",
+        "rawDetailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+      },
+      {
+        "id": 5972,
+        "taskId": 281,
+        "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+        "occurredAt": "2026-11-15T22:50:35.818589",
+        "trigger": "SYSTEM",
+        "reasonCode": "NORMAL_CONTEXT_BUILT",
+        "detailSummary": "生成规划上下文快照CTX-20261115-0332",
+        "detail": "生成规划上下文快照CTX-20261115-0332",
+        "rawDetailSummary": "生成规划上下文快照CTX-20261115-0332"
+      },
+      {
+        "id": 5973,
+        "taskId": 281,
+        "eventType": "PLAN_GENERATED",
+        "occurredAt": "2026-11-15T22:50:57.284659",
+        "trigger": "SYSTEM",
+        "reasonCode": "NORMAL_PLAN_GENERATED",
+        "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1",
+        "detail": "候选计划生成完成，来源AUTONOMOUS，版本1",
+        "rawDetailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+      },
+      {
+        "id": 5974,
+        "taskId": 281,
+        "eventType": "PLAN_VALIDATED",
+        "occurredAt": "2026-11-15T22:50:57.284659",
+        "trigger": "SYSTEM",
+        "reasonCode": "ERR_CAPABILITY_NOT_IN_TASK_DEFINITION",
+        "detailSummary": "候选计划三类校验未通过: 1项错误 [CONSTRAINT 步骤4: 步骤所需能力CAP_ESCORT超出任务定义声明的可用能力类型范围: [CAP_FLIGHT_UPDATE, CAP_INFO_DISPLAY, CAP_NOTIFICATION, CAP_NAVIGATION](ERR_CAPABILITY_NOT_IN_TASK_DEFINITION)]",
+        "detail": "候选计划三类校验未通过: 1项错误 [CONSTRAINT 步骤4: 步骤所需能力CAP_ESCORT超出任务定义声明的可用能力类型范围: [CAP_FLIGHT_UPDATE, CAP_INFO_DISPLAY, CAP_NOTIFICATION, CAP_NAVIGATION](ERR_CAPABILITY_NOT_IN_TASK_DEFINITION)]",
+        "rawDetailSummary": "候选计划三类校验未通过: 1项错误 [CONSTRAINT 步骤4: 步骤所需能力CAP_ESCORT超出任务定义声明的可用能力类型范围: [CAP_FLIGHT_UPDATE, CAP_INFO_DISPLAY, CAP_NOTIFICATION, CAP_NAVIGATION](ERR_CAPABILITY_NOT_IN_TASK_DEFINITION)]"
+      },
+      {
+        "id": 5975,
+        "taskId": 281,
+        "eventType": "BASELINE_INPUT_BOUND",
+        "occurredAt": "2026-11-15T22:50:57.28883",
+        "trigger": "SYSTEM",
+        "reasonCode": "NORMAL_EVENT",
+        "detailSummary": "基线模板输入取自目标理解解析结果: [targetLocation]",
+        "detail": "基线模板输入取自目标理解解析结果: [targetLocation]",
+        "rawDetailSummary": "基线模板输入取自目标理解解析结果: [targetLocation]"
+      },
+      {
+        "id": 5976,
+        "taskId": 281,
+        "eventType": "BASELINE_DOWNGRADED",
+        "occurredAt": "2026-11-15T22:50:57.307365",
+        "trigger": "SYSTEM",
+        "reasonCode": "NORMAL_BASELINE_DOWNGRADED",
+        "detailSummary": "已自动切换至基线模板航班变更应对标准模板(V1.19)，原因: 候选计划三类校验未通过，转基线模板降级: ERR_CAPABILITY_NOT_IN_TASK_DEFINITION，选择依据: [任务族精确匹配(FLIGHT_CHANGE_RESPONSE), 步骤数4步少优先, 最近试运行通过时间2026-10-25T04:01:19.923403优先]",
+        "detail": "已自动切换至基线模板航班变更应对标准模板(V1.19)，原因: 候选计划三类校验未通过，转基线模板降级: ERR_CAPABILITY_NOT_IN_TASK_DEFINITION，选择依据: [任务族精确匹配(FLIGHT_CHANGE_RESPONSE), 步骤数4步少优先, 最近试运行通过时间2026-10-25T04:01:19.923403优先]",
+        "rawDetailSummary": "已自动切换至基线模板航班变更应对标准模板(V1.19)，原因: 候选计划三类校验未通过，转基线模板降级: ERR_CAPABILITY_NOT_IN_TASK_DEFINITION，选择依据: [任务族精确匹配(FLIGHT_CHANGE_RESPONSE), 步骤数4步少优先, 最近试运行通过时间2026-10-25T04:01:19.923403优先]"
+      },
+      {
+        "id": 5977,
+        "taskId": 281,
+        "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+        "occurredAt": "2026-11-15T22:50:57.326459",
+        "trigger": "SYSTEM",
+        "reasonCode": "NORMAL_ASSIGNMENT_REQUESTED",
+        "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-B0D7BDAD(匹配度1.0,距离0.0,负载0)，向候选AGT-B0D7BDAD发起承接请求",
+        "detail": "步骤1候选排序（能力匹配->距离->负载）: AGT-B0D7BDAD(匹配度1.0,距离0.0,负载0)，向候选AGT-B0D7BDAD发起承接请求",
+        "rawDetailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-B0D7BDAD(匹配度1.0,距离0.0,负载0)，向候选AGT-B0D7BDAD发起承接请求"
+      },
+      {
+        "id": 5978,
+        "taskId": 281,
+        "eventType": "AGENT_ASSIGNED",
+        "occurredAt": "2026-11-15T22:50:57.360753",
+        "trigger": "SYSTEM",
+        "reasonCode": "NORMAL_AGENT_ASSIGNED",
+        "detailSummary": "设备代理AGT-B0D7BDAD接受步骤1承接请求",
+        "detail": "设备代理AGT-B0D7BDAD接受步骤1承接请求",
+        "rawDetailSummary": "设备代理AGT-B0D7BDAD接受步骤1承接请求"
+      },
+      {
+        "id": 5979,
+        "taskId": 281,
+        "eventType": "STEP_DISPATCHED",
+        "occurredAt": "2026-11-15T22:50:57.365464",
+        "trigger": "SYSTEM",
+        "reasonCode": "NORMAL_STEP_DISPATCHED",
+        "detailSummary": "指令CMD-20261115225057-FAAD0057已下发至设备代理AGT-B0D7BDAD，业务意图: 执行CAP_FLIGHT_UPDATE能力（基线模板步骤）",
+        "detail": "指令CMD-20261115225057-FAAD0057已下发至设备代理AGT-B0D7BDAD，业务意图: 执行CAP_FLIGHT_UPDATE能力（基线模板步骤）",
+        "rawDetailSummary": "指令CMD-20261115225057-FAAD0057已下发至设备代理AGT-B0D7BDAD，业务意图: 执行CAP_FLIGHT_UPDATE能力（基线模板步骤）"
+      },
+      {
+        "id": 5980,
+        "taskId": 281,
+        "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+        "occurredAt": "2026-11-15T22:50:57.90719",
+        "trigger": "SYSTEM",
+        "reasonCode": "DEVICE_SUCCESS",
+        "detailSummary": "指令CMD-20261115225057-FAAD0057收到设备代理AGT-B0D7BDAD执行反馈: SUCCESS",
+        "detail": "指令CMD-20261115225057-FAAD0057收到设备代理AGT-B0D7BDAD执行反馈: SUCCESS",
+        "rawDetailSummary": "指令CMD-20261115225057-FAAD0057收到设备代理AGT-B0D7BDAD执行反馈: SUCCESS"
+      },
+      {
+        "id": 5981,
+        "taskId": 281,
+        "eventType": "STEP_COMPLETED",
+        "occurredAt": "2026-11-15T22:50:57.909495",
+        "trigger": "SYSTEM",
+        "reasonCode": "NORMAL_STEP_COMPLETED",
+        "detailSummary": "步骤1完成条件已满足: publishStatus=SUCCESS",
+        "detail": "步骤1完成条件已满足: publishStatus=SUCCESS",
+        "rawDetailSummary": "步骤1完成条件已满足: publishStatus=SUCCESS"
+      },
+      {
+        "id": 5982,
+        "taskId": 281,
+        "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+        "occurredAt": "2026-11-15T22:50:57.914198",
+        "trigger": "SYSTEM",
+        "reasonCode": "NORMAL_ASSIGNMENT_REQUESTED",
+        "detailSummary": "步骤2候选排序（能力匹配->距离->负载）: AGT-3A76FECA(匹配度1.0,距离0.0,负载0)；AGT-62EAF5EA(匹配度1.0,距离0.0,负载0)，向候选AGT-3A76FECA发起承接请求",
+        "detail": "步骤2候选排序（能力匹配->距离->负载）: AGT-3A76FECA(匹配度1.0,距离0.0,负载0)；AGT-62EAF5EA(匹配度1.0,距离0.0,负载0)，向候选AGT-3A76FECA发起承接请求",
+        "rawDetailSummary": "步骤2候选排序（能力匹配->距离->负载）: AGT-3A76FECA(匹配度1.0,距离0.0,负载0)；AGT-62EAF5EA(匹配度1.0,距离0.0,负载0)，向候选AGT-3A76FECA发起承接请求"
+      },
+      {
+        "id": 5983,
+        "taskId": 281,
+        "eventType": "AGENT_ASSIGNED",
+        "occurredAt": "2026-11-15T22:50:57.942519",
+        "trigger": "SYSTEM",
+        "reasonCode": "NORMAL_AGENT_ASSIGNED",
+        "detailSummary": "设备代理AGT-3A76FECA接受步骤2承接请求",
+        "detail": "设备代理AGT-3A76FECA接受步骤2承接请求",
+        "rawDetailSummary": "设备代理AGT-3A76FECA接受步骤2承接请求"
+      },
+      {
+        "id": 5984,
+        "taskId": 281,
+        "eventType": "STEP_DISPATCHED",
+        "occurredAt": "2026-11-15T22:50:57.944647",
+        "trigger": "SYSTEM",
+        "reasonCode": "NORMAL_STEP_DISPATCHED",
+        "detailSummary": "指令CMD-20261115225057-FAAD0059已下发至设备代理AGT-3A76FECA，业务意图: 执行CAP_INFO_DISPLAY能力（基线模板步骤）",
+        "detail": "指令CMD-20261115225057-FAAD0059已下发至设备代理AGT-3A76FECA，业务意图: 执行CAP_INFO_DISPLAY能力（基线模板步骤）",
+        "rawDetailSummary": "指令CMD-20261115225057-FAAD0059已下发至设备代理AGT-3A76FECA，业务意图: 执行CAP_INFO_DISPLAY能力（基线模板步骤）"
+      },
+      {
+        "id": 5985,
+        "taskId": 281,
+        "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+        "occurredAt": "2026-11-15T22:50:58.476046",
+        "trigger": "SYSTEM",
+        "reasonCode": "DEVICE_SUCCESS",
+        "detailSummary": "指令CMD-20261115225057-FAAD0059收到设备代理AGT-3A76FECA执行反馈: SUCCESS",
+        "detail": "指令CMD-20261115225057-FAAD0059收到设备代理AGT-3A76FECA执行反馈: SUCCESS",
+        "rawDetailSummary": "指令CMD-20261115225057-FAAD0059收到设备代理AGT-3A76FECA执行反馈: SUCCESS"
+      },
+      {
+        "id": 5986,
+        "taskId": 281,
+        "eventType": "STEP_COMPLETED",
+        "occurredAt": "2026-11-15T22:50:58.478502",
+        "trigger": "SYSTEM",
+        "reasonCode": "NORMAL_STEP_COMPLETED",
+        "detailSummary": "步骤2完成条件已满足: displayStatus=SUCCESS",
+        "detail": "步骤2完成条件已满足: displayStatus=SUCCESS",
+        "rawDetailSummary": "步骤2完成条件已满足: displayStatus=SUCCESS"
+      },
+      {
+        "id": 5987,
+        "taskId": 281,
+        "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+        "occurredAt": "2026-11-15T22:50:58.485986",
+        "trigger": "SYSTEM",
+        "reasonCode": "NORMAL_ASSIGNMENT_REQUESTED",
+        "detailSummary": "步骤3候选排序（能力匹配->距离->负载）: AGT-3A36BBB4(匹配度1.0,距离0.0,负载0)；AGT-CCDDEB4A(匹配度1.0,距离0.0,负载0)，向候选AGT-3A36BBB4发起承接请求",
+        "detail": "步骤3候选排序（能力匹配->距离->负载）: AGT-3A36BBB4(匹配度1.0,距离0.0,负载0)；AGT-CCDDEB4A(匹配度1.0,距离0.0,负载0)，向候选AGT-3A36BBB4发起承接请求",
+        "rawDetailSummary": "步骤3候选排序（能力匹配->距离->负载）: AGT-3A36BBB4(匹配度1.0,距离0.0,负载0)；AGT-CCDDEB4A(匹配度1.0,距离0.0,负载0)，向候选AGT-3A36BBB4发起承接请求"
+      },
+      {
+        "id": 5988,
+        "taskId": 281,
+        "eventType": "AGENT_ASSIGNED",
+        "occurredAt": "2026-11-15T22:50:58.521777",
+        "trigger": "SYSTEM",
+        "reasonCode": "NORMAL_AGENT_ASSIGNED",
+        "detailSummary": "设备代理AGT-3A36BBB4接受步骤3承接请求",
+        "detail": "设备代理AGT-3A36BBB4接受步骤3承接请求",
+        "rawDetailSummary": "设备代理AGT-3A36BBB4接受步骤3承接请求"
+      },
+      {
+        "id": 5989,
+        "taskId": 281,
+        "eventType": "STEP_DISPATCHED",
+        "occurredAt": "2026-11-15T22:50:58.52431",
+        "trigger": "SYSTEM",
+        "reasonCode": "NORMAL_STEP_DISPATCHED",
+        "detailSummary": "指令CMD-20261115225058-FAAD005B已下发至设备代理AGT-3A36BBB4，业务意图: 执行CAP_NOTIFICATION能力（基线模板步骤）",
+        "detail": "指令CMD-20261115225058-FAAD005B已下发至设备代理AGT-3A36BBB4，业务意图: 执行CAP_NOTIFICATION能力（基线模板步骤）",
+        "rawDetailSummary": "指令CMD-20261115225058-FAAD005B已下发至设备代理AGT-3A36BBB4，业务意图: 执行CAP_NOTIFICATION能力（基线模板步骤）"
+      },
+      {
+        "id": 5990,
+        "taskId": 281,
+        "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+        "occurredAt": "2026-11-15T22:50:59.071425",
+        "trigger": "SYSTEM",
+        "reasonCode": "DEVICE_SUCCESS",
+        "detailSummary": "指令CMD-20261115225058-FAAD005B收到设备代理AGT-3A36BBB4执行反馈: SUCCESS",
+        "detail": "指令CMD-20261115225058-FAAD005B收到设备代理AGT-3A36BBB4执行反馈: SUCCESS",
+        "rawDetailSummary": "指令CMD-20261115225058-FAAD005B收到设备代理AGT-3A36BBB4执行反馈: SUCCESS"
+      },
+      {
+        "id": 5991,
+        "taskId": 281,
+        "eventType": "STEP_COMPLETED",
+        "occurredAt": "2026-11-15T22:50:59.074428",
+        "trigger": "SYSTEM",
+        "reasonCode": "NORMAL_STEP_COMPLETED",
+        "detailSummary": "步骤3完成条件已满足: notificationStatus=SUCCESS",
+        "detail": "步骤3完成条件已满足: notificationStatus=SUCCESS",
+        "rawDetailSummary": "步骤3完成条件已满足: notificationStatus=SUCCESS"
+      },
+      {
+        "id": 5992,
+        "taskId": 281,
+        "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+        "occurredAt": "2026-11-15T22:50:59.079543",
+        "trigger": "SYSTEM",
+        "reasonCode": "NORMAL_ASSIGNMENT_REQUESTED",
+        "detailSummary": "步骤4候选排序（能力匹配->距离->负载）: AGT-3A36BBB4(匹配度1.0,距离0.0,负载0)；AGT-CCDDEB4A(匹配度1.0,距离0.0,负载0)，向候选AGT-3A36BBB4发起承接请求",
+        "detail": "步骤4候选排序（能力匹配->距离->负载）: AGT-3A36BBB4(匹配度1.0,距离0.0,负载0)；AGT-CCDDEB4A(匹配度1.0,距离0.0,负载0)，向候选AGT-3A36BBB4发起承接请求",
+        "rawDetailSummary": "步骤4候选排序（能力匹配->距离->负载）: AGT-3A36BBB4(匹配度1.0,距离0.0,负载0)；AGT-CCDDEB4A(匹配度1.0,距离0.0,负载0)，向候选AGT-3A36BBB4发起承接请求"
+      },
+      {
+        "id": 5993,
+        "taskId": 281,
+        "eventType": "AGENT_ASSIGNED",
+        "occurredAt": "2026-11-15T22:50:59.10764",
+        "trigger": "SYSTEM",
+        "reasonCode": "NORMAL_AGENT_ASSIGNED",
+        "detailSummary": "设备代理AGT-3A36BBB4接受步骤4承接请求",
+        "detail": "设备代理AGT-3A36BBB4接受步骤4承接请求",
+        "rawDetailSummary": "设备代理AGT-3A36BBB4接受步骤4承接请求"
+      },
+      {
+        "id": 5994,
+        "taskId": 281,
+        "eventType": "STEP_DISPATCHED",
+        "occurredAt": "2026-11-15T22:50:59.11022",
+        "trigger": "SYSTEM",
+        "reasonCode": "NORMAL_STEP_DISPATCHED",
+        "detailSummary": "指令CMD-20261115225059-FAAD005D已下发至设备代理AGT-3A36BBB4，业务意图: 执行CAP_NAVIGATION能力（基线模板步骤）",
+        "detail": "指令CMD-20261115225059-FAAD005D已下发至设备代理AGT-3A36BBB4，业务意图: 执行CAP_NAVIGATION能力（基线模板步骤）",
+        "rawDetailSummary": "指令CMD-20261115225059-FAAD005D已下发至设备代理AGT-3A36BBB4，业务意图: 执行CAP_NAVIGATION能力（基线模板步骤）"
+      },
+      {
+        "id": 5995,
+        "taskId": 281,
+        "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+        "occurredAt": "2026-11-15T22:51:00.237663",
+        "trigger": "SYSTEM",
+        "reasonCode": "DEVICE_SUCCESS",
+        "detailSummary": "指令CMD-20261115225059-FAAD005D收到设备代理AGT-3A36BBB4执行反馈: SUCCESS",
+        "detail": "指令CMD-20261115225059-FAAD005D收到设备代理AGT-3A36BBB4执行反馈: SUCCESS",
+        "rawDetailSummary": "指令CMD-20261115225059-FAAD005D收到设备代理AGT-3A36BBB4执行反馈: SUCCESS"
+      },
+      {
+        "id": 5996,
+        "taskId": 281,
+        "eventType": "STEP_COMPLETED",
+        "occurredAt": "2026-11-15T22:51:00.240224",
+        "trigger": "SYSTEM",
+        "reasonCode": "NORMAL_STEP_COMPLETED",
+        "detailSummary": "步骤4完成条件已满足: routeGenerated=true",
+        "detail": "步骤4完成条件已满足: routeGenerated=true",
+        "rawDetailSummary": "步骤4完成条件已满足: routeGenerated=true"
+      },
+      {
+        "id": 5997,
+        "taskId": 281,
+        "eventType": "TASK_COMPLETED",
+        "occurredAt": "2026-11-15T22:51:00.245304",
+        "trigger": "SYSTEM",
+        "reasonCode": "FLIGHT_CHANGE_RESPONSE_COMPLETED",
+        "detailSummary": "航班变更可用渠道执行完成；已覆盖: [CAP_FLIGHT_UPDATE, CAP_INFO_DISPLAY, CAP_NOTIFICATION, CAP_NAVIGATION]；未覆盖: []",
+        "detail": "{\"summary\":\"航班变更可用渠道执行完成；已覆盖: [CAP_FLIGHT_UPDATE, CAP_INFO_DISPLAY, CAP_NOTIFICATION, CAP_NAVIGATION]；未覆盖: []\",\"coveredChannels\":[\"CAP_FLIGHT_UPDATE\",\"CAP_INFO_DISPLAY\",\"CAP_NOTIFICATION\",\"CAP_NAVIGATION\"],\"uncoveredChannels\":[],\"channelMetrics\":[{\"stepSeq\":1,\"capabilityType\":\"CAP_FLIGHT_UPDATE\",\"deviceAgentId\":3,\"stepStatus\":\"COMPLETED\",\"executionResult\":\"SUCCESS\",\"durationMs\":543},{\"stepSeq\":2,\"capabilityType\":\"CAP_INFO_DISPLAY\",\"deviceAgentId\":53,\"stepStatus\":\"COMPLETED\",\"executionResult\":\"SUCCESS\",\"durationMs\":531},{\"stepSeq\":3,\"capabilityType\":\"CAP_NOTIFICATION\",\"deviceAgentId\":6,\"stepStatus\":\"COMPLETED\",\"executionResult\":\"SUCCESS\",\"durationMs\":547},{\"stepSeq\":4,\"capabilityType\":\"CAP_NAVIGATION\",\"deviceAgentId\":6,\"stepStatus\":\"COMPLETED\",\"executionResult\":\"SUCCESS\",\"durationMs\":1130}]}",
+        "rawDetailSummary": "{\"summary\":\"航班变更可用渠道执行完成；已覆盖: [CAP_FLIGHT_UPDATE, CAP_INFO_DISPLAY, CAP_NOTIFICATION, CAP_NAVIGATION]；未覆盖: []\",\"coveredChannels\":[\"CAP_FLIGHT_UPDATE\",\"CAP_INFO_DISPLAY\",\"CAP_NOTIFICATION\",\"CAP_NAVIGATION\"],\"uncoveredChannels\":[],\"channelMetrics\":[{\"stepSeq\":1,\"capabilityType\":\"CAP_FLIGHT_UPDATE\",\"deviceAgentId\":3,\"stepStatus\":\"COMPLETED\",\"executionResult\":\"SUCCESS\",\"durationMs\":543},{\"stepSeq\":2,\"capabilityType\":\"CAP_INFO_DISPLAY\",\"deviceAgentId\":53,\"stepStatus\":\"COMPLETED\",\"executionResult\":\"SUCCESS\",\"durationMs\":531},{\"stepSeq\":3,\"capabilityType\":\"CAP_NOTIFICATION\",\"deviceAgentId\":6,\"stepStatus\":\"COMPLETED\",\"executionResult\":\"SUCCESS\",\"durationMs\":547},{\"stepSeq\":4,\"capabilityType\":\"CAP_NAVIGATION\",\"deviceAgentId\":6,\"stepStatus\":\"COMPLETED\",\"executionResult\":\"SUCCESS\",\"durationMs\":1130}]}"
+      }
+    ],
+    "plans": [
+      {
+        "id": 368,
+        "versionNo": 1,
+        "source": "AUTONOMOUS",
+        "baselineTemplateId": null,
+        "snapshotId": "CTX-20261115-0332",
+        "planSteps": [
+          {
+            "stepSeq": 1,
+            "stepGoal": "通过航延屏发布航班CA1234延误变更信息",
+            "capabilityType": "CAP_FLIGHT_UPDATE",
+            "inputParams": {
+              "flightNumber": "CA1234",
+              "updateType": "DELAY",
+              "updateContent": "航班CA1234延误30分钟，新起飞时间23:00，登机口GATE_A05不变",
+              "displayDuration": 300
+            },
+            "precondition": "航延屏设备在线且空闲，航班变更信息已确认",
+            "completionCondition": "航延屏显示发布状态成功，publishStatus返回成功",
+            "failureHandling": "若发布失败，尝试备用航延屏SIM_F2_DISPLAY或记录失败待人工处理",
+            "stepTimeout": 30
+          },
+          {
+            "stepSeq": 2,
+            "stepGoal": "通过智慧航显发布航班延误提示信息",
+            "capabilityType": "CAP_INFO_DISPLAY",
+            "inputParams": {
+              "contentType": "TEXT",
+              "contentData": "【航班延误提示】CA1234航班原计划22:30起飞，现延误至23:00，登机口GATE_A05不变，请旅客留意航班动态",
+              "displayDuration": 300
+            },
+            "precondition": "智慧航显设备在线且空闲，航延屏发布已完成或并行执行",
+            "completionCondition": "智慧航显显示状态返回成功，displayStatus为成功",
+            "failureHandling": "若显示失败，切换至备用智慧航显SIM_F2_DISPLAY_B或记录故障",
+            "stepTimeout": 30
+          },
+          {
+            "stepSeq": 3,
+            "stepGoal": "机器人导航至GATE_A05准备引导旅客",
+            "capabilityType": "CAP_NAVIGATION",
+            "inputParams": {
+              "targetLocation": "GATE_A05",
+              "routePreference": "BARRIER_FREE"
+            },
+            "precondition": "机器人设备在线且空闲，航班信息已发布",
+            "completionCondition": "机器人成功生成导航路线，routeGenerated为true",
+            "failureHandling": "若导航失败，检查目标位置有效性或切换备用机器人SIM_F2_ROBOT_B",
+            "stepTimeout": 60
+          },
+          {
+            "stepSeq": 4,
+            "stepGoal": "机器人引导旅客前往GATE_A05",
+            "capabilityType": "CAP_ESCORT",
+            "inputParams": {
+              "targetLocation": "GATE_A05",
+              "escortMode": "LEAD",
+              "maxDuration": 600
+            },
+            "precondition": "机器人已成功导航至GATE_A05或起始引导点，旅客已就位",
+            "completionCondition": "机器人抵达GATE_A05，arrivalStatus返回成功",
+            "failureHandling": "若引导超时或失败，机器人原地播报通知并等待人工协助",
+            "stepTimeout": 600
+          }
+        ],
+        "structureCheckResult": "PASS",
+        "capabilityCheckResult": "PASS",
+        "constraintCheckResult": "FAIL",
+        "validationErrors": [
+          {
+            "errorType": "CONSTRAINT",
+            "description": "步骤所需能力CAP_ESCORT超出任务定义声明的可用能力类型范围: [CAP_FLIGHT_UPDATE, CAP_INFO_DISPLAY, CAP_NOTIFICATION, CAP_NAVIGATION]",
+            "stepSeq": 4,
+            "reasonCode": "ERR_CAPABILITY_NOT_IN_TASK_DEFINITION"
+          }
+        ],
+        "riskLevel": null,
+        "riskReasonCode": null,
+        "judgmentBasis": null,
+        "confidence": 0.85,
+        "ruleSetVersion": null,
+        "frozenAt": null,
+        "createdAt": "2026-11-15T22:50:57.282511"
+      },
+      {
+        "id": 369,
+        "versionNo": 2,
+        "source": "BASELINE_TEMPLATE",
+        "baselineTemplateId": 3,
+        "snapshotId": "CTX-20261115-0333",
+        "planSteps": [
+          {
+            "stepSeq": 1,
+            "capabilityType": "CAP_FLIGHT_UPDATE",
+            "paramMapping": [
+              {
+                "target": "flightNumber",
+                "source": "TEMPLATE_INPUT.flightNumber"
+              },
+              {
+                "target": "updateType",
+                "source": "TEMPLATE_INPUT.updateType"
+              },
+              {
+                "target": "updateContent",
+                "source": "TEMPLATE_INPUT.updateContent"
+              },
+              {
+                "target": "displayDuration",
+                "source": "TEMPLATE_INPUT.displayDuration"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "publishStatus=SUCCESS",
+            "stepGoal": "执行CAP_FLIGHT_UPDATE能力（基线模板步骤）",
+            "precondition": "候选设备在线且空闲",
+            "failureHandling": "重试一次或转人工处理",
+            "inputParams": {
+              "flightNumber": "CA1234",
+              "updateType": "GATE_CHANGE",
+              "updateContent": "测试航班登机口变更至F2_TEST_GATE",
+              "displayDuration": 60
+            }
+          },
+          {
+            "stepSeq": 2,
+            "capabilityType": "CAP_INFO_DISPLAY",
+            "paramMapping": [
+              {
+                "target": "contentType",
+                "source": "TEMPLATE_INPUT.contentType"
+              },
+              {
+                "target": "contentData",
+                "source": "TEMPLATE_INPUT.displayContent"
+              },
+              {
+                "target": "displayDuration",
+                "source": "TEMPLATE_INPUT.displayDuration"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "displayStatus=SUCCESS",
+            "stepGoal": "执行CAP_INFO_DISPLAY能力（基线模板步骤）",
+            "precondition": "候选设备在线且空闲",
+            "failureHandling": "重试一次或转人工处理",
+            "inputParams": {
+              "contentType": "TEXT",
+              "contentData": "虚构航班登机口及无障碍路径提示，请前往F2_TEST_GATE。",
+              "displayDuration": 60
+            }
+          },
+          {
+            "stepSeq": 3,
+            "capabilityType": "CAP_NOTIFICATION",
+            "paramMapping": [
+              {
+                "target": "notificationType",
+                "source": "TEMPLATE_INPUT.notificationType"
+              },
+              {
+                "target": "notificationContent",
+                "source": "TEMPLATE_INPUT.notificationContent"
+              },
+              {
+                "target": "repeatCount",
+                "source": "TEMPLATE_INPUT.repeatCount"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "notificationStatus=SUCCESS",
+            "stepGoal": "执行CAP_NOTIFICATION能力（基线模板步骤）",
+            "precondition": "候选设备在线且空闲",
+            "failureHandling": "重试一次或转人工处理",
+            "inputParams": {
+              "notificationType": "BOTH",
+              "notificationContent": "虚构航班登机口已变更，请改道至新登机口。",
+              "repeatCount": 1
+            }
+          },
+          {
+            "stepSeq": 4,
+            "capabilityType": "CAP_NAVIGATION",
+            "paramMapping": [
+              {
+                "target": "targetLocation",
+                "source": "TEMPLATE_INPUT.targetLocation"
+              },
+              {
+                "target": "routePreference",
+                "source": "TEMPLATE_INPUT.routePreference"
+              }
+            ],
+            "stepTimeout": 60,
+            "completionCondition": "routeGenerated=true",
+            "stepGoal": "执行CAP_NAVIGATION能力（基线模板步骤）",
+            "precondition": "候选设备在线且空闲",
+            "failureHandling": "重试一次或转人工处理",
+            "inputParams": {
+              "targetLocation": "GATE_A05",
+              "routePreference": "BARRIER_FREE"
+            }
+          }
+        ],
+        "structureCheckResult": "PASS",
+        "capabilityCheckResult": "PASS",
+        "constraintCheckResult": "PASS",
+        "validationErrors": [],
+        "riskLevel": null,
+        "riskReasonCode": null,
+        "judgmentBasis": null,
+        "confidence": null,
+        "ruleSetVersion": "V1.19",
+        "frozenAt": "2026-11-15T22:50:57.305105",
+        "createdAt": "2026-11-15T22:50:57.302905"
+      }
+    ],
+    "assignments": [
+      {
+        "id": 664,
+        "stepSeq": 1,
+        "deviceAgentCode": "AGT-B0D7BDAD",
+        "commandId": "CMD-20261115225057-FAAD0056",
+        "stepStatus": "COMPLETED",
+        "retryCount": 0,
+        "executionResult": "SUCCESS",
+        "reasonCode": "DEVICE_SUCCESS",
+        "outputParams": {
+          "publishTime": "2026-11-15T22:50:57.887131900+08:00",
+          "publishStatus": "SUCCESS"
+        },
+        "dispatchedAt": "2026-11-15T22:50:57.36328",
+        "feedbackAt": "2026-11-15T22:50:57.90719",
+        "rejectedAgentIds": [],
+        "acceptanceRequestedAt": "2026-11-15T22:50:57.326459",
+        "acceptedAt": "2026-11-15T22:50:57.360753",
+        "acceptanceDurationMs": 34,
+        "acceptanceResponseTime": "34ms"
+      },
+      {
+        "id": 665,
+        "stepSeq": 2,
+        "deviceAgentCode": "AGT-3A76FECA",
+        "commandId": "CMD-20261115225057-FAAD0058",
+        "stepStatus": "COMPLETED",
+        "retryCount": 0,
+        "executionResult": "SUCCESS",
+        "reasonCode": "DEVICE_SUCCESS",
+        "outputParams": {
+          "errorMessage": "",
+          "actualDuration": 60,
+          "displayStatus": "SUCCESS"
+        },
+        "dispatchedAt": "2026-11-15T22:50:57.944647",
+        "feedbackAt": "2026-11-15T22:50:58.476046",
+        "rejectedAgentIds": [],
+        "acceptanceRequestedAt": "2026-11-15T22:50:57.914198",
+        "acceptedAt": "2026-11-15T22:50:57.939777",
+        "acceptanceDurationMs": 25,
+        "acceptanceResponseTime": "25ms"
+      },
+      {
+        "id": 666,
+        "stepSeq": 3,
+        "deviceAgentCode": "AGT-3A36BBB4",
+        "commandId": "CMD-20261115225058-FAAD005A",
+        "stepStatus": "COMPLETED",
+        "retryCount": 0,
+        "executionResult": "SUCCESS",
+        "reasonCode": "DEVICE_SUCCESS",
+        "outputParams": {
+          "notificationStatus": "SUCCESS",
+          "actualRepeatCount": 1
+        },
+        "dispatchedAt": "2026-11-15T22:50:58.52431",
+        "feedbackAt": "2026-11-15T22:50:59.071425",
+        "rejectedAgentIds": [],
+        "acceptanceRequestedAt": "2026-11-15T22:50:58.485986",
+        "acceptedAt": "2026-11-15T22:50:58.519267",
+        "acceptanceDurationMs": 33,
+        "acceptanceResponseTime": "33ms"
+      },
+      {
+        "id": 667,
+        "stepSeq": 4,
+        "deviceAgentCode": "AGT-3A36BBB4",
+        "commandId": "CMD-20261115225059-FAAD005C",
+        "stepStatus": "COMPLETED",
+        "retryCount": 0,
+        "executionResult": "SUCCESS",
+        "reasonCode": "DEVICE_SUCCESS",
+        "outputParams": {
+          "waypointCount": 4,
+          "estimatedDuration": 94,
+          "estimatedDistance": 239.0,
+          "routeGenerated": true
+        },
+        "dispatchedAt": "2026-11-15T22:50:59.10764",
+        "feedbackAt": "2026-11-15T22:51:00.237663",
+        "rejectedAgentIds": [],
+        "acceptanceRequestedAt": "2026-11-15T22:50:59.079543",
+        "acceptedAt": "2026-11-15T22:50:59.10511",
+        "acceptanceDurationMs": 25,
+        "acceptanceResponseTime": "25ms"
+      }
+    ]
+  },
+  {
+    "originalTaskId": 274,
+    "input": {
+      "taskGoal": "请测量T2值机岛A03当前行李的长宽高和重量；超规时上报告警、由智慧航显发布超规行李专柜B01办理提示，并由移动机器人提供导航；正常行李留存测量结果后结束。",
+      "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+      "sceneParams": {
+        "baggageLocation": "T2值机岛A03",
+        "targetCounter": "超规行李专柜B01"
+      }
+    },
+    "task": {
+      "id": 282,
+      "taskCode": "TASK-20261115-0281",
+      "taskGoal": "请测量T2值机岛A03当前行李的长宽高和重量；超规时上报告警、由智慧航显发布超规行李专柜B01办理提示，并由移动机器人提供导航；正常行李留存测量结果后结束。",
+      "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+      "sceneParams": {
+        "baggageLocation": "T2值机岛A03",
+        "targetCounter": "超规行李专柜B01",
+        "baggageId": "BAG-260479"
+      },
+      "goalParsingResult": {
+        "completionCondition": "行李已完成尺寸重量测量且超规事件（如有）已上报",
+        "origin": null,
+        "destination": "超规行李专柜B01",
+        "originalGoal": "请测量T2值机岛A03当前行李的长宽高和重量；超规时上报告警、由智慧航显发布超规行李专柜B01办理提示，并由移动机器人提供导航；正常行李留存测量结果后结束。",
+        "constraints": [
+          "超规行李处置全程不得引导旅客脱离监控区域",
+          "测量结果超标须触发超规事件上报"
+        ]
+      },
+      "status": "COMPLETED",
+      "currentPlanVersionId": 370,
+      "replanUsed": false,
+      "replanningReason": null,
+      "manualTerminateReason": null,
+      "failureReason": null,
+      "missingInfoQuestions": null,
+      "downgradeReason": null,
+      "isDryRun": false,
+      "createdAt": "2026-11-15T22:51:00.479388",
+      "updatedAt": "2026-11-15T22:51:32.405793",
+      "createdBy": "oprator"
+    },
+    "events": [
+      {
+        "id": 5998,
+        "taskId": 282,
+        "eventType": "GOAL_SUBMITTED",
+        "occurredAt": "2026-11-15T22:51:00.481669",
+        "trigger": "OPERATOR",
+        "reasonCode": "NORMAL_GOAL_SUBMITTED",
+        "detailSummary": "运行操作员oprator提交任务目标: 请测量T2值机岛A03当前行李的长宽高和重量；超规时上报告警、由智慧航显发布超规行李专柜B01办理提示，并由移动机器人提供导航；正常行李留存测量结果后结束。",
+        "detail": "运行操作员oprator提交任务目标: 请测量T2值机岛A03当前行李的长宽高和重量；超规时上报告警、由智慧航显发布超规行李专柜B01办理提示，并由移动机器人提供导航；正常行李留存测量结果后结束。",
+        "rawDetailSummary": "运行操作员oprator提交任务目标: 请测量T2值机岛A03当前行李的长宽高和重量；超规时上报告警、由智慧航显发布超规行李专柜B01办理提示，并由移动机器人提供导航；正常行李留存测量结果后结束。"
+      },
+      {
+        "id": 5999,
+        "taskId": 282,
+        "eventType": "GOAL_CLARIFIED",
+        "occurredAt": "2026-11-15T22:51:03.839933",
+        "trigger": "SYSTEM",
+        "reasonCode": "NORMAL_GOAL_CLARIFIED",
+        "detailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建",
+        "detail": "目标理解完成，关键信息已完整，进入规划上下文构建",
+        "rawDetailSummary": "目标理解完成，关键信息已完整，进入规划上下文构建"
+      },
+      {
+        "id": 6000,
+        "taskId": 282,
+        "eventType": "CONTEXT_SNAPSHOT_GENERATED",
+        "occurredAt": "2026-11-15T22:51:03.849031",
+        "trigger": "SYSTEM",
+        "reasonCode": "NORMAL_CONTEXT_BUILT",
+        "detailSummary": "生成规划上下文快照CTX-20261115-0334",
+        "detail": "生成规划上下文快照CTX-20261115-0334",
+        "rawDetailSummary": "生成规划上下文快照CTX-20261115-0334"
+      },
+      {
+        "id": 6001,
+        "taskId": 282,
+        "eventType": "PLAN_GENERATED",
+        "occurredAt": "2026-11-15T22:51:31.700174",
+        "trigger": "SYSTEM",
+        "reasonCode": "NORMAL_PLAN_GENERATED",
+        "detailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1",
+        "detail": "候选计划生成完成，来源AUTONOMOUS，版本1",
+        "rawDetailSummary": "候选计划生成完成，来源AUTONOMOUS，版本1"
+      },
+      {
+        "id": 6002,
+        "taskId": 282,
+        "eventType": "PLAN_VALIDATED",
+        "occurredAt": "2026-11-15T22:51:31.704728",
+        "trigger": "SYSTEM",
+        "reasonCode": "NORMAL_PLAN_VALIDATED",
+        "detailSummary": "候选计划三类校验全部通过，已冻结版本",
+        "detail": "候选计划三类校验全部通过，已冻结版本",
+        "rawDetailSummary": "候选计划三类校验全部通过，已冻结版本"
+      },
+      {
+        "id": 6003,
+        "taskId": 282,
+        "eventType": "SUPERVISION_JUDGED",
+        "occurredAt": "2026-11-15T22:51:31.712429",
+        "trigger": "SYSTEM",
+        "reasonCode": "NORMAL_SUPERVISION_JUDGED",
+        "detailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则；命中单一风险信号（候选差异较大），单一信号不直接阻断，低风险自动执行；置信度=0.85（仅作参考，不覆盖三类校验结果）；规则集版本=V1.2；推荐处置=AUTO_EXECUTE（自动执行）",
+        "detail": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则；命中单一风险信号（候选差异较大），单一信号不直接阻断，低风险自动执行；置信度=0.85（仅作参考，不覆盖三类校验结果）；规则集版本=V1.2；推荐处置=AUTO_EXECUTE（自动执行）",
+        "rawDetailSummary": "监督判定: 风险等级=LOW；原因码=无；判定依据=未命中确定性高风险规则；命中单一风险信号（候选差异较大），单一信号不直接阻断，低风险自动执行；置信度=0.85（仅作参考，不覆盖三类校验结果）；规则集版本=V1.2；推荐处置=AUTO_EXECUTE（自动执行）"
+      },
+      {
+        "id": 6004,
+        "taskId": 282,
+        "eventType": "AGENT_ASSIGNMENT_REQUESTED",
+        "occurredAt": "2026-11-15T22:51:31.748416",
+        "trigger": "SYSTEM",
+        "reasonCode": "NORMAL_ASSIGNMENT_REQUESTED",
+        "detailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-1C13535E(匹配度1.0,距离0.0,负载0)；AGT-D602D701(匹配度1.0,距离0.0,负载0)，向候选AGT-1C13535E发起承接请求",
+        "detail": "步骤1候选排序（能力匹配->距离->负载）: AGT-1C13535E(匹配度1.0,距离0.0,负载0)；AGT-D602D701(匹配度1.0,距离0.0,负载0)，向候选AGT-1C13535E发起承接请求",
+        "rawDetailSummary": "步骤1候选排序（能力匹配->距离->负载）: AGT-1C13535E(匹配度1.0,距离0.0,负载0)；AGT-D602D701(匹配度1.0,距离0.0,负载0)，向候选AGT-1C13535E发起承接请求"
+      },
+      {
+        "id": 6005,
+        "taskId": 282,
+        "eventType": "AGENT_ASSIGNED",
+        "occurredAt": "2026-11-15T22:51:31.81942",
+        "trigger": "SYSTEM",
+        "reasonCode": "NORMAL_AGENT_ASSIGNED",
+        "detailSummary": "设备代理AGT-1C13535E接受步骤1承接请求",
+        "detail": "设备代理AGT-1C13535E接受步骤1承接请求",
+        "rawDetailSummary": "设备代理AGT-1C13535E接受步骤1承接请求"
+      },
+      {
+        "id": 6006,
+        "taskId": 282,
+        "eventType": "STEP_DISPATCHED",
+        "occurredAt": "2026-11-15T22:51:31.833742",
+        "trigger": "SYSTEM",
+        "reasonCode": "NORMAL_STEP_DISPATCHED",
+        "detailSummary": "指令CMD-20261115225131-FAAD005F已下发至设备代理AGT-1C13535E，业务意图: 在T2值机岛A03测量行李BAG-260479的长宽高和重量",
+        "detail": "指令CMD-20261115225131-FAAD005F已下发至设备代理AGT-1C13535E，业务意图: 在T2值机岛A03测量行李BAG-260479的长宽高和重量",
+        "rawDetailSummary": "指令CMD-20261115225131-FAAD005F已下发至设备代理AGT-1C13535E，业务意图: 在T2值机岛A03测量行李BAG-260479的长宽高和重量"
+      },
+      {
+        "id": 6007,
+        "taskId": 282,
+        "eventType": "EXECUTION_FEEDBACK_RECEIVED",
+        "occurredAt": "2026-11-15T22:51:32.382109",
+        "trigger": "SYSTEM",
+        "reasonCode": "DEVICE_SUCCESS",
+        "detailSummary": "指令CMD-20261115225131-FAAD005F收到设备代理AGT-1C13535E执行反馈: SUCCESS",
+        "detail": "指令CMD-20261115225131-FAAD005F收到设备代理AGT-1C13535E执行反馈: SUCCESS",
+        "rawDetailSummary": "指令CMD-20261115225131-FAAD005F收到设备代理AGT-1C13535E执行反馈: SUCCESS"
+      },
+      {
+        "id": 6008,
+        "taskId": 282,
+        "eventType": "STEP_COMPLETED",
+        "occurredAt": "2026-11-15T22:51:32.394147",
+        "trigger": "SYSTEM",
+        "reasonCode": "NORMAL_STEP_COMPLETED",
+        "detailSummary": "步骤1完成条件已满足: 返回length、width、height、weight及isOversize测量结果，measureStatus为SUCCESS",
+        "detail": "步骤1完成条件已满足: 返回length、width、height、weight及isOversize测量结果，measureStatus为SUCCESS",
+        "rawDetailSummary": "步骤1完成条件已满足: 返回length、width、height、weight及isOversize测量结果，measureStatus为SUCCESS"
+      },
+      {
+        "id": 6009,
+        "taskId": 282,
+        "eventType": "TASK_COMPLETED",
+        "occurredAt": "2026-11-15T22:51:32.40784",
+        "trigger": "SYSTEM",
+        "reasonCode": "BAGGAGE_WITHIN_LIMIT",
+        "detailSummary": "行李未超规，结束处置；三边和115.0cm（阈值158cm），重量10.0kg（阈值32kg）；来源：附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束",
+        "detail": "行李未超规，结束处置；三边和115.0cm（阈值158cm），重量10.0kg（阈值32kg）；来源：附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束",
+        "rawDetailSummary": "行李未超规，结束处置；三边和115.0cm（阈值158cm），重量10.0kg（阈值32kg）；来源：附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束"
+      }
+    ],
+    "plans": [
+      {
+        "id": 370,
+        "versionNo": 1,
+        "source": "AUTONOMOUS",
+        "baselineTemplateId": null,
+        "snapshotId": "CTX-20261115-0334",
+        "planSteps": [
+          {
+            "stepSeq": 1,
+            "stepGoal": "在T2值机岛A03测量行李BAG-260479的长宽高和重量",
+            "capabilityType": "CAP_BAGGAGE_MEASURE",
+            "inputParams": {
+              "measureMode": "AUTO",
+              "timeout": 30
+            },
+            "precondition": "行李BAG-260479已放置于T2值机岛A03测量区域，设备处于空闲状态",
+            "completionCondition": "返回length、width、height、weight及isOversize测量结果，measureStatus为SUCCESS",
+            "failureHandling": "测量超时或失败时，提示人工介入并结束任务",
+            "stepTimeout": 35
+          }
+        ],
+        "structureCheckResult": "PASS",
+        "capabilityCheckResult": "PASS",
+        "constraintCheckResult": "PASS",
+        "validationErrors": [],
+        "riskLevel": "LOW",
+        "riskReasonCode": null,
+        "judgmentBasis": "未命中确定性高风险规则；命中单一风险信号（候选差异较大），单一信号不直接阻断，低风险自动执行",
+        "confidence": 0.85,
+        "ruleSetVersion": "V1.2",
+        "frozenAt": "2026-11-15T22:51:31.704728",
+        "createdAt": "2026-11-15T22:51:31.697613"
+      }
+    ],
+    "assignments": [
+      {
+        "id": 668,
+        "stepSeq": 1,
+        "deviceAgentCode": "AGT-1C13535E",
+        "commandId": "CMD-20261115225131-FAAD005E",
+        "stepStatus": "COMPLETED",
+        "retryCount": 0,
+        "executionResult": "SUCCESS",
+        "reasonCode": "DEVICE_SUCCESS",
+        "outputParams": {
+          "weight": 10.0,
+          "measureStatus": "SUCCESS",
+          "width": 40.0,
+          "height": 20.0,
+          "isOversize": false,
+          "length": 55.0,
+          "totalDimensionCm": 115.0,
+          "dimensionThresholdCm": 158,
+          "weightThresholdKg": 32,
+          "thresholdSource": "附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束",
+          "baggageInfo": "{\"weight\":10.0,\"measureStatus\":\"SUCCESS\",\"width\":40.0,\"height\":20.0,\"isOversize\":false,\"length\":55.0,\"totalDimensionCm\":115.0,\"dimensionThresholdCm\":158,\"weightThresholdKg\":32,\"thresholdSource\":\"附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束\"}"
+        },
+        "dispatchedAt": "2026-11-15T22:51:31.833742",
+        "feedbackAt": "2026-11-15T22:51:32.3811",
+        "rejectedAgentIds": [],
+        "acceptanceRequestedAt": "2026-11-15T22:51:31.748416",
+        "acceptedAt": "2026-11-15T22:51:31.816842",
+        "acceptanceDurationMs": 68,
+        "acceptanceResponseTime": "68ms"
+      }
+    ]
+  }
+]
