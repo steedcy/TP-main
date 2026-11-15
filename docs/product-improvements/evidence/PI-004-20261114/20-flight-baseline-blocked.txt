@@ -1,0 +1,124 @@
+- complementary:
+  - generic: 智慧机场AI协同平台
+  - menu:
+    - menuitem "运行总览":
+      - generic: 运行总览
+    - menuitem "任务管理":
+      - generic: 任务管理
+    - menuitem "异常处置":
+      - generic: 异常处置
+    - menuitem "过程追溯":
+      - generic: 过程追溯
+    - menuitem "二维态势":
+      - generic: 二维态势
+    - menuitem "仿真控制":
+      - generic: 仿真控制
+    - menuitem "设备代理":
+      - generic: 设备代理
+    - menuitem "操作记录":
+      - generic: 操作记录
+- generic: （运行操作员）
+- button "退出登录":
+  - generic: 退出登录
+- main:
+  - table:
+    - rowgroup:
+      - row "任务编号 TASK-20261114-0262 状态 待人工处理":
+        - rowheader "任务编号"
+        - cell "TASK-20261114-0262":
+          - generic: TASK-20261114-0262
+        - rowheader "状态"
+        - cell "待人工处理":
+          - generic: 待人工处理
+      - row "任务目标 航班CA1234延误30分钟，请在T2候机区发布航班变更信息，并引导旅客前往GATE_A05。":
+        - rowheader "任务目标"
+        - cell "航班CA1234延误30分钟，请在T2候机区发布航班变更信息，并引导旅客前往GATE_A05。":
+          - generic: 航班CA1234延误30分钟，请在T2候机区发布航班变更信息，并引导旅客前往GATE_A05。
+      - row "任务族 FLIGHT_CHANGE_RESPONSE 重规划次数 0 / 1":
+        - rowheader "任务族"
+        - cell "FLIGHT_CHANGE_RESPONSE":
+          - generic: FLIGHT_CHANGE_RESPONSE
+        - rowheader "重规划次数"
+        - cell "0 / 1":
+          - generic: 0 / 1
+      - row "失败/降级原因 三轮信息补充后仍缺少关键信息，需人工处理":
+        - rowheader "失败/降级原因"
+        - cell "三轮信息补充后仍缺少关键信息，需人工处理":
+          - generic: 三轮信息补充后仍缺少关键信息，需人工处理
+  - generic: 目标理解结果
+  - table:
+    - rowgroup:
+      - row "起点 T2候机区":
+        - rowheader "起点"
+        - cell "T2候机区":
+          - generic: T2候机区
+      - row "目的地 GATE_A05":
+        - rowheader "目的地"
+        - cell "GATE_A05":
+          - generic: GATE_A05
+      - row "约束条件 航班变更信息发布须在旅客到达登机口前完成；涉及登机口变更时须同步空间引导":
+        - rowheader "约束条件"
+        - cell "航班变更信息发布须在旅客到达登机口前完成；涉及登机口变更时须同步空间引导":
+          - generic: 航班变更信息发布须在旅客到达登机口前完成；涉及登机口变更时须同步空间引导
+      - row "完成条件 航班变更信息已送达且旅客后续引导（如需）已完成":
+        - rowheader "完成条件"
+        - cell "航班变更信息已送达且旅客后续引导（如需）已完成":
+          - generic: 航班变更信息已送达且旅客后续引导（如需）已完成
+  - alert:
+    - img "exclamation-circle":
+    - generic: 待补充问题
+    - generic: 请补充有效的航班变更类型
+  - generic: 航班变更渠道响应
+  - table:
+    - rowgroup:
+      - row "航延屏 未覆盖（计划缺少该渠道）":
+        - rowheader "航延屏"
+        - cell "未覆盖（计划缺少该渠道）":
+          - generic: 未覆盖（计划缺少该渠道）
+      - row "智慧航显 未覆盖（计划缺少该渠道）":
+        - rowheader "智慧航显"
+        - cell "未覆盖（计划缺少该渠道）":
+          - generic: 未覆盖（计划缺少该渠道）
+      - row "机器人 未覆盖（计划缺少该渠道）":
+        - rowheader "机器人"
+        - cell "未覆盖（计划缺少该渠道）":
+          - generic: 未覆盖（计划缺少该渠道）
+  - generic: 事件时间线（只读，事件仅可追加不可修改删除，对应5.7.1）
+  - list:
+    - generic: "2026-11-14T21:58:39.557376 - GOAL_SUBMITTED （原因码: NORMAL_GOAL_SUBMITTED）：运行操作员[操作员账号]提交任务目标: 航班CA1234延误30分钟，请在T2候机区发布航班变更信息，并引导旅客前往GATE_A05。"
+    - generic: "2026-11-14T21:58:47.613118 - GOAL_CLARIFIED （原因码: INFO_CHECK_OVERRIDE）：系统按航班变更必需字段核对：仍缺 [flightNumber, changeType, originalTime, changeDescription]（模型判断完整）"
+    - generic: "2026-11-14T21:58:47.632374 - GOAL_CLARIFIED （原因码: INFO_INCOMPLETE）：目标理解发现信息缺失，已补充0轮，待补充问题: [请补充航班号, 请补充有效的航班变更类型, 请补充原计划时间, 请补充航班变更内容]"
+    - generic: "2026-11-14T21:59:46.229146 - GOAL_CLARIFIED （原因码: NORMAL_GOAL_CLARIFIED）：运行操作员[操作员账号]补充信息: {\"请补充航班号\":\"CA1234\",\"请补充有效的航班变更类型\":\"延误\",\"请补充原计划时间\":\"2026-11-14 22:30\",\"请补充航班变更内容\":\"CA1234 原计划22:30，延误30分钟至23:00，登机口GATE_A05不变。在T2候机区发布变更并引导旅客前往GATE_A05。\"}"
+    - generic: "2026-11-14T21:59:49.118403 - GOAL_CLARIFIED （原因码: INFO_CHECK_OVERRIDE）：系统按航班变更必需字段核对：仍缺 [changeType]（模型判断完整）"
+    - generic: "2026-11-14T21:59:49.125797 - GOAL_CLARIFIED （原因码: INFO_INCOMPLETE）：目标理解发现信息缺失，已补充1轮，待补充问题: [请补充有效的航班变更类型]"
+    - generic: "2026-11-14T22:00:04.60702 - GOAL_CLARIFIED （原因码: NORMAL_GOAL_CLARIFIED）：运行操作员[操作员账号]补充信息: {\"请补充有效的航班变更类型\":\"DELAY\"}"
+    - generic: "2026-11-14T22:00:15.113113 - GOAL_CLARIFIED （原因码: INFO_CHECK_OVERRIDE）：系统按航班变更必需字段核对：仍缺 [changeType]（模型判断完整）"
+    - generic: "2026-11-14T22:00:15.119624 - GOAL_CLARIFIED （原因码: INFO_INCOMPLETE）：目标理解发现信息缺失，已补充2轮，待补充问题: [请补充有效的航班变更类型]"
+    - generic: "2026-11-14T22:03:31.077241 - GOAL_CLARIFIED （原因码: NORMAL_GOAL_CLARIFIED）：运行操作员[操作员账号]补充信息: {\"请补充有效的航班变更类型\":\"DELAY\"}"
+    - generic: "2026-11-14T22:03:34.376039 - GOAL_CLARIFIED （原因码: INFO_CHECK_OVERRIDE）：系统按航班变更必需字段核对：仍缺 [changeType]（模型判断完整）"
+    - generic: "2026-11-14T22:03:34.382893 - GOAL_CLARIFIED （原因码: INFO_INCOMPLETE）：目标理解发现信息缺失，已补充3轮，待补充问题: [请补充有效的航班变更类型]"
+    - generic: "2026-11-14T22:03:34.386364 - TASK_PENDING_MANUAL （原因码: INFO_INCOMPLETE）：三轮信息补充后仍缺少关键信息，需人工处理"
+  - generic: 待人工处理
+  - button "转基线执行":
+    - generic: 转基线执行
+  - button "重试规划":
+    - generic: 重试规划
+  - button "置为失败":
+    - generic: 置为失败
+  - button "终止任务":
+    - generic: 终止任务
+- img "close-circle":
+- text: "任务仍有未补充的关键信息，不能转基线或重试规划，请先补齐或将任务置为失败: [请补充有效的航班变更类型]"
+- generic: "* 137 / 500 *"
+- dialog "转基线执行":
+  - document:
+    - button "Close":
+      - img "close":
+    - generic: 转基线执行
+    - paragraph: 任务将切换为基线模板重新规划并执行。请写明处置原因（1～200 字，必填）：
+    - textbox "请输入转基线处置原因": 三轮澄清后有效枚举未生效，检查能否按原航班变更事件转入受校验基线。
+    - text: 33 / 200
+    - button "Cancel":
+      - generic: Cancel
+    - button "确认转基线" [active]:
+      - generic: 确认转基线

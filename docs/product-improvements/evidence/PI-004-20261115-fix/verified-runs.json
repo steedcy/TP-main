@@ -1,0 +1,751 @@
+{
+  "implementation": "80aeeba1a16c54c9d1c55f92eaf251354c4f1c6f",
+  "environment": "isolated API, PostgreSQL schema, five local simulators, unavailable external planner to exercise baseline fallback",
+  "builds": {
+    "airport-ai-app-1.0.0.jar": "af9c338b8d23d255779cd8ac4f84e1a75839f300d02ed4fd0fcb4595cd2754ba",
+    "device-simulator-runtime.jar": "9b10f3740d54c0ba1ace2669a3a7f2d314dc4203f017e640dbc0bdb4c204680e"
+  },
+  "tests": {
+    "backend": {
+      "tests": 626,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 2
+    },
+    "simulator": {
+      "tests": 29,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    }
+  },
+  "checks": {
+    "all five tasks completed": true,
+    "four flight devices actions": true,
+    "delay, time and same gate on each publication": true,
+    "normal sample ends after real measurement": true,
+    "escort pickup and notice include both places": true,
+    "same robot arrives before escorting to destination": true,
+    "oversize event reused without second physical sample": true,
+    "alert acknowledged, counter displayed and reached": true,
+    "32 kg at threshold remains normal": true,
+    "backend regression suite": true,
+    "simulator regression suite": true
+  },
+  "tasks": [
+    {
+      "scenario": "flight",
+      "input": {
+        "taskGoal": "虚构航班CA1234延误至23:00，登机口GATE_A05不变，请发布变更并引导。",
+        "taskFamily": "FLIGHT_CHANGE_RESPONSE",
+        "sceneParams": {
+          "eventSource": "MANUAL_FORM",
+          "flightNumber": "CA1234",
+          "changeType": "DELAY",
+          "originalTime": "2026-11-15T22:30:00",
+          "newTime": "2026-11-15T23:00:00",
+          "newGate": "GATE_A05",
+          "changeDescription": "航班延误30分钟，登机口不变"
+        }
+      },
+      "taskCode": "TASK-20261115-0004",
+      "status": "COMPLETED",
+      "commands": [
+        {
+          "step_seq": 1,
+          "agent_code": "AGT-39547019",
+          "capability_type": "CAP_FLIGHT_UPDATE",
+          "command_status": "SUCCEEDED",
+          "params": {
+            "flightNumber": "CA1234",
+            "updateType": "DELAY",
+            "updateContent": "CA1234 航班延误30分钟，登机口不变，变更后时间 2026-11-15T23:00:00，登机口 GATE_A05",
+            "displayDuration": 60
+          }
+        },
+        {
+          "step_seq": 2,
+          "agent_code": "AGT-E315AC12",
+          "capability_type": "CAP_INFO_DISPLAY",
+          "command_status": "SUCCEEDED",
+          "params": {
+            "contentType": "TEXT",
+            "contentData": "CA1234 航班延误30分钟，登机口不变，变更后时间 2026-11-15T23:00:00，登机口 GATE_A05",
+            "displayDuration": 60
+          }
+        },
+        {
+          "step_seq": 3,
+          "agent_code": "AGT-198955D8",
+          "capability_type": "CAP_NOTIFICATION",
+          "command_status": "SUCCEEDED",
+          "params": {
+            "notificationType": "BOTH",
+            "notificationContent": "CA1234 航班延误30分钟，登机口不变，变更后时间 2026-11-15T23:00:00，登机口 GATE_A05",
+            "repeatCount": 1
+          }
+        },
+        {
+          "step_seq": 4,
+          "agent_code": "AGT-198955D8",
+          "capability_type": "CAP_NAVIGATION",
+          "command_status": "SUCCEEDED",
+          "params": {
+            "targetLocation": "GATE_A05",
+            "routePreference": "BARRIER_FREE"
+          }
+        }
+      ],
+      "steps": [
+        {
+          "step_seq": 1,
+          "step_status": "COMPLETED",
+          "reason_code": "DEVICE_SUCCESS",
+          "output_params": {
+            "publishStatus": "SUCCESS",
+            "publishTime": "2026-11-15T21:32:34.568915900+08:00"
+          }
+        },
+        {
+          "step_seq": 2,
+          "step_status": "COMPLETED",
+          "reason_code": "DEVICE_SUCCESS",
+          "output_params": {
+            "errorMessage": "",
+            "actualDuration": 60,
+            "displayStatus": "SUCCESS"
+          }
+        },
+        {
+          "step_seq": 3,
+          "step_status": "COMPLETED",
+          "reason_code": "DEVICE_SUCCESS",
+          "output_params": {
+            "notificationStatus": "SUCCESS",
+            "actualRepeatCount": 1
+          }
+        },
+        {
+          "step_seq": 4,
+          "step_status": "COMPLETED",
+          "reason_code": "DEVICE_SUCCESS",
+          "output_params": {
+            "estimatedDuration": 94,
+            "estimatedDistance": 239.0,
+            "routeGenerated": true,
+            "waypointCount": 4,
+            "arrivalStatus": "ARRIVED",
+            "arrivalLocation": "GATE_A05",
+            "arrivalDeviceCode": "SIM_F2_ROBOT_B"
+          }
+        }
+      ],
+      "events": [
+        {
+          "event_type": "GOAL_SUBMITTED",
+          "reason_code": "NORMAL_GOAL_SUBMITTED"
+        },
+        {
+          "event_type": "GOAL_UNDERSTANDING_FAILED",
+          "reason_code": "ERR_GOAL_UNDERSTANDING_TIMEOUT"
+        },
+        {
+          "event_type": "BASELINE_DOWNGRADED",
+          "reason_code": "NORMAL_BASELINE_DOWNGRADED"
+        },
+        {
+          "event_type": "AGENT_ASSIGNMENT_REQUESTED",
+          "reason_code": "NORMAL_ASSIGNMENT_REQUESTED"
+        },
+        {
+          "event_type": "AGENT_ASSIGNED",
+          "reason_code": "NORMAL_AGENT_ASSIGNED"
+        },
+        {
+          "event_type": "STEP_DISPATCHED",
+          "reason_code": "NORMAL_STEP_DISPATCHED"
+        },
+        {
+          "event_type": "EXECUTION_FEEDBACK_RECEIVED",
+          "reason_code": "DEVICE_SUCCESS"
+        },
+        {
+          "event_type": "STEP_COMPLETED",
+          "reason_code": "NORMAL_STEP_COMPLETED"
+        },
+        {
+          "event_type": "AGENT_ASSIGNMENT_REQUESTED",
+          "reason_code": "NORMAL_ASSIGNMENT_REQUESTED"
+        },
+        {
+          "event_type": "AGENT_ASSIGNED",
+          "reason_code": "NORMAL_AGENT_ASSIGNED"
+        },
+        {
+          "event_type": "STEP_DISPATCHED",
+          "reason_code": "NORMAL_STEP_DISPATCHED"
+        },
+        {
+          "event_type": "EXECUTION_FEEDBACK_RECEIVED",
+          "reason_code": "DEVICE_SUCCESS"
+        },
+        {
+          "event_type": "STEP_COMPLETED",
+          "reason_code": "NORMAL_STEP_COMPLETED"
+        },
+        {
+          "event_type": "AGENT_ASSIGNMENT_REQUESTED",
+          "reason_code": "NORMAL_ASSIGNMENT_REQUESTED"
+        },
+        {
+          "event_type": "AGENT_ASSIGNED",
+          "reason_code": "NORMAL_AGENT_ASSIGNED"
+        },
+        {
+          "event_type": "STEP_DISPATCHED",
+          "reason_code": "NORMAL_STEP_DISPATCHED"
+        },
+        {
+          "event_type": "EXECUTION_FEEDBACK_RECEIVED",
+          "reason_code": "DEVICE_SUCCESS"
+        },
+        {
+          "event_type": "STEP_COMPLETED",
+          "reason_code": "NORMAL_STEP_COMPLETED"
+        },
+        {
+          "event_type": "AGENT_ASSIGNMENT_REQUESTED",
+          "reason_code": "NORMAL_ASSIGNMENT_REQUESTED"
+        },
+        {
+          "event_type": "AGENT_ASSIGNED",
+          "reason_code": "NORMAL_AGENT_ASSIGNED"
+        },
+        {
+          "event_type": "STEP_DISPATCHED",
+          "reason_code": "NORMAL_STEP_DISPATCHED"
+        },
+        {
+          "event_type": "EXECUTION_FEEDBACK_RECEIVED",
+          "reason_code": "DEVICE_SUCCESS"
+        },
+        {
+          "event_type": "STEP_COMPLETED",
+          "reason_code": "NORMAL_STEP_COMPLETED"
+        },
+        {
+          "event_type": "TASK_COMPLETED",
+          "reason_code": "FLIGHT_CHANGE_RESPONSE_COMPLETED"
+        }
+      ]
+    },
+    {
+      "scenario": "normal",
+      "input": {
+        "taskGoal": "请测量T2值机岛A03当前行李，正常留存结果，超规时引导至超规行李专柜B01。",
+        "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
+        "sceneParams": {
+          "baggageLocation": "T2值机岛A03",
+          "targetCounter": "超规行李专柜B01"
+        }
+      },
+      "taskCode": "TASK-20261115-0005",
+      "status": "COMPLETED",
+      "commands": [
+        {
+          "step_seq": 1,
+          "agent_code": "AGT-BE3506E3",
+          "capability_type": "CAP_BAGGAGE_MEASURE",
+          "command_status": "SUCCEEDED",
+          "params": {
+            "measureMode": "AUTO",
+            "timeout": 30
+          }
+        }
+      ],
+      "steps": [
+        {
+          "step_seq": 1,
+          "step_status": "COMPLETED",
+          "reason_code": "DEVICE_SUCCESS",
+          "output_params": {
+            "weight": 10.0,
+            "length": 55.0,
+            "isOversize": false,
+            "height": 20.0,
+            "width": 40.0,
+            "measureStatus": "SUCCESS",
+            "totalDimensionCm": 115.0,
+            "dimensionThresholdCm": 158,
+            "weightThresholdKg": 32,
+            "thresholdSource": "附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束",
+            "baggageInfo": "{\"weight\":10.0,\"length\":55.0,\"isOversize\":false,\"height\":20.0,\"width\":40.0,\"measureStatus\":\"SUCCESS\",\"totalDimensionCm\":115.0,\"dimensionThresholdCm\":158,\"weightThresholdKg\":32,\"thresholdSource\":\"附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束\"}"
+          }
+        }
+      ],
+      "events": [
+        {
+          "event_type": "GOAL_SUBMITTED",
+          "reason_code": "NORMAL_GOAL_SUBMITTED"
+        },
+        {
+          "event_type": "GOAL_UNDERSTANDING_FAILED",
+          "reason_code": "ERR_GOAL_UNDERSTANDING_TIMEOUT"
+        },
+        {
+          "event_type": "BASELINE_DOWNGRADED",
+          "reason_code": "NORMAL_BASELINE_DOWNGRADED"
+        },
+        {
+          "event_type": "AGENT_ASSIGNMENT_REQUESTED",
+          "reason_code": "NORMAL_ASSIGNMENT_REQUESTED"
+        },
+        {
+          "event_type": "AGENT_ASSIGNED",
+          "reason_code": "NORMAL_AGENT_ASSIGNED"
+        },
+        {
+          "event_type": "STEP_DISPATCHED",
+          "reason_code": "NORMAL_STEP_DISPATCHED"
+        },
+        {
+          "event_type": "EXECUTION_FEEDBACK_RECEIVED",
+          "reason_code": "DEVICE_SUCCESS"
+        },
+        {
+          "event_type": "STEP_COMPLETED",
+          "reason_code": "NORMAL_STEP_COMPLETED"
+        },
+        {
+          "event_type": "TASK_COMPLETED",
+          "reason_code": "BAGGAGE_WITHIN_LIMIT"
+        }
+      ]
+    },
+    {
+      "scenario": "escort",
+      "input": {
+        "taskGoal": "在T2值机区会合，向现场人员发出提示，提供轮椅陪同前往GATE_A05。",
+        "taskFamily": "SPECIAL_PASSENGER_SERVICE",
+        "sceneParams": {
+          "origin": "T2值机区",
+          "destination": "GATE_A05",
+          "assistanceType": "轮椅陪同"
+        }
+      },
+      "taskCode": "TASK-20261115-0006",
+      "status": "COMPLETED",
+      "commands": [
+        {
+          "step_seq": 1,
+          "agent_code": "AGT-E315AC12",
+          "capability_type": "CAP_INFO_DISPLAY",
+          "command_status": "SUCCEEDED",
+          "params": {
+            "contentType": "TEXT",
+            "contentData": "轮椅陪同：请在T2值机区会合，现场人员请协助，由服务机器人陪同前往GATE_A05。",
+            "displayDuration": 60
+          }
+        },
+        {
+          "step_seq": 2,
+          "agent_code": "AGT-198955D8",
+          "capability_type": "CAP_NOTIFICATION",
+          "command_status": "SUCCEEDED",
+          "params": {
+            "notificationType": "BOTH",
+            "notificationContent": "轮椅陪同：请在T2值机区会合，现场人员请协助，由服务机器人陪同前往GATE_A05。",
+            "repeatCount": 1
+          }
+        },
+        {
+          "step_seq": 3,
+          "agent_code": "AGT-198955D8",
+          "capability_type": "CAP_NAVIGATION",
+          "command_status": "SUCCEEDED",
+          "params": {
+            "targetLocation": "T2值机区",
+            "routePreference": "BARRIER_FREE"
+          }
+        },
+        {
+          "step_seq": 4,
+          "agent_code": "AGT-198955D8",
+          "capability_type": "CAP_ESCORT",
+          "command_status": "SUCCEEDED",
+          "params": {
+            "targetLocation": "GATE_A05",
+            "escortMode": "LEAD",
+            "maxDuration": 600
+          }
+        }
+      ],
+      "steps": [
+        {
+          "step_seq": 1,
+          "step_status": "COMPLETED",
+          "reason_code": "DEVICE_SUCCESS",
+          "output_params": {
+            "errorMessage": "",
+            "actualDuration": 60,
+            "displayStatus": "SUCCESS"
+          }
+        },
+        {
+          "step_seq": 2,
+          "step_status": "COMPLETED",
+          "reason_code": "DEVICE_SUCCESS",
+          "output_params": {
+            "notificationStatus": "SUCCESS",
+            "actualRepeatCount": 1
+          }
+        },
+        {
+          "step_seq": 3,
+          "step_status": "COMPLETED",
+          "reason_code": "DEVICE_SUCCESS",
+          "output_params": {
+            "estimatedDuration": 157,
+            "estimatedDistance": 379.0,
+            "routeGenerated": true,
+            "waypointCount": 8,
+            "arrivalStatus": "ARRIVED",
+            "arrivalLocation": "T2值机区",
+            "arrivalDeviceCode": "SIM_F2_ROBOT_B"
+          }
+        },
+        {
+          "step_seq": 4,
+          "step_status": "COMPLETED",
+          "reason_code": "DEVICE_SUCCESS",
+          "output_params": {
+            "arrivalStatus": "ARRIVED",
+            "actualDistance": 85.2,
+            "actualDuration": 420
+          }
+        }
+      ],
+      "events": [
+        {
+          "event_type": "GOAL_SUBMITTED",
+          "reason_code": "NORMAL_GOAL_SUBMITTED"
+        },
+        {
+          "event_type": "GOAL_UNDERSTANDING_FAILED",
+          "reason_code": "ERR_GOAL_UNDERSTANDING_TIMEOUT"
+        },
+        {
+          "event_type": "BASELINE_DOWNGRADED",
+          "reason_code": "NORMAL_BASELINE_DOWNGRADED"
+        },
+        {
+          "event_type": "AGENT_ASSIGNMENT_REQUESTED",
+          "reason_code": "NORMAL_ASSIGNMENT_REQUESTED"
+        },
+        {
+          "event_type": "AGENT_ASSIGNED",
+          "reason_code": "NORMAL_AGENT_ASSIGNED"
+        },
+        {
+          "event_type": "STEP_DISPATCHED",
+          "reason_code": "NORMAL_STEP_DISPATCHED"
+        },
+        {
+          "event_type": "EXECUTION_FEEDBACK_RECEIVED",
+          "reason_code": "DEVICE_SUCCESS"
+        },
+        {
+          "event_type": "STEP_COMPLETED",
+          "reason_code": "NORMAL_STEP_COMPLETED"
+        },
+        {
+          "event_type": "AGENT_ASSIGNMENT_REQUESTED",
+          "reason_code": "NORMAL_ASSIGNMENT_REQUESTED"
+        },
+        {
+          "event_type": "AGENT_ASSIGNED",
+          "reason_code": "NORMAL_AGENT_ASSIGNED"
+        },
+        {
+          "event_type": "STEP_DISPATCHED",
+          "reason_code": "NORMAL_STEP_DISPATCHED"
+        },
+        {
+          "event_type": "EXECUTION_FEEDBACK_RECEIVED",
+          "reason_code": "DEVICE_SUCCESS"
+        },
+        {
+          "event_type": "STEP_COMPLETED",
+          "reason_code": "NORMAL_STEP_COMPLETED"
+        },
+        {
+          "event_type": "AGENT_ASSIGNMENT_REQUESTED",
+          "reason_code": "NORMAL_ASSIGNMENT_REQUESTED"
+        },
+        {
+          "event_type": "AGENT_ASSIGNED",
+          "reason_code": "NORMAL_AGENT_ASSIGNED"
+        },
+        {
+          "event_type": "STEP_DISPATCHED",
+          "reason_code": "NORMAL_STEP_DISPATCHED"
+        },
+        {
+          "event_type": "EXECUTION_FEEDBACK_RECEIVED",
+          "reason_code": "DEVICE_SUCCESS"
+        },
+        {
+          "event_type": "STEP_COMPLETED",
+          "reason_code": "NORMAL_STEP_COMPLETED"
+        },
+        {
+          "event_type": "AGENT_ASSIGNMENT_REQUESTED",
+          "reason_code": "NORMAL_ASSIGNMENT_REQUESTED"
+        },
+        {
+          "event_type": "AGENT_ASSIGNED",
+          "reason_code": "NORMAL_AGENT_ASSIGNED"
+        },
+        {
+          "event_type": "STEP_DISPATCHED",
+          "reason_code": "NORMAL_STEP_DISPATCHED"
+        },
+        {
+          "event_type": "EXECUTION_FEEDBACK_RECEIVED",
+          "reason_code": "DEVICE_SUCCESS"
+        },
+        {
+          "event_type": "STEP_COMPLETED",
+          "reason_code": "NORMAL_STEP_COMPLETED"
+        },
+        {
+          "event_type": "TASK_COMPLETED",
+          "reason_code": "SPECIAL_PASSENGER_SERVICE_COMPLETED"
+        }
+      ]
+    },
+    {
+      "scenario": "weight-boundary",
+      "input": {
+        "baggageLocation": "T2值机岛A03",
+        "targetCounter": "超规行李专柜B01",
+        "length": 55,
+        "width": 40,
+        "height": 20,
+        "weight": 32,
+        "dimensionThresholdCm": 158,
+        "weightThresholdKg": 32
+      },
+      "taskCode": "TASK-20261115-0007",
+      "status": "COMPLETED",
+      "commands": [],
+      "steps": [],
+      "events": [
+        {
+          "event_type": "GOAL_SUBMITTED",
+          "reason_code": "MEASUREMENT_EVENT"
+        },
+        {
+          "event_type": "TASK_COMPLETED",
+          "reason_code": "BAGGAGE_WITHIN_LIMIT"
+        }
+      ]
+    },
+    {
+      "scenario": "oversize",
+      "input": {
+        "baggageLocation": "T2值机岛A03",
+        "targetCounter": "超规行李专柜B01",
+        "length": 100,
+        "width": 60,
+        "height": 40,
+        "weight": 28,
+        "dimensionThresholdCm": 158,
+        "weightThresholdKg": 32,
+        "thresholdSource": "附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束"
+      },
+      "taskCode": "TASK-20261115-0008",
+      "status": "COMPLETED",
+      "commands": [
+        {
+          "step_seq": 2,
+          "agent_code": "AGT-BE3506E3",
+          "capability_type": "CAP_OVERSIZE_ALERT",
+          "command_status": "SUCCEEDED",
+          "params": {
+            "baggageInfo": "{\"length\":100.0,\"width\":60.0,\"height\":40.0,\"weight\":28.0,\"isOversize\":true,\"totalDimensionCm\":200.0,\"dimensionThresholdCm\":158.0,\"weightThresholdKg\":32.0,\"thresholdSource\":\"附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束\",\"baggageId\":\"BAG-564409\",\"measureStatus\":\"SUCCESS\",\"measurementSource\":\"MEASUREMENT_EVENT\"}",
+            "alertLevel": "WARNING"
+          }
+        },
+        {
+          "step_seq": 3,
+          "agent_code": "AGT-E315AC12",
+          "capability_type": "CAP_INFO_DISPLAY",
+          "command_status": "SUCCEEDED",
+          "params": {
+            "contentType": "TEXT",
+            "contentData": "超规行李（BAG-564409）请前往超规行李专柜B01办理托运。",
+            "displayDuration": 60
+          }
+        },
+        {
+          "step_seq": 4,
+          "agent_code": "AGT-198955D8",
+          "capability_type": "CAP_NAVIGATION",
+          "command_status": "SUCCEEDED",
+          "params": {
+            "targetLocation": "超规行李专柜B01",
+            "routePreference": "BARRIER_FREE"
+          }
+        }
+      ],
+      "steps": [
+        {
+          "step_seq": 1,
+          "step_status": "COMPLETED",
+          "reason_code": "MEASUREMENT_EVENT_REUSED",
+          "output_params": {
+            "length": 100.0,
+            "width": 60.0,
+            "height": 40.0,
+            "weight": 28.0,
+            "isOversize": true,
+            "totalDimensionCm": 200.0,
+            "dimensionThresholdCm": 158.0,
+            "weightThresholdKg": 32.0,
+            "thresholdSource": "附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束",
+            "baggageId": "BAG-564409",
+            "measureStatus": "SUCCESS",
+            "measurementSource": "MEASUREMENT_EVENT",
+            "baggageInfo": "{\"length\":100.0,\"width\":60.0,\"height\":40.0,\"weight\":28.0,\"isOversize\":true,\"totalDimensionCm\":200.0,\"dimensionThresholdCm\":158.0,\"weightThresholdKg\":32.0,\"thresholdSource\":\"附录F-五类设备能力边界清单 2.2 智能行李测量设备能力约束\",\"baggageId\":\"BAG-564409\",\"measureStatus\":\"SUCCESS\",\"measurementSource\":\"MEASUREMENT_EVENT\"}"
+          }
+        },
+        {
+          "step_seq": 2,
+          "step_status": "COMPLETED",
+          "reason_code": "DEVICE_SUCCESS",
+          "output_params": {
+            "reportTime": "2026-11-15T21:32:45.072698200+08:00",
+            "reportStatus": "SUCCESS",
+            "alertId": "ALERT-0cc0468a-a10f-42de-9632-31b73b56eb3d"
+          }
+        },
+        {
+          "step_seq": 3,
+          "step_status": "COMPLETED",
+          "reason_code": "DEVICE_SUCCESS",
+          "output_params": {
+            "errorMessage": "",
+            "actualDuration": 60,
+            "displayStatus": "SUCCESS"
+          }
+        },
+        {
+          "step_seq": 4,
+          "step_status": "COMPLETED",
+          "reason_code": "DEVICE_SUCCESS",
+          "output_params": {
+            "estimatedDuration": 190,
+            "estimatedDistance": 426.0,
+            "routeGenerated": true,
+            "waypointCount": 11,
+            "arrivalStatus": "ARRIVED",
+            "arrivalLocation": "超规行李专柜B01",
+            "arrivalDeviceCode": "SIM_F2_ROBOT_B"
+          }
+        }
+      ],
+      "events": [
+        {
+          "event_type": "GOAL_SUBMITTED",
+          "reason_code": "MEASUREMENT_EVENT"
+        },
+        {
+          "event_type": "MEASUREMENT_RECORDED",
+          "reason_code": "MEASUREMENT_EVENT"
+        },
+        {
+          "event_type": "GOAL_UNDERSTANDING_FAILED",
+          "reason_code": "ERR_GOAL_UNDERSTANDING_TIMEOUT"
+        },
+        {
+          "event_type": "BASELINE_DOWNGRADED",
+          "reason_code": "NORMAL_BASELINE_DOWNGRADED"
+        },
+        {
+          "event_type": "STEP_COMPLETED",
+          "reason_code": "MEASUREMENT_EVENT_REUSED"
+        },
+        {
+          "event_type": "AGENT_ASSIGNMENT_REQUESTED",
+          "reason_code": "NORMAL_ASSIGNMENT_REQUESTED"
+        },
+        {
+          "event_type": "AGENT_ASSIGNED",
+          "reason_code": "NORMAL_AGENT_ASSIGNED"
+        },
+        {
+          "event_type": "STEP_DISPATCHED",
+          "reason_code": "NORMAL_STEP_DISPATCHED"
+        },
+        {
+          "event_type": "EXECUTION_FEEDBACK_RECEIVED",
+          "reason_code": "DEVICE_SUCCESS"
+        },
+        {
+          "event_type": "STEP_COMPLETED",
+          "reason_code": "NORMAL_STEP_COMPLETED"
+        },
+        {
+          "event_type": "AGENT_ASSIGNMENT_REQUESTED",
+          "reason_code": "NORMAL_ASSIGNMENT_REQUESTED"
+        },
+        {
+          "event_type": "AGENT_ASSIGNED",
+          "reason_code": "NORMAL_AGENT_ASSIGNED"
+        },
+        {
+          "event_type": "STEP_DISPATCHED",
+          "reason_code": "NORMAL_STEP_DISPATCHED"
+        },
+        {
+          "event_type": "EXECUTION_FEEDBACK_RECEIVED",
+          "reason_code": "DEVICE_SUCCESS"
+        },
+        {
+          "event_type": "STEP_COMPLETED",
+          "reason_code": "NORMAL_STEP_COMPLETED"
+        },
+        {
+          "event_type": "AGENT_ASSIGNMENT_REQUESTED",
+          "reason_code": "NORMAL_ASSIGNMENT_REQUESTED"
+        },
+        {
+          "event_type": "AGENT_ASSIGNED",
+          "reason_code": "NORMAL_AGENT_ASSIGNED"
+        },
+        {
+          "event_type": "STEP_DISPATCHED",
+          "reason_code": "NORMAL_STEP_DISPATCHED"
+        },
+        {
+          "event_type": "EXECUTION_FEEDBACK_RECEIVED",
+          "reason_code": "DEVICE_SUCCESS"
+        },
+        {
+          "event_type": "STEP_COMPLETED",
+          "reason_code": "NORMAL_STEP_COMPLETED"
+        },
+        {
+          "event_type": "TASK_COMPLETED",
+          "reason_code": "OVERSIZE_HANDLING_CLOSED_LOOP"
+        }
+      ]
+    }
+  ],
+  "browserChecks": {
+    "normalInstructionsHidden": true,
+    "escortArrivalVisible": true,
+    "fiveTasksCompletedVisible": true
+  }
+}

@@ -1,0 +1,91 @@
+- complementary:
+  - generic: 智慧机场AI协同平台
+  - menu:
+    - menuitem "运行总览":
+      - generic: 运行总览
+    - menuitem "任务管理":
+      - generic: 任务管理
+    - menuitem "异常处置":
+      - generic: 异常处置
+    - menuitem "过程追溯":
+      - generic: 过程追溯
+    - menuitem "二维态势":
+      - generic: 二维态势
+    - menuitem "仿真控制":
+      - generic: 仿真控制
+    - menuitem "设备代理":
+      - generic: 设备代理
+    - menuitem "操作记录":
+      - generic: 操作记录
+- generic: （运行操作员）
+- button "退出登录":
+  - generic: 退出登录
+- main:
+  - button "提交任务":
+    - generic: 提交任务
+  - textbox "任务编号"
+  - textbox "目标关键字"
+  - combobox
+  - generic: 按状态筛选
+  - combobox
+  - generic: 按任务族筛选
+  - textbox "Start date": 2026-11-14 00:00:00
+  - generic "to":
+    - img "swap-right":
+  - textbox "End date": 2026-11-14 23:59:59
+  - img "calendar":
+  - img "close-circle":
+  - button "查 询":
+    - generic: 查 询
+  - table:
+    - rowgroup:
+      - row "任务编号 任务目标 任务族 状态 创建时间 操作":
+        - columnheader "任务编号"
+        - columnheader "任务目标"
+        - columnheader "任务族"
+        - columnheader "状态"
+        - columnheader "创建时间"
+        - columnheader "操作"
+    - rowgroup:
+      - row "TASK-20261114-0262 航班CA1234延误30分钟，请在T2候机区发布航班变更信息，并引导旅客前往GATE_A05。 FLIGHT_CHANGE_RESPONSE 待规划 2026-11-14T21:58:39.078292 详情 补充信息":
+        - cell "TASK-20261114-0262"
+        - cell "航班CA1234延误30分钟，请在T2候机区发布航班变更信息，并引导旅客前往GATE_A05。"
+        - cell "FLIGHT_CHANGE_RESPONSE"
+        - cell "待规划":
+          - generic: 待规划
+        - cell "2026-11-14T21:58:39.078292"
+        - cell "详情 补充信息":
+          - generic: 详情
+          - generic: 补充信息
+  - list:
+    - listitem: 共 1 条
+    - listitem "Previous Page":
+      - button "left" [disabled]:
+        - img "left":
+    - listitem "1":
+      - generic: "1"
+    - listitem "Next Page":
+      - button "right" [disabled]:
+        - img "right":
+    - combobox
+    - generic: 20 / page
+- dialog "补充信息":
+  - document:
+    - button "Close":
+      - img "close":
+    - generic: 补充信息
+    - paragraph: 系统在目标理解中发现以下信息缺失，请逐条补充后重新提交：
+    - generic "请补充航班号"
+    - textbox: CA1234
+    - generic "请补充有效的航班变更类型"
+    - textbox: 延误
+    - generic "请补充原计划时间"
+    - textbox: 2026-11-14 22:30
+    - generic "请补充航班变更内容"
+    - textbox [active]: CA1234 原计划22:30，延误30分钟至23:00，登机口GATE_A05不变。在T2候机区发布变更并引导旅客前往GATE_A05。
+    - button "放弃并取消任务":
+      - generic: 放弃并取消任务
+    - button "Cancel":
+      - generic: Cancel
+    - button "OK":
+      - generic: OK
