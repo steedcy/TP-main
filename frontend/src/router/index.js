@@ -20,6 +20,7 @@ const routes = [
       { path: 'task-definitions', name: 'TaskDefinitions', component: () => import('../views/taskdef/TaskDefinitionView.vue'), meta: { roles: ['CONFIG_ADMIN'] } },
       { path: 'risk-rules', name: 'RiskRules', component: () => import('../views/risk/RiskRuleView.vue'), meta: { roles: ['CONFIG_ADMIN'] } },
       { path: 'tasks', name: 'Tasks', component: () => import('../views/task/TaskListView.vue'), meta: { roles: ['OPERATOR'] } },
+      { path: 'task-board', name: 'TaskBoard', component: () => import('../views/task/TaskBoardView.vue'), meta: { roles: ['OPERATOR', 'SYSTEM_ADMIN'] } },
       { path: 'tasks/:taskId', name: 'TaskDetail', component: () => import('../views/task/TaskDetailView.vue'), meta: { roles: ['OPERATOR', 'SYSTEM_ADMIN'] } },
       { path: 'task-exceptions', name: 'TaskExceptions', component: () => import('../views/task/TaskExceptionListView.vue'), meta: { roles: ['SYSTEM_ADMIN', 'OPERATOR'] } },
       { path: 'task-trace', name: 'TaskTrace', component: () => import('../views/task/TaskTraceView.vue'), meta: { roles: ['SYSTEM_ADMIN', 'OPERATOR'] } },

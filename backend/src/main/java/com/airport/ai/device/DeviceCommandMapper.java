@@ -9,6 +9,7 @@ import java.util.Optional;
 public interface DeviceCommandMapper {
     java.util.List<DeviceCommandRecord> findRecentByAgentCode(@Param("agentCode") String agentCode,
                                                                @Param("limit") int limit);
+    java.util.List<DeviceCommandRecord> findByTaskId(@Param("taskId") Long taskId);
     int insertIfAbsent(DeviceCommandRecord command);
     java.util.List<DeviceCommandRecord> findUnconfirmedCancelBefore(@Param("threshold") java.time.LocalDateTime threshold);
     Optional<DeviceCommandRecord> findByKey(@Param("agentCode") String agentCode,

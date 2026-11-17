@@ -8,15 +8,34 @@ import java.math.BigDecimal;
 @Component
 @ConfigurationProperties(prefix = "simulator")
 public class SimulatorProperties {
-    // Synthetic fixture landmarks in F2 pixel coordinates; not a calibrated physical map.
-    private java.util.Map<String, java.util.List<Double>> landmarks = new java.util.LinkedHashMap<>(java.util.Map.of(
-        "F2_SERVICE_POINT", java.util.List.of(810.0,4200.0),
-        "F2_BAGGAGE_POINT", java.util.List.of(805.0,4050.0),
-        "T2值机岛A03", java.util.List.of(805.0,4050.0),
-        "T2值机区", java.util.List.of(805.0,4050.0),
-        "超规行李专柜B01", java.util.List.of(810.0,4200.0),
-        "F2_TEST_GATE", java.util.List.of(815.0,4600.0),
-        "GATE_A05", java.util.List.of(815.0,4600.0)));
+    // Synthetic fixture landmarks in F2 pixel coordinates (1260 x 6895 floorplan); not a calibrated physical map.
+    private java.util.Map<String, java.util.List<Double>> landmarks = new java.util.LinkedHashMap<>(java.util.Map.ofEntries(
+        java.util.Map.entry("F2_SERVICE_POINT", java.util.List.of(810.0, 4200.0)),
+        java.util.Map.entry("F2_BAGGAGE_POINT", java.util.List.of(805.0, 4050.0)),
+        java.util.Map.entry("T2值机岛A01", java.util.List.of(400.0, 3100.0)),
+        java.util.Map.entry("T2值机岛A02", java.util.List.of(400.0, 3250.0)),
+        java.util.Map.entry("T2值机岛A03", java.util.List.of(805.0, 4050.0)),
+        java.util.Map.entry("T2值机岛B01", java.util.List.of(465.0, 3447.0)),
+        java.util.Map.entry("T2值机区", java.util.List.of(805.0, 4050.0)),
+        java.util.Map.entry("行李托运柜台A01", java.util.List.of(430.0, 3180.0)),
+        java.util.Map.entry("行李托运柜台B02", java.util.List.of(490.0, 3520.0)),
+        java.util.Map.entry("超规行李专柜B01", java.util.List.of(810.0, 4200.0)),
+        java.util.Map.entry("智能行李测量点A", java.util.List.of(400.0, 3106.0)),
+        java.util.Map.entry("智能行李测量点B", java.util.List.of(465.0, 3447.0)),
+        java.util.Map.entry("安检通道01", java.util.List.of(630.0, 3750.0)),
+        java.util.Map.entry("安检通道02", java.util.List.of(740.0, 3750.0)),
+        java.util.Map.entry("VIP安检通道", java.util.List.of(840.0, 3750.0)),
+        java.util.Map.entry("旅客服务中心", java.util.List.of(630.0, 4150.0)),
+        java.util.Map.entry("航显中心点", java.util.List.of(870.0, 2960.0)),
+        java.util.Map.entry("GATE_A01", java.util.List.of(500.0, 4600.0)),
+        java.util.Map.entry("GATE_A02", java.util.List.of(610.0, 4600.0)),
+        java.util.Map.entry("GATE_A03", java.util.List.of(710.0, 4600.0)),
+        java.util.Map.entry("F2_TEST_GATE", java.util.List.of(815.0, 4600.0)),
+        java.util.Map.entry("GATE_A05", java.util.List.of(815.0, 4600.0)),
+        java.util.Map.entry("GATE_A06", java.util.List.of(920.0, 4600.0)),
+        java.util.Map.entry("GATE_B01", java.util.List.of(420.0, 5200.0)),
+        java.util.Map.entry("GATE_B02", java.util.List.of(620.0, 5200.0)),
+        java.util.Map.entry("GATE_B03", java.util.List.of(820.0, 5200.0))));
     public java.util.Map<String,java.util.List<Double>> getLandmarks() { return landmarks; }
     public void setLandmarks(java.util.Map<String,java.util.List<Double>> value) { landmarks=value; }
     private String deviceCode = "SIM_DISPLAY_001";

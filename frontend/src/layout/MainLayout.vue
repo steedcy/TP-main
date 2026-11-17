@@ -5,6 +5,7 @@
       <a-menu theme="dark" mode="inline" :selectedKeys="[$route.name]">
         <a-menu-item key="Overview" @click="$router.push('/overview')">运行总览</a-menu-item>
         <a-menu-item key="Tasks" v-if="isOperator" @click="$router.push('/tasks')">任务管理</a-menu-item>
+        <a-menu-item key="TaskBoard" v-if="isOperator || isSystemAdmin" @click="$router.push('/task-board')">任务协同看板</a-menu-item>
         <a-menu-item key="TaskExceptions" v-if="isOperator || isSystemAdmin" @click="$router.push('/task-exceptions')">异常处置</a-menu-item>
         <a-menu-item key="TaskTrace" v-if="isOperator || isSystemAdmin" @click="$router.push('/task-trace')">过程追溯</a-menu-item>
         <a-menu-item key="Situation" @click="$router.push('/situation')">二维态势</a-menu-item>

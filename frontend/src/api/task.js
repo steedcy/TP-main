@@ -56,3 +56,7 @@ export function submitMeasurementEvent(data) {
   return request.post('/tasks/measurement-event', data)
 }
 
+export function getTaskBoardCommands(taskId) {
+  return request.get(`/task-board/tasks/${taskId}/commands`)
+}
+
