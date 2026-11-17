@@ -229,7 +229,7 @@ function syncPassengerLayer() {
 
 function focusActiveArea() {
   if (!map) return
-  map.fitBounds([[MAP_HEIGHT - 5400, 200], [MAP_HEIGHT - 2800, 1060]])
+  map.fitBounds([[MAP_HEIGHT - 3880, 260], [MAP_HEIGHT - 2080, 1060]])
 }
 
 function fitAll() {

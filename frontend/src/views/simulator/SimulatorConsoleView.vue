@@ -138,18 +138,18 @@ const lastMeasurementResult = ref(null)
 
 function fillOversizePreset() {
   measurementForm.value = {
-    baggageLocation: 'T2值机岛A03',
+    baggageLocation: '国内值机柜台02',
     length: 100,
     width: 60,
     height: 40,
     weight: 28,
-    targetCounter: '超规行李专柜B01'
+    targetCounter: '超规行李托运'
   }
 }
 
 function fillNormalPreset() {
   measurementForm.value = {
-    baggageLocation: 'T2值机岛A02',
+    baggageLocation: '国内值机柜台01',
     length: 50,
     width: 40,
     height: 20,
@@ -208,30 +208,30 @@ const scenarioLabels = { SUCCESS: '正常成功', FAILED: '设备错误', TIMEOU
 const demos = [
   {
     key: 'flight', title: '航班变更与旅客引导',
-    description: '航延屏发布变更，航显展示引导，机器人通知或导航。',
+    description: '航延屏发布变更，航显展示引导，机器人通知并引导至登机口13。',
     requiredTypes: ['FLIGHT_DELAY_BOARD', 'SMART_DISPLAY', 'MOBILE_ROBOT'],
     taskFamily: 'FLIGHT_CHANGE_RESPONSE',
     sceneParams: {
       eventSource: 'MANUAL_FORM', flightNumber: 'CA1234', changeType: 'DELAY',
-      newGate: 'GATE_A05', changeDescription: '虚构航班CA1234延误30分钟，登机口GATE_A05不变'
+      newGate: '登机口13', changeDescription: '虚构航班CA1234延误30分钟，登机口13不变'
     },
-    taskGoal: '虚构航班CA1234原计划22:30，延误30分钟至23:00，请通过航延屏发布变更、智慧航显发布提示，并由机器人引导旅客前往GATE_A05。'
+    taskGoal: '虚构航班CA1234原计划22:30，延误30分钟至23:00，请通过航延屏发布变更、智慧航显发布提示，并由机器人引导旅客前往登机口13。'
   },
   {
     key: 'baggage', title: '超规行李处置',
-    description: '测量行李尺寸重量，并对超规结果生成告警。',
+    description: '测量国内值机柜台02行李尺寸重量，超规时引导至超规行李托运。',
     requiredTypes: ['BAGGAGE_SCANNER', 'SMART_DISPLAY', 'MOBILE_ROBOT'],
     taskFamily: 'OVERSIZE_BAGGAGE_HANDLING',
-    sceneParams: { baggageLocation: 'T2值机岛A03', targetCounter: '超规行李专柜B01' },
-    taskGoal: '请测量T2值机岛A03当前行李的长宽高和重量；超规时上报告警、由智慧航显发布超规行李专柜B01办理提示，并由移动机器人提供导航；正常行李留存测量结果后结束。'
+    sceneParams: { baggageLocation: '国内值机柜台02', targetCounter: '超规行李托运' },
+    taskGoal: '请测量国内值机柜台02当前行李的长宽高和重量；超规时上报告警、由智慧航显发布超规行李托运办理提示，并由移动机器人提供导航；正常行李留存测量结果后结束。'
   },
   {
     key: 'escort', title: '特殊旅客陪同',
-    description: '航显发布会合提示，机器人陪同旅客到登机口。',
+    description: '航显发布会合提示，机器人至VIP值机柜台会合并陪同前往登机口13。',
     requiredTypes: ['SMART_DISPLAY', 'MOBILE_ROBOT'],
     taskFamily: 'SPECIAL_PASSENGER_SERVICE',
-    sceneParams: { assistanceType: '轮椅陪同', origin: 'T2值机区', destination: 'GATE_A05' },
-    taskGoal: '请为虚构轮椅旅客在T2值机区通过智慧航显显示会合提示、通知现场人员，并安排服务机器人前往会合后陪同旅客前往GATE_A05。'
+    sceneParams: { assistanceType: '轮椅陪同', origin: 'VIP值机柜台', destination: '登机口13' },
+    taskGoal: '请为虚构轮椅旅客在VIP值机柜台通过智慧航显显示会合提示、通知现场人员，并安排服务机器人前往会合后陪同旅客前往登机口13。'
   }
 ]
 const columns = [

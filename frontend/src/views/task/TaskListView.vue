@@ -117,7 +117,7 @@ const filterTimeRange = ref(shouldDefaultToToday(route.query) ? todayRange().map
 const form = reactive({ taskGoal: '', taskFamily: undefined })
 const flight = reactive({ flightNumber: '', changeType: undefined, originalTime: null, newTime: null,
   originalGate: undefined, newGate: undefined, changeDescription: '' })
-const presetGates = ['A01', 'B02', 'C03', 'GATE_A05', 'F2_TEST_GATE']
+const presetGates = ['登机口10', '登机口11', '登机口12', '登机口13', '登机口14', 'A01', 'B02', 'C03', 'GATE_A05', 'F2_TEST_GATE']
 const isFlightChange = computed(() => form.taskFamily === 'FLIGHT_CHANGE_RESPONSE')
 const needsNewTime = computed(() => ['DELAY', 'EARLY'].includes(flight.changeType))
 const canSubmit = computed(() => isFlightChange.value
