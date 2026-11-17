@@ -143,6 +143,19 @@ public class TaskBoardController {
         return ApiResponse.ok(terminalMapMapper.findAllRegions());
     }
 
+    @PutMapping("/regions/{id}")
+    @PreAuthorize("hasRole('OPERATOR')")
+    public ApiResponse<List<Map<String, Object>>> updateRegion(@PathVariable Long id, @RequestBody Map<String, Object> body) {
+        String name = requireText(body.get("regionName"), "区域名称不能为空");
+        String type = requireText(body.get("regionType"), "区域类型不能为空");
+        if (!REGION_TYPES.contains(type)) {
+            throw new BusinessException(ErrorCode.PARAM_FORMAT_ERROR, "不支持的区域类型：" + type);
+        }
+        String geometryJson = requireText(body.get("geometryJson"), "区域几何数据不能为空");
+        terminalMapMapper.updateRegion(id, name, type, geometryJson);
+        return ApiResponse.ok(terminalMapMapper.findAllRegions());
+    }
+
     @DeleteMapping("/regions/{id}")
     @PreAuthorize("hasRole('OPERATOR')")
     public ApiResponse<List<Map<String, Object>>> deleteRegion(@PathVariable Long id) {

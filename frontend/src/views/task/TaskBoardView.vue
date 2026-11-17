@@ -2,8 +2,8 @@
   <section class="task-board">
     <header class="board-header">
       <div>
-        <h2>任务协同看板</h2>
-        <p>F2 航站楼空间态势 · 规划/风险/调度全链路实况、历史回溯与人工空间规划</p>
+        <h2>任务协同看板（Leaflet-Geoman 室内矢量地图）</h2>
+        <p>F2 航站楼空间态势 · 规划/风险/调度全链路实况、历史回溯与矢量地图编辑</p>
       </div>
       <a-space wrap>
         <a-radio-group v-model:value="mode" button-style="solid" size="small">
@@ -12,7 +12,7 @@
         </a-radio-group>
         <a-select
           v-model:value="selectedTaskId"
-          style="width: 320px"
+          style="width: 300px"
           show-search
           :filter-option="filterTaskOption"
           placeholder="选择要查看的任务"
@@ -28,47 +28,38 @@
       </a-space>
     </header>
 
-    <!-- 绘制模式提示条 -->
     <a-alert
-      v-if="drawMode"
+      v-if="pickPassengerMode"
       type="info"
       show-icon
       style="margin-bottom: 12px"
-      :message="drawBannerTitle"
+      message="请在地图上直接点击旅客当前所在位置（或点击任意 POI 点位）"
     >
       <template #action>
-        <a-space>
-          <a-button v-if="drawMode === 'ISOLATED_ZONE' || drawMode === 'CHECKIN_HALL' || drawMode === 'CORRIDOR'" size="small" type="primary" @click="finishDrawing">
-            完成绘制（已选 {{ drawPoints.length }} 点）
-          </a-button>
-          <a-button size="small" @click="cancelDrawing">取消</a-button>
-        </a-space>
+        <a-button size="small" @click="pickPassengerMode = false">取消</a-button>
       </template>
     </a-alert>
 
     <a-row :gutter="16">
-      <!-- 左侧：F2 互动平面图 + POI + 隔离区/走廊 + 实时路线引导 -->
+      <!-- 左侧：Leaflet + Leaflet-Geoman 室内矢量地图 -->
       <a-col :xs="24" :lg="14">
         <a-card class="map-card" :body-style="{ padding: '12px' }">
           <div class="map-toolbar">
             <a-space wrap size="small">
-              <a-button size="small" @click="zoomBy(1.25)">＋</a-button>
-              <a-button size="small" @click="zoomBy(0.8)">－</a-button>
-              <a-button size="small" @click="focusActiveArea">聚焦活动区</a-button>
-              <a-button size="small" @click="fitAll">全图</a-button>
-              <a-tag color="blue">{{ Math.round(zoom * 100) }}%</a-tag>
+              <a-button size="small" @click="mapEditorRef?.focusActiveArea()">聚焦活动区</a-button>
+              <a-button size="small" @click="mapEditorRef?.fitAll()">查看全图</a-button>
               <a-button
                 size="small"
-                :type="drawMode === 'PASSENGER' ? 'primary' : 'default'"
-                @click="togglePickPassenger"
+                :type="pickPassengerMode ? 'primary' : 'default'"
+                @click="pickPassengerMode = !pickPassengerMode"
               >
-                {{ drawMode === 'PASSENGER' ? '点击地图定位旅客中…' : '地图点选旅客位置' }}
+                {{ pickPassengerMode ? '点选旅客位置中…' : '地图点选旅客位置' }}
               </a-button>
-              <template v-if="isOperator">
-                <a-button size="small" @click="startDrawRegion('CHECKIN_HALL')">绘制值机办理区</a-button>
-                <a-button size="small" @click="startDrawRegion('ISOLATED_ZONE')">绘制候机隔离区</a-button>
-                <a-button size="small" @click="startDrawRegion('CORRIDOR')">绘制走廊</a-button>
-              </template>
+              <a-button size="small" @click="handleExportGeoJson">导出 GeoJSON</a-button>
+              <label v-if="isOperator" class="geojson-import-btn">
+                <a-button size="small">导入 GeoJSON</a-button>
+                <input type="file" accept=".json,.geojson" style="display: none" @change="handleImportGeoJson" />
+              </label>
             </a-space>
             <a-space wrap size="small" style="margin-top: 6px;">
               <span style="font-size: 12px; color: #666;">图层：</span>
@@ -82,178 +73,36 @@
             </a-space>
           </div>
 
-          <div
-            ref="viewportRef"
-            class="map-viewport"
-            :class="{ picking: Boolean(drawMode) }"
-            @wheel.prevent="handleWheel"
-            @pointerdown="startPan"
-            @pointermove="movePan"
-            @pointerup="endPan"
-            @pointercancel="endPan"
-          >
-            <div class="map-canvas" :style="canvasStyle" @click="handleMapClick">
-              <img class="floorplan" src="/F2.jpg" alt="F2 平面图" draggable="false" />
+          <IndoorMapEditor
+            ref="mapEditorRef"
+            :editable="isOperator"
+            :pois="pois"
+            :regions="regions"
+            :devices="devices"
+            :passenger-point="effectivePassengerPoint"
+            :route-points="routeInfo.points"
+            :stop-points="routeStopPoints"
+            :collab-edges="collabEdges"
+            :active-device-step-map="activeDeviceStepMap"
+            :show-pois="showPois"
+            :show-regions="showRegions"
+            :show-route="showRoute"
+            :show-collab-links="showCollabLinks"
+            :pick-passenger-mode="pickPassengerMode"
+            @cursor-move="cursorPos = $event"
+            @pick-passenger="handlePickPassenger"
+            @poi-click="handlePoiClick"
+            @create-poi="handleGeomanCreatePoi"
+            @update-poi="handleGeomanUpdatePoi"
+            @delete-poi="handleDeletePoi"
+            @create-region="handleGeomanCreateRegion"
+            @update-region="handleGeomanUpdateRegion"
+            @delete-region="handleDeleteRegion"
+          />
 
-              <!-- SVG 隔离区、走廊、路径引导与设备协同连线层 -->
-              <svg class="map-svg" :viewBox="`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`">
-                <!-- 已保存的值机办理区、候机隔离区与走廊 -->
-                <g v-if="showRegions">
-                  <template v-for="reg in parsedRegions" :key="reg.id">
-                    <polygon
-                      v-if="reg.regionType === 'ISOLATED_ZONE' && reg.points.length >= 3"
-                      :points="reg.points.map(p => `${p.x},${p.y}`).join(' ')"
-                      fill="rgba(114, 46, 209, 0.14)"
-                      stroke="#722ed1"
-                      stroke-width="3"
-                      stroke-dasharray="8 6"
-                    />
-                    <polygon
-                      v-else-if="reg.regionType === 'CHECKIN_HALL' && reg.points.length >= 3"
-                      :points="reg.points.map(p => `${p.x},${p.y}`).join(' ')"
-                      fill="rgba(82, 196, 26, 0.14)"
-                      stroke="#389e0d"
-                      stroke-width="3"
-                      stroke-dasharray="8 6"
-                    />
-                    <polyline
-                      v-else-if="reg.regionType === 'CORRIDOR' && reg.points.length >= 2"
-                      :points="reg.points.map(p => `${p.x},${p.y}`).join(' ')"
-                      fill="none"
-                      stroke="#13c2c2"
-                      stroke-width="10"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      opacity="0.45"
-                    />
-                    <text
-                      v-if="reg.points.length"
-                      :x="reg.points[0].x"
-                      :y="reg.points[0].y - 10"
-                      :fill="reg.regionType === 'ISOLATED_ZONE' ? '#531dab' : reg.regionType === 'CHECKIN_HALL' ? '#237804' : '#08979c'"
-                      font-size="14"
-                      font-weight="bold"
-                    >
-                      {{ reg.regionType === 'ISOLATED_ZONE' ? '候机隔离区：' : reg.regionType === 'CHECKIN_HALL' ? '值机办理区：' : '走廊通道：' }}{{ reg.regionName }}
-                    </text>
-                  </template>
-                </g>
-
-                <!-- 正在绘制中的预览 -->
-                <g v-if="(drawMode === 'ISOLATED_ZONE' || drawMode === 'CHECKIN_HALL' || drawMode === 'CORRIDOR') && drawPoints.length">
-                  <polyline
-                    :points="drawPoints.map(p => `${p.x},${p.y}`).join(' ')"
-                    fill="none"
-                    :stroke="drawMode === 'ISOLATED_ZONE' ? '#722ed1' : drawMode === 'CHECKIN_HALL' ? '#389e0d' : '#13c2c2'"
-                    stroke-width="5"
-                    stroke-dasharray="6 4"
-                  />
-                  <circle
-                    v-for="(pt, idx) in drawPoints"
-                    :key="`dp-${idx}`"
-                    :cx="pt.x"
-                    :cy="pt.y"
-                    r="8"
-                    :fill="drawMode === 'ISOLATED_ZONE' ? '#722ed1' : drawMode === 'CHECKIN_HALL' ? '#389e0d' : '#13c2c2'"
-                    stroke="#fff"
-                    stroke-width="2"
-                  />
-                </g>
-
-                <!-- 设备协同连线 -->
-                <g v-if="showCollabLinks && collabEdges.length">
-                  <line
-                    v-for="(edge, idx) in collabEdges"
-                    :key="`collab-${idx}`"
-                    :x1="edge.x1"
-                    :y1="edge.y1"
-                    :x2="edge.x2"
-                    :y2="edge.y2"
-                    stroke="#fa8c16"
-                    stroke-width="4"
-                    stroke-dasharray="10 8"
-                    opacity="0.75"
-                  />
-                </g>
-
-                <!-- 实时走廊路线引导图 -->
-                <g v-if="showRoute && routeInfo.points.length >= 2">
-                  <polyline
-                    :points="routePolylinePoints"
-                    fill="none"
-                    stroke="#1677ff"
-                    stroke-width="8"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    opacity="0.25"
-                  />
-                  <polyline
-                    class="route-animated"
-                    :points="routePolylinePoints"
-                    fill="none"
-                    stroke="#1677ff"
-                    stroke-width="5"
-                    stroke-dasharray="16 10"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                  <g v-for="(pt, idx) in routeStopPoints" :key="`stop-${idx}`">
-                    <circle :cx="pt.x" :cy="pt.y" r="14" fill="#1677ff" stroke="#fff" stroke-width="3" />
-                    <text :x="pt.x" :y="pt.y + 5" text-anchor="middle" fill="#fff" font-size="13" font-weight="bold">
-                      {{ idx + 1 }}
-                    </text>
-                  </g>
-                </g>
-              </svg>
-
-              <!-- 预设 / 人工管理 POI 点位 -->
-              <template v-if="showPois">
-                <div
-                  v-for="poi in pois"
-                  :key="poi.poiCode"
-                  class="poi-marker"
-                  :style="{ left: `${poi.x}px`, top: `${poi.y}px`, '--poi-color': poiColor(poi.category) }"
-                  :title="`${poi.poiName} (${poi.x}, ${poi.y})`"
-                  @click.stop="handlePoiClick(poi)"
-                >
-                  <span class="poi-dot">{{ poiBadge(poi.category) }}</span>
-                  <span class="poi-label">{{ poi.poiName }}</span>
-                </div>
-              </template>
-
-              <!-- 旅客当前位置 -->
-              <div
-                v-if="effectivePassengerPoint"
-                class="passenger-marker"
-                :style="{ left: `${effectivePassengerPoint.x}px`, top: `${effectivePassengerPoint.y}px` }"
-              >
-                <span class="passenger-pulse"></span>
-                <span class="passenger-icon">🧑</span>
-                <span class="passenger-label">旅客位置：{{ effectivePassengerPoint.label }}</span>
-              </div>
-
-              <!-- 7 台实时设备 -->
-              <div
-                v-for="device in positionedDevices"
-                :key="device.deviceCode"
-                class="device-marker"
-                :class="deviceMarkerClass(device)"
-                :style="{ left: `${device.location.x}px`, top: `${device.location.y}px` }"
-                :title="`${device.deviceName} (${device.deviceCode})`"
-              >
-                <span class="device-dot"></span>
-                <span class="device-label">
-                  {{ device.deviceName }}
-                  <template v-if="activeDeviceStepMap[device.agentId]">
-                    · 执行第{{ activeDeviceStepMap[device.agentId] }}步
-                  </template>
-                </span>
-              </div>
-            </div>
-          </div>
           <div class="map-footer">
             <span>指针坐标：{{ cursorPos ? `X ${cursorPos.x}, Y ${cursorPos.y}` : '—' }}</span>
-            <span>支持滚轮缩放、左键拖拽平移；运行操作员可在右侧打开“空间 POI 与区域管理”自定义点位</span>
+            <span>左上角工具栏支持 Leaflet-Geoman 矢量标注、顶点吸附、拖拽编辑、擦除删除与 GeoJSON 互通</span>
           </div>
         </a-card>
       </a-col>
@@ -378,7 +227,7 @@
     </a-row>
 
     <!-- 空间 POI 与区域管理抽屉（仅运行操作员） -->
-    <a-drawer v-model:open="spaceDrawerOpen" title="空间 POI 与隔离区/走廊管理" width="560">
+    <a-drawer v-model:open="spaceDrawerOpen" title="空间 POI 与功能区域/走廊管理" width="580">
       <a-tabs>
         <a-tab-pane key="pois" tab="POI 点位管理">
           <div style="display: flex; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
@@ -386,7 +235,7 @@
               <a-button type="primary" size="small" @click="openPoiModal(null)">新增 POI</a-button>
               <a-button size="small" :loading="syncingScanners" @click="handleSyncScanners">同步行李测量仿真体坐标</a-button>
             </a-space>
-            <a-select v-model:value="poiCategoryFilter" size="small" style="width: 150px" allow-clear placeholder="按类型筛选">
+            <a-select v-model:value="poiCategoryFilter" size="small" style="width: 180px" allow-clear placeholder="按类型筛选">
               <a-select-option v-for="c in POI_CATEGORIES" :key="c.key" :value="c.key">{{ c.label }}</a-select-option>
             </a-select>
           </div>
@@ -413,23 +262,10 @@
           </a-table>
         </a-tab-pane>
 
-        <a-tab-pane key="regions" tab="功能区域与走廊规划">
-          <div style="margin-bottom: 12px;">
-            <a-space wrap>
-              <a-button size="small" @click="spaceDrawerOpen = false; startDrawRegion('CHECKIN_HALL')">
-                绘制值机办理区
-              </a-button>
-              <a-button type="primary" size="small" @click="spaceDrawerOpen = false; startDrawRegion('ISOLATED_ZONE')">
-                绘制候机隔离区
-              </a-button>
-              <a-button size="small" @click="spaceDrawerOpen = false; startDrawRegion('CORRIDOR')">
-                绘制通行走廊
-              </a-button>
-            </a-space>
-            <p style="font-size: 12px; color: #666; margin-top: 6px;">
-              值机办理区为安检前值机/行李托运区；候机隔离区为过安检后连通各登机口的区域；绘制走廊后，系统将沿隔离区与大厅内走廊计算引导路线。
-            </p>
-          </div>
+        <a-tab-pane key="regions" tab="功能区域与走廊">
+          <p style="font-size: 12px; color: #666; margin-bottom: 12px;">
+            请使用地图左上角 Leaflet-Geoman 工具栏直接绘制多边形/折线、拖拽修改顶点或使用橡皮擦删除。
+          </p>
           <a-table :data-source="regions" :pagination="false" size="small" row-key="id">
             <a-table-column title="区域名称" data-index="regionName" key="regionName" />
             <a-table-column title="类型" key="regionType">
@@ -455,10 +291,10 @@
     <a-modal v-model:open="poiModalOpen" :title="poiForm.id ? '编辑 POI 点位' : '新增 POI 点位'" @ok="handleSavePoi">
       <a-form layout="vertical">
         <a-form-item label="POI 编码（唯一标识）">
-          <a-input v-model:value="poiForm.poiCode" :disabled="Boolean(poiForm.id)" placeholder="例如 GATE_A08 或 安检通道03" />
+          <a-input v-model:value="poiForm.poiCode" :disabled="Boolean(poiForm.id)" placeholder="例如 GATE_A08 或 母婴室01" />
         </a-form-item>
         <a-form-item label="POI 中文名称">
-          <a-input v-model:value="poiForm.poiName" placeholder="例如 登机口 A08" />
+          <a-input v-model:value="poiForm.poiName" placeholder="例如 登机口 A08 或 2号母婴室" />
         </a-form-item>
         <a-form-item label="POI 类型">
           <a-select v-model:value="poiForm.category" @change="handlePoiCategoryChange">
@@ -473,27 +309,33 @@
           </a-select>
         </a-form-item>
         <a-row :gutter="12">
-          <a-col :span="10">
+          <a-col :span="12">
             <a-form-item label="X 坐标（像素）"><a-input-number v-model:value="poiForm.x" style="width: 100%" /></a-form-item>
           </a-col>
-          <a-col :span="10">
+          <a-col :span="12">
             <a-form-item label="Y 坐标（像素）"><a-input-number v-model:value="poiForm.y" style="width: 100%" /></a-form-item>
-          </a-col>
-          <a-col :span="4" style="display: flex; align-items: flex-end; padding-bottom: 24px;">
-            <a-button size="small" @click="startPickPoiCoord">地图拾取</a-button>
           </a-col>
         </a-row>
         <a-form-item label="所属区域（可选）">
-          <a-input v-model:value="poiForm.zone" placeholder="如 A指廊 / 中央安检区" />
+          <a-input v-model:value="poiForm.zone" placeholder="如 候机隔离区 / 值机办理区" />
         </a-form-item>
       </a-form>
     </a-modal>
 
-    <!-- 保存区域命名弹窗 -->
-    <a-modal v-model:open="regionNameModalOpen" title="保存绘制区域" @ok="handleSaveRegion">
+    <!-- 保存 Geoman 绘制区域弹窗 -->
+    <a-modal v-model:open="regionModalOpen" title="保存矢量绘制区域" @ok="handleSaveRegion">
       <a-form layout="vertical">
+        <a-form-item label="区域类型">
+          <a-select v-model:value="regionForm.regionType">
+            <a-select-option v-if="regionForm.regionType === 'CORRIDOR'" value="CORRIDOR">通行走廊（贯穿登机口通道）</a-select-option>
+            <template v-else>
+              <a-select-option value="ISOLATED_ZONE">安检后候机隔离区</a-select-option>
+              <a-select-option value="CHECKIN_HALL">值机与行李托运办理区</a-select-option>
+            </template>
+          </a-select>
+        </a-form-item>
         <a-form-item label="区域名称">
-          <a-input v-model:value="regionNameInput" placeholder="如：T2施工隔离区 / 中央主走廊" />
+          <a-input v-model:value="regionForm.regionName" placeholder="如：T2候机隔离区 / A指廊主走廊" />
         </a-form-item>
       </a-form>
     </a-modal>
@@ -508,7 +350,7 @@
       <a-form layout="vertical">
         <a-form-item label="任务场景">
           <a-select v-model:value="quickForm.scenario">
-            <a-select-option value="SPECIAL_PASSENGER_SERVICE">特殊旅客协同服务（支持经安检至登机口）</a-select-option>
+            <a-select-option value="SPECIAL_PASSENGER_SERVICE">特殊旅客协同服务（支持经安检至登机口/设施）</a-select-option>
             <a-select-option value="FLIGHT_CHANGE_RESPONSE">航班变更发布与多渠道引导</a-select-option>
             <a-select-option value="OVERSIZE_BAGGAGE_HANDLING">行李测量与超规专柜引导</a-select-option>
           </a-select>
@@ -525,7 +367,7 @@
             <a-select-option v-for="p in securityPois" :key="p.poiCode" :value="p.poiCode">{{ p.poiName }}</a-select-option>
           </a-select>
         </a-form-item>
-        <a-form-item label="目标登机口 / 专柜">
+        <a-form-item label="目标登机口 / 专柜 / 商铺或设施">
           <a-select v-model:value="quickForm.destination" show-search>
             <a-select-option v-for="p in destPois" :key="p.poiCode" :value="p.poiCode">
               {{ p.poiName }} ({{ Math.round(p.x) }}, {{ Math.round(p.y) }})
@@ -550,6 +392,7 @@ import { useRoute } from 'vue-router'
 import { message } from 'ant-design-vue'
 import { useAuthStore } from '../../store/auth'
 import request from '../../api/request'
+import IndoorMapEditor from '../../components/IndoorMapEditor.vue'
 import {
   createMapRegion,
   createPoi,
@@ -565,18 +408,16 @@ import {
   listTasks,
   submitTask,
   syncScannerPois,
+  updateMapRegion,
   updatePoi
 } from '../../api/task'
 import {
   DEFAULT_TERMINAL_POIS,
-  MAP_HEIGHT,
-  MAP_WIDTH,
   POI_CATEGORIES,
   computeTerminalRoute,
   formatReadableCommand,
   formatReadableFeedback,
   nearestPoi,
-  parseRegionGeometry,
   resolveLocation,
   translateStepStatus,
   translateTaskFamily
@@ -586,6 +427,7 @@ const route = useRoute()
 const authStore = useAuthStore()
 const isOperator = computed(() => authStore.role === 'OPERATOR')
 
+const mapEditorRef = ref(null)
 const mode = ref('live')
 const loading = ref(false)
 const taskList = ref([])
@@ -594,29 +436,20 @@ const currentTask = ref(null)
 const planVersions = ref([])
 const contextSnapshots = ref([])
 const stepAssignments = ref([])
-const taskEvents = ref([])
 const taskCommands = ref([])
 const devices = ref([])
 
 const pois = ref([...DEFAULT_TERMINAL_POIS])
 const regions = ref([])
-
-// 地图交互状态
-const viewportRef = ref(null)
-const zoom = ref(0.65)
-const pan = reactive({ x: 0, y: -1750 })
-const dragging = ref(false)
-const dragOrigin = reactive({ x: 0, y: 0, panX: 0, panY: 0 })
 const cursorPos = ref(null)
+const pickPassengerMode = ref(false)
 const manualPassengerPoint = ref(null)
 
-// 空间绘制 / 拾取模式: null | 'PASSENGER' | 'POI_PICK' | 'ISOLATED_ZONE' | 'CORRIDOR'
-const drawMode = ref(null)
-const drawPoints = ref([])
-const regionNameModalOpen = ref(false)
-const regionNameInput = ref('')
+const showPois = ref(true)
+const showRegions = ref(true)
+const showRoute = ref(true)
+const showCollabLinks = ref(true)
 
-// POI 与区域管理抽屉
 const spaceDrawerOpen = ref(false)
 const poiCategoryFilter = ref(undefined)
 const syncingScanners = ref(false)
@@ -632,19 +465,19 @@ const poiForm = reactive({
   linkedDeviceCode: null
 })
 
-const showPois = ref(true)
-const showRegions = ref(true)
-const showRoute = ref(true)
-const showCollabLinks = ref(true)
+const regionModalOpen = ref(false)
+const regionForm = reactive({
+  regionType: 'ISOLATED_ZONE',
+  regionName: '',
+  points: []
+})
 
-// 回放状态
 const playbackPlaying = ref(false)
 const playbackSpeed = ref(1)
 const playbackStep = ref(5)
 let liveTimer = null
 let playbackTimer = null
 
-// 快捷发起弹窗
 const quickModalOpen = ref(false)
 const quickSubmitting = ref(false)
 const quickForm = reactive({
@@ -655,41 +488,15 @@ const quickForm = reactive({
   assistanceType: '轮椅陪同'
 })
 
-const drawBannerTitle = computed(() => {
-  if (drawMode.value === 'PASSENGER') return '请直接在地图上点击旅客当前所在位置'
-  if (drawMode.value === 'POI_PICK') return '请直接在地图上点击该 POI 的目标位置'
-  if (drawMode.value === 'CHECKIN_HALL') return '请依次点击值机办理区顶点（至少 3 个点），然后点击右侧“完成绘制”'
-  if (drawMode.value === 'ISOLATED_ZONE') return '请依次点击安检后候机隔离区顶点（至少 3 个点），然后点击右侧“完成绘制”'
-  if (drawMode.value === 'CORRIDOR') return '请依次点击贯穿各登机口的走廊路径节点（至少 2 个点），然后点击右侧“完成绘制”'
-  return ''
-})
-
-const parsedRegions = computed(() =>
-  regions.value.map(r => ({ ...r, points: parseRegionGeometry(r) }))
-)
-
 const filteredPois = computed(() =>
   poiCategoryFilter.value ? pois.value.filter(p => p.category === poiCategoryFilter.value) : pois.value
 )
-
 const scannerDevices = computed(() =>
   devices.value.filter(d => (d.simulatedDeviceType || d.deviceTypeCode) === 'BAGGAGE_SCANNER')
 )
-
 const securityPois = computed(() => pois.value.filter(p => p.category === 'SECURITY'))
 const destPois = computed(() =>
   pois.value.filter(p => ['GATE', 'BAGGAGE', 'SHOP', 'FACILITY', 'SERVICE'].includes(p.category))
-)
-
-const canvasStyle = computed(() => ({
-  width: `${MAP_WIDTH}px`,
-  height: `${MAP_HEIGHT}px`,
-  transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom.value})`,
-  transformOrigin: '0 0'
-}))
-
-const positionedDevices = computed(() =>
-  devices.value.filter(d => d.location && Number.isFinite(Number(d.location.x)) && Number.isFinite(Number(d.location.y)))
 )
 
 const sceneParamsObj = computed(() => {
@@ -726,14 +533,9 @@ const routeInfo = computed(() => {
   return computeTerminalRoute(stops, regions.value)
 })
 
-const routePolylinePoints = computed(() =>
-  routeInfo.value.points.map(p => `${p.x},${p.y}`).join(' ')
-)
-
 const routeStopPoints = computed(() =>
   [effectivePassengerPoint.value, effectiveViaPoint.value, effectiveDestPoint.value].filter(Boolean)
 )
-
 const routeStopNames = computed(() => routeStopPoints.value.map(p => p.label || '点位'))
 
 const visibleStageIndex = computed(() => {
@@ -746,16 +548,13 @@ const visibleStageIndex = computed(() => {
 })
 
 const stagePercent = computed(() => Math.min(100, Math.round((visibleStageIndex.value / 4) * 100)))
-
 const latestModelPlan = computed(() =>
   [...planVersions.value].reverse().find(p => p.planSource !== 'BASELINE_TEMPLATE') || null
 )
-
 const activePlan = computed(() => {
   const id = currentTask.value?.currentPlanVersionId
   return planVersions.value.find(p => p.id === id) || planVersions.value[planVersions.value.length - 1] || null
 })
-
 const snapshotSummary = computed(() => {
   const snap = contextSnapshots.value[contextSnapshots.value.length - 1]
   if (!snap) return `当前在线设备 ${devices.value.filter(d => d.onlineStatus === 'ONLINE').length} 台`
@@ -814,12 +613,7 @@ const collabEdges = computed(() => {
 })
 
 const deviceBubbles = computed(() => {
-  const iconMap = {
-    FLIGHT_DELAY_BOARD: '🛫',
-    SMART_DISPLAY: '📺',
-    BAGGAGE_SCANNER: '🧳',
-    MOBILE_ROBOT: '🤖'
-  }
+  const iconMap = { FLIGHT_DELAY_BOARD: '🛫', SMART_DISPLAY: '📺', BAGGAGE_SCANNER: '🧳', MOBILE_ROBOT: '🤖' }
   return visibleSteps.value.map(s => {
     const dtype = s.deviceType || inferTypeByCap(s.capabilityType)
     return {
@@ -851,17 +645,8 @@ function deviceTypeZh(dtype) {
   return map[dtype] || '智能设备'
 }
 
-function poiColor(cat) {
-  return POI_CATEGORIES.find(c => c.key === cat)?.color || '#1677ff'
-}
-
-function poiBadge(cat) {
-  return POI_CATEGORIES.find(c => c.key === cat)?.badge || '点'
-}
-
-function poiCategoryLabel(cat) {
-  return POI_CATEGORIES.find(c => c.key === cat)?.label || cat
-}
+function poiColor(cat) { return POI_CATEGORIES.find(c => c.key === cat)?.color || '#1677ff' }
+function poiCategoryLabel(cat) { return POI_CATEGORIES.find(c => c.key === cat)?.label || cat }
 
 function capabilityLabel(cap) {
   const map = {
@@ -909,150 +694,83 @@ function stageStatus(idx) {
   return 'wait'
 }
 
-function deviceMarkerClass(d) {
-  if (d.onlineStatus !== 'ONLINE') return 'offline'
-  if (d.workStatus === 'BUSY' || activeDeviceStepMap.value[d.agentId]) return 'busy'
-  return 'online'
-}
-
 function filterTaskOption(input, option) {
   const text = String(option?.children?.[0]?.children || '')
   return text.toLowerCase().includes(input.toLowerCase())
 }
 
-function zoomBy(factor) {
-  zoom.value = Math.min(2.0, Math.max(0.2, +(zoom.value * factor).toFixed(2)))
-}
-
-function fitAll() {
-  zoom.value = 0.25
-  pan.x = 180
-  pan.y = 20
-}
-
-function focusActiveArea() {
-  zoom.value = 0.65
-  pan.x = 0
-  pan.y = -1750
-}
-
-function handleWheel(e) {
-  zoomBy(e.deltaY < 0 ? 1.12 : 0.88)
-}
-
-function startPan(e) {
-  if (e.button !== 0) return
-  dragging.value = true
-  dragOrigin.x = e.clientX
-  dragOrigin.y = e.clientY
-  dragOrigin.panX = pan.x
-  dragOrigin.panY = pan.y
-}
-
-function movePan(e) {
-  if (viewportRef.value) {
-    const rect = viewportRef.value.getBoundingClientRect()
-    const mx = Math.round((e.clientX - rect.left - pan.x) / zoom.value)
-    const my = Math.round((e.clientY - rect.top - pan.y) / zoom.value)
-    if (mx >= 0 && mx <= MAP_WIDTH && my >= 0 && my <= MAP_HEIGHT) {
-      cursorPos.value = { x: mx, y: my }
-    }
+function handlePickPassenger(pt) {
+  if (pt.code) {
+    manualPassengerPoint.value = pt
+    quickForm.origin = pt.code
+  } else {
+    const near = nearestPoi(pt.x, pt.y, pois.value)
+    manualPassengerPoint.value = { x: pt.x, y: pt.y, label: near ? `${near.poiName}附近` : `(${pt.x}, ${pt.y})` }
+    if (near) quickForm.origin = near.poiCode
   }
-  if (!dragging.value) return
-  pan.x = dragOrigin.panX + (e.clientX - dragOrigin.x)
-  pan.y = dragOrigin.panY + (e.clientY - dragOrigin.y)
+  pickPassengerMode.value = false
+  message.success(`已设置旅客位置：${manualPassengerPoint.value.label}`)
 }
 
-function endPan() {
-  dragging.value = false
+function handlePoiClick(poi) {
+  message.info(`${poi.poiName}（${poiCategoryLabel(poi.category)}，坐标 ${Math.round(poi.x)}, ${Math.round(poi.y)}）`)
 }
 
-function togglePickPassenger() {
-  drawMode.value = drawMode.value === 'PASSENGER' ? null : 'PASSENGER'
-  drawPoints.value = []
+function handleGeomanCreatePoi(pt) {
+  openPoiModal({ poiCode: `POI_${Date.now()}`, poiName: '', category: 'GATE', x: pt.x, y: pt.y, zone: '' })
 }
 
-function startDrawRegion(type) {
-  drawMode.value = type
-  drawPoints.value = []
-}
-
-function cancelDrawing() {
-  drawMode.value = null
-  drawPoints.value = []
-}
-
-function finishDrawing() {
-  const minPts = (drawMode.value === 'ISOLATED_ZONE' || drawMode.value === 'CHECKIN_HALL') ? 3 : 2
-  if (drawPoints.value.length < minPts) {
-    message.warning(`至少需要点击 ${minPts} 个点`)
-    return
+async function handleGeomanUpdatePoi(poi) {
+  try {
+    const res = await updatePoi(poi.id, poi)
+    pois.value = res.data || []
+    message.success(`已更新 POI「${poi.poiName}」坐标 (${poi.x}, ${poi.y})`)
+  } catch (err) {
+    message.error(err?.response?.data?.message || '更新 POI 失败')
   }
-  regionNameInput.value = drawMode.value === 'ISOLATED_ZONE'
-    ? '安检后候机隔离区'
-    : drawMode.value === 'CHECKIN_HALL'
-      ? '值机与行李托运办理区'
-      : '候机厅通行走廊'
-  regionNameModalOpen.value = true
+}
+
+function handleGeomanCreateRegion({ regionType, points }) {
+  regionForm.regionType = regionType
+  regionForm.regionName = regionType === 'CORRIDOR' ? '新建通行走廊' : '安检后候机隔离区'
+  regionForm.points = points
+  regionModalOpen.value = true
+}
+
+async function handleGeomanUpdateRegion({ id, regionName, regionType, points }) {
+  try {
+    const res = await updateMapRegion(id, {
+      regionName,
+      regionType,
+      geometryJson: JSON.stringify(points)
+    })
+    regions.value = res.data || []
+    message.success(`已更新区域「${regionName}」几何边界`)
+  } catch (err) {
+    message.error(err?.response?.data?.message || '更新区域失败')
+  }
 }
 
 async function handleSaveRegion() {
-  const name = regionNameInput.value.trim()
-  if (!name) {
+  if (!regionForm.regionName.trim()) {
     message.warning('请输入区域名称')
     return
   }
-  const code = `${drawMode.value}_${Date.now()}`
   const res = await createMapRegion({
-    regionCode: code,
-    regionName: name,
-    regionType: drawMode.value,
-    geometryJson: JSON.stringify(drawPoints.value)
+    regionCode: `${regionForm.regionType}_${Date.now()}`,
+    regionName: regionForm.regionName.trim(),
+    regionType: regionForm.regionType,
+    geometryJson: JSON.stringify(regionForm.points)
   })
   regions.value = res.data || []
-  regionNameModalOpen.value = false
-  drawMode.value = null
-  drawPoints.value = []
-  message.success('已保存空间区域配置')
+  regionModalOpen.value = false
+  message.success('已保存矢量区域')
 }
 
 async function handleDeleteRegion(id) {
   const res = await deleteMapRegion(id)
   regions.value = res.data || []
   message.success('已删除区域')
-}
-
-function handleMapClick(e) {
-  if (!drawMode.value || !viewportRef.value) return
-  const rect = viewportRef.value.getBoundingClientRect()
-  const mx = Math.round((e.clientX - rect.left - pan.x) / zoom.value)
-  const my = Math.round((e.clientY - rect.top - pan.y) / zoom.value)
-  if (drawMode.value === 'PASSENGER') {
-    const near = nearestPoi(mx, my, pois.value)
-    manualPassengerPoint.value = { x: mx, y: my, label: near ? `${near.poiName}附近` : `(${mx}, ${my})` }
-    if (near) quickForm.origin = near.poiCode
-    drawMode.value = null
-    message.success(`已设置旅客位置：${manualPassengerPoint.value.label}`)
-  } else if (drawMode.value === 'POI_PICK') {
-    poiForm.x = mx
-    poiForm.y = my
-    drawMode.value = null
-    poiModalOpen.value = true
-    message.success(`已拾取坐标 (${mx}, ${my})`)
-  } else if (drawMode.value === 'ISOLATED_ZONE' || drawMode.value === 'CHECKIN_HALL' || drawMode.value === 'CORRIDOR') {
-    drawPoints.value.push({ x: mx, y: my })
-  }
-}
-
-function handlePoiClick(poi) {
-  if (drawMode.value === 'PASSENGER') {
-    manualPassengerPoint.value = { x: Number(poi.x), y: Number(poi.y), label: poi.poiName, code: poi.poiCode }
-    quickForm.origin = poi.poiCode
-    drawMode.value = null
-    message.success(`已设置旅客起点：${poi.poiName}`)
-  } else {
-    message.info(`${poi.poiName}（${poiCategoryLabel(poi.category)}，坐标 ${Math.round(poi.x)}, ${Math.round(poi.y)}）`)
-  }
 }
 
 function openPoiModal(record) {
@@ -1068,31 +786,15 @@ function openPoiModal(record) {
       linkedDeviceCode: record.linkedDeviceCode || null
     })
   } else {
-    Object.assign(poiForm, {
-      id: null,
-      poiCode: '',
-      poiName: '',
-      category: 'GATE',
-      x: 600,
-      y: 4200,
-      zone: '',
-      linkedDeviceCode: null
-    })
+    Object.assign(poiForm, { id: null, poiCode: '', poiName: '', category: 'GATE', x: 600, y: 4200, zone: '', linkedDeviceCode: null })
   }
   poiModalOpen.value = true
 }
 
-function startPickPoiCoord() {
-  poiModalOpen.value = false
-  spaceDrawerOpen.value = false
-  drawMode.value = 'POI_PICK'
-}
-
 function handlePoiCategoryChange(val) {
   if (val === 'MEASURE' && scannerDevices.value.length && !poiForm.linkedDeviceCode) {
-    const dev = scannerDevices.value[0]
-    poiForm.linkedDeviceCode = dev.deviceCode
-    handleScannerDeviceSelect(dev.deviceCode)
+    poiForm.linkedDeviceCode = scannerDevices.value[0].deviceCode
+    handleScannerDeviceSelect(poiForm.linkedDeviceCode)
   }
 }
 
@@ -1108,9 +810,7 @@ function handleScannerDeviceSelect(code) {
 
 async function handleSavePoi() {
   try {
-    const res = poiForm.id
-      ? await updatePoi(poiForm.id, { ...poiForm })
-      : await createPoi({ ...poiForm })
+    const res = poiForm.id ? await updatePoi(poiForm.id, { ...poiForm }) : await createPoi({ ...poiForm })
     pois.value = res.data || []
     poiModalOpen.value = false
     message.success('POI 点位已保存')
@@ -1136,14 +836,74 @@ async function handleSyncScanners() {
   }
 }
 
+function handleExportGeoJson() {
+  const geo = mapEditorRef.value?.exportGeoJson()
+  if (!geo) return
+  const blob = new Blob([JSON.stringify(geo, null, 2)], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `f2-terminal-layout-${Date.now()}.geojson`
+  a.click()
+  URL.revokeObjectURL(url)
+  message.success('已导出标准 GeoJSON 矢量文件')
+}
+
+async function handleImportGeoJson(e) {
+  const file = e.target.files?.[0]
+  if (!file) return
+  try {
+    const geo = JSON.parse(await file.text())
+    const features = Array.isArray(geo.features) ? geo.features : []
+    let count = 0
+    for (const f of features) {
+      const p = f.properties || {}
+      if (f.geometry?.type === 'Point' && Array.isArray(f.geometry.coordinates)) {
+        const [x, y] = f.geometry.coordinates
+        await createPoi({
+          poiCode: p.poiCode || `GEO_POI_${Date.now()}_${count}`,
+          poiName: p.poiName || p.name || `导入点位 ${count + 1}`,
+          category: p.category || 'SERVICE',
+          x,
+          y,
+          zone: p.zone || ''
+        }).catch(() => {})
+        count++
+      } else if (f.geometry?.type === 'LineString' && Array.isArray(f.geometry.coordinates)) {
+        const pts = f.geometry.coordinates.map(([x, y]) => ({ x, y }))
+        await createMapRegion({
+          regionCode: p.regionCode || `GEO_CORR_${Date.now()}_${count}`,
+          regionName: p.regionName || p.name || `导入走廊 ${count + 1}`,
+          regionType: 'CORRIDOR',
+          geometryJson: JSON.stringify(pts)
+        }).catch(() => {})
+        count++
+      } else if (f.geometry?.type === 'Polygon' && Array.isArray(f.geometry.coordinates?.[0])) {
+        const pts = f.geometry.coordinates[0].slice(0, -1).map(([x, y]) => ({ x, y }))
+        await createMapRegion({
+          regionCode: p.regionCode || `GEO_ZONE_${Date.now()}_${count}`,
+          regionName: p.regionName || p.name || `导入区域 ${count + 1}`,
+          regionType: p.regionType || 'ISOLATED_ZONE',
+          geometryJson: JSON.stringify(pts)
+        }).catch(() => {})
+        count++
+      }
+    }
+    await loadMapLayoutData()
+    message.success(`已导入 ${count} 项 GeoJSON 要素`)
+  } catch {
+    message.error('GeoJSON 文件解析失败')
+  } finally {
+    e.target.value = ''
+  }
+}
+
 async function loadMapLayoutData() {
   try {
     const res = await getMapLayout()
     if (res.data?.pois?.length) pois.value = res.data.pois
     regions.value = res.data?.regions || []
-  } catch {
-    // 回退默认内置 POI
-  }
+  } catch {}
 }
 
 async function loadSnapshot() {
@@ -1153,19 +913,17 @@ async function loadSnapshot() {
 
 async function loadTaskDetails(taskId) {
   if (!taskId) return
-  const [tRes, pRes, cRes, sRes, eRes, cmdRes] = await Promise.all([
+  const [tRes, pRes, cRes, sRes, cmdRes] = await Promise.all([
     getTask(taskId),
     getPlanVersions(taskId),
     getContextSnapshots(taskId),
     getStepAssignments(taskId),
-    getTaskEvents(taskId),
     getTaskBoardCommands(taskId).catch(() => ({ data: [] }))
   ])
   currentTask.value = tRes.data
   planVersions.value = pRes.data || []
   contextSnapshots.value = cRes.data || []
   stepAssignments.value = sRes.data || []
-  taskEvents.value = eRes.data || []
   taskCommands.value = cmdRes.data || []
 }
 
@@ -1178,9 +936,7 @@ async function refreshAll() {
       const qId = Number(route.query.taskId)
       selectedTaskId.value = qId || taskList.value[0]?.id || null
     }
-    if (selectedTaskId.value) {
-      await loadTaskDetails(selectedTaskId.value)
-    }
+    if (selectedTaskId.value) await loadTaskDetails(selectedTaskId.value)
   } finally {
     loading.value = false
   }
@@ -1209,12 +965,8 @@ function togglePlayback() {
   playbackPlaying.value = true
   const intervalMs = Math.round(1500 / playbackSpeed.value)
   playbackTimer = setInterval(() => {
-    if (playbackStep.value < 4) {
-      playbackStep.value += 1
-    } else {
-      playbackPlaying.value = false
-      clearInterval(playbackTimer)
-    }
+    if (playbackStep.value < 4) playbackStep.value += 1
+    else { playbackPlaying.value = false; clearInterval(playbackTimer) }
   }, intervalMs)
 }
 
@@ -1254,10 +1006,7 @@ async function handleQuickSubmit() {
       payload = {
         taskFamily: 'OVERSIZE_BAGGAGE_HANDLING',
         taskGoal: `请测量${quickForm.origin}当前行李的长宽高和重量；超规时上报告警、由智慧航显发布${quickForm.destination}办理提示，并由移动机器人提供导航；正常行李留存测量结果后结束。`,
-        sceneParams: {
-          baggageLocation: quickForm.origin,
-          targetCounter: quickForm.destination
-        }
+        sceneParams: { baggageLocation: quickForm.origin, targetCounter: quickForm.destination }
       }
     }
     const res = await submitTask(payload)
@@ -1300,165 +1049,19 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.board-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 12px;
-}
+.board-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; }
 .board-header h2 { margin: 0; }
 .board-header p { margin: 2px 0 0; color: #666; font-size: 13px; }
 .map-toolbar { margin-bottom: 8px; }
-.route-badge {
-  background: #e6f4ff;
-  color: #0958d9;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-}
-.map-viewport {
-  position: relative;
-  height: 620px;
-  overflow: hidden;
-  border: 1px solid #d9d9d9;
-  border-radius: 6px;
-  background: #f5f5f5;
-  cursor: grab;
-  user-select: none;
-}
-.map-viewport.picking { cursor: crosshair; }
-.map-canvas { position: relative; }
-.floorplan { width: 1260px; height: 6895px; display: block; pointer-events: none; }
-.map-svg { position: absolute; left: 0; top: 0; width: 1260px; height: 6895px; pointer-events: none; }
-.route-animated { animation: dashMove 1.2s linear infinite; }
-@keyframes dashMove {
-  to { stroke-dashoffset: -52; }
-}
-.poi-marker {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  cursor: pointer;
-  z-index: 4;
-}
-.poi-dot {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--poi-color);
-  color: #fff;
-  font-size: 11px;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid #fff;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.25);
-}
-.poi-label {
-  background: rgba(255,255,255,0.92);
-  padding: 1px 6px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  color: #262626;
-  border: 1px solid #d9d9d9;
-  white-space: nowrap;
-}
-.passenger-marker {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  z-index: 12;
-  pointer-events: none;
-}
-.passenger-pulse {
-  position: absolute;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: rgba(22, 119, 255, 0.25);
-  animation: pulse 1.5s infinite;
-}
-.passenger-icon { font-size: 24px; position: relative; }
-.passenger-label {
-  background: #1677ff;
-  color: #fff;
-  padding: 1px 6px;
-  border-radius: 4px;
-  font-size: 11px;
-  white-space: nowrap;
-}
-.device-marker {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  z-index: 8;
-}
-.device-dot {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  border: 2px solid #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.35);
-}
-.device-marker.online .device-dot { background: #52c41a; }
-.device-marker.busy .device-dot { background: #fa8c16; animation: pulse 1.2s infinite; }
-.device-marker.offline .device-dot { background: #8c8c8c; }
-.device-label {
-  background: rgba(0,0,0,0.75);
-  color: #fff;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 11px;
-  white-space: nowrap;
-}
-@keyframes pulse {
-  0% { transform: scale(1); opacity: 0.9; }
-  70% { transform: scale(1.6); opacity: 0.2; }
-  100% { transform: scale(1); opacity: 0.9; }
-}
-.map-footer {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: #888;
-  margin-top: 6px;
-}
+.route-badge { background: #e6f4ff; color: #0958d9; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+.map-footer { display: flex; justify-content: space-between; font-size: 12px; color: #888; margin-top: 6px; }
 .stage-desc { font-size: 12px; color: #444; }
 .step-pill { display: flex; align-items: center; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
 .bubble-list { display: flex; flex-direction: column; gap: 10px; max-height: 260px; overflow-y: auto; }
-.bubble-item {
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  background: #fafafa;
-  border: 1px solid #f0f0f0;
-  border-radius: 8px;
-  padding: 8px 10px;
-}
-.bubble-avatar {
-  font-size: 24px;
-  line-height: 1;
-  background: #fff;
-  border: 1px solid #e8e8e8;
-  border-radius: 50%;
-  width: 38px;
-  height: 38px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
+.bubble-item { display: flex; gap: 10px; align-items: flex-start; background: #fafafa; border: 1px solid #f0f0f0; border-radius: 8px; padding: 8px 10px; }
+.bubble-avatar { font-size: 24px; line-height: 1; background: #fff; border: 1px solid #e8e8e8; border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .bubble-content { flex: 1; font-size: 12px; }
 .bubble-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
 .bubble-text { color: #333; word-break: break-word; }
+.geojson-import-btn { display: inline-block; cursor: pointer; }
 </style>

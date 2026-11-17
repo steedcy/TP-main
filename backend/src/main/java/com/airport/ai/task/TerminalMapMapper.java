@@ -65,6 +65,13 @@ public interface TerminalMapMapper {
                      @Param("geometryJson") String geometryJson,
                      @Param("createdBy") String createdBy);
 
+    @Update("UPDATE terminal_map_regions SET region_name = #{regionName}, region_type = #{regionType}, " +
+            "geometry_json = #{geometryJson}, updated_at = CURRENT_TIMESTAMP WHERE id = #{id}")
+    int updateRegion(@Param("id") Long id,
+                     @Param("regionName") String regionName,
+                     @Param("regionType") String regionType,
+                     @Param("geometryJson") String geometryJson);
+
     @Delete("DELETE FROM terminal_map_regions WHERE id = #{id}")
     int deleteRegion(@Param("id") Long id);
 

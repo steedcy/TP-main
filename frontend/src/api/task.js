@@ -84,6 +84,10 @@ export function createMapRegion(data) {
   return request.post('/task-board/regions', data)
 }
 
+export function updateMapRegion(id, data) {
+  return request.put(`/task-board/regions/${id}`, data)
+}
+
 export function deleteMapRegion(id) {
   return request.delete(`/task-board/regions/${id}`)
 }
