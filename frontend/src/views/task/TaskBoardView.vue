@@ -363,12 +363,20 @@
           </a-select>
         </a-form-item>
         <a-form-item label="旅客 / 事发当前位置（也可先在地图点选）">
-          <a-select v-model:value="quickForm.origin" show-search>
+          <a-select v-model:value="quickForm.origin" show-search allow-clear placeholder="选择预设点位或直接填写下方坐标" @change="handleQuickOriginChange">
             <a-select-option v-for="p in pois" :key="p.poiCode" :value="p.poiCode">
               {{ p.poiName }} ({{ Math.round(p.x) }}, {{ Math.round(p.y) }})
             </a-select-option>
           </a-select>
         </a-form-item>
+        <a-row :gutter="12">
+          <a-col :span="12">
+            <a-form-item label="旅客初始 X 坐标（默认 390）"><a-input-number v-model:value="quickForm.passengerX" style="width: 100%" /></a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="旅客初始 Y 坐标（默认 3070）"><a-input-number v-model:value="quickForm.passengerY" style="width: 100%" /></a-form-item>
+          </a-col>
+        </a-row>
         <a-form-item v-if="quickForm.scenario === 'SPECIAL_PASSENGER_SERVICE'" label="途经安检通道（用于路线引导图，可选）">
           <a-select v-model:value="quickForm.viaSecurity" allow-clear placeholder="不选则直达目的地">
             <a-select-option v-for="p in securityPois" :key="p.poiCode" :value="p.poiCode">{{ p.poiName }}</a-select-option>
@@ -490,7 +498,9 @@ const quickModalOpen = ref(false)
 const quickSubmitting = ref(false)
 const quickForm = reactive({
   scenario: 'SPECIAL_PASSENGER_SERVICE',
-  origin: 'T2值机区',
+  origin: '',
+  passengerX: 390,
+  passengerY: 3070,
   viaSecurity: 'VIP安检通道',
   destination: 'GATE_A05',
   assistanceType: '轮椅陪同'
@@ -519,9 +529,16 @@ const sceneParamsObj = computed(() => {
 const effectivePassengerPoint = computed(() => {
   if (manualPassengerPoint.value) return manualPassengerPoint.value
   const sp = sceneParamsObj.value
+  if (Number.isFinite(Number(sp.passengerX)) && Number.isFinite(Number(sp.passengerY))) {
+    return {
+      x: Number(sp.passengerX),
+      y: Number(sp.passengerY),
+      label: sp.origin || `坐标 (${sp.passengerX}, ${sp.passengerY})`
+    }
+  }
   const parsed = currentTask.value?.goalParsingResult || {}
   const cand = sp.origin || sp.baggageLocation || parsed.origin
-  return resolveLocation(cand, pois.value, devices.value) || resolveLocation('T2值机区', pois.value, devices.value)
+  return resolveLocation(cand, pois.value, devices.value) || { x: 390, y: 3070, label: '旅客初始位置 (390, 3070)' }
 })
 
 const effectiveViaPoint = computed(() => {
@@ -736,13 +753,25 @@ function handlePickPassenger(pt) {
   if (pt.code) {
     manualPassengerPoint.value = pt
     quickForm.origin = pt.code
+    quickForm.passengerX = pt.x
+    quickForm.passengerY = pt.y
   } else {
     const near = nearestPoi(pt.x, pt.y, pois.value)
-    manualPassengerPoint.value = { x: pt.x, y: pt.y, label: near ? `${near.poiName}附近` : `(${pt.x}, ${pt.y})` }
-    if (near) quickForm.origin = near.poiCode
+    manualPassengerPoint.value = { x: pt.x, y: pt.y, label: near ? `${near.poiName}附近 (${pt.x}, ${pt.y})` : `(${pt.x}, ${pt.y})` }
+    quickForm.origin = near ? near.poiCode : ''
+    quickForm.passengerX = pt.x
+    quickForm.passengerY = pt.y
   }
   pickPassengerMode.value = false
   message.success(`已设置旅客位置：${manualPassengerPoint.value.label}`)
+}
+
+function handleQuickOriginChange(code) {
+  const poi = pois.value.find(p => p.poiCode === code)
+  if (poi) {
+    quickForm.passengerX = Math.round(Number(poi.x))
+    quickForm.passengerY = Math.round(Number(poi.y))
+  }
 }
 
 function handlePoiClick(poi) {
@@ -1016,15 +1045,18 @@ function togglePlayback() {
 async function handleQuickSubmit() {
   quickSubmitting.value = true
   try {
+    const originLabel = quickForm.origin || `坐标(${quickForm.passengerX}, ${quickForm.passengerY})`
     let payload
     if (quickForm.scenario === 'SPECIAL_PASSENGER_SERVICE') {
       const viaText = quickForm.viaSecurity ? `经${quickForm.viaSecurity}` : ''
       payload = {
         taskFamily: 'SPECIAL_PASSENGER_SERVICE',
-        taskGoal: `请为虚构${quickForm.assistanceType}旅客在${quickForm.origin}通过智慧航显显示会合提示、通知现场人员，并安排服务机器人前往会合后${viaText}陪同旅客前往${quickForm.destination}。`,
+        taskGoal: `请为虚构${quickForm.assistanceType}旅客在${originLabel}通过智慧航显显示会合提示、通知现场人员，并安排服务机器人前往会合后${viaText}陪同旅客前往${quickForm.destination}。`,
         sceneParams: {
           assistanceType: quickForm.assistanceType,
-          origin: quickForm.origin,
+          origin: originLabel,
+          passengerX: quickForm.passengerX,
+          passengerY: quickForm.passengerY,
           viaSecurity: quickForm.viaSecurity || null,
           destination: quickForm.destination
         }
@@ -1033,14 +1065,16 @@ async function handleQuickSubmit() {
       const today = new Date().toISOString().slice(0, 10)
       payload = {
         taskFamily: 'FLIGHT_CHANGE_RESPONSE',
-        taskGoal: `虚构航班CA1234原计划22:30，延误30分钟至23:00，请通过航延屏发布变更、智慧航显发布提示，并由机器人引导旅客从${quickForm.origin}前往${quickForm.destination}。`,
+        taskGoal: `虚构航班CA1234原计划22:30，延误30分钟至23:00。旅客当前位于${originLabel}，请先由航延屏发布航班延误信息，然后由智慧航显展示当前位置到${quickForm.destination}的引导线路图，并安排移动服务机器人陪同旅客前往${quickForm.destination}。`,
         sceneParams: {
           eventSource: 'MANUAL_FORM',
           flightNumber: 'CA1234',
           changeType: 'DELAY',
           originalTime: `${today}T22:30:00`,
           newTime: `${today}T23:00:00`,
-          origin: quickForm.origin,
+          origin: originLabel,
+          passengerX: quickForm.passengerX,
+          passengerY: quickForm.passengerY,
           newGate: quickForm.destination,
           changeDescription: `虚构航班CA1234延误30分钟，登机口${quickForm.destination}`
         }
@@ -1048,8 +1082,13 @@ async function handleQuickSubmit() {
     } else {
       payload = {
         taskFamily: 'OVERSIZE_BAGGAGE_HANDLING',
-        taskGoal: `请测量${quickForm.origin}当前行李的长宽高和重量；超规时上报告警、由智慧航显发布${quickForm.destination}办理提示，并由移动机器人提供导航；正常行李留存测量结果后结束。`,
-        sceneParams: { baggageLocation: quickForm.origin, targetCounter: quickForm.destination }
+        taskGoal: `请测量${originLabel}当前行李的长宽高和重量；超规时上报告警、由智慧航显发布${quickForm.destination}办理提示，并由移动机器人提供导航；正常行李留存测量结果后结束。`,
+        sceneParams: {
+          baggageLocation: originLabel,
+          passengerX: quickForm.passengerX,
+          passengerY: quickForm.passengerY,
+          targetCounter: quickForm.destination
+        }
       }
     }
     const res = await submitTask(payload)

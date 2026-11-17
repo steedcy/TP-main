@@ -7,7 +7,7 @@ import java.util.Set;
 /** Physical channel required by the three preset passenger-service scenarios. */
 public final class CoreScenarioChannelPolicy {
     private static final Set<String> FLIGHT_CHANNELS = Set.of(
-            "CAP_FLIGHT_UPDATE", "CAP_INFO_DISPLAY", "CAP_NOTIFICATION", "CAP_NAVIGATION");
+            "CAP_FLIGHT_UPDATE", "CAP_INFO_DISPLAY", "CAP_NOTIFICATION", "CAP_NAVIGATION", "CAP_ESCORT");
     private static final Set<String> FLIGHT_PUBLICATION_CHANNELS = Set.of(
             "CAP_FLIGHT_UPDATE", "CAP_INFO_DISPLAY", "CAP_NOTIFICATION");
     private CoreScenarioChannelPolicy() {}
@@ -27,7 +27,8 @@ public final class CoreScenarioChannelPolicy {
                     "CAP_FLIGHT_UPDATE", "FLIGHT_DELAY_BOARD",
                     "CAP_INFO_DISPLAY", "SMART_DISPLAY",
                     "CAP_NOTIFICATION", "MOBILE_ROBOT",
-                    "CAP_NAVIGATION", "MOBILE_ROBOT").get(capabilityType);
+                    "CAP_NAVIGATION", "MOBILE_ROBOT",
+                    "CAP_ESCORT", "MOBILE_ROBOT").get(capabilityType);
             case "OVERSIZE_BAGGAGE_HANDLING" -> Map.of(
                     "CAP_BAGGAGE_MEASURE", "BAGGAGE_SCANNER",
                     "CAP_OVERSIZE_ALERT", "BAGGAGE_SCANNER",

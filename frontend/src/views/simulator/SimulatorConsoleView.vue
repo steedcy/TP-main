@@ -21,6 +21,12 @@
           <div class="demo-card">
             <strong>{{ demo.title }}</strong>
             <p>{{ demo.description }}</p>
+            <div v-if="demo.key === 'flight'" style="margin-bottom: 8px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 12px;">
+              <span>旅客坐标：</span>
+              <a-input-number v-model:value="flightPassengerX" size="small" :min="0" :max="1260" style="width: 74px" />
+              <span>,</span>
+              <a-input-number v-model:value="flightPassengerY" size="small" :min="0" :max="6895" style="width: 78px" />
+            </div>
             <a-button type="primary" :loading="submitting === demo.key" :disabled="!hasOnlineTypes(demo.requiredTypes)" @click="submitDemo(demo)">
               提交演示任务
             </a-button>
@@ -133,6 +139,8 @@ const measurementForm = ref({
   weight: 28,
   targetCounter: '超规行李托运'
 })
+const flightPassengerX = ref(390)
+const flightPassengerY = ref(3070)
 const measurementSubmitting = ref(false)
 const lastMeasurementResult = ref(null)
 
@@ -284,13 +292,20 @@ async function submitDemo(demo) {
   submitting.value = demo.key
   try {
     const sceneParams = { ...demo.sceneParams }
+    let taskGoal = demo.taskGoal
     if (demo.key === 'flight') {
       const now = new Date()
       const date = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-')
       sceneParams.originalTime = date + 'T22:30:00'
       sceneParams.newTime = date + 'T23:00:00'
+      const px = Number(flightPassengerX.value ?? 390)
+      const py = Number(flightPassengerY.value ?? 3070)
+      sceneParams.passengerX = px
+      sceneParams.passengerY = py
+      sceneParams.origin = `坐标(${px}, ${py})`
+      taskGoal = `虚构航班CA1234原计划22:30，延误30分钟至23:00。旅客当前位于坐标(${px}, ${py})，请先由航延屏发布航班延误信息，然后由智慧航显展示当前位置(${px}, ${py})到登机口13的引导线路图，再安排移动服务机器人陪同旅客前往登机口13。`
     }
-    const response = await submitTask({ taskGoal: demo.taskGoal, taskFamily: demo.taskFamily, sceneParams })
+    const response = await submitTask({ taskGoal, taskFamily: demo.taskFamily, sceneParams })
     const task = response.data
     message.success(`已提交演示任务${task?.taskCode ? `：${task.taskCode}` : ''}`)
   } finally { submitting.value = '' }

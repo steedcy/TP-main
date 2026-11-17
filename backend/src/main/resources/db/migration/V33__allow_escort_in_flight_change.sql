@@ -1,0 +1,3 @@
+UPDATE task_definitions
+SET available_capability_types = '["CAP_FLIGHT_UPDATE","CAP_INFO_DISPLAY","CAP_NOTIFICATION","CAP_NAVIGATION","CAP_ESCORT"]'
+WHERE definition_code = 'FLIGHT_CHANGE_RESPONSE';
