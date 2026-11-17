@@ -67,6 +67,7 @@
               <a-checkbox v-model:checked="showRegions">功能区域/走廊（{{ regions.length }}）</a-checkbox>
               <a-checkbox v-model:checked="showRoute">路线引导图</a-checkbox>
               <a-checkbox v-model:checked="showCollabLinks">设备协同连线</a-checkbox>
+              <a-checkbox v-model:checked="showDeviceBubbles">地图对话气泡</a-checkbox>
               <span v-if="routeInfo.totalPixels > 0" class="route-badge">
                 引导路径约 {{ routeInfo.totalPixels }} 像素（{{ routeStopNames.join(' → ') }}）
               </span>
@@ -84,10 +85,12 @@
             :stop-points="routeStopPoints"
             :collab-edges="collabEdges"
             :active-device-step-map="activeDeviceStepMap"
+            :step-bubbles="deviceBubbles"
             :show-pois="showPois"
             :show-regions="showRegions"
             :show-route="showRoute"
             :show-collab-links="showCollabLinks"
+            :show-device-bubbles="showDeviceBubbles"
             :pick-passenger-mode="pickPassengerMode"
             @cursor-move="cursorPos = $event"
             @pick-passenger="handlePickPassenger"
@@ -120,8 +123,9 @@
             </div>
             <a-space size="small">
               <a-button size="small" type="primary" @click="togglePlayback">
-                {{ playbackPlaying ? '⏸ 暂停回放' : '▶ 过程回放' }}
+                {{ playbackPlaying ? '⏸ 暂停回放' : '▶ 分步回放' }}
               </a-button>
+              <a-button size="small" @click="stepForwardPlayback">下一步</a-button>
               <a-button size="small" @click="resetPlayback">重置</a-button>
               <a-select v-model:value="playbackSpeed" size="small" style="width: 72px">
                 <a-select-option :value="1">1倍速</a-select-option>
@@ -164,9 +168,12 @@
                 <div class="stage-desc">
                   <template v-if="latestModelPlan">
                     模型生成方案第 {{ latestModelPlan.versionNo }} 版（共 {{ latestModelPlan.planSteps?.length || 0 }} 个步骤）·
-                    校验结果：<a-tag :color="latestModelPlan.validationStatus === 'PASSED' ? 'green' : 'red'">
-                      {{ latestModelPlan.validationStatus === 'PASSED' ? '校验通过' : '校验拦截' }}
+                    校验结果：<a-tag :color="modelValidationPassed ? 'green' : 'red'">
+                      {{ modelValidationPassed ? '校验通过' : '校验拦截' }}
                     </a-tag>
+                    <div v-if="!modelValidationPassed && latestModelPlan.validationErrors?.length" style="color: #cf1322; margin-top: 2px;">
+                      拦截原因：{{ latestModelPlan.validationErrors[0].description || latestModelPlan.validationErrors[0].reasonCode }}
+                    </div>
                   </template>
                   <template v-else>尚未生成模型候选计划</template>
                 </div>
@@ -176,9 +183,9 @@
               <template #description>
                 <div class="stage-desc">
                   <template v-if="activePlan">
-                    当前生效方案：第 {{ activePlan.versionNo }} 版（{{ activePlan.planSource === 'BASELINE_TEMPLATE' ? '基线模板降级' : '自主规划执行' }}）·
+                    当前生效方案：第 {{ activePlan.versionNo }} 版（{{ activePlan.source === 'BASELINE_TEMPLATE' ? '基线模板降级' : '自主规划执行' }}）·
                     风险等级：<a-tag :color="activePlan.riskLevel === 'HIGH' ? 'red' : 'green'">
-                      {{ activePlan.riskLevel === 'HIGH' ? '高风险' : '低风险' }}
+                      {{ activePlan.riskLevel === 'HIGH' ? '高风险' : activePlan.riskLevel === 'LOW' ? '低风险' : '已降级保护' }}
                     </a-tag>
                     <div v-if="currentTask?.downgradeReason" style="color: #cf1322; margin-top: 2px;">
                       降级说明：{{ currentTask.downgradeReason }}
@@ -449,6 +456,7 @@ const showPois = ref(true)
 const showRegions = ref(true)
 const showRoute = ref(true)
 const showCollabLinks = ref(true)
+const showDeviceBubbles = ref(true)
 
 const spaceDrawerOpen = ref(false)
 const poiCategoryFilter = ref(undefined)
@@ -538,8 +546,10 @@ const routeStopPoints = computed(() =>
 )
 const routeStopNames = computed(() => routeStopPoints.value.map(p => p.label || '点位'))
 
+const totalPlaybackFrames = computed(() => 4 + mergedSteps.value.length)
+
 const visibleStageIndex = computed(() => {
-  if (mode.value === 'playback') return playbackStep.value
+  if (mode.value === 'playback') return Math.min(4, playbackStep.value)
   if (!currentTask.value) return 0
   if (stepAssignments.value.length) return 4
   if (planVersions.value.length) return 3
@@ -547,10 +557,23 @@ const visibleStageIndex = computed(() => {
   return 0
 })
 
-const stagePercent = computed(() => Math.min(100, Math.round((visibleStageIndex.value / 4) * 100)))
+const stagePercent = computed(() => {
+  if (mode.value === 'playback') {
+    return Math.min(100, Math.round((playbackStep.value / Math.max(1, totalPlaybackFrames.value)) * 100))
+  }
+  return Math.min(100, Math.round((visibleStageIndex.value / 4) * 100))
+})
+
 const latestModelPlan = computed(() =>
-  [...planVersions.value].reverse().find(p => p.planSource !== 'BASELINE_TEMPLATE') || null
+  [...planVersions.value].reverse().find(p => p.source !== 'BASELINE_TEMPLATE') || null
 )
+
+const modelValidationPassed = computed(() => {
+  const pv = latestModelPlan.value
+  if (!pv) return false
+  if (pv.validationErrors?.length) return false
+  return pv.structureCheckResult !== 'FAIL' && pv.capabilityCheckResult !== 'FAIL' && pv.constraintCheckResult !== 'FAIL'
+})
 const activePlan = computed(() => {
   const id = currentTask.value?.currentPlanVersionId
   return planVersions.value.find(p => p.id === id) || planVersions.value[planVersions.value.length - 1] || null
@@ -586,13 +609,21 @@ const mergedSteps = computed(() => {
 const visibleSteps = computed(() => {
   if (mode.value === 'live') return mergedSteps.value
   if (playbackStep.value < 4) return []
-  return mergedSteps.value
+  const count = Math.max(0, playbackStep.value - 3)
+  return mergedSteps.value.slice(0, count).map((s, idx) => {
+    const isCurrentPlayback = mode.value === 'playback' && playbackStep.value < totalPlaybackFrames.value && idx === count - 1
+    return {
+      ...s,
+      isActive: isCurrentPlayback,
+      stepStatus: isCurrentPlayback ? 'EXECUTING' : s.stepStatus
+    }
+  })
 })
 
 const activeDeviceStepMap = computed(() => {
   const map = {}
   for (const s of visibleSteps.value) {
-    if (s.deviceAgentCode && (s.stepStatus === 'DISPATCHED' || s.stepStatus === 'EXECUTING')) {
+    if (s.deviceAgentCode && (s.isActive || s.stepStatus === 'DISPATCHED' || s.stepStatus === 'EXECUTING')) {
       map[s.deviceAgentCode] = s.stepSeq
     }
   }
@@ -622,6 +653,8 @@ const deviceBubbles = computed(() => {
       icon: iconMap[dtype] || '📡',
       deviceLabel: s.deviceName || (dtype ? deviceTypeZh(dtype) : '待分派设备'),
       status: s.stepStatus,
+      statusText: translateStepStatus(s.stepStatus),
+      isActive: Boolean(s.isActive),
       commandText: formatReadableCommand(s.capabilityType, s.inputParams) || capabilityLabel(s.capabilityType),
       feedbackText: formatReadableFeedback(s.outputParams, s.reasonCode)
     }
@@ -954,6 +987,16 @@ function resetPlayback() {
   playbackStep.value = 0
 }
 
+function stepForwardPlayback() {
+  if (mode.value !== 'playback') {
+    mode.value = 'playback'
+    playbackStep.value = 0
+  }
+  if (playbackStep.value < totalPlaybackFrames.value) {
+    playbackStep.value += 1
+  }
+}
+
 function togglePlayback() {
   if (mode.value !== 'playback') mode.value = 'playback'
   if (playbackPlaying.value) {
@@ -961,11 +1004,11 @@ function togglePlayback() {
     clearInterval(playbackTimer)
     return
   }
-  if (playbackStep.value >= 4) playbackStep.value = 0
+  if (playbackStep.value >= totalPlaybackFrames.value) playbackStep.value = 0
   playbackPlaying.value = true
   const intervalMs = Math.round(1500 / playbackSpeed.value)
   playbackTimer = setInterval(() => {
-    if (playbackStep.value < 4) playbackStep.value += 1
+    if (playbackStep.value < totalPlaybackFrames.value) playbackStep.value += 1
     else { playbackPlaying.value = false; clearInterval(playbackTimer) }
   }, intervalMs)
 }
@@ -1027,7 +1070,7 @@ watch(mode, (val) => {
   if (val === 'live') {
     playbackPlaying.value = false
     clearInterval(playbackTimer)
-    playbackStep.value = 5
+    playbackStep.value = 99
   } else {
     resetPlayback()
   }

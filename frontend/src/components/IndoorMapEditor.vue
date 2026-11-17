@@ -22,10 +22,12 @@ const props = defineProps({
   stopPoints: { type: Array, default: () => [] },
   collabEdges: { type: Array, default: () => [] },
   activeDeviceStepMap: { type: Object, default: () => ({}) },
+  stepBubbles: { type: Array, default: () => [] },
   showPois: { type: Boolean, default: true },
   showRegions: { type: Boolean, default: true },
   showRoute: { type: Boolean, default: true },
   showCollabLinks: { type: Boolean, default: true },
+  showDeviceBubbles: { type: Boolean, default: true },
   pickPassengerMode: { type: Boolean, default: false }
 })
 
@@ -48,6 +50,7 @@ let poisGroup = null
 let routeGroup = null
 let collabGroup = null
 let devicesGroup = null
+let bubblesGroup = null
 let passengerGroup = null
 
 function toLatLng(x, y) {
@@ -227,6 +230,45 @@ function syncPassengerLayer() {
   passengerGroup.addLayer(L.marker(toLatLng(props.passengerPoint.x, props.passengerPoint.y), { icon, pmIgnore: true }))
 }
 
+function syncBubblesLayer() {
+  if (!bubblesGroup) return
+  bubblesGroup.clearLayers()
+  if (!props.showDeviceBubbles || !props.stepBubbles.length) return
+
+  const devByAgent = new Map()
+  for (const d of props.devices) {
+    if (d.agentId) devByAgent.set(d.agentId, d)
+  }
+  const perDeviceCount = new Map()
+
+  for (const b of props.stepBubbles) {
+    const dev = devByAgent.get(b.agentCode)
+    if (!dev?.location || !Number.isFinite(Number(dev.location.x)) || !Number.isFinite(Number(dev.location.y))) continue
+    const idx = perDeviceCount.get(b.agentCode) || 0
+    perDeviceCount.set(b.agentCode, idx + 1)
+    const offsetY = -36 - idx * 84
+    const activeCls = b.isActive ? 'active' : b.status === 'SKIPPED' || b.status === 'FAILED' ? 'warn' : 'done'
+    const statusText = b.isActive ? '执行中' : b.statusText
+    const feedbackHtml = b.feedbackText && !b.isActive
+      ? `<div class="mb-row fb"><span>回执：</span>${b.feedbackText}</div>`
+      : ''
+    const icon = L.divIcon({
+      className: 'leaflet-map-bubble-wrapper',
+      html: `<div class="leaflet-map-bubble ${activeCls}" style="transform: translate(16px, ${offsetY}px);">
+        <div class="mb-head">
+          <span>${b.icon} 第${b.stepSeq}步 · ${b.deviceLabel}</span>
+          <span class="mb-tag">${statusText}</span>
+        </div>
+        <div class="mb-row cmd"><span>指令：</span>${b.commandText}</div>
+        ${feedbackHtml}
+      </div>`,
+      iconSize: [0, 0],
+      iconAnchor: [0, 0]
+    })
+    bubblesGroup.addLayer(L.marker(toLatLng(dev.location.x, dev.location.y), { icon, interactive: false, pmIgnore: true }))
+  }
+}
+
 function focusActiveArea() {
   if (!map) return
   map.fitBounds([[MAP_HEIGHT - 3880, 260], [MAP_HEIGHT - 2080, 1060]])
@@ -280,6 +322,7 @@ onMounted(() => {
   routeGroup = L.layerGroup().addTo(map)
   poisGroup = L.layerGroup().addTo(map)
   devicesGroup = L.layerGroup().addTo(map)
+  bubblesGroup = L.layerGroup().addTo(map)
   passengerGroup = L.layerGroup().addTo(map)
 
   focusActiveArea()
@@ -351,6 +394,7 @@ onMounted(() => {
   syncRouteLayer()
   syncCollabLayer()
   syncDevicesLayer()
+  syncBubblesLayer()
   syncPassengerLayer()
 })
 
@@ -359,6 +403,7 @@ watch(() => [props.pois, props.showPois], syncPoisLayer, { deep: true })
 watch(() => [props.routePoints, props.stopPoints, props.showRoute], syncRouteLayer, { deep: true })
 watch(() => [props.collabEdges, props.showCollabLinks], syncCollabLayer, { deep: true })
 watch(() => [props.devices, props.activeDeviceStepMap], syncDevicesLayer, { deep: true })
+watch(() => [props.stepBubbles, props.devices, props.showDeviceBubbles], syncBubblesLayer, { deep: true })
 watch(() => props.passengerPoint, syncPassengerLayer, { deep: true })
 
 onBeforeUnmount(() => {
@@ -482,6 +527,56 @@ defineExpose({ fitAll, focusActiveArea, exportGeoJson })
 .leaflet-route-animated {
   animation: lfDash 1.2s linear infinite;
 }
+.leaflet-map-bubble {
+  width: 248px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 2px solid #1677ff;
+  border-radius: 8px;
+  padding: 6px 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+  font-size: 11px;
+  line-height: 1.4;
+  color: #262626;
+  pointer-events: none;
+}
+.leaflet-map-bubble.active {
+  border-color: #fa8c16;
+  box-shadow: 0 0 0 4px rgba(250, 140, 22, 0.25), 0 6px 14px rgba(0, 0, 0, 0.28);
+}
+.leaflet-map-bubble.done {
+  border-color: #52c41a;
+}
+.leaflet-map-bubble.warn {
+  border-color: #ff4d4f;
+}
+.leaflet-map-bubble .mb-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 700;
+  margin-bottom: 3px;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 2px;
+}
+.leaflet-map-bubble .mb-tag {
+  font-size: 10px;
+  padding: 0 5px;
+  border-radius: 4px;
+  background: #e6f4ff;
+  color: #0958d9;
+}
+.leaflet-map-bubble.active .mb-tag { background: #fff7e6; color: #d46b08; }
+.leaflet-map-bubble.done .mb-tag { background: #f6ffed; color: #389e0d; }
+.leaflet-map-bubble.warn .mb-tag { background: #fff2f0; color: #cf1322; }
+.leaflet-map-bubble .mb-row {
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.leaflet-map-bubble .mb-row.cmd span { color: #0958d9; font-weight: 600; }
+.leaflet-map-bubble .mb-row.fb span { color: #389e0d; font-weight: 600; }
 @keyframes lfDash {
   to { stroke-dashoffset: -40; }
 }
