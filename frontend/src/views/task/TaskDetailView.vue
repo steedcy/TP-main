@@ -445,7 +445,7 @@ const baggageTempId = computed(() => {
 })
 
 const targetCounterDisplay = computed(() => {
-  return task.value?.sceneParams?.targetCounter || '超规行李专柜 B-01 (值机岛端头)'
+  return task.value?.sceneParams?.targetCounter || '超规行李托运'
 })
 
 const baggageNoticeText = computed(() => {

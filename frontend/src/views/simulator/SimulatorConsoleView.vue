@@ -36,7 +36,7 @@
       </p>
       <a-form layout="inline" style="margin-bottom: 12px; row-gap: 8px;">
         <a-form-item label="行李位置">
-          <a-input v-model:value="measurementForm.baggageLocation" style="width: 140px" placeholder="如 T2值机岛A03" />
+          <a-input v-model:value="measurementForm.baggageLocation" style="width: 140px" placeholder="如 国内值机柜台02" />
         </a-form-item>
         <a-form-item label="长 (cm)">
           <a-input-number v-model:value="measurementForm.length" :min="1" :max="500" style="width: 90px" />
@@ -126,12 +126,12 @@ import {
 import { submitTask, submitMeasurementEvent } from '../../api/task'
 
 const measurementForm = ref({
-  baggageLocation: 'T2值机岛A03',
+  baggageLocation: '国内值机柜台02',
   length: 100,
   width: 60,
   height: 40,
   weight: 28,
-  targetCounter: '超规行李专柜B01'
+  targetCounter: '超规行李托运'
 })
 const measurementSubmitting = ref(false)
 const lastMeasurementResult = ref(null)
