@@ -908,7 +908,7 @@ async function loadMapLayoutData() {
 
 async function loadSnapshot() {
   const res = await request.get('/situation/snapshot')
-  devices.value = res.data?.devices || []
+  devices.value = res.data?.agents || res.data?.devices || []
 }
 
 async function loadTaskDetails(taskId) {

@@ -157,6 +157,9 @@
           <template v-if="column.dataIndex === 'stepSeq'">
             <span :id="`step-${record.stepSeq}`" :style="highlightStep === record.stepSeq ? 'background:#fffbe6;padding:0 4px' : ''">{{ record.stepSeq }}</span>
           </template>
+          <template v-else-if="column.dataIndex === 'deviceAgentCode'">
+            <span>{{ resolveDeviceName(record.deviceAgentCode) || '未分配' }}</span>
+          </template>
           <template v-else-if="column.dataIndex === 'stepStatus'">
             <a-tag>{{ stepStatusLabel(record.stepStatus) }}</a-tag>
             <span v-if="record.reasonCode === 'MEASUREMENT_EVENT_REUSED'">采用已登记的测量事件</span>
@@ -243,7 +246,7 @@
         <a-timeline-item v-for="e in events" :key="e.id">
           {{ e.occurredAt }} - {{ e.eventType }}
           <span v-if="e.reasonCode" style="margin-left: 6px; color: #fa8c16">（原因码: {{ e.reasonCode }}）</span>
-          <span v-if="e.detailSummary">：{{ e.detailSummary }}</span>
+          <span v-if="e.detailSummary">：{{ replaceDeviceCodesInText(e.detailSummary) }}</span>
         </a-timeline-item>
       </a-timeline>
     </a-card>
@@ -392,6 +395,7 @@ import { taskProgress, progressText } from '../../utils/taskProgress'
 import { templateReference, matchBasis } from '../../utils/downgradeMatch'
 import { getBaselineTemplate } from '../../api/baseline'
 import { capabilityLabel } from '../../constants/capability'
+import request from '../../api/request'
 import { getTask, getTaskEvents, getPlanVersions, getContextSnapshots, getStepAssignments, clarifyTask, manualAction, terminateTask } from '../../api/task'
 
 const authStore = useAuthStore()
@@ -410,6 +414,24 @@ function priorPlanVersion(pv) {
 }
 const contextSnapshots = ref([])
 const stepAssignments = ref([])
+const deviceNameMap = ref({})
+
+function resolveDeviceName(code) {
+  if (!code) return ''
+  return deviceNameMap.value[code] || code
+}
+
+function replaceDeviceCodesInText(text) {
+  if (!text) return text
+  let out = String(text)
+  const entries = Object.entries(deviceNameMap.value).sort((a, b) => b[0].length - a[0].length)
+  for (const [code, name] of entries) {
+    if (code && name && out.includes(code)) {
+      out = out.split(code).join(name)
+    }
+  }
+  return out
+}
 const currentSteps = computed(() => planVersions.value.find(p => p.id === task.value?.currentPlanVersionId)?.planSteps || [])
 const progress = computed(() => taskProgress(currentSteps.value, stepAssignments.value))
 const progressLabel = computed(() => progressText(progress.value))
@@ -627,7 +649,7 @@ function candidatesOf(pv, step) {
   if (!Array.isArray(agents)) agents = []
   const names = agents
     .filter((a) => a.onlineStatus === 'ONLINE' && (a.capabilities || []).includes(step.capabilityType))
-    .map((a) => a.agentId)
+    .map((a) => a.deviceName || resolveDeviceName(a.agentId) || a.agentId)
   return names.length ? names.join('，') : '无在线候选设备（或快照不可用）'
 }
 function checkLabel(result) {
@@ -646,7 +668,7 @@ function flightAssignmentSummary(assignment) {
   const ended = Date.parse(assignment.feedbackAt)
   const responseTime = Number.isFinite(started) && Number.isFinite(ended)
     ? `，响应时长 ${Math.max(0, ((ended - started) / 1000)).toFixed(1)} 秒` : ''
-  return `${assignment.deviceAgentCode || '未分配'}：${stepStatusLabel(assignment.stepStatus)}`
+  return `${resolveDeviceName(assignment.deviceAgentCode) || '未分配'}：${stepStatusLabel(assignment.stepStatus)}`
     + `${assignment.feedbackAt ? `，完成时间 ${assignment.feedbackAt}${responseTime}` : ''}`
 }
 
@@ -663,10 +685,11 @@ function leaveIfMissing(error) {
 }
 
 async function fetchAll() {
-  let taskResp, eventsResp, planResp, snapResp, stepResp
+  let taskResp, eventsResp, planResp, snapResp, stepResp, sitResp
   try {
-    [taskResp, eventsResp, planResp, snapResp, stepResp] = await Promise.all([
-      getTask(taskId, { silent: true }), getTaskEvents(taskId), getPlanVersions(taskId), getContextSnapshots(taskId), getStepAssignments(taskId)
+    [taskResp, eventsResp, planResp, snapResp, stepResp, sitResp] = await Promise.all([
+      getTask(taskId, { silent: true }), getTaskEvents(taskId), getPlanVersions(taskId), getContextSnapshots(taskId), getStepAssignments(taskId),
+      request.get('/situation/snapshot').catch(() => ({ data: { agents: [] } }))
     ])
   } catch (e) {
     if (leaveIfMissing(e)) return
@@ -679,6 +702,22 @@ async function fetchAll() {
     }
     throw e
   }
+  const map = {}
+  for (const a of (sitResp?.data?.agents || sitResp?.data?.devices || [])) {
+    if (a.agentId && a.deviceName) map[a.agentId] = a.deviceName
+    if (a.deviceCode && a.deviceName) map[a.deviceCode] = a.deviceName
+  }
+  for (const s of (snapResp?.data || [])) {
+    let agents = s?.agents
+    if (typeof agents === 'string') { try { agents = JSON.parse(agents) } catch { agents = [] } }
+    if (Array.isArray(agents)) {
+      for (const a of agents) {
+        if (a.agentId && a.deviceName) map[a.agentId] = a.deviceName
+        if (a.deviceCode && a.deviceName) map[a.deviceCode] = a.deviceName
+      }
+    }
+  }
+  deviceNameMap.value = map
   task.value = taskResp.data
   events.value = eventsResp.data
   planVersions.value = planResp.data
