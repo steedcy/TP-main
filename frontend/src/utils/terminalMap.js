@@ -7,7 +7,9 @@ export const POI_CATEGORIES = [
   { key: 'BAGGAGE', label: '行李托运柜台', color: '#fa8c16', badge: '托' },
   { key: 'SECURITY', label: '安检通道', color: '#722ed1', badge: '安' },
   { key: 'MEASURE', label: '智能行李测量点', color: '#eb2f96', badge: '测' },
-  { key: 'SERVICE', label: '服务柜台', color: '#52c41a', badge: '服' }
+  { key: 'SERVICE', label: '服务柜台', color: '#52c41a', badge: '服' },
+  { key: 'SHOP', label: '商铺餐饮', color: '#faad14', badge: '商' },
+  { key: 'FACILITY', label: '公共设施（卫生间/母婴室/医疗室）', color: '#2f54eb', badge: '设' }
 ]
 
 export const DEFAULT_TERMINAL_POIS = [
@@ -142,17 +144,12 @@ export function nearestPoi(x, y, pois = DEFAULT_TERMINAL_POIS) {
 
 function buildCorridorGraph(regions = []) {
   const customCorridors = regions.filter(r => r.regionType === 'CORRIDOR')
-  const isolatedPolygons = regions
-    .filter(r => r.regionType === 'ISOLATED_ZONE')
-    .map(parseRegionGeometry)
-    .filter(pts => pts.length >= 3)
 
   let nodes = []
   let edges = []
 
   if (customCorridors.length > 0) {
     let idx = 0
-    const corridorGroups = []
     for (const c of customCorridors) {
       const pts = parseRegionGeometry(c)
       const groupIds = []
@@ -162,9 +159,8 @@ function buildCorridorGraph(regions = []) {
         groupIds.push(nid)
         if (i > 0) edges.push([groupIds[i - 1], nid])
       }
-      corridorGroups.push(groupIds)
     }
-    // 自动连接相邻走廊的接近节点（<= 120px）以便跨走廊换乘
+    // 自动连接相邻走廊的接近节点（<= 120px）以便跨走廊连通
     for (let i = 0; i < nodes.length; i++) {
       for (let j = i + 1; j < nodes.length; j++) {
         if (dist(nodes[i], nodes[j]) <= 120) {
@@ -182,7 +178,6 @@ function buildCorridorGraph(regions = []) {
   for (const [u, v] of edges) {
     const nu = nodeMap[u], nv = nodeMap[v]
     if (!nu || !nv) continue
-    if (segmentCrossesPolygons(nu, nv, isolatedPolygons)) continue
     const w = dist(nu, nv)
     adj[u].push({ to: v, w })
     adj[v].push({ to: u, w })

@@ -38,7 +38,7 @@
     >
       <template #action>
         <a-space>
-          <a-button v-if="drawMode === 'ISOLATED_ZONE' || drawMode === 'CORRIDOR'" size="small" type="primary" @click="finishDrawing">
+          <a-button v-if="drawMode === 'ISOLATED_ZONE' || drawMode === 'CHECKIN_HALL' || drawMode === 'CORRIDOR'" size="small" type="primary" @click="finishDrawing">
             完成绘制（已选 {{ drawPoints.length }} 点）
           </a-button>
           <a-button size="small" @click="cancelDrawing">取消</a-button>
@@ -65,14 +65,15 @@
                 {{ drawMode === 'PASSENGER' ? '点击地图定位旅客中…' : '地图点选旅客位置' }}
               </a-button>
               <template v-if="isOperator">
-                <a-button size="small" @click="startDrawRegion('ISOLATED_ZONE')">绘制隔离区</a-button>
+                <a-button size="small" @click="startDrawRegion('CHECKIN_HALL')">绘制值机办理区</a-button>
+                <a-button size="small" @click="startDrawRegion('ISOLATED_ZONE')">绘制候机隔离区</a-button>
                 <a-button size="small" @click="startDrawRegion('CORRIDOR')">绘制走廊</a-button>
               </template>
             </a-space>
             <a-space wrap size="small" style="margin-top: 6px;">
               <span style="font-size: 12px; color: #666;">图层：</span>
               <a-checkbox v-model:checked="showPois">POI 点位（{{ pois.length }}）</a-checkbox>
-              <a-checkbox v-model:checked="showRegions">隔离区/走廊（{{ regions.length }}）</a-checkbox>
+              <a-checkbox v-model:checked="showRegions">功能区域/走廊（{{ regions.length }}）</a-checkbox>
               <a-checkbox v-model:checked="showRoute">路线引导图</a-checkbox>
               <a-checkbox v-model:checked="showCollabLinks">设备协同连线</a-checkbox>
               <span v-if="routeInfo.totalPixels > 0" class="route-badge">
@@ -96,14 +97,22 @@
 
               <!-- SVG 隔离区、走廊、路径引导与设备协同连线层 -->
               <svg class="map-svg" :viewBox="`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`">
-                <!-- 已保存的隔离区与走廊 -->
+                <!-- 已保存的值机办理区、候机隔离区与走廊 -->
                 <g v-if="showRegions">
                   <template v-for="reg in parsedRegions" :key="reg.id">
                     <polygon
                       v-if="reg.regionType === 'ISOLATED_ZONE' && reg.points.length >= 3"
                       :points="reg.points.map(p => `${p.x},${p.y}`).join(' ')"
-                      fill="rgba(255, 77, 79, 0.22)"
-                      stroke="#ff4d4f"
+                      fill="rgba(114, 46, 209, 0.14)"
+                      stroke="#722ed1"
+                      stroke-width="3"
+                      stroke-dasharray="8 6"
+                    />
+                    <polygon
+                      v-else-if="reg.regionType === 'CHECKIN_HALL' && reg.points.length >= 3"
+                      :points="reg.points.map(p => `${p.x},${p.y}`).join(' ')"
+                      fill="rgba(82, 196, 26, 0.14)"
+                      stroke="#389e0d"
                       stroke-width="3"
                       stroke-dasharray="8 6"
                     />
@@ -121,21 +130,21 @@
                       v-if="reg.points.length"
                       :x="reg.points[0].x"
                       :y="reg.points[0].y - 10"
-                      :fill="reg.regionType === 'ISOLATED_ZONE' ? '#cf1322' : '#08979c'"
+                      :fill="reg.regionType === 'ISOLATED_ZONE' ? '#531dab' : reg.regionType === 'CHECKIN_HALL' ? '#237804' : '#08979c'"
                       font-size="14"
                       font-weight="bold"
                     >
-                      {{ reg.regionType === 'ISOLATED_ZONE' ? '隔离区：' : '走廊：' }}{{ reg.regionName }}
+                      {{ reg.regionType === 'ISOLATED_ZONE' ? '候机隔离区：' : reg.regionType === 'CHECKIN_HALL' ? '值机办理区：' : '走廊通道：' }}{{ reg.regionName }}
                     </text>
                   </template>
                 </g>
 
                 <!-- 正在绘制中的预览 -->
-                <g v-if="(drawMode === 'ISOLATED_ZONE' || drawMode === 'CORRIDOR') && drawPoints.length">
+                <g v-if="(drawMode === 'ISOLATED_ZONE' || drawMode === 'CHECKIN_HALL' || drawMode === 'CORRIDOR') && drawPoints.length">
                   <polyline
                     :points="drawPoints.map(p => `${p.x},${p.y}`).join(' ')"
                     fill="none"
-                    :stroke="drawMode === 'ISOLATED_ZONE' ? '#ff4d4f' : '#13c2c2'"
+                    :stroke="drawMode === 'ISOLATED_ZONE' ? '#722ed1' : drawMode === 'CHECKIN_HALL' ? '#389e0d' : '#13c2c2'"
                     stroke-width="5"
                     stroke-dasharray="6 4"
                   />
@@ -145,7 +154,7 @@
                     :cx="pt.x"
                     :cy="pt.y"
                     r="8"
-                    :fill="drawMode === 'ISOLATED_ZONE' ? '#ff4d4f' : '#13c2c2'"
+                    :fill="drawMode === 'ISOLATED_ZONE' ? '#722ed1' : drawMode === 'CHECKIN_HALL' ? '#389e0d' : '#13c2c2'"
                     stroke="#fff"
                     stroke-width="2"
                   />
@@ -404,26 +413,29 @@
           </a-table>
         </a-tab-pane>
 
-        <a-tab-pane key="regions" tab="隔离区与走廊规划">
+        <a-tab-pane key="regions" tab="功能区域与走廊规划">
           <div style="margin-bottom: 12px;">
-            <a-space>
+            <a-space wrap>
+              <a-button size="small" @click="spaceDrawerOpen = false; startDrawRegion('CHECKIN_HALL')">
+                绘制值机办理区
+              </a-button>
               <a-button type="primary" size="small" @click="spaceDrawerOpen = false; startDrawRegion('ISOLATED_ZONE')">
-                在地图绘制隔离区
+                绘制候机隔离区
               </a-button>
               <a-button size="small" @click="spaceDrawerOpen = false; startDrawRegion('CORRIDOR')">
-                在地图绘制走廊
+                绘制通行走廊
               </a-button>
             </a-space>
             <p style="font-size: 12px; color: #666; margin-top: 6px;">
-              隔离区为红色禁行区（路线自动绕行）；绘制走廊后，系统将优先沿人工指定的走廊拓扑计算引导路线。
+              值机办理区为安检前值机/行李托运区；候机隔离区为过安检后连通各登机口的区域；绘制走廊后，系统将沿隔离区与大厅内走廊计算引导路线。
             </p>
           </div>
           <a-table :data-source="regions" :pagination="false" size="small" row-key="id">
             <a-table-column title="区域名称" data-index="regionName" key="regionName" />
             <a-table-column title="类型" key="regionType">
               <template #default="{ record }">
-                <a-tag :color="record.regionType === 'ISOLATED_ZONE' ? 'red' : 'cyan'">
-                  {{ record.regionType === 'ISOLATED_ZONE' ? '隔离禁行区' : '人工走廊' }}
+                <a-tag :color="record.regionType === 'ISOLATED_ZONE' ? 'purple' : record.regionType === 'CHECKIN_HALL' ? 'green' : 'cyan'">
+                  {{ record.regionType === 'ISOLATED_ZONE' ? '安检后候机隔离区' : record.regionType === 'CHECKIN_HALL' ? '值机办理区' : '通行走廊' }}
                 </a-tag>
               </template>
             </a-table-column>
@@ -646,8 +658,9 @@ const quickForm = reactive({
 const drawBannerTitle = computed(() => {
   if (drawMode.value === 'PASSENGER') return '请直接在地图上点击旅客当前所在位置'
   if (drawMode.value === 'POI_PICK') return '请直接在地图上点击该 POI 的目标位置'
-  if (drawMode.value === 'ISOLATED_ZONE') return '请依次点击隔离区顶点（至少 3 个点），然后点击右侧“完成绘制”'
-  if (drawMode.value === 'CORRIDOR') return '请依次点击走廊路径节点（至少 2 个点），然后点击右侧“完成绘制”'
+  if (drawMode.value === 'CHECKIN_HALL') return '请依次点击值机办理区顶点（至少 3 个点），然后点击右侧“完成绘制”'
+  if (drawMode.value === 'ISOLATED_ZONE') return '请依次点击安检后候机隔离区顶点（至少 3 个点），然后点击右侧“完成绘制”'
+  if (drawMode.value === 'CORRIDOR') return '请依次点击贯穿各登机口的走廊路径节点（至少 2 个点），然后点击右侧“完成绘制”'
   return ''
 })
 
@@ -664,7 +677,9 @@ const scannerDevices = computed(() =>
 )
 
 const securityPois = computed(() => pois.value.filter(p => p.category === 'SECURITY'))
-const destPois = computed(() => pois.value.filter(p => p.category === 'GATE' || p.category === 'BAGGAGE'))
+const destPois = computed(() =>
+  pois.value.filter(p => ['GATE', 'BAGGAGE', 'SHOP', 'FACILITY', 'SERVICE'].includes(p.category))
+)
 
 const canvasStyle = computed(() => ({
   width: `${MAP_WIDTH}px`,
@@ -968,12 +983,16 @@ function cancelDrawing() {
 }
 
 function finishDrawing() {
-  const minPts = drawMode.value === 'ISOLATED_ZONE' ? 3 : 2
+  const minPts = (drawMode.value === 'ISOLATED_ZONE' || drawMode.value === 'CHECKIN_HALL') ? 3 : 2
   if (drawPoints.value.length < minPts) {
     message.warning(`至少需要点击 ${minPts} 个点`)
     return
   }
-  regionNameInput.value = drawMode.value === 'ISOLATED_ZONE' ? '新建隔离禁行区' : '新建人工走廊'
+  regionNameInput.value = drawMode.value === 'ISOLATED_ZONE'
+    ? '安检后候机隔离区'
+    : drawMode.value === 'CHECKIN_HALL'
+      ? '值机与行李托运办理区'
+      : '候机厅通行走廊'
   regionNameModalOpen.value = true
 }
 
@@ -1020,7 +1039,7 @@ function handleMapClick(e) {
     drawMode.value = null
     poiModalOpen.value = true
     message.success(`已拾取坐标 (${mx}, ${my})`)
-  } else if (drawMode.value === 'ISOLATED_ZONE' || drawMode.value === 'CORRIDOR') {
+  } else if (drawMode.value === 'ISOLATED_ZONE' || drawMode.value === 'CHECKIN_HALL' || drawMode.value === 'CORRIDOR') {
     drawPoints.value.push({ x: mx, y: my })
   }
 }

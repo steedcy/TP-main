@@ -33,8 +33,9 @@ import java.util.Set;
 public class TaskBoardController {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final Set<String> POI_CATEGORIES = Set.of("GATE", "CHECKIN", "BAGGAGE", "SECURITY", "MEASURE", "SERVICE");
-    private static final Set<String> REGION_TYPES = Set.of("ISOLATED_ZONE", "CORRIDOR");
+    private static final Set<String> POI_CATEGORIES = Set.of(
+            "GATE", "CHECKIN", "BAGGAGE", "SECURITY", "MEASURE", "SERVICE", "SHOP", "FACILITY");
+    private static final Set<String> REGION_TYPES = Set.of("ISOLATED_ZONE", "CHECKIN_HALL", "CORRIDOR");
 
     private final TaskService taskService;
     private final DeviceCommandMapper deviceCommandMapper;
