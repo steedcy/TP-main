@@ -60,3 +60,31 @@ export function getTaskBoardCommands(taskId) {
   return request.get(`/task-board/tasks/${taskId}/commands`)
 }
 
+export function getMapLayout() {
+  return request.get('/task-board/map-layout')
+}
+
+export function createPoi(data) {
+  return request.post('/task-board/pois', data)
+}
+
+export function updatePoi(id, data) {
+  return request.put(`/task-board/pois/${id}`, data)
+}
+
+export function deletePoi(id) {
+  return request.delete(`/task-board/pois/${id}`)
+}
+
+export function syncScannerPois() {
+  return request.post('/task-board/pois/sync-scanners')
+}
+
+export function createMapRegion(data) {
+  return request.post('/task-board/regions', data)
+}
+
+export function deleteMapRegion(id) {
+  return request.delete(`/task-board/regions/${id}`)
+}
+
