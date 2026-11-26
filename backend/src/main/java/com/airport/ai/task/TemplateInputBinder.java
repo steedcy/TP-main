@@ -32,7 +32,7 @@ public final class TemplateInputBinder {
             "startLocation", "origin");
 
     private static final java.util.regex.Pattern LOCATION_CODE_PATTERN =
-            java.util.regex.Pattern.compile("(?<![A-Z0-9_])((?:F\\d+_(?!TEST\\b)[A-Z0-9_]+|GATE_[A-Z0-9_]+))(?![A-Z0-9_])");
+            java.util.regex.Pattern.compile("(?<![A-Z0-9_])((?:F\\d+_(?!TEST\\b)[A-Z0-9_]+|(?:GATE|ENTRANCE|SERVICE|SECURITY|CHECKIN|MEASURE|BAGGAGE|LOUNGE|SHOP|FAC)_[A-Z0-9_]+))(?![A-Z0-9_])");
 
     private static final List<String> LOCATION_INTENT_KEYWORDS = List.of(
             "前往", "引导", "陪同", "送往", "送到", "带到", "去往", "到达", "抵达", "登机口", "服务点", "行李点",

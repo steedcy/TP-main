@@ -3,7 +3,7 @@
     <header class="page-header">
       <div>
         <h1>二维态势</h1>
-        <p>F2 候机楼平面图 · 坐标原点位于左上角，单位为像素</p>
+        <p>候机楼矢量平面图（2000 × 600）· 坐标原点位于左上角，单位为像素</p>
       </div>
       <a-space wrap>
         <a-tag color="blue">自动刷新 {{ refreshInterval }} 秒</a-tag>
@@ -52,7 +52,29 @@
           class="map-canvas"
           :style="canvasStyle"
         >
-          <img class="floorplan" src="/F2.jpg" alt="F2 候机楼平面图" draggable="false" @load="mapLoaded = true" @error="mapError = true" />
+          <svg class="floorplan" viewBox="0 0 2000 600" preserveAspectRatio="none" aria-label="候机楼矢量平面图">
+            <rect x="40" y="40" width="1920" height="480" fill="#f5f6f8" stroke="#bfbfbf" stroke-width="2" />
+            <!-- 候机区（安检隔离区内，与背景区分颜色） -->
+            <rect x="40" y="40" width="1920" height="195" fill="#dbeafe" fill-opacity="0.85" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="8 6" />
+            <!-- 中间分隔带：左侧/右侧不可通行商铺区 + 中央可通行安全检查 -->
+            <rect x="40" y="235" width="840" height="106" fill="#6b7280" fill-opacity="0.65" stroke="#434343" stroke-width="1.5" />
+            <rect x="880" y="235" width="316" height="106" fill="#b5f5ec" fill-opacity="0.8" stroke="#08979c" stroke-width="2" />
+            <text x="1038" y="294" text-anchor="middle" fill="#006d75" font-size="18" font-weight="600">安全检查</text>
+            <rect x="1196" y="235" width="764" height="106" fill="#6b7280" fill-opacity="0.65" stroke="#434343" stroke-width="1.5" />
+            <!-- 值机区（安检隔离区外） -->
+            <rect x="40" y="341" width="1920" height="179" fill="#ecfdf5" fill-opacity="0.75" stroke="#10b981" stroke-width="1.5" stroke-dasharray="8 6" />
+            <!-- 6个登机口与3个出入口示意 -->
+            <g fill="#1677ff" font-size="14" font-weight="600" text-anchor="middle">
+              <text x="239" y="58">1号登机口</text><text x="482" y="58">2号登机口</text>
+              <text x="719" y="58">3号登机口</text><text x="1022" y="58">4号登机口</text>
+              <text x="1257" y="58">5号登机口</text><text x="1685" y="58">6号登机口</text>
+            </g>
+            <g fill="#595959" font-size="14" font-weight="600" text-anchor="middle">
+              <text x="311" y="514">1号门</text>
+              <text x="1036" y="514">2号门</text>
+              <text x="1877" y="514">3号门</text>
+            </g>
+          </svg>
           <button
             v-for="device in positionedDevices"
             :key="device.deviceCode"
@@ -182,8 +204,10 @@ import { markerZIndex, offlineSummary, reportedAtClass, findOverlappingDevices, 
 import { DEVICE_TYPES, deviceTypeLabel, capabilityLabel } from '../../constants/capability'
 import { useAuthStore } from '../../store/auth'
 
-const MAP_WIDTH = 1260
-const MAP_HEIGHT = 6895
+const MAP_WIDTH = 2000
+const MAP_HEIGHT = 600
+const DEFAULT_CENTER_X = 1000
+const DEFAULT_CENTER_Y = 280
 const viewportRef = ref(null)
 const viewportSize = ref({ width: 0, height: 0 })
 const devices = ref([])
@@ -200,7 +224,7 @@ const refreshInterval = ref(5)
 const zoom = ref(1)
 const pan = ref({ x: 0, y: 0 })
 const dragging = ref(false)
-const mapLoaded = ref(false)
+const mapLoaded = ref(true)
 const mapError = ref(false)
 const cursorCoordinate = ref(null)
 const selectedDevice = ref(null)
@@ -344,6 +368,19 @@ function fitWidth() {
   pan.value = { x: 0, y: 0 }
 }
 
+function centerAt(mapX, mapY, targetZoom = 1) {
+  updateViewport()
+  if (!viewportSize.value.width || !viewportSize.value.height) return false
+  zoom.value = targetZoom
+  const canvasX = (mapX / MAP_WIDTH) * baseWidth.value * targetZoom
+  const canvasY = (mapY / MAP_HEIGHT) * baseHeight.value * targetZoom
+  pan.value = {
+    x: viewportSize.value.width / 2 - canvasX,
+    y: viewportSize.value.height / 2 - canvasY
+  }
+  return true
+}
+
 function fitAll() {
   updateViewport()
   const ratio = Math.min(viewportSize.value.width / baseWidth.value, viewportSize.value.height / baseHeight.value)
@@ -414,9 +451,16 @@ function handlePointerLeave() {
   clearCursorCoordinate()
 }
 
+let initialCentered = false
+
 onMounted(() => {
-  updateViewport()
-  resizeObserver = new ResizeObserver(updateViewport)
+  initialCentered = centerAt(DEFAULT_CENTER_X, DEFAULT_CENTER_Y, 1)
+  resizeObserver = new ResizeObserver(() => {
+    updateViewport()
+    if (!initialCentered) {
+      initialCentered = centerAt(DEFAULT_CENTER_X, DEFAULT_CENTER_Y, 1)
+    }
+  })
   if (viewportRef.value) resizeObserver.observe(viewportRef.value)
   loadSnapshot()
   timer = window.setInterval(loadSnapshot, refreshInterval.value * 1000)
@@ -448,7 +492,7 @@ onUnmounted(() => {
 .floorplan { display: block; width: 100%; height: 100%; object-fit: fill; pointer-events: none; }
 .device-marker:hover { z-index: 7 !important; }
 .reported-at-offline { color: #cf1322; font-weight: 600; }
-.device-marker { position: absolute; z-index: 2; transform: translate(-50%, -50%); padding: 0; border: 0; background: transparent; cursor: pointer; white-space: nowrap; }
+.device-marker { position: absolute; z-index: 2; transform: translate(-50%, -50%); padding: 0; border: 0; background: transparent; cursor: pointer; white-space: nowrap; transition: left 0.55s linear, top 0.55s linear; }
 .marker-dot { width: 14px; height: 14px; border-width: 2px; }
 .marker-online .marker-dot { background: #16a34a; }
 .marker-busy .marker-dot { background: #f59e0b; }

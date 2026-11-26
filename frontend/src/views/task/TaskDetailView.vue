@@ -7,7 +7,7 @@
       <a-descriptions-item label="任务族">{{ task.taskFamily || '未指定' }}</a-descriptions-item>
       <a-descriptions-item label="重规划次数">{{ task.replanUsed ? '1 / 1' : '0 / 1' }}</a-descriptions-item>
       <a-descriptions-item :label="task.status === 'COMPLETED' ? '历史失败/降级原因' : '失败/降级原因'" v-if="task.failureReason || task.downgradeReason" :span="2">
-        {{ task.failureReason || task.downgradeReason }}
+        {{ replaceCapabilityCodesInText(task.failureReason || task.downgradeReason) }}
       </a-descriptions-item>
     </a-descriptions>
 
@@ -35,9 +35,9 @@
       <a-collapse>
         <a-collapse-panel v-for="snap in contextSnapshots" :key="snap.id"
                            :header="`${snap.snapshotCode} - 生成时间: ${snap.generatedAt}`">
-          <p><b>能力覆盖：</b>{{ JSON.stringify(snap.capabilityCoverage) }}</p>
+          <p><b>能力覆盖：</b>{{ formatCapabilityCoverage(snap.capabilityCoverage) }}</p>
           <p><b>参与规划的代理：</b></p>
-          <pre>{{ JSON.stringify(snap.agents, null, 2) }}</pre>
+          <pre>{{ JSON.stringify(formatSnapshotAgents(snap.agents), null, 2) }}</pre>
           <p v-if="snap.failedAgentCodes?.length"><b>查询失败的代理：</b>{{ snap.failedAgentCodes.join('，') }}</p>
         </a-collapse-panel>
       </a-collapse>
@@ -56,7 +56,7 @@
             <a-descriptions-item label="风险等级" v-if="pv.riskLevel">{{ pv.riskLevel }}</a-descriptions-item>
             <a-descriptions-item label="推荐处置" v-if="pv.riskLevel">{{ recommendedActionText(pv) }}</a-descriptions-item>
             <a-descriptions-item label="风险原因" v-if="pv.riskReasonCode">{{ pv.riskReasonCode }}</a-descriptions-item>
-            <a-descriptions-item label="判定依据" :span="2" v-if="pv.judgmentBasis">{{ pv.judgmentBasis }}</a-descriptions-item>
+            <a-descriptions-item label="判定依据" :span="2" v-if="pv.judgmentBasis">{{ replaceCapabilityCodesInText(pv.judgmentBasis) }}</a-descriptions-item>
             <a-descriptions-item label="置信度" v-if="pv.confidence != null">{{ pv.confidence }}</a-descriptions-item>
             <a-descriptions-item label="规则集版本" v-if="pv.ruleSetVersion">{{ pv.ruleSetVersion }}</a-descriptions-item>
           </a-descriptions>
@@ -66,7 +66,7 @@
             <template #description>
               <ul>
                 <li v-for="(err, i) in pv.validationErrors" :key="i">
-                  [{{ err.errorType }}] 步骤{{ err.stepSeq ?? '—' }}：{{ err.description }}（{{ err.reasonCode }}）
+                  [{{ err.errorType }}] 步骤{{ err.stepSeq ?? '—' }}：{{ replaceCapabilityCodesInText(err.description) }}（{{ err.reasonCode }}）
                 </li>
               </ul>
             </template>
@@ -117,7 +117,7 @@
                 <span v-if="templateRefOf(pv)?.currentVersion && templateRefOf(pv).currentVersion !== templateRefOf(pv).version"
                       style="color: #999">（模板当前为 {{ templateRefOf(pv).currentVersion }}）</span>
               </a-descriptions-item>
-              <a-descriptions-item label="降级原因" :span="2" v-if="task.downgradeReason">{{ task.downgradeReason }}</a-descriptions-item>
+              <a-descriptions-item label="降级原因" :span="2" v-if="task.downgradeReason">{{ replaceCapabilityCodesInText(task.downgradeReason) }}</a-descriptions-item>
             </a-descriptions>
             <a-table :dataSource="matchRowsOf(pv)" size="small" :pagination="false" rowKey="item" style="margin-top: 8px"
                      :columns="[{ title: '匹配项', dataIndex: 'item' }, { title: '任务要求', dataIndex: 'expected' },
@@ -134,7 +134,8 @@
           <p style="margin-top: 8px"><b>候选步骤：</b></p>
           <a-table :dataSource="pv.planSteps" :columns="stepColumns" rowKey="stepSeq" size="small" :pagination="false">
             <template #bodyCell="{ column, record }">
-              <template v-if="column.dataIndex === 'inputParams'">
+              <template v-if="column.dataIndex === 'capabilityType'">{{ capabilityLabel(record.capabilityType) }}</template>
+              <template v-else-if="column.dataIndex === 'inputParams'">
                 <code>{{ JSON.stringify(record.inputParams ?? record.paramMapping ?? {}) }}</code>
               </template>
               <template v-else-if="column.key === 'paramSource'">{{ paramSourceOf(pv, record) }}</template>
@@ -394,7 +395,7 @@ import { message } from 'ant-design-vue'
 import { taskProgress, progressText } from '../../utils/taskProgress'
 import { templateReference, matchBasis } from '../../utils/downgradeMatch'
 import { getBaselineTemplate } from '../../api/baseline'
-import { capabilityLabel } from '../../constants/capability'
+import { capabilityLabel, replaceCapabilityCodesInText } from '../../constants/capability'
 import request from '../../api/request'
 import { getTask, getTaskEvents, getPlanVersions, getContextSnapshots, getStepAssignments, clarifyTask, manualAction, terminateTask } from '../../api/task'
 
@@ -430,7 +431,7 @@ function replaceDeviceCodesInText(text) {
       out = out.split(code).join(name)
     }
   }
-  return out
+  return replaceCapabilityCodesInText(out)
 }
 const currentSteps = computed(() => planVersions.value.find(p => p.id === task.value?.currentPlanVersionId)?.planSteps || [])
 const progress = computed(() => taskProgress(currentSteps.value, stepAssignments.value))
@@ -606,7 +607,7 @@ const statusOptions = [
 const stepColumns = [
   { title: '步骤', dataIndex: 'stepSeq' },
   { title: '步骤目标', dataIndex: 'stepGoal' },
-  { title: '所需能力', dataIndex: 'capabilityType' },
+  { title: '所需能力', dataIndex: 'capabilityType', customRender: ({ text }) => capabilityLabel(text) },
   { title: '输入参数', dataIndex: 'inputParams' },
   { title: '参数来源', key: 'paramSource' },
   { title: '候选设备', key: 'candidates' },
@@ -620,6 +621,22 @@ function statusLabel(status) {
 }
 function sourceLabel(source) {
   return source === 'BASELINE_TEMPLATE' ? '基线模板' : '自主规划'
+}
+function formatCapabilityCoverage(coverage) {
+  if (!coverage) return '—'
+  const available = (coverage.available || []).map(capabilityLabel).join('、') || '无'
+  const missing = (coverage.missing || []).map(capabilityLabel).join('、') || '无'
+  return `可用：${available}；缺失：${missing}`
+}
+function formatSnapshotAgents(agents) {
+  if (!Array.isArray(agents)) return agents
+  return agents.map((agent) => ({
+    ...agent,
+    capabilities: Array.isArray(agent.capabilities) ? agent.capabilities.map(capabilityLabel) : agent.capabilities,
+    capabilitySchemas: Array.isArray(agent.capabilitySchemas)
+      ? agent.capabilitySchemas.map((s) => ({ ...s, capabilityType: capabilityLabel(s.capabilityType) }))
+      : agent.capabilitySchemas
+  }))
 }
 function recommendedActionText(pv) {
   const action = pv?.recommendedAction || (pv?.riskLevel === 'LOW' ? 'AUTO_EXECUTE' : pv?.riskLevel === 'HIGH' ? 'BASELINE_DOWNGRADE' : 'MANUAL_HANDLING')

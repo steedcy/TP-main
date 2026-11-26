@@ -1,21 +1,309 @@
 [
   {
-    "deviceCode": "SIM_F2_DISPLAY",
-    "deviceName": "智慧显示终端仿真体",
+    "deviceCode": "SIM_SCANNER_W",
+    "deviceName": "智能行李测量设备01",
+    "deviceTypeCode": "SIMULATOR",
+    "isSimulator": true,
+    "simulatedDeviceType": "BAGGAGE_SCANNER",
+    "areaCode": "隔离区外",
+    "positionX": 520,
+    "positionY": 425,
+    "accessEndpoint": "http://127.0.0.1:18101",
+    "accessCredentialRef": "local-sim/SIM_SCANNER_W",
+    "statusReportInterval": 5,
+    "remark": "值机区左侧行李测量",
+    "capabilities": [
+      {
+        "capabilityCode": "CAP_BAGGAGE_MEASURE",
+        "capabilityName": "行李尺寸重量测量",
+        "capabilityType": "CAP_BAGGAGE_MEASURE",
+        "inputParams": [
+          {
+            "name": "measureMode",
+            "type": "String",
+            "required": true,
+            "defaultValue": "AUTO",
+            "range": "AUTO/MANUAL"
+          },
+          {
+            "name": "timeout",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "30",
+            "range": "10~60"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "length",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "width",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "height",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "weight",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "isOversize",
+            "type": "Boolean",
+            "required": true
+          },
+          {
+            "name": "measureStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "baggageInfo",
+            "type": "String",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：行李尺寸重量测量"
+      },
+      {
+        "capabilityCode": "CAP_OVERSIZE_ALERT",
+        "capabilityName": "超规行李上报",
+        "capabilityType": "CAP_OVERSIZE_ALERT",
+        "inputParams": [
+          {
+            "name": "baggageInfo",
+            "type": "String",
+            "required": true,
+            "defaultValue": "{\"length\": 80, \"width\": 55, \"height\": 35, \"weight\": 35}"
+          },
+          {
+            "name": "alertLevel",
+            "type": "String",
+            "required": true,
+            "defaultValue": "WARNING",
+            "range": "WARNING/ERROR"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "alertId",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "reportStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "reportTime",
+            "type": "String",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：超规行李上报"
+      },
+      {
+        "capabilityCode": "CAP_SIM_STATUS",
+        "capabilityName": "仿真状态生成",
+        "capabilityType": "CAP_SIM_STATUS",
+        "inputParams": [],
+        "outputParams": [],
+        "capabilityDescription": "仿真体生成并上报模拟设备状态"
+      }
+    ]
+  },
+  {
+    "deviceCode": "SIM_SCANNER_E",
+    "deviceName": "智能行李测量设备02",
+    "deviceTypeCode": "SIMULATOR",
+    "isSimulator": true,
+    "simulatedDeviceType": "BAGGAGE_SCANNER",
+    "areaCode": "隔离区外",
+    "positionX": 1420,
+    "positionY": 425,
+    "accessEndpoint": "http://127.0.0.1:18102",
+    "accessCredentialRef": "local-sim/SIM_SCANNER_E",
+    "statusReportInterval": 5,
+    "remark": "值机区右侧行李测量",
+    "capabilities": [
+      {
+        "capabilityCode": "CAP_BAGGAGE_MEASURE",
+        "capabilityName": "行李尺寸重量测量",
+        "capabilityType": "CAP_BAGGAGE_MEASURE",
+        "inputParams": [
+          {
+            "name": "measureMode",
+            "type": "String",
+            "required": true,
+            "defaultValue": "AUTO",
+            "range": "AUTO/MANUAL"
+          },
+          {
+            "name": "timeout",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "30",
+            "range": "10~60"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "length",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "width",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "height",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "weight",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "isOversize",
+            "type": "Boolean",
+            "required": true
+          },
+          {
+            "name": "measureStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "baggageInfo",
+            "type": "String",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：行李尺寸重量测量"
+      },
+      {
+        "capabilityCode": "CAP_OVERSIZE_ALERT",
+        "capabilityName": "超规行李上报",
+        "capabilityType": "CAP_OVERSIZE_ALERT",
+        "inputParams": [
+          {
+            "name": "baggageInfo",
+            "type": "String",
+            "required": true,
+            "defaultValue": "{\"length\": 80, \"width\": 55, \"height\": 35, \"weight\": 35}"
+          },
+          {
+            "name": "alertLevel",
+            "type": "String",
+            "required": true,
+            "defaultValue": "WARNING",
+            "range": "WARNING/ERROR"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "alertId",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "reportStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "reportTime",
+            "type": "String",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：超规行李上报"
+      },
+      {
+        "capabilityCode": "CAP_SIM_STATUS",
+        "capabilityName": "仿真状态生成",
+        "capabilityType": "CAP_SIM_STATUS",
+        "inputParams": [],
+        "outputParams": [],
+        "capabilityDescription": "仿真体生成并上报模拟设备状态"
+      }
+    ]
+  },
+  {
+    "deviceCode": "SIM_DISPLAY_C1",
+    "deviceName": "智慧航显01",
     "deviceTypeCode": "SIMULATOR",
     "isSimulator": true,
     "simulatedDeviceType": "SMART_DISPLAY",
-    "areaCode": "F2_TEST",
-    "positionX": 805,
-    "positionY": 4200,
-    "accessEndpoint": "http://127.0.0.1:8091",
-    "accessCredentialRef": "local-test/SIM_F2_DISPLAY",
+    "areaCode": "隔离区外",
+    "positionX": 680,
+    "positionY": 445,
+    "accessEndpoint": "http://127.0.0.1:18103",
+    "accessCredentialRef": "local-sim/SIM_DISPLAY_C1",
     "statusReportInterval": 5,
-    "remark": "95用例准备；F2像素坐标；虚构业务数据，非实地标定",
+    "remark": "值机区左侧智慧航显",
     "capabilities": [
       {
+        "capabilityCode": "CAP_FLIGHT_UPDATE",
+        "capabilityName": "航班信息发布",
+        "capabilityType": "CAP_FLIGHT_UPDATE",
+        "inputParams": [
+          {
+            "name": "flightNumber",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEST1022"
+          },
+          {
+            "name": "updateType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "GATE_CHANGE",
+            "range": "DELAY/EARLY/GATE_CHANGE/CANCEL"
+          },
+          {
+            "name": "updateContent",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试航班登机口变更至GATE_04"
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "10~600"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "publishStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "publishTime",
+            "type": "String",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：航班信息发布"
+      },
+      {
         "capabilityCode": "CAP_INFO_DISPLAY",
-        "capabilityName": "INFO_DISPLAY测试能力",
+        "capabilityName": "综合信息展示",
         "capabilityType": "CAP_INFO_DISPLAY",
         "inputParams": [
           {
@@ -29,7 +317,7 @@
             "name": "contentData",
             "type": "String",
             "required": true,
-            "defaultValue": "测试信息：请前往F2服务点"
+            "defaultValue": "测试信息：请前往服务台(SERVICE_DESK)"
           },
           {
             "name": "displayDuration",
@@ -56,64 +344,18 @@
             "required": false
           }
         ],
-        "capabilityDescription": "按现有仿真驱动业务契约配置"
-      },
-      {
-        "capabilityCode": "CAP_FLIGHT_UPDATE",
-        "capabilityName": "FLIGHT_UPDATE测试能力",
-        "capabilityType": "CAP_FLIGHT_UPDATE",
-        "inputParams": [
-          {
-            "name": "flightNumber",
-            "type": "String",
-            "required": true,
-            "defaultValue": "TEST1022"
-          },
-          {
-            "name": "updateType",
-            "type": "String",
-            "required": true,
-            "defaultValue": "GATE_CHANGE",
-            "range": "DELAY/EARLY/GATE_CHANGE/CANCEL"
-          },
-          {
-            "name": "updateContent",
-            "type": "String",
-            "required": true,
-            "defaultValue": "测试航班登机口变更至F2_TEST_GATE"
-          },
-          {
-            "name": "displayDuration",
-            "type": "Integer",
-            "required": true,
-            "defaultValue": "60",
-            "range": "10~600"
-          }
-        ],
-        "outputParams": [
-          {
-            "name": "publishStatus",
-            "type": "String",
-            "required": true
-          },
-          {
-            "name": "publishTime",
-            "type": "String",
-            "required": true
-          }
-        ],
-        "capabilityDescription": "按现有仿真驱动业务契约配置"
+        "capabilityDescription": "标准能力模板：综合信息展示"
       },
       {
         "capabilityCode": "CAP_NAVIGATION",
-        "capabilityName": "NAVIGATION测试能力",
+        "capabilityName": "空间引导",
         "capabilityType": "CAP_NAVIGATION",
         "inputParams": [
           {
             "name": "targetLocation",
             "type": "String",
             "required": true,
-            "defaultValue": "F2_TEST_GATE"
+            "defaultValue": "GATE_04"
           },
           {
             "name": "routePreference",
@@ -145,140 +387,667 @@
             "required": true
           }
         ],
-        "capabilityDescription": "按现有仿真驱动业务契约配置"
+        "capabilityDescription": "标准能力模板：空间引导"
+      },
+      {
+        "capabilityCode": "CAP_SIM_STATUS",
+        "capabilityName": "仿真状态生成",
+        "capabilityType": "CAP_SIM_STATUS",
+        "inputParams": [],
+        "outputParams": [],
+        "capabilityDescription": "仿真体生成并上报模拟设备状态"
       }
     ]
   },
   {
-    "deviceCode": "SIM_F2_BAGGAGE",
-    "deviceName": "行李测量仪仿真体",
+    "deviceCode": "SIM_DISPLAY_C2",
+    "deviceName": "智慧航显02",
     "deviceTypeCode": "SIMULATOR",
     "isSimulator": true,
-    "simulatedDeviceType": "BAGGAGE_SCANNER",
-    "areaCode": "F2_TEST",
-    "positionX": 805,
-    "positionY": 4050,
-    "accessEndpoint": "http://127.0.0.1:8092",
-    "accessCredentialRef": "local-test/SIM_F2_BAGGAGE",
+    "simulatedDeviceType": "SMART_DISPLAY",
+    "areaCode": "隔离区外",
+    "positionX": 1280,
+    "positionY": 445,
+    "accessEndpoint": "http://127.0.0.1:18104",
+    "accessCredentialRef": "local-sim/SIM_DISPLAY_C2",
     "statusReportInterval": 5,
-    "remark": "95用例准备；F2像素坐标；虚构业务数据，非实地标定",
+    "remark": "值机区右侧智慧航显",
     "capabilities": [
       {
-        "capabilityCode": "CAP_BAGGAGE_MEASURE",
-        "capabilityName": "BAGGAGE_MEASURE测试能力",
-        "capabilityType": "CAP_BAGGAGE_MEASURE",
+        "capabilityCode": "CAP_FLIGHT_UPDATE",
+        "capabilityName": "航班信息发布",
+        "capabilityType": "CAP_FLIGHT_UPDATE",
         "inputParams": [
           {
-            "name": "measureMode",
+            "name": "flightNumber",
             "type": "String",
             "required": true,
-            "defaultValue": "AUTO",
-            "range": "AUTO/MANUAL"
+            "defaultValue": "TEST1022"
           },
           {
-            "name": "timeout",
+            "name": "updateType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "GATE_CHANGE",
+            "range": "DELAY/EARLY/GATE_CHANGE/CANCEL"
+          },
+          {
+            "name": "updateContent",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试航班登机口变更至GATE_04"
+          },
+          {
+            "name": "displayDuration",
             "type": "Integer",
             "required": true,
-            "defaultValue": "30",
-            "range": "10~60"
+            "defaultValue": "60",
+            "range": "10~600"
           }
         ],
         "outputParams": [
           {
-            "name": "length",
-            "type": "Double",
+            "name": "publishStatus",
+            "type": "String",
             "required": true
           },
           {
-            "name": "width",
-            "type": "Double",
+            "name": "publishTime",
+            "type": "String",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：航班信息发布"
+      },
+      {
+        "capabilityCode": "CAP_INFO_DISPLAY",
+        "capabilityName": "综合信息展示",
+        "capabilityType": "CAP_INFO_DISPLAY",
+        "inputParams": [
+          {
+            "name": "contentType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEXT",
+            "range": "TEXT/IMAGE/VIDEO/HTML"
+          },
+          {
+            "name": "contentData",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试信息：请前往服务台(SERVICE_DESK)"
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "5~300"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "displayStatus",
+            "type": "String",
             "required": true
           },
           {
-            "name": "height",
-            "type": "Double",
+            "name": "actualDuration",
+            "type": "Integer",
             "required": true
           },
           {
-            "name": "weight",
-            "type": "Double",
-            "required": true
+            "name": "errorMessage",
+            "type": "String",
+            "required": false
+          }
+        ],
+        "capabilityDescription": "标准能力模板：综合信息展示"
+      },
+      {
+        "capabilityCode": "CAP_NAVIGATION",
+        "capabilityName": "空间引导",
+        "capabilityType": "CAP_NAVIGATION",
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "GATE_04"
           },
           {
-            "name": "isOversize",
+            "name": "routePreference",
+            "type": "String",
+            "required": true,
+            "defaultValue": "BARRIER_FREE",
+            "range": "SHORTEST/BARRIER_FREE"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "routeGenerated",
             "type": "Boolean",
             "required": true
           },
           {
-            "name": "measureStatus",
-            "type": "String",
+            "name": "estimatedDistance",
+            "type": "Double",
             "required": true
           },
           {
-            "name": "baggageInfo",
-            "type": "String",
+            "name": "estimatedDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "waypointCount",
+            "type": "Integer",
             "required": true
           }
         ],
-        "capabilityDescription": "按现有仿真驱动业务契约配置"
+        "capabilityDescription": "标准能力模板：空间引导"
       },
       {
-        "capabilityCode": "CAP_OVERSIZE_ALERT",
-        "capabilityName": "OVERSIZE_ALERT测试能力",
-        "capabilityType": "CAP_OVERSIZE_ALERT",
-        "inputParams": [
-          {
-            "name": "baggageInfo",
-            "type": "String",
-            "required": true,
-            "defaultValue": "{\"length\": 80, \"width\": 55, \"height\": 35, \"weight\": 35}"
-          },
-          {
-            "name": "alertLevel",
-            "type": "String",
-            "required": true,
-            "defaultValue": "WARNING",
-            "range": "WARNING/ERROR"
-          }
-        ],
-        "outputParams": [
-          {
-            "name": "alertId",
-            "type": "String",
-            "required": true
-          },
-          {
-            "name": "reportStatus",
-            "type": "String",
-            "required": true
-          },
-          {
-            "name": "reportTime",
-            "type": "String",
-            "required": true
-          }
-        ],
-        "capabilityDescription": "按现有仿真驱动业务契约配置"
+        "capabilityCode": "CAP_SIM_STATUS",
+        "capabilityName": "仿真状态生成",
+        "capabilityType": "CAP_SIM_STATUS",
+        "inputParams": [],
+        "outputParams": [],
+        "capabilityDescription": "仿真体生成并上报模拟设备状态"
       }
     ]
   },
   {
-    "deviceCode": "SIM_F2_FLIGHT",
-    "deviceName": "航班信息屏仿真体",
+    "deviceCode": "SIM_DISPLAY_H1",
+    "deviceName": "智慧航显03",
+    "deviceTypeCode": "SIMULATOR",
+    "isSimulator": true,
+    "simulatedDeviceType": "SMART_DISPLAY",
+    "areaCode": "隔离区内",
+    "positionX": 380,
+    "positionY": 145,
+    "accessEndpoint": "http://127.0.0.1:18105",
+    "accessCredentialRef": "local-sim/SIM_DISPLAY_H1",
+    "statusReportInterval": 5,
+    "remark": "候机区西侧智慧航显",
+    "capabilities": [
+      {
+        "capabilityCode": "CAP_FLIGHT_UPDATE",
+        "capabilityName": "航班信息发布",
+        "capabilityType": "CAP_FLIGHT_UPDATE",
+        "inputParams": [
+          {
+            "name": "flightNumber",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEST1022"
+          },
+          {
+            "name": "updateType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "GATE_CHANGE",
+            "range": "DELAY/EARLY/GATE_CHANGE/CANCEL"
+          },
+          {
+            "name": "updateContent",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试航班登机口变更至GATE_04"
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "10~600"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "publishStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "publishTime",
+            "type": "String",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：航班信息发布"
+      },
+      {
+        "capabilityCode": "CAP_INFO_DISPLAY",
+        "capabilityName": "综合信息展示",
+        "capabilityType": "CAP_INFO_DISPLAY",
+        "inputParams": [
+          {
+            "name": "contentType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEXT",
+            "range": "TEXT/IMAGE/VIDEO/HTML"
+          },
+          {
+            "name": "contentData",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试信息：请前往服务台(SERVICE_DESK)"
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "5~300"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "displayStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "errorMessage",
+            "type": "String",
+            "required": false
+          }
+        ],
+        "capabilityDescription": "标准能力模板：综合信息展示"
+      },
+      {
+        "capabilityCode": "CAP_NAVIGATION",
+        "capabilityName": "空间引导",
+        "capabilityType": "CAP_NAVIGATION",
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "GATE_04"
+          },
+          {
+            "name": "routePreference",
+            "type": "String",
+            "required": true,
+            "defaultValue": "BARRIER_FREE",
+            "range": "SHORTEST/BARRIER_FREE"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "routeGenerated",
+            "type": "Boolean",
+            "required": true
+          },
+          {
+            "name": "estimatedDistance",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "estimatedDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "waypointCount",
+            "type": "Integer",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：空间引导"
+      },
+      {
+        "capabilityCode": "CAP_SIM_STATUS",
+        "capabilityName": "仿真状态生成",
+        "capabilityType": "CAP_SIM_STATUS",
+        "inputParams": [],
+        "outputParams": [],
+        "capabilityDescription": "仿真体生成并上报模拟设备状态"
+      }
+    ]
+  },
+  {
+    "deviceCode": "SIM_DISPLAY_H2",
+    "deviceName": "智慧航显04",
+    "deviceTypeCode": "SIMULATOR",
+    "isSimulator": true,
+    "simulatedDeviceType": "SMART_DISPLAY",
+    "areaCode": "隔离区内",
+    "positionX": 1028,
+    "positionY": 165,
+    "accessEndpoint": "http://127.0.0.1:18106",
+    "accessCredentialRef": "local-sim/SIM_DISPLAY_H2",
+    "statusReportInterval": 5,
+    "remark": "候机区服务台旁智慧航显",
+    "capabilities": [
+      {
+        "capabilityCode": "CAP_FLIGHT_UPDATE",
+        "capabilityName": "航班信息发布",
+        "capabilityType": "CAP_FLIGHT_UPDATE",
+        "inputParams": [
+          {
+            "name": "flightNumber",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEST1022"
+          },
+          {
+            "name": "updateType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "GATE_CHANGE",
+            "range": "DELAY/EARLY/GATE_CHANGE/CANCEL"
+          },
+          {
+            "name": "updateContent",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试航班登机口变更至GATE_04"
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "10~600"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "publishStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "publishTime",
+            "type": "String",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：航班信息发布"
+      },
+      {
+        "capabilityCode": "CAP_INFO_DISPLAY",
+        "capabilityName": "综合信息展示",
+        "capabilityType": "CAP_INFO_DISPLAY",
+        "inputParams": [
+          {
+            "name": "contentType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEXT",
+            "range": "TEXT/IMAGE/VIDEO/HTML"
+          },
+          {
+            "name": "contentData",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试信息：请前往服务台(SERVICE_DESK)"
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "5~300"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "displayStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "errorMessage",
+            "type": "String",
+            "required": false
+          }
+        ],
+        "capabilityDescription": "标准能力模板：综合信息展示"
+      },
+      {
+        "capabilityCode": "CAP_NAVIGATION",
+        "capabilityName": "空间引导",
+        "capabilityType": "CAP_NAVIGATION",
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "GATE_04"
+          },
+          {
+            "name": "routePreference",
+            "type": "String",
+            "required": true,
+            "defaultValue": "BARRIER_FREE",
+            "range": "SHORTEST/BARRIER_FREE"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "routeGenerated",
+            "type": "Boolean",
+            "required": true
+          },
+          {
+            "name": "estimatedDistance",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "estimatedDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "waypointCount",
+            "type": "Integer",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：空间引导"
+      },
+      {
+        "capabilityCode": "CAP_SIM_STATUS",
+        "capabilityName": "仿真状态生成",
+        "capabilityType": "CAP_SIM_STATUS",
+        "inputParams": [],
+        "outputParams": [],
+        "capabilityDescription": "仿真体生成并上报模拟设备状态"
+      }
+    ]
+  },
+  {
+    "deviceCode": "SIM_DISPLAY_H3",
+    "deviceName": "智慧航显05",
+    "deviceTypeCode": "SIMULATOR",
+    "isSimulator": true,
+    "simulatedDeviceType": "SMART_DISPLAY",
+    "areaCode": "隔离区内",
+    "positionX": 1620,
+    "positionY": 145,
+    "accessEndpoint": "http://127.0.0.1:18107",
+    "accessCredentialRef": "local-sim/SIM_DISPLAY_H3",
+    "statusReportInterval": 5,
+    "remark": "候机区东侧智慧航显",
+    "capabilities": [
+      {
+        "capabilityCode": "CAP_FLIGHT_UPDATE",
+        "capabilityName": "航班信息发布",
+        "capabilityType": "CAP_FLIGHT_UPDATE",
+        "inputParams": [
+          {
+            "name": "flightNumber",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEST1022"
+          },
+          {
+            "name": "updateType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "GATE_CHANGE",
+            "range": "DELAY/EARLY/GATE_CHANGE/CANCEL"
+          },
+          {
+            "name": "updateContent",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试航班登机口变更至GATE_04"
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "10~600"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "publishStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "publishTime",
+            "type": "String",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：航班信息发布"
+      },
+      {
+        "capabilityCode": "CAP_INFO_DISPLAY",
+        "capabilityName": "综合信息展示",
+        "capabilityType": "CAP_INFO_DISPLAY",
+        "inputParams": [
+          {
+            "name": "contentType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEXT",
+            "range": "TEXT/IMAGE/VIDEO/HTML"
+          },
+          {
+            "name": "contentData",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试信息：请前往服务台(SERVICE_DESK)"
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "5~300"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "displayStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "errorMessage",
+            "type": "String",
+            "required": false
+          }
+        ],
+        "capabilityDescription": "标准能力模板：综合信息展示"
+      },
+      {
+        "capabilityCode": "CAP_NAVIGATION",
+        "capabilityName": "空间引导",
+        "capabilityType": "CAP_NAVIGATION",
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "GATE_04"
+          },
+          {
+            "name": "routePreference",
+            "type": "String",
+            "required": true,
+            "defaultValue": "BARRIER_FREE",
+            "range": "SHORTEST/BARRIER_FREE"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "routeGenerated",
+            "type": "Boolean",
+            "required": true
+          },
+          {
+            "name": "estimatedDistance",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "estimatedDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "waypointCount",
+            "type": "Integer",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：空间引导"
+      },
+      {
+        "capabilityCode": "CAP_SIM_STATUS",
+        "capabilityName": "仿真状态生成",
+        "capabilityType": "CAP_SIM_STATUS",
+        "inputParams": [],
+        "outputParams": [],
+        "capabilityDescription": "仿真体生成并上报模拟设备状态"
+      }
+    ]
+  },
+  {
+    "deviceCode": "SIM_DELAY_G3",
+    "deviceName": "航延屏01",
     "deviceTypeCode": "SIMULATOR",
     "isSimulator": true,
     "simulatedDeviceType": "FLIGHT_DELAY_BOARD",
-    "areaCode": "F2_TEST",
-    "positionX": 815,
-    "positionY": 4500,
-    "accessEndpoint": "http://127.0.0.1:8093",
-    "accessCredentialRef": "local-test/SIM_F2_FLIGHT",
+    "areaCode": "隔离区内",
+    "positionX": 482,
+    "positionY": 85,
+    "accessEndpoint": "http://127.0.0.1:18108",
+    "accessCredentialRef": "local-sim/SIM_DELAY_G3",
     "statusReportInterval": 5,
-    "remark": "95用例准备；F2像素坐标；虚构业务数据，非实地标定",
+    "remark": "3号登机口附近航延屏",
     "capabilities": [
       {
         "capabilityCode": "CAP_FLIGHT_UPDATE",
-        "capabilityName": "FLIGHT_UPDATE测试能力",
+        "capabilityName": "航班信息发布",
         "capabilityType": "CAP_FLIGHT_UPDATE",
         "inputParams": [
           {
@@ -298,7 +1067,7 @@
             "name": "updateContent",
             "type": "String",
             "required": true,
-            "defaultValue": "测试航班登机口变更至F2_TEST_GATE"
+            "defaultValue": "测试航班登机口变更至GATE_04"
           },
           {
             "name": "displayDuration",
@@ -320,11 +1089,11 @@
             "required": true
           }
         ],
-        "capabilityDescription": "按现有仿真驱动业务契约配置"
+        "capabilityDescription": "标准能力模板：航班信息发布"
       },
       {
         "capabilityCode": "CAP_INFO_DISPLAY",
-        "capabilityName": "INFO_DISPLAY测试能力",
+        "capabilityName": "综合信息展示",
         "capabilityType": "CAP_INFO_DISPLAY",
         "inputParams": [
           {
@@ -338,7 +1107,7 @@
             "name": "contentData",
             "type": "String",
             "required": true,
-            "defaultValue": "测试信息：请前往F2服务点"
+            "defaultValue": "测试信息：请前往服务台(SERVICE_DESK)"
           },
           {
             "name": "displayDuration",
@@ -365,77 +1134,617 @@
             "required": false
           }
         ],
-        "capabilityDescription": "按现有仿真驱动业务契约配置"
+        "capabilityDescription": "标准能力模板：综合信息展示"
+      },
+      {
+        "capabilityCode": "CAP_SIM_STATUS",
+        "capabilityName": "仿真状态生成",
+        "capabilityType": "CAP_SIM_STATUS",
+        "inputParams": [],
+        "outputParams": [],
+        "capabilityDescription": "仿真体生成并上报模拟设备状态"
       }
     ]
   },
   {
-    "deviceCode": "SIM_F2_ROBOT",
-    "deviceName": "移动服务机器人仿真体",
+    "deviceCode": "SIM_DELAY_G4",
+    "deviceName": "航延屏02",
     "deviceTypeCode": "SIMULATOR",
     "isSimulator": true,
-    "simulatedDeviceType": "MOBILE_ROBOT",
-    "areaCode": "F2_TEST",
-    "positionX": 810,
-    "positionY": 4180,
-    "accessEndpoint": "http://127.0.0.1:8094",
-    "accessCredentialRef": "local-test/SIM_F2_ROBOT",
+    "simulatedDeviceType": "FLIGHT_DELAY_BOARD",
+    "areaCode": "隔离区内",
+    "positionX": 719,
+    "positionY": 85,
+    "accessEndpoint": "http://127.0.0.1:18109",
+    "accessCredentialRef": "local-sim/SIM_DELAY_G4",
     "statusReportInterval": 5,
-    "remark": "95用例准备；F2像素坐标；虚构业务数据，非实地标定",
+    "remark": "4号登机口附近航延屏",
     "capabilities": [
       {
-        "capabilityCode": "CAP_NAVIGATION",
-        "capabilityName": "NAVIGATION测试能力",
-        "capabilityType": "CAP_NAVIGATION",
+        "capabilityCode": "CAP_FLIGHT_UPDATE",
+        "capabilityName": "航班信息发布",
+        "capabilityType": "CAP_FLIGHT_UPDATE",
         "inputParams": [
           {
-            "name": "targetLocation",
+            "name": "flightNumber",
             "type": "String",
             "required": true,
-            "defaultValue": "F2_TEST_GATE"
+            "defaultValue": "TEST1022"
           },
           {
-            "name": "routePreference",
+            "name": "updateType",
             "type": "String",
             "required": true,
-            "defaultValue": "BARRIER_FREE",
-            "range": "SHORTEST/BARRIER_FREE"
+            "defaultValue": "GATE_CHANGE",
+            "range": "DELAY/EARLY/GATE_CHANGE/CANCEL"
+          },
+          {
+            "name": "updateContent",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试航班登机口变更至GATE_04"
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "10~600"
           }
         ],
         "outputParams": [
           {
-            "name": "routeGenerated",
-            "type": "Boolean",
+            "name": "publishStatus",
+            "type": "String",
             "required": true
           },
           {
-            "name": "estimatedDistance",
-            "type": "Double",
-            "required": true
-          },
-          {
-            "name": "estimatedDuration",
-            "type": "Integer",
-            "required": true
-          },
-          {
-            "name": "waypointCount",
-            "type": "Integer",
+            "name": "publishTime",
+            "type": "String",
             "required": true
           }
         ],
-        "capabilityDescription": "按现有仿真驱动业务契约配置"
+        "capabilityDescription": "标准能力模板：航班信息发布"
       },
       {
+        "capabilityCode": "CAP_INFO_DISPLAY",
+        "capabilityName": "综合信息展示",
+        "capabilityType": "CAP_INFO_DISPLAY",
+        "inputParams": [
+          {
+            "name": "contentType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEXT",
+            "range": "TEXT/IMAGE/VIDEO/HTML"
+          },
+          {
+            "name": "contentData",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试信息：请前往服务台(SERVICE_DESK)"
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "5~300"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "displayStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "errorMessage",
+            "type": "String",
+            "required": false
+          }
+        ],
+        "capabilityDescription": "标准能力模板：综合信息展示"
+      },
+      {
+        "capabilityCode": "CAP_SIM_STATUS",
+        "capabilityName": "仿真状态生成",
+        "capabilityType": "CAP_SIM_STATUS",
+        "inputParams": [],
+        "outputParams": [],
+        "capabilityDescription": "仿真体生成并上报模拟设备状态"
+      }
+    ]
+  },
+  {
+    "deviceCode": "SIM_DELAY_G5",
+    "deviceName": "航延屏03",
+    "deviceTypeCode": "SIMULATOR",
+    "isSimulator": true,
+    "simulatedDeviceType": "FLIGHT_DELAY_BOARD",
+    "areaCode": "隔离区内",
+    "positionX": 1022,
+    "positionY": 85,
+    "accessEndpoint": "http://127.0.0.1:18110",
+    "accessCredentialRef": "local-sim/SIM_DELAY_G5",
+    "statusReportInterval": 5,
+    "remark": "5号登机口附近航延屏",
+    "capabilities": [
+      {
+        "capabilityCode": "CAP_FLIGHT_UPDATE",
+        "capabilityName": "航班信息发布",
+        "capabilityType": "CAP_FLIGHT_UPDATE",
+        "inputParams": [
+          {
+            "name": "flightNumber",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEST1022"
+          },
+          {
+            "name": "updateType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "GATE_CHANGE",
+            "range": "DELAY/EARLY/GATE_CHANGE/CANCEL"
+          },
+          {
+            "name": "updateContent",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试航班登机口变更至GATE_04"
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "10~600"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "publishStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "publishTime",
+            "type": "String",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：航班信息发布"
+      },
+      {
+        "capabilityCode": "CAP_INFO_DISPLAY",
+        "capabilityName": "综合信息展示",
+        "capabilityType": "CAP_INFO_DISPLAY",
+        "inputParams": [
+          {
+            "name": "contentType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEXT",
+            "range": "TEXT/IMAGE/VIDEO/HTML"
+          },
+          {
+            "name": "contentData",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试信息：请前往服务台(SERVICE_DESK)"
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "5~300"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "displayStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "errorMessage",
+            "type": "String",
+            "required": false
+          }
+        ],
+        "capabilityDescription": "标准能力模板：综合信息展示"
+      },
+      {
+        "capabilityCode": "CAP_SIM_STATUS",
+        "capabilityName": "仿真状态生成",
+        "capabilityType": "CAP_SIM_STATUS",
+        "inputParams": [],
+        "outputParams": [],
+        "capabilityDescription": "仿真体生成并上报模拟设备状态"
+      }
+    ]
+  },
+  {
+    "deviceCode": "SIM_DELAY_G6",
+    "deviceName": "航延屏04",
+    "deviceTypeCode": "SIMULATOR",
+    "isSimulator": true,
+    "simulatedDeviceType": "FLIGHT_DELAY_BOARD",
+    "areaCode": "隔离区内",
+    "positionX": 1257,
+    "positionY": 85,
+    "accessEndpoint": "http://127.0.0.1:18111",
+    "accessCredentialRef": "local-sim/SIM_DELAY_G6",
+    "statusReportInterval": 5,
+    "remark": "6号登机口附近航延屏",
+    "capabilities": [
+      {
+        "capabilityCode": "CAP_FLIGHT_UPDATE",
+        "capabilityName": "航班信息发布",
+        "capabilityType": "CAP_FLIGHT_UPDATE",
+        "inputParams": [
+          {
+            "name": "flightNumber",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEST1022"
+          },
+          {
+            "name": "updateType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "GATE_CHANGE",
+            "range": "DELAY/EARLY/GATE_CHANGE/CANCEL"
+          },
+          {
+            "name": "updateContent",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试航班登机口变更至GATE_04"
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "10~600"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "publishStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "publishTime",
+            "type": "String",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：航班信息发布"
+      },
+      {
+        "capabilityCode": "CAP_INFO_DISPLAY",
+        "capabilityName": "综合信息展示",
+        "capabilityType": "CAP_INFO_DISPLAY",
+        "inputParams": [
+          {
+            "name": "contentType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEXT",
+            "range": "TEXT/IMAGE/VIDEO/HTML"
+          },
+          {
+            "name": "contentData",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试信息：请前往服务台(SERVICE_DESK)"
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "5~300"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "displayStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "errorMessage",
+            "type": "String",
+            "required": false
+          }
+        ],
+        "capabilityDescription": "标准能力模板：综合信息展示"
+      },
+      {
+        "capabilityCode": "CAP_SIM_STATUS",
+        "capabilityName": "仿真状态生成",
+        "capabilityType": "CAP_SIM_STATUS",
+        "inputParams": [],
+        "outputParams": [],
+        "capabilityDescription": "仿真体生成并上报模拟设备状态"
+      }
+    ]
+  },
+  {
+    "deviceCode": "SIM_DELAY_C1",
+    "deviceName": "航延屏05",
+    "deviceTypeCode": "SIMULATOR",
+    "isSimulator": true,
+    "simulatedDeviceType": "FLIGHT_DELAY_BOARD",
+    "areaCode": "隔离区外",
+    "positionX": 360,
+    "positionY": 465,
+    "accessEndpoint": "http://127.0.0.1:18112",
+    "accessCredentialRef": "local-sim/SIM_DELAY_C1",
+    "statusReportInterval": 5,
+    "remark": "值机区左侧航延屏",
+    "capabilities": [
+      {
+        "capabilityCode": "CAP_FLIGHT_UPDATE",
+        "capabilityName": "航班信息发布",
+        "capabilityType": "CAP_FLIGHT_UPDATE",
+        "inputParams": [
+          {
+            "name": "flightNumber",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEST1022"
+          },
+          {
+            "name": "updateType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "GATE_CHANGE",
+            "range": "DELAY/EARLY/GATE_CHANGE/CANCEL"
+          },
+          {
+            "name": "updateContent",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试航班登机口变更至GATE_04"
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "10~600"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "publishStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "publishTime",
+            "type": "String",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：航班信息发布"
+      },
+      {
+        "capabilityCode": "CAP_INFO_DISPLAY",
+        "capabilityName": "综合信息展示",
+        "capabilityType": "CAP_INFO_DISPLAY",
+        "inputParams": [
+          {
+            "name": "contentType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEXT",
+            "range": "TEXT/IMAGE/VIDEO/HTML"
+          },
+          {
+            "name": "contentData",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试信息：请前往服务台(SERVICE_DESK)"
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "5~300"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "displayStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "errorMessage",
+            "type": "String",
+            "required": false
+          }
+        ],
+        "capabilityDescription": "标准能力模板：综合信息展示"
+      },
+      {
+        "capabilityCode": "CAP_SIM_STATUS",
+        "capabilityName": "仿真状态生成",
+        "capabilityType": "CAP_SIM_STATUS",
+        "inputParams": [],
+        "outputParams": [],
+        "capabilityDescription": "仿真体生成并上报模拟设备状态"
+      }
+    ]
+  },
+  {
+    "deviceCode": "SIM_DELAY_C2",
+    "deviceName": "航延屏06",
+    "deviceTypeCode": "SIMULATOR",
+    "isSimulator": true,
+    "simulatedDeviceType": "FLIGHT_DELAY_BOARD",
+    "areaCode": "隔离区外",
+    "positionX": 1660,
+    "positionY": 465,
+    "accessEndpoint": "http://127.0.0.1:18113",
+    "accessCredentialRef": "local-sim/SIM_DELAY_C2",
+    "statusReportInterval": 5,
+    "remark": "值机区右侧航延屏",
+    "capabilities": [
+      {
+        "capabilityCode": "CAP_FLIGHT_UPDATE",
+        "capabilityName": "航班信息发布",
+        "capabilityType": "CAP_FLIGHT_UPDATE",
+        "inputParams": [
+          {
+            "name": "flightNumber",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEST1022"
+          },
+          {
+            "name": "updateType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "GATE_CHANGE",
+            "range": "DELAY/EARLY/GATE_CHANGE/CANCEL"
+          },
+          {
+            "name": "updateContent",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试航班登机口变更至GATE_04"
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "10~600"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "publishStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "publishTime",
+            "type": "String",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：航班信息发布"
+      },
+      {
+        "capabilityCode": "CAP_INFO_DISPLAY",
+        "capabilityName": "综合信息展示",
+        "capabilityType": "CAP_INFO_DISPLAY",
+        "inputParams": [
+          {
+            "name": "contentType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEXT",
+            "range": "TEXT/IMAGE/VIDEO/HTML"
+          },
+          {
+            "name": "contentData",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试信息：请前往服务台(SERVICE_DESK)"
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "5~300"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "displayStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "errorMessage",
+            "type": "String",
+            "required": false
+          }
+        ],
+        "capabilityDescription": "标准能力模板：综合信息展示"
+      },
+      {
+        "capabilityCode": "CAP_SIM_STATUS",
+        "capabilityName": "仿真状态生成",
+        "capabilityType": "CAP_SIM_STATUS",
+        "inputParams": [],
+        "outputParams": [],
+        "capabilityDescription": "仿真体生成并上报模拟设备状态"
+      }
+    ]
+  },
+  {
+    "deviceCode": "SIM_ROBOT_C1",
+    "deviceName": "移动服务机器人01",
+    "deviceTypeCode": "SIMULATOR",
+    "isSimulator": true,
+    "simulatedDeviceType": "MOBILE_ROBOT",
+    "areaCode": "隔离区外",
+    "positionX": 440,
+    "positionY": 405,
+    "accessEndpoint": "http://127.0.0.1:18114",
+    "accessCredentialRef": "local-sim/SIM_ROBOT_C1",
+    "statusReportInterval": 5,
+    "remark": "值机区西侧机器人",
+    "capabilities": [
+      {
         "capabilityCode": "CAP_ESCORT",
-        "capabilityName": "ESCORT测试能力",
+        "capabilityName": "陪同服务",
         "capabilityType": "CAP_ESCORT",
         "inputParams": [
           {
             "name": "targetLocation",
             "type": "String",
             "required": true,
-            "defaultValue": "F2_TEST_GATE"
+            "defaultValue": "GATE_04"
           },
           {
             "name": "escortMode",
@@ -469,11 +1778,99 @@
             "required": true
           }
         ],
-        "capabilityDescription": "按现有仿真驱动业务契约配置"
+        "capabilityDescription": "标准能力模板：陪同服务"
+      },
+      {
+        "capabilityCode": "CAP_INFO_DISPLAY",
+        "capabilityName": "综合信息展示",
+        "capabilityType": "CAP_INFO_DISPLAY",
+        "inputParams": [
+          {
+            "name": "contentType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEXT",
+            "range": "TEXT/IMAGE/VIDEO/HTML"
+          },
+          {
+            "name": "contentData",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试信息：请前往服务台(SERVICE_DESK)"
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "5~300"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "displayStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "errorMessage",
+            "type": "String",
+            "required": false
+          }
+        ],
+        "capabilityDescription": "标准能力模板：综合信息展示"
+      },
+      {
+        "capabilityCode": "CAP_NAVIGATION",
+        "capabilityName": "空间引导",
+        "capabilityType": "CAP_NAVIGATION",
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "GATE_04"
+          },
+          {
+            "name": "routePreference",
+            "type": "String",
+            "required": true,
+            "defaultValue": "BARRIER_FREE",
+            "range": "SHORTEST/BARRIER_FREE"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "routeGenerated",
+            "type": "Boolean",
+            "required": true
+          },
+          {
+            "name": "estimatedDistance",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "estimatedDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "waypointCount",
+            "type": "Integer",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：空间引导"
       },
       {
         "capabilityCode": "CAP_NOTIFICATION",
-        "capabilityName": "NOTIFICATION测试能力",
+        "capabilityName": "现场通知",
         "capabilityType": "CAP_NOTIFICATION",
         "inputParams": [
           {
@@ -509,235 +1906,42 @@
             "required": true
           }
         ],
-        "capabilityDescription": "按现有仿真驱动业务契约配置"
+        "capabilityDescription": "标准能力模板：现场通知"
       },
       {
-        "capabilityCode": "CAP_INFO_DISPLAY",
-        "capabilityName": "INFO_DISPLAY测试能力",
-        "capabilityType": "CAP_INFO_DISPLAY",
-        "inputParams": [
-          {
-            "name": "contentType",
-            "type": "String",
-            "required": true,
-            "defaultValue": "TEXT",
-            "range": "TEXT/IMAGE/VIDEO/HTML"
-          },
-          {
-            "name": "contentData",
-            "type": "String",
-            "required": true,
-            "defaultValue": "测试信息：请前往F2服务点"
-          },
-          {
-            "name": "displayDuration",
-            "type": "Integer",
-            "required": true,
-            "defaultValue": "60",
-            "range": "5~300"
-          }
-        ],
-        "outputParams": [
-          {
-            "name": "displayStatus",
-            "type": "String",
-            "required": true
-          },
-          {
-            "name": "actualDuration",
-            "type": "Integer",
-            "required": true
-          },
-          {
-            "name": "errorMessage",
-            "type": "String",
-            "required": false
-          }
-        ],
-        "capabilityDescription": "按现有仿真驱动业务契约配置"
+        "capabilityCode": "CAP_SIM_STATUS",
+        "capabilityName": "仿真状态生成",
+        "capabilityType": "CAP_SIM_STATUS",
+        "inputParams": [],
+        "outputParams": [],
+        "capabilityDescription": "仿真体生成并上报模拟设备状态"
       }
     ]
   },
   {
-    "deviceCode": "SIM_F2_BAGGAGE_B",
-    "deviceName": "备用行李测量仪仿真体",
-    "deviceTypeCode": "SIMULATOR",
-    "isSimulator": true,
-    "simulatedDeviceType": "BAGGAGE_SCANNER",
-    "areaCode": "F2_TEST",
-    "positionX": 800,
-    "positionY": 4080,
-    "accessEndpoint": "http://127.0.0.1:8095",
-    "accessCredentialRef": "local-test/SIM_F2_BAGGAGE_B",
-    "statusReportInterval": 5,
-    "remark": "95用例准备；F2像素坐标；虚构业务数据，非实地标定",
-    "capabilities": [
-      {
-        "capabilityCode": "CAP_BAGGAGE_MEASURE",
-        "capabilityName": "BAGGAGE_MEASURE测试能力",
-        "capabilityType": "CAP_BAGGAGE_MEASURE",
-        "inputParams": [
-          {
-            "name": "measureMode",
-            "type": "String",
-            "required": true,
-            "defaultValue": "AUTO",
-            "range": "AUTO/MANUAL"
-          },
-          {
-            "name": "timeout",
-            "type": "Integer",
-            "required": true,
-            "defaultValue": "30",
-            "range": "10~60"
-          }
-        ],
-        "outputParams": [
-          {
-            "name": "length",
-            "type": "Double",
-            "required": true
-          },
-          {
-            "name": "width",
-            "type": "Double",
-            "required": true
-          },
-          {
-            "name": "height",
-            "type": "Double",
-            "required": true
-          },
-          {
-            "name": "weight",
-            "type": "Double",
-            "required": true
-          },
-          {
-            "name": "isOversize",
-            "type": "Boolean",
-            "required": true
-          },
-          {
-            "name": "measureStatus",
-            "type": "String",
-            "required": true
-          },
-          {
-            "name": "baggageInfo",
-            "type": "String",
-            "required": true
-          }
-        ],
-        "capabilityDescription": "按现有仿真驱动业务契约配置"
-      },
-      {
-        "capabilityCode": "CAP_OVERSIZE_ALERT",
-        "capabilityName": "OVERSIZE_ALERT测试能力",
-        "capabilityType": "CAP_OVERSIZE_ALERT",
-        "inputParams": [
-          {
-            "name": "baggageInfo",
-            "type": "String",
-            "required": true,
-            "defaultValue": "{\"length\": 80, \"width\": 55, \"height\": 35, \"weight\": 35}"
-          },
-          {
-            "name": "alertLevel",
-            "type": "String",
-            "required": true,
-            "defaultValue": "WARNING",
-            "range": "WARNING/ERROR"
-          }
-        ],
-        "outputParams": [
-          {
-            "name": "alertId",
-            "type": "String",
-            "required": true
-          },
-          {
-            "name": "reportStatus",
-            "type": "String",
-            "required": true
-          },
-          {
-            "name": "reportTime",
-            "type": "String",
-            "required": true
-          }
-        ],
-        "capabilityDescription": "按现有仿真驱动业务契约配置"
-      }
-    ]
-  },
-  {
-    "deviceCode": "SIM_F2_ROBOT_B",
-    "deviceName": "备用移动机器人仿真体",
+    "deviceCode": "SIM_ROBOT_C2",
+    "deviceName": "移动服务机器人02",
     "deviceTypeCode": "SIMULATOR",
     "isSimulator": true,
     "simulatedDeviceType": "MOBILE_ROBOT",
-    "areaCode": "F2_TEST",
-    "positionX": 810,
-    "positionY": 4150,
-    "accessEndpoint": "http://127.0.0.1:8096",
-    "accessCredentialRef": "local-test/SIM_F2_ROBOT_B",
+    "areaCode": "隔离区外",
+    "positionX": 1038,
+    "positionY": 415,
+    "accessEndpoint": "http://127.0.0.1:18115",
+    "accessCredentialRef": "local-sim/SIM_ROBOT_C2",
     "statusReportInterval": 5,
-    "remark": "95用例准备；F2像素坐标；虚构业务数据，非实地标定",
+    "remark": "值机区中轴机器人",
     "capabilities": [
       {
-        "capabilityCode": "CAP_NAVIGATION",
-        "capabilityName": "NAVIGATION测试能力",
-        "capabilityType": "CAP_NAVIGATION",
-        "inputParams": [
-          {
-            "name": "targetLocation",
-            "type": "String",
-            "required": true,
-            "defaultValue": "F2_TEST_GATE"
-          },
-          {
-            "name": "routePreference",
-            "type": "String",
-            "required": true,
-            "defaultValue": "BARRIER_FREE",
-            "range": "SHORTEST/BARRIER_FREE"
-          }
-        ],
-        "outputParams": [
-          {
-            "name": "routeGenerated",
-            "type": "Boolean",
-            "required": true
-          },
-          {
-            "name": "estimatedDistance",
-            "type": "Double",
-            "required": true
-          },
-          {
-            "name": "estimatedDuration",
-            "type": "Integer",
-            "required": true
-          },
-          {
-            "name": "waypointCount",
-            "type": "Integer",
-            "required": true
-          }
-        ],
-        "capabilityDescription": "按现有仿真驱动业务契约配置"
-      },
-      {
         "capabilityCode": "CAP_ESCORT",
-        "capabilityName": "ESCORT测试能力",
+        "capabilityName": "陪同服务",
         "capabilityType": "CAP_ESCORT",
         "inputParams": [
           {
             "name": "targetLocation",
             "type": "String",
             "required": true,
-            "defaultValue": "F2_TEST_GATE"
+            "defaultValue": "GATE_04"
           },
           {
             "name": "escortMode",
@@ -771,11 +1975,99 @@
             "required": true
           }
         ],
-        "capabilityDescription": "按现有仿真驱动业务契约配置"
+        "capabilityDescription": "标准能力模板：陪同服务"
+      },
+      {
+        "capabilityCode": "CAP_INFO_DISPLAY",
+        "capabilityName": "综合信息展示",
+        "capabilityType": "CAP_INFO_DISPLAY",
+        "inputParams": [
+          {
+            "name": "contentType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEXT",
+            "range": "TEXT/IMAGE/VIDEO/HTML"
+          },
+          {
+            "name": "contentData",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试信息：请前往服务台(SERVICE_DESK)"
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "5~300"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "displayStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "errorMessage",
+            "type": "String",
+            "required": false
+          }
+        ],
+        "capabilityDescription": "标准能力模板：综合信息展示"
+      },
+      {
+        "capabilityCode": "CAP_NAVIGATION",
+        "capabilityName": "空间引导",
+        "capabilityType": "CAP_NAVIGATION",
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "GATE_04"
+          },
+          {
+            "name": "routePreference",
+            "type": "String",
+            "required": true,
+            "defaultValue": "BARRIER_FREE",
+            "range": "SHORTEST/BARRIER_FREE"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "routeGenerated",
+            "type": "Boolean",
+            "required": true
+          },
+          {
+            "name": "estimatedDistance",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "estimatedDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "waypointCount",
+            "type": "Integer",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：空间引导"
       },
       {
         "capabilityCode": "CAP_NOTIFICATION",
-        "capabilityName": "NOTIFICATION测试能力",
+        "capabilityName": "现场通知",
         "capabilityType": "CAP_NOTIFICATION",
         "inputParams": [
           {
@@ -811,11 +2103,80 @@
             "required": true
           }
         ],
-        "capabilityDescription": "按现有仿真驱动业务契约配置"
+        "capabilityDescription": "标准能力模板：现场通知"
+      },
+      {
+        "capabilityCode": "CAP_SIM_STATUS",
+        "capabilityName": "仿真状态生成",
+        "capabilityType": "CAP_SIM_STATUS",
+        "inputParams": [],
+        "outputParams": [],
+        "capabilityDescription": "仿真体生成并上报模拟设备状态"
+      }
+    ]
+  },
+  {
+    "deviceCode": "SIM_ROBOT_C3",
+    "deviceName": "移动服务机器人03",
+    "deviceTypeCode": "SIMULATOR",
+    "isSimulator": true,
+    "simulatedDeviceType": "MOBILE_ROBOT",
+    "areaCode": "隔离区外",
+    "positionX": 1520,
+    "positionY": 405,
+    "accessEndpoint": "http://127.0.0.1:18116",
+    "accessCredentialRef": "local-sim/SIM_ROBOT_C3",
+    "statusReportInterval": 5,
+    "remark": "值机区东侧机器人",
+    "capabilities": [
+      {
+        "capabilityCode": "CAP_ESCORT",
+        "capabilityName": "陪同服务",
+        "capabilityType": "CAP_ESCORT",
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "GATE_04"
+          },
+          {
+            "name": "escortMode",
+            "type": "String",
+            "required": true,
+            "defaultValue": "LEAD",
+            "range": "LEAD/FOLLOW"
+          },
+          {
+            "name": "maxDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "600",
+            "range": "60~1800"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "arrivalStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualDistance",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "actualDuration",
+            "type": "Integer",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：陪同服务"
       },
       {
         "capabilityCode": "CAP_INFO_DISPLAY",
-        "capabilityName": "INFO_DISPLAY测试能力",
+        "capabilityName": "综合信息展示",
         "capabilityType": "CAP_INFO_DISPLAY",
         "inputParams": [
           {
@@ -829,7 +2190,7 @@
             "name": "contentData",
             "type": "String",
             "required": true,
-            "defaultValue": "测试信息：请前往F2服务点"
+            "defaultValue": "测试信息：请前往服务台(SERVICE_DESK)"
           },
           {
             "name": "displayDuration",
@@ -856,7 +2217,886 @@
             "required": false
           }
         ],
-        "capabilityDescription": "按现有仿真驱动业务契约配置"
+        "capabilityDescription": "标准能力模板：综合信息展示"
+      },
+      {
+        "capabilityCode": "CAP_NAVIGATION",
+        "capabilityName": "空间引导",
+        "capabilityType": "CAP_NAVIGATION",
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "GATE_04"
+          },
+          {
+            "name": "routePreference",
+            "type": "String",
+            "required": true,
+            "defaultValue": "BARRIER_FREE",
+            "range": "SHORTEST/BARRIER_FREE"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "routeGenerated",
+            "type": "Boolean",
+            "required": true
+          },
+          {
+            "name": "estimatedDistance",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "estimatedDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "waypointCount",
+            "type": "Integer",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：空间引导"
+      },
+      {
+        "capabilityCode": "CAP_NOTIFICATION",
+        "capabilityName": "现场通知",
+        "capabilityType": "CAP_NOTIFICATION",
+        "inputParams": [
+          {
+            "name": "notificationType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "BOTH",
+            "range": "VOICE/TEXT/BOTH"
+          },
+          {
+            "name": "notificationContent",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试旅客需要轮椅陪同，请现场服务人员协助"
+          },
+          {
+            "name": "repeatCount",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "1",
+            "range": "1~5"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "notificationStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualRepeatCount",
+            "type": "Integer",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：现场通知"
+      },
+      {
+        "capabilityCode": "CAP_SIM_STATUS",
+        "capabilityName": "仿真状态生成",
+        "capabilityType": "CAP_SIM_STATUS",
+        "inputParams": [],
+        "outputParams": [],
+        "capabilityDescription": "仿真体生成并上报模拟设备状态"
+      }
+    ]
+  },
+  {
+    "deviceCode": "SIM_ROBOT_H1",
+    "deviceName": "移动服务机器人04",
+    "deviceTypeCode": "SIMULATOR",
+    "isSimulator": true,
+    "simulatedDeviceType": "MOBILE_ROBOT",
+    "areaCode": "隔离区内",
+    "positionX": 280,
+    "positionY": 120,
+    "accessEndpoint": "http://127.0.0.1:18117",
+    "accessCredentialRef": "local-sim/SIM_ROBOT_H1",
+    "statusReportInterval": 5,
+    "remark": "候机区西侧机器人",
+    "capabilities": [
+      {
+        "capabilityCode": "CAP_ESCORT",
+        "capabilityName": "陪同服务",
+        "capabilityType": "CAP_ESCORT",
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "GATE_04"
+          },
+          {
+            "name": "escortMode",
+            "type": "String",
+            "required": true,
+            "defaultValue": "LEAD",
+            "range": "LEAD/FOLLOW"
+          },
+          {
+            "name": "maxDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "600",
+            "range": "60~1800"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "arrivalStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualDistance",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "actualDuration",
+            "type": "Integer",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：陪同服务"
+      },
+      {
+        "capabilityCode": "CAP_INFO_DISPLAY",
+        "capabilityName": "综合信息展示",
+        "capabilityType": "CAP_INFO_DISPLAY",
+        "inputParams": [
+          {
+            "name": "contentType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEXT",
+            "range": "TEXT/IMAGE/VIDEO/HTML"
+          },
+          {
+            "name": "contentData",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试信息：请前往服务台(SERVICE_DESK)"
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "5~300"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "displayStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "errorMessage",
+            "type": "String",
+            "required": false
+          }
+        ],
+        "capabilityDescription": "标准能力模板：综合信息展示"
+      },
+      {
+        "capabilityCode": "CAP_NAVIGATION",
+        "capabilityName": "空间引导",
+        "capabilityType": "CAP_NAVIGATION",
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "GATE_04"
+          },
+          {
+            "name": "routePreference",
+            "type": "String",
+            "required": true,
+            "defaultValue": "BARRIER_FREE",
+            "range": "SHORTEST/BARRIER_FREE"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "routeGenerated",
+            "type": "Boolean",
+            "required": true
+          },
+          {
+            "name": "estimatedDistance",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "estimatedDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "waypointCount",
+            "type": "Integer",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：空间引导"
+      },
+      {
+        "capabilityCode": "CAP_NOTIFICATION",
+        "capabilityName": "现场通知",
+        "capabilityType": "CAP_NOTIFICATION",
+        "inputParams": [
+          {
+            "name": "notificationType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "BOTH",
+            "range": "VOICE/TEXT/BOTH"
+          },
+          {
+            "name": "notificationContent",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试旅客需要轮椅陪同，请现场服务人员协助"
+          },
+          {
+            "name": "repeatCount",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "1",
+            "range": "1~5"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "notificationStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualRepeatCount",
+            "type": "Integer",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：现场通知"
+      },
+      {
+        "capabilityCode": "CAP_SIM_STATUS",
+        "capabilityName": "仿真状态生成",
+        "capabilityType": "CAP_SIM_STATUS",
+        "inputParams": [],
+        "outputParams": [],
+        "capabilityDescription": "仿真体生成并上报模拟设备状态"
+      }
+    ]
+  },
+  {
+    "deviceCode": "SIM_ROBOT_H2",
+    "deviceName": "移动服务机器人05",
+    "deviceTypeCode": "SIMULATOR",
+    "isSimulator": true,
+    "simulatedDeviceType": "MOBILE_ROBOT",
+    "areaCode": "隔离区内",
+    "positionX": 780,
+    "positionY": 145,
+    "accessEndpoint": "http://127.0.0.1:18118",
+    "accessCredentialRef": "local-sim/SIM_ROBOT_H2",
+    "statusReportInterval": 5,
+    "remark": "候机区中偏西机器人",
+    "capabilities": [
+      {
+        "capabilityCode": "CAP_ESCORT",
+        "capabilityName": "陪同服务",
+        "capabilityType": "CAP_ESCORT",
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "GATE_04"
+          },
+          {
+            "name": "escortMode",
+            "type": "String",
+            "required": true,
+            "defaultValue": "LEAD",
+            "range": "LEAD/FOLLOW"
+          },
+          {
+            "name": "maxDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "600",
+            "range": "60~1800"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "arrivalStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualDistance",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "actualDuration",
+            "type": "Integer",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：陪同服务"
+      },
+      {
+        "capabilityCode": "CAP_INFO_DISPLAY",
+        "capabilityName": "综合信息展示",
+        "capabilityType": "CAP_INFO_DISPLAY",
+        "inputParams": [
+          {
+            "name": "contentType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEXT",
+            "range": "TEXT/IMAGE/VIDEO/HTML"
+          },
+          {
+            "name": "contentData",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试信息：请前往服务台(SERVICE_DESK)"
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "5~300"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "displayStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "errorMessage",
+            "type": "String",
+            "required": false
+          }
+        ],
+        "capabilityDescription": "标准能力模板：综合信息展示"
+      },
+      {
+        "capabilityCode": "CAP_NAVIGATION",
+        "capabilityName": "空间引导",
+        "capabilityType": "CAP_NAVIGATION",
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "GATE_04"
+          },
+          {
+            "name": "routePreference",
+            "type": "String",
+            "required": true,
+            "defaultValue": "BARRIER_FREE",
+            "range": "SHORTEST/BARRIER_FREE"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "routeGenerated",
+            "type": "Boolean",
+            "required": true
+          },
+          {
+            "name": "estimatedDistance",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "estimatedDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "waypointCount",
+            "type": "Integer",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：空间引导"
+      },
+      {
+        "capabilityCode": "CAP_NOTIFICATION",
+        "capabilityName": "现场通知",
+        "capabilityType": "CAP_NOTIFICATION",
+        "inputParams": [
+          {
+            "name": "notificationType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "BOTH",
+            "range": "VOICE/TEXT/BOTH"
+          },
+          {
+            "name": "notificationContent",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试旅客需要轮椅陪同，请现场服务人员协助"
+          },
+          {
+            "name": "repeatCount",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "1",
+            "range": "1~5"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "notificationStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualRepeatCount",
+            "type": "Integer",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：现场通知"
+      },
+      {
+        "capabilityCode": "CAP_SIM_STATUS",
+        "capabilityName": "仿真状态生成",
+        "capabilityType": "CAP_SIM_STATUS",
+        "inputParams": [],
+        "outputParams": [],
+        "capabilityDescription": "仿真体生成并上报模拟设备状态"
+      }
+    ]
+  },
+  {
+    "deviceCode": "SIM_ROBOT_H3",
+    "deviceName": "移动服务机器人06",
+    "deviceTypeCode": "SIMULATOR",
+    "isSimulator": true,
+    "simulatedDeviceType": "MOBILE_ROBOT",
+    "areaCode": "隔离区内",
+    "positionX": 1200,
+    "positionY": 145,
+    "accessEndpoint": "http://127.0.0.1:18119",
+    "accessCredentialRef": "local-sim/SIM_ROBOT_H3",
+    "statusReportInterval": 5,
+    "remark": "候机区中偏东机器人",
+    "capabilities": [
+      {
+        "capabilityCode": "CAP_ESCORT",
+        "capabilityName": "陪同服务",
+        "capabilityType": "CAP_ESCORT",
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "GATE_04"
+          },
+          {
+            "name": "escortMode",
+            "type": "String",
+            "required": true,
+            "defaultValue": "LEAD",
+            "range": "LEAD/FOLLOW"
+          },
+          {
+            "name": "maxDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "600",
+            "range": "60~1800"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "arrivalStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualDistance",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "actualDuration",
+            "type": "Integer",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：陪同服务"
+      },
+      {
+        "capabilityCode": "CAP_INFO_DISPLAY",
+        "capabilityName": "综合信息展示",
+        "capabilityType": "CAP_INFO_DISPLAY",
+        "inputParams": [
+          {
+            "name": "contentType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEXT",
+            "range": "TEXT/IMAGE/VIDEO/HTML"
+          },
+          {
+            "name": "contentData",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试信息：请前往服务台(SERVICE_DESK)"
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "5~300"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "displayStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "errorMessage",
+            "type": "String",
+            "required": false
+          }
+        ],
+        "capabilityDescription": "标准能力模板：综合信息展示"
+      },
+      {
+        "capabilityCode": "CAP_NAVIGATION",
+        "capabilityName": "空间引导",
+        "capabilityType": "CAP_NAVIGATION",
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "GATE_04"
+          },
+          {
+            "name": "routePreference",
+            "type": "String",
+            "required": true,
+            "defaultValue": "BARRIER_FREE",
+            "range": "SHORTEST/BARRIER_FREE"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "routeGenerated",
+            "type": "Boolean",
+            "required": true
+          },
+          {
+            "name": "estimatedDistance",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "estimatedDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "waypointCount",
+            "type": "Integer",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：空间引导"
+      },
+      {
+        "capabilityCode": "CAP_NOTIFICATION",
+        "capabilityName": "现场通知",
+        "capabilityType": "CAP_NOTIFICATION",
+        "inputParams": [
+          {
+            "name": "notificationType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "BOTH",
+            "range": "VOICE/TEXT/BOTH"
+          },
+          {
+            "name": "notificationContent",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试旅客需要轮椅陪同，请现场服务人员协助"
+          },
+          {
+            "name": "repeatCount",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "1",
+            "range": "1~5"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "notificationStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualRepeatCount",
+            "type": "Integer",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：现场通知"
+      },
+      {
+        "capabilityCode": "CAP_SIM_STATUS",
+        "capabilityName": "仿真状态生成",
+        "capabilityType": "CAP_SIM_STATUS",
+        "inputParams": [],
+        "outputParams": [],
+        "capabilityDescription": "仿真体生成并上报模拟设备状态"
+      }
+    ]
+  },
+  {
+    "deviceCode": "SIM_ROBOT_H4",
+    "deviceName": "移动服务机器人07",
+    "deviceTypeCode": "SIMULATOR",
+    "isSimulator": true,
+    "simulatedDeviceType": "MOBILE_ROBOT",
+    "areaCode": "隔离区内",
+    "positionX": 1750,
+    "positionY": 120,
+    "accessEndpoint": "http://127.0.0.1:18120",
+    "accessCredentialRef": "local-sim/SIM_ROBOT_H4",
+    "statusReportInterval": 5,
+    "remark": "候机区东侧机器人",
+    "capabilities": [
+      {
+        "capabilityCode": "CAP_ESCORT",
+        "capabilityName": "陪同服务",
+        "capabilityType": "CAP_ESCORT",
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "GATE_04"
+          },
+          {
+            "name": "escortMode",
+            "type": "String",
+            "required": true,
+            "defaultValue": "LEAD",
+            "range": "LEAD/FOLLOW"
+          },
+          {
+            "name": "maxDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "600",
+            "range": "60~1800"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "arrivalStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualDistance",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "actualDuration",
+            "type": "Integer",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：陪同服务"
+      },
+      {
+        "capabilityCode": "CAP_INFO_DISPLAY",
+        "capabilityName": "综合信息展示",
+        "capabilityType": "CAP_INFO_DISPLAY",
+        "inputParams": [
+          {
+            "name": "contentType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "TEXT",
+            "range": "TEXT/IMAGE/VIDEO/HTML"
+          },
+          {
+            "name": "contentData",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试信息：请前往服务台(SERVICE_DESK)"
+          },
+          {
+            "name": "displayDuration",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "60",
+            "range": "5~300"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "displayStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "errorMessage",
+            "type": "String",
+            "required": false
+          }
+        ],
+        "capabilityDescription": "标准能力模板：综合信息展示"
+      },
+      {
+        "capabilityCode": "CAP_NAVIGATION",
+        "capabilityName": "空间引导",
+        "capabilityType": "CAP_NAVIGATION",
+        "inputParams": [
+          {
+            "name": "targetLocation",
+            "type": "String",
+            "required": true,
+            "defaultValue": "GATE_04"
+          },
+          {
+            "name": "routePreference",
+            "type": "String",
+            "required": true,
+            "defaultValue": "BARRIER_FREE",
+            "range": "SHORTEST/BARRIER_FREE"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "routeGenerated",
+            "type": "Boolean",
+            "required": true
+          },
+          {
+            "name": "estimatedDistance",
+            "type": "Double",
+            "required": true
+          },
+          {
+            "name": "estimatedDuration",
+            "type": "Integer",
+            "required": true
+          },
+          {
+            "name": "waypointCount",
+            "type": "Integer",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：空间引导"
+      },
+      {
+        "capabilityCode": "CAP_NOTIFICATION",
+        "capabilityName": "现场通知",
+        "capabilityType": "CAP_NOTIFICATION",
+        "inputParams": [
+          {
+            "name": "notificationType",
+            "type": "String",
+            "required": true,
+            "defaultValue": "BOTH",
+            "range": "VOICE/TEXT/BOTH"
+          },
+          {
+            "name": "notificationContent",
+            "type": "String",
+            "required": true,
+            "defaultValue": "测试旅客需要轮椅陪同，请现场服务人员协助"
+          },
+          {
+            "name": "repeatCount",
+            "type": "Integer",
+            "required": true,
+            "defaultValue": "1",
+            "range": "1~5"
+          }
+        ],
+        "outputParams": [
+          {
+            "name": "notificationStatus",
+            "type": "String",
+            "required": true
+          },
+          {
+            "name": "actualRepeatCount",
+            "type": "Integer",
+            "required": true
+          }
+        ],
+        "capabilityDescription": "标准能力模板：现场通知"
+      },
+      {
+        "capabilityCode": "CAP_SIM_STATUS",
+        "capabilityName": "仿真状态生成",
+        "capabilityType": "CAP_SIM_STATUS",
+        "inputParams": [],
+        "outputParams": [],
+        "capabilityDescription": "仿真体生成并上报模拟设备状态"
       }
     ]
   }

@@ -1,5 +1,5 @@
 param(
-    [ValidateSet('Start','Stop','Status','DeviceFault','UseKimi','UseFaultModel','Frontend','ModelFixture')]
+    [ValidateSet('Start','StartAll','Stop','Status','DeviceFault','UseKimi','UseFaultModel','Frontend','ModelFixture')]
     [string]$Action='Status',
     [string]$Device,
     [string]$Mode
@@ -31,6 +31,20 @@ try {
         'ModelFixture' { & $tipPython -X utf8 $tipTool model-fixture }
         'DeviceFault' { & $tipPython -X utf8 $tipTool fault $Device $Mode }
         'Start' { & $tipPython -X utf8 $tipTool backend; if ($LASTEXITCODE -eq 0) { & $tipPython -X utf8 $tipTool start } }
+        'StartAll' {
+            & $tipPython -X utf8 $tipTool backend
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            & $tipPython -X utf8 $tipTool start
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            $frontendListening = Get-NetTCPConnection -LocalPort 5173 -State Listen -ErrorAction SilentlyContinue
+            if (-not $frontendListening) {
+                & $tipPython -X utf8 $tipTool frontend
+                if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            } else {
+                Write-Output 'Frontend already listening on http://127.0.0.1:5173'
+            }
+            Write-Output 'All services ready: Frontend http://127.0.0.1:5173 | Backend http://127.0.0.1:8080 | All active simulators started'
+        }
         'UseKimi' { Stop-TipOwnedService 'backend'; & $tipPython -X utf8 $tipTool backend --provider moonshot }
         'UseFaultModel' { Stop-TipOwnedService 'backend'; & $tipPython -X utf8 $tipTool backend --provider fault }
     }

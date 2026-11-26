@@ -44,6 +44,10 @@ public class RiskAssessmentService {
     private final BigDecimal lowConfidenceThreshold;
     private final long contextStaleSeconds;
     private final int resourceCriticalCandidateThreshold;
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private com.airport.ai.task.TerminalMapMapper terminalMapMapper;
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private com.airport.ai.task.TaskMapper taskMapper;
 
     /**
      * 隔离测试用故障注入（默认关闭，仅隔离后端通过app.risk.fault-injection.mode开启）：
@@ -55,7 +59,7 @@ public class RiskAssessmentService {
     public RiskAssessmentService(RiskRuleMapper riskRuleMapper,
                                   @Value("${app.risk.low-confidence-threshold:0.8}") double lowConfidenceThreshold,
                                   @Value("${app.risk.context-stale-seconds:60}") long contextStaleSeconds,
-                                  @Value("${app.risk.resource-critical-candidate-threshold:1}") int resourceCriticalCandidateThreshold) {
+                                  @Value("${app.risk.resource-critical-candidate-threshold:0}") int resourceCriticalCandidateThreshold) {
         this.riskRuleMapper = riskRuleMapper;
         this.lowConfidenceThreshold = BigDecimal.valueOf(lowConfidenceThreshold);
         this.contextStaleSeconds = contextStaleSeconds;
@@ -104,15 +108,20 @@ public class RiskAssessmentService {
                         confidence, ruleSetVersion);
             }
         }
-        if (enabledCodes.contains(RULE_CROSS_ZONE) && hitsCrossZone(planVersion)) {
-            return highRisk(RULE_CROSS_ZONE, "移动服务机器人跨区域连续服务，命中确定性高风险规则", confidence, ruleSetVersion);
+        if (enabledCodes.contains(RULE_CROSS_ZONE) && hitsCrossZone(planVersion, taskFamily)) {
+            return highRisk(RULE_CROSS_ZONE, "移动服务机器人跨区域（隔离区外↔隔离区内）连续服务，命中确定性高风险规则", confidence, ruleSetVersion);
         }
-        // The selected device consumes one candidate. The rule is about spare devices,
-        // so a single online candidate means zero backups, not one.
+        // The selected device consumes one candidate. When threshold == 0, only require available candidates > 0
+        // (no extra spare device required); when threshold > 0, require at least that many spare devices.
         int backupCandidateCount = Math.max(0, minCandidateCount - 1);
-        if (enabledCodes.contains(RULE_RESOURCE_CRITICAL) && backupCandidateCount < resourceCriticalCandidateThreshold) {
+        boolean resourceCriticalHit = resourceCriticalCandidateThreshold <= 0
+                ? minCandidateCount <= 0
+                : backupCandidateCount < resourceCriticalCandidateThreshold;
+        if (enabledCodes.contains(RULE_RESOURCE_CRITICAL) && resourceCriticalHit) {
             return highRisk(RULE_RESOURCE_CRITICAL,
-                    "可用备用候选设备数量(" + backupCandidateCount + ")低于配置阈值(" + resourceCriticalCandidateThreshold + ")，命中确定性高风险规则",
+                    resourceCriticalCandidateThreshold <= 0
+                            ? "可用候选设备数量(" + minCandidateCount + ")不大于0，命中确定性高风险规则"
+                            : "可用备用候选设备数量(" + backupCandidateCount + ")低于配置阈值(" + resourceCriticalCandidateThreshold + ")，命中确定性高风险规则",
                     confidence, ruleSetVersion);
         }
 
@@ -184,10 +193,16 @@ public class RiskAssessmentService {
     }
 
     @SuppressWarnings("unchecked")
-    private boolean hitsCrossZone(PlanVersion planVersion) {
-        // 统计移动服务机器人步骤（capabilityType为机器人专属能力）涉及的不同区域数量
-        Set<Object> zones = parseSteps(planVersion.getPlanSteps()).stream()
-                .filter(step -> isMobileRobotCapability((String) step.get("capabilityType")))
+    private boolean hitsCrossZone(PlanVersion planVersion, String taskFamily) {
+        List<Map<String, Object>> steps = parseSteps(planVersion.getPlanSteps());
+        List<Map<String, Object>> robotSteps = steps.stream()
+                .filter(step -> !PlanStepRules.isConditionNode(step))
+                .filter(step -> isMobileRobotStep((String) step.get("capabilityType"), taskFamily))
+                .toList();
+        if (robotSteps.isEmpty()) return false;
+
+        // 1. 兼容显式 targetZone 参数
+        Set<Object> explicitZones = robotSteps.stream()
                 .map(step -> {
                     Object inputParams = step.get("inputParams");
                     if (inputParams instanceof Map) {
@@ -195,9 +210,87 @@ public class RiskAssessmentService {
                     }
                     return null;
                 })
-                .filter(zone -> zone != null)
+                .filter(zone -> zone != null && !String.valueOf(zone).isBlank())
                 .collect(Collectors.toSet());
-        return zones.size() >= 2;
+        if (explicitZones.size() >= 2) return true;
+
+        // 2. 基于当前候机楼室内地图 POI 坐标与任务起终点判定是否跨越隔离区边界（隔离区内 y<235 vs 隔离区外 y>341）
+        if (terminalMapMapper == null) return false;
+        Map<String, String> poiIsolationZone = loadPoiIsolationZones();
+        if (poiIsolationZone.isEmpty()) return false;
+
+        Set<String> touchedZones = new java.util.LinkedHashSet<>();
+        if (taskMapper != null && planVersion.getTaskId() != null) {
+            try {
+                taskMapper.findById(planVersion.getTaskId()).ifPresent(task -> {
+                    collectZoneFromTaskJson(task.getSceneParams(), List.of("origin", "startLocation", "originLocation", "baggageLocation"), poiIsolationZone, touchedZones);
+                    collectZoneFromTaskJson(task.getGoalParsingResult(), List.of("origin"), poiIsolationZone, touchedZones);
+                });
+            } catch (Exception ignored) {}
+        }
+        for (Map<String, Object> step : robotSteps) {
+            Object inputParams = step.get("inputParams");
+            if (inputParams instanceof Map<?, ?> map) {
+                for (String key : List.of("origin", "targetLocation", "destination")) {
+                    String z = resolveIsolationZone(map.get(key), poiIsolationZone);
+                    if (z != null) touchedZones.add(z);
+                }
+            }
+        }
+        return touchedZones.size() >= 2;
+    }
+
+    private boolean isMobileRobotStep(String capabilityType, String taskFamily) {
+        if (!isMobileRobotCapability(capabilityType)) return false;
+        String required = CoreScenarioChannelPolicy.requiredType(taskFamily, capabilityType);
+        return required == null || "MOBILE_ROBOT".equals(required);
+    }
+
+    private Map<String, String> loadPoiIsolationZones() {
+        Map<String, String> map = new java.util.HashMap<>();
+        try {
+            for (Map<String, Object> poi : terminalMapMapper.findAllPois()) {
+                double py = poi.get("y") instanceof Number n ? n.doubleValue() : -1;
+                String isoZone = py >= 0 ? (py < 235 ? "隔离区内" : (py > 341 ? "隔离区外" : null)) : null;
+                if (isoZone == null) continue;
+                if (poi.get("poiCode") != null) map.put(String.valueOf(poi.get("poiCode")).trim().toUpperCase(), isoZone);
+                if (poi.get("poiName") != null) map.putIfAbsent(String.valueOf(poi.get("poiName")).trim().toUpperCase(), isoZone);
+            }
+        } catch (Exception ignored) {}
+        return map;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void collectZoneFromTaskJson(String json, List<String> keys, Map<String, String> poiIsolationZone, Set<String> out) {
+        if (json == null || json.isBlank()) return;
+        try {
+            Map<String, Object> parsed = MAPPER.readValue(json, Map.class);
+            for (String k : keys) {
+                String z = resolveIsolationZone(parsed.get(k), poiIsolationZone);
+                if (z != null) out.add(z);
+            }
+        } catch (Exception ignored) {}
+    }
+
+    private String resolveIsolationZone(Object rawLoc, Map<String, String> poiIsolationZone) {
+        if (rawLoc == null) return null;
+        String text = String.valueOf(rawLoc).trim();
+        if (text.isEmpty()) return null;
+        if ("隔离区内".equals(text) || "隔离区外".equals(text)) return text;
+        String normalized = com.airport.ai.task.TerminalLocationNormalizer.normalize(text);
+        if (normalized != null) {
+            String byNorm = poiIsolationZone.get(normalized.toUpperCase());
+            if (byNorm != null) return byNorm;
+        }
+        String direct = poiIsolationZone.get(text.toUpperCase());
+        if (direct != null) return direct;
+        int open = text.indexOf('('), close = text.indexOf(')', open + 1);
+        if (open < 0) { open = text.indexOf('（'); close = text.indexOf('）', open + 1); }
+        if (open >= 0 && close > open + 1) {
+            String inner = text.substring(open + 1, close).trim().toUpperCase();
+            if (poiIsolationZone.containsKey(inner)) return poiIsolationZone.get(inner);
+        }
+        return null;
     }
 
     private boolean isMobileRobotCapability(String capabilityType) {

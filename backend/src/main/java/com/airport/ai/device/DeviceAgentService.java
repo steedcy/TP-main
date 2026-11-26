@@ -168,8 +168,8 @@ public class DeviceAgentService {
         syncReportedZone(device, zone);
     }
 
-    @org.springframework.beans.factory.annotation.Value("${app.device.preset-areas:F2_TEST}")
-    private String presetAreasConfig = "F2_TEST";
+    @org.springframework.beans.factory.annotation.Value("${app.device.preset-areas:隔离区内,隔离区外}")
+    private String presetAreasConfig = "隔离区内,隔离区外";
 
     private void syncReportedZone(Device device, String zone) {
         if (zone == null || zone.isBlank() || zone.equals(device.getAreaCode())) return;

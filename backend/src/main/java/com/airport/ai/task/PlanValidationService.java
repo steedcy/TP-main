@@ -24,6 +24,18 @@ public class PlanValidationService {
     private final DeviceCapabilityMapper deviceCapabilityMapper;
     private final com.airport.ai.taskdef.TaskDefinitionMapper taskDefinitionMapper;
     private final TaskMapper taskMapper;
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private TerminalMapMapper terminalMapMapper;
+    @org.springframework.beans.factory.annotation.Value("${app.device.fixed-device-strict-zone:true}")
+    private boolean fixedDeviceStrictZone = true;
+    @org.springframework.beans.factory.annotation.Value("${app.device.fixed-max-service-distance:650}")
+    private double fixedMaxServiceDistance = 650.0;
+    @org.springframework.beans.factory.annotation.Value("${app.device.robot-max-service-distance:1600}")
+    private double robotMaxServiceDistance = 1600.0;
+
+    public void setTerminalMapMapper(TerminalMapMapper terminalMapMapper) {
+        this.terminalMapMapper = terminalMapMapper;
+    }
 
     public PlanValidationService(DeviceCapabilityMapper deviceCapabilityMapper) {
         this(deviceCapabilityMapper, null, null);
@@ -352,7 +364,197 @@ public class PlanValidationService {
         // 对应SRS_F022.R07 / DEF-S3-116：任务定义文本约束条件（如禁止前往某地点、限定区域等）参与硬校验
         checkTaskDefinitionConstraint(steps, constraintDescription, result, currentTaskId);
 
+        // 结合当前候机楼室内地图（terminal_pois / terminal_map_regions）校验目标点位存在性、区域硬隔离与最大服务距离
+        checkSpatialMapConstraints(steps, snapshotAgents, taskFamily, currentTaskId, result);
+
         return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void checkSpatialMapConstraints(List<Map<String, Object>> steps, List<Map<String, Object>> snapshotAgents,
+                                            String taskFamily, Long currentTaskId, PlanValidationResult result) {
+        if (terminalMapMapper == null || steps == null || steps.isEmpty()) return;
+        List<Map<String, Object>> pois;
+        List<Map<String, Object>> regions;
+        try {
+            pois = terminalMapMapper.findAllPois();
+            regions = terminalMapMapper.findAllRegions();
+        } catch (Exception ex) {
+            return;
+        }
+        if (pois == null || pois.isEmpty()) return;
+
+        Map<String, Map<String, Object>> poiIndex = new java.util.HashMap<>();
+        for (Map<String, Object> poi : pois) {
+            Object code = poi.get("poiCode");
+            Object name = poi.get("poiName");
+            if (code != null) poiIndex.put(String.valueOf(code).trim().toUpperCase(), poi);
+            if (name != null) poiIndex.putIfAbsent(String.valueOf(name).trim().toUpperCase(), poi);
+        }
+
+        boolean hasSecurityPass = regions == null || regions.isEmpty() || regions.stream()
+                .anyMatch(r -> "SECURITY_AREA".equalsIgnoreCase(String.valueOf(r.get("regionType"))));
+
+        Map<String, Object> scene = loadTaskSceneParams(currentTaskId);
+        Map<String, Object> initialOriginPoi = firstResolvedPoi(scene, List.of("passengerLocation", "origin", "startLocation", "originLocation", "baggageLocation"), poiIndex);
+        Map<String, Object> currentPassengerPoi = initialOriginPoi;
+        Map<String, Object> prevRobotPoi = null;
+        String prevRobotZone = null;
+
+        boolean hasSpatialAgents = snapshotAgents != null && snapshotAgents.stream().anyMatch(a -> a.get("location") instanceof Map<?, ?>);
+
+        for (int i = 0; i < steps.size(); i++) {
+            Map<String, Object> step = steps.get(i);
+            if (PlanStepRules.isConditionNode(step)) continue;
+            Integer stepSeq = asInteger(step.get("stepSeq"));
+            if (stepSeq == null) stepSeq = i + 1;
+            String capabilityType = asString(step.get("capabilityType"));
+            Object rawInputs = step.get("inputParams");
+            Map<?, ?> inputs = rawInputs instanceof Map<?, ?> m ? m : Map.of();
+
+            String requiredChannel = CoreScenarioChannelPolicy.requiredType(taskFamily, capabilityType);
+            boolean isRobotMove = ("CAP_NAVIGATION".equals(capabilityType) || "CAP_ESCORT".equals(capabilityType))
+                    && (requiredChannel == null || "MOBILE_ROBOT".equals(requiredChannel));
+
+            Map<String, Object> explicitStepPoi = null;
+            boolean outOfMapReported = false;
+            for (String locKey : List.of("targetLocation", "targetCounter", "origin", "destination")) {
+                Object val = inputs.get(locKey);
+                if (isBlank(val)) continue;
+                String locText = String.valueOf(val).trim();
+                if (locText.startsWith("TEMPLATE_INPUT.") || locText.matches("STEP\\d+_OUTPUT\\..+")) continue;
+
+                Map<String, Object> matchedPoi = resolvePoiFromIndex(locText, poiIndex);
+                if (matchedPoi == null) {
+                    result.failConstraint("步骤目标点位未在当前候机楼地图中标定: " + locText, stepSeq, "ERR_LOCATION_OUT_OF_MAP");
+                    outOfMapReported = true;
+                    continue;
+                }
+                if (explicitStepPoi == null) explicitStepPoi = matchedPoi;
+                double px = matchedPoi.get("x") instanceof Number n ? n.doubleValue() : -1;
+                double py = matchedPoi.get("y") instanceof Number n ? n.doubleValue() : -1;
+                if (isRobotMove && py >= 0) {
+                    String curZone = py < 235 ? "隔离区内" : (py > 341 ? "隔离区外" : null);
+                    if (curZone != null && prevRobotZone != null && !curZone.equals(prevRobotZone) && !hasSecurityPass) {
+                        result.failConstraint("跨隔离区移动缺少可通行的安全检查通道", stepSeq, "ERR_CROSS_ZONE_UNREACHABLE");
+                    }
+                    if (curZone != null) prevRobotZone = curZone;
+                }
+            }
+            if (outOfMapReported) continue;
+
+            // 确定当前步骤对应的有效目标点位（固定设备默认跟随旅客当前位置；若此前机器人已陪同转移则使用转移后的位置）
+            Map<String, Object> effectivePoi = explicitStepPoi != null ? explicitStepPoi
+                    : (currentPassengerPoi != null ? currentPassengerPoi
+                    : firstResolvedPoi(scene, List.of("targetLocation", "targetCounter"), poiIndex));
+
+            if (effectivePoi != null && hasSpatialAgents && capabilityType != null && !capabilityType.isBlank()) {
+                double tx = effectivePoi.get("x") instanceof Number n ? n.doubleValue() : -1;
+                double ty = effectivePoi.get("y") instanceof Number n ? n.doubleValue() : -1;
+                String targetZone = ty >= 0 ? (ty < 235 ? "隔离区内" : (ty > 341 ? "隔离区外" : null)) : null;
+                boolean globalFlightBroadcast = "FLIGHT_CHANGE_RESPONSE".equals(taskFamily)
+                        && CoreScenarioChannelPolicy.isFlightPublication(capabilityType)
+                        && initialOriginPoi == null;
+
+                List<Map<String, Object>> capCandidates = snapshotAgents.stream()
+                        .filter(agent -> {
+                            Object online = agent.get("onlineStatus");
+                            if (online != null && !"ONLINE".equalsIgnoreCase(String.valueOf(online).trim())) return false;
+                            Object caps = agent.get("capabilities");
+                            return caps instanceof List<?> list && list.contains(capabilityType)
+                                    && CoreScenarioChannelPolicy.matches(taskFamily, capabilityType,
+                                    String.valueOf(agent.get("deviceTypeCode")), String.valueOf(agent.get("simulatedDeviceType")));
+                        }).toList();
+
+                if (!capCandidates.isEmpty() && tx >= 0 && ty >= 0 && ty <= 600) {
+                    List<Map<String, Object>> zoneMatched = capCandidates.stream().filter(agent -> {
+                        String actualType = "SIMULATOR".equals(String.valueOf(agent.get("deviceTypeCode")))
+                                ? String.valueOf(agent.get("simulatedDeviceType")) : String.valueOf(agent.get("deviceTypeCode"));
+                        if ("MOBILE_ROBOT".equals(actualType) || !fixedDeviceStrictZone || globalFlightBroadcast || targetZone == null) {
+                            return true;
+                        }
+                        if (!(agent.get("location") instanceof Map<?, ?> loc)) return true;
+                        String agentZone = loc.get("zone") == null ? null : String.valueOf(loc.get("zone")).trim();
+                        if (!"隔离区内".equals(agentZone) && !"隔离区外".equals(agentZone)) return true;
+                        return targetZone.equals(agentZone);
+                    }).toList();
+
+                    if (zoneMatched.isEmpty()) {
+                        result.failConstraint("固定设备不允许跨隔离区调度（当前位置位于" + targetZone
+                                + "，无同区域可用设备；请先由移动服务机器人引导或陪同前往目标区域）",
+                                stepSeq, "ERR_CROSS_ZONE_FIXED_DEVICE");
+                    } else {
+                        final Map<String, Object> robotAnchor = prevRobotPoi;
+                        List<Map<String, Object>> distMatched = zoneMatched.stream().filter(agent -> {
+                            String actualType = "SIMULATOR".equals(String.valueOf(agent.get("deviceTypeCode")))
+                                    ? String.valueOf(agent.get("simulatedDeviceType")) : String.valueOf(agent.get("deviceTypeCode"));
+                            boolean isRobot = "MOBILE_ROBOT".equals(actualType);
+                            double maxDist = isRobot ? robotMaxServiceDistance : fixedMaxServiceDistance;
+                            if (maxDist <= 0) return true;
+                            if (isRobot && robotAnchor != null && robotAnchor.get("x") instanceof Number rx && robotAnchor.get("y") instanceof Number ry) {
+                                return Math.hypot(rx.doubleValue() - tx, ry.doubleValue() - ty) <= maxDist;
+                            }
+                            if (!(agent.get("location") instanceof Map<?, ?> loc)) return true;
+                            if (!(loc.get("x") instanceof Number ax) || !(loc.get("y") instanceof Number ay)) return true;
+                            return Math.hypot(ax.doubleValue() - tx, ay.doubleValue() - ty) <= maxDist;
+                        }).toList();
+
+                        if (distMatched.isEmpty()) {
+                            boolean allRobot = zoneMatched.stream().allMatch(a -> "MOBILE_ROBOT".equals(
+                                    "SIMULATOR".equals(String.valueOf(a.get("deviceTypeCode")))
+                                            ? String.valueOf(a.get("simulatedDeviceType")) : String.valueOf(a.get("deviceTypeCode"))));
+                            double limit = allRobot ? robotMaxServiceDistance : fixedMaxServiceDistance;
+                            result.failConstraint("步骤目标点位距离可用设备超出最大服务距离限制（上限" + (int) limit + "像素）",
+                                    stepSeq, "ERR_MAX_DISTANCE_EXCEEDED");
+                        }
+                    }
+                }
+            }
+
+            // 更新旅客动态位置与机器人锚点：当机器人执行陪同(CAP_ESCORT)或引导至新地点(CAP_NAVIGATION且目标非初始会合起点)时，旅客随之移动
+            if (isRobotMove && explicitStepPoi != null) {
+                prevRobotPoi = explicitStepPoi;
+                boolean isRendezvousOnly = "CAP_NAVIGATION".equals(capabilityType)
+                        && initialOriginPoi != null
+                        && Objects.equals(initialOriginPoi.get("poiCode"), explicitStepPoi.get("poiCode"));
+                if (!isRendezvousOnly) {
+                    currentPassengerPoi = explicitStepPoi;
+                }
+            }
+        }
+    }
+
+    private static Map<String, Object> firstResolvedPoi(Map<String, Object> scene, List<String> keys, Map<String, Map<String, Object>> poiIndex) {
+        if (scene == null) return null;
+        for (String k : keys) {
+            Object v = scene.get(k);
+            if (v == null) continue;
+            String s = String.valueOf(v).trim();
+            if (s.isEmpty() || s.startsWith("TEMPLATE_INPUT.")) continue;
+            Map<String, Object> p = resolvePoiFromIndex(s, poiIndex);
+            if (p != null) return p;
+        }
+        return null;
+    }
+
+    private static Map<String, Object> resolvePoiFromIndex(String text, Map<String, Map<String, Object>> poiIndex) {
+        String normalized = TerminalLocationNormalizer.normalize(text);
+        if (normalized != null) {
+            Map<String, Object> byNorm = poiIndex.get(normalized.toUpperCase());
+            if (byNorm != null) return byNorm;
+        }
+        Map<String, Object> direct = poiIndex.get(text.toUpperCase());
+        if (direct != null) return direct;
+        int open = text.indexOf('('), close = text.indexOf(')', open + 1);
+        if (open < 0) { open = text.indexOf('（'); close = text.indexOf('）', open + 1); }
+        if (open >= 0 && close > open + 1) {
+            String inner = text.substring(open + 1, close).trim().toUpperCase();
+            Map<String, Object> byInner = poiIndex.get(inner);
+            if (byInner != null) return byInner;
+            String prefix = text.substring(0, open).trim().toUpperCase();
+            if (!prefix.isEmpty()) return poiIndex.get(prefix);
+        }
+        return null;
     }
 
     private static final java.util.regex.Pattern CAPABILITY_CODE_PATTERN = java.util.regex.Pattern.compile(

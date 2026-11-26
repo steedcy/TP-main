@@ -53,7 +53,7 @@
           <span v-else>{{ record.lastReportedAt || '—' }}</span>
         </template>
         <template v-else-if="column.key === 'capabilities'">
-          <a-tag v-for="c in record.enabledCapabilities" :key="c.capabilityCode">{{ c.capabilityCode }} {{ c.capabilityName }}</a-tag>
+          <a-tag v-for="c in record.enabledCapabilities" :key="c.capabilityCode">{{ c.capabilityName || capabilityLabel(c.capabilityCode) }}</a-tag>
           <span v-if="!record.enabledCapabilities?.length">—</span>
         </template>
         <template v-else-if="column.key === 'action'">
@@ -87,7 +87,7 @@
           <div>{{ detail.offlineInfo.affectsTask ? '影响进行中任务' : '不影响任务' }}</div>
         </a-descriptions-item>
         <a-descriptions-item label="启用能力">
-          <div v-for="c in detail.enabledCapabilities" :key="c.capabilityCode">{{ c.capabilityCode }}　{{ c.capabilityName }}</div>
+          <div v-for="c in detail.enabledCapabilities" :key="c.capabilityCode">{{ c.capabilityName || capabilityLabel(c.capabilityCode) }}</div>
           <span v-if="!detail.enabledCapabilities?.length">无已启用能力</span>
         </a-descriptions-item>
       </a-descriptions>
@@ -107,6 +107,7 @@ import { useRoute } from 'vue-router'
 import { message } from 'ant-design-vue'
 import { listAgents, disableAgent, getHeartbeatTimeout, updateHeartbeatTimeout, getAgentTimeline } from '../../api/device'
 import { timelineResult, timelineReason } from '../../utils/timeline'
+import { capabilityLabel } from '../../constants/capability'
 import { useAuthStore } from '../../store/auth'
 
 const list = ref([])

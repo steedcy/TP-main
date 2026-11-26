@@ -35,10 +35,14 @@ public class DemoResetService {
         result.put("sourceDigest", dataset.sourceDigest());
         result.put("currentContentDigest", worker.contentDigest());
         result.put("confirmationPhrase", DemoDataset.CONFIRM_PHRASE);
-        result.put("impactScope", List.of("六个 SIM_F2_* 仿真设备档案及其能力画像",
-                "三套预置基线模板", "超规行李、特殊旅客、航班变更三类预置任务定义"));
-        result.put("preservedScope", List.of("历史任务及事件", "用户账号", "设备令牌和凭据标识", "其他设备"));
-        result.put("postResetState", "设备连接及能力标记为未测试，基线模板标记为草稿；需要重新连接测试、能力测试和模板试运行后启用");
+        result.put("impactScope", List.of(
+                "2000×600 室内地图区域（18 条）与设施点位（68 个）",
+                "20 台标准仿真体设备档案及其对齐附录 F 的能力画像与设备代理",
+                "三套预置基线模板（V1.5 已启用）",
+                "超规行李、特殊旅客、航班变更、通用协同服务四类预置场景规则",
+                "三条风险规则与空间/距离校验规则基线参数"));
+        result.put("preservedScope", List.of("历史任务及事件", "用户账号", "设备令牌和凭据标识", "非预置演示设备"));
+        result.put("postResetState", "地图点位、20台仿真体设备及能力（已测试通过并启用）、三套基线模板（已启用）、四类预置场景与风险/校验规则均恢复至 V1.5 最新标准版本");
         result.put("blockingTasks", worker.blockingTasks());
         result.put("busyDemoAgents", worker.busyDemoAgents());
         return result;

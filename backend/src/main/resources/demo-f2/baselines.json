@@ -3,22 +3,25 @@
     "taskFamily": "OVERSIZE_BAGGAGE_HANDLING",
     "inputParams": [
       {
-        "name": "baggageLocation",
+        "name": "targetCounter",
         "type": "String",
         "required": true,
-        "defaultValue": "F2_BAGGAGE_POINT"
+        "defaultValue": "CHECKIN_WEST",
+        "range": null
       },
       {
         "name": "routePreference",
         "type": "String",
         "required": true,
-        "defaultValue": "BARRIER_FREE"
+        "defaultValue": "BARRIER_FREE",
+        "range": null
       },
       {
         "name": "measureMode",
         "type": "String",
         "required": true,
-        "defaultValue": "AUTO"
+        "defaultValue": "AUTO",
+        "range": null
       },
       {
         "name": "timeout",
@@ -31,43 +34,32 @@
         "name": "alertLevel",
         "type": "String",
         "required": true,
-        "defaultValue": "WARNING"
-    },
-    {
-      "name": "contentType",
-      "type": "String",
-      "required": true,
-      "defaultValue": "TEXT"
-    },
-    {
-      "name": "contentData",
-      "type": "String",
-      "required": true,
-      "defaultValue": "虚构超规行李请前往F2测试服务点办理"
-    },
-    {
-      "name": "displayDuration",
-      "type": "Integer",
-      "required": true,
-      "defaultValue": "60"
+        "defaultValue": "WARNING",
+        "range": null
+      },
+      {
+        "name": "contentType",
+        "type": "String",
+        "required": true,
+        "defaultValue": "TEXT",
+        "range": null
+      },
+      {
+        "name": "contentData",
+        "type": "String",
+        "required": true,
+        "defaultValue": "超规行李请前往值机区西侧柜台(CHECKIN_WEST)办理托运",
+        "range": null
+      },
+      {
+        "name": "displayDuration",
+        "type": "Integer",
+        "required": true,
+        "defaultValue": "60",
+        "range": null
       }
     ],
     "steps": [
-      {
-        "capabilityType": "CAP_NAVIGATION",
-        "paramMapping": [
-          {
-            "target": "targetLocation",
-            "source": "TEMPLATE_INPUT.baggageLocation"
-          },
-          {
-            "target": "routePreference",
-            "source": "TEMPLATE_INPUT.routePreference"
-          }
-        ],
-        "stepTimeout": 60,
-        "completionCondition": "routeGenerated=true"
-      },
       {
         "capabilityType": "CAP_BAGGAGE_MEASURE",
         "paramMapping": [
@@ -81,14 +73,15 @@
           }
         ],
         "stepTimeout": 60,
-        "completionCondition": "measureStatus=SUCCESS"
+        "completionCondition": "measureStatus=SUCCESS",
+        "stepSeq": 1
       },
       {
         "capabilityType": "CAP_OVERSIZE_ALERT",
         "paramMapping": [
           {
             "target": "baggageInfo",
-            "source": "STEP2_OUTPUT.baggageInfo"
+            "source": "STEP1_OUTPUT.baggageInfo"
           },
           {
             "target": "alertLevel",
@@ -96,40 +89,56 @@
           }
         ],
         "stepTimeout": 60,
-        "completionCondition": "reportStatus=SUCCESS"
-    },
-    {
-      "capabilityType": "CAP_INFO_DISPLAY",
-      "paramMapping": [
-        {"target": "contentType", "source": "TEMPLATE_INPUT.contentType"},
-        {"target": "contentData", "source": "TEMPLATE_INPUT.contentData"},
-        {"target": "displayDuration", "source": "TEMPLATE_INPUT.displayDuration"}
-      ],
-      "stepTimeout": 60,
-      "completionCondition": "displayStatus=SUCCESS"
+        "completionCondition": "reportStatus=SUCCESS",
+        "stepSeq": 2
+      },
+      {
+        "capabilityType": "CAP_INFO_DISPLAY",
+        "paramMapping": [
+          {
+            "target": "contentType",
+            "source": "TEMPLATE_INPUT.contentType"
+          },
+          {
+            "target": "contentData",
+            "source": "TEMPLATE_INPUT.contentData"
+          },
+          {
+            "target": "displayDuration",
+            "source": "TEMPLATE_INPUT.displayDuration"
+          }
+        ],
+        "stepTimeout": 60,
+        "completionCondition": "displayStatus=SUCCESS",
+        "stepSeq": 3
+      },
+      {
+        "capabilityType": "CAP_NAVIGATION",
+        "paramMapping": [
+          {
+            "target": "targetLocation",
+            "source": "TEMPLATE_INPUT.targetCounter"
+          },
+          {
+            "target": "routePreference",
+            "source": "TEMPLATE_INPUT.routePreference"
+          }
+        ],
+        "stepTimeout": 60,
+        "completionCondition": "routeGenerated=true",
+        "stepSeq": 4
       }
-    ],
-    "devices": [
-      "SIM_F2_ROBOT",
-      "SIM_F2_BAGGAGE",
-    "SIM_F2_BAGGAGE",
-    "SIM_F2_DISPLAY"
     ]
   },
   {
     "taskFamily": "SPECIAL_PASSENGER_SERVICE",
     "inputParams": [
       {
-        "name": "assistanceType",
-        "type": "String",
-        "required": true,
-        "defaultValue": "测试轮椅旅客需要陪同，请现场服务人员协助"
-      },
-      {
         "name": "notificationType",
         "type": "String",
         "required": true,
-        "defaultValue": "BOTH"
+        "defaultValue": "BOTH",
+        "range": null
       },
       {
         "name": "repeatCount",
@@ -142,13 +151,15 @@
         "name": "targetLocation",
         "type": "String",
         "required": true,
-        "defaultValue": "F2_TEST_GATE"
+        "defaultValue": "GATE_04",
+        "range": null
       },
       {
         "name": "escortMode",
         "type": "String",
         "required": true,
-        "defaultValue": "LEAD"
+        "defaultValue": "LEAD",
+        "range": null
       },
       {
         "name": "maxDuration",
@@ -156,37 +167,71 @@
         "required": true,
         "defaultValue": "600",
         "range": "60~1800"
-    },
-    {
-      "name": "contentType",
-      "type": "String",
-      "required": true,
-      "defaultValue": "TEXT"
-    },
-    {
-      "name": "displayDuration",
-      "type": "Integer",
-      "required": true,
-      "defaultValue": "60"
+      },
+      {
+        "name": "contentType",
+        "type": "String",
+        "required": true,
+        "defaultValue": "TEXT",
+        "range": null
+      },
+      {
+        "name": "displayDuration",
+        "type": "Integer",
+        "required": true,
+        "defaultValue": "60",
+        "range": null
+      },
+      {
+        "name": "origin",
+        "type": "String",
+        "required": true,
+        "defaultValue": "SERVICE_DESK",
+        "range": null
+      },
+      {
+        "name": "meetingNotice",
+        "type": "String",
+        "required": true,
+        "defaultValue": "请在服务台(SERVICE_DESK)会合，由服务机器人陪同前往4号登机口(GATE_04)。",
+        "range": null
+      },
+      {
+        "name": "routePreference",
+        "type": "String",
+        "required": true,
+        "defaultValue": "BARRIER_FREE",
+        "range": null
       }
     ],
     "steps": [
-    {
-      "capabilityType": "CAP_INFO_DISPLAY",
-      "paramMapping": [
-        {"target": "contentType", "source": "TEMPLATE_INPUT.contentType"},
-        {"target": "contentData", "source": "TEMPLATE_INPUT.assistanceType"},
-        {"target": "displayDuration", "source": "TEMPLATE_INPUT.displayDuration"}
-      ],
-      "stepTimeout": 60,
-      "completionCondition": "displayStatus=SUCCESS"
-    },
       {
+        "stepSeq": 1,
+        "capabilityType": "CAP_INFO_DISPLAY",
+        "paramMapping": [
+          {
+            "target": "contentType",
+            "source": "TEMPLATE_INPUT.contentType"
+          },
+          {
+            "target": "contentData",
+            "source": "TEMPLATE_INPUT.meetingNotice"
+          },
+          {
+            "target": "displayDuration",
+            "source": "TEMPLATE_INPUT.displayDuration"
+          }
+        ],
+        "stepTimeout": 60,
+        "completionCondition": "displayStatus=SUCCESS"
+      },
+      {
+        "stepSeq": 2,
         "capabilityType": "CAP_NOTIFICATION",
         "paramMapping": [
           {
             "target": "notificationContent",
-            "source": "TEMPLATE_INPUT.assistanceType"
+            "source": "TEMPLATE_INPUT.meetingNotice"
           },
           {
             "target": "notificationType",
@@ -201,6 +246,23 @@
         "completionCondition": "notificationStatus=SUCCESS"
       },
       {
+        "stepSeq": 3,
+        "capabilityType": "CAP_NAVIGATION",
+        "paramMapping": [
+          {
+            "target": "targetLocation",
+            "source": "TEMPLATE_INPUT.origin"
+          },
+          {
+            "target": "routePreference",
+            "source": "TEMPLATE_INPUT.routePreference"
+          }
+        ],
+        "stepTimeout": 60,
+        "completionCondition": "routeGenerated=true"
+      },
+      {
+        "stepSeq": 4,
         "capabilityType": "CAP_ESCORT",
         "paramMapping": [
           {
@@ -219,11 +281,6 @@
         "stepTimeout": 60,
         "completionCondition": "arrivalStatus=ARRIVED"
       }
-    ],
-    "devices": [
-    "SIM_F2_DISPLAY",
-      "SIM_F2_ROBOT",
-      "SIM_F2_ROBOT"
     ]
   },
   {
@@ -233,7 +290,7 @@
         "name": "flightNumber",
         "type": "String",
         "required": true,
-        "defaultValue": "TEST1022",
+        "defaultValue": "CA1001",
         "range": null
       },
       {
@@ -247,7 +304,7 @@
         "name": "updateContent",
         "type": "String",
         "required": true,
-        "defaultValue": "测试航班登机口变更至F2_TEST_GATE",
+        "defaultValue": "航班登机口变更至4号登机口(GATE_04)",
         "range": null
       },
       {
@@ -261,7 +318,7 @@
         "name": "targetLocation",
         "type": "String",
         "required": true,
-        "defaultValue": "F2_TEST_GATE",
+        "defaultValue": "GATE_04",
         "range": null
       },
       {
@@ -275,7 +332,7 @@
         "name": "displayContent",
         "type": "String",
         "required": true,
-        "defaultValue": "虚构航班登机口及无障碍路径提示，请前往F2_TEST_GATE。",
+        "defaultValue": "航班登机口已变更，请按照指引前往4号登机口(GATE_04)。",
         "range": null
       },
       {
@@ -296,7 +353,7 @@
         "name": "notificationContent",
         "type": "String",
         "required": true,
-        "defaultValue": "虚构航班登机口已变更，请改道至新登机口。",
+        "defaultValue": "航班登机口已变更，请前往新登机口候机。",
         "range": null
       },
       {
@@ -388,12 +445,6 @@
         "stepTimeout": 60,
         "completionCondition": "routeGenerated=true"
       }
-    ],
-    "devices": [
-      "SIM_F2_FLIGHT",
-      "SIM_F2_DISPLAY",
-      "SIM_F2_ROBOT",
-      "SIM_F2_ROBOT"
     ]
   }
 ]

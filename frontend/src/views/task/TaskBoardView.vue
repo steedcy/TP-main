@@ -277,8 +277,8 @@
             <a-table-column title="区域名称" data-index="regionName" key="regionName" />
             <a-table-column title="类型" key="regionType">
               <template #default="{ record }">
-                <a-tag :color="record.regionType === 'ISOLATED_ZONE' ? 'purple' : record.regionType === 'CHECKIN_HALL' ? 'green' : 'cyan'">
-                  {{ record.regionType === 'ISOLATED_ZONE' ? '安检后候机隔离区' : record.regionType === 'CHECKIN_HALL' ? '值机办理区' : '通行走廊' }}
+                <a-tag :color="({ ISOLATED_ZONE: 'purple', CHECKIN_HALL: 'green', SECURITY_AREA: 'blue', SHOP_BLOCK: 'default', CORRIDOR: 'cyan' })[record.regionType] || 'default'">
+                  {{ ({ ISOLATED_ZONE: '候机区', CHECKIN_HALL: '值机区', SECURITY_AREA: '安全检查', SHOP_BLOCK: '商铺/设施（不可通行）', CORRIDOR: '通行走廊' })[record.regionType] || record.regionType }}
                 </a-tag>
               </template>
             </a-table-column>
@@ -338,6 +338,8 @@
             <template v-else>
               <a-select-option value="ISOLATED_ZONE">安检后候机隔离区</a-select-option>
               <a-select-option value="CHECKIN_HALL">值机与行李托运办理区</a-select-option>
+              <a-select-option value="SECURITY_AREA">安全检查（可通行）</a-select-option>
+              <a-select-option value="SHOP_BLOCK">商铺/设施区域（不可通行）</a-select-option>
             </template>
           </a-select>
         </a-form-item>
@@ -371,7 +373,7 @@
         </a-form-item>
         <a-row :gutter="12">
           <a-col :span="12">
-            <a-form-item label="旅客初始 X 坐标（默认 390）"><a-input-number v-model:value="quickForm.passengerX" style="width: 100%" /></a-form-item>
+            <a-form-item label="旅客初始 X 坐标（默认 1036）"><a-input-number v-model:value="quickForm.passengerX" style="width: 100%" /></a-form-item>
           </a-col>
           <a-col :span="12">
             <a-form-item label="旅客初始 Y 坐标（默认 3070）"><a-input-number v-model:value="quickForm.passengerY" style="width: 100%" /></a-form-item>
@@ -499,10 +501,10 @@ const quickSubmitting = ref(false)
 const quickForm = reactive({
   scenario: 'SPECIAL_PASSENGER_SERVICE',
   origin: '',
-  passengerX: 390,
-  passengerY: 3070,
-  viaSecurity: 'VIP安检通道',
-  destination: 'GATE_A05',
+  passengerX: 1036,
+  passengerY: 480,
+  viaSecurity: 'SECURITY_MAIN',
+  destination: 'GATE_04',
   assistanceType: '轮椅陪同'
 })
 
@@ -527,18 +529,52 @@ const sceneParamsObj = computed(() => {
 })
 
 const effectivePassengerPoint = computed(() => {
-  if (manualPassengerPoint.value) return manualPassengerPoint.value
-  const sp = sceneParamsObj.value
-  if (Number.isFinite(Number(sp.passengerX)) && Number.isFinite(Number(sp.passengerY))) {
-    return {
-      x: Number(sp.passengerX),
-      y: Number(sp.passengerY),
-      label: sp.origin || `坐标 (${sp.passengerX}, ${sp.passengerY})`
+  const basePoint = (() => {
+    if (manualPassengerPoint.value) return manualPassengerPoint.value
+    const sp = sceneParamsObj.value
+    if (Number.isFinite(Number(sp.passengerX)) && Number.isFinite(Number(sp.passengerY))) {
+      return {
+        x: Number(sp.passengerX),
+        y: Number(sp.passengerY),
+        label: sp.origin || `坐标 (${sp.passengerX}, ${sp.passengerY})`
+      }
+    }
+    const parsed = currentTask.value?.goalParsingResult || {}
+    const cand = sp.origin || sp.baggageLocation || parsed.origin
+    return resolveLocation(cand, pois.value, devices.value) || { x: 1036, y: 480, label: '旅客初始位置 (1036, 480)' }
+  })()
+
+  if (mode.value === 'live' && currentTask.value) {
+    // 若移动机器人正在执行陪同(CAP_ESCORT)或超规行李引导(CAP_NAVIGATION)，旅客位置实时跟随该机器人移动
+    const escortStep = mergedSteps.value.find(s =>
+      s.stepStatus === 'EXECUTING'
+      && (s.capabilityType === 'CAP_ESCORT'
+        || (currentTask.value?.taskFamily === 'OVERSIZE_BAGGAGE_HANDLING' && s.capabilityType === 'CAP_NAVIGATION'))
+    )
+    if (escortStep?.agentCode) {
+      const robot = devices.value.find(d => d.agentId === escortStep.agentCode || d.deviceCode === escortStep.agentCode)
+      if (robot?.location && Number.isFinite(Number(robot.location.x)) && Number.isFinite(Number(robot.location.y))) {
+        return {
+          x: Number(robot.location.x) + 18,
+          y: Number(robot.location.y) + 6,
+          label: `${robot.deviceName || '机器人'}陪同移动中`
+        }
+      }
+    }
+    const escortDone = mergedSteps.value.some(s =>
+      s.stepStatus === 'COMPLETED'
+      && (s.capabilityType === 'CAP_ESCORT'
+        || (currentTask.value?.taskFamily === 'OVERSIZE_BAGGAGE_HANDLING' && s.capabilityType === 'CAP_NAVIGATION'))
+    )
+    if (escortDone && effectiveDestPoint.value) {
+      return {
+        x: effectiveDestPoint.value.x,
+        y: effectiveDestPoint.value.y,
+        label: `已到达 ${effectiveDestPoint.value.label || '目标点位'}`
+      }
     }
   }
-  const parsed = currentTask.value?.goalParsingResult || {}
-  const cand = sp.origin || sp.baggageLocation || parsed.origin
-  return resolveLocation(cand, pois.value, devices.value) || { x: 390, y: 3070, label: '旅客初始位置 (390, 3070)' }
+  return basePoint
 })
 
 const effectiveViaPoint = computed(() => {
@@ -550,7 +586,7 @@ const effectiveDestPoint = computed(() => {
   const sp = sceneParamsObj.value
   const parsed = currentTask.value?.goalParsingResult || {}
   const cand = sp.destination || sp.targetCounter || sp.newGate || parsed.destination
-  return resolveLocation(cand, pois.value, devices.value) || resolveLocation('GATE_A05', pois.value, devices.value)
+  return resolveLocation(cand, pois.value, devices.value) || resolveLocation('GATE_04', pois.value, devices.value)
 })
 
 const routeInfo = computed(() => {
@@ -1117,15 +1153,20 @@ watch(mode, (val) => {
 
 onMounted(async () => {
   await refreshAll()
-  liveTimer = setInterval(async () => {
-    if (mode.value === 'live' && selectedTaskId.value) {
-      await Promise.all([loadSnapshot(), loadTaskDetails(selectedTaskId.value)]).catch(() => {})
-    }
-  }, 2000)
+  const scheduleLivePoll = () => {
+    const delay = (mode.value === 'live' && isRunning(currentTask.value?.status)) ? 500 : 2000
+    liveTimer = setTimeout(async () => {
+      if (mode.value === 'live' && selectedTaskId.value) {
+        await Promise.all([loadSnapshot(), loadTaskDetails(selectedTaskId.value)]).catch(() => {})
+      }
+      scheduleLivePoll()
+    }, delay)
+  }
+  scheduleLivePoll()
 })
 
 onBeforeUnmount(() => {
-  clearInterval(liveTimer)
+  clearTimeout(liveTimer)
   clearInterval(playbackTimer)
 })
 </script>

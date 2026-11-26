@@ -454,7 +454,31 @@ public class TaskPlanningOrchestrator {
         request.setRequestId(UUID.randomUUID().toString());
         request.setTaskGoal(SceneParamsPrivacyGuard.sanitizeGoal(task.getTaskGoal()));
         request.setTaskFamily(task.getTaskFamily());
-        request.setSceneParams(SceneParamsPrivacyGuard.sanitize(parseMap(task.getSceneParams())));
+        Map<String, Object> sceneParams = new java.util.LinkedHashMap<>(parseMap(task.getSceneParams()));
+        Map<String, Object> parsedGoal = parseMap(task.getGoalParsingResult());
+        if (isBlankValue(sceneParams.get("origin")) && !isBlankValue(parsedGoal.get("origin"))) {
+            sceneParams.put("origin", parsedGoal.get("origin"));
+        }
+        if (isBlankValue(sceneParams.get("destination")) && !isBlankValue(parsedGoal.get("destination"))) {
+            sceneParams.put("destination", parsedGoal.get("destination"));
+        }
+        if ("OVERSIZE_BAGGAGE_HANDLING".equals(task.getTaskFamily())) {
+            // 业务约定：超规行李场景默认旅客就在行李所在测量点
+            Object origin = sceneParams.get("origin");
+            if (isBlankValue(sceneParams.get("baggageLocation")) && !isBlankValue(origin)) {
+                sceneParams.put("baggageLocation", origin);
+            }
+            if (isBlankValue(sceneParams.get("passengerLocation"))) {
+                Object paxLoc = !isBlankValue(sceneParams.get("baggageLocation")) ? sceneParams.get("baggageLocation") : origin;
+                if (!isBlankValue(paxLoc)) {
+                    sceneParams.put("passengerLocation", paxLoc);
+                }
+            }
+        } else if ("SPECIAL_PASSENGER_SERVICE".equals(task.getTaskFamily())
+                && isBlankValue(sceneParams.get("assistanceType"))) {
+            sceneParams.put("assistanceType", inferAssistanceType(task.getTaskGoal()));
+        }
+        request.setSceneParams(SceneParamsPrivacyGuard.sanitize(sceneParams));
 
         List<String> constraints = new ArrayList<>();
         constraints.add("不得下发运动安全控制指令");
@@ -693,6 +717,21 @@ public class TaskPlanningOrchestrator {
         } catch (Exception e) {
             throw new RuntimeException("解析失败: " + json, e);
         }
+    }
+
+    private String inferAssistanceType(String taskGoal) {
+        if (taskGoal == null) return "特殊旅客协助";
+        if (taskGoal.contains("轮椅")) return "轮椅协助";
+        if (taskGoal.contains("无人陪伴儿童") || taskGoal.contains("无陪儿童")) return "无人陪伴儿童";
+        if (taskGoal.contains("急救") || taskGoal.contains("医疗") || taskGoal.contains("不适") || taskGoal.contains("头晕")) return "医疗协助";
+        if (taskGoal.contains("视障") || taskGoal.contains("盲人")) return "视障引导";
+        if (taskGoal.contains("VIP") || taskGoal.contains("行动不便")) return "行动不便协助";
+        if (taskGoal.contains("老年") || taskGoal.contains("老人")) return "老年旅客协助";
+        return "特殊旅客协助";
+    }
+
+    private boolean isBlankValue(Object val) {
+        return val == null || String.valueOf(val).isBlank();
     }
 
     private String toJson(Object value) {

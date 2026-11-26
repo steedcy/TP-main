@@ -2,6 +2,8 @@
 // （SRS_F015.R06，DEF-S3-067）。三项依据：任务族/目标、所需能力、五步限制。
 // 只用页面已有的数据：任务（taskFamily）、计划版本（baselineTemplateId、snapshotId、planSteps）、模板详情。
 
+import { capabilityLabel } from '../constants/capability.js'
+
 export const MAX_STEPS = 5
 
 export function templateReference(planVersion, template) {
@@ -34,8 +36,8 @@ export function matchBasis(task, planVersion, template) {
   const missing = templateCaps.filter((c) => !planCaps.includes(c))
   rows.push({
     item: '所需能力',
-    expected: templateCaps.length ? [...new Set(templateCaps)].join('、') : '未取得模板信息',
-    actual: planCaps.length ? [...new Set(planCaps)].join('、') : '计划无步骤',
+    expected: templateCaps.length ? [...new Set(templateCaps)].map(capabilityLabel).join('、') : '未取得模板信息',
+    actual: planCaps.length ? [...new Set(planCaps)].map(capabilityLabel).join('、') : '计划无步骤',
     ok: templateCaps.length > 0 && missing.length === 0
   })
 

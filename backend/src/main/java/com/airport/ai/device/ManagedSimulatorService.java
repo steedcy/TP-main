@@ -111,6 +111,7 @@ public class ManagedSimulatorService implements AutoCloseable {
             environment.put("SIMULATOR_Y", device.getPositionY().toPlainString());
             environment.put("SIMULATOR_ZONE", device.getAreaCode());
             environment.put("SIMULATOR_HEARTBEAT_INTERVAL_SECONDS", String.valueOf(device.getStatusReportInterval()));
+            environment.put("SIMULATOR_MIN_ROUTE_DURATION_MS", "5500");
             builder.redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.appendTo(
                     logs.resolve(device.getDeviceCode() + ".log").toFile()));
             Process process = builder.start();

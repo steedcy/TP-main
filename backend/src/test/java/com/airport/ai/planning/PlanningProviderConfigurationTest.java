@@ -14,14 +14,26 @@ class PlanningProviderConfigurationTest {
             .withBean(RestTemplateBuilder.class, RestTemplateBuilder::new)
             .withBean(TaskDefinitionMapper.class, () -> mock(TaskDefinitionMapper.class))
             .withUserConfiguration(ExternalPlanningModelServiceImpl.class, ExternalGoalUnderstandingServiceImpl.class,
-                    MoonshotChatClient.class, MoonshotModelService.class);
+                    MoonshotChatClient.class, FailoverChatClient.class, MoonshotModelService.class);
 
     @Test
     void moonshotSelectsOneImplementationForEachContract() {
         runner.withPropertyValues("app.planning-model.provider=moonshot").run(context -> {
             assertThat(context).hasSingleBean(PlanningModelService.class).hasSingleBean(GoalUnderstandingService.class);
             assertThat(context.getBean(PlanningModelService.class)).isInstanceOf(MoonshotModelService.class);
+            assertThat(context.getBean(PlanningChatClient.class)).isInstanceOf(FailoverChatClient.class);
+            assertThat(context.getBean(FailoverChatClient.class).isFallbackEnabled()).isFalse();
             assertThat(context).doesNotHaveBean(ExternalPlanningModelServiceImpl.class);
+        });
+    }
+
+    @Test
+    void moonshotWithFallbackEnabledUsesFailoverClientAsPrimary() {
+        runner.withPropertyValues("app.planning-model.provider=moonshot",
+                "app.planning-model.fallback.enabled=true").run(context -> {
+            assertThat(context).hasSingleBean(PlanningModelService.class).hasSingleBean(GoalUnderstandingService.class);
+            assertThat(context.getBean(PlanningChatClient.class)).isInstanceOf(FailoverChatClient.class);
+            assertThat(context.getBean(FailoverChatClient.class).isFallbackEnabled()).isTrue();
         });
     }
 

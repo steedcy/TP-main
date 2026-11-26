@@ -55,11 +55,14 @@ class DemoResetIntegrationTest {
         assertNotNull(first.get("requestId"));
         assertEquals(DemoDataset.VERSION, first.get("afterDatasetVersion"));
         assertNotNull(first.get("beforeDatasetVersion"));
-        assertEquals(6L, jdbc.queryForObject("SELECT count(*) FROM devices WHERE device_code LIKE 'SIM_F2_%'", Long.class));
-        assertEquals(3L, jdbc.queryForObject("SELECT count(*) FROM baseline_templates WHERE is_preset=TRUE AND template_status='DRAFT'", Long.class));
-        assertEquals(3L, jdbc.queryForObject("SELECT count(*) FROM task_definitions WHERE is_preset=TRUE AND definition_status='ENABLED'", Long.class));
+        assertEquals(20L, jdbc.queryForObject("SELECT count(*) FROM devices WHERE is_simulator=TRUE AND device_status='ACTIVE'", Long.class));
+        assertEquals(18L, jdbc.queryForObject("SELECT count(*) FROM terminal_map_regions", Long.class));
+        assertEquals(68L, jdbc.queryForObject("SELECT count(*) FROM terminal_pois", Long.class));
+        assertEquals(3L, jdbc.queryForObject("SELECT count(*) FROM baseline_templates WHERE is_preset=TRUE AND template_status='ENABLED'", Long.class));
+        assertEquals(4L, jdbc.queryForObject("SELECT count(*) FROM task_definitions WHERE is_preset=TRUE AND definition_status='ENABLED'", Long.class));
+        assertEquals(3L, jdbc.queryForObject("SELECT count(*) FROM risk_rules WHERE enabled=TRUE", Long.class));
 
-        jdbc.update("UPDATE devices SET device_name='MUTATED_FOR_ROLLBACK' WHERE device_code='SIM_F2_DISPLAY'");
+        jdbc.update("UPDATE devices SET device_name='MUTATED_FOR_ROLLBACK' WHERE device_code='SIM_DISPLAY_H2'");
         String beforeFailure = worker.contentDigest();
         assertNotEquals(canonical, beforeFailure);
         assertThrows(IllegalStateException.class,
@@ -127,7 +130,8 @@ class DemoResetIntegrationTest {
         assertNotNull(successAudit.get("after_digest"));
         assertEquals(0L, jdbc.queryForObject("""
                 SELECT count(*) FROM device_capabilities c JOIN devices d ON d.id=c.device_id
-                WHERE d.device_code LIKE 'SIM_F2_%' AND c.capability_status<>'UNTESTED'
+                WHERE d.is_simulator=TRUE AND d.device_status='ACTIVE'
+                  AND (c.capability_status<>'ENABLED' OR c.test_passed<>TRUE)
                 """, Long.class));
     }
 }

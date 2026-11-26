@@ -10,7 +10,7 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import '@geoman-io/leaflet-geoman-free'
 import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css'
-import { MAP_HEIGHT, MAP_WIDTH, POI_CATEGORIES, parseRegionGeometry } from '../utils/terminalMap'
+import { MAP_HEIGHT, MAP_WIDTH, POI_CATEGORIES, parseRegionGeometry, poiIcon } from '../utils/terminalMap'
 
 const props = defineProps({
   editable: { type: Boolean, default: false },
@@ -52,6 +52,9 @@ let collabGroup = null
 let devicesGroup = null
 let bubblesGroup = null
 let passengerGroup = null
+const deviceMarkers = new Map()
+let passengerMarker = null
+let lastPassengerLabel = ''
 
 function toLatLng(x, y) {
   return [MAP_HEIGHT - Number(y), Number(x)]
@@ -89,19 +92,21 @@ function syncRegionsLayer() {
         opacity: 0.65
       })
     } else if (latlngs.length >= 3) {
-      const isIso = reg.regionType === 'ISOLATED_ZONE'
-      layer = L.polygon(latlngs, {
-        color: isIso ? '#722ed1' : '#389e0d',
-        fillColor: isIso ? '#722ed1' : '#52c41a',
-        fillOpacity: 0.16,
-        weight: 2,
-        dashArray: '6 5'
-      })
+      const styleMap = {
+        ISOLATED_ZONE: { color: '#3b82f6', fillColor: '#dbeafe', fillOpacity: 0.55, weight: 2, dashArray: '6 5' },
+        CHECKIN_HALL: { color: '#10b981', fillColor: '#ecfdf5', fillOpacity: 0.45, weight: 2, dashArray: '6 5' },
+        SECURITY_AREA: { color: '#08979c', fillColor: '#b5f5ec', fillOpacity: 0.55, weight: 2 },
+        SHOP_BLOCK: { color: '#434343', fillColor: '#6b7280', fillOpacity: 0.6, weight: 2 }
+      }
+      layer = L.polygon(latlngs, styleMap[reg.regionType] || styleMap.ISOLATED_ZONE)
     }
     if (!layer) continue
     layer._tipMeta = { kind: 'region', data: reg }
-    const prefix = reg.regionType === 'ISOLATED_ZONE' ? '候机隔离区' : reg.regionType === 'CHECKIN_HALL' ? '值机办理区' : '走廊通道'
-    layer.bindTooltip(`${prefix}：${reg.regionName}`, { sticky: true })
+    if (reg.regionType === 'SECURITY_AREA') {
+      layer.bindTooltip('安全检查', { sticky: true })
+    } else if (reg.regionType === 'CORRIDOR') {
+      layer.bindTooltip(`走廊通道：${reg.regionName}`, { sticky: true })
+    }
     layer.on('pm:edit', () => {
       const raw = layer.getLatLngs()
       const ring = Array.isArray(raw[0]) ? raw[0] : raw
@@ -135,7 +140,7 @@ function syncPoisLayer() {
     const icon = L.divIcon({
       className: 'leaflet-poi-wrapper',
       html: `<div class="leaflet-poi-pill" style="--poi-color:${poiColor(poi.category)}">
-        <span class="dot">${poiBadge(poi.category)}</span>
+        <span class="dot">${poiIcon(poi)}</span>
         <span class="txt">${poi.poiName}</span>
       </div>`,
       iconSize: [0, 0],
@@ -201,33 +206,82 @@ function syncCollabLayer() {
 
 function syncDevicesLayer() {
   if (!devicesGroup) return
-  devicesGroup.clearLayers()
+  const seen = new Set()
   for (const d of props.devices) {
     if (!d.location || !Number.isFinite(Number(d.location.x)) || !Number.isFinite(Number(d.location.y))) continue
+    const key = d.deviceCode
+    seen.add(key)
     const isBusy = d.workStatus === 'BUSY' || Boolean(props.activeDeviceStepMap[d.agentId])
     const cls = d.onlineStatus !== 'ONLINE' ? 'offline' : isBusy ? 'busy' : 'online'
     const stepText = props.activeDeviceStepMap[d.agentId] ? ` · 执行第${props.activeDeviceStepMap[d.agentId]}步` : ''
-    const icon = L.divIcon({
-      className: 'leaflet-dev-wrapper',
-      html: `<div class="leaflet-dev-pill ${cls}"><span class="dot"></span><span class="txt">${d.deviceName}${stepText}</span></div>`,
-      iconSize: [0, 0],
-      iconAnchor: [0, 0]
-    })
-    devicesGroup.addLayer(L.marker(toLatLng(d.location.x, d.location.y), { icon, pmIgnore: true }))
+    const stateSig = `${cls}|${d.deviceName}|${stepText}`
+    const latlng = toLatLng(d.location.x, d.location.y)
+    const existing = deviceMarkers.get(key)
+    if (existing) {
+      existing.marker.setLatLng(latlng)
+      if (existing.stateSig !== stateSig) {
+        existing.marker.setIcon(L.divIcon({
+          className: 'leaflet-dev-wrapper',
+          html: `<div class="leaflet-dev-pill ${cls}"><span class="dot"></span><span class="txt">${d.deviceName}${stepText}</span></div>`,
+          iconSize: [0, 0],
+          iconAnchor: [0, 0]
+        }))
+        existing.stateSig = stateSig
+      }
+    } else {
+      const icon = L.divIcon({
+        className: 'leaflet-dev-wrapper',
+        html: `<div class="leaflet-dev-pill ${cls}"><span class="dot"></span><span class="txt">${d.deviceName}${stepText}</span></div>`,
+        iconSize: [0, 0],
+        iconAnchor: [0, 0]
+      })
+      const marker = L.marker(latlng, { icon, pmIgnore: true })
+      devicesGroup.addLayer(marker)
+      deviceMarkers.set(key, { marker, stateSig })
+    }
+  }
+  for (const [key, entry] of deviceMarkers.entries()) {
+    if (!seen.has(key)) {
+      devicesGroup.removeLayer(entry.marker)
+      deviceMarkers.delete(key)
+    }
   }
 }
 
 function syncPassengerLayer() {
   if (!passengerGroup) return
-  passengerGroup.clearLayers()
-  if (!props.passengerPoint) return
-  const icon = L.divIcon({
-    className: 'leaflet-pax-wrapper',
-    html: `<div class="leaflet-pax-pill"><span class="pulse"></span><span class="ico">🧑</span><span class="txt">旅客位置：${props.passengerPoint.label}</span></div>`,
-    iconSize: [0, 0],
-    iconAnchor: [0, 0]
-  })
-  passengerGroup.addLayer(L.marker(toLatLng(props.passengerPoint.x, props.passengerPoint.y), { icon, pmIgnore: true }))
+  if (!props.passengerPoint) {
+    if (passengerMarker) {
+      passengerGroup.removeLayer(passengerMarker)
+      passengerMarker = null
+      lastPassengerLabel = ''
+    }
+    return
+  }
+  const latlng = toLatLng(props.passengerPoint.x, props.passengerPoint.y)
+  const label = props.passengerPoint.label || ''
+  if (passengerMarker) {
+    passengerMarker.setLatLng(latlng)
+    if (lastPassengerLabel !== label) {
+      passengerMarker.setIcon(L.divIcon({
+        className: 'leaflet-pax-wrapper',
+        html: `<div class="leaflet-pax-pill"><span class="pulse"></span><span class="ico">🧑</span><span class="txt">旅客位置：${label}</span></div>`,
+        iconSize: [0, 0],
+        iconAnchor: [0, 0]
+      }))
+      lastPassengerLabel = label
+    }
+  } else {
+    const icon = L.divIcon({
+      className: 'leaflet-pax-wrapper',
+      html: `<div class="leaflet-pax-pill"><span class="pulse"></span><span class="ico">🧑</span><span class="txt">旅客位置：${label}</span></div>`,
+      iconSize: [0, 0],
+      iconAnchor: [0, 0]
+    })
+    passengerMarker = L.marker(latlng, { icon, pmIgnore: true })
+    passengerGroup.addLayer(passengerMarker)
+    lastPassengerLabel = label
+  }
 }
 
 function syncBubblesLayer() {
@@ -271,7 +325,7 @@ function syncBubblesLayer() {
 
 function focusActiveArea() {
   if (!map) return
-  map.fitBounds([[MAP_HEIGHT - 3880, 260], [MAP_HEIGHT - 2080, 1060]])
+  map.fitBounds([[MAP_HEIGHT - 540, 20], [MAP_HEIGHT - 20, 1980]])
 }
 
 function fitAll() {
@@ -315,7 +369,14 @@ onMounted(() => {
     zoomSnap: 0.25,
     attributionControl: false
   })
-  L.imageOverlay('/F2.jpg', [[0, 0], [MAP_HEIGHT, MAP_WIDTH]]).addTo(map)
+  L.rectangle([[MAP_HEIGHT - 520, 40], [MAP_HEIGHT - 40, 1960]], {
+    color: '#bfbfbf',
+    weight: 1.5,
+    fillColor: '#f5f6f8',
+    fillOpacity: 0.45,
+    interactive: false,
+    pmIgnore: true
+  }).addTo(map)
 
   regionsGroup = L.layerGroup().addTo(map)
   collabGroup = L.layerGroup().addTo(map)
@@ -428,6 +489,11 @@ defineExpose({ fitAll, focusActiveArea, exportGeoJson })
 .leaflet-container-box {
   width: 100%;
   height: 100%;
+  background-color: #ffffff;
+  background-image:
+    linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
 }
 </style>
 
@@ -462,6 +528,11 @@ defineExpose({ fitAll, focusActiveArea, exportGeoJson })
   font-weight: 600;
   color: #262626;
   border: 1px solid #d9d9d9;
+}
+.leaflet-map-pane:not(.leaflet-zoom-anim) .leaflet-dev-wrapper,
+.leaflet-map-pane:not(.leaflet-zoom-anim) .leaflet-pax-wrapper {
+  transition: transform 0.55s linear;
+  will-change: transform;
 }
 .leaflet-dev-pill {
   display: inline-flex;

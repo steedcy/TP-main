@@ -26,6 +26,8 @@ public class ExternalGoalUnderstandingServiceImpl implements GoalUnderstandingSe
     private final RestTemplate restTemplate;
     private final String endpoint;
     private final String apiKey;
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private PlanningModelConfigService configService;
 
     public ExternalGoalUnderstandingServiceImpl(RestTemplateBuilder builder,
                                                  @Value("${app.planning-model.endpoint:}") String endpoint,
@@ -41,6 +43,9 @@ public class ExternalGoalUnderstandingServiceImpl implements GoalUnderstandingSe
 
     @Override
     public GoalUnderstandingResponse understand(GoalUnderstandingRequest request) {
+        if (endpoint.isBlank() && configService != null && configService.hasLiveModelKey()) {
+            return configService.delegateUnderstand(request);
+        }
         if (endpoint.isBlank()) {
             GoalUnderstandingResponse resp = new GoalUnderstandingResponse();
             resp.setResultCode("1004");

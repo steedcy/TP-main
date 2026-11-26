@@ -14,6 +14,13 @@ export function capabilityLabel(code) {
   return CAPABILITY_TYPES.find(c => c.value === code)?.label || code
 }
 
+const CAPABILITY_CODE_PATTERN = new RegExp(`\\b(${CAPABILITY_TYPES.map(c => c.value).join('|')})\\b`, 'g')
+
+export function replaceCapabilityCodesInText(text) {
+  if (!text) return text
+  return String(text).replace(CAPABILITY_CODE_PATTERN, code => capabilityLabel(code))
+}
+
 // 系统预置5类设备类型，不可新增或删除（对应5.2.1、5.2.4A业务规则1）
 export const DEVICE_TYPES = [
   { value: 'SMART_DISPLAY', label: '智慧航显' },

@@ -26,13 +26,13 @@ import java.util.UUID;
 /** Kimi transport only: no device commands, automatic retries, or credential logging. */
 @Component
 @ConditionalOnProperty(name = "app.planning-model.provider", havingValue = "moonshot")
-public class MoonshotChatClient {
+public class MoonshotChatClient implements PlanningChatClient {
     private static final Logger LOG = LoggerFactory.getLogger(MoonshotChatClient.class);
     private final HttpClient httpClient;
     private final ObjectMapper mapper;
-    private final URI endpoint;
-    private final String apiKey;
-    private final String model;
+    private volatile URI endpoint;
+    private volatile String apiKey;
+    private volatile String model;
     private final int maxTokens;
     private final Duration timeout;
 
@@ -52,28 +52,52 @@ public class MoonshotChatClient {
                        String apiKey, String model, int maxTokens, long timeoutMs) {
         this.httpClient = httpClient;
         this.mapper = mapper;
-        this.endpoint = URI.create(baseUrl.replaceAll("/+$", "") + "/chat/completions");
-        if (!"https".equals(endpoint.getScheme()) || endpoint.getUserInfo() != null
-                || endpoint.getQuery() != null || endpoint.getFragment() != null) {
-            throw new IllegalArgumentException("Moonshot base URL must be HTTPS without credentials or query parameters");
-        }
-        this.apiKey = apiKey == null ? "" : apiKey.trim();
-        this.model = model;
         if (maxTokens < 1 || maxTokens > 32768 || timeoutMs < 1 || timeoutMs > 60000) {
             throw new IllegalArgumentException("Invalid Moonshot token limit or timeout (maximum 60000 ms)");
         }
         this.maxTokens = maxTokens;
         this.timeout = Duration.ofMillis(timeoutMs);
+        reconfigure(baseUrl, apiKey, model);
     }
 
+    public synchronized void reconfigure(String baseUrl, String apiKey, String model) {
+        String base = (baseUrl == null || baseUrl.isBlank() ? "https://api.moonshot.cn/v1" : baseUrl.trim())
+                .replaceAll("/+$", "");
+        URI nextEndpoint = URI.create(base + "/chat/completions");
+        if (!"https".equals(nextEndpoint.getScheme()) || nextEndpoint.getUserInfo() != null
+                || nextEndpoint.getQuery() != null || nextEndpoint.getFragment() != null) {
+            throw new IllegalArgumentException("Moonshot base URL must be HTTPS without credentials or query parameters");
+        }
+        this.endpoint = nextEndpoint;
+        this.apiKey = apiKey == null ? "" : apiKey.trim();
+        this.model = model;
+    }
+
+    public String baseUrl() {
+        String raw = endpoint.toString();
+        return raw.endsWith("/chat/completions") ? raw.substring(0, raw.length() - "/chat/completions".length()) : raw;
+    }
+
+    public String apiKey() { return apiKey; }
+    public String model() { return model; }
+
+    @Override
     public JsonNode complete(String instruction, Object input, String requestId) {
-        if (apiKey.isBlank() || model == null || model.isBlank()) {
-            throw new CallFailure("1004", "Kimi 密钥或模型名称未配置");
+        return complete(instruction, input, requestId, timeout);
+    }
+
+    @Override
+    public JsonNode complete(String instruction, Object input, String requestId, Duration timeout) {
+        URI currentEndpoint = this.endpoint;
+        String currentApiKey = this.apiKey;
+        String currentModel = this.model;
+        if (currentApiKey.isBlank() || currentModel == null || currentModel.isBlank()) {
+            throw CallFailure.unavailable("1004", "Kimi 密钥或模型名称未配置");
         }
         long started = System.nanoTime();
         try {
             Map<String, Object> body = new LinkedHashMap<>();
-            body.put("model", model);
+            body.put("model", currentModel);
             String userContent = mapper.writeValueAsString(input);
             userContent = com.airport.ai.task.SceneParamsPrivacyGuard.sanitizeText(userContent);
             body.put("messages", List.of(Map.of("role", "system", "content", instruction),
@@ -81,11 +105,11 @@ public class MoonshotChatClient {
             body.put("response_format", Map.of("type", "json_object"));
             body.put("max_tokens", maxTokens);
             body.put("stream", false);
-            if ("kimi-k2.6".equals(model)) body.put("thinking", Map.of("type", "disabled"));
-            if ("kimi-k3".equals(model)) body.put("reasoning_effort", "low");
-            HttpRequest request = HttpRequest.newBuilder(endpoint).timeout(timeout)
+            if ("kimi-k2.6".equals(currentModel)) body.put("thinking", Map.of("type", "disabled"));
+            if ("kimi-k3".equals(currentModel)) body.put("reasoning_effort", "low");
+            HttpRequest request = HttpRequest.newBuilder(currentEndpoint).timeout(timeout)
                     .header("Content-Type", "application/json")
-                    .header("Authorization", "Bearer " + apiKey)
+                    .header("Authorization", "Bearer " + currentApiKey)
                     .header("X-Request-ID", requestId != null && requestId.matches("[A-Za-z0-9_-]{1,128}")
                             ? requestId : UUID.randomUUID().toString())
                     .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(body), StandardCharsets.UTF_8))
@@ -94,7 +118,7 @@ public class MoonshotChatClient {
                     HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
             if (response.statusCode() != 200) {
                 // Do not pass raw upstream bodies or exception text into user-facing task events.
-                throw new CallFailure("1003", "Kimi 调用失败，HTTP " + response.statusCode());
+                throw CallFailure.unavailable("1003", "Kimi 调用失败，HTTP " + response.statusCode());
             }
             JsonNode envelope = readObject(response.body());
             JsonNode choices = envelope.path("choices");
@@ -107,7 +131,7 @@ public class MoonshotChatClient {
                 throw new CallFailure("1002", "Kimi 未返回 JSON 内容");
             }
             JsonNode result = readObject(content.asText());
-            LOG.info("Kimi model={} elapsedMs={} inputTokens={} outputTokens={}", model,
+            LOG.info("Kimi model={} elapsedMs={} inputTokens={} outputTokens={}", currentModel,
                     (System.nanoTime() - started) / 1_000_000,
                     envelope.path("usage").path("prompt_tokens").asInt(),
                     envelope.path("usage").path("completion_tokens").asInt());
@@ -118,11 +142,11 @@ public class MoonshotChatClient {
             Thread.currentThread().interrupt();
             throw new CallFailure("1003", "Kimi 调用已中断");
         } catch (java.net.http.HttpTimeoutException ex) {
-            throw new CallFailure("1003", "Kimi 调用超时");
+            throw CallFailure.unavailable("1003", "Kimi 调用超时");
         } catch (JsonProcessingException ex) {
             throw new CallFailure("1002", "Kimi 返回内容不是有效 JSON");
         } catch (IOException ex) {
-            throw new CallFailure("1003", "Kimi 网络连接异常");
+            throw CallFailure.unavailable("1003", "Kimi 网络连接异常");
         }
     }
 
@@ -132,9 +156,24 @@ public class MoonshotChatClient {
         return node;
     }
 
+    /**
+     * Model call failure. {@code providerUnavailable} is true only when the provider itself could not
+     * serve the call (unconfigured, timeout, network error, non-200 HTTP); content/protocol errors (1002)
+     * are never marked unavailable and therefore never trigger failover to the secondary model.
+     */
     public static class CallFailure extends RuntimeException {
         private final String code;
-        public CallFailure(String code, String message) { super(message); this.code = code; }
+        private final boolean providerUnavailable;
+        public CallFailure(String code, String message) { this(code, message, false); }
+        public CallFailure(String code, String message, boolean providerUnavailable) {
+            super(message);
+            this.code = code;
+            this.providerUnavailable = providerUnavailable;
+        }
+        public static CallFailure unavailable(String code, String message) {
+            return new CallFailure(code, message, true);
+        }
         public String code() { return code; }
+        public boolean providerUnavailable() { return providerUnavailable; }
     }
 }

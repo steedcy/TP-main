@@ -10,6 +10,7 @@ const routes = [
     children: [
       { path: 'overview', name: 'Overview', component: () => import('../views/task/OverviewView.vue') },
       { path: 'users', name: 'Users', component: () => import('../views/auth/UserManageView.vue'), meta: { roles: ['SYSTEM_ADMIN'] } },
+      { path: 'planning-model-config', name: 'PlanningModelConfig', component: () => import('../views/admin/PlanningModelConfigView.vue'), meta: { roles: ['SYSTEM_ADMIN'] } },
       { path: 'demo-data-reset', name: 'DemoDataReset', component: () => import('../views/admin/DemoResetView.vue'), meta: { roles: ['SYSTEM_ADMIN'] } },
       { path: 'devices', name: 'Devices', component: () => import('../views/device/DeviceListView.vue'), meta: { roles: ['CONFIG_ADMIN'] } },
       { path: 'simulators', name: 'Simulators', component: () => import('../views/simulator/SimulatorConsoleView.vue'), meta: { roles: ['CONFIG_ADMIN', 'OPERATOR', 'SYSTEM_ADMIN'] } },

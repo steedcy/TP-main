@@ -102,7 +102,7 @@
             <a-timeline-item v-for="e in filteredEvents" :key="e.id">
               {{ e.occurredAt }} - <b>{{ e.eventType }}</b> - {{ triggerLabel(e.trigger) }}
               <span v-if="e.reasonCode">（{{ e.reasonCode }}）</span>
-              <div v-if="e.detailSummary">{{ e.detailSummary }}</div>
+              <div v-if="e.detailSummary">{{ replaceCapabilityCodesInText(e.detailSummary) }}</div>
             </a-timeline-item>
           </a-timeline>
         </a-card>
@@ -116,6 +116,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import dayjs from 'dayjs'
 import { listTasks, getTask, getTaskEvents, getPlanVersions, getStepAssignments, listTaskExceptions } from '../../api/task'
 import { listTaskDefinitions } from '../../api/taskDefinition'
+import { capabilityLabel, replaceCapabilityCodesInText } from '../../constants/capability'
 
 const filters = reactive({ taskCode: '', taskFamily: undefined, status: undefined })
 const taskDefinitions = ref([])
@@ -154,7 +155,7 @@ function statusLabel(status) {
 const planStepColumns = [
   { title: '步骤', dataIndex: 'stepSeq', width: 60 },
   { title: '步骤目标', dataIndex: 'stepGoal' },
-  { title: '所需能力', dataIndex: 'capabilityType' },
+  { title: '所需能力', dataIndex: 'capabilityType', customRender: ({ text }) => capabilityLabel(text) },
   { title: '前置条件', dataIndex: 'precondition' },
   { title: '完成条件', dataIndex: 'completionCondition' },
   { title: '失败处理', dataIndex: 'failureHandling' }
@@ -223,7 +224,7 @@ const preservedResults = computed(() => {
     .filter(step => step.executionResult != null)
     .map(step => ({
       stepSeq: step.stepSeq,
-      capabilityType: step.capabilityType,
+      capabilityType: capabilityLabel(step.capabilityType),
       executionResult: step.executionResult,
       outputParams: safeJsonParse(step.outputParams),
       originalCommandId: step.originalCommandId || step.commandId
@@ -238,7 +239,7 @@ const preservedResults = computed(() => {
       const stepMeta = firstVersionSteps.find(s => s.stepSeq === a.stepSeq) || {}
       return {
         stepSeq: a.stepSeq,
-        capabilityType: a.capabilityType || stepMeta.capabilityType,
+        capabilityType: capabilityLabel(a.capabilityType || stepMeta.capabilityType),
         executionResult: a.executionResult || 'SUCCESS',
         outputParams: safeJsonParse(a.outputParams),
         originalCommandId: a.commandId || a.executeCommandId

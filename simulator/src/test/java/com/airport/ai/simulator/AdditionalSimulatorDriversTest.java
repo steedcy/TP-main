@@ -61,8 +61,8 @@ class AdditionalSimulatorDriversTest {
         assertEquals("SUCCESS", display.get("displayStatus"));
         var route = driver.routeLocations("CAP_ESCORT", Map.of("targetLocation", "GATE_A05"),
                 new SimulatorProtocol.Location(BigDecimal.ZERO, BigDecimal.ZERO, "T2"), escort);
-        assertEquals(4, route.size());
-        assertNotEquals(BigDecimal.ZERO, route.get(3).x());
+        assertEquals(24, route.size());
+        assertNotEquals(BigDecimal.ZERO, route.get(route.size() - 1).x());
         assertThrows(IllegalArgumentException.class, () -> driver.execute("CAP_ESCORT",
                 Map.of("targetLocation", "GATE_A05", "escortMode", "DRIVE", "maxDuration", 600)));
     }

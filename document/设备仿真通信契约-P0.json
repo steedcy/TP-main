@@ -1,0 +1,51 @@
+{
+  "contractVersion": "1.0",
+  "status": "P0-accepted",
+  "baseline": {
+    "srs": "V1.4",
+    "appendixB": "V2.0",
+    "appendixF": "V1.0",
+    "appendixE": "current-repository"
+  },
+  "deviceProfiles": {
+    "SMART_DISPLAY": ["CAP_INFO_DISPLAY", "CAP_FLIGHT_UPDATE", "CAP_NAVIGATION"],
+    "BAGGAGE_SCANNER": ["CAP_BAGGAGE_MEASURE", "CAP_OVERSIZE_ALERT"],
+    "FLIGHT_DELAY_BOARD": ["CAP_FLIGHT_UPDATE", "CAP_INFO_DISPLAY"],
+    "MOBILE_ROBOT": ["CAP_NAVIGATION", "CAP_ESCORT", "CAP_NOTIFICATION", "CAP_INFO_DISPLAY"]
+  },
+  "simulatorType": "SIMULATOR",
+  "simulatorRequiredCapability": "CAP_SIM_STATUS",
+  "routes": {
+    "health": {"method": "GET", "path": "/device-api/v1/health", "direction": "platform-to-simulator", "phase": "before-agent-binding"},
+    "binding": {"method": "POST", "path": "/device-api/v1/agents/{agentCode}/binding", "direction": "platform-to-simulator", "phase": "after-agent-creation"},
+    "report": {"method": "POST", "path": "/device-api/v1/agents/{agentCode}/report", "direction": "simulator-to-platform", "reportTypes": ["STATUS", "TASK_RESPONSE", "EXECUTION_FEEDBACK"]},
+    "commands": {"method": "POST", "path": "/device-api/v1/agents/{agentCode}/commands", "direction": "platform-to-simulator", "commandTypes": ["TASK_ACCEPT", "EXECUTE_CAPABILITY", "TASK_CANCEL"]},
+    "internalMessages": {"method": "POST", "path": "/internal/v1/device-agent/messages", "direction": "platform-internal", "messageTypes": ["CAPABILITY_QUERY", "STATUS_QUERY", "TASK_ACCEPT", "TASK_REJECT", "EXECUTION_FEEDBACK", "TASK_CANCEL"]}
+  },
+  "reportEnums": {
+    "onlineStatus": ["ONLINE", "OFFLINE"],
+    "workStatus": ["IDLE", "BUSY"],
+    "executionResult": ["SUCCESS", "FAILED", "TIMEOUT"]
+  },
+  "capabilities": {
+    "CAP_INFO_DISPLAY": {"contentType": ["TEXT", "IMAGE", "VIDEO", "HTML"], "displayDurationSeconds": {"min": 5, "max": 300}},
+    "CAP_BAGGAGE_MEASURE": {"measureMode": ["AUTO", "MANUAL"], "timeoutSeconds": {"min": 10, "max": 60}, "effectiveExecutionBudgetSeconds": 30, "oversize": {"dimensionSumCmExclusive": 158, "weightKgExclusive": 32}},
+    "CAP_OVERSIZE_ALERT": {"alertLevel": ["WARNING", "ERROR"]},
+    "CAP_FLIGHT_UPDATE": {"updateType": ["DELAY", "GATE_CHANGE", "CANCEL"], "displayDurationSeconds": {"min": 10, "max": 600}},
+    "CAP_NAVIGATION": {"routePreference": ["SHORTEST", "BARRIER_FREE"]},
+    "CAP_ESCORT": {"escortMode": ["LEAD", "FOLLOW"], "maxDurationSeconds": {"min": 60, "max": 1800}},
+    "CAP_NOTIFICATION": {"notificationType": ["VOICE", "TEXT", "BOTH"], "repeatCount": {"min": 1, "max": 5}},
+    "CAP_SIM_STATUS": {"simulatedResult": ["SUCCESS", "FAILED", "TIMEOUT"], "defaultDelayMilliseconds": 500}
+  },
+  "reliability": {
+    "commandIdRequired": true,
+    "retryReusesCommandId": true,
+    "automaticRetriesMaximum": 1,
+    "duplicateCommandsAreIdempotent": true,
+    "executionRetryAttemptNo": {"initial": 0, "retry": 1},
+    "heartbeatIntervalSeconds": {"default": 15, "min": 5, "max": 60},
+    "heartbeatTimeoutSeconds": {"default": 30, "min": 10, "max": 120}
+  },
+  "auth": {"scheme": "Bearer device token", "separateFromUserJwt": true},
+  "forbiddenSafetyFields": ["speed", "velocity", "acceleration", "pose", "waypoints", "obstacleAvoidance", "emergencyStop", "speedLimit", "safeStopOnDisconnect"]
+}

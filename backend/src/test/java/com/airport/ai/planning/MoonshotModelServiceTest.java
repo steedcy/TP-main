@@ -114,4 +114,66 @@ class MoonshotModelServiceTest {
         });
         assertFalse(service.generatePlan(request).isSuccess());
     }
+
+    @Test
+    void supportsGeneralServiceCatchAllFamilyForUnderstandingAndPlanning() throws Exception {
+        TaskDefinition general = new TaskDefinition();
+        general.setDefinitionCode("GENERAL_SERVICE");
+        general.setTaskName("通用协同服务");
+        general.setGoalTemplate("开放式机场服务目标");
+        general.setSceneParams("[]");
+        general.setAvailableCapabilityTypes("[\"CAP_INFO_DISPLAY\",\"CAP_NAVIGATION\",\"CAP_NOTIFICATION\"]");
+        general.setConstraintDescription("禁止进入商铺区");
+        general.setCompletionCondition("任务目标已完成");
+        when(definitions.findByDefinitionStatus("ENABLED")).thenReturn(List.of(flightDefinition(), general));
+
+        ObjectNode json = (ObjectNode) mapper.readTree("""
+                {"resultCode":"0","errorMessage":null,"origin":"SERVICE_DESK","destination":"GATE_04",
+                 "constraints":[],"completionCondition":"已在智慧屏发布提示并完成引导","infoComplete":true,
+                 "missingInfoQuestions":[],"unrelatedToAnyFamily":false,"inferredTaskFamily":"GENERAL_SERVICE"}
+                """);
+        when(client.complete(anyString(), any(), any())).thenAnswer(invocation -> {
+            String prompt = invocation.getArgument(0);
+            assertTrue(prompt.contains("GENERAL_SERVICE"));
+            return json;
+        });
+
+        GoalUnderstandingResponse understood = service.understand(goalRequest());
+        assertTrue(understood.isSuccess());
+        assertFalse(understood.isUnrelatedToAnyFamily());
+        assertTrue(understood.isInfoComplete());
+        assertEquals("GENERAL_SERVICE", understood.getInferredTaskFamily());
+
+        PlanningRequest planReq = new PlanningRequest();
+        planReq.setTaskFamily("GENERAL_SERVICE");
+        planReq.setCapabilityContext(List.of(
+                Map.of("capabilityType", "CAP_INFO_DISPLAY", "candidateCount", 1),
+                Map.of("capabilityType", "CAP_NAVIGATION", "candidateCount", 2),
+                Map.of("capabilityType", "CAP_ESCORT", "candidateCount", 1),
+                Map.of("capabilityType", "CAP_NOTIFICATION", "candidateCount", 0)));
+        doAnswer(invocation -> {
+            Map<?, ?> payload = invocation.getArgument(1);
+            assertEquals(List.of("CAP_INFO_DISPLAY", "CAP_NAVIGATION"), payload.get("eligibleCapabilityTypes"));
+            throw new MoonshotChatClient.CallFailure("1002", "fixture response");
+        }).when(client).complete(anyString(), any(), any());
+        assertFalse(service.generatePlan(planReq).isSuccess());
+    }
+
+    @Test
+    void oversizeBaggagePlanningDefaultsPassengerLocationToBaggageLocation() {
+        PlanningRequest planReq = new PlanningRequest();
+        planReq.setTaskFamily("OVERSIZE_BAGGAGE_HANDLING");
+        planReq.setSceneParams(Map.of("baggageLocation", "MEASURE_WEST", "targetCounter", "CHECKIN_WEST"));
+        planReq.setCapabilityContext(List.of(Map.of("capabilityType", "CAP_BAGGAGE_MEASURE", "candidateCount", 1)));
+        when(client.complete(anyString(), any(), any())).thenAnswer(invocation -> {
+            String prompt = invocation.getArgument(0);
+            Map<?, ?> payload = invocation.getArgument(1);
+            Map<?, ?> req = (Map<?, ?>) payload.get("request");
+            Map<?, ?> scene = (Map<?, ?>) req.get("sceneParams");
+            assertTrue(prompt.contains("OVERSIZE_BAGGAGE_HANDLING"));
+            assertEquals("MEASURE_WEST", scene.get("passengerLocation"));
+            throw new MoonshotChatClient.CallFailure("1002", "fixture response");
+        });
+        assertFalse(service.generatePlan(planReq).isSuccess());
+    }
 }

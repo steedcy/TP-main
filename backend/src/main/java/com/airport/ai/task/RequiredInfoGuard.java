@@ -74,7 +74,7 @@ public final class RequiredInfoGuard {
                     out.add(new Requirement(p.getName(), List.of(p.getName()), null, "请补充" + p.getName()));
                 }
             }
-            return out;
+            return out.isEmpty() ? null : out;
         } catch (Exception ex) {
             return null;
         }

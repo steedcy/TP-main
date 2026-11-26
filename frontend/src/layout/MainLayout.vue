@@ -4,8 +4,8 @@
       <div class="logo">智慧机场AI协同平台</div>
       <a-menu theme="dark" mode="inline" :selectedKeys="[$route.name]">
         <a-menu-item key="Overview" @click="$router.push('/overview')">运行总览</a-menu-item>
+        <a-menu-item key="TaskBoard" v-if="isOperator || isSystemAdmin" @click="$router.push('/task-board')">任务看板</a-menu-item>
         <a-menu-item key="Tasks" v-if="isOperator" @click="$router.push('/tasks')">任务管理</a-menu-item>
-        <a-menu-item key="TaskBoard" v-if="isOperator || isSystemAdmin" @click="$router.push('/task-board')">任务协同看板</a-menu-item>
         <a-menu-item key="TaskExceptions" v-if="isOperator || isSystemAdmin" @click="$router.push('/task-exceptions')">异常处置</a-menu-item>
         <a-menu-item key="TaskTrace" v-if="isOperator || isSystemAdmin" @click="$router.push('/task-trace')">过程追溯</a-menu-item>
         <a-menu-item key="Situation" @click="$router.push('/situation')">二维态势</a-menu-item>
@@ -17,6 +17,7 @@
         <a-menu-item key="TaskDefinitions" v-if="isConfigAdmin" @click="$router.push('/task-definitions')">任务定义</a-menu-item>
         <a-menu-item key="RiskRules" v-if="isConfigAdmin" @click="$router.push('/risk-rules')">风险规则配置</a-menu-item>
         <a-menu-item key="Users" v-if="isSystemAdmin" @click="$router.push('/users')">账号管理</a-menu-item>
+        <a-menu-item key="PlanningModelConfig" v-if="isSystemAdmin" @click="$router.push('/planning-model-config')">规划模型配置</a-menu-item>
         <a-menu-item key="DemoDataReset" v-if="isSystemAdmin" @click="$router.push('/demo-data-reset')">标准演示数据复位</a-menu-item>
         <a-menu-item key="OperationLogs" @click="$router.push('/operation-logs')">操作记录</a-menu-item>
       </a-menu>

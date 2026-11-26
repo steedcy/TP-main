@@ -55,6 +55,8 @@ public class TaskService {
     private final DeviceAgentMessagingService deviceAgentMessagingService;
     private final ForceBypassAuditRecorder forceBypassAuditRecorder;
     private final com.airport.ai.device.DeviceMapper deviceMapper;
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private TerminalMapMapper terminalMapMapper;
 
     @Autowired
     public TaskService(TaskMapper taskMapper,
@@ -205,9 +207,17 @@ public class TaskService {
                 .ifPresent(def -> SceneParamsValidator.validate(def, request.getSceneParams()));
 
         Map<String, Object> sanitizedScene = SceneParamsPrivacyGuard.sanitize(request.getSceneParams());
+        if (sanitizedScene != null) {
+            for (String locKey : List.of("origin", "destination", "targetLocation", "baggageLocation", "targetCounter", "originalGate", "newGate")) {
+                Object v = sanitizedScene.get(locKey);
+                if (v instanceof String s && !s.isBlank()) {
+                    sanitizedScene.put(locKey, TerminalLocationNormalizer.normalize(s));
+                }
+            }
+        }
         if ("OVERSIZE_BAGGAGE_HANDLING".equals(request.getTaskFamily()) && sanitizedScene != null) {
             sanitizedScene.putIfAbsent("baggageId", "BAG-" + System.currentTimeMillis() % 1000000);
-            sanitizedScene.putIfAbsent("targetCounter", sanitizedScene.getOrDefault("targetLocation", "F2_TEST_GATE"));
+            sanitizedScene.putIfAbsent("targetCounter", sanitizedScene.getOrDefault("targetLocation", "CHECKIN_WEST"));
         }
 
         String sanitizedGoal = SceneParamsPrivacyGuard.sanitizeGoal(request.getTaskGoal());
@@ -756,7 +766,77 @@ public class TaskService {
 
         // DEF-S3-130：不执行原候选计划；仅允许已启用、真实 dry-run 通过且三类校验通过的基线，
         // 否则由 orchestrator 统一转 PENDING_MANUAL。
+        enrichTaskForTimeoutFallback(task);
         taskPlanningOrchestrator.downgradeAfterUnderstandingFailure(task.getId(), safeReason);
+    }
+
+    private void enrichTaskForTimeoutFallback(Task task) {
+        if (task == null || task.getTaskGoal() == null || task.getTaskGoal().isBlank()) return;
+        String goal = task.getTaskGoal();
+        boolean updated = false;
+
+        if (task.getTaskFamily() == null || task.getTaskFamily().isBlank()) {
+            String inferred = inferFamilyFromGoalKeywords(goal);
+            if (inferred != null && (taskDefinitionService == null || taskDefinitionService.isEnabledFamily(inferred))) {
+                task.setTaskFamily(inferred);
+                updated = true;
+            }
+        }
+
+        if ((task.getGoalParsingResult() == null || task.getGoalParsingResult().isBlank()) && terminalMapMapper != null) {
+            try {
+                List<Map<String, Object>> pois = terminalMapMapper.findAllPois();
+                if (pois != null && !pois.isEmpty()) {
+                    record Mention(int pos, String poiCode) {}
+                    List<Mention> mentions = new ArrayList<>();
+                    java.util.Set<String> seenCodes = new java.util.HashSet<>();
+                    for (Map<String, Object> poi : pois) {
+                        String code = poi.get("poiCode") == null ? null : String.valueOf(poi.get("poiCode")).trim();
+                        String name = poi.get("poiName") == null ? null : String.valueOf(poi.get("poiName")).trim();
+                        if (code == null || code.isEmpty()) continue;
+                        int idx = goal.indexOf(code);
+                        if (idx < 0 && name != null && name.length() >= 2 && !Set.of("商店", "餐饮", "饮用水", "洗手间", "电梯", "楼梯").contains(name)) {
+                            idx = goal.indexOf(name);
+                        }
+                        if (idx >= 0 && seenCodes.add(code)) {
+                            mentions.add(new Mention(idx, code));
+                        }
+                    }
+                    mentions.sort(java.util.Comparator.comparingInt(Mention::pos));
+                    if (!mentions.isEmpty()) {
+                        Map<String, Object> fallbackParsed = new LinkedHashMap<>();
+                        fallbackParsed.put("originalGoal", goal);
+                        if (mentions.size() >= 2) {
+                            fallbackParsed.put("origin", mentions.get(0).poiCode());
+                            fallbackParsed.put("destination", mentions.get(mentions.size() - 1).poiCode());
+                        } else {
+                            fallbackParsed.put("origin", null);
+                            fallbackParsed.put("destination", mentions.get(0).poiCode());
+                        }
+                        task.setGoalParsingResult(toJson(fallbackParsed));
+                        updated = true;
+                    }
+                }
+            } catch (Exception ignored) {}
+        }
+
+        if (updated) {
+            task.setUpdatedAt(LocalDateTime.now());
+            taskMapper.update(task);
+        }
+    }
+
+    private String inferFamilyFromGoalKeywords(String goal) {
+        if (goal.matches(".*(轮椅|视障|听障|盲人|老年|老人|孕妇|无陪儿童|特殊旅客|无障碍陪同).*")) {
+            return "SPECIAL_PASSENGER_SERVICE";
+        }
+        if (goal.matches(".*(超规行李|大件行李|行李超重|行李超限|行李测量|超规托运).*")) {
+            return "OVERSIZE_BAGGAGE_HANDLING";
+        }
+        if (goal.matches(".*(航班延误|航班取消|登机口变更|改登机口|航班变更).*")) {
+            return "FLIGHT_CHANGE_RESPONSE";
+        }
+        return null;
     }
 
     private String safeText(String value) {
@@ -806,7 +886,7 @@ public class TaskService {
         double weight = request.getWeight();
         double totalDimension = length + width + height;
         double dimThreshold = request.getDimensionThresholdCm() != null ? request.getDimensionThresholdCm() : 158.0;
-        double weightThreshold = request.getWeightThresholdKg() != null ? request.getWeightThresholdKg() : 23.0;
+        double weightThreshold = request.getWeightThresholdKg() != null ? request.getWeightThresholdKg() : 32.0;
         String thresholdSource = request.getThresholdSource() != null && !request.getThresholdSource().isBlank()
                 ? request.getThresholdSource().trim() : (request.getWeightThresholdKg() != null || request.getDimensionThresholdCm() != null ? "测量事件指定阈值" : "测量事件默认阈值");
 
@@ -820,7 +900,7 @@ public class TaskService {
 
         // 4. 构造场景参数（含柜台可选字段，SRS §5.6.3 / DEF-S3-120）
         String targetCounter = request.getTargetCounter() != null && !request.getTargetCounter().isBlank()
-                ? request.getTargetCounter().trim() : "F2_TEST_GATE";
+                ? request.getTargetCounter().trim() : "CHECKIN_WEST";
         String instructions = request.getHandlingInstructions() != null && !request.getHandlingInstructions().isBlank()
                 ? request.getHandlingInstructions().trim()
                 : "超规行李办理流程：1. 前往指定柜台办理称重核验；2. 打印并粘贴超规挂牌；3. 办理专属托运；4. 凭凭证通过安检。";

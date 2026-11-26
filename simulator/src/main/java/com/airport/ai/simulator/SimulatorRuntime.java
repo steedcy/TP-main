@@ -377,7 +377,8 @@ public class SimulatorRuntime {
 
     private void progressAlong(String commandId, java.util.List<SimulatorProtocol.Location> route) {
         if (route == null || route.isEmpty()) return;
-        long delayPerPoint = Math.max(1, properties.getExecutionDelayMilliseconds() / route.size());
+        long totalDuration = Math.max(properties.getExecutionDelayMilliseconds(), properties.getMinRouteDurationMs());
+        long delayPerPoint = Math.max(20L, totalDuration / route.size());
         for (SimulatorProtocol.Location waypoint : route) {
             if (cancelled.contains(commandId) || cancelledWholeTask(commandId)) return;
             try { Thread.sleep(delayPerPoint); }

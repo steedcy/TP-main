@@ -25,6 +25,8 @@ public class ExternalPlanningModelServiceImpl implements PlanningModelService {
     private final RestTemplate restTemplate;
     private final String endpoint;
     private final String apiKey;
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private PlanningModelConfigService configService;
 
     public ExternalPlanningModelServiceImpl(RestTemplateBuilder builder,
                                              @Value("${app.planning-model.endpoint:}") String endpoint,
@@ -44,6 +46,9 @@ public class ExternalPlanningModelServiceImpl implements PlanningModelService {
 
     @Override
     public PlanningResponse generatePlan(PlanningRequest request) {
+        if ((endpoint == null || endpoint.isBlank()) && configService != null && configService.hasLiveModelKey()) {
+            return configService.delegateGeneratePlan(request);
+        }
         if (endpoint == null || endpoint.isBlank()) {
             PlanningResponse resp = new PlanningResponse();
             resp.setResultCode("1004");

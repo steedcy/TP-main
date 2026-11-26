@@ -40,6 +40,18 @@ public class TaskExecutionOrchestrator {
     private final com.airport.ai.device.DeviceAgentMessagingService deviceAgentMessagingService;
     @org.springframework.beans.factory.annotation.Autowired(required = false)
     private com.airport.ai.device.DeviceEventService deviceEventService;
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private TerminalMapMapper terminalMapMapper;
+    @org.springframework.beans.factory.annotation.Value("${app.device.fixed-device-strict-zone:true}")
+    private boolean fixedDeviceStrictZone = true;
+    @org.springframework.beans.factory.annotation.Value("${app.device.fixed-max-service-distance:650}")
+    private double fixedMaxServiceDistance = 650.0;
+    @org.springframework.beans.factory.annotation.Value("${app.device.robot-max-service-distance:1600}")
+    private double robotMaxServiceDistance = 1600.0;
+
+    public void setTerminalMapMapper(TerminalMapMapper terminalMapMapper) {
+        this.terminalMapMapper = terminalMapMapper;
+    }
 
     public TaskExecutionOrchestrator(TaskMapper taskMapper,
                                       PlanVersionMapper planVersionMapper,
@@ -819,7 +831,7 @@ public class TaskExecutionOrchestrator {
 
             Map<String, Object> scene = fromJsonMap(task.getSceneParams());
             String baggageId = String.valueOf(scene.getOrDefault("baggageId", "临时业务编号"));
-            String targetLoc = String.valueOf(scene.getOrDefault("targetCounter", scene.getOrDefault("targetLocation", "F2_TEST_GATE")));
+            String targetLoc = String.valueOf(scene.getOrDefault("targetCounter", scene.getOrDefault("targetLocation", "CHECKIN_WEST")));
             if (guidanceUncovered) {
                 String detail = "超规行李信息提示与测量完成（临时业务编号: " + baggageId + "）：已完成行李测量、超规告警上报、航显办理说明发布；移动机器人未完成引导（无可用移动机器人候选）";
                 taskEventService.append(taskId, "TASK_COMPLETED", "SYSTEM", "OVERSIZE_HANDLING_INFO_ONLY", detail);
@@ -932,7 +944,8 @@ public class TaskExecutionOrchestrator {
             var previous = parseSteps(planVersionMapper.findById(planVersionId).orElseThrow().getPlanSteps()).stream()
                     .filter(s -> Objects.equals(asInteger(s.get("stepSeq")), stepSeq - 1)).findFirst().orElse(Map.of());
             if ("CAP_NAVIGATION".equals(previous.get("capabilityType"))
-                    && "arrivalStatus=ARRIVED".equals(previous.get("completionCondition"))) {
+                    && ("arrivalStatus=ARRIVED".equals(previous.get("completionCondition"))
+                    || "routeGenerated=true".equals(previous.get("completionCondition")))) {
                 var meeting = assignmentMapper.findByPlanVersionIdAndStepSeq(planVersionId, stepSeq - 1);
                 if (meeting.isEmpty() || !"COMPLETED".equals(meeting.get().getStepStatus())) return List.of();
                 var feedback = fromJsonMap(meeting.get().getOutputParams());
@@ -952,6 +965,26 @@ public class TaskExecutionOrchestrator {
         if (targetY == null && inputParams != null) {
             targetY = asBigDecimal(inputParams.get("targetY"));
         }
+        String targetIsolationZone = null;
+        if ((targetX == null || targetY == null) && terminalMapMapper != null) {
+            Map<String, Object> poi = resolveTargetPoiForStep(step, inputParams, planVersionId, stepSeq, taskFamily);
+            if (poi != null) {
+                if (poi.get("x") instanceof Number nx) targetX = BigDecimal.valueOf(nx.doubleValue());
+                if (poi.get("y") instanceof Number ny) {
+                    targetY = BigDecimal.valueOf(ny.doubleValue());
+                    double py = ny.doubleValue();
+                    targetIsolationZone = py < 235 ? "隔离区内" : (py > 341 ? "隔离区外" : null);
+                }
+            }
+        } else if (targetY != null) {
+            double py = targetY.doubleValue();
+            targetIsolationZone = py < 235 ? "隔离区内" : (py > 341 ? "隔离区外" : null);
+        }
+
+        boolean enforceSpatialRules = terminalMapMapper != null && targetX != null && targetY != null && targetY.doubleValue() <= 600.0;
+        boolean globalFlightBroadcast = "FLIGHT_CHANGE_RESPONSE".equals(taskFamily)
+                && CoreScenarioChannelPolicy.isFlightPublication(capabilityType)
+                && !hasExplicitPassengerOrigin(planVersionId);
 
         List<CandidateScore> scored = new ArrayList<>();
         for (DeviceAgent agent : onlineIdle) {
@@ -960,6 +993,32 @@ public class TaskExecutionOrchestrator {
                     || !CoreScenarioChannelPolicy.matches(taskFamily, capabilityType, device)) continue;
             boolean hasCapability = deviceHasCapability(device.getId(), capabilityType);
             if (!hasCapability) continue;
+
+            String actualDeviceType = "SIMULATOR".equals(device.getDeviceTypeCode())
+                    ? device.getSimulatedDeviceType() : device.getDeviceTypeCode();
+            boolean isMobileRobot = "MOBILE_ROBOT".equals(actualDeviceType);
+
+            double rawDistance = (targetX != null && targetY != null
+                    && device.getPositionX() != null && device.getPositionY() != null)
+                    ? Math.hypot(device.getPositionX().doubleValue() - targetX.doubleValue(),
+                                 device.getPositionY().doubleValue() - targetY.doubleValue())
+                    : 0.0;
+
+            if (enforceSpatialRules) {
+                // 规则1：区域硬隔离——除移动服务机器人及无特定旅客起点的航班变更全局广播外，固定设备必须与目标同处一隔离区
+                if (!isMobileRobot && fixedDeviceStrictZone && targetIsolationZone != null
+                        && !globalFlightBroadcast && device.getAreaCode() != null
+                        && ("隔离区内".equals(device.getAreaCode()) || "隔离区外".equals(device.getAreaCode()))
+                        && !targetIsolationZone.equals(device.getAreaCode())) {
+                    continue;
+                }
+                // 规则2：最大服务距离限制——固定设备默认650像素，移动服务机器人默认1600像素
+                double maxAllowedDistance = isMobileRobot ? robotMaxServiceDistance : fixedMaxServiceDistance;
+                if (maxAllowedDistance > 0 && device.getPositionX() != null && device.getPositionY() != null
+                        && rawDistance > maxAllowedDistance) {
+                    continue;
+                }
+            }
 
             double matchScore = 1.0;
             if (agent.getBusinessStatus() != null) {
@@ -974,18 +1033,18 @@ public class TaskExecutionOrchestrator {
             }
             String preferredType = CoreScenarioChannelPolicy.requiredType(taskFamily, capabilityType);
             if (preferredType != null) {
-                String actual = "SIMULATOR".equals(device.getDeviceTypeCode())
-                        ? device.getSimulatedDeviceType() : device.getDeviceTypeCode();
-                if (!preferredType.equals(actual)) {
+                if (!preferredType.equals(actualDeviceType)) {
                     matchScore = Math.min(matchScore, 0.8);
                 }
             }
 
-            double distance = (targetX != null && targetY != null
-                    && device.getPositionX() != null && device.getPositionY() != null)
-                    ? Math.hypot(device.getPositionX().doubleValue() - targetX.doubleValue(),
-                                 device.getPositionY().doubleValue() - targetY.doubleValue())
-                    : 0.0;
+            double distance = rawDistance;
+            if (targetIsolationZone != null && device.getAreaCode() != null
+                    && ("隔离区内".equals(device.getAreaCode()) || "隔离区外".equals(device.getAreaCode()))
+                    && !targetIsolationZone.equals(device.getAreaCode())) {
+                // 移动服务机器人允许跨隔离区，但同区域空闲机器人优先派单，跨隔离区附加绕行距离权重
+                distance += 2000.0;
+            }
 
             int workloadScore = "IDLE".equals(agent.getWorkStatus()) ? 0 : 1;
             if (agent.getBusinessStatus() != null) {
@@ -1011,6 +1070,106 @@ public class TaskExecutionOrchestrator {
     private boolean deviceHasCapability(Long deviceId, String capabilityType) {
         return deviceCapabilityMapper.existsByDeviceIdAndCapabilityTypeAndCapabilityStatus(
                 deviceId, capabilityType, "ENABLED");
+    }
+
+    private boolean hasExplicitPassengerOrigin(Long planVersionId) {
+        if (planVersionId == null || planVersionMapper == null || taskMapper == null) return false;
+        try {
+            return planVersionMapper.findById(planVersionId)
+                    .flatMap(pv -> pv.getTaskId() == null ? Optional.empty() : taskMapper.findById(pv.getTaskId()))
+                    .map(t -> {
+                        Map<String, Object> scene = fromJsonMap(t.getSceneParams());
+                        for (String k : List.of("origin", "startLocation", "originLocation")) {
+                            Object v = scene.get(k);
+                            if (v != null && !String.valueOf(v).isBlank()) return true;
+                        }
+                        return false;
+                    }).orElse(false);
+        } catch (Exception ignored) {
+            return false;
+        }
+    }
+
+    private Map<String, Object> resolveTargetPoiForStep(Map<String, Object> step, Map<String, Object> inputParams,
+                                                        Long planVersionId, Integer stepSeq, String taskFamily) {
+        try {
+            List<Map<String, Object>> pois = terminalMapMapper.findAllPois();
+            if (pois == null || pois.isEmpty()) return null;
+            Map<String, Map<String, Object>> index = new java.util.HashMap<>();
+            for (Map<String, Object> p : pois) {
+                if (p.get("poiCode") != null) index.put(String.valueOf(p.get("poiCode")).trim().toUpperCase(), p);
+                if (p.get("poiName") != null) index.putIfAbsent(String.valueOf(p.get("poiName")).trim().toUpperCase(), p);
+            }
+            // 1. 当前步骤显式指定的地点参数优先
+            if (inputParams != null) {
+                for (String key : List.of("targetLocation", "targetCounter", "origin", "destination")) {
+                    Map<String, Object> matched = lookupPoiText(inputParams.get(key), index);
+                    if (matched != null) return matched;
+                }
+            }
+            // 2. 追踪前序移动机器人陪同/引导后的旅客实时位置
+            if (planVersionId != null) {
+                Optional<PlanVersion> pvOpt = planVersionMapper.findById(planVersionId);
+                if (pvOpt.isPresent()) {
+                    PlanVersion pv = pvOpt.get();
+                    Map<String, Object> scene = pv.getTaskId() == null ? Map.of()
+                            : taskMapper.findById(pv.getTaskId()).map(t -> fromJsonMap(t.getSceneParams())).orElse(Map.of());
+                    Map<String, Object> initialOrigin = null;
+                    for (String k : List.of("origin", "startLocation", "originLocation", "baggageLocation")) {
+                        initialOrigin = lookupPoiText(scene.get(k), index);
+                        if (initialOrigin != null) break;
+                    }
+                    Map<String, Object> currentPassengerPoi = initialOrigin;
+                    if (stepSeq != null && stepSeq > 1) {
+                        for (Map<String, Object> prev : parseSteps(pv.getPlanSteps())) {
+                            if (PlanStepRules.isConditionNode(prev)) continue;
+                            Integer pSeq = asInteger(prev.get("stepSeq"));
+                            if (pSeq == null || pSeq >= stepSeq) continue;
+                            String pCap = String.valueOf(prev.get("capabilityType"));
+                            String reqCh = CoreScenarioChannelPolicy.requiredType(taskFamily, pCap);
+                            boolean robotMove = ("CAP_NAVIGATION".equals(pCap) || "CAP_ESCORT".equals(pCap))
+                                    && (reqCh == null || "MOBILE_ROBOT".equals(reqCh));
+                            if (!robotMove) continue;
+                            Map<String, Object> pIn = stepInputParams(prev);
+                            Map<String, Object> movedTo = lookupPoiText(pIn.get("targetLocation"), index);
+                            if (movedTo == null) movedTo = lookupPoiText(pIn.get("destination"), index);
+                            if (movedTo != null) {
+                                boolean rendezvousOnly = "CAP_NAVIGATION".equals(pCap) && initialOrigin != null
+                                        && Objects.equals(initialOrigin.get("poiCode"), movedTo.get("poiCode"));
+                                if (!rendezvousOnly) {
+                                    currentPassengerPoi = movedTo;
+                                }
+                            }
+                        }
+                    }
+                    if (currentPassengerPoi != null) return currentPassengerPoi;
+                    for (String k : List.of("targetLocation", "targetCounter")) {
+                        Map<String, Object> fallback = lookupPoiText(scene.get(k), index);
+                        if (fallback != null) return fallback;
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
+        return null;
+    }
+
+    private static Map<String, Object> lookupPoiText(Object raw, Map<String, Map<String, Object>> index) {
+        if (raw == null) return null;
+        String text = String.valueOf(raw).trim();
+        if (text.isEmpty() || text.startsWith("TEMPLATE_INPUT.")) return null;
+        String normalized = TerminalLocationNormalizer.normalize(text);
+        if (normalized != null) {
+            Map<String, Object> byNorm = index.get(normalized.toUpperCase());
+            if (byNorm != null) return byNorm;
+        }
+        Map<String, Object> direct = index.get(text.toUpperCase());
+        if (direct != null) return direct;
+        int open = text.indexOf('('), close = text.indexOf(')', open + 1);
+        if (open < 0) { open = text.indexOf('（'); close = text.indexOf('）', open + 1); }
+        if (open >= 0 && close > open + 1) {
+            return index.get(text.substring(open + 1, close).trim().toUpperCase());
+        }
+        return null;
     }
 
     private record CandidateScore(DeviceAgent agent, double matchScore, double distance, int workloadScore) {}

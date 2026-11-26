@@ -1,5 +1,5 @@
-export const MAP_WIDTH = 1260
-export const MAP_HEIGHT = 6895
+export const MAP_WIDTH = 2000
+export const MAP_HEIGHT = 600
 
 export const POI_CATEGORIES = [
   { key: 'GATE', label: '登机口', color: '#1677ff', badge: '登' },
@@ -12,52 +12,89 @@ export const POI_CATEGORIES = [
   { key: 'FACILITY', label: '公共设施（卫生间/母婴室/医疗室）', color: '#2f54eb', badge: '设' }
 ]
 
+export function poiIcon(poi) {
+  const name = String(poi?.poiName || '')
+  if (name.includes('登机口')) return '✈️'
+  if (name.includes('门') || name.includes('出入口')) return '🚪'
+  if (name.includes('安全检查')) return '🛡️'
+  if (name.includes('安全保卫')) return '👮'
+  if (name.includes('洗手间')) return '🚻'
+  if (name.includes('饮用水')) return '🚰'
+  if (name.includes('餐饮')) return '🍽️'
+  if (name.includes('商店')) return '🛍️'
+  if (name.includes('母婴')) return '👶'
+  if (name.includes('急救')) return '🏥'
+  if (name.includes('电梯')) return '🛗'
+  if (name.includes('扶梯') || name.includes('楼梯')) return '🪜'
+  if (name.includes('行李开包')) return '🧳'
+  if (name.includes('测量')) return '⚖️'
+  if (name.includes('头等舱')) return '🛋️'
+  if (name.includes('售票')) return '🎫'
+  if (name.includes('服务台') || name.includes('问询') || name.includes('候机厅')) return 'ℹ️'
+  return POI_CATEGORIES.find(c => c.key === poi?.category)?.badge || '📍'
+}
+
 export const DEFAULT_TERMINAL_POIS = [
-  { poiCode: 'T2值机岛A01', poiName: '国内值机柜台01', category: 'CHECKIN', x: 556, y: 3552, zone: '值机办理区' },
-  { poiCode: 'T2值机岛A03', poiName: '国内值机柜台02', category: 'CHECKIN', x: 575, y: 2575, zone: '值机办理区' },
-  { poiCode: 'T2值机区', poiName: 'VIP值机柜台', category: 'CHECKIN', x: 556, y: 3382, zone: '值机办理区' },
-  { poiCode: '行李托运柜台A01', poiName: '行李托运柜台', category: 'BAGGAGE', x: 560, y: 3330, zone: '行李托运区' },
-  { poiCode: '超规行李专柜B01', poiName: '超规行李托运', category: 'BAGGAGE', x: 600, y: 3743, zone: '超规行李专柜区' },
-  { poiCode: '安检通道01', poiName: '国内安检通道', category: 'SECURITY', x: 622, y: 2970, zone: '中央安检区' },
-  { poiCode: 'VIP安检通道', poiName: '头等舱/无障碍通道', category: 'SECURITY', x: 622, y: 3232, zone: '中央安检区' },
-  { poiCode: '智能行李测量点A', poiName: '智能行李测量点01', category: 'MEASURE', x: 365, y: 3108, zone: '值机办理区', linkedDeviceCode: 'SIM_F2_BAGGAGE' },
-  { poiCode: '智能行李测量点B', poiName: '智能行李测量点02', category: 'MEASURE', x: 456, y: 2508, zone: '值机办理区', linkedDeviceCode: 'SIM_F2_BAGGAGE_B' },
-  { poiCode: '旅客服务中心', poiName: '问询柜台', category: 'SERVICE', x: 408, y: 3012, zone: '值机办理区' },
-  { poiCode: 'GATE_A01', poiName: '登机口14', category: 'GATE', x: 960, y: 2176, zone: '候机隔离区' },
-  { poiCode: 'GATE_A05', poiName: '登机口13', category: 'GATE', x: 960, y: 2506, zone: '候机隔离区' },
-  { poiCode: 'GATE_B01', poiName: '登机口12', category: 'GATE', x: 960, y: 2768, zone: '候机隔离区' },
-  { poiCode: 'GATE_011', poiName: '登机口11', category: 'GATE', x: 960, y: 3242, zone: '候机隔离区' },
-  { poiCode: 'GATE_010', poiName: '登机口10', category: 'GATE', x: 960, y: 3582, zone: '候机隔离区' }
+  { poiCode: 'GATE_01', poiName: '1号登机口', category: 'GATE', x: 239, y: 56, zone: '候机区-西' },
+  { poiCode: 'GATE_02', poiName: '2号登机口', category: 'GATE', x: 482, y: 57, zone: '候机区-西' },
+  { poiCode: 'GATE_03', poiName: '3号登机口', category: 'GATE', x: 719, y: 56, zone: '候机区-西' },
+  { poiCode: 'GATE_04', poiName: '4号登机口', category: 'GATE', x: 1022, y: 57, zone: '候机区-中' },
+  { poiCode: 'GATE_05', poiName: '5号登机口', category: 'GATE', x: 1257, y: 56, zone: '候机区-东' },
+  { poiCode: 'GATE_06', poiName: '6号登机口', category: 'GATE', x: 1685, y: 56, zone: '候机区-东' },
+  { poiCode: 'SERVICE_DESK', poiName: '服务台', category: 'SERVICE', x: 1028, y: 135, zone: '候机区-中', linkedDeviceCode: 'SIM_DISPLAY_H2' },
+  { poiCode: 'SECURITY_MAIN', poiName: '安全检查', category: 'SECURITY', x: 1037, y: 286, zone: '中央安检区' },
+  { poiCode: 'CHECKIN_WEST', poiName: '售票', category: 'SERVICE', x: 896, y: 435, zone: '值机区-西' },
+  { poiCode: 'CHECKIN_EAST', poiName: '问询', category: 'SERVICE', x: 1123, y: 435, zone: '值机区-东' },
+  { poiCode: 'MEASURE_WEST', poiName: '智能行李测量点01', category: 'MEASURE', x: 520, y: 425, zone: '值机区-西', linkedDeviceCode: 'SIM_SCANNER_W' },
+  { poiCode: 'MEASURE_EAST', poiName: '智能行李测量点02', category: 'MEASURE', x: 1420, y: 425, zone: '值机区-东', linkedDeviceCode: 'SIM_SCANNER_E' },
+  { poiCode: 'PET_CHANNEL', poiName: '宠物托运专用通道', category: 'SERVICE', x: 260, y: 260, zone: '中间西区' },
+  { poiCode: 'OVERSIZE_PACKING', poiName: '超规行李打包处', category: 'BAGGAGE', x: 180, y: 318, zone: '中间西区' },
+  { poiCode: 'OVERSIZE_CHECKIN', poiName: '超规行李托运处', category: 'BAGGAGE', x: 310, y: 318, zone: '中间西区' },
+  { poiCode: 'OVERSIZE_STORAGE', poiName: '超规行李寄存处', category: 'BAGGAGE', x: 450, y: 318, zone: '中间西区' },
+  { poiCode: 'SPECIAL_SERVICE_DESK', poiName: '特殊旅客服务台', category: 'SERVICE', x: 1600, y: 318, zone: '中间东区' },
+  { poiCode: 'REBOOK_COUNTER', poiName: '改签退票柜台', category: 'SERVICE', x: 1720, y: 318, zone: '中间东区' },
+  { poiCode: 'TRANSFER_COUNTER', poiName: '中转柜台', category: 'SERVICE', x: 1830, y: 318, zone: '中间东区' },
+  { poiCode: 'DUTY_MANAGER_DESK', poiName: '值班经理接待点', category: 'SERVICE', x: 1810, y: 260, zone: '中间东区' },
+  { poiCode: 'MEAL_VOUCHER_POINT', poiName: '餐食发放登记处', category: 'SERVICE', x: 1905, y: 260, zone: '中间东区' },
+  { poiCode: 'SHUTTLE_GATE', poiName: '远机位摆渡点', category: 'FACILITY', x: 1820, y: 115, zone: '候机区-东' },
+  { poiCode: 'ENTRANCE_01', poiName: '1号门', category: 'FACILITY', x: 311, y: 520, zone: '值机区-南' },
+  { poiCode: 'ENTRANCE_02', poiName: '2号门', category: 'FACILITY', x: 1036, y: 520, zone: '值机区-南' },
+  { poiCode: 'ENTRANCE_03', poiName: '3号门', category: 'FACILITY', x: 1877, y: 520, zone: '值机区-南' }
 ]
 
 const DEFAULT_CORRIDOR_NODES = [
-  { id: 'N_CHK_TOP', x: 480, y: 2540 },
-  { id: 'N_CHK_MID_N', x: 480, y: 2970 },
-  { id: 'N_CHK_MID_S', x: 480, y: 3232 },
-  { id: 'N_CHK_BOT', x: 560, y: 3550 },
-  { id: 'N_SEC_N', x: 622, y: 2970 },
-  { id: 'N_SEC_S', x: 622, y: 3232 },
-  { id: 'N_ISO_TOP', x: 860, y: 2176 },
-  { id: 'N_ISO_G13', x: 860, y: 2506 },
-  { id: 'N_ISO_G12', x: 860, y: 2768 },
-  { id: 'N_ISO_MID_N', x: 860, y: 2970 },
-  { id: 'N_ISO_MID_S', x: 860, y: 3242 },
-  { id: 'N_ISO_BOT', x: 860, y: 3582 }
+  { id: 'N_H_G1', x: 239, y: 115 },
+  { id: 'N_H_G2', x: 482, y: 115 },
+  { id: 'N_H_G3', x: 719, y: 115 },
+  { id: 'N_H_MID', x: 1028, y: 115 },
+  { id: 'N_H_G5', x: 1257, y: 115 },
+  { id: 'N_H_G6', x: 1685, y: 115 },
+  { id: 'N_SEC_N', x: 1038, y: 235 },
+  { id: 'N_SEC_M', x: 1038, y: 288 },
+  { id: 'N_SEC_S', x: 1038, y: 341 },
+  { id: 'N_C_W1', x: 311, y: 425 },
+  { id: 'N_C_W2', x: 520, y: 425 },
+  { id: 'N_C_MID', x: 1038, y: 425 },
+  { id: 'N_C_E2', x: 1420, y: 425 },
+  { id: 'N_C_E3', x: 1877, y: 425 },
+  { id: 'N_ENT_2', x: 1036, y: 520 }
 ]
 
 const DEFAULT_CORRIDOR_EDGES = [
-  ['N_CHK_TOP', 'N_CHK_MID_N'],
-  ['N_CHK_MID_N', 'N_CHK_MID_S'],
-  ['N_CHK_MID_S', 'N_CHK_BOT'],
-  ['N_CHK_MID_N', 'N_SEC_N'],
-  ['N_CHK_MID_S', 'N_SEC_S'],
-  ['N_SEC_N', 'N_ISO_MID_N'],
-  ['N_SEC_S', 'N_ISO_MID_S'],
-  ['N_ISO_TOP', 'N_ISO_G13'],
-  ['N_ISO_G13', 'N_ISO_G12'],
-  ['N_ISO_G12', 'N_ISO_MID_N'],
-  ['N_ISO_MID_N', 'N_ISO_MID_S'],
-  ['N_ISO_MID_S', 'N_ISO_BOT']
+  ['N_H_G1', 'N_H_G2'],
+  ['N_H_G2', 'N_H_G3'],
+  ['N_H_G3', 'N_H_MID'],
+  ['N_H_MID', 'N_H_G5'],
+  ['N_H_G5', 'N_H_G6'],
+  ['N_H_MID', 'N_SEC_N'],
+  ['N_SEC_N', 'N_SEC_M'],
+  ['N_SEC_M', 'N_SEC_S'],
+  ['N_SEC_S', 'N_C_MID'],
+  ['N_C_W1', 'N_C_W2'],
+  ['N_C_W2', 'N_C_MID'],
+  ['N_C_MID', 'N_C_E2'],
+  ['N_C_E2', 'N_C_E3'],
+  ['N_C_MID', 'N_ENT_2']
 ]
 
 function dist(a, b) {
@@ -104,8 +141,38 @@ export function resolveLocation(input, pois = DEFAULT_TERMINAL_POIS, devices = [
     return { x: Number(input.x), y: Number(input.y), label: input.label || '自定义位置' }
   }
   const text = String(input).trim()
-  const aliases = { F2_SERVICE_POINT: '超规行李专柜B01', F2_BAGGAGE_POINT: 'T2值机区', F2_TEST_GATE: 'GATE_A05' }
-  const normalized = aliases[text] || text
+  const aliases = {
+    F2_SERVICE_POINT: 'SERVICE_DESK',
+    F2_BAGGAGE_POINT: 'OVERSIZE_CHECKIN',
+    F2_TEST_GATE: 'GATE_04',
+    GATE_A05: 'GATE_05',
+    '登机口13': 'GATE_01',
+    'VIP值机柜台': 'CHECKIN_WEST',
+    '国内值机柜台02': 'CHECKIN_WEST',
+    '超规行李托运': 'OVERSIZE_CHECKIN',
+    '宠物托运专用通道': 'PET_CHANNEL',
+    '超规行李打包处': 'OVERSIZE_PACKING',
+    '超规行李托运处': 'OVERSIZE_CHECKIN',
+    '超规行李寄存处': 'OVERSIZE_STORAGE',
+    '改签退票柜台': 'REBOOK_COUNTER',
+    '特殊旅客服务台': 'SPECIAL_SERVICE_DESK',
+    '中转柜台': 'TRANSFER_COUNTER',
+    '行李提取与分拣区': 'BAGGAGE_CLAIM_W',
+    '值班经理接待点': 'DUTY_MANAGER_DESK',
+    '餐食发放登记处': 'MEAL_VOUCHER_POINT',
+    '远机位摆渡点': 'SHUTTLE_GATE'
+  }
+  let normalized = aliases[text] || text
+  const gateNumMatch = normalized.match(/(?:[A-Za-z]-?)?(\d{1,3})\s*号?登机口|^GATE[_-]?(\d{1,3})$|^[A-HJ-Z](\d{1,3})$/i)
+  if (gateNumMatch) {
+    const num = Number(gateNumMatch[1] || gateNumMatch[2] || gateNumMatch[3])
+    normalized = `GATE_${String(((Math.max(1, num) - 1) % 6) + 1).padStart(2, '0')}`
+  }
+  const entNumMatch = normalized.match(/(\d{1,2})\s*号门|(\d{1,2})\s*号出入口|^ENTRANCE[_-]?(\d{1,2})$/i)
+  if (entNumMatch) {
+    const num = Number(entNumMatch[1] || entNumMatch[2] || entNumMatch[3])
+    normalized = `ENTRANCE_${String(((Math.max(1, num) - 1) % 3) + 1).padStart(2, '0')}`
+  }
 
   const exact = pois.find(p => p.poiCode === normalized || p.poiName === normalized)
   if (exact) return { x: Number(exact.x), y: Number(exact.y), label: exact.poiName, code: exact.poiCode }
@@ -135,6 +202,10 @@ export function nearestPoi(x, y, pois = DEFAULT_TERMINAL_POIS) {
 
 function buildCorridorGraph(regions = []) {
   const customCorridors = regions.filter(r => r.regionType === 'CORRIDOR')
+  const blockedPolygons = regions
+    .filter(r => r.regionType === 'SHOP_BLOCK' || r.regionType === 'WALL')
+    .map(parseRegionGeometry)
+    .filter(pts => pts.length >= 3)
 
   let nodes = []
   let edges = []
@@ -151,10 +222,10 @@ function buildCorridorGraph(regions = []) {
         if (i > 0) edges.push([groupIds[i - 1], nid])
       }
     }
-    // 自动连接相邻走廊的接近节点（<= 120px）以便跨走廊连通
+    // 自动连接相邻走廊的接近节点（<= 120px），且不穿过商铺/墙体等不可通行区域
     for (let i = 0; i < nodes.length; i++) {
       for (let j = i + 1; j < nodes.length; j++) {
-        if (dist(nodes[i], nodes[j]) <= 120) {
+        if (dist(nodes[i], nodes[j]) <= 120 && !segmentCrossesPolygons(nodes[i], nodes[j], blockedPolygons)) {
           edges.push([nodes[i].id, nodes[j].id])
         }
       }
@@ -259,7 +330,8 @@ export function translateTaskFamily(family) {
   const map = {
     FLIGHT_CHANGE_RESPONSE: '航班变更应对场景',
     OVERSIZE_BAGGAGE_HANDLING: '超规行李处置场景',
-    SPECIAL_PASSENGER_SERVICE: '特殊旅客协同服务场景'
+    SPECIAL_PASSENGER_SERVICE: '特殊旅客协同服务场景',
+    GENERAL_SERVICE: '通用协同服务场景'
   }
   return map[family] || family || '通用协同任务'
 }

@@ -169,7 +169,7 @@ class BaggageMeasurementEventTest {
         req.setLength(40.0);
         req.setWidth(40.0);
         req.setHeight(40.0); // 合计 120cm <= 158cm
-        req.setWeight(25.0); // 25kg > 20kg
+        req.setWeight(35.0); // 35kg > 32kg（附录F标准阈值）
 
         Task result = taskService.submitMeasurementEvent(req, testUser);
 
@@ -179,7 +179,7 @@ class BaggageMeasurementEventTest {
         Map<String, Object> params = parseSceneParams(result.getSceneParams());
         assertEquals(Boolean.TRUE, params.get("isOversize"));
         // 目标柜台未填时使用默认专柜
-        assertEquals("F2_TEST_GATE", params.get("targetCounter"));
+        assertEquals("CHECKIN_WEST", params.get("targetCounter"));
 
         verify(taskPlanningOrchestrator).advance(eq(999L));
     }

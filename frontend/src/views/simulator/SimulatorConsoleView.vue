@@ -130,6 +130,7 @@ import {
   listSimulatorEvents, listSimulatorCommands
 } from '../../api/simulator'
 import { submitTask, submitMeasurementEvent } from '../../api/task'
+import { capabilityLabel } from '../../constants/capability'
 
 const measurementForm = ref({
   baggageLocation: '国内值机柜台02',
@@ -261,7 +262,7 @@ const eventColumns = [
 const commandColumns = [
   { title: '命令编号', dataIndex: 'commandId', key: 'commandId' },
   { title: '命令类型', dataIndex: 'commandType', key: 'commandType' },
-  { title: '能力', dataIndex: 'capabilityType', key: 'capabilityType' },
+  { title: '能力', dataIndex: 'capabilityType', key: 'capabilityType', customRender: ({ text }) => text ? capabilityLabel(text) : '—' },
   { title: '任务', dataIndex: 'taskId', key: 'taskId' },
   { title: '状态', dataIndex: 'commandStatus', key: 'commandStatus' },
   { title: '更新时间', dataIndex: 'updatedAt', key: 'updatedAt' }

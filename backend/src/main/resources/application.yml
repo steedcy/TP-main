@@ -52,6 +52,10 @@ app:
     adapter-public-base-url: ${DEVICE_PLATFORM_BASE_URL:http://localhost:8080}
     max-access-objects-demo: 10
     max-access-objects-system: 20
+    preset-areas: ${APP_DEVICE_PRESET_AREAS:隔离区内,隔离区外}
+    fixed-device-strict-zone: ${APP_DEVICE_FIXED_STRICT_ZONE:true}
+    fixed-max-service-distance: ${APP_DEVICE_FIXED_MAX_DISTANCE:650}
+    robot-max-service-distance: ${APP_DEVICE_ROBOT_MAX_DISTANCE:1600}
     credential-encryption-key: ${DEVICE_CREDENTIAL_ENCRYPTION_KEY:}
     simulator-management-enabled: ${DEVICE_SIMULATOR_MANAGEMENT_ENABLED:true}
     simulator-jar: ${DEVICE_SIMULATOR_JAR:}
@@ -68,7 +72,7 @@ app:
   risk:
     low-confidence-threshold: 0.8
     context-stale-seconds: 60
-    resource-critical-candidate-threshold: 1
+    resource-critical-candidate-threshold: 0
   planning-model:
     provider: ${PLANNING_MODEL_PROVIDER:external}
     endpoint: ${PLANNING_MODEL_ENDPOINT:}
@@ -79,6 +83,14 @@ app:
       api-key: ${MOONSHOT_API_KEY:}
       model: ${MOONSHOT_MODEL:kimi-k2.6}
       max-tokens: ${MOONSHOT_MAX_TOKENS:4096}
+    fallback:
+      enabled: ${PLANNING_FALLBACK_ENABLED:false}
+      base-url: ${FALLBACK_MODEL_BASE_URL:${CLAUDE_BASE_URL:https://ai.axuremart.com/v1}}
+      api-key: ${FALLBACK_MODEL_API_KEY:${CLAUDE_API_KEY:}}
+      model: ${FALLBACK_MODEL_NAME:${CLAUDE_MODEL:gpt-6.1-sol}}
+      max-tokens: ${FALLBACK_MODEL_MAX_TOKENS:${CLAUDE_MAX_TOKENS:4096}}
+      timeout-ms: ${FALLBACK_MODEL_TIMEOUT_MS:${CLAUDE_TIMEOUT_MS:30000}}
+      primary-timeout-ms: ${PLANNING_PRIMARY_TIMEOUT_MS:30000}
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml

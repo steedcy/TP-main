@@ -1,9 +1,13 @@
+# -*- coding: utf-8 -*-
 """Reproducible local preparation; credentials remain in memory or Windows DPAPI storage.
 Use the bundled Python: configure, start, status, smoke, or fault DEVICE MODE.
 This is readiness verification, not the formal 95-case campaign.
 """
-import argparse, base64, ctypes, datetime, json, os, pathlib, shutil, subprocess, sys, time
-import urllib.request, urllib.error, winreg
+import argparse, base64, ctypes, datetime, json, os, pathlib, shutil, signal, socket, subprocess, sys, time
+import urllib.request, urllib.error
+IS_WINDOWS = os.name == 'nt'
+if IS_WINDOWS:
+    import winreg
 
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 LOCAL=ROOT/'.local-test'; LOCAL.mkdir(exist_ok=True)
@@ -24,11 +28,23 @@ def protect(raw, decrypt=False):
     try: return ctypes.string_at(dest.data,dest.size)
     finally: ctypes.windll.kernel32.LocalFree(dest.data)
 def secrets():
-    p=LOCAL/'device-credentials.dpapi'
-    return json.loads(protect(base64.b64decode(p.read_bytes()),True)) if p.exists() else {}
-def store_secrets(values): (LOCAL/'device-credentials.dpapi').write_bytes(base64.b64encode(protect(json.dumps(values).encode())))
+    if IS_WINDOWS:
+        p=LOCAL/'device-credentials.dpapi'
+        return json.loads(protect(base64.b64decode(p.read_bytes()),True)) if p.exists() else {}
+    p=LOCAL/'device-credentials.json'
+    return load(p) if p.exists() else {}
+def store_secrets(values):
+    if IS_WINDOWS:
+        (LOCAL/'device-credentials.dpapi').write_bytes(base64.b64encode(protect(json.dumps(values).encode())))
+        return
+    p=LOCAL/'device-credentials.json'
+    save(p,values)
+    os.chmod(p,0o600)
 
 def account(role='配置管理员'):
+    environment=env()
+    if environment.get('TIP_ADMIN_USERNAME') and environment.get('TIP_ADMIN_PASSWORD'):
+        return environment['TIP_ADMIN_USERNAME'],environment['TIP_ADMIN_PASSWORD']
     rows=[[v.strip() for v in line.strip().strip('|').split('|')] for line in (ROOT/'user.md').read_text(encoding='utf-8-sig').splitlines() if line.strip().startswith('|')]
     row=next(row for row in rows[1:] if role in row[0]); return row[1],row[2]
 
@@ -57,20 +73,57 @@ class API:
 
 def env():
     result=os.environ.copy()
-    for name in ['MOONSHOT_API_KEY','MOONSHOT_MODEL','MOONSHOT_BASE_URL','PLANNING_MODEL_PROVIDER','DEVICE_CREDENTIAL_ENCRYPTION_KEY','DB_HOST','DB_PORT','DB_NAME','DB_USERNAME','DB_PASSWORD','REDIS_HOST','REDIS_PORT','REDIS_PASSWORD']:
-        if result.get(name): continue
-        for root,path in [(winreg.HKEY_CURRENT_USER,'Environment'),(winreg.HKEY_LOCAL_MACHINE,r'SYSTEM\CurrentControlSet\Control\Session Manager\Environment')]:
-            try:
-                with winreg.OpenKey(root,path) as key: result[name]=str(winreg.QueryValueEx(key,name)[0])
-                break
-            except OSError: pass
+    env_file=LOCAL/'.env'
+    if env_file.exists():
+        for raw_line in env_file.read_text(encoding='utf-8').splitlines():
+            line=raw_line.strip()
+            if not line or line.startswith('#') or '=' not in line: continue
+            k,v=line.split('=',1); k=k.strip(); v=v.strip().strip('"').strip("'")
+            if k and not result.get(k): result[k]=v
+    if IS_WINDOWS:
+        for name in ['MOONSHOT_API_KEY','MOONSHOT_MODEL','MOONSHOT_BASE_URL','PLANNING_MODEL_PROVIDER','DEVICE_CREDENTIAL_ENCRYPTION_KEY','DB_HOST','DB_PORT','DB_NAME','DB_USERNAME','DB_PASSWORD','REDIS_HOST','REDIS_PORT','REDIS_PASSWORD']:
+            if result.get(name): continue
+            for root,path in [(winreg.HKEY_CURRENT_USER,'Environment'),(winreg.HKEY_LOCAL_MACHINE,r'SYSTEM\CurrentControlSet\Control\Session Manager\Environment')]:
+                try:
+                    with winreg.OpenKey(root,path) as key: result[name]=str(winreg.QueryValueEx(key,name)[0])
+                    break
+                except OSError: pass
     return result
 
 def launch(key,command,environment):
     log=open(LOCAL/(key+'.log'),'ab',buffering=0)
-    proc=subprocess.Popen(command,cwd=ROOT,env=environment,stdout=log,stderr=subprocess.STDOUT,creationflags=subprocess.CREATE_NO_WINDOW)
+    kwargs={'cwd':ROOT,'env':environment,'stdin':subprocess.DEVNULL,'stdout':log,'stderr':subprocess.STDOUT}
+    if IS_WINDOWS: kwargs['creationflags']=subprocess.CREATE_NO_WINDOW
+    else: kwargs['start_new_session']=True
+    proc=subprocess.Popen(command,**kwargs)
     processes=load(LOCAL/'processes.json') if (LOCAL/'processes.json').exists() else {}
     processes[key]={'pid':proc.pid,'startedAt':stamp()};save(LOCAL/'processes.json',processes)
+
+def port_open(host,port):
+    with socket.socket(socket.AF_INET,socket.SOCK_STREAM) as sock:
+        sock.settimeout(1.0)
+        return sock.connect_ex((host,port))==0
+
+def stop_services(target='*'):
+    reg=LOCAL/'processes.json'
+    if not reg.exists(): return
+    entries=load(reg)
+    for name,info in list(entries.items()):
+        if target!='*' and name!=target: continue
+        pid=info.get('pid')
+        if not pid: continue
+        if IS_WINDOWS:
+            subprocess.run(['taskkill','/PID',str(pid),'/F'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+        else:
+            try:
+                cmdline_path=pathlib.Path(f'/proc/{pid}/cmdline')
+                if cmdline_path.exists():
+                    cmdline=cmdline_path.read_bytes().decode('utf-8',errors='ignore')
+                    if str(ROOT) not in cmdline: continue
+                os.kill(pid,signal.SIGTERM)
+                print(f'Stopped owned service: {name} (PID {pid})')
+            except ProcessLookupError:
+                pass
 
 def wait_health(url,token=None):
     deadline=time.monotonic()+90
@@ -102,7 +155,7 @@ def start_simulator(device,token,agent=None):
     except urllib.error.URLError: pass
     environment.update(SIMULATOR_PORT=str(port),SIMULATOR_DEVICE_CODE=device['deviceCode'],SIMULATED_DEVICE_TYPE=device['simulatedDeviceType'],
         SIMULATOR_DEVICE_TOKEN=token,SIMULATOR_X=str(device['positionX']),SIMULATOR_Y=str(device['positionY']),SIMULATOR_ZONE=device['areaCode'],
-        SIMULATOR_HEARTBEAT_INTERVAL_SECONDS='5',SIMULATOR_EXECUTION_DELAY_MS='1000')
+        SIMULATOR_HEARTBEAT_INTERVAL_SECONDS='5',SIMULATOR_EXECUTION_DELAY_MS='1000',SIMULATOR_MIN_ROUTE_DURATION_MS='5500')
     if device['simulatedDeviceType']=='BAGGAGE_SCANNER':
         environment.update(SIMULATOR_BAGGAGE_LENGTH_CM='80',SIMULATOR_BAGGAGE_WIDTH_CM='55',SIMULATOR_BAGGAGE_HEIGHT_CM='35',SIMULATOR_BAGGAGE_WEIGHT_KG='35')
     if agent:
@@ -186,6 +239,47 @@ def control(code,mode):
     if mode.startswith('delay:'): return request(endpoint+'delay?milliseconds='+mode.split(':')[1],'POST',token=token)
     return request(endpoint+'scenario','POST',{'scenarioResult':mode.upper()},token)
 
+def list_all_pages(api, path):
+    items=[]; page=1
+    while True:
+        res=api(f'{path}?page={page}&size=100')
+        content=res.get('content',[]) if isinstance(res,dict) else []
+        items.extend(content)
+        total_pages=res.get('totalPages',1) if isinstance(res,dict) else 1
+        if page>=total_pages or not content: break
+        page+=1
+    return items
+
+def start_all_simulators():
+    api=API()
+    agents={a['deviceCode']:a['agentId'] for a in list_all_pages(api,'/device-agents')}
+    values=secrets()
+    fixtures={d['deviceCode']:d for d in load(FIXTURES/'devices.json')}
+    devices=[d for d in list_all_pages(api,'/devices') if d.get('isSimulator') and d.get('deviceStatus')=='ACTIVE']
+    for d in devices:
+        code=d['deviceCode']
+        if code in fixtures and code in values:
+            start_simulator(fixtures[code],values[code],agents.get(code))
+            print(f'{code}: started (fixture)',flush=True)
+            continue
+        if d.get('onlineStatus')=='ONLINE':
+            print(f'{code}: already online',flush=True)
+            continue
+        try:
+            latest=api(f'/devices/{code}')
+            if latest.get('onlineStatus')=='ONLINE':
+                print(f'{code}: already online',flush=True)
+                continue
+            if latest.get('onboardingStatus') not in ('PENDING','STARTING','CONNECTING','BINDING'):
+                try:
+                    api(f'/devices/{code}/onboarding/retry','POST')
+                except RuntimeError as retry_ex:
+                    if 'HTTP 409' not in str(retry_ex): raise
+            wait_auto_onboarding(api,code)
+            print(f'{code}: started via backend onboarding',flush=True)
+        except Exception as ex:
+            print(f'{code}: start skipped/failed ({ex})',file=sys.stderr,flush=True)
+
 def status():
     api=API(); devices=api('/devices?page=1&size=100'); agents=api('/device-agents?page=1&size=100')
     summary={'recordedAt':stamp(),'devices':devices,'agents':agents,'templates':api('/baseline-templates')}
@@ -193,19 +287,56 @@ def status():
     print(json.dumps({'devices':len(devices['content']),'agents':[{k:a[k] for k in ['agentId','deviceCode','onlineStatus','workStatus']} for a in agents['content']],
         'baselines':[{k:t[k] for k in ['id','templateName','templateStatus','templateVersion']} for t in summary['templates']]},ensure_ascii=False,indent=2))
 
+def find_node():
+    environment=env()
+    if environment.get('NODE_BIN') and pathlib.Path(environment['NODE_BIN']).exists():
+        return environment['NODE_BIN']
+    found=shutil.which('node')
+    if found: return found
+    if IS_WINDOWS:
+        win_node=pathlib.Path.home()/'.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe'
+        return str(win_node) if win_node.exists() else None
+    candidates=[pathlib.Path('/usr/local/bin/node'),pathlib.Path('/usr/bin/node'),pathlib.Path('/usr/local/node/bin/node'),pathlib.Path('/opt/node/bin/node')]
+    nvm_dir=pathlib.Path.home()/'.nvm/versions/node'
+    if nvm_dir.exists():
+        candidates.extend(sorted(nvm_dir.glob('*/bin/node'),reverse=True))
+    for c in candidates:
+        if c.exists(): return str(c)
+    return None
+
+def start_frontend():
+    if port_open('127.0.0.1',5173):
+        print('Frontend already listening on http://127.0.0.1:5173')
+        return
+    node=find_node()
+    if not node: raise RuntimeError('Node.js is required on PATH (or set NODE_BIN) to start frontend')
+    vite_js=ROOT/'frontend/node_modules/vite/bin/vite.js'
+    if not vite_js.exists(): raise RuntimeError('frontend/node_modules missing; run: cd frontend && npm install')
+    host=os.environ.get('FRONTEND_HOST','127.0.0.1' if IS_WINDOWS else '0.0.0.0')
+    launch('frontend',[node,str(vite_js),str(ROOT/'frontend'),'--host',host,'--port','5173','--strictPort'],env())
+    deadline=time.monotonic()+30
+    while time.monotonic()<deadline:
+        if port_open('127.0.0.1',5173):
+            print(f'Frontend listening on http://{host}:5173')
+            return
+        time.sleep(0.5)
+    raise RuntimeError('Frontend did not become ready; inspect .local-test/frontend.log')
+
 if __name__=='__main__':
-    parser=argparse.ArgumentParser(); parser.add_argument('action',choices=['configure','backend','start','status','fault','frontend','model-fixture']);parser.add_argument('device',nargs='?');parser.add_argument('mode',nargs='?');parser.add_argument('--provider',choices=['moonshot','fault'],default='moonshot');args=parser.parse_args()
+    parser=argparse.ArgumentParser(); parser.add_argument('action',choices=['configure','backend','start','start-all','stop','status','fault','frontend','model-fixture']);parser.add_argument('device',nargs='?');parser.add_argument('mode',nargs='?');parser.add_argument('--provider',choices=['moonshot','fault'],default='moonshot');args=parser.parse_args()
     try:
         if args.action=='configure': configure()
         elif args.action=='backend': start_backend(args.provider)
-        elif args.action=='frontend':
-            node=shutil.which('node') or str(pathlib.Path.home()/'.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe')
-            launch('frontend',[node,str(ROOT/'frontend/node_modules/vite/bin/vite.js'),str(ROOT/'frontend'),'--host','127.0.0.1','--port','5173','--strictPort'],env())
+        elif args.action=='frontend': start_frontend()
         elif args.action=='model-fixture': launch('planning-fixture',[sys.executable,'-X','utf8',str(ROOT/'scripts/planning-fault-server.py')],env())
         elif args.action=='status': status()
+        elif args.action=='stop': stop_services(args.device or '*')
         elif args.action=='fault': print(control(args.device,args.mode))
-        elif args.action=='start':
-            api=API(); agents={a['deviceCode']:a['agentId'] for a in api('/device-agents?page=1&size=100')['content']};values=secrets()
-            for device in load(FIXTURES/'devices.json'): start_simulator(device,values[device['deviceCode']],agents.get(device['deviceCode']))
+        elif args.action=='start': start_all_simulators()
+        elif args.action=='start-all':
+            start_backend(args.provider)
+            start_all_simulators()
+            start_frontend()
+            print('All services ready: Frontend :5173 | Backend :8080 | Simulators')
     except Exception as ex:
         print('Preparation stopped: '+str(ex),file=sys.stderr);sys.exit(1)

@@ -44,7 +44,7 @@ public class DeviceService {
                           @Value("${app.device.max-access-objects-system:20}") int maxAccessObjectsSystem,
                           DeviceCapabilityMapper deviceCapabilityMapper,
                           @org.springframework.context.annotation.Lazy com.airport.ai.task.TaskExceptionService taskExceptionService,
-                          @Value("${app.device.preset-areas:F2_TEST}") String presetAreas,
+                          @Value("${app.device.preset-areas:隔离区内,隔离区外}") String presetAreas,
                           com.airport.ai.devicetype.CapabilityTemplateMapper capabilityTemplateMapper) {
         this.capabilityTemplateMapper = capabilityTemplateMapper;
         this.deviceCapabilityMapper = deviceCapabilityMapper;
