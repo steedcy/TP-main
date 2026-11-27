@@ -56,6 +56,9 @@ public class PlanningModelConfigService {
     private final SecureRandom secureRandom = new SecureRandom();
     private final byte[] cipherKey;
 
+    @Value("${app.planning-model.fallback.active-mode:SECONDARY_ONLY}")
+    private String defaultActiveMode = FailoverChatClient.MODE_SECONDARY_ONLY;
+
     @Autowired
     public PlanningModelConfigService(SystemSettingMapper settings,
                                       OperationLogService operationLogService,
@@ -72,7 +75,7 @@ public class PlanningModelConfigService {
                                       @Value("${app.planning-model.fallback.enabled:false}") boolean fallbackEnabled,
                                       @Value("${app.planning-model.fallback.base-url:https://ai.axuremart.com/v1}") String claudeBaseUrl,
                                       @Value("${app.planning-model.fallback.api-key:}") String claudeApiKey,
-                                      @Value("${app.planning-model.fallback.model:gpt-6.1-sol}") String claudeModel,
+                                      @Value("${app.planning-model.fallback.model:gpt-sonnet-6.1}") String claudeModel,
                                       @Value("${app.planning-model.fallback.max-tokens:4096}") int claudeMaxTokens,
                                       @Value("${app.planning-model.fallback.timeout-ms:30000}") long claudeTimeoutMs,
                                       @Value("${app.planning-model.fallback.primary-timeout-ms:30000}") long primaryTimeoutMs,
@@ -89,6 +92,9 @@ public class PlanningModelConfigService {
                 : new FailoverChatClient(this.moonshotClient, mapper, fallbackEnabled,
                         claudeBaseUrl, claudeApiKey, claudeModel, claudeMaxTokens,
                         claudeTimeoutMs, primaryTimeoutMs, totalTimeoutMs);
+        if (failoverBean == null) {
+            this.failoverClient.setActiveMode(FailoverChatClient.MODE_SECONDARY_ONLY);
+        }
         this.liveModelService = modelServiceBean != null ? modelServiceBean
                 : new MoonshotModelService(this.failoverClient, definitions, mapper);
     }
@@ -121,12 +127,12 @@ public class PlanningModelConfigService {
             String fb = findOrNull(KEY_FALLBACK_ENABLED);
             if (fb != null) {
                 failoverClient.setFallbackEnabled(Boolean.parseBoolean(fb));
-            } else if (claude != null && !claude.apiKey().isBlank()) {
-                failoverClient.setFallbackEnabled(true);
             }
             String mode = findOrNull(KEY_ACTIVE_MODE);
             if (mode != null && !mode.isBlank()) {
                 failoverClient.setActiveMode(mode);
+            } else if (defaultActiveMode != null && !defaultActiveMode.isBlank()) {
+                failoverClient.setActiveMode(defaultActiveMode);
             }
         } catch (Exception ex) {
             LOG.warn("Skipped loading persisted planning model settings: {}", ex.getMessage());

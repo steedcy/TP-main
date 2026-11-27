@@ -23,9 +23,9 @@
             <p>{{ demo.description }}</p>
             <div v-if="demo.key === 'flight'" style="margin-bottom: 8px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 12px;">
               <span>旅客坐标：</span>
-              <a-input-number v-model:value="flightPassengerX" size="small" :min="0" :max="1260" style="width: 74px" />
+              <a-input-number v-model:value="flightPassengerX" size="small" :min="0" :max="2000" style="width: 74px" />
               <span>,</span>
-              <a-input-number v-model:value="flightPassengerY" size="small" :min="0" :max="6895" style="width: 78px" />
+              <a-input-number v-model:value="flightPassengerY" size="small" :min="0" :max="600" style="width: 78px" />
             </div>
             <a-button type="primary" :loading="submitting === demo.key" :disabled="!hasOnlineTypes(demo.requiredTypes)" @click="submitDemo(demo)">
               提交演示任务
@@ -42,7 +42,7 @@
       </p>
       <a-form layout="inline" style="margin-bottom: 12px; row-gap: 8px;">
         <a-form-item label="行李位置">
-          <a-input v-model:value="measurementForm.baggageLocation" style="width: 140px" placeholder="如 国内值机柜台02" />
+          <a-input v-model:value="measurementForm.baggageLocation" style="width: 140px" placeholder="如 MEASURE_WEST" />
         </a-form-item>
         <a-form-item label="长 (cm)">
           <a-input-number v-model:value="measurementForm.length" :min="1" :max="500" style="width: 90px" />
@@ -133,32 +133,32 @@ import { submitTask, submitMeasurementEvent } from '../../api/task'
 import { capabilityLabel } from '../../constants/capability'
 
 const measurementForm = ref({
-  baggageLocation: '国内值机柜台02',
+  baggageLocation: 'MEASURE_WEST',
   length: 100,
   width: 60,
   height: 40,
   weight: 28,
-  targetCounter: '超规行李托运'
+  targetCounter: 'OVERSIZE_CHECKIN'
 })
-const flightPassengerX = ref(390)
-const flightPassengerY = ref(3070)
+const flightPassengerX = ref(896)
+const flightPassengerY = ref(435)
 const measurementSubmitting = ref(false)
 const lastMeasurementResult = ref(null)
 
 function fillOversizePreset() {
   measurementForm.value = {
-    baggageLocation: '国内值机柜台02',
+    baggageLocation: 'MEASURE_WEST',
     length: 100,
     width: 60,
     height: 40,
     weight: 28,
-    targetCounter: '超规行李托运'
+    targetCounter: 'OVERSIZE_CHECKIN'
   }
 }
 
 function fillNormalPreset() {
   measurementForm.value = {
-    baggageLocation: '国内值机柜台01',
+    baggageLocation: 'MEASURE_EAST',
     length: 50,
     width: 40,
     height: 20,
@@ -217,30 +217,30 @@ const scenarioLabels = { SUCCESS: '正常成功', FAILED: '设备错误', TIMEOU
 const demos = [
   {
     key: 'flight', title: '航班变更与旅客引导',
-    description: '航延屏发布变更，航显展示引导，机器人通知并引导至登机口13。',
+    description: '航延屏发布变更，航显展示引导，机器人通知并引导至4号登机口(GATE_04)。',
     requiredTypes: ['FLIGHT_DELAY_BOARD', 'SMART_DISPLAY', 'MOBILE_ROBOT'],
     taskFamily: 'FLIGHT_CHANGE_RESPONSE',
     sceneParams: {
       eventSource: 'MANUAL_FORM', flightNumber: 'CA1234', changeType: 'DELAY',
-      newGate: '登机口13', changeDescription: '虚构航班CA1234延误30分钟，登机口13不变'
+      newGate: 'GATE_04', changeDescription: '虚构航班CA1234延误30分钟，变更至4号登机口(GATE_04)'
     },
-    taskGoal: '虚构航班CA1234原计划22:30，延误30分钟至23:00，请通过航延屏发布变更、智慧航显发布提示，并由机器人引导旅客前往登机口13。'
+    taskGoal: '虚构航班CA1234原计划22:30，延误30分钟至23:00，请通过航延屏发布变更、智慧航显发布提示，并由机器人引导旅客前往4号登机口(GATE_04)。'
   },
   {
     key: 'baggage', title: '超规行李处置',
-    description: '测量国内值机柜台02行李尺寸重量，超规时引导至超规行李托运。',
+    description: '测量智能行李测量点01(MEASURE_WEST)行李尺寸重量，超规时引导至超规行李托运处(OVERSIZE_CHECKIN)。',
     requiredTypes: ['BAGGAGE_SCANNER', 'SMART_DISPLAY', 'MOBILE_ROBOT'],
     taskFamily: 'OVERSIZE_BAGGAGE_HANDLING',
-    sceneParams: { baggageLocation: '国内值机柜台02', targetCounter: '超规行李托运' },
-    taskGoal: '请测量国内值机柜台02当前行李的长宽高和重量；超规时上报告警、由智慧航显发布超规行李托运办理提示，并由移动机器人提供导航；正常行李留存测量结果后结束。'
+    sceneParams: { baggageLocation: 'MEASURE_WEST', targetCounter: 'OVERSIZE_CHECKIN' },
+    taskGoal: '请测量智能行李测量点01(MEASURE_WEST)当前行李的长宽高和重量；超规时上报告警、由智慧航显发布超规行李托运处(OVERSIZE_CHECKIN)办理提示，并由移动机器人提供导航；正常行李留存测量结果后结束。'
   },
   {
     key: 'escort', title: '特殊旅客陪同',
-    description: '航显发布会合提示，机器人至VIP值机柜台会合并陪同前往登机口13。',
+    description: '航显发布会合提示，机器人至服务台(SERVICE_DESK)会合并陪同前往4号登机口(GATE_04)。',
     requiredTypes: ['SMART_DISPLAY', 'MOBILE_ROBOT'],
     taskFamily: 'SPECIAL_PASSENGER_SERVICE',
-    sceneParams: { assistanceType: '轮椅陪同', origin: 'VIP值机柜台', destination: '登机口13' },
-    taskGoal: '请为虚构轮椅旅客在VIP值机柜台通过智慧航显显示会合提示、通知现场人员，并安排服务机器人前往会合后陪同旅客前往登机口13。'
+    sceneParams: { assistanceType: '轮椅陪同', origin: 'SERVICE_DESK', destination: 'GATE_04' },
+    taskGoal: '请为虚构轮椅旅客在服务台(SERVICE_DESK)通过智慧航显显示会合提示、通知现场人员，并安排服务机器人前往会合后陪同旅客前往4号登机口(GATE_04)。'
   }
 ]
 const columns = [

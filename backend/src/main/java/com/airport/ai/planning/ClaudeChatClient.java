@@ -32,7 +32,7 @@ public class ClaudeChatClient implements PlanningChatClient {
     private static final Logger LOG = LoggerFactory.getLogger(ClaudeChatClient.class);
     static final String ANTHROPIC_VERSION = "2023-06-01";
     static final String DEFAULT_BASE_URL = "https://ai.axuremart.com/v1";
-    static final String DEFAULT_MODEL = "gpt-6.1-sol";
+    static final String DEFAULT_MODEL = "gpt-sonnet-6.1";
     static final String JSON_ONLY_SUFFIX = "\n\n输出要求：只输出一个 JSON 对象本身，不要输出 Markdown 代码块、解释或任何其他文字。";
     private static final Pattern FENCED = Pattern.compile("^```(?:json)?\\s*\\n(.*)\\n```$", Pattern.DOTALL);
 

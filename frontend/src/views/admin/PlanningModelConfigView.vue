@@ -6,7 +6,7 @@
         show-icon
         style="margin-bottom: 16px"
         message="主备任务规划模型路由与切换说明"
-        description="支持「主备自动切换」「强制仅用第一模型」「强制仅用第二模型」三种模式。自动切换模式下默认使用第一模型（Kimi），仅当第一模型不可用（密钥未配置、连接超时、网络异常或 HTTP 非 200）时自动切换调用第二模型（gpt-6.1-sol）；内容不合规（1002）不切换。也可在下方手动指定当前使用的模型，保存后立即生效。"
+        description="支持「主备自动切换」「强制仅用第一模型」「强制仅用第二模型」三种模式。默认配置为「强制仅使用第二模型（gpt-sonnet-6.1）」。自动切换模式下默认使用第一模型（Kimi），仅当第一模型不可用（密钥未配置、连接超时、网络异常或 HTTP 非 200）时自动切换调用第二模型（gpt-sonnet-6.1）；内容不合规（1002）不切换。也可在下方手动指定当前使用的模型，保存后立即生效。"
       />
 
       <a-card type="inner" title="当前生效状态与最近一次调用监控" style="margin-bottom: 16px">
@@ -52,7 +52,7 @@
                 仅使用第一模型（强制 Kimi）
               </a-radio-button>
               <a-radio-button value="SECONDARY_ONLY">
-                仅使用第二模型（强制直连 gpt-6.1-sol）
+                仅使用第二模型（强制直连 gpt-sonnet-6.1）
               </a-radio-button>
             </a-radio-group>
           </a-form-item>
@@ -107,7 +107,7 @@
           </a-col>
 
           <a-col :xs="24" :lg="12">
-            <a-card type="inner" title="第二模型（备用模型：gpt-6.1-sol / OpenAI 兼容中转）">
+            <a-card type="inner" title="第二模型（默认主力模型：gpt-sonnet-6.1 / OpenAI 兼容中转）">
               <a-descriptions bordered :column="1" size="small" style="margin-bottom: 16px">
                 <a-descriptions-item label="当前密钥状态">
                   <a-tag :color="config.claudeKeyConfigured ? 'green' : 'default'" data-testid="claude-key-status">
@@ -127,7 +127,7 @@
               <a-form-item label="模型名称" name="claudeModel">
                 <a-input
                   v-model:value="form.claudeModel"
-                  placeholder="gpt-6.1-sol"
+                  placeholder="gpt-sonnet-6.1"
                   data-testid="claude-model"
                 />
               </a-form-item>
@@ -181,9 +181,9 @@ const config = reactive({
   moonshotKeyConfigured: false,
   moonshotApiKeyMasked: '',
   fallbackEnabled: false,
-  activeMode: 'PRIMARY_ONLY',
+  activeMode: 'SECONDARY_ONLY',
   claudeBaseUrl: 'https://ai.axuremart.com/v1',
-  claudeModel: 'gpt-6.1-sol',
+  claudeModel: 'gpt-sonnet-6.1',
   claudeKeyConfigured: false,
   claudeApiKeyMasked: '',
   lastUsedSlot: 'NONE',
@@ -197,9 +197,9 @@ const form = reactive({
   moonshotModel: 'kimi-k2.6',
   moonshotApiKey: '',
   clearMoonshotApiKey: false,
-  activeMode: 'PRIMARY_ONLY',
+  activeMode: 'SECONDARY_ONLY',
   claudeBaseUrl: 'https://ai.axuremart.com/v1',
-  claudeModel: 'gpt-6.1-sol',
+  claudeModel: 'gpt-sonnet-6.1',
   claudeApiKey: '',
   clearClaudeApiKey: false
 })
@@ -233,9 +233,9 @@ function applyView(data) {
   form.moonshotModel = data.moonshotModel || 'kimi-k2.6'
   form.moonshotApiKey = ''
   form.clearMoonshotApiKey = false
-  form.activeMode = data.activeMode || (data.fallbackEnabled ? 'AUTO_FAILOVER' : 'PRIMARY_ONLY')
+  form.activeMode = data.activeMode || (data.fallbackEnabled ? 'AUTO_FAILOVER' : 'SECONDARY_ONLY')
   form.claudeBaseUrl = data.claudeBaseUrl || 'https://ai.axuremart.com/v1'
-  form.claudeModel = data.claudeModel || 'gpt-6.1-sol'
+  form.claudeModel = data.claudeModel || 'gpt-sonnet-6.1'
   form.claudeApiKey = ''
   form.clearClaudeApiKey = false
 }

@@ -23,6 +23,7 @@ class PlanningProviderConfigurationTest {
             assertThat(context.getBean(PlanningModelService.class)).isInstanceOf(MoonshotModelService.class);
             assertThat(context.getBean(PlanningChatClient.class)).isInstanceOf(FailoverChatClient.class);
             assertThat(context.getBean(FailoverChatClient.class).isFallbackEnabled()).isFalse();
+            assertThat(context.getBean(FailoverChatClient.class).activeMode()).isEqualTo(FailoverChatClient.MODE_SECONDARY_ONLY);
             assertThat(context).doesNotHaveBean(ExternalPlanningModelServiceImpl.class);
         });
     }

@@ -58,13 +58,14 @@ public class FailoverChatClient implements PlanningChatClient {
             @Value("${app.planning-model.fallback.enabled:false}") boolean fallbackEnabled,
             @Value("${app.planning-model.fallback.base-url:https://ai.axuremart.com/v1}") String baseUrl,
             @Value("${app.planning-model.fallback.api-key:}") String apiKey,
-            @Value("${app.planning-model.fallback.model:gpt-6.1-sol}") String model,
+            @Value("${app.planning-model.fallback.model:gpt-sonnet-6.1}") String model,
             @Value("${app.planning-model.fallback.max-tokens:4096}") int maxTokens,
             @Value("${app.planning-model.fallback.timeout-ms:30000}") long secondaryTimeoutMs,
             @Value("${app.planning-model.fallback.primary-timeout-ms:30000}") long primaryTimeoutMs,
             @Value("${app.planning-model.timeout-ms:60000}") long totalBudgetMs) {
         this(primary, new ClaudeChatClient(mapper, baseUrl, apiKey, model, maxTokens, secondaryTimeoutMs),
                 fallbackEnabled, primaryTimeoutMs, secondaryTimeoutMs, totalBudgetMs);
+        setActiveMode(MODE_SECONDARY_ONLY);
     }
 
     FailoverChatClient(PlanningChatClient primary, PlanningChatClient secondary,
