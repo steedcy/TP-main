@@ -85,7 +85,8 @@ $ArchiveDir = Split-Path -Parent $ArchivePath
 if (-not (Test-Path $ArchiveDir)) { New-Item -ItemType Directory -Force -Path $ArchiveDir | Out-Null }
 if (Test-Path $ArchivePath) { Remove-Item $ArchivePath -Force }
 
-& tar -czf $ArchivePath -C $Staging .
+$ArchiveItems = (Get-ChildItem -LiteralPath $Staging -Force | Select-Object -ExpandProperty Name)
+& tar -czf $ArchivePath -C $Staging $ArchiveItems
 if ($LASTEXITCODE -ne 0) { throw "tar 打包失败" }
 
 Remove-Item $Staging -Recurse -Force
