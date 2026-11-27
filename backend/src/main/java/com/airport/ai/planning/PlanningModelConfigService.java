@@ -75,7 +75,7 @@ public class PlanningModelConfigService {
                                       @Value("${app.planning-model.fallback.enabled:false}") boolean fallbackEnabled,
                                       @Value("${app.planning-model.fallback.base-url:https://ai.axuremart.com/v1}") String claudeBaseUrl,
                                       @Value("${app.planning-model.fallback.api-key:}") String claudeApiKey,
-                                      @Value("${app.planning-model.fallback.model:gpt-sonnet-6.1}") String claudeModel,
+                                      @Value("${app.planning-model.fallback.model:gpt-6.1-sol}") String claudeModel,
                                       @Value("${app.planning-model.fallback.max-tokens:4096}") int claudeMaxTokens,
                                       @Value("${app.planning-model.fallback.timeout-ms:30000}") long claudeTimeoutMs,
                                       @Value("${app.planning-model.fallback.primary-timeout-ms:30000}") long primaryTimeoutMs,
