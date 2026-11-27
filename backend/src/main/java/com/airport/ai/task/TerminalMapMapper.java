@@ -15,7 +15,8 @@ import java.util.Map;
 public interface TerminalMapMapper {
 
     @Select("SELECT id, poi_code AS \"poiCode\", poi_name AS \"poiName\", category, " +
-            "pos_x AS \"x\", pos_y AS \"y\", zone_name AS \"zone\", linked_device_code AS \"linkedDeviceCode\" " +
+            "pos_x AS \"x\", pos_y AS \"y\", zone_name AS \"zone\", linked_device_code AS \"linkedDeviceCode\", " +
+            "bounds_json AS \"boundsJson\" " +
             "FROM terminal_pois ORDER BY category ASC, id ASC")
     List<Map<String, Object>> findAllPois();
 

@@ -545,18 +545,22 @@ const effectivePassengerPoint = computed(() => {
   })()
 
   if (mode.value === 'live' && currentTask.value) {
-    // 若移动机器人正在执行陪同(CAP_ESCORT)或超规行李引导(CAP_NAVIGATION)，旅客位置实时跟随该机器人移动
+    // 若移动机器人正在执行陪同(CAP_ESCORT)或空间引导(CAP_NAVIGATION)，旅客位置实时跟随该机器人同步移动
     const escortStep = mergedSteps.value.find(s =>
       s.stepStatus === 'EXECUTING'
       && (s.capabilityType === 'CAP_ESCORT'
-        || (currentTask.value?.taskFamily === 'OVERSIZE_BAGGAGE_HANDLING' && s.capabilityType === 'CAP_NAVIGATION'))
+        || (s.capabilityType === 'CAP_NAVIGATION' && (
+          currentTask.value?.taskFamily === 'OVERSIZE_BAGGAGE_HANDLING'
+          || currentTask.value?.taskFamily === 'FLIGHT_CHANGE_RESPONSE'
+          || currentTask.value?.taskFamily === 'GENERAL_SERVICE'
+        )))
     )
     if (escortStep?.agentCode) {
       const robot = devices.value.find(d => d.agentId === escortStep.agentCode || d.deviceCode === escortStep.agentCode)
       if (robot?.location && Number.isFinite(Number(robot.location.x)) && Number.isFinite(Number(robot.location.y))) {
         return {
-          x: Number(robot.location.x) + 18,
-          y: Number(robot.location.y) + 6,
+          x: Number(robot.location.x) + 22,
+          y: Number(robot.location.y) + 8,
           label: `${robot.deviceName || '机器人'}陪同移动中`
         }
       }
@@ -564,13 +568,33 @@ const effectivePassengerPoint = computed(() => {
     const escortDone = mergedSteps.value.some(s =>
       s.stepStatus === 'COMPLETED'
       && (s.capabilityType === 'CAP_ESCORT'
-        || (currentTask.value?.taskFamily === 'OVERSIZE_BAGGAGE_HANDLING' && s.capabilityType === 'CAP_NAVIGATION'))
+        || (s.capabilityType === 'CAP_NAVIGATION' && (
+          currentTask.value?.taskFamily === 'OVERSIZE_BAGGAGE_HANDLING'
+          || currentTask.value?.taskFamily === 'FLIGHT_CHANGE_RESPONSE'
+          || currentTask.value?.taskFamily === 'GENERAL_SERVICE'
+        )))
     )
     if (escortDone && effectiveDestPoint.value) {
       return {
         x: effectiveDestPoint.value.x,
         y: effectiveDestPoint.value.y,
         label: `已到达 ${effectiveDestPoint.value.label || '目标点位'}`
+      }
+    }
+  } else if (mode.value === 'playback' && currentTask.value && playbackStep.value >= 5) {
+    const activeIdx = Math.min(mergedSteps.value.length - 1, playbackStep.value - 5)
+    const activeSteps = mergedSteps.value.slice(0, activeIdx + 1)
+    const hasEscortOrNav = activeSteps.some(s =>
+      s.capabilityType === 'CAP_ESCORT' || s.capabilityType === 'CAP_NAVIGATION'
+    )
+    if (hasEscortOrNav && effectiveDestPoint.value) {
+      const isLast = playbackStep.value >= totalPlaybackFrames.value
+      const ratio = isLast ? 1 : 0.55
+      const dest = effectiveDestPoint.value
+      return {
+        x: Math.round(basePoint.x + (dest.x - basePoint.x) * ratio),
+        y: Math.round(basePoint.y + (dest.y - basePoint.y) * ratio),
+        label: isLast ? `已到达 ${dest.label || '目标点位'}` : '陪同前往目的地中'
       }
     }
   }
@@ -1154,7 +1178,7 @@ watch(mode, (val) => {
 onMounted(async () => {
   await refreshAll()
   const scheduleLivePoll = () => {
-    const delay = (mode.value === 'live' && isRunning(currentTask.value?.status)) ? 500 : 2000
+    const delay = (mode.value === 'live' && isRunning(currentTask.value?.status)) ? 350 : 2000
     liveTimer = setTimeout(async () => {
       if (mode.value === 'live' && selectedTaskId.value) {
         await Promise.all([loadSnapshot(), loadTaskDetails(selectedTaskId.value)]).catch(() => {})

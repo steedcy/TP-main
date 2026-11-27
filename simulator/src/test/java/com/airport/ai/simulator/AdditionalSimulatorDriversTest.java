@@ -74,6 +74,7 @@ class AdditionalSimulatorDriversTest {
         properties.setToken("test-token");
         properties.setSimulatedDeviceType("MOBILE_ROBOT");
         properties.setExecutionDelayMilliseconds(80);
+        properties.setMinRouteDurationMs(200);
         SimulatorRuntime runtime = new SimulatorRuntime(properties, java.util.List.of(
                 new SmartDisplayDriver(), new BaggageScannerDriver(properties),
                 new FlightDelayBoardDriver(), new MobileRobotDriver()));

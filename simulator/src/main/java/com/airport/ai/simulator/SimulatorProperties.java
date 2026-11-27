@@ -157,7 +157,7 @@ public class SimulatorProperties {
     private int heartbeatIntervalSeconds = 15;
     private int heartbeatTimeoutSeconds = 30;
     private int executionDelayMilliseconds = 500;
-    private int minRouteDurationMs = 0;
+    private int minRouteDurationMs = 6000;
     private volatile String scenarioResult = "SUCCESS";
     private BigDecimal x = new BigDecimal("120.5");
     private BigDecimal y = new BigDecimal("88.2");

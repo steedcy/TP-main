@@ -161,9 +161,10 @@ public class DemoResetWorker {
         jdbc.update("DELETE FROM terminal_pois");
         for (JsonNode poi : dataset.mapPois()) {
             String linked = poi.path("linkedDeviceCode").isNull() ? null : poi.path("linkedDeviceCode").asText(null);
+            String boundsJson = poi.hasNonNull("bounds") ? poi.get("bounds").toString() : null;
             jdbc.update("""
-                    INSERT INTO terminal_pois (poi_code, poi_name, category, pos_x, pos_y, zone_name, linked_device_code, created_by)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    INSERT INTO terminal_pois (poi_code, poi_name, category, pos_x, pos_y, zone_name, linked_device_code, bounds_json, created_by)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     poi.path("poiCode").asText(),
                     poi.path("poiName").asText(),
@@ -172,6 +173,7 @@ public class DemoResetWorker {
                     poi.path("posY").decimalValue(),
                     poi.path("zoneName").asText(),
                     linked,
+                    boundsJson,
                     username);
         }
     }
@@ -360,7 +362,7 @@ public class DemoResetWorker {
                 FROM terminal_map_regions ORDER BY region_code
                 """));
         content.add(jdbc.queryForList("""
-                SELECT poi_code, poi_name, category, pos_x, pos_y, zone_name, linked_device_code
+                SELECT poi_code, poi_name, category, pos_x, pos_y, zone_name, linked_device_code, bounds_json
                 FROM terminal_pois ORDER BY poi_code
                 """));
         content.add(namedJdbc.queryForList("""

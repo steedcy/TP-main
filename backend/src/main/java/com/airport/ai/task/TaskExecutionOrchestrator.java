@@ -42,12 +42,26 @@ public class TaskExecutionOrchestrator {
     private com.airport.ai.device.DeviceEventService deviceEventService;
     @org.springframework.beans.factory.annotation.Autowired(required = false)
     private TerminalMapMapper terminalMapMapper;
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private SpatialRuleConfig spatialRuleConfig;
     @org.springframework.beans.factory.annotation.Value("${app.device.fixed-device-strict-zone:true}")
     private boolean fixedDeviceStrictZone = true;
     @org.springframework.beans.factory.annotation.Value("${app.device.fixed-max-service-distance:650}")
     private double fixedMaxServiceDistance = 650.0;
     @org.springframework.beans.factory.annotation.Value("${app.device.robot-max-service-distance:1600}")
     private double robotMaxServiceDistance = 1600.0;
+
+    private boolean strictZoneEnabled() {
+        return spatialRuleConfig != null ? spatialRuleConfig.isFixedDeviceStrictZone() : fixedDeviceStrictZone;
+    }
+
+    private double fixedMaxDist() {
+        return spatialRuleConfig != null ? spatialRuleConfig.getFixedMaxServiceDistance() : fixedMaxServiceDistance;
+    }
+
+    private double robotMaxDist() {
+        return spatialRuleConfig != null ? spatialRuleConfig.getRobotMaxServiceDistance() : robotMaxServiceDistance;
+    }
 
     public void setTerminalMapMapper(TerminalMapMapper terminalMapMapper) {
         this.terminalMapMapper = terminalMapMapper;
@@ -940,6 +954,49 @@ public class TaskExecutionOrchestrator {
         Map<Long, Device> deviceById = deviceMapper.findByIds(deviceIds).stream()
                 .collect(Collectors.toMap(Device::getId, d -> d));
 
+        // 同任务/同组绑定同一台移动服务机器人，并追踪前序移动机器人步骤到达的锚点位置（与 PlanValidationService 保持一致）
+        Long preferredSameRobotAgentId = null;
+        Map<String, Object> prevRobotPoi = null;
+        if (planVersionId != null && stepSeq != null && stepSeq > 1) {
+            PlanVersion pv = planVersionMapper.findById(planVersionId).orElse(null);
+            if (pv != null) {
+                List<Map<String, Object>> allSteps = parseSteps(pv.getPlanSteps());
+                Object bindGroup = step.get("bindSameAgentGroup");
+                boolean isCurrentRobotStep = "CAP_NAVIGATION".equals(capabilityType)
+                        || "CAP_ESCORT".equals(capabilityType)
+                        || ("CAP_NOTIFICATION".equals(capabilityType)
+                                && "MOBILE_ROBOT".equals(CoreScenarioChannelPolicy.requiredType(taskFamily, capabilityType)));
+                for (Map<String, Object> prev : allSteps) {
+                    if (PlanStepRules.isConditionNode(prev)) continue;
+                    Integer pSeq = asInteger(prev.get("stepSeq"));
+                    if (pSeq == null || pSeq >= stepSeq) continue;
+                    String pCap = String.valueOf(prev.get("capabilityType"));
+                    String reqCh = CoreScenarioChannelPolicy.requiredType(taskFamily, pCap);
+                    boolean prevIsRobot = ("CAP_NAVIGATION".equals(pCap) || "CAP_ESCORT".equals(pCap) || "CAP_NOTIFICATION".equals(pCap))
+                            && (reqCh == null || "MOBILE_ROBOT".equals(reqCh));
+                    if (!prevIsRobot) continue;
+                    var prevAssign = assignmentMapper.findByPlanVersionIdAndStepSeq(planVersionId, pSeq).orElse(null);
+                    if (prevAssign != null && "COMPLETED".equals(prevAssign.getStepStatus()) && prevAssign.getDeviceAgentId() != null) {
+                        boolean sameGroup = bindGroup != null && bindGroup.equals(prev.get("bindSameAgentGroup"));
+                        if (sameGroup || isCurrentRobotStep) {
+                            preferredSameRobotAgentId = prevAssign.getDeviceAgentId();
+                        }
+                        if (("CAP_NAVIGATION".equals(pCap) || "CAP_ESCORT".equals(pCap)) && terminalMapMapper != null) {
+                            Map<String, Object> movedTo = resolveTargetPoiForStep(prev, stepInputParams(prev), planVersionId, pSeq, taskFamily);
+                            if (movedTo != null) prevRobotPoi = movedTo;
+                        }
+                    }
+                }
+            }
+        }
+        if (preferredSameRobotAgentId != null) {
+            final Long boundAgentId = preferredSameRobotAgentId;
+            List<DeviceAgent> boundOnly = onlineIdle.stream().filter(a -> boundAgentId.equals(a.getId())).toList();
+            if (!boundOnly.isEmpty()) {
+                onlineIdle = boundOnly;
+            }
+        }
+
         if ("SPECIAL_PASSENGER_SERVICE".equals(taskFamily) && "CAP_ESCORT".equals(capabilityType) && stepSeq > 1) {
             var previous = parseSteps(planVersionMapper.findById(planVersionId).orElseThrow().getPlanSteps()).stream()
                     .filter(s -> Objects.equals(asInteger(s.get("stepSeq")), stepSeq - 1)).findFirst().orElse(Map.of());
@@ -970,21 +1027,22 @@ public class TaskExecutionOrchestrator {
             Map<String, Object> poi = resolveTargetPoiForStep(step, inputParams, planVersionId, stepSeq, taskFamily);
             if (poi != null) {
                 if (poi.get("x") instanceof Number nx) targetX = BigDecimal.valueOf(nx.doubleValue());
-                if (poi.get("y") instanceof Number ny) {
-                    targetY = BigDecimal.valueOf(ny.doubleValue());
-                    double py = ny.doubleValue();
-                    targetIsolationZone = py < 235 ? "隔离区内" : (py > 341 ? "隔离区外" : null);
-                }
+                if (poi.get("y") instanceof Number ny) targetY = BigDecimal.valueOf(ny.doubleValue());
+                targetIsolationZone = SpatialRuleConfig.resolveIsolationZone(poi);
             }
         } else if (targetY != null) {
             double py = targetY.doubleValue();
-            targetIsolationZone = py < 235 ? "隔离区内" : (py > 341 ? "隔离区外" : null);
+            targetIsolationZone = py < SpatialRuleConfig.HOLDING_ZONE_MAX_Y ? "隔离区内"
+                    : (py > SpatialRuleConfig.CHECKIN_HALL_MIN_Y ? "隔离区外" : null);
         }
 
         boolean enforceSpatialRules = terminalMapMapper != null && targetX != null && targetY != null && targetY.doubleValue() <= 600.0;
         boolean globalFlightBroadcast = "FLIGHT_CHANGE_RESPONSE".equals(taskFamily)
                 && CoreScenarioChannelPolicy.isFlightPublication(capabilityType)
                 && !hasExplicitPassengerOrigin(planVersionId);
+        boolean strictZone = strictZoneEnabled();
+        double fixedLimit = fixedMaxDist();
+        double robotLimit = robotMaxDist();
 
         List<CandidateScore> scored = new ArrayList<>();
         for (DeviceAgent agent : onlineIdle) {
@@ -998,22 +1056,27 @@ public class TaskExecutionOrchestrator {
                     ? device.getSimulatedDeviceType() : device.getDeviceTypeCode();
             boolean isMobileRobot = "MOBILE_ROBOT".equals(actualDeviceType);
 
-            double rawDistance = (targetX != null && targetY != null
-                    && device.getPositionX() != null && device.getPositionY() != null)
-                    ? Math.hypot(device.getPositionX().doubleValue() - targetX.doubleValue(),
-                                 device.getPositionY().doubleValue() - targetY.doubleValue())
-                    : 0.0;
+            double rawDistance = 0.0;
+            if (targetX != null && targetY != null) {
+                if (isMobileRobot && preferredSameRobotAgentId != null && preferredSameRobotAgentId.equals(agent.getId())
+                        && prevRobotPoi != null && prevRobotPoi.get("x") instanceof Number rx && prevRobotPoi.get("y") instanceof Number ry) {
+                    rawDistance = Math.hypot(rx.doubleValue() - targetX.doubleValue(), ry.doubleValue() - targetY.doubleValue());
+                } else if (device.getPositionX() != null && device.getPositionY() != null) {
+                    rawDistance = Math.hypot(device.getPositionX().doubleValue() - targetX.doubleValue(),
+                                             device.getPositionY().doubleValue() - targetY.doubleValue());
+                }
+            }
 
             if (enforceSpatialRules) {
                 // 规则1：区域硬隔离——除移动服务机器人及无特定旅客起点的航班变更全局广播外，固定设备必须与目标同处一隔离区
-                if (!isMobileRobot && fixedDeviceStrictZone && targetIsolationZone != null
+                if (!isMobileRobot && strictZone && targetIsolationZone != null
                         && !globalFlightBroadcast && device.getAreaCode() != null
                         && ("隔离区内".equals(device.getAreaCode()) || "隔离区外".equals(device.getAreaCode()))
                         && !targetIsolationZone.equals(device.getAreaCode())) {
                     continue;
                 }
-                // 规则2：最大服务距离限制——固定设备默认650像素，移动服务机器人默认1600像素
-                double maxAllowedDistance = isMobileRobot ? robotMaxServiceDistance : fixedMaxServiceDistance;
+                // 规则2：最大服务距离限制——统一读取 SpatialRuleConfig（固定设备默认650像素，移动服务机器人默认1600像素）
+                double maxAllowedDistance = isMobileRobot ? robotLimit : fixedLimit;
                 if (maxAllowedDistance > 0 && device.getPositionX() != null && device.getPositionY() != null
                         && rawDistance > maxAllowedDistance) {
                     continue;

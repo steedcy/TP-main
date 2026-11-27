@@ -26,12 +26,26 @@ public class PlanValidationService {
     private final TaskMapper taskMapper;
     @org.springframework.beans.factory.annotation.Autowired(required = false)
     private TerminalMapMapper terminalMapMapper;
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private SpatialRuleConfig spatialRuleConfig;
     @org.springframework.beans.factory.annotation.Value("${app.device.fixed-device-strict-zone:true}")
     private boolean fixedDeviceStrictZone = true;
     @org.springframework.beans.factory.annotation.Value("${app.device.fixed-max-service-distance:650}")
     private double fixedMaxServiceDistance = 650.0;
     @org.springframework.beans.factory.annotation.Value("${app.device.robot-max-service-distance:1600}")
     private double robotMaxServiceDistance = 1600.0;
+
+    private boolean strictZoneEnabled() {
+        return spatialRuleConfig != null ? spatialRuleConfig.isFixedDeviceStrictZone() : fixedDeviceStrictZone;
+    }
+
+    private double fixedMaxDist() {
+        return spatialRuleConfig != null ? spatialRuleConfig.getFixedMaxServiceDistance() : fixedMaxServiceDistance;
+    }
+
+    private double robotMaxDist() {
+        return spatialRuleConfig != null ? spatialRuleConfig.getRobotMaxServiceDistance() : robotMaxServiceDistance;
+    }
 
     public void setTerminalMapMapper(TerminalMapMapper terminalMapMapper) {
         this.terminalMapMapper = terminalMapMapper;
@@ -434,7 +448,7 @@ public class PlanValidationService {
                 double px = matchedPoi.get("x") instanceof Number n ? n.doubleValue() : -1;
                 double py = matchedPoi.get("y") instanceof Number n ? n.doubleValue() : -1;
                 if (isRobotMove && py >= 0) {
-                    String curZone = py < 235 ? "隔离区内" : (py > 341 ? "隔离区外" : null);
+                    String curZone = SpatialRuleConfig.resolveIsolationZone(matchedPoi);
                     if (curZone != null && prevRobotZone != null && !curZone.equals(prevRobotZone) && !hasSecurityPass) {
                         result.failConstraint("跨隔离区移动缺少可通行的安全检查通道", stepSeq, "ERR_CROSS_ZONE_UNREACHABLE");
                     }
@@ -451,7 +465,7 @@ public class PlanValidationService {
             if (effectivePoi != null && hasSpatialAgents && capabilityType != null && !capabilityType.isBlank()) {
                 double tx = effectivePoi.get("x") instanceof Number n ? n.doubleValue() : -1;
                 double ty = effectivePoi.get("y") instanceof Number n ? n.doubleValue() : -1;
-                String targetZone = ty >= 0 ? (ty < 235 ? "隔离区内" : (ty > 341 ? "隔离区外" : null)) : null;
+                String targetZone = SpatialRuleConfig.resolveIsolationZone(effectivePoi);
                 boolean globalFlightBroadcast = "FLIGHT_CHANGE_RESPONSE".equals(taskFamily)
                         && CoreScenarioChannelPolicy.isFlightPublication(capabilityType)
                         && initialOriginPoi == null;
@@ -467,10 +481,13 @@ public class PlanValidationService {
                         }).toList();
 
                 if (!capCandidates.isEmpty() && tx >= 0 && ty >= 0 && ty <= 600) {
+                    boolean strictZone = strictZoneEnabled();
+                    double fixedLimit = fixedMaxDist();
+                    double robotLimit = robotMaxDist();
                     List<Map<String, Object>> zoneMatched = capCandidates.stream().filter(agent -> {
                         String actualType = "SIMULATOR".equals(String.valueOf(agent.get("deviceTypeCode")))
                                 ? String.valueOf(agent.get("simulatedDeviceType")) : String.valueOf(agent.get("deviceTypeCode"));
-                        if ("MOBILE_ROBOT".equals(actualType) || !fixedDeviceStrictZone || globalFlightBroadcast || targetZone == null) {
+                        if ("MOBILE_ROBOT".equals(actualType) || !strictZone || globalFlightBroadcast || targetZone == null) {
                             return true;
                         }
                         if (!(agent.get("location") instanceof Map<?, ?> loc)) return true;
@@ -489,7 +506,7 @@ public class PlanValidationService {
                             String actualType = "SIMULATOR".equals(String.valueOf(agent.get("deviceTypeCode")))
                                     ? String.valueOf(agent.get("simulatedDeviceType")) : String.valueOf(agent.get("deviceTypeCode"));
                             boolean isRobot = "MOBILE_ROBOT".equals(actualType);
-                            double maxDist = isRobot ? robotMaxServiceDistance : fixedMaxServiceDistance;
+                            double maxDist = isRobot ? robotLimit : fixedLimit;
                             if (maxDist <= 0) return true;
                             if (isRobot && robotAnchor != null && robotAnchor.get("x") instanceof Number rx && robotAnchor.get("y") instanceof Number ry) {
                                 return Math.hypot(rx.doubleValue() - tx, ry.doubleValue() - ty) <= maxDist;
@@ -503,7 +520,7 @@ public class PlanValidationService {
                             boolean allRobot = zoneMatched.stream().allMatch(a -> "MOBILE_ROBOT".equals(
                                     "SIMULATOR".equals(String.valueOf(a.get("deviceTypeCode")))
                                             ? String.valueOf(a.get("simulatedDeviceType")) : String.valueOf(a.get("deviceTypeCode"))));
-                            double limit = allRobot ? robotMaxServiceDistance : fixedMaxServiceDistance;
+                            double limit = allRobot ? robotLimit : fixedLimit;
                             result.failConstraint("步骤目标点位距离可用设备超出最大服务距离限制（上限" + (int) limit + "像素）",
                                     stepSeq, "ERR_MAX_DISTANCE_EXCEEDED");
                         }

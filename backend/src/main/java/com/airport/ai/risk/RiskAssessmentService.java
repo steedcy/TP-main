@@ -250,8 +250,7 @@ public class RiskAssessmentService {
         Map<String, String> map = new java.util.HashMap<>();
         try {
             for (Map<String, Object> poi : terminalMapMapper.findAllPois()) {
-                double py = poi.get("y") instanceof Number n ? n.doubleValue() : -1;
-                String isoZone = py >= 0 ? (py < 235 ? "隔离区内" : (py > 341 ? "隔离区外" : null)) : null;
+                String isoZone = com.airport.ai.task.SpatialRuleConfig.resolveIsolationZone(poi);
                 if (isoZone == null) continue;
                 if (poi.get("poiCode") != null) map.put(String.valueOf(poi.get("poiCode")).trim().toUpperCase(), isoZone);
                 if (poi.get("poiName") != null) map.putIfAbsent(String.valueOf(poi.get("poiName")).trim().toUpperCase(), isoZone);

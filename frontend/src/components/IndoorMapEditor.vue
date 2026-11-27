@@ -137,6 +137,24 @@ function syncPoisLayer() {
   if (!props.showPois) return
 
   for (const poi of props.pois) {
+    if (poi.boundsJson) {
+      try {
+        const b = typeof poi.boundsJson === 'string' ? JSON.parse(poi.boundsJson) : poi.boundsJson
+        if (b && Number.isFinite(Number(b.x1)) && Number.isFinite(Number(b.y1))
+            && Number.isFinite(Number(b.x2)) && Number.isFinite(Number(b.y2))) {
+          const rect = L.rectangle([toLatLng(b.x1, b.y1), toLatLng(b.x2, b.y2)], {
+            color: poiColor(poi.category),
+            weight: 1.2,
+            dashArray: '3 3',
+            fillColor: poiColor(poi.category),
+            fillOpacity: 0.14,
+            pmIgnore: true
+          })
+          rect.bindTooltip(`${poi.poiName} (${poi.poiCode})`, { sticky: true })
+          poisGroup.addLayer(rect)
+        }
+      } catch {}
+    }
     const icon = L.divIcon({
       className: 'leaflet-poi-wrapper',
       html: `<div class="leaflet-poi-pill" style="--poi-color:${poiColor(poi.category)}">
@@ -597,6 +615,10 @@ defineExpose({ fitAll, focusActiveArea, exportGeoJson })
 }
 .leaflet-route-animated {
   animation: lfDash 1.2s linear infinite;
+}
+.leaflet-marker-icon.leaflet-dev-wrapper,
+.leaflet-marker-icon.leaflet-passenger-wrapper {
+  transition: transform 0.35s linear;
 }
 .leaflet-map-bubble {
   width: 248px;
