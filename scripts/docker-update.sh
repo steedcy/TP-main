@@ -24,7 +24,7 @@ trap 'rm -f "/tmp/airport-ai-docker-update-$$.sh" 2>/dev/null || true' EXIT
 
 REPO_DIR="${REPO_DIR:-/opt/airport-ai/repo}"
 BACKUP_ROOT="${BACKUP_ROOT:-/opt/airport-ai/backup}"
-SRC_ARCHIVE="/tmp/airport-ai-src.tar.gz"
+SRC_ARCHIVE=""
 LOAD_IMAGES=""
 SERVER_IP=""
 ROLLBACK_TS=""
@@ -304,6 +304,13 @@ EOF
 
 main() {
   parse_args "$@"
+  if [[ -z "${SRC_ARCHIVE}" ]]; then
+    if [[ -f "/tmp/airport-ai-docker-prebuilt.tar.gz" ]]; then
+      SRC_ARCHIVE="/tmp/airport-ai-docker-prebuilt.tar.gz"
+    else
+      SRC_ARCHIVE="/tmp/airport-ai-src.tar.gz"
+    fi
+  fi
   if [[ "${LIST_BACKUPS}" == "true" ]]; then
     list_backups
     exit 0

@@ -43,7 +43,7 @@ services:
   backend:
     build:
       context: .
-      dockerfile: docker/backend/Dockerfile
+      dockerfile: ${BACKEND_DOCKERFILE:-docker/backend/Dockerfile}
     image: airport-ai-backend:latest
     container_name: airport-ai-backend
     restart: unless-stopped
@@ -97,7 +97,7 @@ services:
   frontend:
     build:
       context: .
-      dockerfile: docker/frontend/Dockerfile
+      dockerfile: ${FRONTEND_DOCKERFILE:-docker/frontend/Dockerfile}
     image: airport-ai-frontend:latest
     container_name: airport-ai-frontend
     restart: unless-stopped

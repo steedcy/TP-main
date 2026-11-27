@@ -147,7 +147,17 @@ build_and_up() {
     log "跳过源码编译，直接使用离线镜像启动全部容器..."
     docker compose up -d --no-build
   else
-    log "开始构建最新镜像并启动全部容器..."
+    if [[ -f "${REPO_DIR}/prebuilt/airport-ai-app.jar" ]] \
+       && [[ -f "${REPO_DIR}/prebuilt/device-simulator-runtime.jar" ]] \
+       && [[ -f "${REPO_DIR}/prebuilt/frontend-dist/index.html" ]] \
+       && [[ -f "${REPO_DIR}/docker/backend/Dockerfile.prebuilt" ]] \
+       && [[ -f "${REPO_DIR}/docker/frontend/Dockerfile.prebuilt" ]]; then
+      log "检测到预编译成品目录 prebuilt/，跳过 Maven/npm 依赖下载与编译，直接打包镜像..."
+      export BACKEND_DOCKERFILE="docker/backend/Dockerfile.prebuilt"
+      export FRONTEND_DOCKERFILE="docker/frontend/Dockerfile.prebuilt"
+    else
+      log "开始构建最新镜像并启动全部容器..."
+    fi
     docker compose up -d --build
   fi
 
