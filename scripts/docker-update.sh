@@ -30,6 +30,9 @@ SERVER_IP=""
 ROLLBACK_TS=""
 LIST_BACKUPS=false
 SKIP_DB_RESTORE=false
+SKIP_SIMULATORS=false
+ADMIN_USER=""
+ADMIN_PASS=""
 KEEP_BACKUPS="${KEEP_BACKUPS:-10}"
 
 log()  { printf '[INFO] %s\n' "$*"; }
@@ -51,6 +54,9 @@ usage() {
   --list-backups              列出所有可回滚的历史备份时间戳
   --rollback <TIMESTAMP>      一键回滚到指定时间戳的备份（恢复代码、数据库并重新启动）
   --skip-db-restore           回滚时仅恢复代码与容器，不覆盖当前数据库
+  --skip-simulators           更新或回滚后不自动批量拉起仿真体
+  --admin-user <USER>         用于自动拉起仿真体的管理员账号（默认读取 .env SIM_ADMIN_USERNAME 或 admin）
+  --admin-pass <PASS>         用于自动拉起仿真体的管理员密码（默认读取 .env SIM_ADMIN_PASSWORD）
 
 示例:
   sudo bash scripts/docker-update.sh
@@ -71,6 +77,9 @@ parse_args() {
       --list-backups)    LIST_BACKUPS=true; shift ;;
       --rollback)        ROLLBACK_TS="${2:?缺少 --rollback 参数}"; shift 2 ;;
       --skip-db-restore) SKIP_DB_RESTORE=true; shift ;;
+      --skip-simulators) SKIP_SIMULATORS=true; shift ;;
+      --admin-user)      ADMIN_USER="${2:?缺少 --admin-user 参数}"; shift 2 ;;
+      --admin-pass)      ADMIN_PASS="${2:?缺少 --admin-pass 参数}"; shift 2 ;;
       -h|--help)         usage; exit 0 ;;
       *) die "未知参数: $1（使用 --help 查看帮助）" ;;
     esac
@@ -264,6 +273,19 @@ verify_deployment() {
   health_json="$(curl -fsS http://127.0.0.1:8080/actuator/health 2>/dev/null || echo '{"status":"DOWN"}')"
   local http_code
   http_code="$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:${front_port}/" 2>/dev/null || echo '000')"
+
+  if [[ "${SKIP_SIMULATORS}" != "true" ]] && [[ -f "${REPO_DIR}/scripts/docker-start-simulators.sh" ]]; then
+    local sim_pass="${ADMIN_PASS:-${SIM_ADMIN_PASSWORD:-${ADMIN_PASSWORD:-}}}"
+    if [[ -n "${sim_pass}" ]] || [[ -f "${REPO_DIR}/user.md" ]]; then
+      log "正在自动批量拉起容器内所有仿真体设备..."
+      local sim_args=()
+      [[ -n "${ADMIN_USER}" ]] && sim_args+=(--username "${ADMIN_USER}")
+      [[ -n "${sim_pass}" ]] && sim_args+=(--password "${sim_pass}")
+      bash "${REPO_DIR}/scripts/docker-start-simulators.sh" "${sim_args[@]}" || warn "部分仿真体自动拉起未完成，可在页面「仿真场景控制」手动启动"
+    else
+      warn "未在 .env 配置 SIM_ADMIN_PASSWORD 且未传入 --admin-pass，跳过自动拉起仿真体；可随后执行：bash scripts/docker-start-simulators.sh --password <admin密码>"
+    fi
+  fi
 
   cat <<EOF
 
